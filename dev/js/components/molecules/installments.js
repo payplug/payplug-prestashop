@@ -19,10 +19,9 @@ class Installments {
 
     checkAmount() {
         var amount = $('input[name="payplug_inst_min_amount"]').val(),
-            minAmountErrorSpan = $('.installmentError'),
-            matches = amount.match(/^[0-9]+$/);
+            minAmountErrorSpan = $('.installmentError');
 
-        if ( installments.props.limits.min > amount || amount > installments.props.limits.max || matches == null ) {
+        if (installments.props.limits.min > amount || amount > installments.props.limits.max || isNaN(amount)) {
             $('.installmentMinAmount').addClass('-error');
             minAmountErrorSpan.text(errorInstallmentAmount);
             minAmountErrorSpan.show();

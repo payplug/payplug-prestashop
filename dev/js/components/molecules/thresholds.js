@@ -24,13 +24,12 @@ class Thresholds {
     checkMin() {
         var val_min = $('input[name="payplug_oney_custom_min_amounts"]').val(),
             val_max = $('input[name="payplug_oney_custom_max_amounts"]').val(),
-            matches = val_min.match(/^[0-9]+$/),
             thresholdsErrorSpan = $('.thresholdError');
 
         if ($('._statement').hasClass('-right')) {
             $('._statement').removeClass('-right');
         }
-        if (thresholds.props.limits.min > val_min || matches == null) {
+        if (thresholds.props.limits.min > val_min || isNaN(val_min)) {
             $('.minThreshold').addClass('-error');
             thresholdsErrorSpan.text(errorOneyThresholds.replace(/\\(.)/mg, "$1"));
             thresholdsErrorSpan.show();
@@ -52,10 +51,9 @@ class Thresholds {
     checkMax() {
         var val_min = $('input[name="payplug_oney_custom_min_amounts"]').val(),
             val_max = $('input[name="payplug_oney_custom_max_amounts"]').val(),
-            matches = val_min.match(/^[0-9]+$/),
             thresholdsErrorSpan = $('.thresholdError');
 
-        if (thresholds.props.limits.max < val_max || matches == null) {
+        if (thresholds.props.limits.max < val_max || isNaN(val_max)) {
             $('._statement').addClass('-right');
             $('.maxThreshold').addClass('-error');
             thresholdsErrorSpan.text(errorOneyThresholds.replace(/\\(.)/mg, "$1"));
