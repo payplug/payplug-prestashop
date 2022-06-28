@@ -62,17 +62,26 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
             $apple_pay = array();
             $apple_pay['payment_token'] = $token;
 
+            $this->logger->addLog('Retrieving payment : ' . $id_payment, 'info');
             $payment = $this->dependencies->apiClass->retrievePayment($id_payment);
+            $this->logger->addLog('Payment retrieved', 'info');
 
             // To update metadatas keys
             $data = array(
                 'apple_pay' => $apple_pay
             );
 
+            $this->logger->addLog('Patch ressource with data', 'info');
             $update = $payment['resource']->update($data);
+            $this->logger->addLog('Ressource patched', 'info');
 
             if ($update->is_paid !== true) {
-                $this->logger->addLog($update->failure->message);
+                if (!empty($update->failure)) {
+                    $this->logger->addLog($update->failure->message, 'error');
+                } else {
+                    $this->logger->addLog('Error during payment validation', 'error');
+                }
+
                 die(json_encode([
                     'result' => false
                 ]));
@@ -85,6 +94,7 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
                 'transaction_id' => $id_payment
             ];
 
+            $this->logger->addLog('Creating order in Presatshop BO', 'info');
             $validateOrder_result = $this->moduleInstance->validateOrder(
                 $this->context->cart->id,
                 Configuration::get('PAYPLUG_ORDER_STATE_PAID'),
@@ -99,6 +109,7 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
 
             if ($validateOrder_result === true) {
                 $id_order = Order::getOrderByCartId($this->context->cart->id);
+                $this->logger->addLog('Order created. ID : ' . $id_order, 'info');
 
                 $link_redirect = __PS_BASE_URI__ . $order_confirmation_url
                     . 'id_cart=' . $this->context->cart->id . '&id_module=' . $this->moduleInstance->id

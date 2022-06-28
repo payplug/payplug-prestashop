@@ -778,12 +778,21 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $this->setUserAgent();
-            $response = [
-                'result' => true,
-                'resource' => InstallmentPlan::abort($inst_id, $api),
-                'code' => 200
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $this->setUserAgent();
+                $response = [
+                    'result' => true,
+                    'resource' => InstallmentPlan::abort($inst_id, $api),
+                    'code' => 200
+                ];
+            }
         } catch (Exception $e) {
             $response = [
                 'result' => false,
@@ -814,11 +823,20 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $response = [
-                'code' => 200,
-                'result' => true,
-                'resource' => InstallmentPlan::create($atttributes, $api)
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'code' => 200,
+                    'result' => true,
+                    'resource' => InstallmentPlan::create($atttributes, $api)
+                ];
+            }
         } catch (Exception $e) {
             $response = [
                 'code' => (int)$e->getCode(),
@@ -849,11 +867,20 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $response = [
-                'code' => 200,
-                'result' => true,
-                'resource' => InstallmentPlan::retrieve($inst_id, $api)
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'code' => 200,
+                    'result' => true,
+                    'resource' => InstallmentPlan::retrieve($inst_id, $api)
+                ];
+            }
         } catch (ConfigurationNotSetException $e) {
             $response = [
                 'code' => (int)$e->getCode(),
@@ -896,11 +923,20 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $response = [
-                'result' => true,
-                'resource' => Payment::abort($pay_id, $api),
-                'code' => 200
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'result' => true,
+                    'resource' => Payment::abort($pay_id, $api),
+                    'code' => 200
+                ];
+            }
         } catch (Exception $e) {
             $response = [
                 'result' => false,
@@ -930,11 +966,20 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $response = [
-                'result' => true,
-                'resource' =>  Payment::capture($pay_id, $api),
-                'code' => 200
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'result' => true,
+                    'resource' => Payment::capture($pay_id, $api),
+                    'code' => 200
+                ];
+            }
         } catch (NotAllowedException $e) {
             $response = [
                 'result' => false,
@@ -977,11 +1022,20 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $response = [
-                'code' => 200,
-                'result' => true,
-                'resource' => Payment::create($atttributes, $api)
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'code' => 200,
+                    'result' => true,
+                    'resource' => Payment::create($atttributes, $api)
+                ];
+            }
         } catch (Exception $e) {
             $response = [
                 'code' => (int)$e->getCode(),
@@ -1074,11 +1128,20 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $response = [
-                'result' => true,
-                'resource' => Refund::create($pay_id, $data, $api),
-                'code' => 200
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'result' => true,
+                    'resource' => Refund::create($pay_id, $data, $api),
+                    'code' => 200
+                ];
+            }
         } catch (Exception $e) {
             $response = [
                 'result' => false,
@@ -1108,21 +1171,21 @@ class ApiClass
         }
 
         try {
-            if (!$mode) {
-                $api = $this->setSecretKey();
-            } else {
-                $api =  $this->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey($mode.'ApiKey')
-                    )
-                );
-            }
+            $api = $this->setSecretKey();
 
-            $response = [
-                'code' => 200,
-                'result' => true,
-                'resource' => Payment::retrieve($pay_id, $api)
-            ];
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'code' => 200,
+                    'result' => true,
+                    'resource' => Payment::retrieve($pay_id, $api)
+                ];
+            }
         } catch (ConfigurationNotSetException $e) {
             $response = [
                 'code' => (int)$e->getCode(),
@@ -1164,11 +1227,20 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $response = [
-                'code' => 200,
-                'result' => true,
-                'resource' => Card::delete($card_id, $api)
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'code' => 200,
+                    'result' => true,
+                    'resource' => Card::delete($card_id, $api)
+                ];
+            }
         } catch (ConfigurationNotSetException $e) {
             $response = [
                 'code' => $e->getCode(),
@@ -1198,11 +1270,20 @@ class ApiClass
 
         try {
             $api = $this->setSecretKey();
-            $response = [
-                'result' => true,
-                'code' => 200,
-                'resource' => OneySimulation::getSimulations($data, $api)
-            ];
+
+            if (!$api) {
+                $response = [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'Cannot connect to the API'
+                ];
+            } else {
+                $response = [
+                    'result' => true,
+                    'code' => 200,
+                    'resource' => OneySimulation::getSimulations($data, $api)
+                ];
+            }
         } catch (Exception $e) {
             $response = [
                 'result' => false,
