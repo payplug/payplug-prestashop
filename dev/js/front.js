@@ -38,13 +38,12 @@ var $document, $window, __moduleName__Module = {
             // Styling
             var $options = $('input[data-module-name="__moduleName__"]');
             $options.parents('.payment-option').addClass('__moduleName__PaymentOption')
-
             $options.each(function () {
                 var $form = $('#pay-with-' + this.id + '-form').find('form');
                 if ($form.find('input[name=method]').val() == "oney") {
-                    if ($form.find('input[name=oney_type]').val().includes("without_fees")) {
+                    if ($form.find('input[name=__moduleName__Oney_type]').val().includes("without_fees")) {
                         $('#' + this.id + '-container').addClass('without_fees');
-                    } else if ($form.find('input[name=oney_type]').val().includes("with_fees")) {
+                    } else if ($form.find('input[name=__moduleName__Oney_type]').val().includes("with_fees")) {
                         $('#' + this.id + '-container').addClass('with_fees');
                     }
                 }
@@ -77,12 +76,12 @@ var $document, $window, __moduleName__Module = {
                         // Select Oney Option
                         var $required = $('.' + __moduleName__Module.oney.required.props.identifier);
                         if ($required.length) {
-                            var oney_type = $required.data('oney_type'),
-                                paymentOption = $('input[value="' + oney_type + '"]')
+                            var paymentOption = $('input[name=__moduleName__Oney_type]')
                                     .parent('form')
                                     .find('button[type=submit]')
                                     .attr('id')
                                     .replace('pay-with-', '');
+
                             $('#' + paymentOption).trigger('click');
                         }
                     }

@@ -44,7 +44,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $is_deferred = (bool)Tools::getValue('def');
             $is_one_click = (bool)($method === 'one_click');
             $is_installment = (bool)($method === 'installment');
-            $oney_type = Tools::getValue('oney_type');
+            $oney_type = Tools::getValue($dependencies->name . 'Oney_type');
             $is_oney = (bool)($method === 'oney' && $oney_type);
             $is_bancontact = (bool)($method === 'bancontact');
 

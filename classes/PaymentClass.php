@@ -739,11 +739,11 @@ class PaymentClass
     public function getPaymentErrorsCookie()
     {
         // get payplug errors
-        $cookie_errors = $this->context->cookie->__get('payplug_errors');
+        $cookie_errors = $this->context->cookie->__get($this->dependencies->name . 'Errors');
         $payplug_errors = !empty($cookie_errors) ? $cookie_errors : false;
 
         // then flush to avoid repetition
-        $this->context->cookie->__set('payplug_errors', '');
+        $this->context->cookie->__set($this->dependencies->name . 'Errors', '');
 
         // if no error all good then return true
         return json_decode($payplug_errors, true);
@@ -1153,7 +1153,7 @@ class PaymentClass
                         'value' => 'oney',
                     ],
                     'oney_type' => [
-                        'name' => 'oney_type',
+                        'name' =>  $this->dependencies->name . 'Oney_type',
                         'type' => 'hidden',
                         'value' => $oney_payment,
                     ],
@@ -2139,8 +2139,8 @@ class PaymentClass
 
         $value = json_encode($payplug_errors);
 
-        $this->context->cookie->__set('payplug_errors', $value);
-        return (bool)$this->context->cookie->__get('payplug_errors');
+        $this->context->cookie->__set($this->dependencies->name . 'Errors', $value);
+        return (bool)$this->context->cookie->__get($this->dependencies->name . 'Errors');
     }
 
     public function getBrowser()
