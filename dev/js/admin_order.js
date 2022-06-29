@@ -340,13 +340,13 @@ var $document, $window, __moduleName__Module = {
 };
 
 $(document).ready(function () {
-    $('.open_payment_information').unbind('click').click(function (e) {
+    $(document).on('click','.open_payment_information', function(event) {
+        event.preventDefault();
         if ($(this).parent().parent().next('tr').is(':visible')) {
             $(this).parent().parent().next('tr').hide();
         } else {
             $(this).parent().parent().next('tr').show();
         }
-        e.preventDefault();
     });
 
     __moduleName__Module.init();

@@ -42,14 +42,14 @@
                 <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="date">{$payment['date']|escape:'htmlall':'UTF-8'}</td>
                 <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="amount">{displayPrice price=$payment['amount']}</td>
                 <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="state" data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}-state="{$payment['status_code']|escape:'htmlall':'UTF-8'}" class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">{$payment['status']|escape:'htmlall':'UTF-8'}</td>
-                {if isset($payment['id'])}
-                    <td class="actions">
+                <td class="actions">
+                    {if isset($payment['id'])}
                         <button class="btn btn-default open_payment_information">
                             <i class="icon-search"></i>
                             {l s='Details' mod='payplug'}
                         </button>
-                    </td>
-                {/if}
+                    {/if}
+                </td>
             </tr>
             {if isset($payment['id'])}
                 <tr class="payment_information" style="display: none;">
