@@ -904,9 +904,13 @@ class HookClass
             $specific->displayHeader();
         }
 
-        $is_lightbox =  'popup' == $this->config->get(
-            $this->dependencies->getConfigurationKey('embeddedMode')
-        ) && $this->tools->tool('getValue', 'popup');
+        $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
+        $is_lightbox =  (
+            'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
+                || 'new_card' != $id_card
+        )
+            && $this->tools->tool('getValue', 'popup');
+
         if ($is_lightbox) {
             $cart = $params['cart'];
             if (!$this->validate->validate('isLoadedObject', $cart)) {
@@ -916,7 +920,7 @@ class HookClass
             $this->context->controller->addJS($views_path . 'js/embedded-v' . $this->dependencies->version . '.js');
 
             $payment_options = [
-                'id_card' => $this->tools->tool('getValue', 'pc', 'new_card'),
+                'id_card' => $id_card,
                 'is_installment' => (bool) $this->tools->tool('getValue', 'inst'),
                 'is_deferred' => (bool) $this->tools->tool('getValue', 'def'),
             ];
