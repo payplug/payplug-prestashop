@@ -25,13 +25,14 @@
         display: block;
       }
 
-      @media (@screen-mobile) {
+      @media (@screen-tablet) {
         display: none;
       }
     }
 
     & > ._text {
       margin: 0 0 0 @margin-6;
+      max-width: calc(100% - 60px);
 
       ._title {
         color: @color-border-title;
@@ -149,6 +150,19 @@
     &.-standard {
       ._informations {
         padding: @padding-8 0 0 @padding-15;
+
+        @media (@screen-tablet) {
+          .payplugUIIOptions {
+            flex-direction: column;
+            label {
+              margin: 0;
+              & + label {
+                margin: @margin-2 0 0;
+              }
+            }
+          }
+        }
+
       }
     }
 

@@ -30,9 +30,6 @@ if (!\defined('_PS_VERSION_')) {
 
 require_once \dirname(__FILE__) . '/vendor/autoload.php';
 
-use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException;
-use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException;
-
 class PsPaylater extends PaymentModule
 {
     public $payplug_dependencies;
