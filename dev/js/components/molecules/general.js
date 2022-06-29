@@ -1,6 +1,6 @@
 class General {
     props = {
-        'container': 'generalBlock',
+        'container': '__moduleName__Configuration',
         'query': null
     };
 
@@ -9,18 +9,19 @@ class General {
     }
 
     handleEvents() {
+        const {container} = general.props;
         $(document)
-            .on('click', 'button[name=showLogin]', general.showLogin)
-            .on('click', 'button[name=hideLogin]', general.hideLogin)
-            .on('click', 'button[name=login]', general.login)
-            .on('click', 'input[name=payplug_sandbox]', general.handleSandbox)
-            .on('click', 'button[name=logout]', general.logout)
-            .on('click', 'button[name=closePopin]', general.closePopin)
-            .on('click', '.alertLiveButton', general.handleAlertLiveButton)
-            .on('click', 'button[name=submitSandbox]', general.submitSandbox)
-            .on('click', 'button[name=validateLive]', general.validateLive)
-            .on('click', 'input[name=modalTriggered]', general.handleModal)
-            .on('click', 'input[name=alertTriggered]', general.closeAlert)
+            .on('click', '.' + container + ' button[name=showLogin]', general.showLogin)
+            .on('click', '.' + container + ' button[name=hideLogin]', general.hideLogin)
+            .on('click', '.' + container + ' button[name=login]', general.login)
+            .on('click', '.' + container + ' input[name=payplug_sandbox]', general.handleSandbox)
+            .on('click', '.' + container + ' button[name=logout]', general.logout)
+            .on('click', '.' + container + ' button[name=closePopin]', general.closePopin)
+            .on('click', '.' + container + ' .alertLiveButton', general.handleAlertLiveButton)
+            .on('click', '.' + container + ' button[name=submitSandbox]', general.submitSandbox)
+            .on('click', '.' + container + ' button[name=validateLive]', general.validateLive)
+            .on('click', '.' + container + ' input[name=modalTriggered]', general.handleModal)
+            .on('click', '.' + container + ' input[name=alertTriggered]', general.closeAlert)
     }
 
     handleAlertLiveButton(event) {

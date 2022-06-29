@@ -27,6 +27,7 @@ use PayLaterModule\classes\DependenciesClass;
 
 class AdminPsPayLaterController extends ModuleAdminController
 {
+    private $constant;
     private $dependencies;
     private $logger;
     public $module;
@@ -38,6 +39,7 @@ class AdminPsPayLaterController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
     }
@@ -56,9 +58,14 @@ class AdminPsPayLaterController extends ModuleAdminController
             $this->setPsAccount();
         }
 
-
         $this->dependencies->configClass->postProcess();
         $this->dependencies->configClass->assignContentVar();
+
+        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+        $this->context->controller->addJS($views_path . '/js/admin-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
+        $this->context->controller->addJS($views_path . '/js/components-v'.$this->dependencies->version.'.js');
 
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name

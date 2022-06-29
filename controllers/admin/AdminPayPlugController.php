@@ -28,6 +28,7 @@ use PayPlugModule\classes\DependenciesClass;
 class AdminPayPlugController extends ModuleAdminController
 {
     private $dependencies;
+    private $constant;
 
     public function __construct()
     {
@@ -36,6 +37,7 @@ class AdminPayPlugController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
     }
 
     /**
@@ -53,6 +55,12 @@ class AdminPayPlugController extends ModuleAdminController
 
         $this->dependencies->configClass->postProcess();
         $this->dependencies->configClass->assignContentVar();
+
+        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+        $this->context->controller->addJS($views_path . '/js/admin-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
+        $this->context->controller->addJS($views_path . '/js/components-v'.$this->dependencies->version.'.js');
 
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name
