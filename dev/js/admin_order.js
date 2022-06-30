@@ -342,10 +342,16 @@ var $document, $window, __moduleName__Module = {
 $(document).ready(function () {
     $(document).on('click','.open_payment_information', function(event) {
         event.preventDefault();
-        if ($(this).parent().parent().next('tr').is(':visible')) {
-            $(this).parent().parent().next('tr').hide();
+        event.stopPropagation();
+        const $button = $(event.target),
+            payment = $button.data('payment'),
+            $detail = $('.payment_information-' + payment),
+            shown = $detail.is('.-show');
+
+        if (shown) {
+            $detail.removeClass('-show');
         } else {
-            $(this).parent().parent().next('tr').show();
+            $detail.addClass('-show');
         }
     });
 

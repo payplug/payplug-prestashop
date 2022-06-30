@@ -44,7 +44,7 @@
                 <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="state" data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}-state="{$payment['status_code']|escape:'htmlall':'UTF-8'}" class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">{$payment['status']|escape:'htmlall':'UTF-8'}</td>
                 <td class="actions">
                     {if isset($payment['id'])}
-                        <button class="btn btn-default open_payment_information">
+                        <button class="btn btn-default open_payment_information" data-payment="{$k}">
                             <i class="icon-search"></i>
                             {l s='Details' mod='payplug'}
                         </button>
@@ -52,7 +52,7 @@
                 </td>
             </tr>
             {if isset($payment['id'])}
-                <tr class="payment_information" style="display: none;">
+                <tr class="payment_information payment_information-{$k}">
                     <td colspan="5">
                         {include file='./details.tpl' payment=$payment}
                     </td>
