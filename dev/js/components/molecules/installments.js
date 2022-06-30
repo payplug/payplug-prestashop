@@ -13,8 +13,8 @@ class Installments {
 
     handleEvents() {
         $(document)
-            .on('focusout', 'input[name="payplug_inst_min_amount"]', installments.checkAmount);
-
+            .on('focusout', 'input[name="payplug_inst_min_amount"]', installments.checkAmount)
+            .on('change', '.installmentSwitch input', installments.handleInstallment);
     }
 
     checkAmount() {
@@ -41,11 +41,15 @@ class Installments {
         if ($input.prop('checked')) {
             $select.removeClass('-disabled')
                 .find('._current').attr('tabindex', '1');
-            $inputMode.prop('disabled', false);
+            $inputMode.prop('disabled', false)
+                .parents('.payplugUIInput')
+                .removeClass('-disabled');
         } else {
             $select.addClass('-disabled')
                 .find('._current').removeAttr('tabindex');
-            $inputMode.prop('disabled', true);
+            $inputMode.prop('disabled', true)
+                .parents('.payplugUIInput')
+                .addClass('-disabled');
         }
     }
 }
