@@ -289,7 +289,7 @@ class PaymentRepository extends BaseClass
         // Before create a new payment, delete the previous one, if exists and it's not a oneclick payment
         // to avoid double order creation
         if ($apiPayment = $this->checkPaymentTable($paymentDetails['cartId'])) {
-            if (!in_array($apiPayment['payment_method'], ['oneclick', 'bancontact', 'applepay', 'oney'])) {
+            if (!in_array($apiPayment['payment_method'], ['oneclick', 'bancontact', 'apple_pay', 'oney'])) {
                 $payment = $this->dependencies->apiClass->retrievePayment($apiPayment['id_payment']);
                 if ($payment['result'] && !$payment['resource']->failure) {
                     $this->logger->addLog('Payment already exists: ' . $apiPayment['id_payment'] . ', so we delete it before create a new one');
@@ -303,6 +303,8 @@ class PaymentRepository extends BaseClass
 
                     $this->logger->addLog('Payment aborted.');
                 }
+            } elseif ($apiPayment['payment_method'] == 'apple_pay') {
+                $this->dependencies->paymentClass->deletePayment($paymentDetails['cartId']);
             }
         }
 
@@ -351,7 +353,7 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        if (isset($paymentDetails['paymentTab']['integration'])) {
+        if (isset($paymentDetails['paymentTab']['integration']) || $paymentDetails['paymentMethod'] == 'apple_pay') {
             $paymentDetails['paymentReturnUrl'] = $paymentDetails['paymentTab']['hosted_payment']['return_url'];
         } elseif (isset($this->apiPayment->hosted_payment->return_url)) {
             $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->return_url;
@@ -381,6 +383,7 @@ class PaymentRepository extends BaseClass
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
+            'resource' => $payment['resource'],
             'response' => '[createPayment] Payment successfully created'
         ];
     }
@@ -564,6 +567,7 @@ class PaymentRepository extends BaseClass
             case 'standard':
             case 'installment':
             case 'integrated':
+            case 'apple_pay':
                 $returnUrl = $paymentDetails['paymentUrl']
                     ? $paymentDetails['paymentUrl']
                     : $paymentDetails['paymentReturnUrl'];

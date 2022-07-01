@@ -487,6 +487,28 @@ class PaymentClass
     }
 
     /**
+     * @description Delete stored payment
+     * @unused
+     *
+     * @param int $cart_id
+     * @param string $pay_id
+     * @return bool
+     */
+    public function deletePayment($cart_id, $pay_id = '')
+    {
+        $this->query
+            ->delete()
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
+            ->where('id_cart = ' . (int)$cart_id);
+
+        if ($pay_id != '') {
+            $this->query->where('id_payment = "' . $this->query->escape($pay_id) . '"');
+        }
+
+        return $this->query->build();
+    }
+
+    /**
      * @description Capture the payment
      */
     public function capturePayment()
@@ -549,25 +571,6 @@ class PaymentClass
             'message' => $this->dependencies->l('payplug.capturePayment.captured.', 'paymentclass'),
             'reload' => true,
         ]));
-    }
-
-    /**
-     * @description Delete stored payment
-     * @unused
-     *
-     * @param string $pay_id
-     * @param array $cart_id
-     * @return bool
-     */
-    public function deletePayment($pay_id, $cart_id)
-    {
-        $this->query
-            ->delete()
-            ->from($this->constant->get(_DB_PREFIX_) . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int)$cart_id)
-            ->where('id_payment = "' . $this->query->escape($pay_id) . '"');
-
-        return $this->query->build();
     }
 
     /**
@@ -1575,7 +1578,8 @@ class PaymentClass
             'is_deferred' => false,
             'is_oney' => false,
             'is_integrated' => false,
-            'is_bancontact' => false
+            'is_bancontact' => false,
+            'is_applepay' => false
         ];
 
         foreach ($default_options as $key => $value) {
@@ -1622,12 +1626,16 @@ class PaymentClass
             ),
             'bancontact' => (int)$this->config->get(
                 $this->dependencies->getConfigurationKey('bancontact')
+            ),
+            'applepay' => (int)$this->config->get(
+                $this->dependencies->getConfigurationKey('applepay')
             )
         ];
 
         $is_one_click = $options['id_card'] != 'new_card' && $config['one_click'];
         $options['is_installment'] = $options['is_installment'] && $config['installment'];
         $options['is_bancontact'] = $options['is_bancontact'] && $config['bancontact'];
+        $options['is_applepay'] = $options['is_applepay'] && $config['applepay'];
 
         // defined which is current payment method
         if ($is_one_click) {
@@ -1640,6 +1648,8 @@ class PaymentClass
             $payment_method = 'bancontact';
         } elseif ($options['is_integrated']) {
             $payment_method = 'integrated';
+        } elseif ($options['is_applepay']) {
+            $payment_method = 'apple_pay';
         } else {
             $payment_method = 'standard';
         }
@@ -1950,6 +1960,21 @@ class PaymentClass
             unset($payment_tab['allow_save_card']);
         }
 
+        if ($options['is_applepay']) {
+            $payment_tab['payment_method'] = "apple_pay";
+            $payment_tab['payment_context'] = array(
+                'apple_pay' => array(
+                    'domain_name' => $this->context->shop->domain_ssl,
+                    'application_data' => base64_encode(json_encode(array(
+                        'apple_pay_domain' => $this->context->shop->domain_ssl
+                    )))
+                )
+            );
+            unset($payment_tab['force_3ds']);
+            unset($payment_tab['allow_save_card']);
+            unset($payment_tab['shipping']['delivery_type']);
+        }
+
         // Prepare details to create / retrieve payment
         $this->paymentDetails = [
             'paymentMethod' => $payment_method,
@@ -1975,7 +2000,7 @@ class PaymentClass
         /*
          * Create payment if inexistent
          */
-        if (!$this->payment->checkPaymentTable($cart->id)) {
+        if (!$this->payment->checkPaymentTable($cart->id) || $options['is_applepay']) {
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
 
@@ -1999,6 +2024,10 @@ class PaymentClass
                     'paymentDetails' => $insertPaymentTable['paymentDetails'],
                     'response' => $insertPaymentTable['response']
                 ];
+            }
+
+            if ($options['is_applepay']) {
+                return $createPayment;
             }
 
             // Generate the return URL

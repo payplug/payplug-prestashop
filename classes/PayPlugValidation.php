@@ -35,6 +35,7 @@ use Validate;
 class PayPlugValidation
 {
     public $apiClass;
+    public $context;
     public $logger;
     public $paymentClass;
     public $debug;
@@ -53,6 +54,7 @@ class PayPlugValidation
     {
         $this->dependencies = new DependenciesClass();
         $this->apiClass = $this->dependencies->apiClass;
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->orderClass = $this->dependencies->orderClass;
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->installmentClass = $this->dependencies->installmentClass;
@@ -74,6 +76,7 @@ class PayPlugValidation
         $this->isDeferred = false;
         $this->isOney = false;
         $this->isBancontact = false;
+        $this->isApplepay = false;
         $this->type = 'payment';
         $this->setLogger();
     }
@@ -258,9 +261,13 @@ class PayPlugValidation
                         case 'bancontact':
                             $this->isBancontact = true;
                             break;
+                        case 'apple_pay':
+                            $this->isApplepay = true;
+                            break;
                         default:
                             $this->isOney = false;
                             $this->isBancontact = false;
+                            $this->isApplepay = false;
                     }
                 }
 
@@ -522,6 +529,16 @@ class PayPlugValidation
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
+
+                if ($this->isApplepay) {
+                    $token = Tools::getValue('token');
+
+                    $apple_pay = array();
+                    $apple_pay['payment_token'] = $token;
+
+                    $data['apple_pay'] = $apple_pay;
+                }
+
                 $this->apiClass->patchPayment($payment->id, $data);
 
                 if (!$this->orderClass->addPayplugOrderPayment($id_order, $payment->id)) {
@@ -597,10 +614,20 @@ class PayPlugValidation
             $this->logger->addLog('Lock deleted.', 'debug');
         }
 
-        $link_redirect = __PS_BASE_URI__ . $order_confirmation_url
-            . 'id_cart=' . $cart->id . '&id_module=' . $this->moduleInstance->id
-            . '&id_order=' . $id_order . '&key=' . $customer->secure_key;
+        $link_redirect = $this->context->link->getPageLink('order-confirmation', true, $this->context->language->id, [
+            'id_cart' => $cart->id,
+            'id_module' => $this->moduleInstance->id,
+            'id_order' => $id_order,
+            'key' => $customer->secure_key
+        ]);
         $this->logger->addLog('Redirecting to order-confirmation page');
+
+        if ($this->isApplepay) {
+            die(json_encode([
+                'result' => true,
+                'link_redirect' => $link_redirect
+            ]));
+        }
 
         Tools::redirect($link_redirect);
     }

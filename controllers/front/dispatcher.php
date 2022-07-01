@@ -47,6 +47,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $oney_type = Tools::getValue($dependencies->name . 'Oney_type');
             $is_oney = (bool)($method === 'oney' && $oney_type);
             $is_bancontact = (bool)($method === 'bancontact');
+            $is_applepay = (bool)($method === 'applepay');
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
@@ -79,7 +80,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 } else {
                     Tools::redirect($payment['return_url']);
                 }
-            } elseif (!$embedded && !$is_one_click) {
+            } elseif (!$embedded && !$is_one_click && !$is_applepay) {
                 // if the payment is redirect and not a one click payment, prepare the payment and redirect
                 $payment_options = [
                     'id_card' => $id_card,
@@ -94,6 +95,32 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     Tools::redirect($error_url);
                 } else {
                     Tools::redirect($payment['return_url']);
+                }
+            } elseif ($options['applepay'] && $is_applepay) {
+                $payment_options = [
+                    'is_applepay' => $is_applepay,
+                    'payment_context' => array(
+                        'apple_pay' => array(
+                            'domain_name' => $this->context->shop->domain_ssl,
+                            'application_data' => base64_encode(json_encode(array(
+                                'apple_pay_domain' => $this->context->shop->domain_ssl
+                            )))
+                        )
+                    )
+                ];
+                $payment = $paymentClass->preparePayment($payment_options);
+                if (!$payment['result']) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Failed preparePayment'
+                    ]));
+                } else {
+                    die(json_encode([
+                        'result' => true,
+                        'apiResponse' => $payment['resource']->payment_method,
+                        'idPayment' => $payment['paymentDetails']['paymentId'],
+                        'idCart' => $this->context->cart->id
+                    ]));
                 }
             } else {
                 // else reload the page with lightbox arg

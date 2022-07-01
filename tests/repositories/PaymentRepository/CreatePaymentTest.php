@@ -380,6 +380,7 @@ final class CreatePaymentTest extends BasePaymentRepository
             [
                 'result' => true,
                 'paymentDetails' => $paymentDetails,
+                'resource' => $paymentMock,
                 'response' => "[createPayment] Payment successfully created",
             ]
         );
