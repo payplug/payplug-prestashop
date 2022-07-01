@@ -465,6 +465,8 @@ class PayPlugValidation
                 }
             } elseif ($this->isBancontact) {
                 $module_name = $this->dependencies->l('validation.createOrder.bancontact', 'payplugvalidation');
+            } elseif ($this->isApplepay) {
+                $module_name = $this->dependencies->l('validation.createOrder.applepay', 'payplugvalidation');
             }
 
             $cart_amount = (float)$cart->getOrderTotal(true, Cart::BOTH);

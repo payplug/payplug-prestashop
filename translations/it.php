@@ -409,6 +409,7 @@ $_MODULE['<{payplug}prestashop>payplugnotifications_afa6af64101c99bd561ca833fdb7
 $_MODULE['<{payplug}prestashop>payplugnotifications_baad4f460ebbb7b6080ffce28c800b87'] = 'dal totale dell\'ordine';
 $_MODULE['<{payplug}prestashop>payplugnotifications_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
 $_MODULE['<{payplug}prestashop>payplugnotifications_f9932dff56316ff55d6280cfeb91846e'] = 'Oney 4x';
+$_MODULE['<{payplug}prestashop>payplugvalidation_2a7fff1b4d732ad60c83c97651935fac'] = 'Apple Pay';
 $_MODULE['<{payplug}prestashop>payplugvalidation_37e5f7ac383cfd2bec46c08a29b13a39'] = 'Oney 3x senza spese';
 $_MODULE['<{payplug}prestashop>payplugvalidation_61349303d97520640a6bc5151919ff7f'] = 'Oney 4x senza spese';
 $_MODULE['<{payplug}prestashop>payplugvalidation_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';

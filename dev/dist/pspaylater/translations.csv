@@ -406,6 +406,7 @@ key;default;tags;fr;en;gb;it
 <{pspaylater}prestashop>payplugnotifications_baad4f460ebbb7b6080ffce28c800b87;" as the total value of the order";;"du total de la commande";" as the total value of the order";" as the total value of the order";"dal totale dell'ordine"
 <{pspaylater}prestashop>payplugnotifications_ce2d9931d650f844d0e49ba70cf68376;"Oney 3x";;"Oney 3x";"Oney 3x";"Oney 3x";"Oney 3x"
 <{pspaylater}prestashop>payplugnotifications_f9932dff56316ff55d6280cfeb91846e;"Oney 4x";;"Oney 4x";"Oney 4x";"Oney 4x";"Oney 4x"
+<{pspaylater}prestashop>payplugvalidation_2a7fff1b4d732ad60c83c97651935fac;validation.createOrder.applepay;;"Apple Pay";"Apple Pay";"Apple Pay";"Apple Pay"
 <{pspaylater}prestashop>payplugvalidation_37e5f7ac383cfd2bec46c08a29b13a39;validation.createOrder.oneyX3WithoutFees;;"Oney 3x sans frais";"Oney 3x without fees";"Oney 3x without fees";"Oney 3x senza spese"
 <{pspaylater}prestashop>payplugvalidation_61349303d97520640a6bc5151919ff7f;validation.createOrder.oneyX4WithoutFees;;"Oney 4x sans frais";"Oney 4x without fees";"Oney 4x without fees";"Oney 4x senza spese"
 <{pspaylater}prestashop>payplugvalidation_ce2d9931d650f844d0e49ba70cf68376;"Oney 3x";;"Oney 3x";"Oney 3x";"Oney 3x";"Oney 3x"
