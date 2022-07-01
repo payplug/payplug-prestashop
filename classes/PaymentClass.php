@@ -24,6 +24,7 @@
 namespace PayPlugModule\classes;
 
 use Media;
+use Tools;
 
 class PaymentClass
 {
@@ -831,7 +832,7 @@ class PaymentClass
             ];
         }
 
-        if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+        if ($this->dependencies->configClass->isValidFeature('feature_applepay') && Tools::version_compare(_PS_VERSION_, '1.7', '>=')) {
             $payment_methods['applepay'] = [
                 "name" => $this->dependencies->l('payment.getPaymentMethod.applepay.name', 'paymentclass'),
                 "image_url" => $views_path . 'img/svg/payment/applepay.svg',
