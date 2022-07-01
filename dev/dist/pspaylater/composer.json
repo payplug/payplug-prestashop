@@ -32,6 +32,8 @@
             "*.sh",
             "test",
             "tests",
+            "controllers/admin/AdminPayPlugController.php",
+            "controllers/admin/AdminPayPlugInstallmentController.php",
             "controllers/tools",
             "views/build",
             "views/build-bnpl",
