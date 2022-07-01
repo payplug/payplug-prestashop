@@ -36,6 +36,8 @@ class AdminPayPlugController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
+
+        die(dump(__LINE__));
     }
 
     /**
@@ -45,27 +47,31 @@ class AdminPayPlugController extends ModuleAdminController
      */
     public function initContent()
     {
-        parent::initContent();
+        try {
+            parent::initContent();
 
-        if (Tools::getValue('_ajax')) {
-            $this->dependencies->adminClass->adminAjaxController();
-        }
+            if (Tools::getValue('_ajax')) {
+                $this->dependencies->adminClass->adminAjaxController();
+            }
 
-        $this->dependencies->configClass->postProcess();
-        $this->dependencies->configClass->assignContentVar();
-
-        $this->context->smarty->assign([
-            'module_name' => $this->dependencies->name
-        ]);
-
-        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
-            $content =  $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->dependencies->name.'/views/templates/admin/admin.tpl');
+            $this->dependencies->configClass->postProcess();
+            $this->dependencies->configClass->assignContentVar();
 
             $this->context->smarty->assign([
-                'content' => $this->content . $content
+                'module_name' => $this->dependencies->name
             ]);
-        } else {
-            $this->setTemplate('admin.tpl');
+
+            if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+                $content =  $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->dependencies->name.'/views/templates/admin/admin.tpl');
+
+                $this->context->smarty->assign([
+                    'content' => $this->content . $content
+                ]);
+            } else {
+                $this->setTemplate('admin.tpl');
+            }
+        } catch (Exception $exception) {
+            die(dump($exception));
         }
     }
 }
