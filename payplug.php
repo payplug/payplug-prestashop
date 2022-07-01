@@ -109,8 +109,14 @@ class Payplug extends PaymentModule
         if (!$this->isValidInstallation()) {
             $this->install(true);
         }
+        $controllerName = 'AdminPayPlug';
 
-        Tools::redirectAdmin($this->context->link->getAdminLink('AdminPayPlug'));
+        // Check if controller name exist
+        if (!Tab::getIdFromClassName($controllerName)) {
+            $this->payplug_dependencies->getDependency('install')->installTab();
+        }
+
+        Tools::redirectAdmin($this->context->link->getAdminLink($controllerName));
     }
 
     /**

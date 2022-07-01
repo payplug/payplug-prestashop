@@ -96,7 +96,14 @@ class PsPaylater extends PaymentModule
             $this->install(true);
         }
 
-        Tools::redirectAdmin($this->context->link->getAdminLink('AdminPsPayLater'));
+        $controllerName = 'AdminPsPayLater';
+
+        // Check if controller name exist
+        if (!Tab::getIdFromClassName($controllerName)) {
+            $this->payplug_dependencies->getDependency('install')->installTab();
+        }
+
+        Tools::redirectAdmin($this->context->link->getAdminLink($controllerName));
     }
 
     /**

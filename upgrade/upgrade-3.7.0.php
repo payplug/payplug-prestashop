@@ -63,15 +63,13 @@ function upgrade_module_3_7_0($object)
             VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
         }
     }
+
     if ($payplug_order_states_sql) {
         foreach ($payplug_order_states_sql as $sql) {
             $flag = $flag &&  Db::getInstance()->execute($sql);
             unset($sql);
         }
     }
-
-    // Set PayPlug Publishable key if merchand account connected
-    $flag = $flag && $object->payplug_dependencies->apiClass->setPublishableKeys();
 
     return $flag;
 }

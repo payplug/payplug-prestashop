@@ -21,7 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use Db;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -30,10 +29,6 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_3_8_0($object)
 {
     $flag = true;
-
-    if (!$object->payplug_dependencies->getDependency('install')->installTab()) {
-        return false;
-    }
 
     // add  PAYPLUG_APPLEPAY to database
     $flag = $flag && Configuration::updateValue(
