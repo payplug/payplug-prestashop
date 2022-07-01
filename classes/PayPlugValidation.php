@@ -469,6 +469,30 @@ class PayPlugValidation
 
             $cart_amount = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
+            if ($this->isApplepay) {
+                $token = Tools::getValue('token');
+
+                $apple_pay = array();
+                $apple_pay['payment_token'] = $token;
+
+                $data['apple_pay'] = $apple_pay;
+
+                $patchPayment = $this->apiClass->patchPayment($payment->id, $data);
+
+                if ($patchPayment['resource']->is_paid !== true) {
+                    if (!empty($patchPayment['resource']->failure)) {
+                        $this->logger->addLog($patchPayment['resource']->failure->message, 'error');
+                    } else {
+                        $this->logger->addLog('Error during payment patch', 'error');
+                    }
+
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Error during payment patch'
+                    ]));
+                }
+            }
+
             try {
                 if ($amount != $cart_amount) {
                     $this->logger->addLog('Cart amount is different and may occurred an error');
@@ -529,15 +553,6 @@ class PayPlugValidation
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
-
-                if ($this->isApplepay) {
-                    $token = Tools::getValue('token');
-
-                    $apple_pay = array();
-                    $apple_pay['payment_token'] = $token;
-
-                    $data['apple_pay'] = $apple_pay;
-                }
 
                 $this->apiClass->patchPayment($payment->id, $data);
 
