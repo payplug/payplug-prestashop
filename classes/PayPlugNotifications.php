@@ -784,10 +784,6 @@ class PayPlugNotifications
             $this->order->addOrderPayment($this->payment->amount / 100, null, $this->payment->id);
         }
 
-        // If payment is paid, set the invoice
-        if ($new_order_state_id == $this->order_states['paid']) {
-            $this->order->setInvoice(true);
-        }
 
         // Then update the order state
         $this->updateOrderState($new_order_state_id);
