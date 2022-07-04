@@ -526,7 +526,6 @@ class PaymentClass
                 ]));
             }
 
-            $order->setInvoice(true);
             $current_state = (int)$order->getCurrentState();
             $this->logger->addLog('Current order state: ' . $current_state, 'notice');
             if ($current_state != 0 && $current_state != $new_state) {
