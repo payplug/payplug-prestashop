@@ -46,5 +46,15 @@ function upgrade_module_3_8_0($object)
     }
     $flag = $flag && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO');
 
+    // Uninstall current AdminTab to avoid dupplication
+    $sql = 'SELECT `id_tab` FROM `' . _DB_PREFIX_ . 'tab` WHERE `module` = "payplug"';
+    $tabIds = Db::getInstance()->execute($sql);
+    if ($tabIds) {
+        foreach ($tabIds as $tabId) {
+            $tab = new Tab($tabId);
+            $flag = $flag && $tab->delete();
+        }
+    }
+
     return $flag;
 }
