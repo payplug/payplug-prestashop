@@ -21,10 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
-use PayPlugModule\src\application\dependencies\PluginInit;
-use PayPlugModule\src\specific\TranslationSpecific;
+use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\specific\TranslationSpecific;
 use Tools;
 
 if (!defined('_PS_VERSION_')) {
@@ -366,7 +366,7 @@ class DependenciesClass
      */
     public function loadSpecificPresta()
     {
-        $SpecificClass = '\PayPlugModule\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
+        $SpecificClass = '\PayPlug\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
         if (class_exists($SpecificClass)) {
             return new $SpecificClass();
         }

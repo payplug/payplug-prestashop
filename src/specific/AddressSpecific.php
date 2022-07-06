@@ -21,10 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayPlug\src\specific;
 
 use Address;
-use PayPlugModule\src\interfaces\AddressInterface;
+use PayPlug\src\interfaces\AddressInterface;
 
 class AddressSpecific implements AddressInterface
 {

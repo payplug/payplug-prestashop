@@ -504,7 +504,7 @@ class PsPaylater extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
     }
 
     private function setModule()

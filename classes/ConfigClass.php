@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 use Configuration;
 use Country;
@@ -30,8 +30,8 @@ use Language;
 use libphonenumberlight;
 use Media;
 use Module;
-use PayPlugModule\backward\PayPlugBackward;
-use PayPlugModule\src\repositories\LoggerRepository;
+use PayPlug\backward\PayPlugBackward;
+use PayPlug\src\repositories\LoggerRepository;
 use Tools;
 use Validate;
 

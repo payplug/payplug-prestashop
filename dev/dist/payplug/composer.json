@@ -44,7 +44,7 @@
     },
     "autoload": {
         "psr-4": {
-            "PayPlugModule\\": "./",
+            "PayPlug\\": "./",
             "libphonenumberlight\\": "vendor/giggsey/libphonenumberlight"
         }
     },

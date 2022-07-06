@@ -28,8 +28,8 @@ else
   fi
 fi
 
-#grep -rl `basename PayPlugModule` . ':!dev/ci/set_namespace.sh' | xargs sed -i -e 's/'`basename PayPlugModule`'/'`basename PayPlugModule`'/g';
-git grep -rl `basename ${namespace}Module` . ':!dev/**' ':!*AdminPsPayLaterController.php' | xargs sed -i -e 's/'`basename ${namespace}Module`'/'`basename ${newnamespace}Module`'/g';
+#grep -rl `basename PayPlug` . ':!dev/ci/set_namespace.sh' | xargs sed -i -e 's/'`basename PayPlug`'/'`basename PayPlug`'/g';
+git grep -rl use `basename ${namespace}` . ':!dev/**' ':!*AdminPsPayLaterController.php' | xargs sed -i -e 's/use '`basename ${namespace}`'/use '`basename ${newnamespace}`'/g';
 
 #rename the front controllers files
 git grep -rl 'class '${class} ./controllers/front | xargs sed -i -e 's/class '${class}'/class '${newclass}'/g';

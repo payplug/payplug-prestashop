@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlug\src\repositories;
 
-use PayPlugModule\classes\ConfigClass;
-use PayPlugModule\src\exceptions\BadParameterException;
+use PayPlug\classes\ConfigClass;
+use PayPlug\src\exceptions\BadParameterException;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
-use PayPlugModule\src\application\dependencies\BaseClass;
+use PayPlug\src\application\dependencies\BaseClass;
 
 class OneyRepository extends BaseClass
 {

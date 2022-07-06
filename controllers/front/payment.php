@@ -31,7 +31,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
-        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+        $this->dependencies = new \PayPlug\classes\DependenciesClass();
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();

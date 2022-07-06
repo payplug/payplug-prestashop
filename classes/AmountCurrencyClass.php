@@ -21,13 +21,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 use Cart;
 use Configuration;
 use Currency;
 use Order;
-use PayPlugModule\src\specific\ToolsSpecific;
+use PayPlug\src\specific\ToolsSpecific;
 use Tools;
 
 class AmountCurrencyClass

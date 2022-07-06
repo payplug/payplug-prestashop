@@ -21,52 +21,52 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\application\dependencies;
+namespace PayPlug\src\application\dependencies;
 
-use PayPlugModule\classes\ConfigClass;
-use PayPlugModule\classes\AmountCurrencyClass;
-use PayPlugModule\classes\MyLogPHP;
+use PayPlug\classes\ConfigClass;
+use PayPlug\classes\AmountCurrencyClass;
+use PayPlug\classes\MyLogPHP;
 
-use PayPlugModule\src\application\dependencies\BaseClass;
+use PayPlug\src\application\dependencies\BaseClass;
 
-use PayPlugModule\src\repositories\CacheRepository;
-use PayPlugModule\src\repositories\CardRepository;
-use PayPlugModule\src\repositories\HookRepository;
-use PayPlugModule\src\repositories\InstallRepository;
-use PayPlugModule\src\repositories\LoggerRepository;
-use PayPlugModule\src\repositories\OneyRepository;
-use PayPlugModule\src\repositories\OrderStateRepository;
-use PayPlugModule\src\repositories\PaymentRepository;
-use PayPlugModule\src\repositories\QueryRepository;
-use PayPlugModule\src\repositories\SQLtableRepository;
-use PayPlugModule\src\repositories\TranslationsRepository;
+use PayPlug\src\repositories\CacheRepository;
+use PayPlug\src\repositories\CardRepository;
+use PayPlug\src\repositories\HookRepository;
+use PayPlug\src\repositories\InstallRepository;
+use PayPlug\src\repositories\LoggerRepository;
+use PayPlug\src\repositories\OneyRepository;
+use PayPlug\src\repositories\OrderStateRepository;
+use PayPlug\src\repositories\PaymentRepository;
+use PayPlug\src\repositories\QueryRepository;
+use PayPlug\src\repositories\SQLtableRepository;
+use PayPlug\src\repositories\TranslationsRepository;
 
 
-use PayPlugModule\src\models\entities\CacheEntity;
-use PayPlugModule\src\models\entities\OneyEntity;
-use PayPlugModule\src\models\entities\PaymentEntity;
-use PayPlugModule\src\models\entities\PluginEntity;
-use PayPlugModule\src\models\entities\OrderStateEntity;
+use PayPlug\src\models\entities\CacheEntity;
+use PayPlug\src\models\entities\OneyEntity;
+use PayPlug\src\models\entities\PaymentEntity;
+use PayPlug\src\models\entities\PluginEntity;
+use PayPlug\src\models\entities\OrderStateEntity;
 
-use PayPlugModule\src\specific\AddressSpecific;
-use PayPlugModule\src\specific\AssignSpecific;
-use PayPlugModule\src\specific\CarrierSpecific;
-use PayPlugModule\src\specific\CartSpecific;
-use PayPlugModule\src\specific\ConfigurationSpecific;
-use PayPlugModule\src\specific\ConstantSpecific;
-use PayPlugModule\src\specific\ContextSpecific;
-use PayPlugModule\src\specific\CountrySpecific;
-use PayPlugModule\src\specific\CurrencySpecific;
-use PayPlugModule\src\specific\CustomerSpecific;
-use PayPlugModule\src\specific\LanguageSpecific;
-use PayPlugModule\src\specific\ModuleSpecific;
-use PayPlugModule\src\specific\OrderSpecific;
-use PayPlugModule\src\specific\OrderHistorySpecific;
-use PayPlugModule\src\specific\OrderStateSpecific;
-use PayPlugModule\src\specific\ProductSpecific;
-use PayPlugModule\src\specific\ShopSpecific;
-use PayPlugModule\src\specific\ToolsSpecific;
-use PayPlugModule\src\specific\ValidateSpecific;
+use PayPlug\src\specific\AddressSpecific;
+use PayPlug\src\specific\AssignSpecific;
+use PayPlug\src\specific\CarrierSpecific;
+use PayPlug\src\specific\CartSpecific;
+use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\specific\ConstantSpecific;
+use PayPlug\src\specific\ContextSpecific;
+use PayPlug\src\specific\CountrySpecific;
+use PayPlug\src\specific\CurrencySpecific;
+use PayPlug\src\specific\CustomerSpecific;
+use PayPlug\src\specific\LanguageSpecific;
+use PayPlug\src\specific\ModuleSpecific;
+use PayPlug\src\specific\OrderSpecific;
+use PayPlug\src\specific\OrderHistorySpecific;
+use PayPlug\src\specific\OrderStateSpecific;
+use PayPlug\src\specific\ProductSpecific;
+use PayPlug\src\specific\ShopSpecific;
+use PayPlug\src\specific\ToolsSpecific;
+use PayPlug\src\specific\ValidateSpecific;
 
 class PluginInit extends BaseClass
 {
