@@ -158,9 +158,21 @@ class AdminClass
             if ($this->tools->tool('getValue', 'permissionsModal')) {
                 if ($this->tools->tool('getValue', 'type') == 'oneyPremium') {
                     $link = 'https://portal.payplug.com/#/configuration/oney';
-                } elseif ($this->tools->tool('getValue', 'type') == 'bancontactPremium' || (Tools::getValue(
-                    'type'
-                ) == 'applepayPremium')) {
+                } elseif ($this->tools->tool('getValue', 'type') == 'bancontactPremium') {
+                    switch ($this->context->language->iso_code) {
+                        case 'fr':
+                            $link = 'https://support.payplug.com/hc/fr/requests/new?ticket_form_id=4583813991452';
+                            break;
+
+                        case 'it':
+                            $link = 'https://support.payplug.com/hc/it/requests/new?ticket_form_id=4583813991452';
+                            break;
+
+                        default:
+                            $link = 'https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=4583813991452';
+                            break;
+                    }
+                } elseif ($this->tools->tool('getValue', 'type') == 'applepayPremium') {
                     $link = 'mailto:support@payplug.com';
                 } else {
                     $link = 'https://www.payplug.com/contact';
