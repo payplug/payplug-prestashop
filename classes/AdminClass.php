@@ -65,7 +65,7 @@ class AdminClass
                     $admin_ajax_url = $context->link->getAdminLink('AdminPsPayLater');
                     break;
                 case 'payplug':
-                    $admin_ajax_url = $context->link->getAdminLink('AdminPayPlug');
+                    $admin_ajax_url = $context->link->getAdminLink('AdminPayplug');
                     break;
             }
         } elseif ($controller_name == 'AdminOrders') {
