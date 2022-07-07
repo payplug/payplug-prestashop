@@ -31,6 +31,8 @@ class Installments {
             minAmountErrorSpan.hide();
             $('.installmentErrorIcon').hide();
         }
+
+        $(window).trigger('checkConfiguration');
     }
 
     handleInstallment(event) {
