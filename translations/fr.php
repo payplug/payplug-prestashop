@@ -16,6 +16,7 @@ $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_96f4b8e98e77cb6409c
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_b17f3f4dcf653a5776792498a9b44d6a'] = 'Mettre à jour les paramètres';
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_c2f3f489a00553e7a01d369c103c7251'] = 'NON';
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_f5b9feca9ae5347976ca001437662708'] = 'Désactiver le paiement en un clic';
+$_MODULE['<{payplug}prestashop>adminclass_0e680da64d1177e15410f89337007bc9'] = 'Une erreur est survenue';
 $_MODULE['<{payplug}prestashop>adminclass_3b13b7b1ada74ffc106c25a47078e387'] = 'Le mot de passe saisi n\'est pas valide';
 $_MODULE['<{payplug}prestashop>adminclass_4e0d05bb4a524d1dbda1ac5d0ada5a29'] = 'Activer une fonctionnalité';
 $_MODULE['<{payplug}prestashop>adminclass_60b031efb994d5c853cfc4816fab262e'] = 'L\'e-mail ou le mot de passe saisi est incorrect.';

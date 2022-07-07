@@ -702,11 +702,15 @@ class PaymentRepository extends BaseClass
 
         if ($storedPayment['payment_method'] == 'installment') {
             $installment = $this->dependencies->apiClass->retrieveInstallment($storedPayment['id_payment']);
+            if (!$installment['result']) {
+                return $this->returnPaymentError(
+                    ['name' => 'storedPayment', 'value' => $storedPayment],
+                    '[isValidApiPayment] Cannot retrieve payment with id:' . $storedPayment['id_payment']
+                );
+            }
             $installment = $installment['resource'];
             $firstSchedule = $installment->schedule[0]->payment_ids;
-            /*
-             * Try to see if the first schedule was cancelled
-             */
+            // Try to see if the first schedule was cancelled
             $storedPayment['id_payment'] = end($firstSchedule);
         }
 

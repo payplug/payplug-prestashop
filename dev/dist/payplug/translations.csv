@@ -13,6 +13,7 @@ key;default;tags;fr;en;gb;it
 <{payplug}prestashop>admin_uninstall_configuration_b17f3f4dcf653a5776792498a9b44d6a;"Update settings";;"Mettre à jour les paramètres";"Update settings";"Update settings";"Aggiorna le impostazioni"
 <{payplug}prestashop>admin_uninstall_configuration_c2f3f489a00553e7a01d369c103c7251;NO;;NON;NO;NO;NO
 <{payplug}prestashop>admin_uninstall_configuration_f5b9feca9ae5347976ca001437662708;"Disable one click payment";;"Désactiver le paiement en un clic";"Disable one click payment";"Disable one click payment";"Disattiva il pagamento one click"
+<{payplug}prestashop>adminclass_0e680da64d1177e15410f89337007bc9;payplug.adminAjaxController.errorOccurred;;"Une erreur est survenue";"An error has occurred";"An error has occurred";"C'è stato un errore"
 <{payplug}prestashop>adminclass_3b13b7b1ada74ffc106c25a47078e387;payplug.adminAjaxController.passwordInvalid;;"Le mot de passe saisi n'est pas valide";"The password you entered is invalid";"The password you entered is invalid";"La password inserita non é corretta"
 <{payplug}prestashop>adminclass_4e0d05bb4a524d1dbda1ac5d0ada5a29;payplug.adminAjaxController.enableFeature;;"Activer une fonctionnalité";"Enable feature";"Enable feature";"Attivare una funzionalità"
 <{payplug}prestashop>adminclass_60b031efb994d5c853cfc4816fab262e;payplug.adminAjaxController.credentialsNotCorrect;;"L'e-mail ou le mot de passe saisi est incorrect.";"The email and/or password was not correct.";"The email and/or password was not correct.";"L'indirizzo mail e/o la password sono errati."
