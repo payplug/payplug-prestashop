@@ -64,6 +64,13 @@ class PayplugApplepaypaymentModuleFrontController extends ModuleFrontController
 
             $this->logger->addLog('Retrieving payment : ' . $id_payment, 'info');
             $payment = $this->dependencies->apiClass->retrievePayment($id_payment);
+            if (!$payment['result']) {
+                die(json_encode([
+                    'result' => false,
+                    'template' => $this->paymentClass->displayPaymentErrors($errors)
+                ]));
+            }
+
             $this->logger->addLog('Payment retrieved', 'info');
 
             // To update metadatas keys
