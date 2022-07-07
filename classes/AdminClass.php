@@ -219,15 +219,15 @@ class AdminClass
             die(json_encode(['popin' => $popin, 'content' => $content]));
         }
 
-        if (Tools::isSubmit('submitAccount')) {
+        if ($this->tools->tool('isSubmit', 'submitAccount')) {
             $this->dependencies->configClass->submitAccount();
         }
 
-        if (Tools::isSubmit('checkOnboarding')) {
+        if ($this->tools->tool('isSubmit', 'checkOnboarding')) {
             $this->dependencies->configClass->checkOnboarding();
         }
 
-        if (Tools::isSubmit('checkState')) {
+        if ($this->tools->tool('isSubmit', 'checkState')) {
             $content = $this->dependencies->configClass->checkState();
             if ($content) {
                 die(json_encode(['content' => $content]));
@@ -324,6 +324,13 @@ class AdminClass
         if ((int)$this->tools->tool('getValue', 'update') == 1) {
             $pay_id = $this->tools->tool('getValue', 'pay_id');
             $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            if (!$payment['result']) {
+                die(json_encode([
+                    'data' => $this->dependencies->l('payplug.adminAjaxController.errorOccurred', 'adminclass'),
+                    'status' => 'error'
+                ]));
+            }
+
             $payment = $payment['resource'];
 
             $id_order = $this->tools->tool('getValue', 'id_order');

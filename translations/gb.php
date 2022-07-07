@@ -16,6 +16,7 @@ $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_96f4b8e98e77cb6409c
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_b17f3f4dcf653a5776792498a9b44d6a'] = 'Update settings';
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_c2f3f489a00553e7a01d369c103c7251'] = 'NO';
 $_MODULE['<{payplug}prestashop>admin_uninstall_configuration_f5b9feca9ae5347976ca001437662708'] = 'Disable one click payment';
+$_MODULE['<{payplug}prestashop>adminclass_0e680da64d1177e15410f89337007bc9'] = 'An error has occurred';
 $_MODULE['<{payplug}prestashop>adminclass_3b13b7b1ada74ffc106c25a47078e387'] = 'The password you entered is invalid';
 $_MODULE['<{payplug}prestashop>adminclass_4e0d05bb4a524d1dbda1ac5d0ada5a29'] = 'Enable feature';
 $_MODULE['<{payplug}prestashop>adminclass_60b031efb994d5c853cfc4816fab262e'] = 'The email and/or password was not correct.';
