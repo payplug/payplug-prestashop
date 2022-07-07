@@ -21,11 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlug\src\repositories;
 
 use Exception;
-use PayPlugModule\src\models\entities\CardEntity;
-use PayPlugModule\src\application\dependencies\BaseClass;
+use PayPlug\src\models\entities\CardEntity;
+use PayPlug\src\application\dependencies\BaseClass;
 
 class CardRepository extends BaseClass
 {

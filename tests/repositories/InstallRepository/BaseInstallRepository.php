@@ -22,12 +22,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\InstallRepository;
+namespace PayPlug\tests\repositories\InstallRepository;
 
-use PayPlugModule\classes\DependenciesClass;
-use PayPlugModule\src\repositories\InstallRepository;
-use PayPlugModule\src\models\entities\OrderStateEntity;
-use PayPlugModule\tests\repositories\RepositoryBase;
+use PayPlug\classes\DependenciesClass;
+use PayPlug\src\repositories\InstallRepository;
+use PayPlug\src\models\entities\OrderStateEntity;
+use PayPlug\tests\repositories\RepositoryBase;
 
 class BaseInstallRepository extends RepositoryBase
 {

@@ -22,9 +22,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\HookRepository;
+namespace PayPlug\tests\repositories\HookRepository;
 
-use PayPlugModule\tests\repositories\RepositoryBase;
+use PayPlug\tests\repositories\RepositoryBase;
 
 class BaseHookRepository extends RepositoryBase
 {

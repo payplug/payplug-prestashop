@@ -23,9 +23,9 @@
 
 require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
-use PayPlugModule\classes\DependenciesClass;
+use PayPlug\classes\DependenciesClass;
 
-class AdminPayPlugController extends ModuleAdminController
+class AdminPayplugController extends ModuleAdminController
 {
     private $dependencies;
     private $constant;

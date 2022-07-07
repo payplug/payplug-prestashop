@@ -50,14 +50,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $ajax = new \PayPlugModule\classes\PayPlugAjax();
+            $ajax = new \PayPlug\classes\PayPlugAjax();
             $ajax->run();
             exit;
         }
 
         require_once(_PS_ROOT_DIR_.'/config/config.inc.php');
 
-        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+        $this->dependencies = new \PayPlug\classes\DependenciesClass();
         $this->apiClass = $this->dependencies->apiClass;
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();

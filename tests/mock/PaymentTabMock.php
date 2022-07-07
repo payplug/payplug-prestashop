@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPlugModule\tests\mock;
+namespace PayPlug\tests\mock;
 
 class PaymentTabMock
 {

@@ -22,7 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\mock;
+namespace PayPlug\tests\mock;
 
 class OrderStateMock
 {

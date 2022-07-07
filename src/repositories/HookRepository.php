@@ -21,11 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlug\src\repositories;
 
-use PayPlugModule\classes\MediaClass;
+use PayPlug\classes\MediaClass;
 use Media;
-use PayPlugModule\src\application\dependencies\BaseClass;
+use PayPlug\src\application\dependencies\BaseClass;
 
 class HookRepository extends BaseClass
 {

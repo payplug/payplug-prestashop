@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\exceptions;
+namespace PayPlug\src\exceptions;
 
 class BadParameterException extends \Exception
 {

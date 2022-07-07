@@ -21,10 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlug\src\repositories;
 
-use PayPlugModule\src\specific\OrderStateSpecific;
-use PayPlugModule\src\application\dependencies\BaseClass;
+use PayPlug\src\specific\OrderStateSpecific;
+use PayPlug\src\application\dependencies\BaseClass;
 
 class OrderStateRepository extends BaseClass
 {

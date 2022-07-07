@@ -22,9 +22,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\OrderStateRepository;
+namespace PayPlug\tests\repositories\OrderStateRepository;
 
-use PayPlugModule\tests\mock\OrderStateMock;
+use PayPlug\tests\mock\OrderStateMock;
 
 /**
  * @group unit
