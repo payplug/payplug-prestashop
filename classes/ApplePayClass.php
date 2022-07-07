@@ -21,13 +21,13 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 use Carrier;
 use Context;
 use Exception;
 use Media;
-use PayPlugModule\src\repositories\LoggerRepository;
+use PayPlug\src\repositories\LoggerRepository;
 
 class ApplePayClass
 {

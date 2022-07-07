@@ -36,7 +36,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
 
         include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
 
-        $this->dependencies = new \PayPlugModule\classes\DependenciesClass();
+        $this->dependencies = new \PayPlug\classes\DependenciesClass();
 
         $this->plugin = $this->dependencies->getPlugin();
         $this->card = $this->plugin->getCard();

@@ -62,16 +62,16 @@ class Payplug extends PaymentModule
 
         $this->module = false;
         $this->controllers = [
-            'AdminPayPlug',
+            'AdminPayplug',
             'AdminPayPlugInstallment'
         ];
         $this->adminControllers = [
             [
-                'className' => 'AdminPayPlug'
+                'className' => 'AdminPayplug'
             ],
             [
                 'className' => 'AdminPayPlugInstallment',
-                'parent' => 'AdminPayPlug',
+                'parent' => 'AdminPayplug',
                 'name' => [
                     'en' => 'Installment Plans',
                     'gb' => 'Installment Plans',
@@ -109,7 +109,7 @@ class Payplug extends PaymentModule
         if (!$this->isValidInstallation()) {
             $this->install(true);
         }
-        $controllerName = 'AdminPayPlug';
+        $controllerName = 'AdminPayplug';
 
         // Check if controller name exist
         if (!Tab::getIdFromClassName($controllerName)) {
@@ -486,7 +486,7 @@ class Payplug extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
     }
 
     private function setModule()

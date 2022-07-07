@@ -22,7 +22,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\tests\repositories\InstallRepository;
+namespace PayPlug\tests\repositories\InstallRepository;
 
 use Mockery\Mock;
 

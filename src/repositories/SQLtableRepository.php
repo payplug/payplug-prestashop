@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlug\src\repositories;
 
-use PayPlugModule\classes\MyLogPHP;
+use PayPlug\classes\MyLogPHP;
 
 class SQLtableRepository
 {

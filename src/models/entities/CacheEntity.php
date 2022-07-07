@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\models\entities;
+namespace PayPlug\src\models\entities;
 
-use PayPlugModule\src\exceptions\BadParameterException;
+use PayPlug\src\exceptions\BadParameterException;
 
 class CacheEntity
 {

@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 if (!defined('_PS_VERSION_')) {
     exit;

@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPlugModuleMock;
+namespace PayPlugMock;
 
 class PayPlugCacheMock
 {

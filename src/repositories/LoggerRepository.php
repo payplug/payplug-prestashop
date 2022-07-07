@@ -21,10 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlug\src\repositories;
 
-use PayPlugModule\src\models\entities\LoggerEntity;
-use PayPlugModule\src\application\dependencies\BaseClass;
+use PayPlug\src\models\entities\LoggerEntity;
+use PayPlug\src\application\dependencies\BaseClass;
 
 class LoggerRepository extends BaseClass
 {
