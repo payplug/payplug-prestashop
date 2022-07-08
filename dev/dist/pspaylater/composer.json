@@ -32,7 +32,7 @@
             "*.sh",
             "test",
             "tests",
-            "controllers/admin/AdminPayPlugController.php",
+            "controllers/admin/AdminPayplugController.php",
             "controllers/admin/AdminPayPlugInstallmentController.php",
             "controllers/tools",
             "views/build",
