@@ -111,9 +111,21 @@ class Payplug extends PaymentModule
         }
         $controllerName = 'AdminPayplug';
 
-        // Check if controller name exist
-        if (!Tab::getIdFromClassName($controllerName)) {
+        // Check if controller name exist then if linked to the right module
+        $idtab = Tab::getIdFromClassName($controllerName);
+        if (!$idtab) {
             $this->payplug_dependencies->getDependency('install')->installTab();
+        } else {
+            $tab = new Tab($idtab);
+            if ('payplug' != $tab->module) {
+                foreach ($this->adminControllers as $adminControllers) {
+                    $idtab = Tab::getIdFromClassName($adminControllers['className']);
+                    $tab = new Tab($idtab);
+                    $tab->module = 'payplug';
+                    $tab->active = 1;
+                    $tab->save();
+                }
+            }
         }
 
         Tools::redirectAdmin($this->context->link->getAdminLink($controllerName));
