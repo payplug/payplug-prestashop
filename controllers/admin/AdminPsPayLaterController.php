@@ -23,7 +23,7 @@
 
 require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
-use PayLaterModule\classes\DependenciesClass;
+use PayLater\classes\DependenciesClass;
 
 class AdminPsPayLaterController extends ModuleAdminController
 {
