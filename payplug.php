@@ -62,16 +62,16 @@ class Payplug extends PaymentModule
 
         $this->module = false;
         $this->controllers = [
-            'AdminPayplug',
+            'AdminPayPlug',
             'AdminPayPlugInstallment'
         ];
         $this->adminControllers = [
             [
-                'className' => 'AdminPayplug'
+                'className' => 'AdminPayPlug'
             ],
             [
                 'className' => 'AdminPayPlugInstallment',
-                'parent' => 'AdminPayplug',
+                'parent' => 'AdminPayPlug',
                 'name' => [
                     'en' => 'Installment Plans',
                     'gb' => 'Installment Plans',
@@ -109,7 +109,7 @@ class Payplug extends PaymentModule
         if (!$this->isValidInstallation()) {
             $this->install(true);
         }
-        $controllerName = 'AdminPayplug';
+        $controllerName = 'AdminPayPlug';
 
         // Check if controller name exist then if linked to the right module
         $idtab = Tab::getIdFromClassName($controllerName);
