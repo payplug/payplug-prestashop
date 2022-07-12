@@ -47,6 +47,10 @@ class AdminPayplugController extends ModuleAdminController
      */
     public function initContent()
     {
+        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            parent::initContent();
+        }
+
         if (Tools::getValue('_ajax')) {
             $this->dependencies->adminClass->adminAjaxController();
         }
@@ -72,8 +76,7 @@ class AdminPayplugController extends ModuleAdminController
             ]);
         } else {
             $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
+            parent::initContent();
         }
-
-        parent::initContent();
     }
 }
