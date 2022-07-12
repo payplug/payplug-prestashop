@@ -71,7 +71,9 @@ class AdminPsPayLaterController extends ModuleAdminController
             'module_name' => $this->dependencies->name
         ]);
 
-        $this->setTemplate('admin.tpl');
+        $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
+
+        parent::initContent();
     }
 
     public function setPsAccount()
