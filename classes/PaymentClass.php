@@ -1293,7 +1293,11 @@ class PaymentClass
         }
 
         // Apple Pay payment
-        if ($options['applepay'] && $this->dependencies->configClass->isValidFeature('feature_applepay') && $this->getBrowser() == 'Safari') {
+        if ($options['applepay']
+            && $this->dependencies->configClass->isValidFeature('feature_applepay')
+            && $this->getBrowser() == 'Safari'
+            && !$this->config->get($this->dependencies->getConfigurationKey('sandboxMode'))
+        ) {
             $paymentOption['applepay']['name'] = 'applepay';
             $paymentOption['applepay']['inputs'] = [
                 'pc' => [
