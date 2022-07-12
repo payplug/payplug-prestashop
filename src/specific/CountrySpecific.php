@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayPlug\src\specific;
 
-use PayPlugModule\src\interfaces\CountryInterface;
+use PayPlug\src\interfaces\CountryInterface;
 use Country;
 
 class CountrySpecific implements CountryInterface

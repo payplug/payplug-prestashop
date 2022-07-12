@@ -21,19 +21,14 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use Db;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_8_0($object)
+function upgrade_module_3_8_1($object)
 {
     $flag = true;
-
-    if (!$object->payplug_dependencies->getDependency('install')->installTab()) {
-        return false;
-    }
 
     // add  PAYPLUG_APPLEPAY to database
     $flag = $flag && Configuration::updateValue(
@@ -50,6 +45,21 @@ function upgrade_module_3_8_0($object)
         $flag = $flag && Configuration::updateValue('PAYPLUG_DEFERRED_STATE', 0);
     }
     $flag = $flag && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO');
+
+
+    // Uninstall current AdminTab to avoid dupplication
+    $sql = 'SELECT * FROM `'._DB_PREFIX_.'tab` WHERE `module` = "payplug"';
+    $tabIds = Db::getInstance()->executeS($sql);
+
+    if (!empty($tabIds) && is_array($tabIds)) {
+        foreach ($tabIds as $tabId) {
+            $tab = new Tab($tabId['id_tab']);
+            if ($tab->class_name == "AdminPayPlug") {
+                $tab->class_name = "AdminPayplug";
+                $flag = $flag && $tab->save();
+            }
+        }
+    }
 
     return $flag;
 }

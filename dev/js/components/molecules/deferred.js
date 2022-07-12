@@ -13,6 +13,7 @@ class Deferred {
     handleEvents() {
         $(document)
             .on('ready', deferred.setIdOrderState)
+            .on('change', '.deferredSwitch input', deferred.toggleDeferredState)
             .on('change', '.payplugUISelect.-deferred input', deferred.handleDeferredState);
     }
 
@@ -32,7 +33,18 @@ class Deferred {
         }
     }
 
+    toggleDeferredState(event) {
+        const $input = $(event.target),
+            $select = $('.payplugUISelect.-deferred');
 
+        if ($input.prop('checked')) {
+            $select.removeClass('-disabled')
+                .find('._current').attr('tabindex', '1');
+        } else {
+            $select.addClass('-disabled')
+                .find('._current').removeAttr('tabindex');
+        }
+    }
 
     removeDisplayOrderStatusAlert() {
         const $content = $('._standardAdvancedOption.-deferred').find('._content'),

@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 use Configuration;
 use Exception;
@@ -41,7 +41,7 @@ use Payplug\Payment;
 use Payplug\Payplug;
 use Payplug\Refund;
 
-use PayPlugModule\src\exceptions\BadParameterException;
+use PayPlug\src\exceptions\BadParameterException;
 
 use Symfony\Component\Dotenv\Dotenv;
 use Tools;

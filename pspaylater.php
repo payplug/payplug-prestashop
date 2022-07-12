@@ -30,9 +30,6 @@ if (!\defined('_PS_VERSION_')) {
 
 require_once \dirname(__FILE__) . '/vendor/autoload.php';
 
-use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException;
-use PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException;
-
 class PsPaylater extends PaymentModule
 {
     public $payplug_dependencies;
@@ -59,7 +56,7 @@ class PsPaylater extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '0.2.1';
+        $this->version = '0.2.2';
 
         parent::__construct();
 
@@ -99,7 +96,14 @@ class PsPaylater extends PaymentModule
             $this->install(true);
         }
 
-        Tools::redirectAdmin($this->context->link->getAdminLink('AdminPsPayLater'));
+        $controllerName = 'AdminPsPayLater';
+
+        // Check if controller name exist
+        if (!Tab::getIdFromClassName($controllerName)) {
+            $this->payplug_dependencies->getDependency('install')->installTab();
+        }
+
+        Tools::redirectAdmin($this->context->link->getAdminLink($controllerName));
     }
 
     /**
@@ -500,7 +504,7 @@ class PsPaylater extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
     }
 
     private function setModule()

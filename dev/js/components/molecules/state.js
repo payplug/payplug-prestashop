@@ -9,8 +9,9 @@ class State {
     }
 
     handleEvents() {
+        const {container} = state.props;
         $(document)
-            .on('click', 'button[name=stateButton]', state.checkState)
+            .on('click', '.' + container + ' button[name=stateButton]', state.checkState)
     }
 
     checkState() {

@@ -7,8 +7,7 @@ class PaymentMethod {
 
     initialize() {
         paymentMethod.handleEvents();
-        paymentMethod.handleSandbox();
-        paymentMethod.checkPaymentOptionInformation();
+        paymentMethod.handleReloadContent();
     }
 
     handleEvents() {
@@ -18,9 +17,13 @@ class PaymentMethod {
             .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission)
             .on('change', '.deferredSwitch input', paymentMethod.handleDeferredPermission)
             .on('change', '.installmentSwitch input', paymentMethod.handleInstallmentPermission);
-
         $(window)
-            .on('reloadEvent', paymentMethod.initialize);
+            .on('reloadEvent', paymentMethod.handleReloadContent);
+    }
+
+    handleReloadContent() {
+        paymentMethod.handleSandbox();
+        paymentMethod.checkPaymentOptionInformation();
     }
 
     handleDeferredPermission(event) {
@@ -33,39 +36,6 @@ class PaymentMethod {
             event.stopPropagation();
             paymentMethod.checkPremium($switch);
         }
-        paymentMethod.toggleDeferredState(event);
-    }
-    toggleDeferredState(event) {
-        const $input = $(event.target),
-            $select = $('.payplugUISelect.-deferred');
-
-        if ($input.prop('checked')) {
-            $select.removeClass('-disabled')
-                .find('._current').attr('tabindex', '1');
-        } else {
-            $select.addClass('-disabled')
-                .find('._current').removeAttr('tabindex');
-        }
-    }
-
-    handleInstallment(event) {
-        const $input = $(event.target),
-            $select = $('.payplugUISelect.installmentMode'),
-            $inputMode = $('.payplugUIInput.installmentMinAmount').find('input');
-
-        if ($input.prop('checked')) {
-            $select.removeClass('-disabled')
-                .find('._current').attr('tabindex', '1');
-            $inputMode.prop('disabled', false)
-                .parents('.payplugUIInput')
-                .removeClass('-disabled');
-        } else {
-            $select.addClass('-disabled')
-                .find('._current').removeAttr('tabindex');
-            $inputMode.prop('disabled', true)
-                .parents('.payplugUIInput')
-                .addClass('-disabled');
-        }
     }
 
     handleInstallmentPermission(event) {
@@ -76,9 +46,8 @@ class PaymentMethod {
         if (!parseInt($sandbox.val())) {
             event.preventDefault();
             event.stopPropagation();
-            paymentMethod.checkPremium($switch,event);
+            paymentMethod.checkPremium($switch);
         }
-        paymentMethod.handleInstallment(event);
     }
 
     handleOneClickPermission(event) {
@@ -130,7 +99,7 @@ class PaymentMethod {
         }
     }
 
-    checkPremium($switch, event='') {
+    checkPremium($switch) {
         const $sandbox = $('input[name=payplug_sandbox]:checked');
         const checked = $switch.find('input').prop('checked');
         if (!checked) {
@@ -149,15 +118,15 @@ class PaymentMethod {
         });
 
         const paymentMethodName = $switch.find('input').attr('name');
-        paymentMethod.getPermissions($sandbox, true, paymentMethodName, event);
+        paymentMethod.getPermissions($sandbox, true, paymentMethodName);
     }
 
-    handlePaymentMethod(paymentMethodName, event='') {
+    handlePaymentMethod(paymentMethodName) {
         const $container = $('.' + paymentMethod.props.container);
         const $input = $('input[name=' + paymentMethodName + ']');
         const $switch = $input.parents('.payplugUISwitch');
 
-        $input.prop('checked', false);
+        $input.prop('checked', false).trigger('change');
         paymentMethod.tooglePaymentOptionInformation($switch);
 
         const queryData = {
@@ -186,12 +155,6 @@ class PaymentMethod {
             },
             success: function (result) {
                 if (result.content) {
-                    if (paymentMethodName==='payplug_inst'){
-                        paymentMethod.handleInstallment(event);
-                    }
-                    if(paymentMethodName==='payplug_deferred'){
-                        paymentMethod.toggleDeferredState(event);
-                    }
                     if ($('.payplugUIModal').length) {
                         $('.payplugUIModal').replaceWith(result.content);
                     } else {
@@ -207,12 +170,17 @@ class PaymentMethod {
     handleSandbox() {
         const $sandbox = $('input[name=payplug_sandbox]:checked');
         const sandBoxValue = parseInt($sandbox.val());
+
+        if ($sandbox.data('notallowed')) {
+            return;
+        }
+
+        paymentMethod.getPermissions(sandBoxValue, false);
         paymentMethod.toggleBancontact(sandBoxValue);
         paymentMethod.toggleApplePay(sandBoxValue);
-        paymentMethod.getPermissions(sandBoxValue, false);
     }
 
-    getPermissions(sandBoxValue, switchToggle, paymentMethodName = '', event='') {
+    getPermissions(sandBoxValue, switchToggle, paymentMethodName = '') {
         const queryData = {
             _ajax: 1,
             checkPremium: 1
@@ -242,8 +210,7 @@ class PaymentMethod {
                 if (typeof result != 'undefined') {
                     if (switchToggle) {
                         if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName]) {
-
-                            paymentMethod.handlePaymentMethod(paymentMethodName, event);
+                            paymentMethod.handlePaymentMethod(paymentMethodName);
                         } else {
                             paymentMethod.checkPaymentOptionInformation();
                         }
@@ -281,7 +248,7 @@ class PaymentMethod {
 
     toggleApplePay(hide) {
         const $container = $('.' + paymentMethod.props.container);
-        if ($container.find('.-applepay').length){
+        if ($container.find('.-applepay').length) {
             if (hide) {
                 $container.find('.-applepay').hide();
             } else {

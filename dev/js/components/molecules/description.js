@@ -6,13 +6,13 @@ class Description {
     };
 
     initialize() {
-        this.handleEvents();
+        description.handleEvents();
     }
 
     handleEvents() {
-        console.log('handleEvents');
+        const {container} = description.props;
         $(document)
-            .on('change', 'input[name=payplug_show]', this.triggerShow);
+            .on('change', '.' + container + ' input[name=payplug_show]', this.triggerShow);
     }
 
     triggerShow(event) {

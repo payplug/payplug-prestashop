@@ -23,11 +23,12 @@
 
 require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
-use PayPlugModule\classes\DependenciesClass;
+use PayPlug\classes\DependenciesClass;
 
-class AdminPayPlugController extends ModuleAdminController
+class AdminPayplugController extends ModuleAdminController
 {
     private $dependencies;
+    private $constant;
 
     public function __construct()
     {
@@ -36,6 +37,7 @@ class AdminPayPlugController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
     }
 
     /**
@@ -45,7 +47,9 @@ class AdminPayPlugController extends ModuleAdminController
      */
     public function initContent()
     {
-        parent::initContent();
+        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            parent::initContent();
+        }
 
         if (Tools::getValue('_ajax')) {
             $this->dependencies->adminClass->adminAjaxController();
@@ -53,6 +57,12 @@ class AdminPayPlugController extends ModuleAdminController
 
         $this->dependencies->configClass->postProcess();
         $this->dependencies->configClass->assignContentVar();
+
+        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+        $this->context->controller->addJS($views_path . '/js/admin-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
+        $this->context->controller->addJS($views_path . '/js/components-v'.$this->dependencies->version.'.js');
 
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name
@@ -65,7 +75,8 @@ class AdminPayPlugController extends ModuleAdminController
                 'content' => $this->content . $content
             ]);
         } else {
-            $this->setTemplate('admin.tpl');
+            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
+            parent::initContent();
         }
     }
 }

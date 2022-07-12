@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 use Db;
 use DbQuery;
@@ -84,11 +84,10 @@ class OrderClass
     }
 
     /**
-     * @description
-     * get order payment
+     * @description Get order payment
      *
      * @param int $id_order
-     * @return integer
+     * @return string
      */
     public function getPayplugOrderPayment($id_order)
     {
@@ -102,8 +101,7 @@ class OrderClass
     }
 
     /**
-     * @description
-     * get all order payment for given id order
+     * @description Get all order payment for given id order
      *
      * @param int $id_order
      * @return array
@@ -112,6 +110,7 @@ class OrderClass
     {
         $this->query
             ->select()
+            ->fields('id_payment')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_payment')
             ->where('id_order = ' . (int)$id_order);
 

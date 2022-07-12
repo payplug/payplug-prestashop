@@ -340,13 +340,19 @@ var $document, $window, __moduleName__Module = {
 };
 
 $(document).ready(function () {
-    $('.open_payment_information').unbind('click').click(function (e) {
-        if ($(this).parent().parent().next('tr').is(':visible')) {
-            $(this).parent().parent().next('tr').hide();
+    $(document).on('click','.open_payment_information', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const $button = $(event.target),
+            payment = $button.data('payment'),
+            $detail = $('.payment_information-' + payment),
+            shown = $detail.is('.-show');
+
+        if (shown) {
+            $detail.removeClass('-show');
         } else {
-            $(this).parent().parent().next('tr').show();
+            $detail.addClass('-show');
         }
-        e.preventDefault();
     });
 
     __moduleName__Module.init();

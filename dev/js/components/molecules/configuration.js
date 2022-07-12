@@ -10,9 +10,10 @@ class Configuration {
     }
 
     handleEvents() {
+        const {container} = configuration.props;
         $(document)
-            .on('click', 'button[name=saveConfiguration]', this.submit)
-            .on('click', 'button[name=closePopin]', this.closePopin)
+            .on('click', '.' + container + ' button[name=saveConfiguration]', this.submit)
+            .on('click', '.' + container + ' button[name=closePopin]', this.closePopin)
     }
 
     get() {

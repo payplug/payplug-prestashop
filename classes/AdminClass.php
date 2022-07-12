@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 use OrderHistory;
 use OrderState;
-use PayPlugModule\backward\PayPlugBackward;
-use PayPlugModule\src\specific\ContextSpecific;
+use PayPlug\backward\PayPlugBackward;
+use PayPlug\src\specific\ContextSpecific;
 use Tools;
 use Validate;
 
@@ -65,7 +65,7 @@ class AdminClass
                     $admin_ajax_url = $context->link->getAdminLink('AdminPsPayLater');
                     break;
                 case 'payplug':
-                    $admin_ajax_url = $context->link->getAdminLink('AdminPayPlug');
+                    $admin_ajax_url = $context->link->getAdminLink('AdminPayplug');
                     break;
             }
         } elseif ($controller_name == 'AdminOrders') {

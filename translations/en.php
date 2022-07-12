@@ -343,7 +343,7 @@ $_MODULE['<{payplug}prestashop>paylater_88faf5140e46519b6202e754c59a3f73'] = 'Wi
 $_MODULE['<{payplug}prestashop>paylater_a89597ac9fa68018f8edf15ca13dee0f'] = 'PayLater';
 $_MODULE['<{payplug}prestashop>paylater_advanced_6521bd25a546e9c35f31c2f412d17ed8'] = 'Show payment schedule on the checkout page';
 $_MODULE['<{payplug}prestashop>paylater_advanced_80142c6e69c0f9cbfb72359668d152d4'] = 'and';
-$_MODULE['<{payplug}prestashop>paylater_advanced_8d604a04ff58a0ac82ba9df9a1aff105'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose whether or not you want to pay all the fees.';
+$_MODULE['<{payplug}prestashop>paylater_advanced_8d604a04ff58a0ac82ba9df9a1aff105'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose whether or not you want to pay all the fees. [1]Find out more.[/1]';
 $_MODULE['<{payplug}prestashop>paylater_advanced_912c4c5bcef386d618d4069652369009'] = 'Advanced settings';
 $_MODULE['<{payplug}prestashop>paylater_advanced_afafab57d74470e88a32b75fbf7585c8'] = 'Customise your split payment offer';
 $_MODULE['<{payplug}prestashop>paylater_advanced_ef7c4029dae4055307a23b8ea0f301cd'] = 'Offer guaranteed split payments for amounts between';
@@ -409,6 +409,7 @@ $_MODULE['<{payplug}prestashop>payplugnotifications_afa6af64101c99bd561ca833fdb7
 $_MODULE['<{payplug}prestashop>payplugnotifications_baad4f460ebbb7b6080ffce28c800b87'] = ' as the total value of the order';
 $_MODULE['<{payplug}prestashop>payplugnotifications_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
 $_MODULE['<{payplug}prestashop>payplugnotifications_f9932dff56316ff55d6280cfeb91846e'] = 'Oney 4x';
+$_MODULE['<{payplug}prestashop>payplugvalidation_2a7fff1b4d732ad60c83c97651935fac'] = 'Apple Pay';
 $_MODULE['<{payplug}prestashop>payplugvalidation_37e5f7ac383cfd2bec46c08a29b13a39'] = 'Oney 3x without fees';
 $_MODULE['<{payplug}prestashop>payplugvalidation_61349303d97520640a6bc5151919ff7f'] = 'Oney 4x without fees';
 $_MODULE['<{payplug}prestashop>payplugvalidation_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';

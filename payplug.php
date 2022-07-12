@@ -56,22 +56,22 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.8.0';
+        $this->version = '3.8.2';
 
         parent::__construct();
 
         $this->module = false;
         $this->controllers = [
-            'AdminPayPlug',
+            'AdminPayplug',
             'AdminPayPlugInstallment'
         ];
         $this->adminControllers = [
             [
-                'className' => 'AdminPayPlug'
+                'className' => 'AdminPayplug'
             ],
             [
                 'className' => 'AdminPayPlugInstallment',
-                'parent' => 'AdminPayPlug',
+                'parent' => 'AdminPayplug',
                 'name' => [
                     'en' => 'Installment Plans',
                     'gb' => 'Installment Plans',
@@ -109,8 +109,26 @@ class Payplug extends PaymentModule
         if (!$this->isValidInstallation()) {
             $this->install(true);
         }
+        $controllerName = 'AdminPayplug';
 
-        Tools::redirectAdmin($this->context->link->getAdminLink('AdminPayPlug'));
+        // Check if controller name exist then if linked to the right module
+        $idtab = Tab::getIdFromClassName($controllerName);
+        if (!$idtab) {
+            $this->payplug_dependencies->getDependency('install')->installTab();
+        } else {
+            $tab = new Tab($idtab);
+            if ('payplug' != $tab->module) {
+                foreach ($this->adminControllers as $adminControllers) {
+                    $idtab = Tab::getIdFromClassName($adminControllers['className']);
+                    $tab = new Tab($idtab);
+                    $tab->module = 'payplug';
+                    $tab->active = 1;
+                    $tab->save();
+                }
+            }
+        }
+
+        Tools::redirectAdmin($this->context->link->getAdminLink($controllerName));
     }
 
     /**
@@ -480,7 +498,7 @@ class Payplug extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlugModule\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
     }
 
     private function setModule()

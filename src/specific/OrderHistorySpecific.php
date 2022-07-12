@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayPlug\src\specific;
 
-use PayPlugModule\src\interfaces\OrderHistoryInterface;
+use PayPlug\src\interfaces\OrderHistoryInterface;
 use OrderHistory;
 
 class OrderHistorySpecific implements OrderHistoryInterface

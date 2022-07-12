@@ -1,8 +1,8 @@
 <?php
 
-namespace PayPlugModuleTest;
+namespace PayPlugTest;
 
-use PayPlugModuleMock\PaymentMock;
+use PayPlugMock\PaymentMock;
 
 use PHPUnit\Framework\TestCase;
 

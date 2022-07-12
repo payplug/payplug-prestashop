@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 use Configuration;
 use Country;
@@ -30,8 +30,8 @@ use Language;
 use libphonenumberlight;
 use Media;
 use Module;
-use PayPlugModule\backward\PayPlugBackward;
-use PayPlugModule\src\repositories\LoggerRepository;
+use PayPlug\backward\PayPlugBackward;
+use PayPlug\src\repositories\LoggerRepository;
 use Tools;
 use Validate;
 
@@ -801,12 +801,6 @@ class ConfigClass
             ]);
         }
 
-        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addJS($views_path . '/js/admin-v'.$this->dependencies->version.'.js');
-        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
-        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
-        $this->context->controller->addJS($views_path . '/js/components-v'.$this->dependencies->version.'.js');
-
         $admin_ajax_url = AdminClass::getAdminAjaxUrl();
 
         // @todo : avoid addJsDef with translations (quotes are not escaped on 1.6 and break header)
@@ -854,7 +848,7 @@ class ConfigClass
         Media::addJsDef(
             [
                 'errorOneyThresholds' => sprintf(
-                    addslashes($this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass')),
+                    $this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass'),
                     $oney_min_amounts,
                     $oney_max_amounts
                 ),

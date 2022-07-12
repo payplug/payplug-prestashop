@@ -21,9 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\specific;
+namespace PayPlug\src\specific;
 
-use PayPlugModule\src\interfaces\QueryInterface;
+use PayPlug\src\interfaces\QueryInterface;
 use Db;
 
 class QuerySpecific implements QueryInterface

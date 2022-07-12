@@ -21,10 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\src\repositories;
+namespace PayPlug\src\repositories;
 
-use PayPlugModule\src\exceptions\BadParameterException;
-use PayPlugModule\src\application\dependencies\BaseClass;
+use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\application\dependencies\BaseClass;
 
 class CacheRepository extends BaseClass
 {

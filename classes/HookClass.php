@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlugModule\classes;
+namespace PayPlug\classes;
 
 use Configuration;
 use Dispatcher;
@@ -904,9 +904,13 @@ class HookClass
             $specific->displayHeader();
         }
 
-        $is_lightbox =  'popup' == $this->config->get(
-            $this->dependencies->getConfigurationKey('embeddedMode')
-        ) && $this->tools->tool('getValue', 'popup');
+        $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
+        $is_lightbox =  (
+            'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
+                || 'new_card' != $id_card
+        )
+            && $this->tools->tool('getValue', 'popup');
+
         if ($is_lightbox) {
             $cart = $params['cart'];
             if (!$this->validate->validate('isLoadedObject', $cart)) {
@@ -916,7 +920,7 @@ class HookClass
             $this->context->controller->addJS($views_path . 'js/embedded-v' . $this->dependencies->version . '.js');
 
             $payment_options = [
-                'id_card' => $this->tools->tool('getValue', 'pc', 'new_card'),
+                'id_card' => $id_card,
                 'is_installment' => (bool) $this->tools->tool('getValue', 'inst'),
                 'is_deferred' => (bool) $this->tools->tool('getValue', 'def'),
             ];
@@ -1005,8 +1009,9 @@ class HookClass
 
             Media::addJsDef([
                 'applePayPaymentRequest' => $applePayPaymentRequest,
-                'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaymerchantsession', [], true),
-                'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypayment', [], true),
+                'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
+                'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
+                'applePayIdCart' => $this->context->cart->id
             ]);
         }
 

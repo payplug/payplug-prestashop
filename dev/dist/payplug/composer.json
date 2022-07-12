@@ -2,7 +2,7 @@
     "name": "payplug/payplug-prestashop",
     "moduleName": "payplug",
     "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "3.8.0",
+    "version": "3.8.2",
     "require": {
 	    "php": "5.6.*",
         "giggsey/libphonenumber-for-php": "^8.12",
@@ -28,6 +28,7 @@
 	        "*.sh",
             "test",
             "tests",
+            "controllers/admin/AdminPsPayLaterController.php",
             "controllers/tools",
             "views/build",
             "views/build-bnpl",
@@ -43,7 +44,7 @@
     },
     "autoload": {
         "psr-4": {
-            "PayPlugModule\\": "./",
+            "PayPlug\\": "./",
             "libphonenumberlight\\": "vendor/giggsey/libphonenumberlight"
         }
     },
