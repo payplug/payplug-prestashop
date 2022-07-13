@@ -56,7 +56,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.8.2';
+        $this->version = '3.9.0';
 
         parent::__construct();
 
@@ -347,7 +347,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayBeforeShoppingCartBlock($params)
     {
-        if ($this->module) {
+        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyCartCta'))) {
             return $this->payplug_dependencies->hookClass->displayBeforeShoppingCartBlock($params);
         }
     }
@@ -357,7 +357,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayExpressCheckout()
     {
-        if ($this->module) {
+        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyCartCta'))) {
             return $this->payplug_dependencies->hookClass->displayExpressCheckout();
         }
     }
@@ -368,7 +368,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayProductPriceBlock($params)
     {
-        if ($this->module) {
+        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyProductCta'))) {
             return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
         }
     }

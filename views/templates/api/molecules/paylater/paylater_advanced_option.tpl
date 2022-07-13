@@ -29,8 +29,9 @@
             file='./../../atoms/title/title.tpl'
             titleClassName='_title'
             titleText=$paylaterAdvancedOptionTitle}
-        <div class="_content">
-            {$paylaterAdvancedOptionContent}
-        </div>
+        {$paylaterAdvancedOptionContent}
+    </div>
+    <div class="_switch">
+        {$paylaterAdvancedOptionSwitch}
     </div>
 </div>

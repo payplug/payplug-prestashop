@@ -56,7 +56,7 @@ class PsPaylater extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '0.2.2';
+        $this->version = '0.3.0';
 
         parent::__construct();
 
@@ -347,7 +347,7 @@ class PsPaylater extends PaymentModule
      */
     public function hookDisplayExpressCheckout()
     {
-        if ($this->module) {
+        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyCartCta'))) {
             return $this->payplug_dependencies->hookClass->displayExpressCheckout();
         }
     }
@@ -359,7 +359,7 @@ class PsPaylater extends PaymentModule
      */
     public function hookDisplayProductPriceBlock($params)
     {
-        if ($this->module) {
+        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyProductCta'))) {
             return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
         }
     }
