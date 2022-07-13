@@ -55,6 +55,15 @@
     {/capture}
 
     {capture assign="optimizedTitle"}{l s='paylater.block.optimizedTitle' mod='payplug'}{/capture}
+    {capture assign="optimizedSwitch"}
+        {include file='./../../atoms/switch/switch.tpl'
+        switchEnabledLabel='On'
+        switchDisabledLabel='Off'
+        switchDataName='optimizedSwitch'
+        switchChecked=$payplug_switch.oney_optimized.checked
+        switchClassName="optimizedSwitch"
+        switchName=$payplug_switch.oney_optimized.name}
+    {/capture}
     {capture assign="optimizedContent"}
         {capture assign='faq_oneyBlock'}
             {capture assign=oneyFaqLink}{$faq_links.oney}#h_2595dd3d-a281-43ab-a51a-4986fecde5ee{/capture}
@@ -65,32 +74,67 @@
                 linkNoTag=true}
         {/capture}
         <p>{l s='paylater.block.optimizedDescription' tags=[$faq_oneyBlock] mod='payplug'}</p>
+    {/capture}
+
+    {capture assign="productOneyCtaTitle"}{l s='paylater.block.productOneyDisplayTitle' mod='payplug'}{/capture}
+    {capture assign="productOneyCtaSwitch"}
         {include file='./../../atoms/switch/switch.tpl'
-            switchEnabledLabel='On'
-            switchDisabledLabel='Off'
-            switchDataName='optimizedSwitch'
-            switchChecked=$payplug_switch.oney_optimized.checked
-            switchClassName="optimizedSwitch"
-            switchName=$payplug_switch.oney_optimized.name}
+        switchEnabledLabel='On'
+        switchDisabledLabel='Off'
+        switchDataName='productOneyCtaTitleSwitch'
+        switchChecked=$payplug_switch.oney_product_cta.checked
+        switchClassName="productOneyCtaSwitch"
+        switchName=$payplug_switch.oney_product_cta.name}
+    {/capture}
+    {capture assign="productOneyCtaContent"}
+
+    {/capture}
+
+    {capture assign="cartOneyCtaTitle"}{l s='paylater.block.cartOneyDisplayTitle' mod='payplug'}{/capture}
+    {capture assign="cartOneyCtaSwitch"}
+        {include file='./../../atoms/switch/switch.tpl'
+        switchEnabledLabel='On'
+        switchDisabledLabel='Off'
+        switchDataName='cartOneyCtaTitleSwitch'
+        switchChecked=$payplug_switch.oney_cart_cta.checked
+        switchClassName="cartOneyCtaSwitch"
+        switchName=$payplug_switch.oney_cart_cta.name}
+    {/capture}
+    {capture assign="cartOneyCtaContent"}
     {/capture}
 
     {assign var='paylaterAdvancedOptions' value=[
         [
             'className' => 'thresholds',
             'title' => $thresholdsTitle,
-            'content' => $thresholdsContent
+            'content' => $thresholdsContent,
+            'switch' => ''
         ],
         [
             'className' => 'optimized',
             'title' => $optimizedTitle,
-            'content' => $optimizedContent
+            'content' => $optimizedContent,
+            'switch' => $optimizedSwitch
+        ],
+        [
+            'className' => 'productOneyCta',
+            'title' => $productOneyCtaTitle,
+            'content' => $productOneyCtaContent,
+            'switch' =>$productOneyCtaSwitch
+        ],
+        [
+            'className' => 'cartOneyCta',
+            'title' => $cartOneyCtaTitle,
+            'content' => $cartOneyCtaContent,
+            'switch' => $cartOneyCtaSwitch
         ]
     ]}
     {foreach $paylaterAdvancedOptions as $paylaterAdvancedOption}
         {include file='./paylater_advanced_option.tpl'
             paylaterAdvancedOptionClassName=$paylaterAdvancedOption.className
             paylaterAdvancedOptionTitle=$paylaterAdvancedOption.title
-            paylaterAdvancedOptionContent=$paylaterAdvancedOption.content}
+            paylaterAdvancedOptionContent=$paylaterAdvancedOption.content
+            paylaterAdvancedOptionSwitch=$paylaterAdvancedOption.switch}
     {/foreach}
 {/capture}
 {include file='./../../atoms/accordion/accordion.tpl'

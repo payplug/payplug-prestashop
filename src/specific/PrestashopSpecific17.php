@@ -334,6 +334,18 @@ class PrestashopSpecific17
             'small' => true,
             'checked' => $configurations['oney_optimized'],
         ];
+        $switch['oney_product_cta'] = [
+            'name' => 'payplug_oney_product_cta',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_product_cta'],
+        ];
+        $switch['oney_cart_cta'] = [
+            'name' => 'payplug_oney_cart_cta',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_cart_cta'],
+        ];
 
         $switch['oney_fees'] = [
             'name' => 'payplug_oney_fees',
