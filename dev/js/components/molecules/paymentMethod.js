@@ -18,7 +18,8 @@ class PaymentMethod {
             .on('change', '.deferredSwitch input', paymentMethod.handleDeferredPermission)
             .on('change', '.installmentSwitch input', paymentMethod.handleInstallmentPermission);
         $(window)
-            .on('reloadEvent', paymentMethod.handleReloadContent);
+            .on('reloadEvent', paymentMethod.handleReloadContent)
+            .on('resetTreshholders', paymentMethod.resetTreshholders);
     }
 
     handleReloadContent() {
@@ -76,6 +77,11 @@ class PaymentMethod {
         const $sandbox = $('input[name=payplug_sandbox]:checked');
         const isSandBox = parseInt($sandbox.val());
 
+        var payment_method = $switch.find('._switch').data('e2e-name');
+        if (payment_method == 'paymentMethod_oney' || payment_method == 'paymentMethod_standard') {
+            paymentMethod.resetTreshholders();
+        }
+
         if (!isSandBox && $switch.is('.-premium')) {
             event.preventDefault();
             event.stopPropagation();
@@ -83,6 +89,33 @@ class PaymentMethod {
         } else {
             paymentMethod.checkPaymentOptionInformation();
         }
+    }
+
+    resetTreshholders() {
+        var treshholdersInputs = {
+            installmentMinAmountInput : {
+                element : $('input[data-e2e-name="installmentMinAmount"]'),
+                amount : inst_min_amount
+            },
+            oneyThresholdMinInput : {
+                element : $('input[data-e2e-name="oneyThresholdMin"]'),
+                amount : oney_min_amounts
+            },
+            oneyThresholdMaxInput : {
+                element : $('input[data-e2e-name="oneyThresholdMax"]'),
+                amount : oney_max_amounts
+            }
+        };
+
+        $.each(treshholdersInputs, function(index) {
+            if (treshholdersInputs[index].element.parent().hasClass('-error') === true) {
+                treshholdersInputs[index].element.val(treshholdersInputs[index].amount);
+                treshholdersInputs[index].element.focusin();
+                treshholdersInputs[index].element.focusout();
+            }
+        });
+
+        $(window).trigger('checkConfiguration');
     }
 
     tooglePaymentOptionInformation($switch) {

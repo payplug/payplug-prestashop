@@ -861,6 +861,7 @@ class ConfigClass
                 'oney_max_amounts' => $oney_max_amounts,
                 'oney_min_amounts' => $oney_min_amounts,
                 'errorInstallmentAmount' => $this->dependencies->l('config.assignContentVar.installment.amountError', 'configclass'),
+                'inst_min_amount' => Configuration::get($this->dependencies->getConfigurationKey('instMinAmount'))
             ]
         );
 
