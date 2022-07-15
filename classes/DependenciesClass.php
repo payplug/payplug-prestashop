@@ -187,12 +187,12 @@ class DependenciesClass
         ],
         'oneyProductCta' => [
             'name' => 'ONEY_PRODUCT_CTA',
-            'defaultValue' => 0,
+            'defaultValue' => 1,
             'setConf' => 1
         ],
         'oneyCartCta' => [
             'name' => 'ONEY_CART_CTA',
-            'defaultValue' => 0,
+            'defaultValue' => 1,
             'setConf' => 1
         ],
         'orderStateAuth' => [
