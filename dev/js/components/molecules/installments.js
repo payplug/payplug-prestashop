@@ -40,6 +40,8 @@ class Installments {
             $select = $('.payplugUISelect.installmentMode'),
             $inputMode = $('.payplugUIInput.installmentMinAmount').find('input');
 
+        $(window).trigger('resetTreshholders');
+
         if ($input.prop('checked')) {
             $select.removeClass('-disabled')
                 .find('._current').attr('tabindex', '1');
