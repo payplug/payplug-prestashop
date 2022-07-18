@@ -19,7 +19,7 @@ class PaymentMethod {
             .on('change', '.installmentSwitch input', paymentMethod.handleInstallmentPermission);
         $(window)
             .on('reloadEvent', paymentMethod.handleReloadContent)
-            .on('resetTreshholders', paymentMethod.resetTreshholders);
+            .on('resetThresholders', paymentMethod.resetThresholders);
     }
 
     handleReloadContent() {
@@ -79,7 +79,7 @@ class PaymentMethod {
 
         var payment_method = $switch.find('._switch').data('e2e-name');
         if (payment_method == 'paymentMethod_oney' || payment_method == 'paymentMethod_standard') {
-            paymentMethod.resetTreshholders();
+            paymentMethod.resetThresholders();
         }
 
         if (!isSandBox && $switch.is('.-premium')) {
@@ -91,8 +91,8 @@ class PaymentMethod {
         }
     }
 
-    resetTreshholders() {
-        var treshholdersInputs = {
+    resetThresholders() {
+        var thresholdersInputs = {
             installmentMinAmountInput : {
                 element : $('input[data-e2e-name="installmentMinAmount"]'),
                 amount : inst_min_amount
@@ -107,11 +107,11 @@ class PaymentMethod {
             }
         };
 
-        $.each(treshholdersInputs, function(index) {
-            if (treshholdersInputs[index].element.parent().hasClass('-error') === true) {
-                treshholdersInputs[index].element.val(treshholdersInputs[index].amount);
-                treshholdersInputs[index].element.focusin();
-                treshholdersInputs[index].element.focusout();
+        $.each(thresholdersInputs, function(index) {
+            if (thresholdersInputs[index].element.parent().hasClass('-error') === true) {
+                thresholdersInputs[index].element.val(thresholdersInputs[index].amount);
+                thresholdersInputs[index].element.focusin();
+                thresholdersInputs[index].element.focusout();
             }
         });
 
