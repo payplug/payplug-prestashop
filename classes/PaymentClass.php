@@ -1109,7 +1109,9 @@ class PaymentClass
             }
         }
 
-        if ($options['oney']) {
+        if ($options['oney'] &&
+            $this->dependencies->configClass->isValidFeature('feature_paylater')
+            ) {
             $use_taxes = (bool)$this->config->get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
 
