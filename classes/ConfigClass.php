@@ -892,6 +892,7 @@ class ConfigClass
             'oney' => $this->configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
             'applepay' => $this->isValidFeature('feature_applepay'),
+            'paylater_isActivated' => $this->isValidFeature('feature_paylater'),
             'integrated' => $this->isValidFeature('feature_integrated'),
             'display_mode_isActivated' => $this->isValidFeature('feature_display_mode'),
             'standard_isActivated' => $this->isValidFeature('feature_standard'),

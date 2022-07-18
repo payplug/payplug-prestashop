@@ -1,10 +1,11 @@
 {
     "features": [
+        "feature_applepay",
         "feature_bancontact",
-        "feature_display_mode",
-        "feature_standard",
-        "feature_installment",
         "feature_deferred",
-        "feature_applepay"
+        "feature_display_mode",
+        "feature_installment",
+        "feature_paylater",
+        "feature_standard"
     ]
 }
