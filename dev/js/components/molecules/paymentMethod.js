@@ -283,9 +283,9 @@ class PaymentMethod {
         const $container = $('.' + paymentMethod.props.container);
         if ($container.find('.-applepay').length) {
             if (hide) {
-                $container.find('.-applepay').hide();
+                $container.find('.-applepay').addClass('-disabled');
             } else {
-                $container.find('.-applepay').show();
+                $container.find('.-applepay').removeClass('-disabled');
             }
         }
     }

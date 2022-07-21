@@ -373,6 +373,7 @@ $_MODULE['<{payplug}prestashop>paymentclass_34fa0c97811e4367e795272fec7c20e5'] =
 $_MODULE['<{payplug}prestashop>paymentclass_3e4527e1fd3b7472f676f9ba82459a9b'] = 'differito';
 $_MODULE['<{payplug}prestashop>paymentclass_4929cc1470a0d9160fc0ae0805274694'] = 'Non disponibile per questo metodo di spedizione';
 $_MODULE['<{payplug}prestashop>paymentclass_4e95b36ca864e9540cc94a3953477f43'] = 'Paga in %sx rate senza spese con carta di gradito grazie a Oney';
+$_MODULE['<{payplug}prestashop>paymentclass_4ed876a9ec77360cdd46c5113bc3f986'] = 'Bancontact non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo PayPlug in modalità LIVE.';
 $_MODULE['<{payplug}prestashop>paymentclass_53f4a41ab6d3316c9da1ada62948d722'] = 'Il tuo carrello non è disponibile';
 $_MODULE['<{payplug}prestashop>paymentclass_57b84b32011fe94629c7612279ba06b6'] = 'Oney 3x';
 $_MODULE['<{payplug}prestashop>paymentclass_7b7fac9977c51c0575969f611af5cec0'] = 'TEST';

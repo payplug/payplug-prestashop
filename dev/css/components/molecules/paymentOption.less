@@ -165,7 +165,14 @@
 
       }
     }
+    &.-disabled {
+      @bg: #colorMap[white];
+      //background: fade(@bg, 70%);
+      background-color: fade(@bg, 70%);
+      height: 100%;
+      z-index: 99;
 
+    }
     @media (@screen-mobile) {
       margin: 0;
       & + .paymentOption {
