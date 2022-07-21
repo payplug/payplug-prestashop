@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\OrderStateInterface;
 use OrderState;
 
-class OrderStateSpecific implements OrderStateInterface
+class OrderStateAdapter implements OrderStateInterface
 {
     private $orderState;
 

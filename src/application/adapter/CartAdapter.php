@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\CartInterface;
 use Cart;
 
-class CartSpecific implements CartInterface
+class CartAdapter implements CartInterface
 {
     public static function factory()
     {

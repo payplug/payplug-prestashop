@@ -42,7 +42,7 @@ class RepositoryBase extends TestCase
     protected $arrayCache;
     protected $arrayLogger;
 
-    // specific
+    // adapter
     protected $assign;
     protected $address;
     protected $carrier;
@@ -79,29 +79,29 @@ class RepositoryBase extends TestCase
             ->shouldReceive('info')
             ->andReturn(true);
 
-        $this->setSpecific();
+        $this->setAdapter();
         $this->setRepository();
         $this->setTemporariesClasses();
     }
 
-    private function setSpecific()
+    private function setAdapter()
     {
-        $this->assign               = MockHelper::createAssignMock('PayPlug\src\specific\AssignSpecific');
-        $this->address              = MockHelper::createAddressMock('PayPlug\src\specific\AddressSpecific');
-        $this->carrier              = MockHelper::createMockFactory('PayPlug\src\specific\CarrierSpecific');
-        $this->cart                 = MockHelper::createMockFactory('PayPlug\src\specific\CartSpecific');
-        $this->config               = MockHelper::createMockFactory('PayPlug\src\specific\ConfigurationSpecific');
-        $this->constant             = MockHelper::createMockFactory('PayPlug\src\specific\ConstantSpecific');
-        $this->context              = MockHelper::createContextMock('PayPlug\src\specific\ContextSpecific');
-        $this->country              = MockHelper::createMockFactory('PayPlug\src\specific\CountrySpecific');
-        $this->currency             = MockHelper::createMockFactory('PayPlug\src\specific\CurrencySpecific');
-        $this->language             = MockHelper::createMockFactory('PayPlug\src\specific\LanguageSpecific');
-        $this->order_state_specific = MockHelper::createMockFactory('PayPlug\src\specific\OrderStateSpecific');
-        $this->product              = MockHelper::createMockFactory('PayPlug\src\specific\ProductSpecific');
-        $this->shop                 = MockHelper::createMockFactory('PayPlug\src\specific\ShopSpecific');
-        $this->tools                = MockHelper::createToolsMock('PayPlug\src\specific\ToolsSpecific');
-        $this->translate            = MockHelper::createTranslateMock('PayPlug\src\specific\TranslationSpecific');
-        $this->validate             = MockHelper::createValidateMock('PayPlug\src\specific\ValidateSpecific');
+        $this->assign               = MockHelper::createAssignMock('PayPlug\src\application\adapter\AssignAdapter');
+        $this->address              = MockHelper::createAddressMock('PayPlug\src\application\adapter\AddressAdapter');
+        $this->carrier              = MockHelper::createMockFactory('PayPlug\src\application\adapter\CarrierAdapter');
+        $this->cart                 = MockHelper::createMockFactory('PayPlug\src\application\adapter\CartAdapter');
+        $this->config               = MockHelper::createMockFactory('PayPlug\src\application\adapter\ConfigurationAdapter');
+        $this->constant             = MockHelper::createMockFactory('PayPlug\src\application\adapter\ConstantAdapter');
+        $this->context              = MockHelper::createContextMock('PayPlug\src\application\adapter\ContextAdapter');
+        $this->country              = MockHelper::createMockFactory('PayPlug\src\application\adapter\CountryAdapter');
+        $this->currency             = MockHelper::createMockFactory('PayPlug\src\application\adapter\CurrencyAdapter');
+        $this->language             = MockHelper::createMockFactory('PayPlug\src\application\adapter\LanguageAdapter');
+        $this->order_state_adapter = MockHelper::createMockFactory('PayPlug\src\application\adapter\OrderStateAdapter');
+        $this->product              = MockHelper::createMockFactory('PayPlug\src\application\adapter\ProductAdapter');
+        $this->shop                 = MockHelper::createMockFactory('PayPlug\src\application\adapter\ShopAdapter');
+        $this->tools                = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
+        $this->translate            = MockHelper::createTranslateMock('PayPlug\src\application\adapter\TranslationAdapter');
+        $this->validate             = MockHelper::createValidateMock('PayPlug\src\application\adapter\ValidateAdapter');
     }
 
     private function setRepository()

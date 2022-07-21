@@ -27,17 +27,17 @@ use Cart;
 use Configuration;
 use Currency;
 use Order;
-use PayPlug\src\specific\ToolsSpecific;
+use PayPlug\src\application\adapter\ToolsAdapter;
 use Tools;
 
 class AmountCurrencyClass
 {
-    private $toolsSpecific;
+    private $toolsAdapter;
     private $dependencies;
 
-    public function __construct($toolsSpecific, $dependencies)
+    public function __construct($toolsAdapter, $dependencies)
     {
-        $this->toolsSpecific = $toolsSpecific;
+        $this->toolsAdapter = $toolsAdapter;
         $this->dependencies = $dependencies;
     }
 
@@ -119,7 +119,7 @@ class AmountCurrencyClass
         } else {
             $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
             $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
-            return (int)($this->toolsSpecific->tool('ps_round', $amount));
+            return (int)($this->toolsAdapter->tool('ps_round', $amount));
         }
     }
 

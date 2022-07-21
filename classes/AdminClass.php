@@ -26,7 +26,7 @@ namespace PayPlug\classes;
 use OrderHistory;
 use OrderState;
 use PayPlug\backward\PayPlugBackward;
-use PayPlug\src\specific\ContextSpecific;
+use PayPlug\src\application\adapter\ContextAdapter;
 use Tools;
 use Validate;
 
@@ -57,7 +57,7 @@ class AdminClass
      */
     public static function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
-        $context = (new ContextSpecific())->getContext();
+        $context = (new ContextAdapter())->getContext();
         $dependencies = new DependenciesClass();
         if ($controller_name == 'AdminModules') {
             switch ($dependencies->name) {
@@ -87,7 +87,7 @@ class AdminClass
             return false;
         }
 
-        $context = (new ContextSpecific())->getContext();
+        $context = (new ContextAdapter())->getContext();
         $admin_url = $context->link->getAdminLink($controller_name);
         if (!empty($params)) {
             foreach ($params as $key => $value) {
@@ -209,7 +209,7 @@ class AdminClass
                         'updated_deferred_state_id' => $this->tools->tool('getValue', 'payplug_deferred_state'),
                         'updated_deferred_state_name' => $order_state->name,
                         'admin_orders_link' => $this->dependencies->configClass
-                            ->getSpecificPrestaClasse()
+                            ->getAdapterPrestaClasse()
                             ->getOrdersByStateLink(
                                 $this->tools->tool('getValue', 'payplug_deferred_state')
                             ),
@@ -429,8 +429,8 @@ class AdminClass
             switch ($this->tools->tool('getValue', 'type')) {
                 case 'orderState':
                     $idOrderState = $this->tools->tool('getValue', 'idOrderState');
-                    $order_state_specific = $this->dependencies->getPlugin()->getOrderStateSpecific();
-                    $order_state = $order_state_specific->get($idOrderState, $this->context->language->id);
+                    $order_state_adapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
+                    $order_state = $order_state_adapter->get($idOrderState, $this->context->language->id);
                     if ($order_state->id) {
                         $this->assign->assign([
                             'orderStateName' => $order_state->name,

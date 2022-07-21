@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,20 +16,20 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CustomerInterface;
-use Customer;
+use PayPlug\src\interfaces\OrderHistoryInterface;
+use OrderHistory;
 
-class CustomerSpecific implements CustomerInterface
+class OrderHistoryAdapter implements OrderHistoryInterface
 {
-    public function get($idCustomer)
+    public function get($idOrderHistory = null)
     {
-        return new Customer($idCustomer);
+        return new OrderHistory($idOrderHistory);
     }
 }

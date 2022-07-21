@@ -21,15 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\ConstantInterface;
 
-class ConstantSpecific implements ConstantInterface
+class ConstantAdapter implements ConstantInterface
 {
     public static function factory()
     {
-        return new ConstantSpecific();
+        return new ConstantAdapter();
     }
 
     public function get($constant)

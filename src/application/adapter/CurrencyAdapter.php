@@ -21,39 +21,33 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CarrierInterface;
-use Carrier;
+use PayPlug\src\interfaces\CurrencyInterface;
+use Currency;
 
-class CarrierSpecific implements CarrierInterface
+class CurrencyAdapter implements CurrencyInterface
 {
-    /** @var int Default delivery delay value in days for new carrier */
-    public $default_delay = 0;
-
-    /** @var string Default delivery type value for new carrier */
-    public $default_delivery_type = 'storepickup';
-
     public static function factory()
     {
         return new self();
     }
 
-    public function get($id_carrier = false)
+    public function get($idCurrency = false)
     {
-        if (!is_int($id_carrier)) {
-            $id_carrier = false;
+        if (!is_int($idCurrency)) {
+            $idCurrency = false;
         }
-        return new Carrier($id_carrier);
+        return new Currency($idCurrency);
     }
 
-    public function getDefaultDelay()
+    public function getCurrency($idCurrency)
     {
-        return $this->default_delay;
+        return new Currency($idCurrency);
     }
 
-    public function getDefaultDeliveryType()
+    public function getIdByIsoCode($isoCode)
     {
-        return $this->default_delivery_type;
+        return Currency::getIdByIsoCode($isoCode);
     }
 }

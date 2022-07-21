@@ -21,33 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CurrencyInterface;
-use Currency;
+use PayPlug\src\interfaces\OrderInterface;
+use Order;
 
-class CurrencySpecific implements CurrencyInterface
+class OrderAdapter implements OrderInterface
 {
-    public static function factory()
+    public function get($idOrder = null)
     {
-        return new self();
-    }
-
-    public function get($idCurrency = false)
-    {
-        if (!is_int($idCurrency)) {
-            $idCurrency = false;
-        }
-        return new Currency($idCurrency);
-    }
-
-    public function getCurrency($idCurrency)
-    {
-        return new Currency($idCurrency);
-    }
-
-    public function getIdByIsoCode($isoCode)
-    {
-        return Currency::getIdByIsoCode($isoCode);
+        return new Order($idOrder);
     }
 }

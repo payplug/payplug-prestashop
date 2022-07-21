@@ -21,20 +21,25 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ShopInterface;
-use Shop;
+use PayPlug\src\interfaces\ContextInterface;
+use Context;
 
-class ShopSpecific implements ShopInterface
+class ContextAdapter implements ContextInterface
 {
-    public function isFeatureActive()
+    public static function factory()
     {
-        return Shop::isFeatureActive();
+        return new self();
     }
 
-    public function setContext()
+    public function get()
     {
-        return Shop::setContext(Shop::CONTEXT_ALL);
+        return Context::getContext();
+    }
+
+    public function getContext()
+    {
+        return Context::getContext();
     }
 }

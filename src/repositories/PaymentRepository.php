@@ -32,16 +32,16 @@ class PaymentRepository extends BaseClass
     protected $dependencies;
 
     private $apiPayment;
-    private $cartSpecific;
-    private $confSpecific;
+    private $cartAdapter;
+    private $confAdapter;
     private $logger;
     private $paymentEntity;
     private $query;
     private $constant;
 
     public function __construct(
-        $cartSpecific,
-        $confSpecific,
+        $cartAdapter,
+        $confAdapter,
         $dependencies,
         $logger,
         $paymentEntity,
@@ -49,8 +49,8 @@ class PaymentRepository extends BaseClass
         $constant
     ) {
         $this->dependencies = $dependencies;
-        $this->cartSpecific = $cartSpecific;
-        $this->confSpecific = $confSpecific;
+        $this->cartAdapter = $cartAdapter;
+        $this->confAdapter = $confAdapter;
         $this->logger = $logger;
         $this->paymentEntity = $paymentEntity;
         $this->query = $query;
@@ -88,7 +88,7 @@ class PaymentRepository extends BaseClass
         }
 
         foreach ($products as $product) {
-            $product['specific_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
+            $product['adapter_prices'] = $product['features'] = $product['date_add'] = $product['date_upd'] = null;
             $cartToHash[] = array_map('strval', $product);
         }
         // For optimised / non optimised Oney + 3x / 4x to have a good hash ;-)
@@ -279,9 +279,9 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        if ($paymentDetails['paymentMethod'] == 'standard' && !$this->confSpecific->get('PAYPLUG_STANDARD')) {
+        if ($paymentDetails['paymentMethod'] == 'standard' && !$this->confAdapter->get('PAYPLUG_STANDARD')) {
             return $this->returnPaymentError(
-                ['name' => 'Configuration::get', 'value' => $this->confSpecific->get('PAYPLUG_STANDARD')],
+                ['name' => 'Configuration::get', 'value' => $this->confAdapter->get('PAYPLUG_STANDARD')],
                 '[createPayment] Try to create standard payment with PAYPLUG_STANDARD disabled'
             );
         }

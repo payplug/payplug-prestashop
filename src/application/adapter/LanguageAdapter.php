@@ -21,22 +21,24 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ValidateInterface;
-use Validate;
+use PayPlug\src\interfaces\LanguageInterface;
+use Language;
 
-class ValidateSpecific implements ValidateInterface
+class LanguageAdapter implements LanguageInterface
 {
-    public static function factory()
+    public function get($idLanguage = false)
     {
-        return new self();
+        if (!is_int($idLanguage)) {
+            $idLanguage = false;
+        }
+
+        return new Language($idLanguage);
     }
 
-    public function validate($action, $object)
+    public function getLanguages($active = false)
     {
-        if (isset($action)) {
-            return Validate::$action($object);
-        }
+        return Language::getLanguages($active);
     }
 }

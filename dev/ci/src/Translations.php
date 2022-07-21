@@ -110,7 +110,7 @@ class Translations
     }
 
     /**
-     * @description Hydrate translation from specific file
+     * @description Hydrate translation from adapter file
      * @param bool $path
      * @param bool $file
      * @return bool

@@ -21,24 +21,27 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\LanguageInterface;
-use Language;
+use PayPlug\src\interfaces\ToolsInterface;
+use Tools;
 
-class LanguageSpecific implements LanguageInterface
+class ToolsAdapter implements ToolsInterface
 {
-    public function get($idLanguage = false)
+    public static function factory()
     {
-        if (!is_int($idLanguage)) {
-            $idLanguage = false;
-        }
-
-        return new Language($idLanguage);
+        return new ToolsAdapter();
     }
 
-    public function getLanguages($active = false)
+    public function tool($action, $param1 = null, $param2 = null)
     {
-        return Language::getLanguages($active);
+        if (isset($action)) {
+            return Tools::$action($param1, $param2);
+        }
+    }
+
+    public function substr($string, $offset = null, $length = null)
+    {
+        return Tools::substr($string, $offset, $length);
     }
 }

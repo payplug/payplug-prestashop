@@ -21,15 +21,38 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\OrderInterface;
-use Order;
+use PayPlug\src\interfaces\CountryInterface;
+use Country;
 
-class OrderSpecific implements OrderInterface
+class CountryAdapter implements CountryInterface
 {
-    public function get($idOrder = null)
+    public static function factory()
     {
-        return new Order($idOrder);
+        return new self();
+    }
+
+    public function get($idCountry = false)
+    {
+        if (!is_int($idCountry)) {
+            $idCountry = false;
+        }
+        return new Country($idCountry);
+    }
+
+    public function getByIso($idCurrency)
+    {
+        return Country::getByIso($idCurrency);
+    }
+
+    public function getCountry($idCountry)
+    {
+        return new Country($idCountry);
+    }
+
+    public function getNameById($param1, $param2)
+    {
+        return Country::getNameById($param1, $param2);
     }
 }

@@ -45,7 +45,7 @@ class PayPlugAjax
     private $dependencies;
     private $oney;
     private $paymentClass;
-    private $toolsSpecific;
+    private $toolsAdapter;
     private $translate;
 
     public function __construct()
@@ -58,7 +58,7 @@ class PayPlugAjax
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
         $this->oney = $this->dependencies->getPlugin()->getOney();
-        $this->toolsSpecific = $this->dependencies->getPlugin()->getTools();
+        $this->toolsAdapter = $this->dependencies->getPlugin()->getTools();
         $this->translate = $this->dependencies->getPlugin()->getTranslate();
 
         $this->paymentClass = $this->dependencies->paymentClass;
@@ -81,7 +81,7 @@ class PayPlugAjax
     public function postProcess()
     {
         $this->context = $this->context->getContext(); // get the method
-        $tools = $this->toolsSpecific;
+        $tools = $this->toolsAdapter;
 
         if (($tools->tool('getValue', '_ajax')) == 1) {
             if ($tools->tool('getIsset', 'pc')) {
