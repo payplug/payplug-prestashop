@@ -11,11 +11,24 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    margin-bottom: 24px;
+    margin-bottom: @margin-6;
 
     ._save {
       width: 100%;
       max-width: 1000px;
+    }
+    ._faq {
+      text-align: center;
+      margin: 64px 0 0;
+
+      p {
+        margin: 0;
+        line-height: 20px;
+      }
+
+      @media (@screen-mobile) {
+        margin: @margin-6 0 0;
+      }
     }
   }
 }
