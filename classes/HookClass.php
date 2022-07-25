@@ -288,10 +288,10 @@ class HookClass
             true
         );
 
-        $specific = $this->dependencies->loadSpecificPresta();
-        if ($specific
-            && (\method_exists($specific, 'customerAccount'))) {
-            $specific->customerAccount();
+        $adapter = $this->dependencies->loadAdapterPresta();
+        if ($adapter
+            && (\method_exists($adapter, 'customerAccount'))) {
+            $adapter->customerAccount();
         }
 
         $this->assign->assign([
@@ -897,14 +897,14 @@ class HookClass
             Media::addJsDef(['check_errors' => true]);
         }
 
-        $specific = $this->dependencies->loadSpecificPresta();
+        $adapter = $this->dependencies->loadAdapterPresta();
 
-        if ($specific
-            && (\method_exists($specific, 'displayHeader'))) {
+        if ($adapter
+            && (\method_exists($adapter, 'displayHeader'))) {
             Media::addJsDef([
                 'module_name' => $this->dependencies->name,
             ]);
-            $specific->displayHeader();
+            $adapter->displayHeader();
         }
 
         $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
@@ -1150,7 +1150,7 @@ class HookClass
         $payment_options = $this->dependencies->paymentClass->getPaymentOptions($cart);
 
         // Transforme tableau en TPL
-        $paymentOptions = $this->dependencies->loadSpecificPresta()->displayPaymentOption(
+        $paymentOptions = $this->dependencies->loadAdapterPresta()->displayPaymentOption(
             $payment_options,
             $cart
         );
@@ -1195,7 +1195,7 @@ class HookClass
         $payment_options = $this->dependencies->paymentClass->getPaymentOptions($cart);
 
         // Transforme tableau en object
-        return $this->dependencies->loadSpecificPresta()->displayPaymentOption($payment_options);
+        return $this->dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);
     }
 
     /**

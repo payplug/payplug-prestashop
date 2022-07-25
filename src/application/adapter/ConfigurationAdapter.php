@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\ConfigurationInterface;
 use Configuration;
 
-class ConfigurationSpecific implements ConfigurationInterface
+class ConfigurationAdapter implements ConfigurationInterface
 {
     private $psConfiguration;
 
@@ -37,7 +37,7 @@ class ConfigurationSpecific implements ConfigurationInterface
 
     public static function factory()
     {
-        return new ConfigurationSpecific();
+        return new ConfigurationAdapter();
     }
 
 

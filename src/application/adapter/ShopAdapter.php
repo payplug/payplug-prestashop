@@ -21,27 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ToolsInterface;
-use Tools;
+use PayPlug\src\interfaces\ShopInterface;
+use Shop;
 
-class ToolsSpecific implements ToolsInterface
+class ShopAdapter implements ShopInterface
 {
-    public static function factory()
+    public function isFeatureActive()
     {
-        return new ToolsSpecific();
+        return Shop::isFeatureActive();
     }
 
-    public function tool($action, $param1 = null, $param2 = null)
+    public function setContext()
     {
-        if (isset($action)) {
-            return Tools::$action($param1, $param2);
-        }
-    }
-
-    public function substr($string, $offset = null, $length = null)
-    {
-        return Tools::substr($string, $offset, $length);
+        return Shop::setContext(Shop::CONTEXT_ALL);
     }
 }

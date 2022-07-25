@@ -21,25 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ContextInterface;
-use Context;
+use PayPlug\src\interfaces\HookInterface;
 
-class ContextSpecific implements ContextInterface
+class HookAdapter implements HookInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
-    public function get()
-    {
-        return Context::getContext();
-    }
-
-    public function getContext()
-    {
-        return Context::getContext();
-    }
 }

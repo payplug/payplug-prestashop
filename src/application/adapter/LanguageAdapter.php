@@ -21,21 +21,24 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ConstantInterface;
+use PayPlug\src\interfaces\LanguageInterface;
+use Language;
 
-class ConstantSpecific implements ConstantInterface
+class LanguageAdapter implements LanguageInterface
 {
-    public static function factory()
+    public function get($idLanguage = false)
     {
-        return new ConstantSpecific();
+        if (!is_int($idLanguage)) {
+            $idLanguage = false;
+        }
+
+        return new Language($idLanguage);
     }
 
-    public function get($constant)
+    public function getLanguages($active = false)
     {
-        if (isset($constant)) {
-            return constant($constant);
-        }
+        return Language::getLanguages($active);
     }
 }

@@ -81,7 +81,7 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\src\specific\QuerySpecific;
+use PayPlug\src\application\adapter\QueryAdapter;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class QueryRepository extends BaseClass
@@ -103,11 +103,11 @@ class QueryRepository extends BaseClass
         'lastId' => [],
     ];
 
-    private $specific_class;
+    private $adapter_class;
 
     public function __construct()
     {
-        $this->specific_class = QuerySpecific::factory();
+        $this->adapter_class = QueryAdapter::factory();
     }
 
     public static function factory()
@@ -333,12 +333,12 @@ class QueryRepository extends BaseClass
 
     public function lastId()
     {
-        return $this->specific_class->getLastId();
+        return $this->adapter_class->getLastId();
     }
 
     public function getValue($id)
     {
-        return $this->specific_class->getValue($id);
+        return $this->adapter_class->getValue($id);
     }
 
     public function build($param = false)
@@ -446,7 +446,7 @@ class QueryRepository extends BaseClass
         }
 
         try {
-            $result = $this->specific_class->query($sql);
+            $result = $this->adapter_class->query($sql);
         } catch (\Exception $e) {
             return false;
             // @todo : AddLog
@@ -473,6 +473,6 @@ class QueryRepository extends BaseClass
 
     public function escape($string, $htmlOK = false)
     {
-        return $this->specific_class->escape($string, $htmlOK);
+        return $this->adapter_class->escape($string, $htmlOK);
     }
 }

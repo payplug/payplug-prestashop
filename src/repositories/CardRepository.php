@@ -32,14 +32,14 @@ class CardRepository extends BaseClass
     protected $dependencies;
 
     private $cardEntity;
-    private $configurationSpecific;
+    private $configurationAdapter;
     private $constant;
     private $query;
     private $logger;
-    private $toolsSpecific;
+    private $toolsAdapter;
 
     public function __construct(
-        $configurationSpecific,
+        $configurationAdapter,
         $constant,
         $dependencies,
         $logger,
@@ -47,17 +47,17 @@ class CardRepository extends BaseClass
         $tools
     ) {
         $this->cardEntity = new CardEntity();
-        $this->configurationSpecific = $configurationSpecific;
+        $this->configurationAdapter = $configurationAdapter;
         $this->constant = $constant;
         $this->dependencies = $dependencies;
         $this->logger = $logger;
         $this->query = $query;
-        $this->toolsSpecific = $tools;
+        $this->toolsAdapter = $tools;
 
-        $isSandbox = $this->configurationSpecific->get(
+        $isSandbox = $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         );
-        $idCompany = $this->configurationSpecific->get(
+        $idCompany = $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
         );
         $this->logger->setParams(['process' => 'cardRepository']);
@@ -421,11 +421,11 @@ class CardRepository extends BaseClass
             return false;
         }
 
-        $config = $this->configurationSpecific;
+        $config = $this->configurationAdapter;
 
         $brand = $payment->card->brand;
-        if ($this->toolsSpecific->tool('strtolower', $brand) != 'mastercard'
-            && $this->toolsSpecific->tool('strtolower', $brand) != 'visa'
+        if ($this->toolsAdapter->tool('strtolower', $brand) != 'mastercard'
+            && $this->toolsAdapter->tool('strtolower', $brand) != 'visa'
         ) {
             $brand = 'none';
         }

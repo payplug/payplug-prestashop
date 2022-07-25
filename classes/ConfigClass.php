@@ -283,13 +283,13 @@ class ConfigClass
 //        }
     }
 
-    public function getSpecificPrestaClasse()
+    public function getAdapterPrestaClasse()
     {
-        return $this->dependencies->loadSpecificPresta();
+        return $this->dependencies->loadAdapterPresta();
     }
 
     /**
-     * Set very specific properties
+     * Set very adapter properties
      *
      * @return void
      */
@@ -839,9 +839,9 @@ class ConfigClass
         $oney_custom_max_amounts = ($customAmounts['max']);
         $oney_custom_min_amounts = ($customAmounts['min']);
 
-        $specific = $this->dependencies->loadSpecificPresta();
-        if ($specific
-            && (method_exists($specific, 'assignSwitchConfiguration'))
+        $adapter = $this->dependencies->loadAdapterPresta();
+        if ($adapter
+            && (method_exists($adapter, 'assignSwitchConfiguration'))
             && $this->isValidFeature('feature_integrated')
             && $this->isValidFeature('feature_standard')
             && Configuration::get(
@@ -849,7 +849,7 @@ class ConfigClass
                 . ($this->configurations['sandbox_mode'] ? '_TEST' : '')
             )
         ) {
-            $specific->assignSwitchConfiguration($this->configurations);
+            $adapter->assignSwitchConfiguration($this->configurations);
         } else {
             $this->assignSwitchConfiguration($this->configurations);
         }

@@ -54,7 +54,7 @@ class InstallRepository extends BaseClass
     protected $order_state_entity;
 
     /** @var object */
-    protected $order_state_specific;
+    protected $order_state_adapter;
 
     /** @var object */
     protected $shop;
@@ -75,7 +75,7 @@ class InstallRepository extends BaseClass
         $dependencies,
         $order_state,
         $order_state_entity,
-        $order_state_specific,
+        $order_state_adapter,
         $shop,
         $sql,
         $tools,
@@ -88,7 +88,7 @@ class InstallRepository extends BaseClass
         $this->dependencies = $dependencies;
         $this->order_state = $order_state;
         $this->order_state_entity = $order_state_entity;
-        $this->order_state_specific = $order_state_specific;
+        $this->order_state_adapter = $order_state_adapter;
         $this->shop = $shop;
         $this->sql = $sql;
         $this->tools = $tools;
@@ -110,7 +110,7 @@ class InstallRepository extends BaseClass
             $key_config_live = $this->dependencies->concatenateModuleNameTo('ORDER_STATE_')
                 . $this->tools->tool('strtoupper', $key);
             $id_order_state_live = (int)$this->config->get($key_config_live);
-            $order_state_live = $this->order_state_specific->get($id_order_state_live);
+            $order_state_live = $this->order_state_adapter->get($id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)
                 || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
                 $this->order_state->create($key, $state, false, true);
@@ -119,7 +119,7 @@ class InstallRepository extends BaseClass
             // Check sandbox OrderState
             $key_config_sandbox = $key_config_live . '_TEST';
             $id_order_state_sandbox = (int)$this->config->get($key_config_sandbox);
-            $order_state_sandbox = $this->order_state_specific->get($id_order_state_sandbox);
+            $order_state_sandbox = $this->order_state_adapter->get($id_order_state_sandbox);
             if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)
                 || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
                 $this->order_state->create($key, $state, true, true);
@@ -289,7 +289,7 @@ class InstallRepository extends BaseClass
 
     public function installTab()
     {
-        return $this->dependencies->loadSpecificPresta()->installTab();
+        return $this->dependencies->loadAdapterPresta()->installTab();
     }
 
     /**
@@ -536,7 +536,7 @@ class InstallRepository extends BaseClass
             return $this->setUninstallError('Uninstall failed: sql.');
         }
 
-        if (!$this->dependencies->loadSpecificPresta()->uninstallTab()) {
+        if (!$this->dependencies->loadAdapterPresta()->uninstallTab()) {
             return $this->setUninstallError('Uninstall failed: tab.');
         }
 

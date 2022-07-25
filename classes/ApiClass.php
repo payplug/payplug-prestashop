@@ -677,7 +677,7 @@ class ApiClass
 
         $keys = array_keys($response['details']);
         foreach ($keys as $key) {
-            // add specific error message
+            // add adapter error message
             switch ($key) {
                 default:
                     $error_key = md5('The transaction was not completed and your card was not charged.');

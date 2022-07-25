@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,25 +16,27 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ModuleInterface;
-use Module;
+use PayPlug\src\interfaces\ValidateInterface;
+use Validate;
 
-class ModuleSpecific implements ModuleInterface
+class ValidateAdapter implements ValidateInterface
 {
-    public function displayError($error)
+    public static function factory()
     {
-        return Module::displayError($error);
+        return new self();
     }
 
-    public function getInstanceByName($moduleName)
+    public function validate($action, $object)
     {
-        return Module::getInstanceByName($moduleName);
+        if (isset($action)) {
+            return Validate::$action($object);
+        }
     }
 }

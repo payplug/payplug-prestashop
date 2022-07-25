@@ -28,15 +28,15 @@
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
     private $card;
-    private $configurationSpecific;
-    private $contextSpecific;
+    private $configurationAdapter;
+    private $contextAdapter;
     private $logger;
     private $oney;
     private $dependencies;
     private $paymentClass;
     private $plugin;
-    private $productSpecific;
-    private $toolsSpecific;
+    private $productAdapter;
+    private $toolsAdapter;
     private $translate;
 
     /**
@@ -62,19 +62,19 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
-        $this->toolsSpecific = $this->plugin->getTools();
+        $this->toolsAdapter = $this->plugin->getTools();
 
-        if ($this->toolsSpecific->tool('getValue', '_ajax') == 1) {
+        if ($this->toolsAdapter->tool('getValue', '_ajax') == 1) {
             $this->card = $this->plugin->getCard();
-            $this->configurationSpecific = $this->plugin->getConfiguration();
-            $this->contextSpecific = $this->plugin->getContext(); // get ContextSpecific Repository object
+            $this->configurationAdapter = $this->plugin->getConfiguration();
+            $this->contextAdapter = $this->plugin->getContext(); // get ContextAdapter Repository object
             $this->oney = $this->plugin->getOney();
-            $this->productSpecific = $this->plugin->getProduct();
+            $this->productAdapter = $this->plugin->getProduct();
             $this->translate = $this->plugin->getTranslate();
 
-            $config = $this->configurationSpecific;
-            $context = $this->contextSpecific->getContext(); // get the method
-            $tools = $this->toolsSpecific;
+            $config = $this->configurationAdapter;
+            $context = $this->contextAdapter->getContext(); // get the method
+            $tools = $this->toolsAdapter;
 
             if ($tools->tool('getIsset', 'pc')) {
                 if ((int)$tools->tool('getValue', 'delete') == 1) {
@@ -233,7 +233,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 } else {
                     $payment = $this->paymentClass->preparePayment([
                         'is_integrated' => 1,
-                        'is_deferred' => (bool)$this->configurationSpecific->get('PAYPLUG_DEFERRED')
+                        'is_deferred' => (bool)$this->configurationAdapter->get('PAYPLUG_DEFERRED')
                     ]);
                     die(json_encode($payment));
                 }
@@ -309,13 +309,13 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 if (!$message || !is_string($message)) {
                     die(json_encode([
                         'result' => true,
-                        'message' =>  'Failed to add log' // specific error
+                        'message' =>  'Failed to add log' // adapter error
                     ]));
                 } else {
                     $this->logger->addLog($message);
                     die(json_encode([
                         'result' => true,
-                        'message' =>  $message // specific error
+                        'message' =>  $message // adapter error
                     ]));
                 }
             } elseif ($tools->tool('getIsset', 'updatePublishableKey')) {
@@ -325,7 +325,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     if (!empty($publishable_keys['error'])
                         && 'EMPTY_PUBLISHABLE_KEY' == $publishable_keys['error']['name']) {
                         $payment_options = [
-                            'is_deferred' => (bool)$this->configurationSpecific->get('PAYPLUG_DEFERRED'),
+                            'is_deferred' => (bool)$this->configurationAdapter->get('PAYPLUG_DEFERRED'),
                         ];
                         $payment = $this->paymentClass->preparePayment($payment_options);
                         if (!$payment['result']) {
@@ -342,8 +342,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     die(json_encode($publishable_keys));
                 }
 
-                $sandbox = (bool)$this->configurationSpecific->get('PAYPLUG_SANDBOX_MODE');
-                $publishable_keys['key'] = (string)$this->configurationSpecific->get(
+                $sandbox = (bool)$this->configurationAdapter->get('PAYPLUG_SANDBOX_MODE');
+                $publishable_keys['key'] = (string)$this->configurationAdapter->get(
                     'PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : '')
                 );
                 die(json_encode($publishable_keys));

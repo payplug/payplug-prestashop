@@ -1226,10 +1226,10 @@ class PaymentClass
                 if ($optimized) {
                     $oneyTpl = 'oney.tpl';
 
-                    $specific = $this->dependencies->loadSpecificPresta();
-                    if ($specific
-                        && (method_exists($specific, 'getPaymentOption'))) {
-                        $oneyData = $specific->getPaymentOption();
+                    $adapter = $this->dependencies->loadAdapterPresta();
+                    if ($adapter
+                        && (method_exists($adapter, 'getPaymentOption'))) {
+                        $oneyData = $adapter->getPaymentOption();
                         $oneyLogo = $oneyData['oneyLogo'];
                         $oneyLabel = $oneyData['oneyCallToActionText'];
                     }
