@@ -128,7 +128,7 @@ class MediaClass
             ]);
         }
 
-        $admin_ajax_url = AdminClass::getAdminAjaxUrl();
+        $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl();
 
         $inst_id = isset($args['inst_id']) ? $args['inst_id'] : null;
 

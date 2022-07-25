@@ -333,7 +333,7 @@ class HookClass
         $amount_refunded_payplug = 0;
         $amount_available = 0;
 
-        $admin_ajax_url = AdminClass::getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
+        $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
         $amount_refunded_presta = RefundClass::getTotalRefunded($order->id);
 
         $inst_id = null;
@@ -633,7 +633,7 @@ class HookClass
             if ($conf == 30 || $conf == 31) {
                 $show_popin = true;
 
-                $admin_ajax_url = AdminClass::getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
+                $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
 
                 $this->html .= '<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>';
             }

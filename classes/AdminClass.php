@@ -23,13 +23,6 @@
 
 namespace PayPlug\classes;
 
-use OrderHistory;
-use OrderState;
-use PayPlug\backward\PayPlugBackward;
-use PayPlug\src\application\adapter\ContextAdapter;
-use Tools;
-use Validate;
-
 class AdminClass
 {
     private $assign;
@@ -37,17 +30,23 @@ class AdminClass
     private $dependencies;
     private $config;
     private $html = '';
+    private $orderHistory;
+    private $orderState;
     private $paymentRepository;
     private $tools;
+    private $validate;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->assign = $this->dependencies->getPlugin()->getAssign();
-        $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
+        $this->orderState = $this->dependencies->getPlugin()->getOrderStateAdapter();
+        $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->tools = $this->dependencies->getPlugin()->getTools();
+        $this->validate = $this->dependencies->getPlugin()->getValidate();
     }
 
     /**
@@ -55,21 +54,19 @@ class AdminClass
      * @param int $id_order
      * @return string
      */
-    public static function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
+    public function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
-        $context = (new ContextAdapter())->getContext();
-        $dependencies = new DependenciesClass();
         if ($controller_name == 'AdminModules') {
-            switch ($dependencies->name) {
+            switch ($this->dependencies->name) {
                 case 'pspaylater':
-                    $admin_ajax_url = $context->link->getAdminLink('AdminPsPayLater');
+                    $admin_ajax_url = $this->context->link->getAdminLink('AdminPsPayLater');
                     break;
                 case 'payplug':
-                    $admin_ajax_url = $context->link->getAdminLink('AdminPayplug');
+                    $admin_ajax_url = $this->context->link->getAdminLink('AdminPayplug');
                     break;
             }
         } elseif ($controller_name == 'AdminOrders') {
-            $admin_ajax_url = $context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
+            $admin_ajax_url = $this->context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
                 . '&vieworder';
         }
 
@@ -81,14 +78,13 @@ class AdminClass
      * @param int $id_order
      * @return string
      */
-    public static function getAdminUrl($controller_name = 'AdminModules', $params = [])
+    public function getAdminUrl($controller_name = 'AdminModules', $params = [])
     {
         if (!empty($params) && !is_array($params)) {
             return false;
         }
 
-        $context = (new ContextAdapter())->getContext();
-        $admin_url = $context->link->getAdminLink($controller_name);
+        $admin_url = $this->context->link->getAdminLink($controller_name);
         if (!empty($params)) {
             foreach ($params as $key => $value) {
                 $admin_url .= '&' . $key . (empty($value) ? '' : '=' . $value);
@@ -113,7 +109,7 @@ class AdminClass
 
         $this->dependencies->configClass->assignContentVar();
 
-        if ($this->dependencies->getPlugin()->getTools()->tool('getValue', 'show_components')) {
+        if ($this->tools->tool('getValue', 'show_components')) {
             return $this->dependencies->configClass->fetchTemplate('/views/templates/admin/components.tpl');
         }
 
@@ -149,9 +145,9 @@ class AdminClass
                 $args = [];
                 foreach ($keys as $key) {
                     if ($key !== 'embedded') {
-                        $args[$key] = (int)Tools::getValue($key);
+                        $args[$key] = (int)$this->tools->tool('getValue', $key);
                     } else {
-                        $args[$key] = (string)Tools::getValue($key);
+                        $args[$key] = (string)$this->tools->tool('getValue', $key);
                     }
                 }
             }
@@ -202,7 +198,7 @@ class AdminClass
                     $this->dependencies->getConfigurationKey('deferredState')
                 )) {
                 $id_order_state = $this->tools->tool('getValue', 'payplug_deferred_state');
-                $order_state = new OrderState($id_order_state, $this->context->language->id);
+                $order_state = $this->orderState->get($id_order_state, $this->context->language->id);
                 if ($this->tools->tool('getValue', 'payplug_deferred')) {
                     $this->context->smarty->assign([
                         'updated_deferred_state' => true,
@@ -250,7 +246,11 @@ class AdminClass
 
         if ($this->tools->tool('getValue', 'submitPwd')) {
             $password = $this->tools->tool('getValue', 'password');
-            if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
+            $isPlaintextPassword = $this->dependencies->configClass
+                ->getAdapterPrestaClasse()
+                ->isPlaintextPassword($password);
+
+            if (!$password || !$isPlaintextPassword) {
                 die(json_encode([
                     'content' => null,
                     'error' => $this->dependencies->l('payplug.adminAjaxController.passwordInvalid', 'adminclass')
@@ -370,10 +370,10 @@ class AdminClass
             }
 
             $order = new Order((int)$id_order);
-            if (Validate::isLoadedObject($order)) {
+            if ($this->validate->validate('isLoadedObject', $order)) {
                 $current_state = (int)$order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
-                    $history = new OrderHistory();
+                    $history = $this->orderHistory->get();
                     $history->id_order = (int)$order->id;
                     $history->changeIdOrderState($new_state, (int)$order->id, true);
                     $history->addWithemail();
@@ -429,8 +429,7 @@ class AdminClass
             switch ($this->tools->tool('getValue', 'type')) {
                 case 'orderState':
                     $idOrderState = $this->tools->tool('getValue', 'idOrderState');
-                    $order_state_adapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
-                    $order_state = $order_state_adapter->get($idOrderState, $this->context->language->id);
+                    $order_state = $this->orderState->get($idOrderState, $this->context->language->id);
                     if ($order_state->id) {
                         $this->assign->assign([
                             'orderStateName' => $order_state->name,

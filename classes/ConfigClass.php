@@ -441,7 +441,7 @@ class ConfigClass
         $this->checkConfiguration();
         $this->html = '';
 
-        $admin_ajax_url = AdminClass::getAdminAjaxUrl();
+        $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl();
 
         $this->context->smarty->assign([
             'admin_ajax_url' => $admin_ajax_url,
@@ -810,7 +810,7 @@ class ConfigClass
             ]);
         }
 
-        $admin_ajax_url = AdminClass::getAdminAjaxUrl();
+        $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl();
 
         // @todo : avoid addJsDef with translations (quotes are not escaped on 1.6 and break header)
         Media::addJsDef([

@@ -336,6 +336,7 @@ class PrestashopAdapter16
 
         return $flag;
     }
+
     /**
      * @description Link to order by order state
      *
@@ -363,5 +364,17 @@ class PrestashopAdapter16
 
         $link = $this->context->link->getAdminLink('AdminOrders', true);
         return $link;
+    }
+
+    /**
+     * @description Check if string is Plaintext Password
+     *
+     * @param $plaintextPasswd
+     * @param int $size
+     * @return bool
+     */
+    public function isPlaintextPassword($plaintextPasswd, $size = 5)
+    {
+        return Tools::strlen($plaintextPasswd) >= $size && Tools::strlen($plaintextPasswd) <= 72;
     }
 }

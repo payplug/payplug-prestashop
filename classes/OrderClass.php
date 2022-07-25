@@ -178,7 +178,7 @@ class OrderClass
                 'updateorder_state' => '',
                 'id_order_state' => $state['id_order_state']
             ];
-            $state['updateLink'] = AdminClass::getAdminUrl('AdminStatuses', $update_link_params);
+            $state['updateLink'] = $this->dependencies->adminClass->getAdminUrl('AdminStatuses', $update_link_params);
         }
 
         return $order_history_states;
