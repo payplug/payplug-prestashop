@@ -834,7 +834,7 @@ class PaymentClass
                 "link" => '',
                 "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('standard')),
                 "config_key" => $this->dependencies->getConfigurationKey('standard'),
-                "informations" => $this->dependencies->configClass->fetchTemplate('/views/templates/api/molecules/standard/standard.tpl'),
+                "informations" => '',
             ];
         }
 
@@ -908,6 +908,12 @@ class PaymentClass
         $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
 
         $payplug_cards = $options['one_click'] ? $this->card->getByCustomer((int)$id_customer, true) : [];
+
+        $shipping_address = $this->address->get((int)$cart->id_address_delivery);
+        $shipping_iso = ConfigClass::getIsoCodeByCountryId((int)$shipping_address->id_country);
+        $bancontactCountry = $this->config->get(
+            $this->dependencies->getConfigurationKey('bancontactCountry')
+        );
 
         $paymentOption = [];
 
@@ -1251,7 +1257,9 @@ class PaymentClass
         }
 
         // Bancontact Payment
-        if ($options['bancontact'] && $this->dependencies->configClass->isValidFeature('feature_bancontact')) {
+        if (($options['bancontact'] && $this->dependencies->configClass->isValidFeature('feature_bancontact'))
+        && (!$bancontactCountry ||  $shipping_iso == 'BE')
+        ) {
             $paymentOption['bancontact']['name'] = 'bancontact';
             $paymentOption['bancontact']['tpl'] = 'bancontact.tpl';
             $paymentOption['bancontact']['logo'] = $this->dependencies->mediaClass->getMediaPath(

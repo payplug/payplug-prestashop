@@ -20,27 +20,47 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 
-{if isset($payment_methods) && $payment_methods}
-    {capture assign="paymentMethod_title"}{l s='paymentMethod.block.title' mod='payplug'}{/capture}
-    {capture assign="paymentMethod_description"}{l s='paymentMethod.block.description' mod='payplug'}{/capture}
-    {capture assign="paymentMethod_content"}
-        {foreach $payment_methods as $payment_method_name => $payment_method}
-            {include file='./paymentOption.tpl'
-                paymentOptionIdentifier = $payment_method_name
-                paymentOptionName = $payment_method.name
-                paymentOptionImage_url = $payment_method.image_url
-                paymentOptionDescription = $payment_method.description
-                paymentOptionLink = $payment_method.link
-                paymentOptionChecked = $payment_method.checked
-                paymentOptionInformations = $payment_method.informations}
-        {/foreach}
-    {/capture}
+<div class="paymentOption
+    -{$paymentOptionIdentifier|escape:'htmlall':'UTF-8'}
+    {if isset($paymentOptionClassName) && $paymentOptionClassName} -{$paymentOptionClassName}{/if}">
+    {if 'standard' == $paymentOptionIdentifier}
+        {assign var="paymentOptionClassName" value='paymentOption_switch'}
+    {else}
+        {assign var="paymentOptionClassName" value='paymentOption_switch -premium'}
+    {/if}
+    {include
+        file='./../../atoms/switch/switch.tpl'
+        switchClassName=$paymentOptionClassName
+        switchDataName='paymentMethod_'|cat:$paymentOptionIdentifier|escape:'htmlall':'UTF-8'
+        switchName='payplug_'|cat:$paymentOptionIdentifier|escape:'htmlall':'UTF-8'
+        switchChecked=$paymentOptionChecked}
+    {if isset($paymentOptionImage_url) && $paymentOptionImage_url}
+        <div class="_logo">
+            <img src="{$paymentOptionImage_url|escape:'htmlall':'UTF-8'}">
+        </div>
+    {/if}
+    <div class="_text">
+        {include
+            file='./../../atoms/title/title.tpl'
+            titleClassName='_title'
+            titleText=$paymentOptionName|escape:'htmlall':'UTF-8'}
+        <p>
+            {$paymentOptionDescription|escape:'htmlall':'UTF-8'}
+            {if isset($paymentOptionLink) && $paymentOptionLink}
+                {capture assign="paymentOptionLinkText"}{l s='paymentOption.link.text' mod='payplug'}{/capture}
+                {include
+                    file='./../../atoms/link/link.tpl'
+                    linkText=$paymentOptionLinkText|escape:'htmlall':'UTF-8'
+                    linkHref=$paymentOptionLink|escape:'htmlall':'UTF-8'
+                    linkTarget='_blank'
+                    linkData='data-link'}
+            {/if}
+        </p>
+    </div>
 
-    {include file='./../../atoms/block/block.tpl'
-        blockTitle=$paymentMethod_title
-        blockDescription=$paymentMethod_description
-        blockContent=$paymentMethod_content
-        blockDisabled=!$connected || !$payplug_switch.show.checked
-        blockData='paymentMethodsBlock'
-        blockClassName='paymentMethodBlock'}
-{/if}
+        <div class="_informations">
+            {include file='./paymentOptions.tpl'
+            paymentOptionIdentifier=$paymentOptionIdentifier }
+        </div>
+
+</div>
