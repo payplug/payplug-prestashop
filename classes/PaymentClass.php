@@ -2020,7 +2020,8 @@ class PaymentClass
         /*
          * Create payment if inexistent
          */
-        if (!$this->payment->checkPaymentTable($cart->id) || $options['is_applepay']) {
+        $force_payment_creation = $options['is_applepay'] || $options['is_oney'];
+        if (!$this->payment->checkPaymentTable($cart->id) || $force_payment_creation) {
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
 
