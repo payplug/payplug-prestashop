@@ -315,7 +315,7 @@ class RefundClass
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
-                            $history->changeIdOrderState($new_state, (int)$order->id);
+                            $history->changeIdOrderState($new_state, (int)$order->id, true);
                             $history->addWithemail();
                             $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                         }
@@ -366,7 +366,7 @@ class RefundClass
                         if ($current_state != 0 && $current_state != $new_state) {
                             $history = new OrderHistory();
                             $history->id_order = (int)$order->id;
-                            $history->changeIdOrderState($new_state, (int)$order->id);
+                            $history->changeIdOrderState($new_state, (int)$order->id, true);
                             $history->addWithemail();
                             $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                         } else {

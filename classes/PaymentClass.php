@@ -134,7 +134,7 @@ class PaymentClass
                 if ($current_state != 0 && $current_state !== $new_state) {
                     $order_history = $this->orderHistory->get();
                     $order_history->id_order = (int)$order->id;
-                    $order_history->changeIdOrderState($new_state, (int)$order->id);
+                    $order_history->changeIdOrderState($new_state, (int)$order->id, true);
                     $order_history->addWithemail();
                 }
             }
@@ -561,7 +561,7 @@ class PaymentClass
                 $order_history = $this->orderHistory->get();
                 $order_history->id_order = (int)$order->id;
                 $this->logger->addLog('New order state: ' . $new_state, 'notice');
-                $order_history->changeIdOrderState($new_state, (int)$order->id);
+                $order_history->changeIdOrderState($new_state, (int)$order->id, true);
                 $order_history->addWithemail();
             }
 
