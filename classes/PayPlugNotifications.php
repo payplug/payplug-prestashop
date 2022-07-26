@@ -601,7 +601,7 @@ class PayPlugNotifications
                 $order_history = new OrderHistory();
                 $order_history->id_order = $id_order;
                 try {
-                    $order_history->changeIdOrderState((int)$new_order_state, $this->order->id);
+                    $order_history->changeIdOrderState((int)$new_order_state, $this->order->id, true);
                     $order_history->save();
                     $this->exitProcess('Order state has been updated.');
                 } catch (Exception $exception) {
@@ -1110,7 +1110,7 @@ class PayPlugNotifications
         try {
             $order_history = new OrderHistory();
             $order_history->id_order = (int)$this->order->id;
-            $order_history->changeIdOrderState((int)$new_order_state, $this->order->id);
+            $order_history->changeIdOrderState((int)$new_order_state, $this->order->id, true);
             $order_history->save();
         } catch (Exception $exception) {
             $this->logger->addLog(
