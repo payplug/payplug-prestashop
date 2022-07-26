@@ -209,9 +209,8 @@ class PaymentMethod {
         }
 
         paymentMethod.getPermissions(sandBoxValue, false);
-        paymentMethod.toggleBancontact(sandBoxValue);
-        paymentMethod.toggleApplePay(sandBoxValue);
-    }
+        paymentMethod.togglePaymentOption(sandBoxValue);
+        }
 
     getPermissions(sandBoxValue, switchToggle, paymentMethodName = '') {
         const queryData = {
@@ -268,24 +267,18 @@ class PaymentMethod {
 
     }
 
-    toggleBancontact(hide) {
+    togglePaymentOption(hide) {
         const $container = $('.' + paymentMethod.props.container);
-        if ($container.find('.-bancontact').length) {
+        if ($container.find('.options').length) {
             if (hide) {
-                $container.find('.-bancontact').hide();
-            } else {
-                $container.find('.-bancontact').show();
-            }
-        }
-    }
+                $container.find('.options').addClass('-disabled');
+                $container.find('._sandboxDescription').removeClass('-disabled');
+                $container.find('._liveDescription').addClass('-disabled');
 
-    toggleApplePay(hide) {
-        const $container = $('.' + paymentMethod.props.container);
-        if ($container.find('.-applepay').length) {
-            if (hide) {
-                $container.find('.-applepay').addClass('-disabled');
             } else {
-                $container.find('.-applepay').removeClass('-disabled');
+                $container.find('.options').removeClass('-disabled');
+                $container.find('._sandboxDescription').addClass('-disabled');
+                $container.find('._liveDescription').removeClass('-disabled');
             }
         }
     }

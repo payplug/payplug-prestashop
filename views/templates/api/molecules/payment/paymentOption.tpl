@@ -44,7 +44,9 @@
             file='./../../atoms/title/title.tpl'
             titleClassName='_title'
             titleText=$paymentOptionName|escape:'htmlall':'UTF-8'}
-        <p>
+
+
+        <p {if 'standard' !== $paymentOptionIdentifier}class="_liveDescription" {/if} >
             {$paymentOptionDescription|escape:'htmlall':'UTF-8'}
             {if isset($paymentOptionLink) && $paymentOptionLink}
                 {capture assign="paymentOptionLinkText"}{l s='paymentOption.link.text' mod='payplug'}{/capture}
@@ -56,10 +58,18 @@
                     linkData='data-link'}
             {/if}
         </p>
+        {if 'standard' !== $paymentOptionIdentifier}
+            <p class="_sandboxDescription" >
+                {if isset($paymentSandboxOptionDescription)}{$paymentSandboxOptionDescription}{/if}
+            </p>
+        {/if}
     </div>
     {if isset($paymentOptionInformations) && $paymentOptionInformations}
-        <div class="_informations">
+        <div class="_informations -disabled">
             {$paymentOptionInformations}
         </div>
+    {/if}
+    {if 'standard' !== $paymentOptionIdentifier }
+            <div class="options"></div>
     {/if}
 </div>

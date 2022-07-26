@@ -24,17 +24,16 @@
     {capture assign="paymentMethod_title"}{l s='paymentMethod.block.title' mod='payplug'}{/capture}
     {capture assign="paymentMethod_description"}{l s='paymentMethod.block.description' mod='payplug'}{/capture}
     {capture assign="paymentMethod_content"}
-{*        {$sex = ($bloke) ? 'Male' : 'Female'}*}
-{*        $payplug_switch.sandbox.checked ?$payment_method.sandboxDescription : $payment_method.description*}
-{*        {var_dump($payplug_switch.sandbox.checked)}*}
-        {$description = $payplug_switch.sandbox.checked ?$payment_method.sandboxDescription : $payment_method.description}
-        {assign description ($payplug_switch.sandbox.checked ) ? $payment_method.sandboxDescription : $payment_method.description}
+
         {foreach $payment_methods as $payment_method_name => $payment_method}
+            {assign var="sandboxDescription" value=$payment_method.sandboxDescription}
+            {assign var="description" value=$payment_method.description}
             {include file='./paymentOption.tpl'
                 paymentOptionIdentifier = $payment_method_name
                 paymentOptionName = $payment_method.name
                 paymentOptionImage_url = $payment_method.image_url
                 paymentOptionDescription = $description
+                paymentSandboxOptionDescription = $sandboxDescription
                 paymentOptionLink = $payment_method.link
                 paymentOptionChecked = $payment_method.checked
                 paymentOptionInformations = $payment_method.informations}

@@ -5,7 +5,7 @@
     display: flex;
     align-items: center;
     margin: @margin-4 0 0;
-    flex-wrap: wrap;
+    position: relative;
 
     ._logo {
       .border(@color-border);
@@ -28,6 +28,7 @@
       @media (@screen-tablet) {
         display: none;
       }
+
     }
 
     & > ._text {
@@ -41,6 +42,10 @@
 
       p {
         margin: 0;
+      }
+
+      & > .-disabled {
+        display: none;
       }
 
       @media (@screen-mobile) {
@@ -127,6 +132,7 @@
 
     & + .paymentOption {
       margin: 42px 0 0;
+
     }
 
     &.-payplug_oney {
@@ -147,7 +153,13 @@
         }
       }
     }
+
+    &.-oney {
+      flex-wrap: wrap;
+    }
+
     &.-standard {
+      flex-wrap: wrap;
       ._informations {
         padding: @padding-8 0 0 @padding-15;
 
@@ -165,14 +177,24 @@
 
       }
     }
-    &.-disabled {
-      @bg: #colorMap[white];
-      //background: fade(@bg, 70%);
-      background-color: fade(@bg, 70%);
-      height: 100%;
-      z-index: 99;
 
+
+
+
+    .options {
+      &.-disabled {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 99;
+        display: block;
+        height: 100%;
+        width: 100%;
+        font-size: 65px;
+        background: hsla(0,0%,100%,.7);
+      }
     }
+
     @media (@screen-mobile) {
       margin: 0;
       & + .paymentOption {
