@@ -175,10 +175,7 @@ class PluginInit extends BaseClass
 
     private function setRepositories()
     {
-        $this->amountCurrencyClass = new AmountCurrencyClass(
-            $this->tools,
-            $this->dependencies
-        );
+        $this->amountCurrencyClass = new AmountCurrencyClass($this->dependencies);
         $this->logger = new LoggerRepository($this->dependencies);
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository();

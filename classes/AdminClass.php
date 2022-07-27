@@ -30,6 +30,7 @@ class AdminClass
     private $dependencies;
     private $config;
     private $html = '';
+    private $order;
     private $orderHistory;
     private $orderState;
     private $paymentRepository;
@@ -42,6 +43,7 @@ class AdminClass
         $this->assign = $this->dependencies->getPlugin()->getAssign();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->order = $this->dependencies->getPlugin()->getOrder();
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->orderState = $this->dependencies->getPlugin()->getOrderStateAdapter();
         $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
@@ -369,7 +371,7 @@ class AdminClass
                 }
             }
 
-            $order = new Order((int)$id_order);
+            $order = $this->order->get((int)$id_order);
             if ($this->validate->validate('isLoadedObject', $order)) {
                 $current_state = (int)$order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
