@@ -48,7 +48,7 @@
             inputName = $payplug_switch.oney_optimized.name}
         {/if}
 
-        {* Advanced Paylater Settings *}
+{*         Advanced Paylater Settings *}
         {include file='./paylater_advanced.tpl'}
     {/capture}
 
@@ -61,14 +61,7 @@
     {else}
         {assign var="paylaterChecked" value=$payplug_switch.oney.checked}
     {/if}
-    {include file='./../payment/paymentOption.tpl'
-        paymentOptionClassName = $module_name
-        paymentOptionIdentifier = 'oney'
-        paymentOptionName = $paylaterTitle
-        paymentOptionDescription = $paylaterDescription
-        paymentOptionChecked = $paylaterChecked
-        paymentOptionLink = $faq_links.oney
-        paymentOptionInformations = $paylaterAdvanced}
+    {$paylaterAdvanced}
 {/capture}
 
 {assign var='paylaterBlock_className' value='paylaterBlock'}

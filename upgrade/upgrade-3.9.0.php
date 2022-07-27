@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_9_0()
 {
-    // add  PAYPLUG_ONEY_CART_CTA & PAYPLUG_ONEY_PRODUCT_CTA to database
+    // add  PAYPLUG_ONEY_CART_CTA & PAYPLUG_ONEY_PRODUCT_CTA & PAYPLUG_BANCONTACT_COUNTRY to database
     return Configuration::updateValue(
         'PAYPLUG_ONEY_CART_CTA',
         null
@@ -35,5 +35,9 @@ function upgrade_module_3_9_0()
         && Configuration::updateValue(
             'PAYPLUG_ONEY_PRODUCT_CTA',
             null
+        )
+        && Configuration::updateValue(
+            'PAYPLUG_BANCONTACT_COUNTRY',
+            0
         );
 }
