@@ -320,15 +320,15 @@ class PaymentRepository extends BaseClass
 
             $this->paymentEntity->setApiPayment($payment['resource']);
         } else {
-            $installment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
-            if (!$installment['result']) {
+            $payment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
+            if (!$payment['result']) {
                 unset($paymentDetails['paymentTab']);
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                    '[createPayment] Exception. Unable to create installment plan. Error: ' . $installment['message']
+                    '[createPayment] Exception. Unable to create installment plan. Error: ' . $payment['message']
                 );
             }
-            $this->paymentEntity->setApiPayment($installment['resource']);
+            $this->paymentEntity->setApiPayment($payment['resource']);
         }
 
         $this->apiPayment = $this->paymentEntity->getApiPayment();
