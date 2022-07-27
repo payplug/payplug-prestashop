@@ -834,8 +834,7 @@ class PaymentClass
                 "sandboxDescription" =>'',
                 "link" => '',
                 "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('standard')),
-                "config_key" => $this->dependencies->getConfigurationKey('standard'),
-                "informations" => '',
+                "config_key" => $this->dependencies->getConfigurationKey('standard')
             ];
         }
 
@@ -847,8 +846,7 @@ class PaymentClass
                 "sandboxDescription" => $this->dependencies->l('payment.getPaymentMethod.applepay.sandboxDescription', 'paymentclass'),
                 "link" => $faq_links['applepay'],
                 "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')),
-                "config_key" => $this->dependencies->getConfigurationKey('applepay'),
-                "informations" => '',
+                "config_key" => $this->dependencies->getConfigurationKey('applepay')
             ];
         }
 
@@ -860,8 +858,7 @@ class PaymentClass
                 "sandboxDescription" => $this->dependencies->l('payment.getPaymentMethod.bancontact.sandboxDescription', 'paymentclass'),
                 "link" => $faq_links['bancontact'],
                 "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('bancontact')),
-                "config_key" => $this->dependencies->getConfigurationKey('bancontact'),
-                "informations" => '',
+                "config_key" => $this->dependencies->getConfigurationKey('bancontact')
             ];
         }
 

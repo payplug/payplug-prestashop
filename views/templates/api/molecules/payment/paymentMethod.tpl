@@ -45,7 +45,8 @@
             titleClassName='_title'
             titleText=$paymentOptionName|escape:'htmlall':'UTF-8'}
 
-        <p {if 'standard' !== $paymentOptionIdentifier}class="_liveDescription" {/if}>
+        <p {if isset($paymentSandboxOptionDescription) && $paymentSandboxOptionDescription != ''}
+            class="-live _description" {/if}>
             {$paymentOptionDescription|escape:'htmlall':'UTF-8'}
             {if isset($paymentOptionLink) && $paymentOptionLink}
                 {capture assign="paymentOptionLinkText"}{l s='paymentOption.link.text' mod='payplug'}{/capture}
@@ -57,18 +58,13 @@
                     linkData='data-link'}
             {/if}
         </p>
-        {if 'standard' !== $paymentOptionIdentifier}
-            <p class="_sandboxDescription" >
+        {if isset($paymentSandboxOptionDescription) && $paymentSandboxOptionDescription != ''}
+            <p class="-sandbox _description" >
                 {if isset($paymentSandboxOptionDescription)}{$paymentSandboxOptionDescription}{/if}
             </p>
         {/if}
 
     </div>
-
-
-    {if 'standard' !== $paymentOptionIdentifier }
-        <div class="options"></div>
-    {/if}
 
     <div class="_informations">
         {include file='./paymentOptions.tpl'
