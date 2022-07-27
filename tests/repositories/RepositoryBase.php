@@ -139,7 +139,19 @@ class RepositoryBase extends TestCase
             });
         $this->dependencies->name = DependenciesMock::get();
 
-        $this->dependencies->amountCurrencyClass   = new AmountCurrencyClass($this->tools, $this->dependencies);
+        $this->dependencies->amountCurrencyClass = \Mockery::mock('alias:PayPlug\classes\AmountCurrencyClass');
+        $this->dependencies->amountCurrencyClass
+            ->shouldReceive('convertAmount')
+            ->andReturnUsing(function ($amount, $to_cents = false) {
+                if ($to_cents) {
+                    return (float)($amount / 100);
+                } else {
+                    $amount = (float)($amount * 1000);
+                    $amount = (float)($amount / 10);
+                    return (int)($this->tools->tool('ps_round', $amount));
+                }
+            });
+
         $this->dependencies->apiClass   = \Mockery::mock('alias:PayPlug\classes\ApiClass');
         $this->dependencies->paymentClass   = \Mockery::mock('alias:PayPlug\classes\PaymentClass');
         $this->dependencies->configClass    = \Mockery::mock('alias:PayPlug\classes\ConfigClass');
