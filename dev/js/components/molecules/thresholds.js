@@ -9,7 +9,6 @@ class Thresholds {
         'query': null,
     };
 
-
     initialize() {
         this.handleEvents();
     }
@@ -44,6 +43,8 @@ class Thresholds {
             $('.thresholdErrorIcon').hide();
             thresholds.checkMax();
         }
+
+        $(window).trigger('checkConfiguration');
     }
 
 
@@ -76,6 +77,8 @@ class Thresholds {
             thresholdsErrorSpan.hide();
             $('.thresholdErrorIcon').hide();
         }
+
+        $(window).trigger('checkConfiguration');
     }
 }
 

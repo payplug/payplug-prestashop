@@ -4,7 +4,7 @@ echo "Set namespace";
 
 mode="normal"
 namespace="PayPlug"
-newnamespace="PayLater"
+newnamespace="PayLaterModule"
 class="Payplug"
 newclass="PsPayLater"
 # Process all options supplied on the command line
@@ -18,7 +18,7 @@ done
 
 if  [ "$mode" = "reverse" ]; then
   echo "Current mode is ${mode}, convert namespace back to Payplug"
-  namespace="PayLater"
+  namespace="PayLaterModule"
   newnamespace="PayPlug"
   class="PsPayLater"
   newclass="Payplug"

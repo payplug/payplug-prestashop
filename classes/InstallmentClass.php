@@ -43,8 +43,13 @@ class InstallmentClass
     {
         if (!is_object($installment)) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
+            if (!$installment['result']) {
+                return false;
+            }
+
             $installment = $installment['resource'];
         }
+
         if (isset($installment->schedule)) {
             $step_count = count($installment->schedule);
             $index = 0;
@@ -54,6 +59,9 @@ class InstallmentClass
                 if (count($schedule->payment_ids) > 0) {
                     $pay_id = $schedule->payment_ids[0];
                     $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                    if (!$payment['result']) {
+                        return false;
+                    }
                     $payment = $payment['resource'];
                     $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($payment);
                 } else {
@@ -92,8 +100,13 @@ class InstallmentClass
     {
         if (!is_object($installment)) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
+            if (!$installment['result']) {
+                return false;
+            }
+
             $installment = $installment['resource'];
         }
+
         $req_installment = '
             SELECT pi.*
             FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_installment` pi 
@@ -117,6 +130,10 @@ class InstallmentClass
     {
         if (!is_object($installment)) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
+            if (!$installment['result']) {
+                return false;
+            }
+
             $installment = $installment['resource'];
         }
 
@@ -180,6 +197,10 @@ class InstallmentClass
     {
         if (!is_object($installment)) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
+            if (!$installment['result']) {
+                return false;
+            }
+
             $installment = $installment['resource'];
         }
         $req_installment = '

@@ -28,4 +28,16 @@
         buttonStyle='default'
         buttonDisabled=!$connected
         buttonText=$footerConfiguration_save}
+
+    <div class="_faq">
+        <p>{l s='configuration.footer.faq' mod='payplug'}</p>
+        {capture assign="faqHref"}{l s='configuration.footer.faqHref' mod='payplug'}{/capture}
+        {capture assign='faqLink'}
+            {include file='./../atoms/link/link.tpl'
+                linkText=''
+                linkHref=$faqHref
+                linkNoTag=true}
+        {/capture}
+        <p>{l s='configuration.footer.faqLink' tags=[$faqLink] mod='payplug'}</p>
+    </div>
 </div>

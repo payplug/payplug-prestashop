@@ -15,10 +15,10 @@
       }
       ._wrapper {
         display: flex;
-        justify-content: center;
         flex-direction: column;
+        align-self: center;
         width: calc(100% - 200px);
-        padding: 0 0 0 40px;
+        padding: 0 50px 0 40px;
 
         @media (@screen-mobile) {
           padding: 0;
@@ -68,13 +68,35 @@
           margin: 0;
         }
       }
-      &.-optimized {
+      &.-optimized{
         ._content {
           justify-content: space-between;
 
           p {
             max-width: calc(100% - 145px);
           }
+        }
+        ._switch {
+          display:flex;
+          align-items: center; /* use center to align on the secondary axis */
+        }
+      }
+      &.-productOneyCta {
+        ._content {
+          justify-content: space-between;
+          p {
+            max-width: calc(100% - 145px);
+          }
+        }
+        ._switch {
+          display:flex;
+          align-items: center; /* use center to align on the secondary axis */
+        }
+      }
+      &.-cartOneyCta {
+        ._switch {
+          display:flex;
+          align-items: center; /* use center to align on the secondary axis */
         }
       }
     }

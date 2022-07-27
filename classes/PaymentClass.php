@@ -112,6 +112,13 @@ class PaymentClass
             ]));
         } else {
             $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+            if (!$installment['result']) {
+                die(json_encode([
+                    'status' => 'error',
+                    'data' => $this->dependencies->l('payplug.abortPayment.cannotAbort', 'paymentclass')
+                ]));
+            }
+
             $installment = $installment['resource'];
 
             if ($installment->is_live == 1) {
@@ -127,7 +134,7 @@ class PaymentClass
                 if ($current_state != 0 && $current_state !== $new_state) {
                     $order_history = $this->orderHistory->get();
                     $order_history->id_order = (int)$order->id;
-                    $order_history->changeIdOrderState($new_state, (int)$order->id);
+                    $order_history->changeIdOrderState($new_state, (int)$order->id, true);
                     $order_history->addWithemail();
                 }
             }
@@ -247,12 +254,11 @@ class PaymentClass
     public function buildPaymentDetails($payment)
     {
         if (!is_object($payment)) {
-            try {
-                $payment = $this->dependencies->apiClass->retrievePayment($payment);
-                $payment = $payment['resource'];
-            } catch (Exception $exception) {
-                return $exception;
+            $payment = $this->dependencies->apiClass->retrievePayment($payment);
+            if (!$payment['result']) {
+                return $payment['message'];
             }
+            $payment = $payment['resource'];
         }
 
         $pay_status = $this->getPaymentStatusByPayment($payment);
@@ -555,7 +561,7 @@ class PaymentClass
                 $order_history = $this->orderHistory->get();
                 $order_history->id_order = (int)$order->id;
                 $this->logger->addLog('New order state: ' . $new_state, 'notice');
-                $order_history->changeIdOrderState($new_state, (int)$order->id);
+                $order_history->changeIdOrderState($new_state, (int)$order->id, true);
                 $order_history->addWithemail();
             }
 
@@ -1103,7 +1109,9 @@ class PaymentClass
             }
         }
 
-        if ($options['oney']) {
+        if ($options['oney'] &&
+            $this->dependencies->configClass->isValidFeature('feature_paylater')
+            ) {
             $use_taxes = (bool)$this->config->get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
 
@@ -1381,11 +1389,18 @@ class PaymentClass
         */
         if (!is_object($payment)) {
             $payment = $this->dependencies->apiClass->retrievePayment($payment);
+            if (!$payment['result']) {
+                return false;
+            }
             $payment = $payment['resource'];
         }
 
         if ($payment->installment_plan_id !== null) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($payment->installment_plan_id);
+            if (!$installment['result']) {
+                return false;
+            }
+
             $installment = $installment['resource'];
         } else {
             $installment = null;
@@ -1487,12 +1502,12 @@ class PaymentClass
         switch ($type) {
             case 'installment':
                 $installment = $this->dependencies->apiClass->retrieveInstallment($payment_id);
-                if (isset($installment['resource']) && $installment['resource']->is_active) {
-                    $schedules = $installment->schedule;
+                if ($installment['result'] && $installment['resource']->is_active) {
+                    $schedules = $installment['resource']->schedule;
                     foreach ($schedules as $schedule) {
                         foreach ($schedule->payment_ids as $pay_id) {
                             $inst_payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-                            if (isset($inst_payment['resource']) && $inst_payment['resource']->is_paid) {
+                            if ($inst_payment['result'] && $inst_payment['resource']->is_paid) {
                                 return true;
                             }
                         }
@@ -1502,7 +1517,7 @@ class PaymentClass
             case 'payment':
             default:
                 $payment = $this->dependencies->apiClass->retrievePayment($payment_id);
-                return isset($payment['resource']) && $payment['resource']->is_paid;
+                return $payment['result'] && $payment['resource']->is_paid;
         }
         return false;
     }
@@ -2005,7 +2020,8 @@ class PaymentClass
         /*
          * Create payment if inexistent
          */
-        if (!$this->payment->checkPaymentTable($cart->id) || $options['is_applepay']) {
+        $force_payment_creation = $options['is_applepay'] || $options['is_oney'];
+        if (!$this->payment->checkPaymentTable($cart->id) || $force_payment_creation) {
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
 

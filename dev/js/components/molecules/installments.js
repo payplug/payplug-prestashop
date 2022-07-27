@@ -31,12 +31,16 @@ class Installments {
             minAmountErrorSpan.hide();
             $('.installmentErrorIcon').hide();
         }
+
+        $(window).trigger('checkConfiguration');
     }
 
     handleInstallment(event) {
         const $input = $(event.target),
             $select = $('.payplugUISelect.installmentMode'),
             $inputMode = $('.payplugUIInput.installmentMinAmount').find('input');
+
+        $(window).trigger('resetThresholders');
 
         if ($input.prop('checked')) {
             $select.removeClass('-disabled')

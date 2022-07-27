@@ -622,6 +622,8 @@ class ConfigClass
             $this->dependencies->getConfigurationKey('oneClick') => 'payplug_one_click',
             $this->dependencies->getConfigurationKey('oney') => 'payplug_oney',
             $this->dependencies->getConfigurationKey('oneyOptimized') => 'payplug_oney_optimized',
+            $this->dependencies->getConfigurationKey('oneyProductCta') => 'payplug_oney_product_cta',
+            $this->dependencies->getConfigurationKey('oneyCartCta') => 'payplug_oney_cart_cta',
             $this->dependencies->getConfigurationKey('oneyFees') => 'payplug_oney_fees',
             $this->dependencies->getConfigurationKey('sandboxMode') => 'payplug_sandbox',
             $this->dependencies->getConfigurationKey('standard') => 'payplug_standard',
@@ -642,6 +644,8 @@ class ConfigClass
                         }
                         break;
                     case 'payplug_oney_optimized':
+                    case 'payplug_oney_product_cta':
+                    case 'payplug_oney_cart_cta':
                     case 'payplug_oney_fees':
                         if ((int)Tools::getValue('payplug_oney') === 1) {
                             Configuration::updateValue($key, $value);
@@ -742,6 +746,8 @@ class ConfigClass
             'oney' => Configuration::get($this->dependencies->getConfigurationKey('oney')),
             'oney_fees' => Configuration::get($this->dependencies->getConfigurationKey('oneyFees')),
             'oney_optimized' => Configuration::get($this->dependencies->getConfigurationKey('oneyOptimized')),
+            'oney_product_cta' => Configuration::get($this->dependencies->getConfigurationKey('oneyProductCta')),
+            'oney_cart_cta' => Configuration::get($this->dependencies->getConfigurationKey('oneyCartCta')),
             'bancontact' => Configuration::get($this->dependencies->getConfigurationKey('bancontact')),
             'applepay' => Configuration::get($this->dependencies->getConfigurationKey('applepay'))
         ];
@@ -855,6 +861,7 @@ class ConfigClass
                 'oney_max_amounts' => $oney_max_amounts,
                 'oney_min_amounts' => $oney_min_amounts,
                 'errorInstallmentAmount' => $this->dependencies->l('config.assignContentVar.installment.amountError', 'configclass'),
+                'inst_min_amount' => Configuration::get($this->dependencies->getConfigurationKey('instMinAmount'))
             ]
         );
 
@@ -885,6 +892,7 @@ class ConfigClass
             'oney' => $this->configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
             'applepay' => $this->isValidFeature('feature_applepay'),
+            'paylater_isActivated' => $this->isValidFeature('feature_paylater'),
             'integrated' => $this->isValidFeature('feature_integrated'),
             'display_mode_isActivated' => $this->isValidFeature('feature_display_mode'),
             'standard_isActivated' => $this->isValidFeature('feature_standard'),
@@ -1024,6 +1032,18 @@ class ConfigClass
             'active' => true,
             'small' => true,
             'checked' => $configurations['oney_optimized'],
+        ];
+        $switch['oney_product_cta'] = [
+            'name' => 'payplug_oney_product_cta',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_product_cta'],
+        ];
+        $switch['oney_cart_cta'] = [
+            'name' => 'payplug_oney_cart_cta',
+            'active' => true,
+            'small' => true,
+            'checked' => $configurations['oney_cart_cta'],
         ];
 
         $switch['oney_fees'] = [

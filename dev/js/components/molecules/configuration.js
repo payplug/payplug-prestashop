@@ -13,7 +13,9 @@ class Configuration {
         const {container} = configuration.props;
         $(document)
             .on('click', '.' + container + ' button[name=saveConfiguration]', this.submit)
-            .on('click', '.' + container + ' button[name=closePopin]', this.closePopin)
+            .on('click', '.' + container + ' button[name=closePopin]', this.closePopin);
+        $(window)
+            .on('checkConfiguration', configuration.checkConfiguration);
     }
 
     get() {
@@ -21,7 +23,6 @@ class Configuration {
         const $input = $container.find('input');
         const $select = $container.find('select');
         let data = {};
-        let hasErrors = false;
 
         $input.map((key,item) => {
             var $item = $(item),
@@ -29,9 +30,6 @@ class Configuration {
                 type = $item.attr('type'),
                 value = $item.val();
 
-            if ($item.is('.-error')) {
-                hasErrors = true;
-            }
             if(typeof name != 'undefined' && name) {
                 switch (type) {
                     case 'radio' :
@@ -52,23 +50,58 @@ class Configuration {
                 }
             }
         });
+
         $select.map((key,item) => {
             var $item = $(item);
-
-            if ($item.is('.-error')) {
-                hasErrors = true;
-            }
             data[$item.attr('name')] = parseInt($item.val());
         });
-        return hasErrors ? {} : data;
+
+        return data;
     }
 
     closePopin(event) {
         const $container = $('.' + configuration.props.container);
         $container.find('input[name=modalTriggered]').prop('checked', false);
     }
+
     closeAlert() {
         $('.payplugUIAlert').filter('.-error').remove();
+    }
+
+    isValidConfiguration() {
+        const $container = $('.' + configuration.props.container);
+        const $input = $container.find('input');
+        const $select = $container.find('select');
+        let hasError = false;
+
+        $input.map((key,item) => {
+            var $item = $(item);
+            if ($item.is('.-error') || $item.parents().is('.-error')) {
+                hasError = true;
+            }
+        });
+        $select.map((key,item) => {
+            var $item = $(item);
+            if ($item.is('.-error') || $item.parents().is('.-error')) {
+                hasError = true;
+            }
+        });
+
+        return !hasError;
+    }
+
+    checkConfiguration() {
+        const $container = $('.' + configuration.props.container);
+        const isValid = configuration.isValidConfiguration();
+        if (isValid) {
+            $container.find('button[name="saveConfiguration"]')
+                .removeClass('-disabled')
+                .removeAttr('disabled');
+        } else {
+            $container.find('button[name="saveConfiguration"]')
+                .addClass('-disabled')
+                .attr('disabled', 'disabled');
+        }
     }
 
     showError() {
@@ -127,18 +160,16 @@ class Configuration {
 
         configuration.closeAlert();
 
-        const currentConfiguration = configuration.get();
-
-        if($.isEmptyObject(currentConfiguration)) {
+        if (!configuration.isValidConfiguration()) {
             return configuration.showError();
         }
 
+        const currentConfiguration = configuration.get();
         const queryData = {
             _ajax: 1,
             save: 1,
             ...currentConfiguration
         };
-
         const $container = $('.' + configuration.props.container);
         const $button = $(this);
 

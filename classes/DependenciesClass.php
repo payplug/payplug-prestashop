@@ -185,6 +185,16 @@ class DependenciesClass
             'defaultValue' => 0,
             'setConf' => 1
         ],
+        'oneyProductCta' => [
+            'name' => 'ONEY_PRODUCT_CTA',
+            'defaultValue' => 1,
+            'setConf' => 1
+        ],
+        'oneyCartCta' => [
+            'name' => 'ONEY_CART_CTA',
+            'defaultValue' => 1,
+            'setConf' => 1
+        ],
         'orderStateAuth' => [
             'name' => 'ORDER_STATE_AUTH',
             'defaultValue' => null,
@@ -311,7 +321,6 @@ class DependenciesClass
         $configuration = $this->getPluginConfiguration();
         $this->name = $configuration->moduleName;
         $this->version = $configuration->version;
-
         $this->initializeAccessors();
     }
 

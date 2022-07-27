@@ -47,6 +47,7 @@ class PayPlugValidation
     private $isDeferred;
     private $isOney;
     private $isBancontact;
+    private $isApplepay;
     private $orderClass;
     private $plugin;
 
@@ -176,37 +177,9 @@ class PayPlugValidation
                 $amount = 0;
                 $pay_id = false;
                 $this->type = 'installment';
-                try {
-                    $installment = $this->apiClass->retrieveInstallment($inst_id);
-                    $installment = $installment['resource'];
-                    $this->api_key = (bool)$installment->is_live ?
-                        Configuration::get(
-                            $this->dependencies->getConfigurationKey('liveApiKey')
-                        ) :
-                        Configuration::get(
-                            $this->dependencies->getConfigurationKey('testApiKey')
-                        );
-                    if (isset($installment->schedule)) {
-                        foreach ($installment->schedule as $schedule) {
-                            $amount += (int)$schedule->amount;
-                            if ($pay_id) {
-                                continue;
-                            }
-                            $pay_id = !empty($schedule->payment_ids) ? $schedule->payment_ids[0] : $pay_id;
-                        }
-                    }
-                    $this->logger->addLog('Retrieving installment...');
-                    if ($installment->failure) {
-                        $this->logger->addLog(
-                            'Installment failure : ' . $installment->failure->message,
-                            'error'
-                        );
-                        $this->paymentClass->setPaymentErrorsCookie([
-                            $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
-                        ]);
-                        Tools::redirect($redirect_url_error);
-                    }
-                } catch (Exception $e) {
+
+                $installment = $this->apiClass->retrieveInstallment($inst_id);
+                if (!$installment['result']) {
                     $this->logger->addLog('Installment cannot be retrieved.', 'error');
                     if (!PayplugLock::deleteLockG2($cart->id)) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
@@ -218,71 +191,37 @@ class PayPlugValidation
                     ]);
                     Tools::redirect($redirect_url_error);
                 }
-            }
-        } else {
-            $this->logger->addLog('Payment is not consumed yet.');
-            try {
-                $payment = $this->apiClass->retrievePayment($pay_id);
-                $payment = $payment['resource'];
-                $this->api_key = (bool)$payment->is_live ?
-                    Configuration::get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    ) :
-                    Configuration::get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    );
-                $this->logger->addLog('Retrieving payment: ' . $payment->id);
-                if (isset($payment->failure) && $payment->failure !== null) {
-                    if (!PayplugLock::deleteLockG2($cart->id)) {
-                        $this->logger->addLog('Lock cannot be deleted.', 'error');
-                    } else {
-                        $this->logger->addLog('Lock deleted.', 'debug');
+
+                $installment = $installment['resource'];
+                $this->api_key = (bool)$installment->is_live ?
+                    Configuration::get($this->dependencies->getConfigurationKey('liveApiKey')) :
+                    Configuration::get($this->dependencies->getConfigurationKey('testApiKey'));
+
+                if (isset($installment->schedule)) {
+                    foreach ($installment->schedule as $schedule) {
+                        $amount += (int)$schedule->amount;
+                        if ($pay_id) {
+                            continue;
+                        }
+                        $pay_id = !empty($schedule->payment_ids) ? $schedule->payment_ids[0] : $pay_id;
                     }
-                    $this->logger->addLog('Payment failure : ' . $payment->failure->message, 'error');
+                }
+                $this->logger->addLog('Retrieving installment...');
+
+                if ($installment->failure) {
+                    $this->logger->addLog('Installment failure : ' . $installment->failure->message, 'error');
                     $this->paymentClass->setPaymentErrorsCookie([
                         $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
                     ]);
-                    if (!PayplugLock::deleteLockG2($cart->id)) {
-                        $this->logger->addLog('Lock cannot be deleted.', 'error');
-                    } else {
-                        $this->logger->addLog('Lock deleted.', 'debug');
-                    }
                     Tools::redirect($redirect_url_error);
                 }
-                $is_paid = $payment->is_paid;
-                if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
-                    switch ($payment->payment_method['type']) {
-                        case 'oney_x3_with_fees':
-                        case 'oney_x4_with_fees':
-                        case 'oney_x3_without_fees':
-                        case 'oney_x4_without_fees':
-                            $this->isOney = true;
-                            break;
-                        case 'bancontact':
-                            $this->isBancontact = true;
-                            break;
-                        case 'apple_pay':
-                            $this->isApplepay = true;
-                            break;
-                        default:
-                            $this->isOney = false;
-                            $this->isBancontact = false;
-                            $this->isApplepay = false;
-                    }
-                }
+            }
+        } else {
+            $this->logger->addLog('Payment is not consumed yet.');
 
-                $is_authorized = false;
-
-                if (($payment->authorization !== null) && isset($payment->authorization->authorized_amount)) {
-                    $is_authorized = true;
-                    if (!$this->isOney) {
-                        $this->isDeferred = true;
-                    }
-                }
-
-                $amount = $payment->amount;
-            } catch (Exception $e) {
-                $this->logger->addLog('Payment cannot be retrieved. Exception : '.$e->getMessage(), 'error');
+            $payment = $this->apiClass->retrievePayment($pay_id);
+            if (!$payment['result']) {
+                $this->logger->addLog('Payment cannot be retrieved. Exception : ' . $payment['message'], 'error');
                 if (!PayplugLock::deleteLockG2($cart->id)) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
@@ -293,6 +232,65 @@ class PayPlugValidation
                 ]);
                 Tools::redirect($redirect_url_error);
             }
+
+            $payment = $payment['resource'];
+            $this->api_key = (bool)$payment->is_live ?
+                Configuration::get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                ) :
+                Configuration::get(
+                    $this->dependencies->getConfigurationKey('testApiKey')
+                );
+            $this->logger->addLog('Retrieving payment: ' . $payment->id);
+            if (isset($payment->failure) && $payment->failure !== null) {
+                if (!PayplugLock::deleteLockG2($cart->id)) {
+                    $this->logger->addLog('Lock cannot be deleted.', 'error');
+                } else {
+                    $this->logger->addLog('Lock deleted.', 'debug');
+                }
+                $this->logger->addLog('Payment failure : ' . $payment->failure->message, 'error');
+                $this->paymentClass->setPaymentErrorsCookie([
+                    $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation')
+                ]);
+                if (!PayplugLock::deleteLockG2($cart->id)) {
+                    $this->logger->addLog('Lock cannot be deleted.', 'error');
+                } else {
+                    $this->logger->addLog('Lock deleted.', 'debug');
+                }
+                Tools::redirect($redirect_url_error);
+            }
+            $is_paid = $payment->is_paid;
+            if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
+                switch ($payment->payment_method['type']) {
+                    case 'oney_x3_with_fees':
+                    case 'oney_x4_with_fees':
+                    case 'oney_x3_without_fees':
+                    case 'oney_x4_without_fees':
+                        $this->isOney = true;
+                        break;
+                    case 'bancontact':
+                        $this->isBancontact = true;
+                        break;
+                    case 'apple_pay':
+                        $this->isApplepay = true;
+                        break;
+                    default:
+                        $this->isOney = false;
+                        $this->isBancontact = false;
+                        $this->isApplepay = false;
+                }
+            }
+
+            $is_authorized = false;
+
+            if (($payment->authorization !== null) && isset($payment->authorization->authorized_amount)) {
+                $is_authorized = true;
+                if (!$this->isOney) {
+                    $this->isDeferred = true;
+                }
+            }
+
+            $amount = $payment->amount;
 
             if (((isset($payment->save_card) && (int)$payment->save_card == 1))
                 ||
@@ -556,12 +554,15 @@ class PayPlugValidation
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;
 
-                $this->apiClass->patchPayment($payment->id, $data);
+                $patchPayment = $this->apiClass->patchPayment($payment->id, $data);
+                if (!$patchPayment['result']) {
+                    $this->logger->addLog('Payment cannot be patched: ' . $patchPayment['message'], 'error');
+                }
 
                 if (!$this->orderClass->addPayplugOrderPayment($id_order, $payment->id)) {
                     $this->logger->addLog('Unable to create order payment.', 'error');
                 }
-            } elseif ($this->type == 'installment') {
+            } elseif ('installment' == $this->type) {
                 $this->installmentClass->addPayplugInstallment($installment->resource, $order);
             }
 

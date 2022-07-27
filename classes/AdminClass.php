@@ -158,9 +158,21 @@ class AdminClass
             if ($this->tools->tool('getValue', 'permissionsModal')) {
                 if ($this->tools->tool('getValue', 'type') == 'oneyPremium') {
                     $link = 'https://portal.payplug.com/#/configuration/oney';
-                } elseif ($this->tools->tool('getValue', 'type') == 'bancontactPremium' || (Tools::getValue(
-                    'type'
-                ) == 'applepayPremium')) {
+                } elseif ($this->tools->tool('getValue', 'type') == 'bancontactPremium') {
+                    switch ($this->context->language->iso_code) {
+                        case 'fr':
+                            $link = 'https://support.payplug.com/hc/fr/requests/new?ticket_form_id=4583813991452';
+                            break;
+
+                        case 'it':
+                            $link = 'https://support.payplug.com/hc/it/requests/new?ticket_form_id=4583813991452';
+                            break;
+
+                        default:
+                            $link = 'https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=4583813991452';
+                            break;
+                    }
+                } elseif ($this->tools->tool('getValue', 'type') == 'applepayPremium') {
                     $link = 'mailto:support@payplug.com';
                 } else {
                     $link = 'https://www.payplug.com/contact';
@@ -219,15 +231,15 @@ class AdminClass
             die(json_encode(['popin' => $popin, 'content' => $content]));
         }
 
-        if (Tools::isSubmit('submitAccount')) {
+        if ($this->tools->tool('isSubmit', 'submitAccount')) {
             $this->dependencies->configClass->submitAccount();
         }
 
-        if (Tools::isSubmit('checkOnboarding')) {
+        if ($this->tools->tool('isSubmit', 'checkOnboarding')) {
             $this->dependencies->configClass->checkOnboarding();
         }
 
-        if (Tools::isSubmit('checkState')) {
+        if ($this->tools->tool('isSubmit', 'checkState')) {
             $content = $this->dependencies->configClass->checkState();
             if ($content) {
                 die(json_encode(['content' => $content]));
@@ -324,6 +336,13 @@ class AdminClass
         if ((int)$this->tools->tool('getValue', 'update') == 1) {
             $pay_id = $this->tools->tool('getValue', 'pay_id');
             $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            if (!$payment['result']) {
+                die(json_encode([
+                    'data' => $this->dependencies->l('payplug.adminAjaxController.errorOccurred', 'adminclass'),
+                    'status' => 'error'
+                ]));
+            }
+
             $payment = $payment['resource'];
 
             $id_order = $this->tools->tool('getValue', 'id_order');
@@ -356,7 +375,7 @@ class AdminClass
                 if ($current_state != 0 && $current_state != $new_state) {
                     $history = new OrderHistory();
                     $history->id_order = (int)$order->id;
-                    $history->changeIdOrderState($new_state, (int)$order->id);
+                    $history->changeIdOrderState($new_state, (int)$order->id, true);
                     $history->addWithemail();
                 }
             }

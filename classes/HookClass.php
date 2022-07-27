@@ -409,6 +409,9 @@ class HookClass
                 if ($schedule->payment_ids != null) {
                     foreach ($schedule->payment_ids as $pay_id) {
                         $p = $this->dependencies->apiClass->retrievePayment($pay_id);
+                        if (!$p['result']) {
+                            return false;
+                        }
                         $p = $p['resource'];
                         $payment_list_new[] = $this->dependencies->paymentClass->buildPaymentDetails($p);
                         if ((int) $p->is_paid == 0) {
