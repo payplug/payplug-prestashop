@@ -132,7 +132,6 @@
 
     & + .paymentOption {
       margin: 42px 0 0;
-
     }
 
     &.-payplug_oney {
@@ -158,10 +157,34 @@
       flex-wrap: wrap;
     }
 
+    ._description {
+      &.-sandbox {
+        display: none;
+      }
+    }
+
+    &.-test {
+      .paymentOption_switch {
+        opacity: 0;
+      }
+      ._description {
+        &.-live {
+          display: none;
+        }
+        &.-sandbox {
+          display: block;
+        }
+      }
+      ._informations {
+        display: none;
+      }
+    }
+
     &.-standard {
       flex-wrap: wrap;
       ._informations {
         padding: @padding-8 0 0 @padding-15;
+        display: block;
 
         @media (@screen-tablet) {
           .payplugUIIOptions {
@@ -176,25 +199,17 @@
         }
 
       }
-    }
-
-
-
-
-    .options {
-      &.-disabled {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 99;
-        display: block;
-        height: 100%;
-        width: 100%;
-        font-size: 65px;
-        background: hsla(0,0%,100%,.7);
+      &.-test {
+        .paymentOption_switch {
+          opacity: 1;
+        }
+        ._description {
+          &.-live {
+            display: block;
+          }
+        }
       }
     }
-
     @media (@screen-mobile) {
       margin: 0;
       & + .paymentOption {

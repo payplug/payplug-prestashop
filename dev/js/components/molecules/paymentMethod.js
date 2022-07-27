@@ -269,16 +269,11 @@ class PaymentMethod {
 
     togglePaymentOption(hide) {
         const $container = $('.' + paymentMethod.props.container);
-        if ($container.find('.options').length) {
+        if ($container.find('.paymentOption').length) {
             if (hide) {
-                $container.find('.options').addClass('-disabled');
-                $container.find('._sandboxDescription').removeClass('-disabled');
-                $container.find('._liveDescription').addClass('-disabled');
-
+                $container.find('.paymentOption').addClass('-test');
             } else {
-                $container.find('.options').removeClass('-disabled');
-                $container.find('._sandboxDescription').addClass('-disabled');
-                $container.find('._liveDescription').removeClass('-disabled');
+                $container.find('.paymentOption').removeClass('-test');
             }
         }
     }
