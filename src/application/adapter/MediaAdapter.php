@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,30 +16,20 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ModuleInterface;
-use Module;
+use PayPlug\src\interfaces\MediaInterface;
+use Media;
 
-class ModuleAdapter implements ModuleInterface
+class MediaAdapter implements MediaInterface
 {
-    public function displayError($error)
+    public function addJsDef($files = [])
     {
-        return Module::displayError($error);
-    }
-
-    public function getInstanceByName($moduleName)
-    {
-        return Module::getInstanceByName($moduleName);
-    }
-
-    public function isEnabled($moduleName)
-    {
-        return Module::isEnabled($moduleName);
+        return Media::addJsDef($files);
     }
 }

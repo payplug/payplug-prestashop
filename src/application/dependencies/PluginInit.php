@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\application\dependencies;
 
-use PayPlug\classes\ConfigClass;
-use PayPlug\classes\AmountCurrencyClass;
 use PayPlug\classes\MyLogPHP;
 
 use PayPlug\src\application\dependencies\BaseClass;
@@ -59,6 +57,7 @@ use PayPlug\src\application\adapter\CountryAdapter;
 use PayPlug\src\application\adapter\CurrencyAdapter;
 use PayPlug\src\application\adapter\CustomerAdapter;
 use PayPlug\src\application\adapter\LanguageAdapter;
+use PayPlug\src\application\adapter\MediaAdapter;
 use PayPlug\src\application\adapter\ModuleAdapter;
 use PayPlug\src\application\adapter\OrderAdapter;
 use PayPlug\src\application\adapter\OrderHistoryAdapter;
@@ -80,13 +79,11 @@ class PluginInit extends BaseClass
     private $order_state_entity;
 
     // Repositories & necessary classes
-    private $amountCurrencyClass;
     private $apiClass;
     private $cache;
     private $card;
     private $hook;
     private $install;
-//    private $installment;
     private $logger;
     private $myLogPhp;
     private $oney;
@@ -108,6 +105,7 @@ class PluginInit extends BaseClass
     private $currency;
     private $customer;
     private $language;
+    private $media;
     private $module;
     private $order;
     private $order_history;
@@ -116,7 +114,6 @@ class PluginInit extends BaseClass
     private $shop;
     private $tools;
     private $validate;
-    private $constantAdapter;
 
     public function __construct($dependencies = null)
     {
@@ -131,7 +128,6 @@ class PluginInit extends BaseClass
             ->setApiClass($this->apiClass)
             ->setApiVersion('2019-08-06')
             ->setAddress($this->address)
-            ->setAmountCurrencyClass($this->amountCurrencyClass)
             ->setAssign($this->assign)
             ->setCache($this->cache)
             ->setCard($this->card)
@@ -145,9 +141,9 @@ class PluginInit extends BaseClass
             ->setCustomer($this->customer)
             ->setHook($this->hook)
             ->setInstall($this->install)
-//            ->setInstallment($this->installment)
             ->setLanguage($this->language)
             ->setLogger($this->logger)
+            ->setMedia($this->media)
             ->setModule($this->module)
             ->setPayment($this->payment)
             ->setProduct($this->product)
@@ -161,6 +157,7 @@ class PluginInit extends BaseClass
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate);
+
         $this->setEntity($this->plugin);
     }
 
@@ -175,7 +172,6 @@ class PluginInit extends BaseClass
 
     private function setRepositories()
     {
-        $this->amountCurrencyClass = new AmountCurrencyClass($this->dependencies);
         $this->logger = new LoggerRepository($this->dependencies);
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository();
@@ -284,6 +280,7 @@ class PluginInit extends BaseClass
         $this->currency  = new CurrencyAdapter();
         $this->customer  = new CustomerAdapter();
         $this->language = new LanguageAdapter();
+        $this->media = new MediaAdapter();
         $this->module = new ModuleAdapter();
         $this->order = new OrderAdapter();
         $this->order_history = new OrderHistoryAdapter();

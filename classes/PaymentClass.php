@@ -913,7 +913,7 @@ class PaymentClass
         $payplug_cards = $options['one_click'] ? $this->card->getByCustomer((int)$id_customer, true) : [];
 
         $shipping_address = $this->address->get((int)$cart->id_address_delivery);
-        $shipping_iso = ConfigClass::getIsoCodeByCountryId((int)$shipping_address->id_country);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int)$shipping_address->id_country);
         $bancontactCountry = $this->config->get(
             $this->dependencies->getConfigurationKey('bancontactCountry')
         );
@@ -1474,14 +1474,14 @@ class PaymentClass
                     case 'billing':
                         $id_country = $this->country->getByIso($payment_tab['billing']['country']);
                         $country = $this->country->get((int)$id_country);
-                        $field = ConfigClass::formatPhoneNumber($field, $country);
+                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $country);
                         break;
                     case 'same':
                     case 'shipping':
                     default:
                         $id_country = $this->country->getByIso($payment_tab['shipping']['country']);
                         $country = $this->country->get($id_country);
-                        $field = ConfigClass::formatPhoneNumber($field, $country);
+                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $country);
                         break;
                 }
             }
@@ -1744,11 +1744,11 @@ class PaymentClass
         $shipping_address = $this->address->get((int)$cart->id_address_delivery);
 
         // ISO
-        $billing_iso = ConfigClass::getIsoCodeByCountryId((int)$billing_address->id_country);
-        $shipping_iso = ConfigClass::getIsoCodeByCountryId((int)$shipping_address->id_country);
+        $billing_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int)$billing_address->id_country);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int)$shipping_address->id_country);
         if (!$shipping_iso || !$billing_iso) {
             $default_language = $this->language->get((int)$this->config->get('PS_LANG_DEFAULT'));
-            $iso_code_list = ConfigClass::getIsoCodeList();
+            $iso_code_list = $this->dependencies->configClass->getIsoCodeList();
             if (in_array($this->tools->tool('strtoupper', $default_language->iso_code), $iso_code_list, true)) {
                 $iso_code = $this->tools->tool('strtoupper', $default_language->iso_code);
             } else {
@@ -1773,11 +1773,11 @@ class PaymentClass
             'last_name' => !empty($billing_address->lastname) ? $billing_address->lastname : null,
             'company_name' => !empty($billing_address->company) ? trim($billing_address->company) : null,
             'email' => $customer->email,
-            'landline_phone_number' => ConfigClass::formatPhoneNumber(
+            'landline_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
                 $billing_address->phone,
                 $billing_address->id_country
             ),
-            'mobile_phone_number' => ConfigClass::formatPhoneNumber(
+            'mobile_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
                 $billing_address->phone_mobile,
                 $billing_address->id_country
             ),
@@ -1786,7 +1786,7 @@ class PaymentClass
             'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
             'city' => !empty($billing_address->city) ? $billing_address->city : null,
             'country' => $billing_iso,
-            'language' => ConfigClass::getIsoFromLanguageCode($this->context->language),
+            'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
         ];
         $billing['company_name'] = empty($billing['company_name']) || !$billing['company_name']
             ? $billing['first_name'] . ' ' . $billing['last_name']
@@ -1808,11 +1808,11 @@ class PaymentClass
             'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
             'company_name' => !empty($shipping_address->company) ? trim($shipping_address->company) : null,
             'email' => $customer->email,
-            'landline_phone_number' => ConfigClass::formatPhoneNumber(
+            'landline_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
                 $shipping_address->phone,
                 $shipping_address->id_country
             ),
-            'mobile_phone_number' => ConfigClass::formatPhoneNumber(
+            'mobile_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
                 $shipping_address->phone_mobile,
                 $shipping_address->id_country
             ),
@@ -1821,7 +1821,7 @@ class PaymentClass
             'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,
             'city' => !empty($shipping_address->city) ? $shipping_address->city : null,
             'country' => $shipping_iso,
-            'language' => ConfigClass::getIsoFromLanguageCode($this->context->language),
+            'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
             'delivery_type' => $delivery_type,
         ];
         $shipping['company_name'] = empty($shipping['company_name']) || !$shipping['company_name']
@@ -1910,11 +1910,11 @@ class PaymentClass
             }
 
             // check billing phonenumber
-            if (!$payment_tab['billing']['mobile_phone_number'] || !ConfigClass::isValidMobilePhoneNumber(
+            if (!$payment_tab['billing']['mobile_phone_number'] || !$this->dependencies->configClass->isValidMobilePhoneNumber(
                 $payment_tab['billing']['country'],
                 $payment_tab['billing']['mobile_phone_number']
             )) {
-                if (ConfigClass::isValidMobilePhoneNumber(
+                if ($this->dependencies->configClass->isValidMobilePhoneNumber(
                     $payment_tab['billing']['country'],
                     $payment_tab['billing']['landline_phone_number']
                 )) {
@@ -1923,11 +1923,11 @@ class PaymentClass
             }
 
             // check shipping phonenumber
-            if (!$payment_tab['shipping']['mobile_phone_number'] || !ConfigClass::isValidMobilePhoneNumber(
+            if (!$payment_tab['shipping']['mobile_phone_number'] || !$this->dependencies->configClass->isValidMobilePhoneNumber(
                 $payment_tab['shipping']['country'],
                 $payment_tab['shipping']['mobile_phone_number']
             )) {
-                if (ConfigClass::isValidMobilePhoneNumber(
+                if ($this->dependencies->configClass->isValidMobilePhoneNumber(
                     $payment_tab['shipping']['country'],
                     $payment_tab['shipping']['landline_phone_number']
                 )) {
@@ -2021,7 +2021,7 @@ class PaymentClass
                 $this->dependencies->getConfigurationKey('embeddedMode')
             ) !== 'redirected',
             'isIntegrated' => $options['is_integrated'],
-            'isMobileDevice' => ConfigClass::isMobiledevice(),
+            'isMobileDevice' => $this->dependencies->configClass->isMobiledevice(),
             'cart' => $cart,
             'cartId' => (int)$payment_tab['metadata']['ID Cart'],
             'cartHash' => null,

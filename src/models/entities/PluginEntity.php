@@ -31,12 +31,6 @@ class PluginEntity
     private $address;
 
     /** @var object */
-    private $admin;
-
-    /** @var object */
-    private $amountCurrencyClass;
-
-    /** @var object */
     private $apiClass;
 
     /** @var string */
@@ -92,6 +86,9 @@ class PluginEntity
 
     /** @var object */
     private $myLogPHP;
+
+    /** @var object */
+    private $media;
 
     /** @var object */
     private $module;
@@ -158,6 +155,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getMedia()
+    {
+        return $this->media;
+    }
+
+    /**
+     * @return object
+     */
     public function getModule()
     {
         return $this->module;
@@ -170,24 +175,6 @@ class PluginEntity
     public function setMyLogPHP($myLogPHP)
     {
         $this->myLogPHP = $myLogPHP;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getAmountCurrencyClass()
-    {
-        return $this->amountCurrencyClass;
-    }
-
-    /**
-     * @param object $amountCurrencyClass
-     * @return PluginEntity
-     */
-    public function setAmountCurrencyClass($amountCurrencyClass)
-    {
-        $this->amountCurrencyClass = $amountCurrencyClass;
         return $this;
     }
 
@@ -225,14 +212,6 @@ class PluginEntity
     {
         $this->orderHistory = $orderHistory;
         return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getAdmin()
-    {
-        return $this->admin;
     }
 
     /**
@@ -467,20 +446,6 @@ class PluginEntity
     public function getValidate()
     {
         return $this->validate;
-    }
-
-    /**
-     * @param object $admin
-     * @return PluginEntity
-     * @throws BadParameterException
-     */
-    public function setAdmin($admin)
-    {
-        if (!is_object($admin)) {
-            throw (new BadParameterException('Invalid argument, $admin must be an AdminClass object'));
-        }
-        $this->admin = $admin;
-        return $this;
     }
 
     /**
@@ -735,6 +700,21 @@ class PluginEntity
         }
 
         $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * @param object $module
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setMedia($media)
+    {
+        if (!is_object($media)) {
+            throw (new BadParameterException('Invalid argument, $media must be a MediaAdapter'));
+        }
+
+        $this->media = $media;
         return $this;
     }
 

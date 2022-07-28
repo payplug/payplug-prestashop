@@ -33,10 +33,10 @@ class ToolsAdapter implements ToolsInterface
         return new ToolsAdapter();
     }
 
-    public function tool($action, $param1 = null, $param2 = null)
+    public function tool($action, $param1 = null, $param2 = null, $param3 = null, $param4 = null)
     {
         if (isset($action)) {
-            return Tools::$action($param1, $param2);
+            return Tools::$action($param1, $param2, $param3, $param4);
         }
     }
 
