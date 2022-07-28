@@ -320,6 +320,7 @@ class DependenciesClass
     public $refundClass;
 
     private $plugin;
+    private $tools;
 
     public function __construct()
     {
@@ -351,6 +352,8 @@ class DependenciesClass
         $this->orderClass = new OrderClass($this);
         $this->paymentClass = new PaymentClass($this);
         $this->refundClass = new RefundClass($this);
+
+        $this->tools = $this->getPlugin()->getTools();
     }
 
     public function setPlugin($plugin)
@@ -419,7 +422,7 @@ class DependenciesClass
      */
     public function concatenateModuleNameTo($string)
     {
-        return Tools::strtoupper($this->name) . "_" . $string;
+        return $this->tools->tool('strtoupper', $this->name) . "_" . $string;
     }
 
     public function getPluginConfiguration()
@@ -429,12 +432,12 @@ class DependenciesClass
             return [];
         }
 
-        $jsonContent = Tools::file_get_contents($json_path);
+        $jsonContent = $this->tools->tool('file_get_contents', $json_path);
         if (!$jsonContent) {
             return [];
         }
 
-        $return = Tools::jsonDecode($jsonContent);
+        $return = $this->tools->tool('jsonDecode', $jsonContent);
 
         return $return;
     }
