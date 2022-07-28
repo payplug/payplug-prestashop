@@ -338,10 +338,9 @@ class DependenciesClass
     {
         $this->setPlugin((new PluginInit($this))->getEntity());
 
-        $this->amountCurrencyClass = $this->getPlugin()->getAmountCurrencyClass();
-
         $this->apiClass = new ApiClass($this);
         $this->applePayClass = new ApplePayClass($this);
+        $this->amountCurrencyClass = new AmountCurrencyClass($this);
         $this->adminClass = new AdminClass($this);
         $this->cardClass = new CardClass($this);
         $this->cartClass = new CartClass($this);

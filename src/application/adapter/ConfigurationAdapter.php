@@ -40,7 +40,6 @@ class ConfigurationAdapter implements ConfigurationInterface
         return new ConfigurationAdapter();
     }
 
-
     public function get($configuration_name)
     {
         // Old PHP configs can't accept $this->classVar::staticMethod()
@@ -59,5 +58,10 @@ class ConfigurationAdapter implements ConfigurationInterface
     {
         $config = $this->psConfiguration;
         return $config::deleteByName($key);
+    }
+
+    public function loadConfiguration()
+    {
+        return Configuration::loadConfiguration();
     }
 }
