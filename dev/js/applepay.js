@@ -35,6 +35,9 @@ window[module_name+'ModuleApplePay'] = {
                 data: {
                     method: 'applepay',
                     id_cart: applePayIdCart
+                },
+                beforeSend: function () {
+                    $('#apple-pay-button').css('pointer-events', 'none');
                 }
             })
             .success(function (datas) {
@@ -119,12 +122,14 @@ window[module_name+'ModuleApplePay'] = {
 
                 session.oncancel = event => {
                     // Payment cancelled by WebKit
+                    $('#apple-pay-button').css('pointer-events', 'auto');
                     console.log('payment cancel');
                 };
 
                 session.begin();
             })
             .error(function () {
+                $('#apple-pay-button').css('pointer-events', 'auto');
                 payplugModule.popup.set(payplug_transaction_error_message);
             })
         })
