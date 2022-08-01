@@ -185,7 +185,10 @@
       flex-wrap: wrap;
       ._informations {
         padding: @padding-8 0 0 @padding-15;
-        display: block;
+
+        &.-show {
+          display: block;
+        }
 
         @media (@screen-tablet) {
           .payplugUIIOptions {

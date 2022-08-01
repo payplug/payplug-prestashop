@@ -65,7 +65,6 @@
         {include file='./../standard/standardPaymentAdvanced.tpl'}
     {/if}
 {elseif 'bancontact' == $paymentOptionIdentifier}
-
     <div class="paymentMethodOptions">
 
         {capture assign="bancontactCountryAction"}
@@ -91,7 +90,8 @@
 
 
     </div>
+{elseif 'oney' == $paymentOptionIdentifier}
+    {$paylaterAdvanced}
 {/if}
-
 
 
