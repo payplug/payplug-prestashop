@@ -61,7 +61,14 @@
     {else}
         {assign var="paylaterChecked" value=$payplug_switch.oney.checked}
     {/if}
-    {$paylaterAdvanced}
+
+    {include file='./../payment/paymentMethod.tpl'
+        paymentOptionClassName = $module_name
+        paymentOptionIdentifier = 'oney'
+        paymentOptionName = $paylaterTitle
+        paymentOptionDescription = $paylaterDescription
+        paymentOptionChecked = $paylaterChecked
+        paymentOptionLink = $faq_links.oney}
 {/capture}
 
 {assign var='paylaterBlock_className' value='paylaterBlock'}
