@@ -42,8 +42,11 @@ window[module_name+'ModuleApplePay'] = {
             })
             .success(function (datas) {
                 var datas = JSON.parse(datas);
-                if (datas.result === false) {
+                if (!datas.result) {
                     console.log(datas.error_message);
+                    $('#apple-pay-button').css('pointer-events', 'auto');
+                    payplugModule.popup.set(payplug_transaction_error_message);
+                    return;
                 }
 
                 try {
@@ -53,7 +56,7 @@ window[module_name+'ModuleApplePay'] = {
                 } catch (error) {
                     console.error(error);
                     payplugModule.popup.set(payplug_transaction_error_message);
-                    return
+                    return;
                 }
 
                 session.onvalidatemerchant = async event => {
@@ -112,6 +115,7 @@ window[module_name+'ModuleApplePay'] = {
                         if (datas.result === true) {
                             window.location.replace(datas.link_redirect);
                         } else {
+                            $('#apple-pay-button').css('pointer-events', 'auto');
                             payplugModule.popup.set(payplug_transaction_error_message);
                         }
                     })
