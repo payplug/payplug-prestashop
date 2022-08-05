@@ -120,9 +120,8 @@ class RefundClass
                     $this->logger->addLog($error, 'error');
                     return ('error');
                 }
-
-                $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve installment id: ' . $installment->id);
-
+                $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve installment id: ' . $inst_id);
+                $installment=$installment['resource'];
                 if (isset($installment->schedule) && $installment->schedule) {
                     $total_amount = $amount;
                     $refund_to_go = [];
@@ -234,7 +233,6 @@ class RefundClass
         ];
         $pay_mode = Tools::getValue('pay_mode');
         $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
-
         if ($refund == 'error') {
             $this->logger->addLog('Cannot refund that amount.', 'notice');
             $this->logger->addLog(
