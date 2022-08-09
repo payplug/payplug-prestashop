@@ -2050,7 +2050,7 @@ class PaymentClass
             } elseif (!$insertPaymentTable['result']) {
                 return [
                     'result' => false,
-                    'paymentDetails' => $insertPaymentTable['paymentDetails'],
+                    'paymentDetails' => $this->paymentDetails,
                     'response' => $insertPaymentTable['response']
                 ];
             }
