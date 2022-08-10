@@ -66,7 +66,7 @@
 
     </div>
 
-    <div class="_informations">
+    <div {if 'applepay' !== $paymentOptionIdentifier} class="_informations"{/if}>
         {include file='./paymentOptions.tpl'
         paymentOptionIdentifier=$paymentOptionIdentifier }
     </div>
