@@ -1160,7 +1160,7 @@ class ApiClass
      * @param $mode false
      * @return array
      */
-    public function retrievePayment($pay_id = false, $mode = false)
+    public function retrievePayment($pay_id = false)
     {
         if (!$pay_id || !is_string($pay_id)) {
             return [

@@ -474,7 +474,7 @@ class PayPlugValidation
 
                 $apple_pay = array();
                 $apple_pay['payment_token'] = $token;
-
+                $data = [];
                 $data['apple_pay'] = $apple_pay;
 
                 $patchPayment = $this->apiClass->patchPayment($payment->id, $data);
