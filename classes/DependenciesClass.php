@@ -55,6 +55,11 @@ class DependenciesClass
             'defaultValue' => null,
             'setConf' => 1
         ],
+        'bancontactCountry' => [
+            'name' => 'BANCONTACT_COUNTRY',
+            'defaultValue' => 0,
+            'setConf' => 1
+        ],
         'companyId' => [
             'name' => 'COMPANY_ID',
             'defaultValue' => null,

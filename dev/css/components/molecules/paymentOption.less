@@ -5,7 +5,7 @@
     display: flex;
     align-items: center;
     margin: @margin-4 0 0;
-    flex-wrap: wrap;
+    position: relative;
 
     ._logo {
       .border(@color-border);
@@ -28,11 +28,12 @@
       @media (@screen-tablet) {
         display: none;
       }
+
     }
 
     & > ._text {
       margin: 0 0 0 @margin-6;
-      max-width: calc(100% - 60px);
+      max-width: calc(80% - 60px);
 
       ._title {
         color: @color-border-title;
@@ -41,6 +42,10 @@
 
       p {
         margin: 0;
+      }
+
+      & > .-disabled {
+        display: none;
       }
 
       @media (@screen-mobile) {
@@ -147,9 +152,43 @@
         }
       }
     }
+
+    &.-oney, &.-bancontact {
+      flex-wrap: wrap;
+    }
+
+    ._description {
+      &.-sandbox {
+        display: none;
+      }
+    }
+
+    &.-test {
+      .paymentOption_switch {
+        opacity: 0;
+        visibility: hidden;
+      }
+      ._description {
+        &.-live {
+          display: none;
+        }
+        &.-sandbox {
+          display: block;
+        }
+      }
+      ._informations {
+        display: none;
+      }
+    }
+
     &.-standard {
+      flex-wrap: wrap;
       ._informations {
         padding: @padding-8 0 0 @padding-15;
+
+        &.-show {
+          display: block;
+        }
 
         @media (@screen-tablet) {
           .payplugUIIOptions {
@@ -164,8 +203,18 @@
         }
 
       }
+      &.-test {
+        .paymentOption_switch {
+          opacity: 1;
+          visibility: visible;
+        }
+        ._description {
+          &.-live {
+            display: block;
+          }
+        }
+      }
     }
-
     @media (@screen-mobile) {
       margin: 0;
       & + .paymentOption {

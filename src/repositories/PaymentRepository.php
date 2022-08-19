@@ -551,8 +551,7 @@ class PaymentRepository extends BaseClass
                     'result' => true,
                     'embedded' => true,
                     'redirect' => $redirect, // force `true` we are in 3DS 1
-                    'return_url' => $redirect ?
-                        $paymentDetails['paymentReturnUrl'] : $paymentDetails['paymentUrl'],
+                    'return_url' => $paymentDetails['paymentReturnUrl'],
                 ];
                 break;
             case 'oney':
@@ -602,6 +601,30 @@ class PaymentRepository extends BaseClass
         ];
     }
 
+
+
+    /**
+     * @description  get payment id
+     * @param $idCart
+     * @return array
+     */
+    public function getPayment($idCart)
+    {
+        if (!$idCart || !is_int($idCart)) {
+            return $this->returnPaymentError(
+                ['name' => 'idCart', 'value' => $idCart],
+                '[getPayment] $cart id  is not valid'
+            );
+        }
+        $this->query
+            ->select()
+            ->fields('id_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
+            ->where('id_cart = ' . (int)$idCart);
+        return $this->query->build('unique_value');
+    }
+
+
     /**
      * @description Insert payment with all details in table
      * @param array $paymentDetails
@@ -630,6 +653,16 @@ class PaymentRepository extends BaseClass
             );
         }
 
+        $paymentExist = $this->getPayment((int)$paymentDetails['cartId']);
+        if (isset($paymentExist['result']) && !$paymentExist['result']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[insertPaymentTable] Problem with the getpayment method.'
+            );
+        }
+        if ($paymentExist) {
+            $this->dependencies->paymentClass->deletePayment($paymentDetails['cartId']);
+        }
         $this->query
             ->insert()
             ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
@@ -642,7 +675,6 @@ class PaymentRepository extends BaseClass
             ->fields('authorized_at')->values((int)$paymentDetails['authorizedAt'])
             ->fields('is_paid')->values((int)$paymentDetails['isPaid'])
             ->fields('date_upd')->values($this->query->escape($paymentDate));
-
         try {
             if (!$this->query->build()) {
                 return $this->returnPaymentError(
@@ -656,6 +688,7 @@ class PaymentRepository extends BaseClass
                 '[insertPaymentTable] Error: ' . $e->getMessage()
             );
         }
+
 
         return [
             'result' => true,

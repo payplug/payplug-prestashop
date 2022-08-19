@@ -21,12 +21,11 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_8_1($object)
+function upgrade_module_3_8_1()
 {
     $flag = true;
 

@@ -630,6 +630,7 @@ class ConfigClass
             $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'payplug_oney_custom_max_amounts',
             $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'payplug_oney_custom_min_amounts',
             $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact',
+            $this->dependencies->getConfigurationKey('bancontactCountry') => 'payplug_bancontact_country',
             $this->dependencies->getConfigurationKey('applepay') => 'payplug_applepay'
         ];
 
@@ -693,6 +694,7 @@ class ConfigClass
 
                         break;
                     case 'payplug_bancontact':
+                    case 'payplug_bancontact_country':
                         if ((int)Tools::getValue('payplug_sandbox') != 1) {
                             Configuration::updateValue($key, $value);
                         }
@@ -749,6 +751,7 @@ class ConfigClass
             'oney_product_cta' => Configuration::get($this->dependencies->getConfigurationKey('oneyProductCta')),
             'oney_cart_cta' => Configuration::get($this->dependencies->getConfigurationKey('oneyCartCta')),
             'bancontact' => Configuration::get($this->dependencies->getConfigurationKey('bancontact')),
+            'bancontact_country' => Configuration::get($this->dependencies->getConfigurationKey('bancontactCountry')),
             'applepay' => Configuration::get($this->dependencies->getConfigurationKey('applepay'))
         ];
 
@@ -1057,6 +1060,14 @@ class ConfigClass
             'name' => 'payplug_bancontact',
             'active' => $connected,
             'checked' => $configurations['bancontact'],
+            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
+            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
+        ];
+
+        $switch['bancontact_country'] = [
+            'name' => 'payplug_bancontact_country',
+            'active' => $connected,
+            'checked' => $configurations['bancontact_country'],
             'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'configclass'),
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'configclass'),
         ];

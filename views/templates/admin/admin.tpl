@@ -41,7 +41,7 @@
         {include file='./../api/molecules/general.tpl'}
 
         {* Payment method block *}
-        {include file='./../api/molecules/payment/paymentMethod.tpl'}
+        {include file='./../api/molecules/payment/paymentMethods.tpl'}
 
         {* Paylater block*}
         {if isset($paylater_isActivated) && $paylater_isActivated}

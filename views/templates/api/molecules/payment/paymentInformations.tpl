@@ -19,3 +19,11 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+
+{foreach $paymentMethodOptions as $paymentMethodOption => $payment_information}
+    {include file='./paymentInformation.tpl'
+    informationTitle = $payment_information.title
+    informationDescription = $payment_information.description
+    informationLink = $payment_information.link
+    informationAction = $payment_information.action}
+{/foreach}

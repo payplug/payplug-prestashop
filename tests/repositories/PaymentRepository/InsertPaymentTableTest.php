@@ -111,6 +111,10 @@ final class InsertPaymentTableTest extends BasePaymentRepository
                 'getHashedCart' => ['result' => true],
                 'returnPaymentError' => $error
             ]);
+        $this->repo
+            ->shouldReceive([
+                                'getPayment' => false,
+                            ]);
 
         $this->query
             ->shouldReceive([
@@ -139,6 +143,10 @@ final class InsertPaymentTableTest extends BasePaymentRepository
                 'getHashedCart' => ['result' => true],
                 'returnPaymentError' => $error
             ]);
+        $this->repo
+            ->shouldReceive([
+                                'getPayment' => false,
+                            ]);
 
         $this->query
             ->shouldReceive([
@@ -161,6 +169,10 @@ final class InsertPaymentTableTest extends BasePaymentRepository
             ->shouldReceive([
                 'getHashedCart' => ['result' => true]
             ]);
+        $this->repo
+            ->shouldReceive([
+                                'getPayment' => false,
+                            ]);
 
         $this->query
             ->shouldReceive([

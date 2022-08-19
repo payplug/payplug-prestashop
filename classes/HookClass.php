@@ -517,11 +517,11 @@ class HookClass
             }
 
             // Get the Payment resource
-            $payment = $this->dependencies->apiClass->retrievePayment($pay_id, $mode);
+            $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
             // If No Payment resource, test the other live mode configuration
             if (!$payment['result']) {
                 $mode = $sandbox ? 'live' : 'test';
-                $payment = $this->dependencies->apiClass->retrievePayment($pay_id, $mode);
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
             }
 
             // If we still don't have a valid Payment resource, return false
