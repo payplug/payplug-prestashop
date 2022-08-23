@@ -547,7 +547,7 @@ class PaymentClass
 
         $order = $this->order->get((int)$id_order);
         if ($this->validate->validate('isLoadedObject', $order)) {
-            if (!$this->dependencies->cartClass->createLockFromCartId($order->id_cart)) {
+            if (!$this->dependencies->cartClass->createLockFromCartId((int)$order->id_cart)) {
                 $this->logger->addLog('An error occured on lock creation', 'notice');
                 die(json_encode([
                     'status' => 'error',
@@ -565,7 +565,7 @@ class PaymentClass
                 $order_history->addWithemail();
             }
 
-            if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
+            if (!$this->dependencies->cartClass->deleteLockFromCartId((int)$order->id_cart)) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'notice');
