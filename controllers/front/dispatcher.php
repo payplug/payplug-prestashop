@@ -122,21 +122,6 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                         'idCart' => $this->context->cart->id
                     ]));
                 }
-            } elseif ($options['one_click'] && $is_one_click) {
-                $payment_options = [
-                    'id_card' => $id_card,
-                    'is_one_click' => $is_one_click,
-                ];
-                $payment = $paymentClass->preparePayment($payment_options);
-
-                if (!$payment['result']) {
-                    $paymentClass->setPaymentErrorsCookie([
-                        $dependencies->l('The transaction was not completed and your card was not charged.')
-                    ]);
-                    Tools::redirect($error_url);
-                } else {
-                    Tools::redirect($payment['return_url']);
-                }
             } else {
                 // else reload the page with lightbox arg
                 $return_url = 'index.php?controller=order&step=3&popup=1'
