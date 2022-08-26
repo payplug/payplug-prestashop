@@ -551,7 +551,8 @@ class PaymentRepository extends BaseClass
                     'result' => true,
                     'embedded' => true,
                     'redirect' => $redirect, // force `true` we are in 3DS 1
-                    'return_url' => $paymentDetails['paymentReturnUrl'],
+                    'return_url' => $redirect ? $paymentDetails['paymentReturnUrl'] : $paymentDetails['paymentUrl'],
+
                 ];
                 break;
             case 'oney':
