@@ -914,6 +914,10 @@ class HookClass
         )
             && $this->tools->tool('getValue', 'popup');
 
+        if ($this->dependencies->name != 'payplug') {
+            return true;
+        }
+
         if ($is_lightbox) {
             $cart = $params['cart'];
             if (!$this->validate->validate('isLoadedObject', $cart)) {
@@ -928,7 +932,10 @@ class HookClass
                 'is_deferred' => (bool) $this->tools->tool('getValue', 'def'),
             ];
 
-            $payment = $this->dependencies->paymentClass->preparePayment($payment_options);
+            $payment = array();
+            if (!$this->tools->tool('getValue', 'pay_id')) {
+                $payment = $this->dependencies->paymentClass->preparePayment($payment_options);
+            }
 
             $dotenv = new Dotenv();
             $dotenvFile = \dirname(__FILE__, 4) . '/payplugroutes/.env';
@@ -939,7 +946,7 @@ class HookClass
                 $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v0/index.js';
             }
 
-            if ($payment['result']) {
+            if (array_key_exists('result', $payment)) {
                 // If payment is paid then redirect
                 if ($payment['redirect']) {
                     $this->tools->tool('redirect', $payment['return_url']);
@@ -962,8 +969,18 @@ class HookClass
                         'api_url' => $api_url,
                     ]);
 
-                    return$this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
+                    return $this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
                 }
+            } elseif ($this->tools->tool('getValue', 'pay_id')) {
+                $payment = $this->dependencies->apiClass->retrievePayment($this->tools->tool('getValue', 'pay_id'));
+                $api_url = $this->dependencies->apiClass->getApiUrl() . '/js/1/form.latest.js';
+
+                $this->assign->assign([
+                    'payment_url' => $payment['resource']->hosted_payment->payment_url,
+                    'api_url' => $api_url,
+                ]);
+
+                return $this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
             } else {
                 $this->dependencies->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('hook.header.transactionNotCompleted', 'hookclass'),
