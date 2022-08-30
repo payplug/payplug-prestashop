@@ -39,6 +39,8 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
         if ($method = Tools::getValue('method')) {
             $dependencies = new \PayPlug\classes\DependenciesClass();
             $paymentClass = $dependencies->paymentClass;
+            $plugin = $dependencies->getPlugin();
+            $configurationSpecific = $plugin->getConfiguration();
             $id_cart = (int)Tools::getValue('id_cart');
             $id_card = Tools::getValue('pc');
             $is_deferred = (bool)Tools::getValue('def');
@@ -122,12 +124,50 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                         'idCart' => $this->context->cart->id
                     ]));
                 }
+            } elseif ($options['one_click'] && $is_one_click) {
+                $payment_options = [
+                    'id_card' => $id_card,
+                    'is_one_click' => $is_one_click,
+                    'is_deferred' => $is_deferred
+                ];
+                $payment = $paymentClass->preparePayment($payment_options);
+
+                if (!$payment['result']) {
+                    $paymentClass->setPaymentErrorsCookie([
+                        $dependencies->l('The transaction was not completed and your card was not charged.')
+                    ]);
+                    Tools::redirect($error_url);
+                } else {
+                    if (str_contains($payment['return_url'], '/payplug/validation')) {
+                        // 3DS1
+                        Tools::redirect($payment['return_url']);
+                    } else {
+                        // 3DS2
+                        $sandbox = (bool) $configurationSpecific->get($dependencies->getConfigurationKey('sandboxMode'));
+                        $mode = $sandbox ? 'test' : 'live';
+
+                        if ($mode == 'live') {
+                            $pay_id = explode('pay/', $payment['return_url']);
+                        } else {
+                            $pay_id = explode('pay/test/', $payment['return_url']);
+                        }
+                        $pay_id = $pay_id[1];
+
+                        $return_url = 'index.php?controller=order&step=3&popup=1'
+                            . ($is_installment ? '&inst=1' : '')
+                            . ($is_one_click ? '&pc=' . $id_card : '')
+                            . '&def=' . (int)$is_deferred
+                            . '&pay_id=pay_' . $pay_id;
+
+                        Tools::redirect($return_url);
+                    }
+                }
             } else {
                 // else reload the page with lightbox arg
                 $return_url = 'index.php?controller=order&step=3&popup=1'
                     . ($is_installment ? '&inst=1' : '')
                     . ($is_one_click ? '&pc=' . $id_card : '')
-                    . '&def=' . (int)Tools::getValue('def');
+                    . '&def=' . (int)$is_deferred;
 
                 Tools::redirect($return_url);
             }
