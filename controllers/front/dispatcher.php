@@ -26,6 +26,16 @@
  */
 class PayplugDispatcherModuleFrontController extends ModuleFrontController
 {
+    private $dependenciesClass;
+    private $toolsAdapter;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->dependenciesClass = new \PayPlug\classes\DependenciesClass();
+        $this->toolsAdapter = $this->dependenciesClass->getPlugin()->getTools();
+    }
+
     /**
      * @description
      * Method that is executed after init() and checkAccess().
@@ -36,17 +46,13 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      */
     public function postProcess()
     {
-        if ($method = Tools::getValue('method')) {
-            $dependencies = new \PayPlug\classes\DependenciesClass();
-            $paymentClass = $dependencies->paymentClass;
-            $plugin = $dependencies->getPlugin();
-            $configurationSpecific = $plugin->getConfiguration();
-            $id_cart = (int)Tools::getValue('id_cart');
-            $id_card = Tools::getValue('pc');
-            $is_deferred = (bool)Tools::getValue('def');
+        if ($method = $this->toolsAdapter->tool('getValue', 'method')) {
+            $id_cart = (int)$this->toolsAdapter->tool('getValue', 'id_cart');
+            $id_card = $this->toolsAdapter->tool('getValue', 'pc');
+            $is_deferred = (bool)$this->toolsAdapter->tool('getValue', 'def');
             $is_one_click = (bool)($method === 'one_click');
             $is_installment = (bool)($method === 'installment');
-            $oney_type = Tools::getValue($dependencies->name . 'Oney_type');
+            $oney_type = $this->toolsAdapter->tool('getValue', $this->dependenciesClass->name . 'Oney_type');
             $is_oney = (bool)($method === 'oney' && $oney_type);
             $is_bancontact = (bool)($method === 'bancontact');
             $is_applepay = (bool)($method === 'applepay');
@@ -56,31 +62,31 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 return false;
             }
 
-            $options = $dependencies->configClass->getAvailableOptions($cart);
+            $options = $this->dependenciesClass->configClass->getAvailableOptions($cart);
 
             $embedded = $options['embedded'] != 'redirected';
-            $error_url = 'index.php?controller=order&step=3&has_error=1&modulename=' . $dependencies->name;
+            $error_url = 'index.php?controller=order&step=3&has_error=1&modulename=' . $this->dependenciesClass->name;
 
             if ($options['oney'] && $is_oney) {
-                $payment = $paymentClass->preparePayment(['is_oney' => $oney_type]);
+                $payment = $this->dependenciesClass->paymentClass->preparePayment(['is_oney' => $oney_type]);
                 if (!$payment['result']) {
-                    Tools::redirect($error_url);
+                    $this->toolsAdapter->tool('redirect', $error_url);
                 } else {
-                    Tools::redirect($payment['return_url']);
+                    $this->toolsAdapter->tool('redirect', $payment['return_url']);
                 }
             } elseif ($options['bancontact'] && $is_bancontact) {
                 $payment_options = [
                     'id_card' => $id_card,
                     'is_bancontact' => $is_bancontact,
                 ];
-                $payment = $paymentClass->preparePayment($payment_options);
+                $payment = $this->dependenciesClass->paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
-                    $paymentClass->setPaymentErrorsCookie([
-                        $dependencies->l('The transaction was not completed and your card was not charged.')
+                    $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
+                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.')
                     ]);
-                    Tools::redirect($error_url);
+                    $this->toolsAdapter->tool('redirect', $error_url);
                 } else {
-                    Tools::redirect($payment['return_url']);
+                    $this->toolsAdapter->tool('redirect', $payment['return_url']);
                 }
             } elseif (!$embedded && !$is_one_click && !$is_applepay) {
                 // if the payment is redirect and not a one click payment, prepare the payment and redirect
@@ -89,14 +95,14 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     'is_installment' => $is_installment,
                     'is_deferred' => $is_deferred,
                 ];
-                $payment = $paymentClass->preparePayment($payment_options);
+                $payment = $this->dependenciesClass->paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
-                    $paymentClass->setPaymentErrorsCookie([
-                        $dependencies->l('The transaction was not completed and your card was not charged.')
+                    $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
+                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.')
                     ]);
-                    Tools::redirect($error_url);
+                    $this->toolsAdapter->tool('redirect', $error_url);
                 } else {
-                    Tools::redirect($payment['return_url']);
+                    $this->toolsAdapter->tool('redirect', $payment['return_url']);
                 }
             } elseif ($options['applepay'] && $is_applepay) {
                 $payment_options = [
@@ -110,7 +116,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                         )
                     )
                 ];
-                $payment = $paymentClass->preparePayment($payment_options);
+                $payment = $this->dependenciesClass->paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
                     die(json_encode([
                         'result' => false,
@@ -124,52 +130,15 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                         'idCart' => $this->context->cart->id
                     ]));
                 }
-            } elseif ($options['one_click'] && $is_one_click) {
-                $payment_options = [
-                    'id_card' => $id_card,
-                    'is_one_click' => $is_one_click,
-                    'is_deferred' => $is_deferred
-                ];
-                $payment = $paymentClass->preparePayment($payment_options);
-
-                if (!$payment['result']) {
-                    $paymentClass->setPaymentErrorsCookie([
-                        $dependencies->l('The transaction was not completed and your card was not charged.')
-                    ]);
-                    Tools::redirect($error_url);
-                } else {
-                    if (str_contains($payment['return_url'], '/payplug/validation')) {
-                        // 3DS1
-                        Tools::redirect($payment['return_url']);
-                    } else {
-                        // 3DS2
-                        $sandbox = (bool) $configurationSpecific->get($dependencies->getConfigurationKey('sandboxMode'));
-                        $mode = $sandbox ? 'test' : 'live';
-
-                        if ($mode == 'live') {
-                            $pay_id = explode('pay/', $payment['return_url']);
-                        } else {
-                            $pay_id = explode('pay/test/', $payment['return_url']);
-                        }
-                        $pay_id = $pay_id[1];
-
-                        $return_url = 'index.php?controller=order&step=3&popup=1'
-                            . ($is_installment ? '&inst=1' : '')
-                            . ($is_one_click ? '&pc=' . $id_card : '')
-                            . '&def=' . (int)$is_deferred
-                            . '&pay_id=pay_' . $pay_id;
-
-                        Tools::redirect($return_url);
-                    }
-                }
             } else {
                 // else reload the page with lightbox arg
-                $return_url = 'index.php?controller=order&step=3&popup=1'
+                $return_url = 'index.php?controller=order&step=3&embedded=1'
                     . ($is_installment ? '&inst=1' : '')
                     . ($is_one_click ? '&pc=' . $id_card : '')
-                    . '&def=' . (int)$is_deferred;
+                    . '&def=' . (int)$is_deferred
+                    . '&modulename=' . $this->dependenciesClass->name;
 
-                Tools::redirect($return_url);
+                $this->toolsAdapter->tool('redirect', $return_url);
             }
         }
     }
