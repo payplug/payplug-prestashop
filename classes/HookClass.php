@@ -892,8 +892,10 @@ class HookClass
             return false;
         }
 
+        $moduleName = $this->tools->tool('getValue', 'modulename');
+
         if ($this->tools->tool('getValue', 'has_error')
-            && $this->dependencies->name == $this->tools->tool('getValue', 'modulename')) {
+            && $this->dependencies->name == $moduleName) {
             Media::addJsDef(['check_errors' => true]);
         }
 
@@ -908,17 +910,17 @@ class HookClass
         }
 
         $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
-        $is_lightbox =  (
-            'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
-                || 'new_card' != $id_card
-        )
-            && $this->tools->tool('getValue', 'popup');
 
-        if ($this->dependencies->name != 'payplug') {
-            return true;
-        }
+        // Is embeddedMode configured to show the lightbox..
+        $show_lightbox = 'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'));
+        // ... or is the payment with one click
+        $show_lightbox = $show_lightbox || 'new_card' != $id_card;
 
-        if ($is_lightbox) {
+        $show_lightbox = $show_lightbox
+            && $this->tools->tool('getValue', 'embedded')
+            && $this->dependencies->name == $moduleName;
+
+        if ($show_lightbox) {
             $cart = $params['cart'];
             if (!$this->validate->validate('isLoadedObject', $cart)) {
                 return;
@@ -932,10 +934,7 @@ class HookClass
                 'is_deferred' => (bool) $this->tools->tool('getValue', 'def'),
             ];
 
-            $payment = array();
-            if (!$this->tools->tool('getValue', 'pay_id')) {
-                $payment = $this->dependencies->paymentClass->preparePayment($payment_options);
-            }
+            $payment = $this->dependencies->paymentClass->preparePayment($payment_options);
 
             $dotenv = new Dotenv();
             $dotenvFile = \dirname(__FILE__, 4) . '/payplugroutes/.env';
@@ -946,7 +945,7 @@ class HookClass
                 $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v0/index.js';
             }
 
-            if (array_key_exists('result', $payment)) {
+            if ($payment['result']) {
                 // If payment is paid then redirect
                 if ($payment['redirect']) {
                     $this->tools->tool('redirect', $payment['return_url']);
@@ -969,18 +968,8 @@ class HookClass
                         'api_url' => $api_url,
                     ]);
 
-                    return $this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
+                    return$this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
                 }
-            } elseif ($this->tools->tool('getValue', 'pay_id')) {
-                $payment = $this->dependencies->apiClass->retrievePayment($this->tools->tool('getValue', 'pay_id'));
-                $api_url = $this->dependencies->apiClass->getApiUrl() . '/js/1/form.latest.js';
-
-                $this->assign->assign([
-                    'payment_url' => $payment['resource']->hosted_payment->payment_url,
-                    'api_url' => $api_url,
-                ]);
-
-                return $this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
             } else {
                 $this->dependencies->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('hook.header.transactionNotCompleted', 'hookclass'),

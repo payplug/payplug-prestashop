@@ -40,7 +40,6 @@ class ConfigurationSpecific implements ConfigurationInterface
         return new ConfigurationSpecific();
     }
 
-
     public function get($configuration_name)
     {
         // Old PHP configs can't accept $this->classVar::staticMethod()
