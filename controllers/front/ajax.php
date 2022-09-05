@@ -237,7 +237,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]);
                     die(json_encode($payment));
                 }
-            } elseif ($tools->tool('getIsset', 'confirmIP')) {
+            } elseif ($tools->tool('getIsset', 'confirmPayment')) {
                 $payment_id = $tools->tool('getValue', 'pay_id');
                 $cart_id = $tools->tool('getValue', 'cart_id');
 
@@ -255,7 +255,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 if ($payment_id != $current_payment_id) {
                     die(json_encode([
                         'result' => false,
-                        'message' => 'invalid payment id, giver: ' . $payment_id . ' and current:' . $current_payment_id
+                        'message' => 'No correspondance with given payment id'
                     ]));
                 }
 
@@ -296,6 +296,94 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $this->dependencies->name,
                     'validation',
                     ['ps' => 1, 'cartid' => (int)$cart_id],
+                    true
+                );
+
+                die(json_encode([
+                    'result' => true,
+                    'return_url' => $return_url,
+                    'message' => 'Success'
+                ]));
+            } elseif ($tools->tool('getIsset', 'patchPayment')) {
+                $paymentId = $tools->tool('getValue', 'pay_id');
+                $cartId = (int)$tools->tool('getValue', 'cart_id');
+                $token = $tools->tool('getValue', 'token');
+
+                // Check if cart id is valid
+                if (!$cartId || (int)$context->cart->id != $cartId) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Invalid cart id given'
+                    ]));
+                }
+
+                // Check if payment id is valid
+                if (!$paymentId) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Invalid payment id given'
+                    ]));
+                }
+
+                // Check payment id correspondance between the given one and the one from the DB
+                $query = $this->plugin->getQuery();
+                $current_payment_id = $query
+                    ->select()
+                    ->fields('id_payment')
+                    ->from(_DB_PREFIX_ . $this->dependencies->name . '_payment')
+                    ->where('id_cart = ' . (int)$context->cart->id)
+                    ->build('unique_value');
+                if ($paymentId != $current_payment_id) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'No correspondance with given payment id'
+                    ]));
+                }
+
+                // Check if token is valid
+                if (!$token) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Invalid token given'
+                    ]));
+                }
+
+                $data = [
+                    'apple_pay' => [
+                        'payment_token' => $token
+                    ]
+                ];
+                $patchPayment = $this->apiClass->patchPayment($paymentId, $data);
+
+                if (!$patchPayment['result']) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'An error occured during payment patch : ' . $patchPayment['message']
+                    ]));
+                }
+
+                $payment = $patchPayment['resource'];
+
+                // Check if payment has failure...
+                if ($payment->failure != null) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => $payment->failure->message
+                    ]));
+                }
+
+                // ... or if is paid
+                if (!$payment->is_paid) {
+                    die(json_encode([
+                        'result' => false,
+                        'message' => 'Payment is not paid'
+                    ]));
+                }
+
+                $return_url = $context->link->getModuleLink(
+                    $this->dependencies->name,
+                    'validation',
+                    ['ps' => 1, 'cartid' => (int)$context->cart->id],
                     true
                 );
 
