@@ -301,7 +301,7 @@ class RefundClass
                     }
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
-                        if (!$this->dependencies->cartClass->createLockFromCartId($order->id_cart)) {
+                        if (!$this->dependencies->cartClass->createLockFromCartId((int)$order->id_cart)) {
                             die(json_encode([
                                 'status' => 'error',
                                 'data' => $this->dependencies->l('payplug.refundPayment.errorOccurred', 'refundclass')
@@ -318,7 +318,7 @@ class RefundClass
                             $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                         }
 
-                        if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
+                        if (!$this->dependencies->cartClass->deleteLockFromCartId((int)$order->id_cart)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->logger->addLog('Lock deleted.', 'notice');
@@ -352,7 +352,7 @@ class RefundClass
                 if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
                     $order = new Order((int)$id_order);
                     if (Validate::isLoadedObject($order)) {
-                        if (!$this->dependencies->cartClass->createLockFromCartId($order->id_cart)) {
+                        if (!$this->dependencies->cartClass->createLockFromCartId((int)$order->id_cart)) {
                             die(json_encode([
                                 'status' => 'error',
                                 'data' => $this->dependencies->l('payplug.refundPayment.errorOccurred', 'refundclass')
@@ -371,7 +371,7 @@ class RefundClass
                             $this->logger->addLog('Order status is already \'refunded\'', 'notice');
                         }
 
-                        if (!$this->dependencies->cartClass->deleteLockFromCartId($order->id_cart)) {
+                        if (!$this->dependencies->cartClass->deleteLockFromCartId((int)$order->id_cart)) {
                             $this->logger->addLog('Lock cannot be deleted.', 'error');
                         } else {
                             $this->logger->addLog('Lock deleted.', 'notice');

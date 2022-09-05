@@ -30,10 +30,10 @@ function upgrade_module_0_3_0()
     // add  PSPAYLATER_ONEY_CART_CTA & PSPAYLATER_ONEY_PRODUCT_CTA to database
     return Configuration::updateValue(
         'PSPAYLATER_ONEY_CART_CTA',
-        null
+        1
     )
         && Configuration::updateValue(
             'PSPAYLATER_ONEY_PRODUCT_CTA',
-            null
+            1
         );
 }

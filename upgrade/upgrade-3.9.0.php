@@ -30,11 +30,11 @@ function upgrade_module_3_9_0()
     // add  PAYPLUG_ONEY_CART_CTA & PAYPLUG_ONEY_PRODUCT_CTA & PAYPLUG_BANCONTACT_COUNTRY to database
     return Configuration::updateValue(
         'PAYPLUG_ONEY_CART_CTA',
-        null
+        1
     )
         && Configuration::updateValue(
             'PAYPLUG_ONEY_PRODUCT_CTA',
-            null
+            1
         )
         && Configuration::updateValue(
             'PAYPLUG_BANCONTACT_COUNTRY',

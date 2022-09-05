@@ -892,8 +892,10 @@ class HookClass
             return false;
         }
 
+        $moduleName = $this->tools->tool('getValue', 'modulename');
+
         if ($this->tools->tool('getValue', 'has_error')
-            && $this->dependencies->name == $this->tools->tool('getValue', 'modulename')) {
+            && $this->dependencies->name == $moduleName) {
             Media::addJsDef(['check_errors' => true]);
         }
 
@@ -908,13 +910,17 @@ class HookClass
         }
 
         $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
-        $is_lightbox =  (
-            'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
-                || 'new_card' != $id_card
-        )
-            && $this->tools->tool('getValue', 'popup');
 
-        if ($is_lightbox) {
+        // Is embeddedMode configured to show the lightbox..
+        $show_lightbox = 'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'));
+        // ... or is the payment with one click
+        $show_lightbox = $show_lightbox || 'new_card' != $id_card;
+
+        $show_lightbox = $show_lightbox
+            && $this->tools->tool('getValue', 'embedded')
+            && $this->dependencies->name == $moduleName;
+
+        if ($show_lightbox) {
             $cart = $params['cart'];
             if (!$this->validate->validate('isLoadedObject', $cart)) {
                 return;
