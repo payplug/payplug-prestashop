@@ -408,6 +408,7 @@ class ApiClass
             }
         }
 
+
         $permissions = [
             'is_live' => $json_answer['is_live'],
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
@@ -420,6 +421,9 @@ class ApiClass
             'can_use_amex' => $can_use_amex,
             'onboardingOneyCompleted' => $onboardingOneyCompleted,
         ];
+        if (isset($json_answer['payment_methods']['apple_pay']['allowed_domain_names'])) {
+            $permissions['apple_pay_allowed_domains'] = $json_answer['payment_methods']['apple_pay']['allowed_domain_names'];
+        }
 
         // If sandbox mode active, no allowed countries sent
         // Then set default as `FR,MQ,YT,RE,GF,GP,IT`

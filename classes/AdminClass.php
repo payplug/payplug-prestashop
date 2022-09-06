@@ -308,6 +308,13 @@ class AdminClass
         if ((int)$this->tools->tool('getValue', 'checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
+            $applepay_allowed_domains = false;
+            if (isset($permissions['apple_pay_allowed_domains'])) {
+                if (in_array($this->config->get('PS_SHOP_DOMAIN'), $permissions['apple_pay_allowed_domains'])) {
+                    $applepay_allowed_domains = true;
+                }
+            }
+
             $return = [
                 'payplug_sandbox' => $permissions['use_live_mode'],
                 'payplug_one_click' => $permissions['can_save_cards'],
@@ -317,6 +324,7 @@ class AdminClass
                 'payplug_amex' => $permissions['can_use_amex'],
                 'payplug_inst' => $permissions['can_create_installment_plan'],
                 'payplug_deferred' => $permissions['can_create_deferred_payment'],
+                'applepay_allowed_domains' => $applepay_allowed_domains ,
             ];
             die(json_encode($return));
         }
