@@ -14,7 +14,7 @@ class Installments {
     handleEvents() {
         $(document)
             .on('focusout', 'input[name="payplug_inst_min_amount"]', installments.checkAmount)
-            .on('change', '.installmentSwitch input', installments.handleInstallment);
+            .on('change', 'input[name="payplug_inst"]', installments.handleInstallment);
     }
 
     checkAmount() {
