@@ -1,6 +1,6 @@
 class Deferred {
     props = {
-        'container': 'standardPaymentAdvanced',
+        'container': '__moduleName__Configuration',
         'idOrderState': null,
         'query': null,
     };
@@ -13,7 +13,7 @@ class Deferred {
     handleEvents() {
         $(document)
             .on('ready', deferred.setIdOrderState)
-            .on('change', '.deferredSwitch input', deferred.toggleDeferredState)
+            .on('change', 'input[name="payplug_deferred"]', deferred.toggleDeferredState)
             .on('change', '.payplugUISelect.-deferred input', deferred.handleDeferredState);
     }
 
@@ -83,7 +83,10 @@ class Deferred {
             success: function (result) {
                 if (typeof result.alert != 'undefined' && result.alert) {
                     deferred.removeDisplayOrderStatusAlert();
-                    const $content = $('._standardAdvancedOption.-deferred').find('._content');
+                    const $content = $('._advancedOption.-deferred').find('._content');
+                    if($('._advancedOption.-deferred').find('.payplugUITextAlert.-warning').length) {
+                        $('._advancedOption.-deferred').find('.payplugUITextAlert.-warning').remove();
+                    }
                     $content.append(result.alert);
                 }
             }

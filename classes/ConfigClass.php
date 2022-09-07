@@ -615,7 +615,7 @@ class ConfigClass
             $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
             $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
             $this->dependencies->getConfigurationKey('show') => 'payplug_show',
-            $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded',
+            $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded_mode',
             $this->dependencies->getConfigurationKey('inst') => 'payplug_inst',
             $this->dependencies->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
             $this->dependencies->getConfigurationKey('instMode') => 'payplug_inst_mode',
@@ -898,7 +898,7 @@ class ConfigClass
             'oney' => $this->configurations['oney'],
             'bancontact' => $this->isValidFeature('feature_bancontact'),
             'applepay' => $this->isValidFeature('feature_applepay'),
-            'paylater_isActivated' => $this->isValidFeature('feature_paylater'),
+            'paylater_isActivated' => $this->isValidFeature('feature_oney'),
             'integrated' => $this->isValidFeature('feature_integrated'),
             'display_mode_isActivated' => $this->isValidFeature('feature_display_mode'),
             'standard_isActivated' => $this->isValidFeature('feature_standard'),
@@ -913,7 +913,7 @@ class ConfigClass
             'oney_custom_min_amounts' => $oney_custom_min_amounts,
             'iso' => $this->context->language->iso_code,
             'onboardingOneyCompleted' => $this->isOnboardingOneyCompleted(),
-            'payment_methods' => $this->dependencies->paymentClass->getPaymentMethods(),
+            'paymentMethods' => $this->dependencies->paymentClass->getNewPaymentMethods(),
             'onBoardingCheck' => false
         ]);
 

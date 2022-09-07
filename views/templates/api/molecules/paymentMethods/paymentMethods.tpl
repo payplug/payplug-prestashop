@@ -19,22 +19,14 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
+
 {*Template for the Payment Method Block*}
-{if isset($payment_methods) && $payment_methods}
+{if isset($paymentMethods) && $paymentMethods}
     {capture assign="paymentMethod_title"}{l s='paymentMethods.block.title' mod='payplug'}{/capture}
     {capture assign="paymentMethod_description"}{l s='paymentMethods.block.description' mod='payplug'}{/capture}
     {capture assign="paymentMethod_content"}
-        {foreach $payment_methods as $payment_method_name => $payment_method}
-            {assign var="sandboxDescription" value=$payment_method.sandboxDescription}
-            {assign var="description" value=$payment_method.description}
-            {include file='./paymentMethod.tpl'
-                paymentOptionIdentifier = $payment_method_name
-                paymentOptionName = $payment_method.name
-                paymentOptionImage_url = $payment_method.image_url
-                paymentOptionDescription = $description
-                paymentSandboxOptionDescription = $sandboxDescription
-                paymentOptionLink = $payment_method.link
-                paymentOptionChecked = $payment_method.checked}
+        {foreach $paymentMethods as $paymentMethodName => $paymentMethod}
+            {include file='./paymentMethod.tpl' paymentMethodName=$paymentMethodName paymentMethod=$paymentMethod}
         {/foreach}
     {/capture}
 
