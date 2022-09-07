@@ -763,23 +763,23 @@ class PaymentClass
      * @description Get available method to confire the module
      * @return array
      */
-    public function getNewPaymentMethods()
+    public function getPaymentMethods()
     {
         $paymentMethods = [];
         $availablePaymentMethods = [
             'standard',
             'applepay',
             'bancontact',
-            'oney'
+            'oney',
+            'amex'
         ];
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $faq_links = $this->dependencies->configClass->configurations['faq_links'];
         foreach ($availablePaymentMethods as $availablePaymentMethod) {
             $featureName = 'feature_' . $availablePaymentMethod;
             if ($this->dependencies->configClass->isValidFeature($featureName)) {
                 $method = 'get' . Tools::ucfirst($availablePaymentMethod) . 'PaymentMethod';
                 // @todo: check if method exists
-                $paymentMethod = $this->$method($views_path, $faq_links);
+                $paymentMethod = $this->$method($views_path);
                 if ($paymentMethod) {
                     $paymentMethods[$availablePaymentMethod] = $paymentMethod;
                 }
@@ -787,13 +787,13 @@ class PaymentClass
         }
 
         $this->assign->assign([
-            'faq_links' => $faq_links,
+            'faq_links' => $this->dependencies->configClass->configurations['faq_links'],
         ]);
 
         return $paymentMethods;
     }
 
-    private function getStandardPaymentMethod($views_path, $faq_links)
+    private function getStandardPaymentMethod($views_path)
     {
         $advancedOptions = [];
 
@@ -882,7 +882,7 @@ class PaymentClass
                 [
                     'title' => $this->dependencies->l('paymentMethod.standard.embedded.title', 'paymentclass'),
                     'description' => $this->dependencies->l('paymentMethod.standard.embedded.description', 'paymentclass'),
-                    'link' => $faq_links['support'],
+                    'link' => $this->dependencies->configClass->configurations['faq_links']['support'],
                     'action' => [
                         'type' => 'options',
                         'params' => [
@@ -896,7 +896,7 @@ class PaymentClass
                 [
                     'title' => $this->dependencies->l('paymentMethod.standard.oneclick.title', 'paymentclass'),
                     'description' => $this->dependencies->l('paymentMethod.standard.oneclick.description', 'paymentclass'),
-                    'link' => $faq_links['one_click'],
+                    'link' => $this->dependencies->configClass->configurations['faq_links']['one_click'],
                     'action' => [
                         'type' => 'switch',
                         'params' => [
@@ -914,7 +914,7 @@ class PaymentClass
         ];
     }
 
-    private function getApplepayPaymentMethod($views_path, $faq_links)
+    private function getApplepayPaymentMethod($views_path)
     {
         return [
             'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('applepay')),
@@ -927,13 +927,32 @@ class PaymentClass
                 ],
                 'live' => [
                     'text' => $this->dependencies->l('paymentMethod.applepay.liveDescription', 'paymentclass'),
-                    'link' => $faq_links['applepay']
+                    'link' => $this->dependencies->configClass->configurations['faq_links']['applepay']
                 ],
             ]
         ];
     }
 
-    private function getBancontactPaymentMethod($views_path, $faq_links)
+    private function getAmexPaymentMethod($views_path)
+    {
+        return [
+            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('amex')),
+            'title' => $this->dependencies->l('paymentMethod.amex.title', 'paymentclass'),
+            'image_url' => $views_path . 'img/svg/payment/amex.svg',
+            'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('amex')),
+            'description' => [
+                'sandbox' => [
+                    'text' => $this->dependencies->l('paymentMethod.amex.testDescription', 'paymentclass'),
+                ],
+                'live' => [
+                    'text' => $this->dependencies->l('paymentMethod.amex.liveDescription', 'paymentclass'),
+                    'link' => $this->dependencies->configClass->configurations['faq_links']['amex']
+                ],
+            ]
+        ];
+    }
+
+    private function getBancontactPaymentMethod($views_path)
     {
         return [
             'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('bancontact')),
@@ -945,7 +964,7 @@ class PaymentClass
                 ],
                 'live' => [
                     'text' => $this->dependencies->l('paymentMethod.bancontact.liveDescription', 'paymentclass'),
-                    'link' => $faq_links['bancontact']
+                    'link' => $this->dependencies->configClass->configurations['faq_links']['bancontact']
                 ],
             ],
             'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('bancontact')),
@@ -971,7 +990,7 @@ class PaymentClass
         ];
     }
 
-    private function getOneyPaymentMethod($views_path, $faq_links)
+    private function getOneyPaymentMethod($views_path)
     {
         $oneyFeesItems = [
              [
@@ -994,7 +1013,7 @@ class PaymentClass
             'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney')),
             'title' => $this->dependencies->l('paymentMethod.oney.title', 'paymentclass'),
             'description' => $this->dependencies->l('paymentMethod.oney.description', 'paymentclass'),
-            'link' => $faq_links['oney'],
+            'link' => $this->dependencies->configClass->configurations['faq_links']['oney'],
             'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('oney')),
             'options' => [
                 [
