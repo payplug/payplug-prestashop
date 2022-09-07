@@ -40,11 +40,13 @@
         {* Général block *}
         {include file='./../api/molecules/general.tpl'}
 
-        {* Payment method block *}
-        {include file='./../api/molecules/payment/paymentMethods.tpl'}
+        {if 'pspaylater' != $module_name}
+            {* Payment method block *}
+            {include file='./../api/molecules/paymentMethods/paymentMethods.tpl'}
+        {/if}
 
         {* Paylater block*}
-        {if isset($paylater_isActivated) && $paylater_isActivated}
+        {if isset($paymentMethods.oney)}
             {include file='./../api/molecules/paylater/paylater.tpl'}
         {/if}
 
