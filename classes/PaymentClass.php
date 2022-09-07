@@ -763,37 +763,42 @@ class PaymentClass
      * @description Get available method to confire the module
      * @return array
      */
-    public function getPaymentMethods()
+    public function getNewPaymentMethods()
     {
-        $payment_methods = [];
-
+        $paymentMethods = [];
+        $availablePaymentMethods = [
+            'standard',
+            'applepay',
+            'bancontact',
+            'oney'
+        ];
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         $faq_links = $this->dependencies->configClass->configurations['faq_links'];
-
-        $order_states = $this->dependencies->orderClass->getOrderStates();
-        $deferred_state = $this->dependencies->configClass->configurations['deferred_state'];
-
-        $order_states_values = [
-            0 => [
-                'key' => 0,
-                'value' => $this->dependencies->l('payment.getPaymentMethod.deferred.capture.default', 'paymentclass'),
-                'selected' => (int)$deferred_state ? false : true,
-            ]
-        ];
-        foreach ($order_states as $order_state) {
-            $order_states_values[$order_state['id_order_state']] = [
-                'key' => $order_state['id_order_state'],
-                'value' => sprintf(
-                    $this->dependencies->l('payment.getPaymentMethod.deferred.capture.state', 'paymentclass'),
-                    $order_state['name']
-                ),
-                'selected' => $order_state['id_order_state'] == $deferred_state ? true : false,
-            ];
+        foreach ($availablePaymentMethods as $availablePaymentMethod) {
+            $featureName = 'feature_' . $availablePaymentMethod;
+            if ($this->dependencies->configClass->isValidFeature($featureName)) {
+                $method = 'get' . Tools::ucfirst($availablePaymentMethod) . 'PaymentMethod';
+                // @todo: check if method exists
+                $paymentMethod = $this->$method($views_path, $faq_links);
+                if ($paymentMethod) {
+                    $paymentMethods[$availablePaymentMethod] = $paymentMethod;
+                }
+            }
         }
 
-        ksort($order_states_values);
+        $this->assign->assign([
+            'faq_links' => $faq_links,
+        ]);
 
-        $embedded_mode_values = [
+        return $paymentMethods;
+    }
+
+    private function getStandardPaymentMethod($views_path, $faq_links)
+    {
+        $advancedOptions = [];
+
+        // EmbeddedMode
+        $embeddedModeItems = [
             [
                 'value' => 'integrated',
                 'dataName' => 'embeddedModeIntegrated',
@@ -810,59 +815,230 @@ class PaymentClass
                 'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.redirected', 'paymentclass')
             ]
         ];
-
         if (!$this->dependencies->configClass->isValidFeature('feature_integrated')) {
-            array_shift($embedded_mode_values);
+            array_shift($embeddedModeItems);
         }
 
-        $this->assign->assign([
-            'faq_links' => $faq_links,
-            'installments_panel_url' => $this->dependencies->configClass->configurations['installments_panel_url'],
-            'inst_mode' => $this->dependencies->configClass->configurations['inst_mode'],
-            'inst_min_amount' => $this->dependencies->configClass->configurations['inst_min_amount'],
-            'order_states_values' => $order_states_values,
-            'installment_isActivated' => $this->dependencies->configClass->isValidFeature('feature_installment'),
-            'deferred_isActivated' => $this->dependencies->configClass->isValidFeature('feature_deferred'),
-            'embedded_mode_values' => $embedded_mode_values,
-        ]);
-
-        if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
-            $payment_methods['standard'] = [
-                "name" => $this->dependencies->l('payment.getPaymentMethod.standard.name', 'paymentclass'),
-                "image_url" => $views_path . 'img/svg/payment/standard.svg',
-                "description" => $this->dependencies->l('payment.getPaymentMethod.standard.description', 'paymentclass'),
-                "sandboxDescription" =>'',
-                "link" => '',
-                "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('standard')),
-                "config_key" => $this->dependencies->getConfigurationKey('standard')
+        // Installment
+        if ($this->dependencies->configClass->isValidFeature('feature_installment')) {
+            $this->assign->assign([
+                'installments_panel_url' => $this->dependencies->configClass->configurations['installments_panel_url'],
+                'inst_mode' => $this->dependencies->configClass->configurations['inst_mode'],
+                'inst_min_amount' => $this->dependencies->configClass->configurations['inst_min_amount'],
+            ]);
+            $advancedOptions['installment'] = [
+                'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('inst')),
+                'title' => $this->dependencies->l('paymentMethod.standard.installment.title', 'paymentclass'),
+                'checked' => $this->config->get($this->dependencies->getConfigurationKey('inst')),
+                'premium' => true,
             ];
         }
 
-        if ($this->dependencies->configClass->isValidFeature('feature_applepay') && Tools::version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $payment_methods['applepay'] = [
-                "name" => $this->dependencies->l('payment.getPaymentMethod.applepay.name', 'paymentclass'),
-                "image_url" => $views_path . 'img/svg/payment/applepay.svg',
-                "description" => $this->dependencies->l('payment.getPaymentMethod.applepay.description', 'paymentclass'),
-                "sandboxDescription" => $this->dependencies->l('payment.getPaymentMethod.applepay.sandboxDescription', 'paymentclass'),
-                "link" => $faq_links['applepay'],
-                "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')),
-                "config_key" => $this->dependencies->getConfigurationKey('applepay')
+        // Deferred State
+        if ($this->dependencies->configClass->isValidFeature('feature_deferred')) {
+            $order_states = $this->dependencies->orderClass->getOrderStates();
+            $deferred_state = $this->dependencies->configClass->configurations['deferred_state'];
+            $order_states_values = [
+                0 => [
+                    'key' => 0,
+                    'value' => $this->dependencies->l('payment.getPaymentMethod.deferred.capture.default', 'paymentclass'),
+                    'selected' => (int)$deferred_state ? false : true,
+                ]
+            ];
+            foreach ($order_states as $order_state) {
+                $order_states_values[$order_state['id_order_state']] = [
+                    'key' => $order_state['id_order_state'],
+                    'value' => sprintf(
+                        $this->dependencies->l('payment.getPaymentMethod.deferred.capture.state', 'paymentclass'),
+                        $order_state['name']
+                    ),
+                    'selected' => $order_state['id_order_state'] == $deferred_state ? true : false,
+                ];
+            }
+            ksort($order_states_values);
+            $this->assign->assign([
+                'order_states_values' => $order_states_values,
+            ]);
+            $advancedOptions['deferred'] = [
+                'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('deferred')),
+                'title' => $this->dependencies->l('paymentMethod.standard.deferred.title', 'paymentclass'),
+                'checked' => $this->config->get($this->dependencies->getConfigurationKey('deferred')),
+                'premium' => true,
             ];
         }
 
-        if ($this->dependencies->configClass->isValidFeature('feature_bancontact')) {
-            $payment_methods['bancontact'] = [
-                "name" => $this->dependencies->l('payment.getPaymentMethod.bancontact.name', 'paymentclass'),
-                "image_url" => $views_path . 'img/svg/payment/bancontact.svg',
-                "description" => $this->dependencies->l('payment.getPaymentMethod.bancontact.description', 'paymentclass'),
-                "sandboxDescription" => $this->dependencies->l('payment.getPaymentMethod.bancontact.sandboxDescription', 'paymentclass'),
-                "link" => $faq_links['bancontact'],
-                "checked" => (bool)$this->config->get($this->dependencies->getConfigurationKey('bancontact')),
-                "config_key" => $this->dependencies->getConfigurationKey('bancontact')
-            ];
-        }
+        return [
+            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('standard')),
+            'title' => $this->dependencies->l('paymentMethod.standard.title', 'paymentclass'),
+            'image_url' => $views_path . 'img/svg/payment/standard.svg',
+            'description' => [
+                'live' => [
+                    'text' => $this->dependencies->l('paymentMethod.standard.description', 'paymentclass'),
+                ],
+            ],
+            'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('standard')),
+            'useSandbox' => true,
+            'options' => [
+                [
+                    'title' => $this->dependencies->l('paymentMethod.standard.embedded.title', 'paymentclass'),
+                    'description' => $this->dependencies->l('paymentMethod.standard.embedded.description', 'paymentclass'),
+                    'link' => $faq_links['support'],
+                    'action' => [
+                        'type' => 'options',
+                        'params' => [
+                            'items' => $embeddedModeItems,
+                            'className' => '_sandboxRadioButton',
+                            'selected' => $this->config->get($this->dependencies->getConfigurationKey('embeddedMode')),
+                            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('embeddedMode')),
+                        ]
+                    ]
+                ],
+                [
+                    'title' => $this->dependencies->l('paymentMethod.standard.oneclick.title', 'paymentclass'),
+                    'description' => $this->dependencies->l('paymentMethod.standard.oneclick.description', 'paymentclass'),
+                    'link' => $faq_links['one_click'],
+                    'action' => [
+                        'type' => 'switch',
+                        'params' => [
+                            'enabledLabel' => 'On',
+                            'disabledLabel' => 'Off',
+                            'dataName' => 'oneClickSwitch',
+                            'checked' => $this->config->get($this->dependencies->getConfigurationKey('oneClick')),
+                            'className' => "oneClickSwitch",
+                            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oneClick')),
+                        ]
+                    ]
+                ],
+            ],
+            'advancedOptions' => $advancedOptions
+        ];
+    }
 
-        return $payment_methods;
+    private function getApplepayPaymentMethod($views_path, $faq_links)
+    {
+        return [
+            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('applepay')),
+            'title' => $this->dependencies->l('paymentMethod.applepay.title', 'paymentclass'),
+            'image_url' => $views_path . 'img/svg/payment/applepay.svg',
+            'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')),
+            'description' => [
+                'sandbox' => [
+                    'text' => $this->dependencies->l('paymentMethod.applepay.testDescription', 'paymentclass'),
+                ],
+                'live' => [
+                    'text' => $this->dependencies->l('paymentMethod.applepay.liveDescription', 'paymentclass'),
+                    'link' => $faq_links['applepay']
+                ],
+            ]
+        ];
+    }
+
+    private function getBancontactPaymentMethod($views_path, $faq_links)
+    {
+        return [
+            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('bancontact')),
+            'title' => $this->dependencies->l('paymentMethod.bancontact.title', 'paymentclass'),
+            'image_url' => $views_path . 'img/svg/payment/bancontact.svg',
+            'description' => [
+                'sandbox' => [
+                    'text' => $this->dependencies->l('paymentMethod.bancontact.testDescription', 'paymentclass'),
+                ],
+                'live' => [
+                    'text' => $this->dependencies->l('paymentMethod.bancontact.liveDescription', 'paymentclass'),
+                    'link' => $faq_links['bancontact']
+                ],
+            ],
+            'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('bancontact')),
+            'options' => [
+                [
+                    'title' => $this->dependencies->l('paymentMethod.bancontactOption.title', 'paymentclass'),
+                    'description' => $this->dependencies->l('paymentMethod.bancontactOption.description', 'paymentclass'),
+                    'action' => [
+                        'type' => 'switch',
+                        'params' => [
+                            'enabledLabel' => 'On',
+                            'disabledLabel' => 'Off',
+                            'dataName' => 'bancontactCountrySwitch',
+                            'checked' => $this->config->get(
+                                $this->dependencies->getConfigurationKey('bancontact_country')
+                            ),
+                            'className' => "bancontactCountrySwitch",
+                            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('bancontactCountry')),
+                        ]
+                    ]
+                ],
+            ]
+        ];
+    }
+
+    private function getOneyPaymentMethod($views_path, $faq_links)
+    {
+        $oneyFeesItems = [
+             [
+                 'value' => '1',
+                 'dataName' => 'oneyWithFees',
+                 'text' => $this->dependencies->l('paymentMethod.oneyWithFees.title', 'paymentclass'),
+                 'subText' => $this->dependencies->l('paymentMethod.oneyWithFees.subtitle', 'paymentclass'),
+                 'className' => '_paylaterLabel'
+             ],
+             [
+                 'value' => '0',
+                 'dataName' => 'oneyWithoutFees',
+                 'text' => $this->dependencies->l('paymentMethod.oneyWithoutFees.title', 'paymentclass'),
+                 'subText' => $this->dependencies->l('paymentMethod.oneyWithoutFees.subtitle', 'paymentclass'),
+                 'className' => '_paylaterLabel'
+             ]
+         ];
+
+        return [
+            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney')),
+            'title' => $this->dependencies->l('paymentMethod.oney.title', 'paymentclass'),
+            'description' => $this->dependencies->l('paymentMethod.oney.description', 'paymentclass'),
+            'link' => $faq_links['oney'],
+            'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('oney')),
+            'options' => [
+                [
+                    'action' => [
+                        'type' => 'option',
+                        'params' => [
+                            'items' => $oneyFeesItems,
+                            'className' => '_paylaterOptions',
+                            'dataName' => 'oneyOptions',
+                            'selected' => $this->config->get($this->dependencies->getConfigurationKey('oney_fees')),
+                            'name' =>  $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_fees')),
+                        ]
+                    ],
+                ],
+            ],
+            'advancedOptions' => [
+                'thresholds' => [
+                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-thresholds.svg',
+                    'title' => $this->dependencies->l('paymentMethod.oneyThresholdsOption.title', 'paymentclass'),
+                    'switch' => false,
+                ],
+                'optimised' => [
+                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-optimized.svg',
+                    'title' => $this->dependencies->l('paymentMethod.oneyOptimisedOption.title', 'paymentclass'),
+                    'switch' => true,
+                    'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_optimized')),
+                    'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_optimized')),
+                ],
+                'product' => [
+                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-productOneyCta',
+                    'title' => $this->dependencies->l('paymentMethod.productOneyCta.title', 'paymentclass'),
+                    'switch' => true,
+                    'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_product_cta')),
+                    'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_product_cta')),
+                ],
+                'cart' => [
+                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-cartOneyCta',
+                    'title' => $this->dependencies->l('paymentMethod.productOneyCta.title', 'paymentclass'),
+                    'switch' => true,
+                    'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_cart_cta')),
+                    'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_cart_cta')),
+                ]
+            ],
+        ];
     }
 
     /**
@@ -1116,7 +1292,7 @@ class PaymentClass
         }
 
         if ($options['oney'] &&
-            $this->dependencies->configClass->isValidFeature('feature_paylater')
+            $this->dependencies->configClass->isValidFeature('feature_oney')
             ) {
             $use_taxes = (bool)$this->config->get('PS_TAX');
             $cart_amount = $this->context->cart->getOrderTotal($use_taxes);

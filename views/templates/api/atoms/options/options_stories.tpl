@@ -26,13 +26,14 @@
     <div>
         <p class="_subtitle">Without description:</p>
         <div>
-            {assign var=items value=[
+            {assign var=optionsItems value=[
             ['value'=>"0", "text" => 'Selected option'],
             ['value'=>"1", "text" => 'Default option'],
             ['value'=>"2", "text" => 'Hovered option', "className" => "-hover"],
             ['value'=>"3", "text" => 'Disabled option', "disabled" =>  true]
             ]}
             {include file='./options.tpl'
+            optionsItems=$optionsItems
             optionsSelected='0'
             optionsName='options_1'}
         </div>
@@ -40,13 +41,14 @@
     <div>
         <p class="_subtitle">With description:</p>
         <div>
-            {assign var=items value=[
+            {assign var=optionsItems value=[
             ['value'=>"0", "text" => 'Selected option', "subText" => 'Lorem ipsum dolor sit amet'],
             ['value'=>"1", "text" => 'Default option', "subText" => 'Consectetur adipiscing elit'],
             ['value'=>"2", "text" => 'Hovered option', "className" => "-hover", "subText" => 'Mauris vehicula suscipit neque'],
             ['value'=>"3", "text" => 'Disabled option', "disabled" =>  true, "subText" => 'Nec fringilla est vestibulum faucibus']
             ]}
             {include file='./options.tpl'
+            optionsItems=$optionsItems
             optionsSelected='0'
             optionsName='options_2'}
         </div>
@@ -57,10 +59,11 @@
             <ul>
                 <li>name (mandatory)</li>
                 <li>selected (mandatory)</li>
+                <li>items (mandatory)</li>
             </ul>
         </div>
         <div>
-            items props :
+            optionsItems props :
             <ul>
                 <li>value (mandatory)</li>
                 <li>text (mandatory)</li>
