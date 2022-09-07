@@ -631,7 +631,8 @@ class ConfigClass
             $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'payplug_oney_custom_min_amounts',
             $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact',
             $this->dependencies->getConfigurationKey('bancontactCountry') => 'payplug_bancontact_country',
-            $this->dependencies->getConfigurationKey('applepay') => 'payplug_applepay'
+            $this->dependencies->getConfigurationKey('applepay') => 'payplug_applepay',
+            $this->dependencies->getConfigurationKey('amex') => 'payplug_amex'
         ];
 
         foreach ($configurationKeys as $key => $config) {
@@ -910,7 +911,7 @@ class ConfigClass
             'oney_custom_min_amounts' => $oney_custom_min_amounts,
             'iso' => $this->context->language->iso_code,
             'onboardingOneyCompleted' => $this->isOnboardingOneyCompleted(),
-            'paymentMethods' => $this->dependencies->paymentClass->getNewPaymentMethods(),
+            'paymentMethods' => $this->dependencies->paymentClass->getPaymentMethods(),
             'onBoardingCheck' => false
         ]);
 
@@ -969,6 +970,7 @@ class ConfigClass
             'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
             'support' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
             'applepay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/5149384347292',
+            'amex' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/5701208563996',
         ];
     }
 

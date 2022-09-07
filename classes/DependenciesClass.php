@@ -50,6 +50,11 @@ class DependenciesClass
             'defaultValue' => null,
             'setConf' => 1
         ],
+        'amex' => [
+            'name' => 'AMEX',
+            'defaultValue' => null,
+            'setConf' => 1
+        ],
         'bancontact' => [
             'name' => 'BANCONTACT',
             'defaultValue' => null,
