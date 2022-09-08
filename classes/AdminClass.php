@@ -174,6 +174,8 @@ class AdminClass
                     }
                 } elseif ($this->tools->tool('getValue', 'type') == 'applepayPremium') {
                     $link = 'mailto:support@payplug.com';
+                } elseif ($this->tools->tool('getValue', 'type') == 'amexPremium') {
+                    $link = 'https://payplug-prod.atlassian.net/servicedesk/customer/portal/13';
                 } else {
                     $link = 'https://www.payplug.com/contact';
                 }
@@ -310,6 +312,7 @@ class AdminClass
                 'payplug_oney' => $permissions['can_use_oney'],
                 'payplug_bancontact' => $permissions['can_use_bancontact'],
                 'payplug_applepay' => $permissions['can_use_applepay'],
+                'payplug_amex' => $permissions['can_use_amex'],
                 'payplug_inst' => $permissions['can_create_installment_plan'],
                 'payplug_deferred' => $permissions['can_create_deferred_payment'],
             ];

@@ -44,6 +44,10 @@
         {capture assign='premiumText'}
             {l s='admin.popin.premium.activateFeatureApplePay' tags=[$premiumLink] mod='payplug'}
         {/capture}
+    {elseif 'amexPremium' == $premiumContent.type}
+        {capture assign='premiumText'}
+            {l s='admin.popin.premium.activateFeatureAmex' tags=[$premiumLink] mod='payplug'}
+        {/capture}
     {else}
         {capture assign='premiumText'}
             {l s='admin.popin.premium.activateFeature' tags=[$premiumLink] mod='payplug'}
