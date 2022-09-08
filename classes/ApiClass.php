@@ -393,6 +393,12 @@ class ApiClass
             $can_use_applepay = true;
         }
 
+        if (isset($json_answer['payment_methods']['american_express']['enabled'])) {
+            $can_use_amex = $json_answer['payment_methods']['american_express']['enabled'];
+        } else {
+            $can_use_amex = true;
+        }
+
         $onboardingOneyCompleted = false;
         if (isset($json_answer['payment_methods']) && !empty(
             $this->config->get(
@@ -421,6 +427,7 @@ class ApiClass
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
             'can_use_bancontact' => $can_use_bancontact,
             'can_use_applepay' => $can_use_applepay,
+            'can_use_amex' => $can_use_amex,
             'onboardingOneyCompleted' => $onboardingOneyCompleted,
         ];
 

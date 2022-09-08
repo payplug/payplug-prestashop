@@ -174,6 +174,8 @@ class AdminClass
                     }
                 } elseif ($this->tools->tool('getValue', 'type') == 'applepayPremium') {
                     $link = 'mailto:support@payplug.com';
+                } elseif ($this->tools->tool('getValue', 'type') == 'amexPremium') {
+                    $link = 'https://payplug-prod.atlassian.net/servicedesk/customer/portal/13';
                 } else {
                     $link = 'https://www.payplug.com/contact';
                 }
@@ -304,49 +306,16 @@ class AdminClass
         if ((int)$this->tools->tool('getValue', 'checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
-            $return = [];
-            if ($permissions) {
-                foreach ($permissions as $key => $value) {
-                    switch ($key) {
-                        case 'use_live_mode':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_sandbox'] = $value;
-                            }
-                            break;
-                        case 'can_save_cards':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_one_click'] = $value;
-                            }
-                            break;
-                        case 'can_use_oney':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_oney'] = $value;
-                            }
-                            break;
-                        case 'can_use_bancontact':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_bancontact'] = $value;
-                            }
-                            break;
-                        case 'can_use_applepay':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_applepay'] = $value;
-                            }
-                            break;
-                        case 'can_create_installment_plan':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_inst'] = $value;
-                            }
-                            break;
-
-                        case 'can_create_deferred_payment':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_deferred'] = $value;
-                            }
-                            break;
-                    }
-                }
-            }
+            $return = [
+                'payplug_sandbox' => $permissions['use_live_mode'],
+                'payplug_one_click' => $permissions['can_save_cards'],
+                'payplug_oney' => $permissions['can_use_oney'],
+                'payplug_bancontact' => $permissions['can_use_bancontact'],
+                'payplug_applepay' => $permissions['can_use_applepay'],
+                'payplug_amex' => $permissions['can_use_amex'],
+                'payplug_inst' => $permissions['can_create_installment_plan'],
+                'payplug_deferred' => $permissions['can_create_deferred_payment'],
+            ];
             die(json_encode($return));
         }
 
