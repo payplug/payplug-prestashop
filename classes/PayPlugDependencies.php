@@ -38,6 +38,9 @@ class PayPlugDependencies
     /** @var HookRepository */
     private $hook;
 
+    /** @var HookClass */
+    public $hookClass;
+
     /** @var InstallRepository */
     private $install;
 

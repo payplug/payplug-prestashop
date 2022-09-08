@@ -385,7 +385,12 @@ class DependenciesClass
      */
     public function loadSpecificPresta()
     {
-        $SpecificClass = '\PayPlug\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $SpecificClass = '\PayPlug\src\specific\PrestashopSpecific16';
+        } else {
+            $SpecificClass = '\PayPlug\src\specific\PrestashopSpecific17';
+        }
+
         if (class_exists($SpecificClass)) {
             return new $SpecificClass();
         }
@@ -440,7 +445,7 @@ class DependenciesClass
             return [];
         }
 
-        $return = Tools::jsonDecode($jsonContent);
+        $return = json_decode($jsonContent);
 
         return $return;
     }

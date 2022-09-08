@@ -23,7 +23,7 @@
 
 //require_once(_PS_ROOT_DIR_."/classes/Tools.php");
 
-//$configuration = Tools::jsonDecode(Tools::file_get_contents(dirname(__FILE__)."/composer.json"));
+//$configuration = json_decode(Tools::file_get_contents(dirname(__FILE__)."/composer.json"));
 //$moduleVersion = $configuration->version;
 //$moduleName = $configuration->moduleName;
 

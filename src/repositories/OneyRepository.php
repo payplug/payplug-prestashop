@@ -1059,7 +1059,7 @@ class OneyRepository extends BaseClass
         $cache = $this->cache->getCacheByKey($cache_key['result']);
 
         if ($cache['result']) {
-            return $tools->tool('jsonDecode', $cache['result']['cache_value'], true);
+            return json_decode($cache['result']['cache_value'], true);
         }
 
 

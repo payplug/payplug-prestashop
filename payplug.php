@@ -54,7 +54,7 @@ class Payplug extends PaymentModule
         $this->displayName = 'PayPlug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
+        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '9.9'];
         $this->tab = 'payments_gateways';
         $this->version = '3.10.0';
 
@@ -140,11 +140,11 @@ class Payplug extends PaymentModule
             'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
             'actionAdminPerformanceControllerAfter',
-            'actionCarrierUpdate',
+            //'actionCarrierUpdate',
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
             'actionExportGDPRData',
-            'actionObjectCarrierAddAfter',
+            //'actionObjectCarrierAddAfter',
             'actionOrderStatusUpdate',
             'actionObjectOrderStateAddAfter',
             'actionObjectOrderStateUpdateAfter',
@@ -159,11 +159,11 @@ class Payplug extends PaymentModule
             'displayProductPriceBlock',
             'displayAdminStatusesForm',
             'header',
-            'moduleRoutes',
+            //'moduleRoutes',
             'payment',
             'paymentReturn',
             'paymentOptions',
-            'registerGDPRConsent',
+            //'registerGDPRConsent',
         ];
     }
 
