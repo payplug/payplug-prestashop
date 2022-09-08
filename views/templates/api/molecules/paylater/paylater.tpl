@@ -29,7 +29,7 @@
 
     <div class="paymentMethod -{$paymentMethods.oney.name|escape:'htmlall':'UTF-8'}">
         {include file='./../../atoms/switch/switch.tpl'
-            switchClassName='paymentMethod_switch'
+            switchClassName='paymentMethod_switch -premium'
             switchDataName='paymentMethod_oney'
             switchName=$paymentMethods.oney.name|escape:'htmlall':'UTF-8'
             switchChecked=$paymentMethods.oney.checked}
