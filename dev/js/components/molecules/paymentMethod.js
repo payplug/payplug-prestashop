@@ -14,9 +14,9 @@ class PaymentMethod {
         $(document)
             .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
             .on('change', '.paymentMethod_switch input', paymentMethod.handlePaymentOption)
-            .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission)
-            .on('change', '.deferredSwitch input', paymentMethod.handleDeferredPermission)
-            .on('change', '.installmentSwitch input', paymentMethod.handleInstallmentPermission);
+            .on('change', 'input[name="payplug_one_click"]', paymentMethod.handleOneClickPermission)
+            .on('change', 'input[name="payplug_deferred"]', paymentMethod.handleDeferredPermission)
+            .on('change', 'input[name="payplug_inst"]', paymentMethod.handleInstallmentPermission);
         $(window)
             .on('reloadEvent', paymentMethod.handleReloadContent)
             .on('resetThresholders', paymentMethod.resetThresholders);
@@ -29,7 +29,7 @@ class PaymentMethod {
 
     handleDeferredPermission(event) {
         const $input = $(event.target),
-            $switch = $input.parents('.deferredSwitch'),
+            $switch = $input.parents('._switch').eq(0),
             $sandbox = $('input[name=payplug_sandbox]:checked');
 
         if (!parseInt($sandbox.val())) {
@@ -41,7 +41,7 @@ class PaymentMethod {
 
     handleInstallmentPermission(event) {
         const $input = $(event.target),
-            $switch = $input.parents('.installmentSwitch'),
+            $switch = $input.parents('._switch').eq(0),
             $sandbox = $('input[name=payplug_sandbox]:checked');
 
         if (!parseInt($sandbox.val())) {
@@ -52,7 +52,7 @@ class PaymentMethod {
     }
 
     handleOneClickPermission(event) {
-        const $switch = $(event.target).parents('.oneClickSwitch'),
+        const $switch = $(event.target).parents('._switch').eq(0),
             $sandbox = $('input[name=payplug_sandbox]:checked'),
             isSandBox = parseInt($sandbox.val());
 

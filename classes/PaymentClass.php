@@ -920,6 +920,7 @@ class PaymentClass
             'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('applepay')),
             'title' => $this->dependencies->l('paymentMethod.applepay.title', 'paymentclass'),
             'image_url' => $views_path . 'img/svg/payment/applepay.svg',
+            'premium' => true,
             'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')),
             'description' => [
                 'sandbox' => [
@@ -967,6 +968,7 @@ class PaymentClass
                     'link' => $this->dependencies->configClass->configurations['faq_links']['bancontact']
                 ],
             ],
+            'premium' => true,
             'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('bancontact')),
             'options' => [
                 [
@@ -1012,6 +1014,7 @@ class PaymentClass
         return [
             'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney')),
             'title' => $this->dependencies->l('paymentMethod.oney.title', 'paymentclass'),
+            'premium' => true,
             'description' => $this->dependencies->l('paymentMethod.oney.description', 'paymentclass'),
             'link' => $this->dependencies->configClass->configurations['faq_links']['oney'],
             'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('oney')),
