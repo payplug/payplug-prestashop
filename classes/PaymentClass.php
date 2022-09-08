@@ -768,10 +768,10 @@ class PaymentClass
         $paymentMethods = [];
         $availablePaymentMethods = [
             'standard',
+            'amex',
             'applepay',
             'bancontact',
-            'oney',
-            'amex'
+            'oney'
         ];
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         foreach ($availablePaymentMethods as $availablePaymentMethod) {
