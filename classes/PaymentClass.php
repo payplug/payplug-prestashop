@@ -940,6 +940,7 @@ class PaymentClass
             'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('amex')),
             'title' => $this->dependencies->l('paymentMethod.amex.title', 'paymentclass'),
             'image_url' => $views_path . 'img/svg/payment/amex.svg',
+            'premium' => true,
             'checked' => (bool)$this->config->get($this->dependencies->getConfigurationKey('amex')),
             'description' => [
                 'sandbox' => [

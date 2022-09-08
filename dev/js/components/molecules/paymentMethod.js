@@ -295,6 +295,9 @@ class PaymentMethod {
             case 'payplug_applepay' :
                 var checkpremium = 'applepayPremium';
                 break;
+            case 'payplug_amex' :
+                var checkpremium = 'amexPremium';
+                break;
             default :
                 var checkpremium = 'premium';
                 break;
