@@ -28,6 +28,7 @@ window[module_name+'ModuleApplePay'] = {
 
             // Create ApplePaySession
             const session = new ApplePaySession(3, request);
+            var paymentId= null;
 
             $.ajax({
                 method: "POST",
@@ -51,7 +52,7 @@ window[module_name+'ModuleApplePay'] = {
 
                 try {
                     var merchant_session_object = datas.apiResponse.merchant_session;
-                    var id_payment = datas.idPayment;
+                    paymentId = datas.idPayment;
                     var id_cart = datas.idCart;
                 } catch (error) {
                     console.error(error);
@@ -91,35 +92,30 @@ window[module_name+'ModuleApplePay'] = {
                     // Define ApplePayPaymentAuthorizationResult
                     $.ajax({
                         method: "POST",
-                        url: applePayPaymentAjaxURL,
+                        url: payplug_ajax_url,
                         data: {
+                            _ajax: 1,
                             token: event.payment.token,
-                            cartid: id_cart,
-                            ps: 1
+                            pay_id: paymentId,
+                            cart_id: id_cart,
+                            patchPayment: 1
                         }
                     })
                     .success(function (datas) {
                         var datas = JSON.parse(datas);
-                        var apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
 
-                        if (datas.result !== true) {
-                            apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
-                        }
-
-                        const result = {
-                            "status": apple_pay_Session_status
-                        };
-
-                        session.completePayment(result);
-
-                        if (datas.result === true) {
-                            window.location.replace(datas.link_redirect);
-                        } else {
+                        if (!datas.result) {
+                            session.completePayment({ "status": ApplePaySession.STATUS_FAILURE });
                             $('#apple-pay-button').css('pointer-events', 'auto');
                             payplugModule.popup.set(payplug_transaction_error_message);
+                            return;
                         }
+
+                        session.completePayment({ "status": ApplePaySession.STATUS_SUCCESS });
+                        window.location.replace(datas.return_url);
                     })
                     .error(function () {
+                        $('#apple-pay-button').css('pointer-events', 'auto');
                         payplugModule.popup.set(payplug_transaction_error_message);
                     })
                 };

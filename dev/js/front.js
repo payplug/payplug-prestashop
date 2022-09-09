@@ -554,7 +554,7 @@ var $document, $window, __moduleName__Module = {
                     dataType: 'json',
                     data: {
                         _ajax: 1,
-                        confirmIP: 1,
+                        confirmPayment: 1,
                         cart_id: integrated.props.cart_id,
                         pay_id: token,
                     },
