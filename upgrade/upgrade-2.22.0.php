@@ -35,13 +35,13 @@ function upgrade_module_2_22_0($object)
     $flag = true;
 
     //adding new configurations
-    if (!PayplugBackward::updateConfiguration('PAYPLUG_DEFERRED', 0)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_DEFERRED_AUTO', 0)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_DEFERRED_STATE', 0)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_ORDER_STATE_AUTH', 0)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_ORDER_STATE_AUTH_TEST', 0)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_ORDER_STATE_EXP', 0)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_ORDER_STATE_EXP_TEST', 0)) {
+    if (!Configuration::updateValue('PAYPLUG_DEFERRED', 0)
+        || !Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', 0)
+        || !Configuration::updateValue('PAYPLUG_DEFERRED_STATE', 0)
+        || !Configuration::updateValue('PAYPLUG_ORDER_STATE_AUTH', 0)
+        || !Configuration::updateValue('PAYPLUG_ORDER_STATE_AUTH_TEST', 0)
+        || !Configuration::updateValue('PAYPLUG_ORDER_STATE_EXP', 0)
+        || !Configuration::updateValue('PAYPLUG_ORDER_STATE_EXP_TEST', 0)) {
         $flag = false;
     }
 
@@ -84,7 +84,7 @@ function upgrade_module_2_22_0($object)
     }
 
     if (version_compare(_PS_VERSION_, '1.5', '<')) {
-        if (!PayplugBackward::updateConfiguration('PAYPLUG_VERSION_1_4', '2.22.0')) {
+        if (!Configuration::updateValue('PAYPLUG_VERSION_1_4', '2.22.0')) {
             $flag = false;
         }
     }

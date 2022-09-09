@@ -139,10 +139,10 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
         }
 
         // check if the shipping country are different then return false
-        $iso_code = $this->toolsSpecific->tool('strtoupper', $shipping_iso);
-        $allow_countries = $this->toolsSpecific->tool(
+        $iso_code = $this->toolsAdapter->tool('strtoupper', $shipping_iso);
+        $allow_countries = $this->toolsAdapter->tool(
             'strtoupper',
-            $this->configurationSpecific->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            $this->configurationAdapter->get('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
         );
         if (!$allow_countries) {
             return [

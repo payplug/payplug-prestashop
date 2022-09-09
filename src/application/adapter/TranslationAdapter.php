@@ -21,39 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CarrierInterface;
-use Carrier;
+use PayPlug\src\interfaces\TranslationInterface;
+use Translate;
 
-class CarrierSpecific implements CarrierInterface
+class TranslationAdapter implements TranslationInterface
 {
-    /** @var int Default delivery delay value in days for new carrier */
-    public $default_delay = 0;
-
-    /** @var string Default delivery type value for new carrier */
-    public $default_delivery_type = 'storepickup';
-
     public static function factory()
     {
         return new self();
     }
 
-    public function get($id_carrier = false)
+    public static function translate($module_class, $string, $repository_name)
     {
-        if (!is_int($id_carrier)) {
-            $id_carrier = false;
-        }
-        return new Carrier($id_carrier);
-    }
-
-    public function getDefaultDelay()
-    {
-        return $this->default_delay;
-    }
-
-    public function getDefaultDeliveryType()
-    {
-        return $this->default_delivery_type;
+        return Translate::getModuleTranslation($module_class, $string, $repository_name);
     }
 }

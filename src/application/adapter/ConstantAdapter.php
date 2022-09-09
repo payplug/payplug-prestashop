@@ -21,20 +21,21 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ShopInterface;
-use Shop;
+use PayPlug\src\interfaces\ConstantInterface;
 
-class ShopSpecific implements ShopInterface
+class ConstantAdapter implements ConstantInterface
 {
-    public function isFeatureActive()
+    public static function factory()
     {
-        return Shop::isFeatureActive();
+        return new ConstantAdapter();
     }
 
-    public function setContext()
+    public function get($constant)
     {
-        return Shop::setContext(Shop::CONTEXT_ALL);
+        if (isset($constant)) {
+            return constant($constant);
+        }
     }
 }

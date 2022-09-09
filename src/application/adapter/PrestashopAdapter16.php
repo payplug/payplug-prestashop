@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
 use Configuration;
 use Language;
@@ -31,7 +31,7 @@ use Validate;
 use Tab;
 use Tools;
 
-class PrestashopSpecific16
+class PrestashopAdapter16
 {
     private $card;
     private $config;
@@ -117,7 +117,7 @@ class PrestashopSpecific16
                     'payplug_oney_required_field' => $this->oney->displayOneyRequiredFields(),
                     'payplug_oney_allowed' => $is_elligible['result'],
                     'payplug_oney_error' => $is_elligible['error'],
-                    'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'prestashopspecific16')
+                    'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'prestashopadapter16')
                 ]);
             } catch (\Exception $e) {
                 var_dump($e);
@@ -240,7 +240,7 @@ class PrestashopSpecific16
         ];
     }
 
-    // todo: set Tab install process in a specific
+    // todo: set Tab install process in a adapter
     public function installTab()
     {
         if ('payplug' != $this->dependencies->name) {
@@ -307,7 +307,7 @@ class PrestashopSpecific16
         return $installed;
     }
 
-    // todo: set Tab uninstall process in a specific
+    // todo: set Tab uninstall process in a adapter
     public function uninstallTab()
     {
         if ('payplug' != $this->dependencies->name) {
@@ -336,6 +336,7 @@ class PrestashopSpecific16
 
         return $flag;
     }
+
     /**
      * @description Link to order by order state
      *
@@ -363,5 +364,17 @@ class PrestashopSpecific16
 
         $link = $this->context->link->getAdminLink('AdminOrders', true);
         return $link;
+    }
+
+    /**
+     * @description Check if string is Plaintext Password
+     *
+     * @param $plaintextPasswd
+     * @param int $size
+     * @return bool
+     */
+    public function isPlaintextPassword($plaintextPasswd, $size = 5)
+    {
+        return Tools::strlen($plaintextPasswd) >= $size && Tools::strlen($plaintextPasswd) <= 72;
     }
 }

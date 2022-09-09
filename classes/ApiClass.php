@@ -23,7 +23,6 @@
 
 namespace PayPlug\classes;
 
-use Configuration;
 use Exception;
 
 use Payplug\Authentication;
@@ -33,6 +32,8 @@ use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\ForbiddenException;
+use Payplug\Exception\NotAllowedException;
 use Payplug\Exception\NotFoundException;
 use Payplug\Exception\UndefinedAttributeException;
 use Payplug\InstallmentPlan;
@@ -44,7 +45,6 @@ use Payplug\Refund;
 use PayPlug\src\exceptions\BadParameterException;
 
 use Symfony\Component\Dotenv\Dotenv;
-use Tools;
 
 class ApiClass
 {
@@ -107,9 +107,9 @@ class ApiClass
     /**
      * @description Check if account is premium
      *
-     * @param string $api_key
-     * @return bool
-     * @throws Payplug\Exception\ConfigurationNotSetException|ConfigurationException
+     * @param null $api_key
+     * @return array|bool
+     * @throws ConfigurationException
      */
     public function getAccountPermissions($api_key = null)
     {
@@ -122,10 +122,10 @@ class ApiClass
     /**
      * @description Get account permission from Payplug API
      *
-     * @param string $api_key
-     * @param boolean $sandbox
-     * @return array | bool
-     * @throws Payplug\Exception\ConfigurationNotSetException|ConfigurationException
+     * @param $api_key
+     * @param bool $sandbox
+     * @return array|false
+     * @throws ConfigurationException
      */
     public function getAccount($api_key, $sandbox = true)
     {
@@ -133,8 +133,6 @@ class ApiClass
 
         try {
             $response = Authentication::getAccount();
-        } catch (ConfigurationNotSetException $e) {
-            return false;
         } catch (ConfigurationException $e) {
             return false;
         }
@@ -176,16 +174,10 @@ class ApiClass
                 : null;
 
             if (!$publishable_key) {
-                Configuration::deleteByName(
-                    $this->dependencies->getConfigurationKey('publishableKey')
-                );
-                Configuration::deleteByName(
-                    $this->dependencies->getConfigurationKey('publishableKeyTest')
-                );
-                Configuration::updateValue(
-                    $this->dependencies->getConfigurationKey('embeddedMode'),
-                    'redirected'
-                );
+                $this->config->deleteByName($this->dependencies->getConfigurationKey('publishableKey'));
+                $this->config->deleteByName($this->dependencies->getConfigurationKey('publishableKeyTest'));
+                $this->config->updateValue($this->dependencies->getConfigurationKey('embeddedMode'), 'redirected');
+
                 return [
                     'result' => false,
                     'error' => [
@@ -196,7 +188,7 @@ class ApiClass
             }
 
             $flag = $flag
-                && Configuration::updateValue(
+                && $this->config->updateValue(
                     $this->dependencies->getConfigurationKey('publishableKey') . ($sandbox ? '_TEST' : ''),
                     $publishable_key
                 );
@@ -229,13 +221,13 @@ class ApiClass
                     : null;
 
             if (!$publishable_key) {
-                Configuration::deleteByName(
+                $this->config->deleteByName(
                     $this->dependencies->getConfigurationKey('publishableKey')
                 );
-                Configuration::deleteByName(
+                $this->config->deleteByName(
                     $this->dependencies->getConfigurationKey('publishableKeyTest')
                 );
-                Configuration::updateValue(
+                $this->config->updateValue(
                     $this->dependencies->getConfigurationKey('embeddedMode'),
                     'redirected'
                 );
@@ -249,7 +241,7 @@ class ApiClass
             }
 
             $flag = $flag
-                && Configuration::updateValue(
+                &&   $this->config->updateValue(
                     $this->dependencies->getConfigurationKey('publishableKey') . (!$sandbox ? '_TEST' : ''),
                     $publishable_key
                 );
@@ -279,12 +271,13 @@ class ApiClass
         ];
     }
 
+
     /**
      * @description Read API response and return permissions
      *
-     * @param string $json_answer
+     * @param $json_answer
      * @param bool $is_sandbox
-     * @return array OR bool
+     * @return array|false
      */
     private function treatAccountResponse($json_answer, $is_sandbox = true)
     {
@@ -332,7 +325,7 @@ class ApiClass
                 foreach ($json_answer['configuration']['min_amounts'] as $key => $value) {
                     $configuration['min_amounts'] .= $key . ':' . $value . ';';
                 }
-                $configuration['min_amounts'] = Tools::substr($configuration['min_amounts'], 0, -1);
+                $configuration['min_amounts'] = $this->tools->substr($configuration['min_amounts'], 0, -1);
             }
 
             if (isset($json_answer['configuration']['max_amounts'])
@@ -341,7 +334,7 @@ class ApiClass
                 foreach ($json_answer['configuration']['max_amounts'] as $key => $value) {
                     $configuration['max_amounts'] .= $key . ':' . $value . ';';
                 }
-                $configuration['max_amounts'] = Tools::substr($configuration['max_amounts'], 0, -1);
+                $configuration['max_amounts'] =  $this->tools->substr($configuration['max_amounts'], 0, -1);
             }
 
             if (isset($json_answer['configuration']['oney'])) {
@@ -353,7 +346,7 @@ class ApiClass
                     foreach ($json_answer['configuration']['oney']['allowed_countries'] as $country) {
                         $allowed .= $country . ',';
                     }
-                    $configuration['oney_allowed_countries'] = Tools::substr($allowed, 0, -1);
+                    $configuration['oney_allowed_countries'] =  $this->tools->substr($allowed, 0, -1);
                 }
 
                 if (isset($json_answer['configuration']['oney']['min_amounts'])
@@ -363,7 +356,7 @@ class ApiClass
                     foreach ($json_answer['configuration']['oney']['min_amounts'] as $key => $value) {
                         $configuration['oney_min_amounts'] .= $key . ':' . $value . ';';
                     }
-                    $configuration['oney_min_amounts'] = Tools::substr($configuration['oney_min_amounts'], 0, -1);
+                    $configuration['oney_min_amounts'] =  $this->tools->substr($configuration['oney_min_amounts'], 0, -1);
                 }
 
                 if (isset($json_answer['configuration']['oney']['max_amounts'])
@@ -373,7 +366,7 @@ class ApiClass
                     foreach ($json_answer['configuration']['oney']['max_amounts'] as $key => $value) {
                         $configuration['oney_max_amounts'] .= $key . ':' . $value . ';';
                     }
-                    $configuration['oney_max_amounts'] = Tools::substr($configuration['oney_max_amounts'], 0, -1);
+                    $configuration['oney_max_amounts'] =  $this->tools->substr($configuration['oney_max_amounts'], 0, -1);
                 }
             }
         }
@@ -437,35 +430,35 @@ class ApiClass
         // Get company country
         $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : false;
 
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : ''),
             $id
         );
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('companyIso'),
             $company_iso
         );
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('currencies'),
             implode(';', $configuration['currencies'])
         );
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('minAmounts'),
             $configuration['min_amounts']
         );
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('maxAmounts'),
             $configuration['max_amounts']
         );
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('oneyAllowedCountries'),
             $configuration['oney_allowed_countries']
         );
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('oneyMaxAmounts'),
             $configuration['oney_max_amounts']
         );
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('oneyMinAmounts'),
             $configuration['oney_min_amounts']
         );
@@ -492,7 +485,7 @@ class ApiClass
     }
 
     /**
-     * Determine wich API key to use
+     * @description Determine wich API key to use
      *
      * @return string
      */
@@ -501,24 +494,18 @@ class ApiClass
         $sandbox_mode = (int)$this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
         );
-        $valid_key = null;
-        if ($sandbox_mode) {
-            $valid_key = $this->config->get(
-                $this->dependencies->getConfigurationKey('testApiKey')
-            );
-        } else {
-            $valid_key = $this->config->get(
-                $this->dependencies->getConfigurationKey('liveApiKey')
-            );
-        }
 
-        return $valid_key;
+        return $sandbox_mode ? $this->config->get(
+            $this->dependencies->getConfigurationKey('testApiKey')
+        ) : $this->config->get(
+            $this->dependencies->getConfigurationKey('liveApiKey')
+        );
     }
 
     /**
-     * Register API Keys
+     * @description  Register API Keys
      *
-     * @param string $json_answer
+     * @param $json_answer
      * @return bool
      * @throws ConfigurationException
      */
@@ -540,11 +527,11 @@ class ApiClass
                 $api_keys['live_key'] = $json_answer['secret_keys']['live'];
             }
         }
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('testApiKey'),
             $api_keys['test_key']
         );
-        Configuration::updateValue(
+        $this->config->updateValue(
             $this->dependencies->getConfigurationKey('liveApiKey'),
             $api_keys['live_key']
         );
@@ -560,9 +547,9 @@ class ApiClass
     }
 
     /**
-     * Determine witch environment is used
+     * @description Determine witch environment is used
      *
-     * @return void
+     * @throws BadParameterException
      */
     private function setEnvironment()
     {
@@ -586,6 +573,8 @@ class ApiClass
     }
 
     /**
+     * @description configure the api url
+     *
      * @param string $api_url
      * @return self
      * @throws BadParameterException
@@ -626,7 +615,7 @@ class ApiClass
     }
 
     /**
-     * Set the user-agent referenced in every API call to identify the module
+     * @description Set the user-agent referenced in every API call to identify the module
      *
      * @return void
      */
@@ -641,6 +630,13 @@ class ApiClass
         }
     }
 
+    /**
+     * @description set the api keys
+     *
+     * @param null $sandbox
+     * @return false|Payplug
+     * @throws ConfigurationException
+     */
     public function initializeApi($sandbox = null)
     {
         if ($sandbox === null && $this->current_api_key) {
@@ -654,7 +650,8 @@ class ApiClass
     }
 
     /**
-     * Return exeption error form API
+     * @description  return exeption error form API
+     *
      * @param $str
      * @return array
      */
@@ -684,7 +681,7 @@ class ApiClass
 
         $keys = array_keys($response['details']);
         foreach ($keys as $key) {
-            // add specific error message
+            // add adapter error message
             switch ($key) {
                 default:
                     $error_key = md5('The transaction was not completed and your card was not charged.');
@@ -700,6 +697,8 @@ class ApiClass
     }
 
     /**
+     * @description determine if the account has a live api key
+     *
      * @return bool
      */
     public function hasLiveKey()
@@ -710,12 +709,12 @@ class ApiClass
     }
 
     /**
-     * login to Payplug API
+     * @description login to Payplug API
      *
-     * @param string $email
-     * @param string $password
+     * @param $email
+     * @param $password
      * @return bool
-     * @throws BadRequestException
+     * @throws ConfigurationException|BadRequestException
      */
     public function login($email, $password)
     {
@@ -749,6 +748,8 @@ class ApiClass
     }
 
     /**
+     * @description get the api url
+     *
      * @return string
      */
     public function getApiUrl()
@@ -756,11 +757,21 @@ class ApiClass
         return $this->api_url;
     }
 
+    /**
+     * @description  get the site url
+     *
+     * @return mixed
+     */
     public function getSiteUrl()
     {
         return $this->site_url;
     }
 
+    /**
+     * @description get the portal url
+     *
+     * @return string
+     */
     public function getPortalUrl()
     {
         return $this->portal_url;
@@ -861,6 +872,7 @@ class ApiClass
      * @param $inst_id
      * @return array
      *
+     * @throws ConfigurationException
      */
     public function retrieveInstallment($inst_id = false)
     {
@@ -960,6 +972,7 @@ class ApiClass
      *
      * @param $pay_id
      * @return array
+     * @throws ConfigurationException
      */
     public function capturePayment($pay_id = false)
     {
@@ -1221,6 +1234,7 @@ class ApiClass
      *
      * @param false $card_id
      * @return array
+     * @throws ConfigurationException
      */
     public function deleteCard($card_id = false)
     {
@@ -1265,6 +1279,12 @@ class ApiClass
         return $response;
     }
 
+    /**
+     * @description get the oney simulations from the api
+     *
+     * @param array $data
+     * @return array
+     */
     public function getOneySimulations($data = [])
     {
         if (!$data || !is_array($data)) {

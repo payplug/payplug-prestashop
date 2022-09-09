@@ -50,7 +50,7 @@ class BaseInstallRepository extends RepositoryBase
             $this->dependencies,
             $this->order_state,
             $this->order_state_entity,
-            $this->order_state_specific,
+            $this->order_state_adapter,
             $this->shop,
             $this->sql,
             $this->tools,

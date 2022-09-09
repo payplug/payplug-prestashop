@@ -21,22 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ValidateInterface;
-use Validate;
+use PayPlug\src\interfaces\HookInterface;
 
-class ValidateSpecific implements ValidateInterface
+class HookAdapter implements HookInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
-    public function validate($action, $object)
-    {
-        if (isset($action)) {
-            return Validate::$action($object);
-        }
-    }
 }

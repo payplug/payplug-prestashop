@@ -21,15 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\OrderHistoryInterface;
-use OrderHistory;
+use PayPlug\src\interfaces\OrderInterface;
+use Order;
 
-class OrderHistorySpecific implements OrderHistoryInterface
+class OrderAdapter implements OrderInterface
 {
-    public function get($idOrderHistory = null)
+    public function get($idOrder = null)
     {
-        return new OrderHistory($idOrderHistory);
+        return new Order($idOrder);
+    }
+
+    public function getOrderByCartId($idCart = null)
+    {
+        return Order::getOrderByCartId($idCart);
     }
 }

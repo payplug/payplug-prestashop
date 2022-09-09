@@ -23,7 +23,7 @@
 
 namespace PayPlug\src\application\dependencies;
 
-use PayPlug\src\specific\TranslationSpecific;
+use PayPlug\src\application\adapter\TranslationAdapter;
 
 class BaseClass
 {
@@ -60,6 +60,6 @@ class BaseClass
     public function l($string)
     {
         $this->setName();
-        return TranslationSpecific::translate($this->payplug, $string, $this->getName());
+        return TranslationAdapter::translate($this->payplug, $string, $this->getName());
     }
 }

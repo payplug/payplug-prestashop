@@ -261,8 +261,6 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithoutCustomer()
     {
-
-//        $contextWithoutCustomer = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
         $contextWithoutCustomer = ContextMock::get();
         $contextWithoutCustomer->customer = null;
 

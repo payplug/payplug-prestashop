@@ -31,12 +31,6 @@ class PluginEntity
     private $address;
 
     /** @var object */
-    private $admin;
-
-    /** @var object */
-    private $amountCurrencyClass;
-
-    /** @var object */
     private $apiClass;
 
     /** @var string */
@@ -79,6 +73,9 @@ class PluginEntity
     private $customer;
 
     /** @var object */
+    private $dispatcher;
+
+    /** @var object */
     private $hook;
 
     /** @var object */
@@ -94,16 +91,22 @@ class PluginEntity
     private $myLogPHP;
 
     /** @var object */
+    private $media;
+
+    /** @var object */
     private $module;
 
     /** @var object */
     private $oney;
 
     /** @var object */
+    private $order_slip;
+
+    /** @var object */
     private $order_state;
 
     /** @var object */
-    private $order_state_specific;
+    private $order_state_adapter;
 
     /** @var object */
     private $payment;
@@ -158,6 +161,22 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getMedia()
+    {
+        return $this->media;
+    }
+
+    /**
+     * @return object
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * @return object
+     */
     public function getModule()
     {
         return $this->module;
@@ -170,24 +189,6 @@ class PluginEntity
     public function setMyLogPHP($myLogPHP)
     {
         $this->myLogPHP = $myLogPHP;
-        return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getAmountCurrencyClass()
-    {
-        return $this->amountCurrencyClass;
-    }
-
-    /**
-     * @param object $amountCurrencyClass
-     * @return PluginEntity
-     */
-    public function setAmountCurrencyClass($amountCurrencyClass)
-    {
-        $this->amountCurrencyClass = $amountCurrencyClass;
         return $this;
     }
 
@@ -225,14 +226,6 @@ class PluginEntity
     {
         $this->orderHistory = $orderHistory;
         return $this;
-    }
-
-    /**
-     * @return object
-     */
-    public function getAdmin()
-    {
-        return $this->admin;
     }
 
     /**
@@ -342,6 +335,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
+    /**
+     * @return object
+     */
     public function getHook()
     {
         return $this->hook;
@@ -408,6 +409,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getOrderSlip()
+    {
+        return $this->order_slip;
+    }
+
+    /**
+     * @return object
+     */
     public function getOrderState()
     {
         return $this->order_state;
@@ -416,9 +425,9 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getOrderStateSpecific()
+    public function getOrderStateAdapter()
     {
-        return $this->order_state_specific;
+        return $this->order_state_adapter;
     }
 
     /**
@@ -448,6 +457,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getShop()
+    {
+        return $this->shop;
+    }
+
+    /**
+     * @return object
+     */
     public function getTools()
     {
         return $this->tools;
@@ -470,20 +487,6 @@ class PluginEntity
     }
 
     /**
-     * @param object $admin
-     * @return PluginEntity
-     * @throws BadParameterException
-     */
-    public function setAdmin($admin)
-    {
-        if (!is_object($admin)) {
-            throw (new BadParameterException('Invalid argument, $admin must be an AdminClass object'));
-        }
-        $this->admin = $admin;
-        return $this;
-    }
-
-    /**
      * @param object $address
      * @return self
      * @throws BadParameterException
@@ -491,7 +494,7 @@ class PluginEntity
     public function setAddress($address)
     {
         if (!is_object($address)) {
-            throw (new BadParameterException('Invalid argument, $address must be an AddressSpecific'));
+            throw (new BadParameterException('Invalid argument, $address must be an AddressAdapter'));
         }
 
         $this->address = $address;
@@ -521,7 +524,7 @@ class PluginEntity
     public function setAssign($assign)
     {
         if (!is_object($assign)) {
-            throw (new BadParameterException('Invalid argument, $assign must be an AssignSpecific'));
+            throw (new BadParameterException('Invalid argument, $assign must be an AssignAdapter'));
         }
 
         $this->assign = $assign;
@@ -566,7 +569,7 @@ class PluginEntity
     public function setCarrier($carrier)
     {
         if (!is_object($carrier)) {
-            throw (new BadParameterException('Invalid argument, $carrier must be CarrierSpecific'));
+            throw (new BadParameterException('Invalid argument, $carrier must be CarrierAdapter'));
         }
 
         $this->carrier = $carrier;
@@ -581,7 +584,7 @@ class PluginEntity
     public function setCart($cart)
     {
         if (!is_object($cart)) {
-            throw (new BadParameterException('Invalid argument, $cart must be CartSpecific'));
+            throw (new BadParameterException('Invalid argument, $cart must be CartAdapter'));
         }
 
         $this->cart = $cart;
@@ -596,7 +599,7 @@ class PluginEntity
     public function setConfiguration($configuration)
     {
         if (!is_object($configuration)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ConfigurationSpecific'));
+            throw (new BadParameterException('Invalid argument, $card must be a ConfigurationAdapter'));
         }
 
         $this->configuration = $configuration;
@@ -611,7 +614,7 @@ class PluginEntity
     public function setConstant($constant)
     {
         if (!is_object($constant)) {
-            throw (new BadParameterException('Invalid argument, $constant must be a ConstantSpecific'));
+            throw (new BadParameterException('Invalid argument, $constant must be a ConstantAdapter'));
         }
 
         $this->constant = $constant;
@@ -626,7 +629,7 @@ class PluginEntity
     public function setContext($context)
     {
         if (!is_object($context)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ContextSpecific'));
+            throw (new BadParameterException('Invalid argument, $card must be a ContextAdapter'));
         }
 
         $this->context = $context;
@@ -641,7 +644,7 @@ class PluginEntity
     public function setCountry($country)
     {
         if (!is_object($country)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ContextSpecific'));
+            throw (new BadParameterException('Invalid argument, $card must be a ContextAdapter'));
         }
 
         $this->country = $country;
@@ -657,7 +660,7 @@ class PluginEntity
         if (!is_object($currency)) {
             throw (
             new BadParameterException(
-                'Invalid Currency object, param $currency must be a CurrencySpecific'
+                'Invalid Currency object, param $currency must be a CurrencyAdapter'
             )
             );
         } else {
@@ -675,13 +678,28 @@ class PluginEntity
         if (!is_object($customer)) {
             throw (
             new BadParameterException(
-                'Invalid Currency object, param $customer must be a CurrencySpecific'
+                'Invalid Currency object, param $customer must be a CurrencyAdapter'
             )
             );
         } else {
             $this->customer = $customer;
             return $this;
         }
+    }
+
+    /**
+     * @param object $hook
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setDispatcher($dispatcher)
+    {
+        if (!is_object($dispatcher)) {
+            throw (new BadParameterException('Invalid argument, $dispatcher must be a DispatcherAdapter'));
+        }
+
+        $this->dispatcher = $dispatcher;
+        return $this;
     }
 
     /**
@@ -743,10 +761,40 @@ class PluginEntity
      * @return self
      * @throws BadParameterException
      */
+    public function setMedia($media)
+    {
+        if (!is_object($media)) {
+            throw (new BadParameterException('Invalid argument, $media must be a MediaAdapter'));
+        }
+
+        $this->media = $media;
+        return $this;
+    }
+
+    /**
+     * @param object $module
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setMessage($message)
+    {
+        if (!is_object($message)) {
+            throw (new BadParameterException('Invalid argument, $message must be a MessageAdapter'));
+        }
+
+        $this->message = $message;
+        return $this;
+    }
+
+    /**
+     * @param object $module
+     * @return self
+     * @throws BadParameterException
+     */
     public function setModule($module)
     {
         if (!is_object($module)) {
-            throw (new BadParameterException('Invalid argument, $module must be a ModuleSpecific'));
+            throw (new BadParameterException('Invalid argument, $module must be a ModuleAdapter'));
         }
 
         $this->module = $module;
@@ -784,18 +832,33 @@ class PluginEntity
     }
 
     /**
+     * @param object $order_slip
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setOrderSlip($order_slip)
+    {
+        if (!is_object($order_slip)) {
+            throw (new BadParameterException('Invalid argument, $order_slip must be an OrderSlip'));
+        }
+
+        $this->order_slip = $order_slip;
+        return $this;
+    }
+
+    /**
      * @param object $order_state
      * @return self
      * @throws BadParameterException
      */
-    public function setOrderStateSpecific($order_state_specific)
+    public function setOrderStateAdapter($order_state_adapter)
     {
-        if (!is_object($order_state_specific)) {
-            $error_msg = 'Invalid argument, $order_state_specific must be an OrderStateSpecific';
+        if (!is_object($order_state_adapter)) {
+            $error_msg = 'Invalid argument, $order_state_adapter must be an OrderStateAdapter';
             throw (new BadParameterException($error_msg));
         }
 
-        $this->order_state_specific = $order_state_specific;
+        $this->order_state_adapter = $order_state_adapter;
         return $this;
     }
 
@@ -817,7 +880,7 @@ class PluginEntity
     public function setProduct($product)
     {
         if (!is_object($product)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ProductSpecific'));
+            throw (new BadParameterException('Invalid argument, $card must be a ProductAdapter'));
         }
 
         $this->product = $product;
@@ -855,6 +918,21 @@ class PluginEntity
     }
 
     /**
+     * @param object $shop
+     * @return self
+     * @throws BadParameterException
+     */
+    public function setShop($shop)
+    {
+        if (!is_object($shop)) {
+            throw (new BadParameterException('Invalid argument, $sql must be a ShopAdapter'));
+        }
+
+        $this->shop = $shop;
+        return $this;
+    }
+
+    /**
      * @param object $tools
      * @return self
      * @throws BadParameterException
@@ -862,7 +940,7 @@ class PluginEntity
     public function setTools($tools)
     {
         if (!is_object($tools)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ToolsSpecific'));
+            throw (new BadParameterException('Invalid argument, $card must be a ToolsAdapter'));
         }
 
         $this->tools = $tools;
@@ -892,7 +970,7 @@ class PluginEntity
     public function setValidate($validate)
     {
         if (!is_object($validate)) {
-            throw (new BadParameterException('Invalid argument, $validate must be ValidateSpecific'));
+            throw (new BadParameterException('Invalid argument, $validate must be ValidateAdapter'));
         }
 
         $this->validate = $validate;

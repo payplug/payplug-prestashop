@@ -23,9 +23,7 @@
 
 namespace PayPlug\src\interfaces;
 
-interface ShopInterface
+interface DispatcherInterface
 {
-    public function get($idShop);
-    public function isFeatureActive();
-    public function setContext();
+    public function getInstance();
 }

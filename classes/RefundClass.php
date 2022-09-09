@@ -23,28 +23,29 @@
 
 namespace PayPlug\classes;
 
-use Configuration;
-use Context;
-use Exception;
-use Order;
-use OrderHistory;
-use OrderSlip;
-use PrestaShopDatabaseException;
-use PrestaShopException;
-use Tools;
-use Validate;
-
 class RefundClass
 {
-    protected $context;
+    private $config;
+    private $context;
     private $dependencies;
     private $logger;
+    private $order;
+    private $orderHistory;
+    private $orderSlip;
+    private $tools;
+    private $validate;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
-        $this->context = \Context::getContext();
+        $this->order = $this->dependencies->getPlugin()->getOrder();
+        $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
+        $this->orderSlip = $this->dependencies->getPlugin()->getOrderSlip();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
+        $this->validate = $this->dependencies->getPlugin()->getValidate();
     }
 
     /**
@@ -65,34 +66,36 @@ class RefundClass
     }
 
     /**
-     * Get total amount already refunded
-     * @param $id_order
-     * @return bool|int
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @description Get total amount already refunded
+     *
+     * @param int $id_order
+     * @return int
      */
-    public static function getTotalRefunded($id_order)
+    public function getTotalRefunded($id_order = 0)
     {
-        $order = new Order((int)$id_order);
-        if (!Validate::isLoadedObject($order)) {
-            return false;
-        } else {
-            $amount_refunded_presta = 0;
-            $flag_shipping_refunded = false;
+        if (!$id_order || !is_int($id_order)) {
+            return 0;
+        }
+        $order = $this->order->get((int)$id_order);
+        if (!$this->validate->validate('isLoadedObject', $order)) {
+            return 0;
+        }
 
-            $order_slips = OrderSlip::getOrdersSlip($order->id_customer, $order->id);
-            if (isset($order_slips) && !empty($order_slips) && sizeof($order_slips)) {
-                foreach ($order_slips as $order_slip) {
-                    $amount_refunded_presta += $order_slip['amount'];
-                    if (!$flag_shipping_refunded && $order_slip['shipping_cost'] == 1) {
-                        $amount_refunded_presta += $order_slip['shipping_cost_amount'];
-                        $flag_shipping_refunded = true;
-                    }
+        $amount_refunded_presta = 0;
+        $flag_shipping_refunded = false;
+
+        $order_slips = $this->orderSlip->getOrdersSlip($order->id_customer, $order->id);
+        if (isset($order_slips) && !empty($order_slips) && sizeof($order_slips)) {
+            foreach ($order_slips as $order_slip) {
+                $amount_refunded_presta += $order_slip['amount'];
+                if (!$flag_shipping_refunded && $order_slip['shipping_cost'] == 1) {
+                    $amount_refunded_presta += $order_slip['shipping_cost_amount'];
+                    $flag_shipping_refunded = true;
                 }
             }
-
-            return $amount_refunded_presta;
         }
+
+        return $amount_refunded_presta;
     }
 
     /**
@@ -108,7 +111,7 @@ class RefundClass
     {
         $this->logger->setParams(['process' => 'refundClass']);
 
-        $sandbox = Tools::strtoupper($pay_mode) == 'TEST';
+        $sandbox = $this->tools->tool('strtoupper', $pay_mode) == 'TEST';
         $this->dependencies->apiClass->initializeApi($sandbox);
 
         if ($pay_id == null) {
@@ -197,13 +200,13 @@ class RefundClass
 
     /**
      * @description  Refund a payment
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     *
+     * @return string
      */
     public function refundPayment()
     {
         $this->logger->addLog('[Payplug] Start refund', 'notice');
-        $amount = str_replace(',', '.', Tools::getValue('amount'));
+        $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
 
         if (!$this->dependencies->amountCurrencyClass->checkAmountToRefund($amount)) {
             $this->logger->addLog('Incorrect amount to refund', 'notice');
@@ -218,20 +221,20 @@ class RefundClass
                 'data' => $this->dependencies->l('payplug.refundPayment.amountAtLeast', 'refundclass')
             ]));
         } else {
-            $amount = str_replace(',', '.', Tools::getValue('amount'));
+            $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
             $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
             $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
             $amount = (int)$amount;
         }
 
-        $id_order = Tools::getValue('id_order');
-        $pay_id = Tools::getValue('pay_id');
-        $inst_id = Tools::getValue('inst_id');
+        $id_order = $this->tools->tool('getValue', 'id_order');
+        $pay_id = $this->tools->tool('getValue', 'pay_id');
+        $inst_id = $this->tools->tool('getValue', 'inst_id');
         $metadata = [
-            'ID Client' => (int)Tools::getValue('id_customer'),
+            'ID Client' => (int)$this->tools->tool('getValue', 'id_customer'),
             'reason' => 'Refunded with Prestashop'
         ];
-        $pay_mode = Tools::getValue('pay_mode');
+        $pay_mode = $this->tools->tool('getValue', 'pay_mode');
         $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
             $this->logger->addLog('Cannot refund that amount.', 'notice');
@@ -286,21 +289,21 @@ class RefundClass
                 $amount_available = (float)($amount_available / 100);
                 $amount_refunded_payplug = (float)($amount_refunded_payplug / 100);
 
-                if ((int)Tools::getValue('id_state') || !$amount_available) {
-                    $new_state = (int)Tools::getValue('id_state');
+                if ((int)$this->tools->tool('getValue', 'id_state') || !$amount_available) {
+                    $new_state = (int)$this->tools->tool('getValue', 'id_state');
                     if (!$new_state) {
                         if ($installment->is_live == 1) {
-                            $new_state = (int)Configuration::get(
+                            $new_state = (int)$this->config->get(
                                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
                             );
                         } else {
-                            $new_state = (int)Configuration::get(
+                            $new_state = (int)$this->config->get(
                                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND_TEST')
                             );
                         }
                     }
-                    $order = new Order((int)$id_order);
-                    if (Validate::isLoadedObject($order)) {
+                    $order = $this->order->get((int)$id_order);
+                    if ($this->validate->validate('isLoadedObject', $order)) {
                         if (!$this->dependencies->cartClass->createLockFromCartId((int)$order->id_cart)) {
                             die(json_encode([
                                 'status' => 'error',
@@ -311,7 +314,7 @@ class RefundClass
                         $current_state = (int)$this->dependencies->orderClass->getCurrentOrderState($order->id);
                         $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                         if ($current_state != 0 && $current_state != $new_state) {
-                            $history = new OrderHistory();
+                            $history = $this->orderHistory->get();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id, true);
                             $history->addWithemail();
@@ -335,23 +338,23 @@ class RefundClass
                     ]));
                 }
                 $payment = $payment['resource'];
+                $new_state = (int)$this->tools->tool('getValue', 'id_state');
 
-                if ((int)Tools::getValue('id_state') != 0) {
-                    $new_state = (int)Tools::getValue('id_state');
-                } elseif ($payment->is_refunded == 1) {
+                if ($payment->is_refunded) {
                     if ($payment->is_live == 1) {
-                        $new_state = (int)Configuration::get(
+                        $new_state = (int)$this->config->get(
                             $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
                         );
                     } else {
-                        $new_state = (int)Configuration::get(
+                        $new_state = (int)$this->config->get(
                             $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND_TEST')
                         );
                     }
                 }
-                if ((int)Tools::getValue('id_state') != 0 || ($payment->is_refunded == 1 && empty($inst_id))) {
-                    $order = new Order((int)$id_order);
-                    if (Validate::isLoadedObject($order)) {
+
+                if ($new_state || ($payment->is_refunded && empty($inst_id))) {
+                    $order = $this->order->get((int)$id_order);
+                    if ($this->validate->validate('isLoadedObject', $order)) {
                         if (!$this->dependencies->cartClass->createLockFromCartId((int)$order->id_cart)) {
                             die(json_encode([
                                 'status' => 'error',
@@ -362,7 +365,7 @@ class RefundClass
                         $current_state = (int)$this->dependencies->orderClass->getCurrentOrderState($order->id);
                         $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                         if ($current_state != 0 && $current_state != $new_state) {
-                            $history = new OrderHistory();
+                            $history = $this->orderHistory->get();
                             $history->id_order = (int)$order->id;
                             $history->changeIdOrderState($new_state, (int)$order->id, true);
                             $history->addWithemail();

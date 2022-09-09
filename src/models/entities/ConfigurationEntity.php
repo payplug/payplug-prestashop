@@ -23,19 +23,19 @@
 
 namespace PayPlug\src\models\entities;
 
-use PayPlug\src\specific\ConfigurationSpecific;
+use PayPlug\src\application\adapter\ConfigurationAdapter;
 
 class ConfigurationEntity
 {
-    private $specific_class;
+    private $adapter_class;
 
     public function __construct()
     {
-        $this->specific_class = new ConfigurationSpecific();
+        $this->adapter_class = new ConfigurationAdapter();
     }
 
     public function get($configuration_name)
     {
-        return $this->specific_class->get($configuration_name);
+        return $this->adapter_class->get($configuration_name);
     }
 }

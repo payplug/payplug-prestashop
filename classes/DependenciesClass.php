@@ -24,7 +24,7 @@
 namespace PayPlug\classes;
 
 use PayPlug\src\application\dependencies\PluginInit;
-use PayPlug\src\specific\TranslationSpecific;
+use PayPlug\src\application\adapter\TranslationAdapter;
 use Tools;
 
 if (!defined('_PS_VERSION_')) {
@@ -316,11 +316,13 @@ class DependenciesClass
             'setConf' => 1
         ],
     ];
+    public $installmentClass;
     public $hookClass;
     public $mediaClass;
     public $name;
     public $orderClass;
     public $paymentClass;
+    public $payplugLock;
     public $version;
     public $refundClass;
 
@@ -343,12 +345,12 @@ class DependenciesClass
     {
         $this->setPlugin((new PluginInit($this))->getEntity());
 
-        $this->amountCurrencyClass = $this->getPlugin()->getAmountCurrencyClass();
-
         $this->apiClass = new ApiClass($this);
         $this->applePayClass = new ApplePayClass($this);
+        $this->amountCurrencyClass = new AmountCurrencyClass($this);
         $this->adminClass = new AdminClass($this);
         $this->cardClass = new CardClass($this);
+        $this->payplugLock = new PayplugLock($this);
         $this->cartClass = new CartClass($this);
         $this->configClass = new ConfigClass($this);
         $this->installmentClass = new InstallmentClass($this);
@@ -377,24 +379,24 @@ class DependenciesClass
         if (!$string || !$this->getPlugin()->getValidate()->validate('isString', $string)) {
             return false;
         }
-        return TranslationSpecific::translate($this->name, $string, $name);
+        return TranslationAdapter::translate($this->name, $string, $name);
     }
 
     /**
      * @return false|mixed
      */
-    public function loadSpecificPresta()
+    public function loadAdapterPresta()
     {
-        $SpecificClass = '\PayPlug\src\specific\PrestashopSpecific' . _PS_VERSION_[0] . _PS_VERSION_[2];
-        if (class_exists($SpecificClass)) {
-            return new $SpecificClass();
+        $AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter' . _PS_VERSION_[0] . _PS_VERSION_[2];
+        if (class_exists($AdapterClass)) {
+            return new $AdapterClass();
         }
 
         return false;
     }
 
     /**
-     * Get configuration key name for specific module
+     * Get configuration key name for adapter module
      * @param string $key
      * @return string
      */
@@ -408,7 +410,7 @@ class DependenciesClass
     }
 
     /**
-     * Get configuration key option for specific module
+     * Get configuration key option for adapter module
      * @param string $key
      * @param string $option
      * @return string|bool
@@ -419,7 +421,7 @@ class DependenciesClass
     }
 
     /**
-     * Concatenate specific module name to configuration key
+     * Concatenate adapter module name to configuration key
      * @param string $string
      * @return string
      */
