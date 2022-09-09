@@ -82,7 +82,7 @@
                 {capture assign=installmentPanelLinkText}{l s='standard.block.installment.panel.link.text' mod='payplug'}{/capture}
                 {include file='./../../atoms/link/link.tpl'
                 linkText=$installmentPanelLinkText|escape:'htmlall':'UTF-8'
-                linkHref=$installmentPanelLink|escape:'UTF-8'
+                linkHref=$installmentPanelLink|escape:'htmlall':'UTF-8'
                 linkTarget='_blank'
                 linkData='data-panelInstallmentLink'}
             {/if}
