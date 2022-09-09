@@ -173,7 +173,19 @@ class AdminClass
                 } elseif ($this->tools->tool('getValue', 'type') == 'applepayPremium') {
                     $link = 'mailto:support@payplug.com';
                 } elseif ($this->tools->tool('getValue', 'type') == 'amexPremium') {
-                    $link = 'https://payplug-prod.atlassian.net/servicedesk/customer/portal/13';
+                    switch ($this->context->language->iso_code) {
+                        case 'fr':
+                            $link = 'https://support.payplug.com/hc/fr/requests/new';
+                            break;
+
+                        case 'it':
+                            $link = 'https://support.payplug.com/hc/it/requests/new';
+                            break;
+
+                        default:
+                            $link = 'https://support.payplug.com/hc/en-gb/requests/new';
+                            break;
+                    }
                 } else {
                     $link = 'https://www.payplug.com/contact';
                 }
