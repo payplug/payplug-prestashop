@@ -24,18 +24,23 @@
 namespace PayPlug\classes;
 
 use Exception;
-use Db;
 
 class InstallmentClass
 {
     private $dependencies;
+    private $query;
+    private $constant;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
     }
 
     /**
+     * @description update the id_payplug_installment
+     *
      * @param $installment
      * @return bool
      */
@@ -73,13 +78,15 @@ class InstallmentClass
                 }
                 $step = $index . '/' . $step_count;
 
+
                 if ($step2update = $this->getStoredInstallmentTransaction($installment, $step)) {
-                    $req_insert_installment = '
-                        UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_installment` 
-                        SET `id_payment` = \'' . pSQL($pay_id) . '\', 
-                        `status` = \'' . (int)$status . '\' 
-                        WHERE `id_payplug_installment` = ' . (int)$step2update['id_payplug_installment'];
-                    $res_insert_installment = Db::getInstance()->Execute($req_insert_installment);
+                    $res_insert_installment = $this->query
+                        ->update()
+                        ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
+                        ->set('id_payment = "' . $this->query->escape($pay_id) . '"')
+                        ->set('status = ' .  (int)$status)
+                        ->where('id_payplug_installment = ' . (int)$step2update['id_payplug_installment'])
+                        ->build();
 
                     if (!$res_insert_installment) {
                         return false;
@@ -92,6 +99,9 @@ class InstallmentClass
     }
 
     /**
+     * @description get the installment payment details
+     * related to id_installment
+     *
      * @param $installment
      * @param $step
      * @return array|bool|object|null
@@ -107,21 +117,24 @@ class InstallmentClass
             $installment = $installment['resource'];
         }
 
-        $req_installment = '
-            SELECT pi.*
-            FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_installment` pi 
-            WHERE pi.id_installment = "' . pSQL($installment->id) . '" 
-            AND pi.step = ' . (int)$step;
-        $res_installment = Db::getInstance()->getRow($req_installment);
+        $req_installment = $this->query
+            ->select()
+            ->fields('*')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
+            ->where('id_installment  = "' . $this->query->escape($installment->id) . '"')
+            ->where('step = "' . $this->query->escape($step) . '"')
+            ->build();
 
-        if (!$res_installment) {
+        if (!$req_installment) {
             return false;
         } else {
-            return $res_installment;
+            return $req_installment[0];
         }
     }
 
     /**
+     * @description insert installment payment in the database
+     *
      * @param $installment
      * @param $order
      * @return bool
@@ -155,32 +168,23 @@ class InstallmentClass
                     $amount = (int)$schedule->amount;
                     $step = $index . '/' . $step_count;
                     $date = $schedule->date;
-                    $req_insert_installment = '
-                INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_installment` (
-                    `id_installment`, 
-                    `id_payment`, 
-                    `id_order`, 
-                    `id_customer`, 
-                    `order_total`, 
-                    `step`, 
-                    `amount`, 
-                    `status`, 
-                    `scheduled_date`
-                ) VALUES (
-                    \'' . pSQL($installment->id) . '\', 
-                    \'' . pSQL($pay_id) . '\', 
-                    \'' . (int)$order->id . '\', 
-                    \'' . (int)$order->id_customer . '\', 
-                    \'' . (int)(($order->total_paid * 1000) / 10) . '\', 
-                    \'' . pSQL($step) . '\', 
-                    \'' . (int)$amount . '\', 
-                    \'' . (int)$status . '\', 
-                    \'' . pSQL($date) . '\'
-                )';
+                    $req_insert_installment =
+                        $this->query
+                            ->insert()
+                            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
+                            ->fields('id_installment')->values($this->query->escape($installment->id))
+                            ->fields('id_payment')->values($this->query->escape($pay_id))
+                            ->fields('id_order')->values((int)$order->id)
+                            ->fields('id_customer')->values((int)$order->id_customer)
+                            ->fields('order_total')->values((int)(($order->total_paid * 1000) / 10))
+                            ->fields('step')->values($this->query->escape($this->query->escape($step)))
+                            ->fields('amount')->values((int)$amount)
+                            ->fields('status')->values((int)$status)
+                            ->fields('scheduled_date')->values($this->query->escape($date))
+                            ->build();
 
-                    $res_insert_installment = Db::getInstance()->Execute($req_insert_installment);
 
-                    if (!$res_insert_installment) {
+                    if (!$req_insert_installment) {
                         return false;
                     }
                 }
@@ -189,6 +193,8 @@ class InstallmentClass
     }
 
     /**
+     * @description get the installment payment details
+     *
      * @param $installment
      * @return array|bool|false|mysqli_result|PDOStatement|resource|null
      * @throws PrestaShopDatabaseException
@@ -203,16 +209,16 @@ class InstallmentClass
 
             $installment = $installment['resource'];
         }
-        $req_installment = '
-            SELECT pi.*
-            FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_installment` pi
-            WHERE pi.id_payment = "' . pSQL($installment->id) . '"';
-        $res_installment = Db::getInstance()->executeS($req_installment);
-
-        if (!$res_installment) {
+        $req_installment = $this->query
+            ->select()
+            ->fields('*')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
+            ->where('id_payment = ' . $this->query->escape(($installment->id)))
+            ->build();
+        if (!$req_installment) {
             return false;
         } else {
-            return $res_installment;
+            return $req_installment;
         }
     }
 
@@ -225,15 +231,21 @@ class InstallmentClass
      */
     public function getInstallmentByCart($id_cart)
     {
-        $req_installment_cart = '
-            SELECT pic.id_payment 
-            FROM ' . _DB_PREFIX_ . $this->dependencies->name . '_payment pic 
-            WHERE pic.id_cart = ' . (int)$id_cart . ' AND pic.payment_method = \'installment\'';
-        $res_installment_cart = Db::getInstance()->getValue($req_installment_cart);
-        if (!$res_installment_cart) {
+        if (!$id_cart || !is_int($id_cart)) {
+            return false;
+        }
+        $req_installment_cart = $this->query
+            ->select()
+            ->fields('id_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
+            ->where('id_cart = ' . (int)$id_cart)
+            ->where('payment_method = "installment"')
+            ->build('unique_value');
+
+        if (!$req_installment_cart) {
             return false;
         }
 
-        return $res_installment_cart;
+        return $req_installment_cart;
     }
 }

@@ -35,7 +35,7 @@ git grep -rl `basename ${namespace}` . ':!dev/**' ':!*AdminPsPayLaterController.
 
 git grep -rl `basename ${namespace}` . ':!dev/**' ':!*AdminPsPayLaterController.php' | xargs sed -i -e 's/'`basename ${namespace}`'\\classes\\/'`basename ${newnamespace}`'\\classes\\/g';
 
-git grep -rl `basename ${namespace}` . ':!dev/**' ':!*AdminPsPayLaterController.php' | xargs sed -i -e 's/'`basename ${namespace}`'\\src\\specific/'`basename ${newnamespace}`'\\src\\specific/g';
+git grep -rl `basename ${namespace}` . ':!dev/**' ':!*AdminPsPayLaterController.php' | xargs sed -i -e 's/'`basename ${namespace}`'\\src\\application\\adapter/'`basename ${newnamespace}`'\\src\\application\\adapter/g';
 
 
 #rename the front controllers files

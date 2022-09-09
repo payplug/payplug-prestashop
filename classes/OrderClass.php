@@ -23,9 +23,7 @@
 
 namespace PayPlug\classes;
 
-use Db;
-use DbQuery;
-use OrderState;
+use PayPlug\src\application\adapter\OrderStateAdapter;
 
 class OrderClass
 {
@@ -33,6 +31,7 @@ class OrderClass
     private $context;
     private $dependencies;
     private $query;
+    private $orderState;
 
     public function __construct($dependencies)
     {
@@ -40,6 +39,7 @@ class OrderClass
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->orderState =   $this->dependencies->getPlugin()->getOrderState();
     }
 
     /**
@@ -69,7 +69,8 @@ class OrderClass
         if ($id_lang === null) {
             $id_lang = $this->context->language->id;
         }
-        return OrderState::getOrderStates($id_lang);
+
+        return OrderStateAdapter::getOrderStates($id_lang);
     }
 
     public function getPayPlugOrderStates($module)
@@ -168,7 +169,7 @@ class OrderClass
         }
 
         foreach ($order_history_states as $key => &$state) {
-            $type = $this->dependencies->getPlugin()->getOrderState()->getType((int)$state['id_order_state']);
+            $type = $this->orderState->getType((int)$state['id_order_state']);
             $state['type'] = $type;
             if (!$type || 'undefined' != $type) {
                 unset($order_history_states[$key]);
@@ -178,7 +179,7 @@ class OrderClass
                 'updateorder_state' => '',
                 'id_order_state' => $state['id_order_state']
             ];
-            $state['updateLink'] = AdminClass::getAdminUrl('AdminStatuses', $update_link_params);
+            $state['updateLink'] = $this->dependencies->adminClass->getAdminUrl('AdminStatuses', $update_link_params);
         }
 
         return $order_history_states;

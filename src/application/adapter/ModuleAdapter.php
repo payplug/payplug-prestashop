@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,29 +16,30 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2022 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\LanguageInterface;
-use Language;
+use PayPlug\src\interfaces\ModuleInterface;
+use Module;
 
-class LanguageSpecific implements LanguageInterface
+class ModuleAdapter implements ModuleInterface
 {
-    public function get($idLanguage = false)
+    public function displayError($error)
     {
-        if (!is_int($idLanguage)) {
-            $idLanguage = false;
-        }
-
-        return new Language($idLanguage);
+        return Module::displayError($error);
     }
 
-    public function getLanguages($active = false)
+    public function getInstanceByName($moduleName)
     {
-        return Language::getLanguages($active);
+        return Module::getInstanceByName($moduleName);
+    }
+
+    public function isEnabled($moduleName)
+    {
+        return Module::isEnabled($moduleName);
     }
 }

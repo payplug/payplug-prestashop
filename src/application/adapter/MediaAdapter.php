@@ -21,42 +21,25 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\OrderStateInterface;
-use OrderState;
+use PayPlug\src\interfaces\MediaInterface;
+use Media;
 
-class OrderStateSpecific implements OrderStateInterface
+class MediaAdapter implements MediaInterface
 {
-    private $orderState;
-
-    public function __construct($id = null)
+    public function addJsDef($files = [])
     {
-        $this->orderState = new OrderState($id);
-        return $this;
+        return Media::addJsDef($files);
     }
 
-    public function delete()
+    public static function getMediaPath($path)
     {
-        return $this->orderState->delete();
+        return Media::getMediaPath($path);
     }
 
-    public function get($id = null, $idLang = null)
+    public function getJsDef()
     {
-        return new OrderState($id, $idLang);
-    }
-
-    public static function getOrderState($id = null)
-    {
-        return new OrderState($id);
-    }
-
-    public function softDelete()
-    {
-        if (method_exists($this->orderState, 'softDelete')) {
-            return $this->orderState->softDelete();
-        } else {
-            return $this->delete();
-        }
+        return Media::getJsDef();
     }
 }

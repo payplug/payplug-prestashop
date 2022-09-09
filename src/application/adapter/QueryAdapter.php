@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\QueryInterface;
 use Db;
 
-class QuerySpecific implements QueryInterface
+class QueryAdapter implements QueryInterface
 {
     private $db;
 
@@ -41,7 +41,7 @@ class QuerySpecific implements QueryInterface
 
     public static function factory()
     {
-        return new QuerySpecific();
+        return new QueryAdapter();
     }
 
     /**

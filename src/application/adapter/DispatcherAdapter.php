@@ -21,11 +21,15 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlug\src\application\adapter;
 
-interface ShopInterface
+use PayPlug\src\interfaces\DispatcherInterface;
+use Dispatcher;
+
+class DispatcherAdapter implements DispatcherInterface
 {
-    public function get($idShop);
-    public function isFeatureActive();
-    public function setContext();
+    public function getInstance()
+    {
+        return Dispatcher::getInstance();
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS
+ * 2013 - 2021 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,33 +16,20 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2022 PayPlug SAS
+ * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use Address;
-use PayPlug\src\interfaces\AddressInterface;
+use PayPlug\src\interfaces\CustomerInterface;
+use Customer;
 
-class AddressSpecific implements AddressInterface
+class CustomerAdapter implements CustomerInterface
 {
-    public static function factory()
+    public function get($idCustomer)
     {
-        return new self();
-    }
-
-    public function get($idAddress = false)
-    {
-        if (!is_int($idAddress)) {
-            $idAddress = false;
-        }
-        return new Address($idAddress);
-    }
-
-    public function getAddress($idAddress)
-    {
-        return new Address($idAddress);
+        return new Customer($idCustomer);
     }
 }

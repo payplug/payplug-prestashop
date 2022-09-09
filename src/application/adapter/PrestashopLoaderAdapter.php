@@ -21,11 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+$PSfile = _PS_MODULE_DIR_ . 'payplug/src/application/adapter/PrestashopAdapter'._PS_VERSION_[0]._PS_VERSION_[2].'.php';
 
-interface ShopInterface
-{
-    public function get($idShop);
-    public function isFeatureActive();
-    public function setContext();
+// PS 1.7 n'aime pas 'include_once' si le fichier n'existe pas : Erreur pdt install du module
+if (is_file($PSfile)) {
+    require_once($PSfile);
 }

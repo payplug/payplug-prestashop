@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,20 +16,32 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CustomerInterface;
-use Customer;
+use PayPlug\src\interfaces\ToolsInterface;
+use Tools;
 
-class CustomerSpecific implements CustomerInterface
+class ToolsAdapter implements ToolsInterface
 {
-    public function get($idCustomer)
+    public static function factory()
     {
-        return new Customer($idCustomer);
+        return new ToolsAdapter();
+    }
+
+    public function tool($action, $param1 = null, $param2 = null, $param3 = null, $param4 = null)
+    {
+        if (isset($action)) {
+            return Tools::$action($param1, $param2, $param3, $param4);
+        }
+    }
+
+    public function substr($string, $offset = null, $length = null)
+    {
+        return Tools::substr($string, $offset, $length);
     }
 }
