@@ -241,7 +241,7 @@ class PaymentMethod {
             success: function (result) {
                 if (typeof result != 'undefined') {
                     if (switchToggle) {
-                        if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName]) {
+                        if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName] || paymentMethodName === 'payplug_applepay' && !result['applepay_allowed_domains']) {
                             paymentMethod.handlePaymentMethod(paymentMethodName);
                         } else {
                             paymentMethod.checkPaymentOptionInformation();
@@ -255,6 +255,7 @@ class PaymentMethod {
             }
         });
     }
+
 
     paymentMethodToggle(permissions, sandBoxValue) {
         if (!sandBoxValue) {
