@@ -281,11 +281,11 @@ final class InstallTest extends BaseInstallRepository
                 'installSQL' => true
             ]);
 
-        $specific = \Mockery::mock();
+        $adapter = \Mockery::mock();
         $this->dependencies
-            ->shouldReceive('loadSpecificPresta')
-            ->andReturn($specific);
-        $specific
+            ->shouldReceive('loadAdapterPresta')
+            ->andReturn($adapter);
+        $adapter
             ->shouldReceive([
                 'installTab' => false
             ]);
@@ -325,11 +325,11 @@ final class InstallTest extends BaseInstallRepository
                 'installSQL' => true
             ]);
 
-        $specific = \Mockery::mock();
+        $adapter = \Mockery::mock();
         $this->dependencies
-            ->shouldReceive('loadSpecificPresta')
-            ->andReturn($specific);
-        $specific
+            ->shouldReceive('loadAdapterPresta')
+            ->andReturn($adapter);
+        $adapter
             ->shouldReceive([
                 'installTab' => true
             ]);

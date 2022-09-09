@@ -24,7 +24,7 @@
 class PayplugCardsModuleFrontController extends ModuleFrontController
 {
     private $card;
-    private $contextSpecific;
+    private $contextAdapter;
     private $dependencies;
     private $plugin;
 
@@ -40,7 +40,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
 
         $this->plugin = $this->dependencies->getPlugin();
         $this->card = $this->plugin->getCard();
-        $this->contextSpecific = $this->plugin->getContext();
+        $this->contextAdapter = $this->plugin->getContext();
 
         include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
     }
@@ -65,15 +65,15 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             'apiVersion' => $this->plugin->getApiVersion()
         ]);
 
-        $customer = $this->contextSpecific->getContext()->customer;
+        $customer = $this->contextAdapter->getContext()->customer;
         $payplug_cards = $this->card->getByCustomer((int)$customer->id);
-        $payplug_delete_card_url  = $this->contextSpecific->getContext()->link->getModuleLink(
+        $payplug_delete_card_url  = $this->contextAdapter->getContext()->link->getModuleLink(
             'payplug',
             'ajax',
             ['_ajax' => 1],
             true
         );
-        $this->contextSpecific->getContext()->smarty->assign([
+        $this->contextAdapter->getContext()->smarty->assign([
             'payplug_cards' => $payplug_cards,
             'payplug_delete_card_url' => $payplug_delete_card_url,
         ]);
@@ -92,7 +92,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         );
 
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $this->contextSpecific->getContext()->smarty->assign([
+            $this->contextAdapter->getContext()->smarty->assign([
                 'version' => 1.6,
             ]);
             $this->setTemplate('customer/cards_1_6.tpl');

@@ -21,10 +21,10 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\interfaces;
 
-use PayPlug\src\interfaces\HookInterface;
-
-class HookSpecific implements HookInterface
+interface OrderSlipInterface
 {
+    public function get($idOrderSlip);
+    public function getOrdersSlip($idCustomer, $idOrder);
 }

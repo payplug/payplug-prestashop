@@ -21,15 +21,20 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\OrderInterface;
-use Order;
+use PayPlug\src\interfaces\AssignInterface;
+use Context;
 
-class OrderSpecific implements OrderInterface
+class AssignAdapter implements AssignInterface
 {
-    public function get($idOrder = null)
+    public static function factory()
     {
-        return new Order($idOrder);
+        return new self();
+    }
+
+    public function assign($parameters = [])
+    {
+        return Context::getContext()->smarty->assign($parameters);
     }
 }

@@ -23,23 +23,19 @@
 
 namespace PayPlug\classes;
 
-use Carrier;
-use Context;
-use Exception;
-use Media;
-use PayPlug\src\repositories\LoggerRepository;
-
 class ApplePayClass
 {
-    protected $context;
+    private $carrier;
+    private $context;
     private $dependencies;
     private $logger;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->carrier =   $this->dependencies->getPlugin()->getCarrier();
         $this->logger =   $this->dependencies->getPlugin()->getLogger();
-        $this->context = \Context::getContext();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->currency = $this->dependencies->getPlugin()->getCurrency();
     }
 
@@ -49,7 +45,7 @@ class ApplePayClass
         $currency = $this->currency->getCurrency($this->context->cart->id_currency);
 
         if ($page != 'order') {
-            $carriers = Carrier::getCarriers($this->context->language->id, true);
+            $carriers = $this->carrier->getCarriers($this->context->language->id, true);
             $shippingMethods = array();
 
             foreach ($carriers as $key => $carrier) {
@@ -70,7 +66,6 @@ class ApplePayClass
                     'phone',
                     'email'
                 ),
-
                 'lineItems' => array(
                     array(
                         'label' => 'Products',

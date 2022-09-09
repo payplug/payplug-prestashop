@@ -67,7 +67,7 @@ class MyLogPHP
      *
      * @param string $errorlevel There are 4 possible levels: INFO, WARNING, DEBUG, ERROR
      * @param string $value The value that will be recorded on log file.
-     * @param string $tag Any possible tag to help the developer to find specific log messages.
+     * @param string $tag Any possible tag to help the developer to find adapter log messages.
      */
     private function log($errorlevel = 'INFO', $value = '', $tag = '', $line_n = null)
     {

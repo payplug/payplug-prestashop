@@ -484,21 +484,21 @@ Consulta la nostra [2]pagina di supporto[/2] per ottenere una versione del modul
 <{payplug}prestashop>premium_bfce2c334962e4675fa1d6e311a9a975;admin.popin.premium.ok;;Ok;Ok;Ok;Ok
 <{payplug}prestashop>premium_edec6233c1d5d587da884e9d6a7bfa84;admin.popin.premium.activateFeature;$premiumLink;"Pour plus d'informations, veuillez nous contacter via [1]notre site[/1].";"For more information, please contact us via [1]our website[/1].";"For more information, please contact us via [1]our website[/1].";"Per più informazioni contattaci tramite il nostro [1]sito web[/1]."
 <{payplug}prestashop>premium_f7110c1f3ae505225620696b7c4a04ca;admin.popin.premium.featureUnavailable;;"Vous n'avez pas accès à cette fonctionnalité.";"You don't have access to this feature yet.";"You don't have access to this feature yet.";"Non puoi ancora accedere a questa funzionalità."
-<{payplug}prestashop>prestashopspecific16_16bfbf9c462762cf1cba4134ec53c504;Loading;;Chargement;Loading;Loading;"Caricamento in corso"
-<{payplug}prestashop>prestashopspecific17_17d93e30f1d51a1503112fdb50da7040;specific17.setIntegratedPaymentOption.placeholderCvv;;123;123;123;123
-<{payplug}prestashop>prestashopspecific17_2a5975d8242f4df9ec544829413f263f;specific17.setIntegratedPaymentOption.placeholderPan;;"Numéro de carte";"Card number";"Card number   ";"Numero di carta"
-<{payplug}prestashop>prestashopspecific17_48d38db0f3027cbc9846143c4ccdbbb7;payplug.assignSwitchConfiguration.popup;;"pop up";"pop up";"pop up";"pop up"
-<{payplug}prestashop>prestashopspecific17_4f55d6ca3d4fdefa6352a3dd259fdb70;payplug.prestashopspecific17.transactionNotCompleted;;"La transaction n'a pas pu aboutir, et votre carte n'a pas été débitée.";"The transaction was not completed and your card was not charged.";"The transaction was not completed and your card was not charged.";"La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta."
-<{payplug}prestashop>prestashopspecific17_5c8c18e98173556b72b7967275b7167e;payplug.assignSwitchConfiguration.no;;non;no;no;no
-<{payplug}prestashop>prestashopspecific17_6b467547a155f666a7ec0f1b4ccee833;specific17.setIntegratedPaymentOption.placeholderExp;;MM/AA;MM/YY;MM/YY;MM/AA
-<{payplug}prestashop>prestashopspecific17_85910e0691a4205f890425497a1fc893;payplug.assignSwitchConfiguration.test;;test;test;test;test
-<{payplug}prestashop>prestashopspecific17_8b8ce2c59a5d4a3a9af43fae395f0099;specific17.setIntegratedPaymentOption.placeholderCardholder;;"Nom prénom";"Surname First name";"Surname First name";"Cognome Nome"
-<{payplug}prestashop>prestashopspecific17_8deca510ddb96ce73b4b888f1ac6bf45;payplug.assignSwitchConfiguration.yes;;oui;yes;yes;si
-<{payplug}prestashop>prestashopspecific17_af839f228c4f4ed3419092c5fbe8a2fa;payplug.assignSwitchConfiguration.redirected;;redirigée;redirected;redirected;rediretta
-<{payplug}prestashop>prestashopspecific17_be68eac79ad39a8e98bfd7c15b9fa7a3;payplug.assignSwitchConfiguration.embedded;;intégrée;embedded;embedded;integrata
-<{payplug}prestashop>prestashopspecific17_c9e5fd656b62ace2dbbae8cceab0a860;payplug.assignSwitchConfiguration.live;;live;live;live;live
-<{payplug}prestashop>prestashopspecific17_ed32bfa1899dc3505c064504bc13ab82;specific17.setIntegratedPaymentOption.name;;"Payer par carte bancaire";"Credit card checkout";"Credit card checkout";"Pagamento con carta di credito"
-<{payplug}prestashop>prestashopspecific17_f40145536110051efd072d7d3c6a56ea;payplug.assignSwitchConfiguration.showPayplug;;"Afficher le module PayPlug à mes clients";"Show PayPlug to my customers";"Show PayPlug to my customers";"Mostra PayPlug ai clienti"
+<{payplug}prestashop>prestashopadapter16_16bfbf9c462762cf1cba4134ec53c504;Loading;;Chargement;Loading;Loading;"Caricamento in corso"
+<{payplug}prestashop>prestashopadapter17_17d93e30f1d51a1503112fdb50da7040;specific17.setIntegratedPaymentOption.placeholderCvv;;123;123;123;123
+<{payplug}prestashop>prestashopadapter17_2a5975d8242f4df9ec544829413f263f;specific17.setIntegratedPaymentOption.placeholderPan;;"Numéro de carte";"Card number";"Card number   ";"Numero di carta"
+<{payplug}prestashop>prestashopadapter17_48d38db0f3027cbc9846143c4ccdbbb7;payplug.assignSwitchConfiguration.popup;;"pop up";"pop up";"pop up";"pop up"
+<{payplug}prestashop>prestashopadapter17_4f55d6ca3d4fdefa6352a3dd259fdb70;payplug.prestashopspecific17.transactionNotCompleted;;"La transaction n'a pas pu aboutir, et votre carte n'a pas été débitée.";"The transaction was not completed and your card was not charged.";"The transaction was not completed and your card was not charged.";"La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta."
+<{payplug}prestashop>prestashopadapter17_5c8c18e98173556b72b7967275b7167e;payplug.assignSwitchConfiguration.no;;non;no;no;no
+<{payplug}prestashop>prestashopadapter17_6b467547a155f666a7ec0f1b4ccee833;specific17.setIntegratedPaymentOption.placeholderExp;;MM/AA;MM/YY;MM/YY;MM/AA
+<{payplug}prestashop>prestashopadapter17_85910e0691a4205f890425497a1fc893;payplug.assignSwitchConfiguration.test;;test;test;test;test
+<{payplug}prestashop>prestashopadapter17_8b8ce2c59a5d4a3a9af43fae395f0099;specific17.setIntegratedPaymentOption.placeholderCardholder;;"Nom prénom";"Surname First name";"Surname First name";"Cognome Nome"
+<{payplug}prestashop>prestashopadapter17_8deca510ddb96ce73b4b888f1ac6bf45;payplug.assignSwitchConfiguration.yes;;oui;yes;yes;si
+<{payplug}prestashop>prestashopadapter17_af839f228c4f4ed3419092c5fbe8a2fa;payplug.assignSwitchConfiguration.redirected;;redirigée;redirected;redirected;rediretta
+<{payplug}prestashop>prestashopadapter17_be68eac79ad39a8e98bfd7c15b9fa7a3;payplug.assignSwitchConfiguration.embedded;;intégrée;embedded;embedded;integrata
+<{payplug}prestashop>prestashopadapter17_c9e5fd656b62ace2dbbae8cceab0a860;payplug.assignSwitchConfiguration.live;;live;live;live;live
+<{payplug}prestashop>prestashopadapter17_ed32bfa1899dc3505c064504bc13ab82;specific17.setIntegratedPaymentOption.name;;"Payer par carte bancaire";"Credit card checkout";"Credit card checkout";"Pagamento con carta di credito"
+<{payplug}prestashop>prestashopadapter17_f40145536110051efd072d7d3c6a56ea;payplug.assignSwitchConfiguration.showPayplug;;"Afficher le module PayPlug à mes clients";"Show PayPlug to my customers";"Show PayPlug to my customers";"Mostra PayPlug ai clienti"
 <{payplug}prestashop>pspaylater_f78df788fa811a2d431266535633199b;pspaylater.construct.description;;"Proposer le paiement en 3 et 4 fois sur votre boutique.";"Offer your customers the option to pay in 3 or 4 instalments";"Offer your customers the option to pay in 3 or 4 instalments";"Proponi ai tuoi clienti il pagamento in 3 o 4 rate"
 <{payplug}prestashop>pwd_a60852f204ed8028c1c58808b746d115;Ok;;Ok;Ok;Ok;Ok
 <{payplug}prestashop>pwd_d698469a293eb8d935d4e9496c53caed;"Please enter your Payplug account password";;"Veuillez saisir votre mot de passe de votre compte PayPlug";"Please enter your PayPlug account password";"Please enter your PayPlug account password";"Si prega di inserire la password del tuo conto PayPlug"

@@ -23,22 +23,23 @@
 
 namespace PayPlug\classes;
 
-use Media;
+use PayPlug\src\application\adapter\MediaAdapter;
 
 class MediaClass
 {
     private $dependencies;
     private $context;
+    private $media;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->media = $this->dependencies->getPlugin()->getMedia();
     }
 
     /**
-     * Include css in template
+     * @description  Include css in template
      *
      * @param string $css_uri
      * @param string $css_media_type
@@ -50,7 +51,7 @@ class MediaClass
     }
 
     /**
-     * Include js script in template
+     * @description  Include js script in template
      *
      * @param string $js_uri
      * @return void
@@ -61,11 +62,11 @@ class MediaClass
     }
 
     /**
-     * Display messages template
+     * @description  Display messages template
      *
      * @param array $messages
      * @param bool $with_msg_button
-     * @param bool $with_yesno_buttons
+     * @param bool $with_yes_no_buttons
      * @return bool|string
      */
     public function displayMessages($messages = [], $with_msg_button = false, $with_yes_no_buttons = false)
@@ -92,7 +93,7 @@ class MediaClass
     }
 
     /**
-     * Display the right pop-in
+     * @description Display the right pop-in
      *
      * @param string $type
      * @param array $args
@@ -128,7 +129,7 @@ class MediaClass
             ]);
         }
 
-        $admin_ajax_url = AdminClass::getAdminAjaxUrl();
+        $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl();
 
         $inst_id = isset($args['inst_id']) ? $args['inst_id'] : null;
 
@@ -179,7 +180,7 @@ class MediaClass
     }
 
     /**
-     * Fetch smarty template
+     * @description  Fetch smarty template
      *
      * @param string $file
      * @return string
@@ -223,6 +224,6 @@ class MediaClass
             return false;
         }
 
-        return Media::getMediaPath($path);
+        return MediaAdapter::getMediaPath($path);
     }
 }

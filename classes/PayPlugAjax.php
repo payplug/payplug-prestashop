@@ -23,11 +23,8 @@
 
 namespace PayPlug\classes;
 
-use PayPlug\src\repositories\CardRepository;
-use Country;
 use Exception;
-use Product;
-use Validate;
+use PayPlug\src\repositories\CardRepository;
 
 require_once(_PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php');
 
@@ -44,9 +41,11 @@ class PayPlugAjax
     private $country;
     private $dependencies;
     private $oney;
+    private $product;
     private $paymentClass;
-    private $toolsSpecific;
+    private $toolsAdapter;
     private $translate;
+    private $validate;
 
     public function __construct()
     {
@@ -58,8 +57,10 @@ class PayPlugAjax
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
         $this->oney = $this->dependencies->getPlugin()->getOney();
-        $this->toolsSpecific = $this->dependencies->getPlugin()->getTools();
+        $this->product = $this->dependencies->getPlugin()->getProduct();
+        $this->toolsAdapter = $this->dependencies->getPlugin()->getTools();
         $this->translate = $this->dependencies->getPlugin()->getTranslate();
+        $this->validate = $this->dependencies->getPlugin()->getValidate();
 
         $this->paymentClass = $this->dependencies->paymentClass;
     }
@@ -75,13 +76,13 @@ class PayPlugAjax
 
 
     /**
-     * Manage ajax processing
+     * @description  Manage ajax processing
      * @throws Exception
      */
     public function postProcess()
     {
         $this->context = $this->context->getContext(); // get the method
-        $tools = $this->toolsSpecific;
+        $tools = $this->toolsAdapter;
 
         if (($tools->tool('getValue', '_ajax')) == 1) {
             if ($tools->tool('getIsset', 'pc')) {
@@ -134,7 +135,7 @@ class PayPlugAjax
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
                     $quantity = (int)$tools->tool('getValue', 'quantity', 1);
                     $quantity = $quantity ? $quantity : 1;
-                    $product_price = Product::getPriceStatic(
+                    $product_price = $this->product->getPriceStatic(
                         $id_product,
                         $use_taxes,
                         $id_product_attribute,
@@ -156,7 +157,7 @@ class PayPlugAjax
                     $delivery_country = $this->country->get($delivery_address->id_country);
                     $iso_code = $delivery_country->iso_code;
 
-                    if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
+                    if ($this->validate->isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
                         $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
                     } else {
                         $is_elligible = $this->oney->isValidOneyAmount($amount);
@@ -171,7 +172,7 @@ class PayPlugAjax
                     $id_product_attribute = (int)$tools->tool('getValue', 'id_product_attribute', 0);
                     $quantity = (int)$tools->tool('getValue', 'quantity', 1);
                     $quantity = $quantity ? $quantity : 1;
-                    $product_price = Product::getPriceStatic(
+                    $product_price = $this->product->getPriceStatic(
                         $id_product,
                         $use_taxes,
                         $id_product_attribute,

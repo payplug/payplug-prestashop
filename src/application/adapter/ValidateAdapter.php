@@ -21,20 +21,22 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\TranslationInterface;
-use Translate;
+use PayPlug\src\interfaces\ValidateInterface;
+use Validate;
 
-class TranslationSpecific implements TranslationInterface
+class ValidateAdapter implements ValidateInterface
 {
     public static function factory()
     {
         return new self();
     }
 
-    public static function translate($module_class, $string, $repository_name)
+    public function validate($action, $object)
     {
-        return Translate::getModuleTranslation($module_class, $string, $repository_name);
+        if (isset($action)) {
+            return Validate::$action($object);
+        }
     }
 }

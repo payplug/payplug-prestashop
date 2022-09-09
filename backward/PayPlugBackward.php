@@ -34,6 +34,8 @@ class PayPlugBackward
     const PASSWORD_LENGTH = 5;
 
     /**
+     * @deprecated Use isPlaintextPassword from PrestashopAdapter16 or PrestashopAdapter17
+     *
      * Check if plaintext password is valid
      * Size is limited by `password_hash()` (72 chars).
      *

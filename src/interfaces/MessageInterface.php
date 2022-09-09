@@ -21,33 +21,9 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\interfaces;
 
-use PayPlug\src\interfaces\CurrencyInterface;
-use Currency;
-
-class CurrencySpecific implements CurrencyInterface
+interface MessageInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
-    public function get($idCurrency = false)
-    {
-        if (!is_int($idCurrency)) {
-            $idCurrency = false;
-        }
-        return new Currency($idCurrency);
-    }
-
-    public function getCurrency($idCurrency)
-    {
-        return new Currency($idCurrency);
-    }
-
-    public function getIdByIsoCode($isoCode)
-    {
-        return Currency::getIdByIsoCode($isoCode);
-    }
+    public function get($idMessage);
 }

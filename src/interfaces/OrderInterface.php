@@ -26,4 +26,5 @@ namespace PayPlug\src\interfaces;
 interface OrderInterface
 {
     public function get($idOrder);
+    public function getOrderByCartId($idCart);
 }
