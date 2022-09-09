@@ -27,7 +27,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
     private $logger;
     private $paymentClass;
     private $plugin;
-    private $toolsSpecific;
+    private $toolsAdapter;
 
     public function postProcess()
     {
@@ -35,7 +35,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
-        $this->toolsSpecific = $this->plugin->getTools();
+        $this->toolsAdapter = $this->plugin->getTools();
 
         $this->dependencies->apiClass->initializeApi();
 

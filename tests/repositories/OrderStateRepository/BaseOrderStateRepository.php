@@ -47,7 +47,7 @@ class BaseOrderStateRepository extends RepositoryBase
             $this->constant,
             $this->dependencies,
             $this->language,
-            $this->order_state_specific,
+            $this->order_state_adapter,
             $this->query,
             $this->tools,
             $this->validate,

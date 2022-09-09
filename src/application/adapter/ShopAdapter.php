@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,25 +16,33 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ModuleInterface;
-use Module;
+use PayPlug\src\interfaces\ShopInterface;
+use Shop;
 
-class ModuleSpecific implements ModuleInterface
+class ShopAdapter implements ShopInterface
 {
-    public function displayError($error)
+    public function get($idShop = false)
     {
-        return Module::displayError($error);
+        if (!is_int($idShop)) {
+            $idShop = false;
+        }
+        return new Shop($idShop);
     }
 
-    public function getInstanceByName($moduleName)
+    public function isFeatureActive()
     {
-        return Module::getInstanceByName($moduleName);
+        return Shop::isFeatureActive();
+    }
+
+    public function setContext()
+    {
+        return Shop::setContext(Shop::CONTEXT_ALL);
     }
 }

@@ -23,14 +23,6 @@
 
 namespace PayPlug\classes;
 
-use Configuration;
-use Dispatcher;
-use Language;
-use Media;
-use Module;
-use Order;
-use OrderState;
-use Tools;
 use Symfony\Component\Dotenv\Dotenv;
 
 class HookClass
@@ -42,10 +34,15 @@ class HookClass
     private $constant;
     private $context;
     private $dependencies;
+    private $dispatcher;
     private $html;
+    private $language;
+    private $media;
     private $oney;
     private $order;
     private $orderHistory;
+    private $orderState;
+    private $orderStateAdapter;
     private $product;
     private $query;
     private $sql;
@@ -63,11 +60,15 @@ class HookClass
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->currency = $this->dependencies->getPlugin()->getCurrency();
+        $this->dispatcher = $this->dependencies->getPlugin()->getDispatcher();
+        $this->language = $this->dependencies->getPlugin()->getLanguage();
+        $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->order = $this->dependencies->getPlugin()->getOrder();
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->orderState = $this->dependencies->getPlugin()->getOrderState();
+        $this->orderStateAdapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
         $this->product = $this->dependencies->getPlugin()->getProduct();
         $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->sql = $this->dependencies->getPlugin()->getSql();
@@ -84,7 +85,7 @@ class HookClass
         }
 
         // clear Language cache
-        Language::loadLanguages();
+        $this->language->loadLanguages();
 
         $all_order_states = \array_merge(
             $this->configClass->orderStates,
@@ -107,7 +108,7 @@ class HookClass
                     }
                 }
 
-                $order_state = new OrderState((int) $id_order_state);
+                $order_state = $this->orderStateAdapter->get((int) $id_order_state);
                 $order_state->name[$language->id] = $name;
                 $order_state->save();
             }
@@ -179,7 +180,7 @@ class HookClass
     public function actionOrderStatusUpdate($params)
     {
         $order = $this->order->get((int) $params['id_order']);
-        $active = Module::isEnabled($this->dependencies->name);
+        $active = $this->module->isEnabled($this->dependencies->name);
         if (!$active
             || $order->payment != $this->module->getInstanceByName($this->dependencies->name)->displayName
             || !$this->config->get(
@@ -247,7 +248,7 @@ class HookClass
                         $ps_order_state_name .= ' [PayPlug]';
                     }
 
-                    $ps_order_state = new OrderState($this->config->get(
+                    $ps_order_state = $this->orderStateAdapter->get($this->config->get(
                         $this->dependencies->concatenateModuleNameTo($payplug_conf)
                     ));
                     $ps_order_state->name[$params['lang']->id] = $ps_order_state_name;
@@ -288,10 +289,10 @@ class HookClass
             true
         );
 
-        $specific = $this->dependencies->loadSpecificPresta();
-        if ($specific
-            && (\method_exists($specific, 'customerAccount'))) {
-            $specific->customerAccount();
+        $adapter = $this->dependencies->loadAdapterPresta();
+        if ($adapter
+            && (\method_exists($adapter, 'customerAccount'))) {
+            $adapter->customerAccount();
         }
 
         $this->assign->assign([
@@ -333,8 +334,8 @@ class HookClass
         $amount_refunded_payplug = 0;
         $amount_available = 0;
 
-        $admin_ajax_url = AdminClass::getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
-        $amount_refunded_presta = RefundClass::getTotalRefunded($order->id);
+        $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
+        $amount_refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
 
         $inst_id = null;
         $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCart($order->id_cart);
@@ -342,7 +343,7 @@ class HookClass
 
         // Backward if order validated before
         if (!$payment_id) {
-            $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCartBackward($order->id_cart);
+            $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCartBackward((int)$order->id_cart);
         }
 
         if ($payment_id && \strpos($payment_id, 'inst') !== false) {
@@ -643,7 +644,7 @@ class HookClass
             if ($conf == 30 || $conf == 31) {
                 $show_popin = true;
 
-                $admin_ajax_url = AdminClass::getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
+                $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
 
                 $this->html .= '<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>';
             }
@@ -800,8 +801,8 @@ class HookClass
 
     public function actionAdminControllerSetMedia()
     {
-        if (Dispatcher::getInstance()->getController() == 'AdminOrders' && Tools::getValue('id_order')) {
-            $order = new Order(Tools::getValue('id_order'));
+        if ($this->dispatcher->getInstance()->getController() == 'AdminOrders' && $this->tools->tool('getValue', 'id_order')) {
+            $order = $this->order->get($this->tools->tool('getValue', 'id_order'));
 
             if ($order->module == $this->dependencies->name) {
                 $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
@@ -822,7 +823,7 @@ class HookClass
         if (\version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
             $this->dependencies->configClass->assignContentVar();
             $this->assign->assign([
-                'js_def' => Media::getJsDef(),
+                'js_def' => $this->media->getJsDef(),
             ]);
 
             return$this->dependencies->configClass->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
@@ -840,7 +841,7 @@ class HookClass
     {
         if (!$this->oney->isOneyAllowed() ||
             (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
-            Configuration::get(
+            $this->config->get(
                 $this->dependencies->getConfigurationKey('companyIso')
             )) {
             return false;
@@ -869,7 +870,7 @@ class HookClass
     {
         if (!$this->oney->isOneyAllowed() ||
             (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
-            Configuration::get($this->dependencies->getConfigurationKey('companyIso'))
+            $this->config->get($this->dependencies->getConfigurationKey('companyIso'))
         ) {
             return false;
         }
@@ -906,17 +907,17 @@ class HookClass
 
         if ($this->tools->tool('getValue', 'has_error')
             && $this->dependencies->name == $moduleName) {
-            Media::addJsDef(['check_errors' => true]);
+            $this->media->addJsDef(['check_errors' => true]);
         }
 
-        $specific = $this->dependencies->loadSpecificPresta();
+        $adapter = $this->dependencies->loadAdapterPresta();
 
-        if ($specific
-            && (\method_exists($specific, 'displayHeader'))) {
-            Media::addJsDef([
+        if ($adapter
+            && (\method_exists($adapter, 'displayHeader'))) {
+            $this->media->addJsDef([
                 'module_name' => $this->dependencies->name,
             ]);
-            $specific->displayHeader();
+            $adapter->displayHeader();
         }
 
         $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
@@ -966,7 +967,7 @@ class HookClass
                         $this->dependencies->getConfigurationKey('embeddedMode')
                     ) == 'integrated') {
                         $api_url = $integrated_payment_js_url;
-                        Media::addJsDef([
+                        $this->media->addJsDef([
                             'isIntegratedPayment' => true,
                         ]);
                     } else {
@@ -978,7 +979,7 @@ class HookClass
                         'api_url' => $api_url,
                     ]);
 
-                    return$this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
+                    return $this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
                 }
             } else {
                 $this->dependencies->paymentClass->setPaymentErrorsCookie([
@@ -992,7 +993,7 @@ class HookClass
         if ($this->config->get(
             $this->dependencies->getConfigurationKey('oney')
         )) {
-            Media::addJsDef([
+            $this->media->addJsDef([
                 $this->dependencies->name . '_oney' => true,
                 $this->dependencies->name . '_oney_loading_msg' => $this->dependencies->l('hook.header.loading', 'hookclass'),
             ]);
@@ -1008,14 +1009,12 @@ class HookClass
             $payplug_domain = 'https://secure.payplug.com';
         }
 
-        if ((string) Configuration::get(
-            $this->dependencies->getConfigurationKey('embeddedMode')
-        ) == 'integrated') {
+        if ('integrated' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))) {
             $integratedPaymentError = $this->dependencies->l('hook.header.integratedPayment.error', 'hookclass');
-            $sandbox = Configuration::get($this->dependencies->getConfigurationKey('sandboxMode'));
-            Media::addJsDef([
+            $sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            $this->media->addJsDef([
                 'integratedPaymentError' => $integratedPaymentError,
-                'payplug_publishable_key' => Configuration::get(
+                'payplug_publishable_key' => $this->config->get(
                     $this->dependencies->getConfigurationKey('publishableKey') . ($sandbox ? '_TEST' : '')
                 ),
             ]);
@@ -1024,9 +1023,9 @@ class HookClass
         if ($this->config->get(
             $this->dependencies->getConfigurationKey('applepay')
         )) {
-            $applePayPaymentRequest = $this->dependencies->applePayClass->getPaymentRequest(Dispatcher::getInstance()->getController());
+            $applePayPaymentRequest = $this->dependencies->applePayClass->getPaymentRequest($this->dispatcher->getInstance()->getController());
 
-            Media::addJsDef([
+            $this->media->addJsDef([
                 'applePayPaymentRequest' => $applePayPaymentRequest,
                 'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
                 'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
@@ -1034,7 +1033,7 @@ class HookClass
             ]);
         }
 
-        Media::addJsDef(
+        $this->media->addJsDef(
             [
                 $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
                 'PAYPLUG_DOMAIN' => $payplug_domain,
@@ -1049,12 +1048,12 @@ class HookClass
      */
     public function displayProductPriceBlock($param)
     {
-        $current_controller = Dispatcher::getInstance()->getController();
+        $current_controller = $this->dispatcher->getInstance()->getController();
 
         if (!$this->oney->isOneyAllowed()
             || $current_controller != 'product'
             || (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
-            Configuration::get($this->dependencies->getConfigurationKey('companyIso'))) {
+            $this->config->get($this->dependencies->getConfigurationKey('companyIso'))) {
             return false;
         }
 
@@ -1166,7 +1165,7 @@ class HookClass
         $payment_options = $this->dependencies->paymentClass->getPaymentOptions($cart);
 
         // Transforme tableau en TPL
-        $paymentOptions = $this->dependencies->loadSpecificPresta()->displayPaymentOption(
+        $paymentOptions = $this->dependencies->loadAdapterPresta()->displayPaymentOption(
             $payment_options,
             $cart
         );
@@ -1211,7 +1210,7 @@ class HookClass
         $payment_options = $this->dependencies->paymentClass->getPaymentOptions($cart);
 
         // Transforme tableau en object
-        return $this->dependencies->loadSpecificPresta()->displayPaymentOption($payment_options);
+        return $this->dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);
     }
 
     /**

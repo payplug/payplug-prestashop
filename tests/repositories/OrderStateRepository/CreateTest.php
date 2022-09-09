@@ -104,7 +104,7 @@ final class CreateTest extends BaseOrderStateRepository
                 'getOrderStateByConfiguration' => $this->orderStateMock->id
             ]);
 
-        $this->order_state_specific
+        $this->order_state_adapter
             ->shouldReceive([
                 'get' => $this->orderStateMock
             ]);
@@ -123,7 +123,7 @@ final class CreateTest extends BaseOrderStateRepository
                 'getOrderStateByTemplate' => $this->orderStateMock->id,
             ]);
 
-        $this->order_state_specific
+        $this->order_state_adapter
             ->shouldReceive([
                 'get' => $this->orderStateMock
             ]);
@@ -143,7 +143,7 @@ final class CreateTest extends BaseOrderStateRepository
                 'findByName' => $this->orderStateMock->id,
             ]);
 
-        $this->order_state_specific
+        $this->order_state_adapter
             ->shouldReceive([
                 'get' => $this->orderStateMock
             ]);
@@ -164,7 +164,7 @@ final class CreateTest extends BaseOrderStateRepository
                 'add' => $this->orderStateMock->id,
             ]);
 
-        $this->order_state_specific
+        $this->order_state_adapter
             ->shouldReceive([
                 'get' => $this->orderStateMock
             ]);
@@ -187,7 +187,7 @@ final class CreateTest extends BaseOrderStateRepository
                 'add' => $new_order_state,
             ]);
 
-        $this->order_state_specific
+        $this->order_state_adapter
             ->shouldReceive([
                 'get' => $this->orderStateMock
             ]);
@@ -214,7 +214,7 @@ final class CreateTest extends BaseOrderStateRepository
 
         $this->orderStateMock->deleted = 1;
 
-        $this->order_state_specific
+        $this->order_state_adapter
             ->shouldReceive([
                 'get' => $this->orderStateMock
             ]);
@@ -239,7 +239,7 @@ final class CreateTest extends BaseOrderStateRepository
 
         $this->orderStateMock->deleted = 1;
 
-        $this->order_state_specific
+        $this->order_state_adapter
             ->shouldReceive([
                 'get' => $this->orderStateMock
             ]);

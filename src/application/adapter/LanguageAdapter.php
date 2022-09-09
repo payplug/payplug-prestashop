@@ -21,25 +21,29 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ContextInterface;
-use Context;
+use PayPlug\src\interfaces\LanguageInterface;
+use Language;
 
-class ContextSpecific implements ContextInterface
+class LanguageAdapter implements LanguageInterface
 {
-    public static function factory()
+    public function get($idLanguage = false)
     {
-        return new self();
+        if (!is_int($idLanguage)) {
+            $idLanguage = false;
+        }
+
+        return new Language($idLanguage);
     }
 
-    public function get()
+    public function getLanguages($active = false)
     {
-        return Context::getContext();
+        return Language::getLanguages($active);
     }
 
-    public function getContext()
+    public function loadLanguages()
     {
-        return Context::getContext();
+        return Language::loadLanguages();
     }
 }

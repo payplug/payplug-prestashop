@@ -21,11 +21,33 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\interfaces;
+namespace PayPlug\src\application\adapter;
 
-interface ShopInterface
+use PayPlug\src\interfaces\CurrencyInterface;
+use Currency;
+
+class CurrencyAdapter implements CurrencyInterface
 {
-    public function get($idShop);
-    public function isFeatureActive();
-    public function setContext();
+    public static function factory()
+    {
+        return new self();
+    }
+
+    public function get($idCurrency = false)
+    {
+        if (!is_int($idCurrency)) {
+            $idCurrency = false;
+        }
+        return new Currency($idCurrency);
+    }
+
+    public function getCurrency($idCurrency)
+    {
+        return new Currency($idCurrency);
+    }
+
+    public function getIdByIsoCode($isoCode)
+    {
+        return Currency::getIdByIsoCode($isoCode);
+    }
 }

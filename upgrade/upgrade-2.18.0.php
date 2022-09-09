@@ -35,7 +35,7 @@ function upgrade_module_2_18_0($object)
     $flag = true;
 
     if (version_compare(_PS_VERSION_, '1.5', '<')) {
-        if (!PayplugBackward::updateConfiguration('PAYPLUG_VERSION_1_4', '2.18.0')) {
+        if (!Configuration::updateValue('PAYPLUG_VERSION_1_4', '2.18.0')) {
             $flag = false;
         }
     }

@@ -27,4 +27,5 @@ interface ModuleInterface
 {
     public function displayError($error);
     public function getInstanceByName($moduleName);
+    public function isEnabled($moduleName);
 }

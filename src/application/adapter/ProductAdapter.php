@@ -21,12 +21,12 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-namespace PayPlug\src\specific;
+namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\ProductInterface;
 use Product;
 
-class ProductSpecific implements ProductInterface
+class ProductAdapter implements ProductInterface
 {
     public function product($method)
     {

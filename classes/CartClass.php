@@ -25,28 +25,33 @@ namespace PayPlug\classes;
 
 use DateTime;
 use DateInterval;
-use Db;
 
 class CartClass
 {
     private $logger;
     private $dependencies;
+    private $query;
+    private $constant;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
     }
 
     /**
      * @description Create a lock from a Cart ID
-     * @param bool $id_cart
+     *
+     * @param int $id_cart
      * @return bool
      */
-    public function createLockFromCartId($id_cart = false)
+    public function createLockFromCartId($id_cart = 0)
     {
-        if (!$id_cart) {
+        if (!$id_cart || !is_int($id_cart)) {
             return false;
         }
+
         $this->logger = $this->dependencies->getPlugin()->getLogger();
 
         $this->logger->addLog('Lock creation', 'notice');
@@ -57,7 +62,7 @@ class CartClass
         $end_of_life = $creation_date->add($lifetime);
 
         do {
-            $cart_lock = PayplugLock::createLockG2($id_cart, $this->dependencies->name);
+            $cart_lock = $this->dependencies->payplugLock->createLockG2($id_cart, $this->dependencies->name);
 
             if (!$cart_lock) {
                 $time = new DateTime('now');
@@ -78,48 +83,60 @@ class CartClass
 
     /**
      * @description Delete payplug lock for given id cart
-     * @param bool $id_cart
+     *
+     * @param int $id_cart
      * @return bool
      */
-    public function deleteLockFromCartId($id_cart = false)
+    public function deleteLockFromCartId($id_cart = 0)
     {
-        if (!$id_cart) {
+        if (!$id_cart || !is_int($id_cart)) {
             return false;
         }
-        return PayplugLock::deleteLockG2($id_cart);
+
+        return $this->dependencies->payplugLock->deleteLockG2($id_cart);
     }
 
     /**
      * @description Get cart installment
      *
-     * @param $id_cart
-     * @return bool
+     * @param int $id_cart
+     * @return integer
      */
-    public function getPayplugInstallmentCart($id_cart)
+    public function getPayplugInstallmentCart($id_cart = 0)
     {
-        $req_cart_installment = '
-            SELECT pic.id_payment
-            FROM ' . _DB_PREFIX_ . $this->dependencies->name . '_payment pic
-            WHERE pic.id_cart = ' . (int)$id_cart;
-        $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
+        if (!$id_cart || !is_int($id_cart)) {
+            return 0;
+        }
 
-        return $res_cart_installment;
+        $id_payment = $this->query
+            ->select()
+            ->fields('id_payment')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
+            ->where('id_cart = ' . (int)$id_cart)
+            ->build('unique_value');
+
+        return $id_payment;
     }
 
     /**
      * @description get cart installment backward
-     * @param $id_cart
+     * @param int $id_cart
      * @return mixed
      * @deprecated use for installment from PayPlug 3.1.3 or further
      */
-    public function getPayplugInstallmentCartBackward($id_cart)
+    public function getPayplugInstallmentCartBackward($id_cart = 0)
     {
-        $req_cart_installment = '
-            SELECT pic.id_installment
-            FROM ' . _DB_PREFIX_ . $this->dependencies->name . '_installment_cart pic
-            WHERE pic.id_cart = ' . (int)$id_cart;
-        $res_cart_installment = Db::getInstance()->getValue($req_cart_installment);
+        if (!$id_cart || !is_int($id_cart)) {
+            return 0;
+        }
 
-        return $res_cart_installment;
+        $id_payment = $this->query
+            ->select()
+            ->fields('id_installment')
+            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment_cart')
+            ->where('id_cart = ' . (int)$id_cart)
+            ->build('unique_value');
+
+        return $id_payment;
     }
 }
