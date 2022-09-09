@@ -30,6 +30,9 @@ class MediaAdapter implements MediaInterface
 {
     public function addJsDef($files = [])
     {
+        foreach ($files as &$file) {
+            $file = addslashes($file);
+        }
         return Media::addJsDef($files);
     }
 
