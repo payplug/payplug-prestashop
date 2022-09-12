@@ -420,6 +420,7 @@ key;default;tags;fr;en;gb;it
 <{payplug}prestashop>payplugnotifications_afa6af64101c99bd561ca833fdb70b52;notification.createOrder.oneyX3WithoutFees;;"Oney 3x sans frais";"Oney 3x without fees";"Oney 3x without fees";"Oney 3x senza spese"
 <{payplug}prestashop>payplugnotifications_baad4f460ebbb7b6080ffce28c800b87;" as the total value of the order";;"du total de la commande";" as the total value of the order";" as the total value of the order";"dal totale dell'ordine"
 <{payplug}prestashop>payplugnotifications_ce2d9931d650f844d0e49ba70cf68376;"Oney 3x";;"Oney 3x";"Oney 3x";"Oney 3x";"Oney 3x"
+<{payplug}prestashop>payplugnotifications_bc8ccce668b84bedd79a3de5e4feea8b;notification.createOrder.applepay;;"Apple Pay";"Apple Pay";"Apple Pay";"Apple Pay"
 <{payplug}prestashop>payplugnotifications_f9932dff56316ff55d6280cfeb91846e;"Oney 4x";;"Oney 4x";"Oney 4x";"Oney 4x";"Oney 4x"
 <{payplug}prestashop>payplugvalidation_2a7fff1b4d732ad60c83c97651935fac;validation.createOrder.applepay;;"Apple Pay";"Apple Pay";"Apple Pay";"Apple Pay"
 <{payplug}prestashop>payplugvalidation_37e5f7ac383cfd2bec46c08a29b13a39;validation.createOrder.oneyX3WithoutFees;;"Oney 3x sans frais";"Oney 3x without fees";"Oney 3x without fees";"Oney 3x senza spese"
