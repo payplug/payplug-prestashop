@@ -770,6 +770,7 @@ class PaymentClass
             'bancontact',
             'oney'
         ];
+
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         foreach ($availablePaymentMethods as $availablePaymentMethod) {
             $featureName = 'feature_' . $availablePaymentMethod;
@@ -913,6 +914,11 @@ class PaymentClass
 
     private function getApplepayPaymentMethod($views_path)
     {
+        // If CMS version under 1.7 return empty has the method is not available
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            return [];
+        }
+
         return [
             'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('applepay')),
             'title' => $this->dependencies->l('paymentMethod.applepay.title', 'paymentclass'),
