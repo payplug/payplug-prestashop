@@ -49,6 +49,9 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class ApiClass
 {
+    /** @var object */
+    private $api;
+
     /** @var string */
     private $api_url;
 
@@ -613,10 +616,12 @@ class ApiClass
 
         $this->setUserAgent();
 
-        return Payplug::init([
+        $this->api = Payplug::init([
             'secretKey' => $token,
             'apiVersion' => $this->dependencies->getPlugin()->getApiVersion()
         ]);
+
+        return $this->api;
     }
 
     /**
@@ -806,9 +811,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -818,7 +825,7 @@ class ApiClass
                 $this->setUserAgent();
                 $response = [
                     'result' => true,
-                    'resource' => InstallmentPlan::abort($inst_id, $api),
+                    'resource' => InstallmentPlan::abort($inst_id, $this->api),
                     'code' => 200
                 ];
             }
@@ -851,9 +858,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -863,7 +872,7 @@ class ApiClass
                 $response = [
                     'code' => 200,
                     'result' => true,
-                    'resource' => InstallmentPlan::create($atttributes, $api)
+                    'resource' => InstallmentPlan::create($atttributes, $this->api)
                 ];
             }
         } catch (Exception $e) {
@@ -896,9 +905,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -908,7 +919,7 @@ class ApiClass
                 $response = [
                     'code' => 200,
                     'result' => true,
-                    'resource' => InstallmentPlan::retrieve($inst_id, $api)
+                    'resource' => InstallmentPlan::retrieve($inst_id, $this->api)
                 ];
             }
         } catch (ConfigurationNotSetException $e) {
@@ -952,9 +963,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -963,7 +976,7 @@ class ApiClass
             } else {
                 $response = [
                     'result' => true,
-                    'resource' => Payment::abort($pay_id, $api),
+                    'resource' => Payment::abort($pay_id, $this->api),
                     'code' => 200
                 ];
             }
@@ -996,9 +1009,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -1007,7 +1022,7 @@ class ApiClass
             } else {
                 $response = [
                     'result' => true,
-                    'resource' => Payment::capture($pay_id, $api),
+                    'resource' => Payment::capture($pay_id, $this->api),
                     'code' => 200
                 ];
             }
@@ -1052,9 +1067,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -1064,7 +1081,7 @@ class ApiClass
                 $response = [
                     'code' => 200,
                     'result' => true,
-                    'resource' => Payment::create($atttributes, $api)
+                    'resource' => Payment::create($atttributes, $this->api)
                 ];
             }
         } catch (Exception $e) {
@@ -1158,9 +1175,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -1169,7 +1188,7 @@ class ApiClass
             } else {
                 $response = [
                     'result' => true,
-                    'resource' => Refund::create($pay_id, $data, $api),
+                    'resource' => Refund::create($pay_id, $data, $this->api),
                     'code' => 200
                 ];
             }
@@ -1202,9 +1221,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -1214,7 +1235,7 @@ class ApiClass
                 $response = [
                     'code' => 200,
                     'result' => true,
-                    'resource' => Payment::retrieve($pay_id, $api)
+                    'resource' => Payment::retrieve($pay_id, $this->api)
                 ];
             }
         } catch (ConfigurationNotSetException $e) {
@@ -1258,9 +1279,11 @@ class ApiClass
         }
 
         try {
-            $api = $this->setSecretKey();
+            if (!$this->api) {
+                $this->api = $this->setSecretKey();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'code' => 500,
                     'result' => false,
@@ -1270,7 +1293,7 @@ class ApiClass
                 $response = [
                     'code' => 200,
                     'result' => true,
-                    'resource' => Card::delete($card_id, $api)
+                    'resource' => Card::delete($card_id, $this->api)
                 ];
             }
         } catch (ConfigurationNotSetException $e) {

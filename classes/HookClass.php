@@ -352,7 +352,6 @@ class HookClass
         if ($inst_id) {
             $payment_list = [];
 
-            $sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
             if ($sandbox) {
                 $this->dependencies->apiClass->setSecretKey(
                     $this->config->get(
@@ -375,7 +374,7 @@ class HookClass
             // Get the installment plan resource
             $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
 
-            // If No installment paln resource, test the other live mode configuration
+            // If No installment plan resource, test the other live mode configuration
             if (!$installment['result']) {
                 if ($sandbox) {
                     $this->dependencies->apiClass->setSecretKey($this->config->get(
@@ -512,8 +511,6 @@ class HookClass
                 }
             }
 
-            $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
-            $mode = $sandbox ? 'test' : 'live';
             // If no payment id, return false
             if (!$pay_id || empty($pay_id)) {
                 return false;
@@ -521,10 +518,20 @@ class HookClass
 
             // Get the Payment resource
             $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+
             // If No Payment resource, test the other live mode configuration
             if (!$payment['result']) {
-                $mode = $sandbox ? 'live' : 'test';
-                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                if ($sandbox) {
+                    $this->dependencies->apiClass->setSecretKey($this->config->get(
+                        $this->dependencies->getConfigurationKey('liveApiKey')
+                    ));
+                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                } else {
+                    $this->dependencies->apiClass->setSecretKey($this->config->get(
+                        $this->dependencies->getConfigurationKey('testApiKey')
+                    ));
+                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                }
             }
 
             // If we still don't have a valid Payment resource, return false
