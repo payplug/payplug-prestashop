@@ -136,7 +136,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function getOrderIdByPayplugInstallmentId($id_payplug_installment)
     {
-        $sql = 'SELECT DISTINCT pi.id_order
+        $sql = 'SELECT DISTINCT id_order
                 FROM `'._DB_PREFIX_.$this->table.'`
                 WHERE `id_'.$this->dependencies->name.'_installment` = ' . (int)$id_payplug_installment;
 
