@@ -356,15 +356,16 @@ class ConfigClass
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
 
         $available_options = [
-            'standard' => (int)$this->config->get($this->dependencies->getConfigurationKey('standard')) === 1,
-            'live' => (int)$this->config->get($this->dependencies->getConfigurationKey('sandboxMode')) === 0,
+            'standard' => (bool)$this->config->get($this->dependencies->getConfigurationKey('standard')),
+            'live' => !(bool)$this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),
             'embedded' => (string)$this->config->get($this->dependencies->getConfigurationKey('embeddedMode')),
-            'one_click' => (int)$this->config->get($this->dependencies->getConfigurationKey('oneClick')) === 1,
-            'installment' => (int)$this->config->get($this->dependencies->getConfigurationKey('inst')) === 1,
-            'deferred' => (int)$this->config->get($this->dependencies->getConfigurationKey('deferred')) === 1,
-            'oney' => (int)$this->config->get($this->dependencies->getConfigurationKey('oney')) === 1,
-            'bancontact' => (int)$this->config->get($this->dependencies->getConfigurationKey('bancontact')) === 1,
-            'applepay' => (int)$this->config->get($this->dependencies->getConfigurationKey('applepay')) === 1,
+            'one_click' => (bool)$this->config->get($this->dependencies->getConfigurationKey('oneClick')),
+            'installment' => (bool)$this->config->get($this->dependencies->getConfigurationKey('inst')),
+            'deferred' => (bool)$this->config->get($this->dependencies->getConfigurationKey('deferred')),
+            'oney' => (bool)$this->config->get($this->dependencies->getConfigurationKey('oney')),
+            'bancontact' => (bool)$this->config->get($this->dependencies->getConfigurationKey('bancontact')),
+            'applepay' => (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')),
+            'amex' => (bool)$this->config->get($this->dependencies->getConfigurationKey('amex')),
         ];
 
         if ($this->config->get($this->dependencies->getConfigurationKey('email')) === null
@@ -380,6 +381,7 @@ class ConfigClass
             $available_options['oney'] = false;
             $available_options['bancontact'] = false;
             $available_options['applepay'] = false;
+            $available_options['amex'] = false;
         } else {
             if (!$permissions['use_live_mode']
                 || $this->config->get($this->dependencies->getConfigurationKey('liveApiKey')) === null
@@ -401,9 +403,12 @@ class ConfigClass
             if (!$permissions['can_use_bancontact']) {
                 $available_options['bancontact'] = false;
             }
-            /*if (!$permissions['can_use_applepay']) {
+            if (!$permissions['can_use_applepay'] || !$available_options['live']) {
                 $available_options['applepay'] = false;
-            }*/
+            }
+            if (!$permissions['can_use_amex'] || !$available_options['live']) {
+                $available_options['amex'] = false;
+            }
         }
 
         return $available_options;

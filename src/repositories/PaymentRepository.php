@@ -564,11 +564,12 @@ class PaymentRepository extends BaseClass
                     'return_url' => $paymentDetails['paymentUrl'],
                 ];
                 break;
+            case 'amex':
+            case 'apple_pay':
             case 'bancontact':
-            case 'standard':
             case 'installment':
             case 'integrated':
-            case 'apple_pay':
+            case 'standard':
                 $returnUrl = $paymentDetails['paymentUrl']
                     ? $paymentDetails['paymentUrl']
                     : $paymentDetails['paymentReturnUrl'];
