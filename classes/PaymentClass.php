@@ -901,11 +901,11 @@ class PaymentClass
      * @return array
      * @throws Exception
      */
-    public function getPaymentOptions($cart)
+    public function getPaymentOptions()
     {
+        $cart = $this->context->cart;
         $options = $this->dependencies->configClass->getAvailableOptions($cart);
-
-        $id_customer = (isset($cart->id_customer)) ? $cart->id_customer : $cart['cart']->id_customer;
+        $id_customer = (int)$this->context->customer->id;
 
         $payplug_cards = $options['one_click'] ? $this->card->getByCustomer((int)$id_customer, true) : [];
 
