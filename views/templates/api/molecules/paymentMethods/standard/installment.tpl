@@ -59,7 +59,7 @@
     {if isset($installments_panel_url) && $installments_panel_url}
         {include file='./../../../atoms/link/link.tpl'
             linkText={l s='installment.textLink' mod='payplug'}
-            linkHref=$installments_panel_url|escape:'UTF-8'
+            linkHref=$installments_panel_url|escape:'htmlall':'UTF-8'
             linkTarget='_blank'
             linkData='data-panelInstallmentLink'}
     {/if}
