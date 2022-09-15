@@ -380,6 +380,7 @@ $_MODULE['<{payplug}prestashop>paymentclass_12b7f5d461ea98aaea1af114b824a0b6'] =
 $_MODULE['<{payplug}prestashop>paymentclass_161d4ffa7573ab94df1ca05d6e39b7ad'] = 'redirected';
 $_MODULE['<{payplug}prestashop>paymentclass_17de4c685248dc4807a28e806605f580'] = 'Pay by card in %sx with Oney';
 $_MODULE['<{payplug}prestashop>paymentclass_1a5ea175a58e46aec10650431fa85c8e'] = 'An error has occurred';
+$_MODULE['<{payplug}prestashop>paymentclass_1a640aa287dc4b539df4237a7ef91289'] = 'Pay with American Express';
 $_MODULE['<{payplug}prestashop>paymentclass_1d521005082987d1af288735f8598034'] = 'Bancontact payment';
 $_MODULE['<{payplug}prestashop>paymentclass_1e6a37a246de37dc82e38ed90b25553c'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose below whether or not you want to pay all the fees.';
 $_MODULE['<{payplug}prestashop>paymentclass_22a7feaef223ecdb667e30110cdbdf67'] = 'Display the Oney logo on the product page';
