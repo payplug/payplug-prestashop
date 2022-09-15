@@ -1135,7 +1135,7 @@ class PaymentClass
         return $payment_options;
     }
 
-    private function getAmexPaymentOption($payment_options)
+    private function getAmexPaymentOption($payment_options, $options = [])
     {
         $payment_options['amex'] = [
             'name' => 'amex',
@@ -1161,7 +1161,6 @@ class PaymentClass
                     'value' => 'amex',
                 ],
             ],
-            'tpl' => 'amex.tpl',
             'extra_classes' => 'amex',
             'payment_controller_url' => $this->context->link->getModuleLink(
                 $this->dependencies->name,
@@ -1190,7 +1189,7 @@ class PaymentClass
 
     private function getApplepayPaymentOption($payment_options)
     {
-        if ($this->getBrowser() != 'Safari') {
+        if (!$this->getBrowser() == 'Safari') {
             return $payment_options;
         }
 
