@@ -1154,7 +1154,7 @@ class HookClass
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
-        $payment_options = $this->dependencies->paymentClass->getPaymentOptions($cart);
+        $payment_options = $this->dependencies->paymentClass->getPaymentOptions();
 
         // Transforme tableau en TPL
         $paymentOptions = $this->dependencies->loadAdapterPresta()->displayPaymentOption(
@@ -1199,7 +1199,7 @@ class HookClass
         ]);
 
         // Données sous forme de tableau (pour 1.6 et 1.7)
-        $payment_options = $this->dependencies->paymentClass->getPaymentOptions($cart);
+        $payment_options = $this->dependencies->paymentClass->getPaymentOptions();
 
         // Transforme tableau en object
         return $this->dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);
