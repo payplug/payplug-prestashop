@@ -392,6 +392,7 @@ class PaymentClass
         }
 
         $is_oney = false;
+        $is_amex = false;
         $is_bancontact = false;
         if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
             switch ($payment->payment_method['type']) {
@@ -414,6 +415,10 @@ class PaymentClass
                 case 'bancontact':
                     $is_bancontact = true;
                     $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.bancontact', 'paymentclass');
+                    break;
+                case 'american_express':
+                    $is_amex = true;
+                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.amex', 'paymentclass');
                     break;
                 default:
                     $payment_details['type'] = $payment->payment_method['type'];
@@ -482,7 +487,7 @@ class PaymentClass
             unset($payment_details['card_mask']);
             unset($payment_details['card_date']);
         }
-        if ($is_bancontact) {
+        if ($is_bancontact || $is_amex) {
             unset($payment_details['tds']);
             unset($payment_details['card_brand']);
         }

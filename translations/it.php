@@ -395,6 +395,7 @@ $_MODULE['<{payplug}prestashop>paymentclass_4929cc1470a0d9160fc0ae0805274694'] =
 $_MODULE['<{payplug}prestashop>paymentclass_4e95b36ca864e9540cc94a3953477f43'] = 'Paga in %sx rate senza spese con carta di gradito grazie a Oney';
 $_MODULE['<{payplug}prestashop>paymentclass_53f4a41ab6d3316c9da1ada62948d722'] = 'Il tuo carrello non è disponibile';
 $_MODULE['<{payplug}prestashop>paymentclass_57b84b32011fe94629c7612279ba06b6'] = 'Oney 3x';
+$_MODULE['<{payplug}prestashop>paymentclass_5bc24cd1b6ed3efb0307bb857297ca2d'] = 'AmEx';
 $_MODULE['<{payplug}prestashop>paymentclass_6072656e6ff581c0ef3d16c15478f07a'] = 'Con costi';
 $_MODULE['<{payplug}prestashop>paymentclass_63b81f97c737a503a312121750756c39'] = 'Pagamento AmEx';
 $_MODULE['<{payplug}prestashop>paymentclass_6b4af996236ab7d4adaf3a13ed1ad4a8'] = 'Pagamento con carta';
@@ -445,6 +446,7 @@ $_MODULE['<{payplug}prestashop>paymentmethods_a68656a488991534ba51663006be6417']
 $_MODULE['<{payplug}prestashop>paymentrepository_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>payplug_a24854748a79644ea78a127748b9e081'] = 'La soluzione di pagamento online che ti assiste con facilità e ti aiuta ad aumentare le vendite.';
 $_MODULE['<{payplug}prestashop>payplugnotifications_070045a43ffc0c954761e803bf7ec0f7'] = 'L\'importo raccolto da PayPlug è diverso';
+$_MODULE['<{payplug}prestashop>payplugnotifications_2bcb0b71cd65a1ad24e6c475744b9454'] = 'AmEx';
 $_MODULE['<{payplug}prestashop>payplugnotifications_8ab5e03a31bc896544bba57d2c8fe7a9'] = 'Bancontact';
 $_MODULE['<{payplug}prestashop>payplugnotifications_a562c75930a61d31bdeb1ffa12948cad'] = 'Oney 4x senza spese';
 $_MODULE['<{payplug}prestashop>payplugnotifications_afa6af64101c99bd561ca833fdb70b52'] = 'Oney 3x senza spese';
@@ -454,6 +456,7 @@ $_MODULE['<{payplug}prestashop>payplugnotifications_f9932dff56316ff55d6280cfeb91
 $_MODULE['<{payplug}prestashop>payplugvalidation_2a7fff1b4d732ad60c83c97651935fac'] = 'Apple Pay';
 $_MODULE['<{payplug}prestashop>payplugvalidation_37e5f7ac383cfd2bec46c08a29b13a39'] = 'Oney 3x senza spese';
 $_MODULE['<{payplug}prestashop>payplugvalidation_61349303d97520640a6bc5151919ff7f'] = 'Oney 4x senza spese';
+$_MODULE['<{payplug}prestashop>payplugvalidation_93de6a60bb878c218ccb1ce56a529a80'] = 'AmEx';
 $_MODULE['<{payplug}prestashop>payplugvalidation_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
 $_MODULE['<{payplug}prestashop>payplugvalidation_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>payplugvalidation_d14f16350ea2ddc76f6241cc131dcd82'] = 'Bancontact';
