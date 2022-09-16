@@ -44,6 +44,7 @@ class PayPlugValidation
     private $isDeferred;
     private $isOney;
     private $isBancontact;
+    private $isAmex;
     private $isApplepay;
     private $orderAdapter;
     private $orderClass;
@@ -88,6 +89,7 @@ class PayPlugValidation
         $this->isOney = false;
         $this->isBancontact = false;
         $this->isApplepay = false;
+        $this->isAmex = false;
         $this->type = 'payment';
         $this->setLogger();
     }
@@ -285,10 +287,14 @@ class PayPlugValidation
                     case 'apple_pay':
                         $this->isApplepay = true;
                         break;
+                    case 'american_express':
+                        $this->isAmex = true;
+                        break;
                     default:
                         $this->isOney = false;
                         $this->isBancontact = false;
                         $this->isApplepay = false;
+                        $this->isAmex = false;
                 }
             }
 
@@ -477,6 +483,8 @@ class PayPlugValidation
                 $module_name = $this->dependencies->l('validation.createOrder.bancontact', 'payplugvalidation');
             } elseif ($this->isApplepay) {
                 $module_name = $this->dependencies->l('validation.createOrder.applepay', 'payplugvalidation');
+            } elseif ($this->isAmex) {
+                $module_name = $this->dependencies->l('validation.createOrder.amex', 'payplugvalidation');
             }
 
             $cart_amount = (float)$cart->getOrderTotal(true);
