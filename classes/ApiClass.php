@@ -43,6 +43,7 @@ use Payplug\Payplug;
 use Payplug\Refund;
 
 use PayPlug\src\exceptions\BadParameterException;
+use Payplug\Exception\PayplugServerException;
 
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -748,6 +749,12 @@ class ApiClass
                 return false;
             }
         } catch (BadRequestException $e) {
+            json_encode([
+                'content' => null,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        } catch (PayplugServerException $e) {
             json_encode([
                 'content' => null,
                 'error' => $e->getMessage()

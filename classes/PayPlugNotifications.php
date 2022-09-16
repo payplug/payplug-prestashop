@@ -41,6 +41,7 @@ class PayPlugNotifications
     public $cart = null;
     public $except;
     public $flag;
+    public $is_amex = false;
     public $is_applepay = false;
     public $is_oney = false;
     public $is_installment = false;
@@ -349,6 +350,8 @@ class PayPlugNotifications
             $module_name = $this->dependencies->l('notification.createOrder.bancontact', 'payplugnotifications');
         } elseif ($this->is_applepay) {
             $module_name = $this->dependencies->l('notification.createOrder.applepay', 'payplugnotifications');
+        } elseif ($this->is_amex) {
+            $module_name = $this->dependencies->l('notification.createOrder.amex', 'payplugnotifications');
         }
 
         // Create Order
@@ -1107,6 +1110,12 @@ class PayPlugNotifications
             $this->is_applepay = $this->payment->payment_method['type'] == 'apple_pay';
         }
         $this->logger->addLog('Notification: is_applepay: ' . ($this->is_applepay ? 'ok' : 'nok'));
+
+        // Define if payment is amex resource
+        if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
+            $this->is_amex = $this->payment->payment_method['type'] == 'american_express';
+        }
+        $this->logger->addLog('Notification: is_amex ' . ($this->is_amex ? 'ok' : 'nok'));
     }
 
     /**
