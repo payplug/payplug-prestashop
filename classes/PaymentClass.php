@@ -1189,9 +1189,10 @@ class PaymentClass
 
     private function getApplepayPaymentOption($payment_options)
     {
-        if (!$this->getBrowser() == 'Safari') {
-            return $payment_options;
-        }
+        // @todo debug applepay
+//        if (!$this->getBrowser() == 'Safari') {
+//            return $payment_options;
+//        }
 
         $payment_options['applepay'] = [
             'name' => 'applepay',
@@ -1235,6 +1236,10 @@ class PaymentClass
             ),
             'moduleName' => $this->dependencies->name,
         ];
+
+        $this->assign->assign([
+            'language' => $this->context->language,
+        ]);
 
         return $payment_options;
     }

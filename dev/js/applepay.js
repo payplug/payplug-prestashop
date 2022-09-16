@@ -68,13 +68,6 @@ window[module_name+'ModuleApplePay'] = {
                     }
                 };
 
-                /*session.onpaymentmethodselected = event => {
-                    // Define ApplePayPaymentMethodUpdate based on the selected payment method.
-                    // No updates or errors are needed, pass an empty object.
-                    const update = {};
-                    session.completePaymentMethodSelection(update);
-                };*/
-
                 session.onshippingmethodselected = event => {
                     // Define ApplePayShippingMethodUpdate based on the selected shipping method.
                     // No updates or errors are needed, pass an empty object.
@@ -135,7 +128,3 @@ window[module_name+'ModuleApplePay'] = {
         })
     }
 };
-
-$(document).ready(function () {
-    window[module_name+'ModuleApplePay'].init();
-});
