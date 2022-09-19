@@ -1133,6 +1133,7 @@ class PayPlugNotifications
             $this->exitProcess($exception->getMessage(), 500);
         }
 
+        $this->order = new Order((int)$this->order->id);
         $this->order->current_state = $order_history->id_order_state;
         try {
             $this->order->update();
