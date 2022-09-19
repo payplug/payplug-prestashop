@@ -416,6 +416,9 @@ class PaymentClass
                     $is_bancontact = true;
                     $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.bancontact', 'paymentclass');
                     break;
+                case 'apple_pay':
+                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.applepay', 'paymentclass');
+                    break;
                 case 'american_express':
                     $is_amex = true;
                     $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.amex', 'paymentclass');
