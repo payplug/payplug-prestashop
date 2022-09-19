@@ -416,6 +416,7 @@ $_MODULE['<{payplug}prestashop>paymentclass_966b4c4d017888219a6e6c1d96fa139e'] =
 $_MODULE['<{payplug}prestashop>paymentclass_986cdbb05721ddb9a91e7e0b8a7d1514'] = 'Show payment schedule on the checkout page';
 $_MODULE['<{payplug}prestashop>paymentclass_9bf217744be4e0ee492005a526bc6953'] = 'Oney 4x without fees';
 $_MODULE['<{payplug}prestashop>paymentclass_9ea5e176a20f9f14c8a7c6d75cd9e084'] = 'The total amount of your order must be between %d€ and %d€ to pay with Oney.';
+$_MODULE['<{payplug}prestashop>paymentclass_9eecd680a6cab55fc512d4457ad0b765'] = 'Apple Pay';
 $_MODULE['<{payplug}prestashop>paymentclass_b03b16e62130450640365492263f0c9a'] = 'without fees';
 $_MODULE['<{payplug}prestashop>paymentclass_b36ec167248ce836c4f4a942c17140ae'] = 'Activate non-guaranteed fractional payments';
 $_MODULE['<{payplug}prestashop>paymentclass_b6bb2c2741d0e8d6bf3482324c6af55a'] = 'Pay with Bancontact';
