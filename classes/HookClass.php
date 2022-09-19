@@ -591,10 +591,6 @@ class HookClass
 
             $single_payment = $this->dependencies->paymentClass->buildPaymentDetails($payment);
 
-            if (isset($single_payment['type']) && $single_payment['type'] == 'apple_pay') {
-                $single_payment['type'] = 'Apple Pay';
-            }
-
             $amount_refunded_payplug = ($payment->amount_refunded) / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);

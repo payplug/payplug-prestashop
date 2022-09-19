@@ -394,6 +394,7 @@ class PaymentClass
         $is_oney = false;
         $is_amex = false;
         $is_bancontact = false;
+        $is_applepay = false;
         if (isset($payment->payment_method) && isset($payment->payment_method['type'])) {
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
@@ -415,6 +416,9 @@ class PaymentClass
                 case 'bancontact':
                     $is_bancontact = true;
                     $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.bancontact', 'paymentclass');
+                    break;
+                case 'apple_pay':
+                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.applepay', 'paymentclass');
                     break;
                 case 'american_express':
                     $is_amex = true;
