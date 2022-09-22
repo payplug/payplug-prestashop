@@ -78,11 +78,10 @@
         <p>
             {l s='standard.block.installment.description' mod='payplug'}
             {if isset($installments_panel_url) && $installments_panel_url}
-                {capture assign=installmentPanelLink}{$installments_panel_url}{/capture}
                 {capture assign=installmentPanelLinkText}{l s='standard.block.installment.panel.link.text' mod='payplug'}{/capture}
                 {include file='./../../atoms/link/link.tpl'
                 linkText=$installmentPanelLinkText|escape:'htmlall':'UTF-8'
-                linkHref=$installmentPanelLink|escape:'htmlall':'UTF-8'
+                linkHref=$installments_panel_url
                 linkTarget='_blank'
                 linkData='data-panelInstallmentLink'}
             {/if}
