@@ -344,8 +344,6 @@ class AdminClass
                                 $return['payplug_deferred'] = $value;
                             }
                             break;
-
-
                     }
                 }
             }
