@@ -61,7 +61,8 @@ class PrestashopSpecific17
         $this->context->controller->addCSS($views_path . '/css/front-v'.$this->dependencies->version.'.css');
         $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
         $this->context->controller->addJS($views_path . '/js/front-v'.$this->dependencies->version.'.js');
-        if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+        if ($this->dependencies->configClass->isValidFeature('feature_applepay')
+            && (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')) === true) {
             Media::addJsDef(
                 [
                     $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
