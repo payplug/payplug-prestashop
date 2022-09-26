@@ -64,7 +64,8 @@ var $document,
                     is_inst: null,
                     is_oney: null,
                     oney_form: null,
-                    is_bancontact: null
+                    is_bancontact: null,
+                    is_amex: null
                 };
 
                 options = $.extend(default_options, options);
@@ -77,6 +78,9 @@ var $document,
                 }
                 if (options['is_bancontact'] === true) {
                     data.bancontact = 1;
+                }
+                if (options['is_amex'] === true) {
+                    data.amex = 1;
                 }
 
                 if (options['is_oney']) {
@@ -188,13 +192,14 @@ var $document,
                 var $link = $(this),
                     is_inst = $link.is('.installment'),
                     is_bancontact = $link.is('.bancontact'),
+                    is_amex = $link.is('.amex'),
                     spinner_url= $('input:hidden[name=spinner_url]').val();
 
                 if (($('#form_payplug_payment').length && !is_inst)) {
                     return false;
                 }
 
-                payplugModule.payment.send({id_card: 'new_card', is_inst: is_inst, is_bancontact: is_bancontact});
+                payplugModule.payment.send({id_card: 'new_card', is_inst: is_inst, is_bancontact: is_bancontact, is_amex: is_amex});
 
                 return false;
             },
