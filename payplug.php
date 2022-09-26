@@ -140,11 +140,11 @@ class Payplug extends PaymentModule
             'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
             'actionAdminPerformanceControllerAfter',
-            'actionCarrierUpdate',
+            //'actionCarrierUpdate',
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
             'actionExportGDPRData',
-            'actionObjectCarrierAddAfter',
+            //'actionObjectCarrierAddAfter',
             'actionOrderStatusUpdate',
             'actionObjectOrderStateAddAfter',
             'actionObjectOrderStateUpdateAfter',
@@ -159,11 +159,11 @@ class Payplug extends PaymentModule
             'displayProductPriceBlock',
             'displayAdminStatusesForm',
             'header',
-            'moduleRoutes',
+            //'moduleRoutes',
             'payment',
             'paymentReturn',
             'paymentOptions',
-            'registerGDPRConsent',
+            //'registerGDPRConsent',
         ];
     }
 
