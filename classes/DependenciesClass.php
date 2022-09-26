@@ -387,7 +387,12 @@ class DependenciesClass
      */
     public function loadAdapterPresta()
     {
-        $AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter' . _PS_VERSION_[0] . _PS_VERSION_[2];
+        //$AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter' . _PS_VERSION_[0] . _PS_VERSION_[2];
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter16';
+        } else {
+            $AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter17';
+        }
         if (class_exists($AdapterClass)) {
             return new $AdapterClass();
         }
@@ -442,7 +447,7 @@ class DependenciesClass
             return [];
         }
 
-        $return = Tools::jsonDecode($jsonContent);
+        $return = json_decode($jsonContent);
 
         return $return;
     }
