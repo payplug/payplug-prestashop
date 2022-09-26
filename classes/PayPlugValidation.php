@@ -638,6 +638,6 @@ class PayPlugValidation
         ]);
         $this->logger->addLog('Redirecting to order-confirmation page');
 
-        Tools::redirect($link_redirect);
+        $this->toolsAdapter->tool('redirect', $link_redirect);
     }
 }
