@@ -1161,6 +1161,7 @@ class PaymentClass
                     'value' => 'amex',
                 ],
             ],
+            'tpl' => 'unified.tpl',
             'extra_classes' => 'amex',
             'payment_controller_url' => $this->context->link->getModuleLink(
                 $this->dependencies->name,
