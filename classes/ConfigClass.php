@@ -854,16 +854,19 @@ class ConfigClass
             $this->assignSwitchConfiguration($this->configurations);
         }
 
+        $errorOneyThresholds = sprintf(
+            $this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass'),
+            $oney_min_amounts,
+            $oney_max_amounts
+        );
+        $errorInstallmentAmount = $this->dependencies->l('config.assignContentVar.installment.amountError', 'configclass');
+
         Media::addJsDef(
             [
-                'errorOneyThresholds' => sprintf(
-                    $this->dependencies->l('config.assignContentVar.oney.thresholdsError', 'configclass'),
-                    $oney_min_amounts,
-                    $oney_max_amounts
-                ),
+                'errorOneyThresholds' => addslashes($errorOneyThresholds),
                 'oney_max_amounts' => $oney_max_amounts,
                 'oney_min_amounts' => $oney_min_amounts,
-                'errorInstallmentAmount' => $this->dependencies->l('config.assignContentVar.installment.amountError', 'configclass'),
+                'errorInstallmentAmount' => addslashes($errorInstallmentAmount),
                 'inst_min_amount' => Configuration::get($this->dependencies->getConfigurationKey('instMinAmount'))
             ]
         );
