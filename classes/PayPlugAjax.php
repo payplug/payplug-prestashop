@@ -94,12 +94,14 @@ class PayPlugAjax
                     ) == 1;
                     $is_oney = $tools->tool('getValue', 'io');
                     $is_bancontact = $tools->tool('getValue', 'bancontact');
+                    $is_amex = $tools->tool('getValue', 'amex');
                     $options = [
                         'id_card' => $tools->tool('getValue', 'pc'),
                         'is_installment' => $is_installment,
                         'is_deferred' => $is_deferred,
                         'is_bancontact' => $is_bancontact,
                         'is_oney' => $is_oney,
+                        'is_amex' => $is_amex,
                         '_ajax' => 1,
                     ];
                     $payment = $this->paymentClass->preparePayment($options);
