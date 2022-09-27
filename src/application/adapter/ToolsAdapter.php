@@ -44,4 +44,9 @@ class ToolsAdapter implements ToolsInterface
     {
         return Tools::substr($string, $offset, $length);
     }
+
+    public function jsonDecode($data, $assoc = false, $depth = 512, $options = 0)
+    {
+        return Tools::jsonDecode($data, $assoc, $depth, $options);
+    }
 }
