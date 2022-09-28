@@ -31,6 +31,8 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
+        \PayPlug\src\utilities\helpers\UrlHelper::register();
+
         $this->dependencies = new \PayPlug\classes\DependenciesClass();
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();

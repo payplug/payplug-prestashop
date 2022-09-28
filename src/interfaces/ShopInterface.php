@@ -28,4 +28,5 @@ interface ShopInterface
     public function get($idShop);
     public function isFeatureActive();
     public function setContext();
+    public function getBaseURL($id_shop, $auto_secure_mode, $add_base_uri);
 }

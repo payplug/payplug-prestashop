@@ -49,4 +49,9 @@ class ToolsAdapter implements ToolsInterface
     {
         return Tools::jsonDecode($data, $assoc, $depth, $options);
     }
+
+    public function getAllValues()
+    {
+        return Tools::getAllValues();
+    }
 }

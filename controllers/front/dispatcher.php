@@ -46,6 +46,8 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      */
     public function postProcess()
     {
+        \PayPlug\src\utilities\helpers\UrlHelper::register();
+
         if ($method = $this->toolsAdapter->tool('getValue', 'method')) {
             $id_cart = (int)$this->toolsAdapter->tool('getValue', 'id_cart');
             $id_card = $this->toolsAdapter->tool('getValue', 'pc');

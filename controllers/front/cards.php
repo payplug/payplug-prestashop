@@ -45,6 +45,12 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
     }
 
+    public function postProcess()
+    {
+        \PayPlug\src\utilities\helpers\UrlHelper::register();
+        return parent::postProcess();
+    }
+
     /**
      * @see FrontController::initContent()
      */

@@ -233,6 +233,20 @@ class SQLtableRepository
             return false;
         }
 
+        // Create module Url
+        $this->query
+            ->create()
+            ->table(_DB_PREFIX_ . $this->dependencies->name . '_url')
+            ->fields('`id_payplug_url` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`key` VARCHAR(64) NOT NULL')
+            ->fields('`url` VARCHAR(256) NOT NULL')
+            ->engine(_MYSQL_ENGINE_);
+
+        if (!$this->query->build()) {
+            $log->error('Installation SQL failed: ' . $this->dependencies->name . '_URL.');
+            return false;
+        }
+
         $log->info('Installation SQL ended.');
         return true;
     }
@@ -260,6 +274,7 @@ class SQLtableRepository
             _DB_PREFIX_ . $this->dependencies->name . '_cache',
             _DB_PREFIX_ . $this->dependencies->name . '_order_payment',
             _DB_PREFIX_ . $this->dependencies->name . '_order_state',
+            _DB_PREFIX_ . $this->dependencies->name . '_url',
         ];
 
         if (!$keep_cards) {

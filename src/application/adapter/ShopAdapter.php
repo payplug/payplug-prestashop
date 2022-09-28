@@ -45,4 +45,13 @@ class ShopAdapter implements ShopInterface
     {
         return Shop::setContext(Shop::CONTEXT_ALL);
     }
+
+    public function getBaseURL($id_shop = 0, $auto_secure_mode = false, $add_base_uri = true)
+    {
+        if (!$id_shop || !is_int($id_shop)) {
+            return '';
+        }
+        $shop = self::get($id_shop);
+        return $shop->getBaseURL($auto_secure_mode, $add_base_uri);
+    }
 }

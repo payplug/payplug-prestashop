@@ -23,8 +23,18 @@
 
 class PayplugToolsModuleFrontController extends ModuleFrontController
 {
+    private $dependencies;
+
     public function postProcess()
     {
+        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $toolsAdapter = $this->dependencies->getPlugin()->getTools();
+
+        if ($toolsAdapter->tool('getIsset', 'getModuleRoutes')) {
+            $routes = \PayPlug\src\utilities\helpers\UrlHelper::getAll();
+            die(json_encode(['routes' => $routes]));
+        }
+
         return parent::postProcess();
     }
 }

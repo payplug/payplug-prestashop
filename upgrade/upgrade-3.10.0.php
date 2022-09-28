@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_10_0()
+function upgrade_module_3_10_0($object)
 {
     $flag = true;
 
@@ -34,6 +34,15 @@ function upgrade_module_3_10_0()
         'PAYPLUG_AMEX',
         null
     );
+
+    // Create new table to register module url
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name.'_url` (
+                `id_payplug_url` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                `key` VARCHAR(64) NOT NULL,
+                `url` VARCHAR(256) NOT NULL
+            ) ENGINE=' . _MYSQL_ENGINE_;
+
+    $flag = $flag && Db::getInstance()->execute($sql);
 
     return $flag;
 }

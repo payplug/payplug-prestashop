@@ -49,6 +49,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
      */
     public function postProcess()
     {
+        \PayPlug\src\utilities\helpers\UrlHelper::register();
+
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $ajax = new \PayPlug\classes\PayPlugAjax();
             $ajax->run();
