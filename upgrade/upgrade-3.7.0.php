@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-use Db;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
