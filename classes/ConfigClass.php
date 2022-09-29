@@ -866,6 +866,8 @@ class ConfigClass
                 'inst_min_amount' => $this->config->get($this->dependencies->getConfigurationKey('instMinAmount'))
             ]
         );
+        // check if oney belgum is allowed for this module
+        $oney_belgium = $this->isValidFeature('feature_belgian_oney') && in_array('BE', explode(",", $this->config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries'))));
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -908,6 +910,7 @@ class ConfigClass
             'oney_custom_max_amounts' => $oney_custom_max_amounts,
             'oney_custom_min_amounts' => $oney_custom_min_amounts,
             'iso' => $this->context->language->iso_code,
+            'oney_belgium' => $oney_belgium,
             'onboardingOneyCompleted' => $this->isOnboardingOneyCompleted(),
             'paymentMethods' => $this->dependencies->paymentClass->getPaymentMethods(),
             'onBoardingCheck' => false

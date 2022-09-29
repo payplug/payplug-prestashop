@@ -21,6 +21,12 @@
 *}
 
 {* Advanced Paylater Settings *}
+{if $oney_belgium}
+    {include file='./../../atoms/textAlert/textAlert.tpl'
+    textAlertType='warning'
+    textAlertText={l s='paylater.alertContent' tags=['<br>'] mod='payplug'}}
+{/if}
+
 {capture assign="paylaterAdvancedTitle"}{l s='paylater.block.accordionTitle' mod='payplug'}{/capture}
 {capture assign="paylaterAdvancedContent"}
     {capture assign="thresholdsTitle"}{l s='paylater.block.thresholdsTitle' mod='payplug'}{/capture}

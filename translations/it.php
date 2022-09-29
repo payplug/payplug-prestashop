@@ -361,6 +361,7 @@ $_MODULE['<{payplug}prestashop>paylater_advanced_6ac582bbcc5ea9159e91318fddbfdac
 $_MODULE['<{payplug}prestashop>paylater_advanced_7d1099b228b2b96f30eaaa8bd5052fe2'] = 'Visualizza il logo Oney sulla pagina prodotto';
 $_MODULE['<{payplug}prestashop>paylater_advanced_80142c6e69c0f9cbfb72359668d152d4'] = 'e';
 $_MODULE['<{payplug}prestashop>paylater_advanced_8d604a04ff58a0ac82ba9df9a1aff105'] = 'I tuoi clienti possono scegliere di pagare gli ordini in 3 o 4 rate. Scegli qui sotto se vuoi prendere a tuo carico tutti i costi (o meno). [1]Per saperne di più.[/1]';
+$_MODULE['<{payplug}prestashop>paylater_advanced_8e3ffade00001a4b882076cdd72414b7'] = 'Please note: due to Belgian microcredit regulations, payment in 4x instalments is not available.[1] Only the 3x instalments payment option will appear on your store.';
 $_MODULE['<{payplug}prestashop>paylater_advanced_912c4c5bcef386d618d4069652369009'] = 'Impostazioni avanzate';
 $_MODULE['<{payplug}prestashop>paylater_advanced_afafab57d74470e88a32b75fbf7585c8'] = 'Personalizza la tua offerta di pagamento rateale';
 $_MODULE['<{payplug}prestashop>paylater_advanced_ef7c4029dae4055307a23b8ea0f301cd'] = 'Proporre pagamenti rateali garantiti per importi compresi tra';
