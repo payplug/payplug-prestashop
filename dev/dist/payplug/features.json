@@ -6,7 +6,6 @@
         "feature_display_mode",
         "feature_installment",
         "feature_oney",
-        "feature_standard",
-        "feature_amex"
+        "feature_standard"
     ]
 }
