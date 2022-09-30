@@ -338,7 +338,7 @@ class HookClass
         $amount_refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
 
         $inst_id = null;
-        $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCart($order->id_cart);
+        $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCart((int)$order->id_cart);
         $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
 
         // Backward if order validated before
