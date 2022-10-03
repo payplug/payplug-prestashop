@@ -1046,26 +1046,26 @@ class PaymentClass
             ],
             'advancedOptions' => [
                 'thresholds' => [
-                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-thresholds.svg',
+                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-thresholds.jpg',
                     'title' => $this->dependencies->l('paymentMethod.oneyThresholdsOption.title', 'paymentclass'),
                     'switch' => false,
                 ],
                 'optimised' => [
-                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-optimized.svg',
+                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-optimized.jpg',
                     'title' => $this->dependencies->l('paymentMethod.oneyOptimisedOption.title', 'paymentclass'),
                     'switch' => true,
                     'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_optimized')),
                     'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_optimized')),
                 ],
                 'product' => [
-                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-productOneyCta',
+                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-productOneyCta.jpg',
                     'title' => $this->dependencies->l('paymentMethod.productOneyCta.title', 'paymentclass'),
                     'switch' => true,
                     'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_product_cta')),
                     'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_product_cta')),
                 ],
                 'cart' => [
-                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-cartOneyCta',
+                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-cartOneyCta.jpg',
                     'title' => $this->dependencies->l('paymentMethod.productOneyCta.title', 'paymentclass'),
                     'switch' => true,
                     'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_cart_cta')),
