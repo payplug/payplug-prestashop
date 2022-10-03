@@ -47,6 +47,6 @@ class ToolsAdapter implements ToolsInterface
 
     public function jsonDecode($data, $assoc = false, $depth = 512, $options = 0)
     {
-        return Tools::jsonDecode($data, $assoc, $depth, $options);
+        return json_decode($data, $assoc, $depth, $options);
     }
 }
