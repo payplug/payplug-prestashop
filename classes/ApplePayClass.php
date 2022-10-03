@@ -44,7 +44,8 @@ class ApplePayClass
         $additionalPaymentRequestDatas = array();
         $currency = $this->currency->getCurrency($this->context->cart->id_currency);
 
-        if ($page != 'order') {
+        // Uncomment this when page panier developments will starts
+        /*if ($page != 'order') {
             $carriers = $this->carrier->getCarriers($this->context->language->id, true);
             $shippingMethods = array();
 
@@ -77,7 +78,7 @@ class ApplePayClass
                     )
                 ),
             );
-        }
+        }*/
 
         $applePayPaymentRequest = array(
             'countryCode' => $this->context->country->iso_code,
