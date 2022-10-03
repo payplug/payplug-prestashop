@@ -110,7 +110,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         ;
                     } else {
                         $id_product_attribute = $group ?
-                            (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) :
+                            (int)$this->productAdapter->getIdProductAttributeByIdAttributes($id_product, $group) :
                             0
                         ;
                     }
@@ -144,7 +144,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 if ($id_product = (int)$tools->tool('getValue', 'id_product')) {
                     $group = $tools->tool('getValue', 'group');
                     $id_product_attribute = $group ?
-                        (int)Product::getIdProductAttributeByIdAttributes($id_product, $group) :
+                        (int)$this->productAdapter->getIdProductAttributeByIdAttributes($id_product, $group) :
                         0
                     ;
                     // Some integration will not use qty data but quantity_wanted

@@ -401,10 +401,10 @@ class Payplug extends PaymentModule
      * @param $params
      * @return mixed
      */
-    public function hookPaymentOptions($params)
+    public function hookPaymentOptions()
     {
         if ($this->module) {
-            return $this->payplug_dependencies->hookClass->paymentOptions($params);
+            return $this->payplug_dependencies->hookClass->paymentOptions();
         }
     }
 

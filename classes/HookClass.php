@@ -1187,7 +1187,7 @@ class HookClass
      *
      * @return array
      */
-    public function paymentOptions($params)
+    public function paymentOptions()
     {
         if (!$this->dependencies->configClass->isAllowed()) {
             return false;
