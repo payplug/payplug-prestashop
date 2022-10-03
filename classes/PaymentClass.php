@@ -1128,14 +1128,14 @@ class PaymentClass
             $allowed_feature = $this->dependencies->configClass->isValidFeature('feature_' . $available_payment_option);
             if (isset($options[$available_payment_option]) && $options[$available_payment_option] && $allowed_feature) {
                 $method = 'get' . $this->tools->tool('ucfirst', $available_payment_option) . 'PaymentOption';
-                $payment_options = $this->$method($payment_options, $options);
+                $payment_options = $this->$method($payment_options);
             }
         }
 
         return $payment_options;
     }
 
-    private function getAmexPaymentOption($payment_options, $options = [])
+    private function getAmexPaymentOption($payment_options)
     {
         $payment_options['amex'] = [
             'name' => 'amex',
