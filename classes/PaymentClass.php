@@ -1128,7 +1128,7 @@ class PaymentClass
             $allowed_feature = $this->dependencies->configClass->isValidFeature('feature_' . $available_payment_option);
             if (isset($options[$available_payment_option]) && $options[$available_payment_option] && $allowed_feature) {
                 $method = 'get' . $this->tools->tool('ucfirst', $available_payment_option) . 'PaymentOption';
-                $payment_options = $this->$method($payment_options);
+                $payment_options = $this->$method($payment_options, $options);
             }
         }
 
@@ -1370,7 +1370,7 @@ class PaymentClass
             'action' => $this->context->link->getModuleLink(
                 $this->dependencies->name,
                 'dispatcher',
-                ['def' => (int)$options['deferred']],
+                ['def' => isset($options['deferred']) ? (int)$options['deferred'] : 0],
                 true
             ),
             'moduleName' => $this->dependencies->name
@@ -1523,7 +1523,7 @@ class PaymentClass
     private function getStandardPaymentOption($payment_options, $options = [])
     {
         //One Click Payment
-        if ($options['one_click']) {
+        if (isset($options['one_click']) && $options['one_click']) {
             $cards = $this->card->getByCustomer((int)$this->context->customer->id, true);
             foreach ($cards as $card) {
                 $brand = ($card['brand'] != 'none')
@@ -1575,7 +1575,7 @@ class PaymentClass
                     'action' => $this->context->link->getModuleLink(
                         $this->dependencies->name,
                         'dispatcher',
-                        ['def' => (int)$options['deferred']],
+                        ['def' => isset($options['deferred']) ? (int)$options['deferred'] : 0],
                         true
                     ),
                     'moduleName' => $this->dependencies->name
@@ -1626,7 +1626,7 @@ class PaymentClass
             'action' => $this->context->link->getModuleLink(
                 $this->dependencies->name,
                 'dispatcher',
-                ['def' => (int)$options['deferred']],
+                ['def' => isset($options['deferred']) ? (int)$options['deferred'] : 0],
                 true
             ),
             'moduleName' => $this->dependencies->name
