@@ -28,6 +28,7 @@
             ".*",
             "!.htaccess",
             "!pspaylater/composer.json",
+            "!pspaylater/module_files.csv",
             "dev",
             "*.sh",
             "test",

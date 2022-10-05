@@ -101,25 +101,17 @@ build zip release:
   stage: build
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
-    - php ./dev/ci/generate-version.php
-    - php ./dev/ci/generate-upgrade.php
-    - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - rm -rf ./vendor
     - composer install --no-dev
     - rm webpack.config.js
     - ./dev/ci/secure_directories.sh
     - git status
     - ./dev/ci/assets_revision.sh -b payplug
-    - mkdir payplug
     - php ./dev/ci/import-translations.php
     - ./dev/ci/copy_translations.sh
   script:
     - shopt -s extglob
-    - mv !(payplug|composer.json) payplug
-    - cp composer.json ./payplug
-    - composer archive --file payplug_$CI_COMMIT_REF_NAME --format zip
-    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./payplug/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
-    - composer archive --file payplug_qa_$CI_COMMIT_REF_NAME --format zip
+    - ./dev/ci/build.sh -n payplug -c $CI_COMMIT_REF_NAME
   artifacts:
     paths:
       - payplug_$CI_COMMIT_REF_NAME.zip
@@ -156,9 +148,6 @@ build zip pspaylater:
   stage: build-pspaylater
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
-    - php ./dev/ci/generate-version.php
-    - php ./dev/ci/generate-upgrade.php
-    - php ./vendor/bin/php-cs-fixer fix -vvv upgrade
     - ls -als ./vendor
     - rm -rf ./vendor
     - ./dev/ci/set_namespace.sh
@@ -173,11 +162,7 @@ build zip pspaylater:
     - ./dev/ci/copy_translations.sh
   script:
     - shopt -s extglob
-    - mv !(pspaylater|composer.json) pspaylater
-    - cp composer.json ./pspaylater
-    - composer archive --file pspaylater_$CI_COMMIT_REF_NAME --format zip
-    - sed -i 's/api.payplug.com/api-qa.payplug.com/' ./pspaylater/vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php
-    - composer archive --file pspaylater_qa_$CI_COMMIT_REF_NAME --format zip
+    - ./dev/ci/build.sh -n pspaylater -c $CI_COMMIT_REF_NAME
   artifacts:
     paths:
       - pspaylater_$CI_COMMIT_REF_NAME.zip
