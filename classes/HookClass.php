@@ -1019,10 +1019,8 @@ class HookClass
         if ($this->config->get(
             $this->dependencies->getConfigurationKey('applepay')
         )) {
-            $applePayPaymentRequest = $this->dependencies->applePayClass->getPaymentRequest($this->dispatcher->getInstance()->getController());
-
             $this->media->addJsDef([
-                'applePayPaymentRequest' => $applePayPaymentRequest,
+                'applePayPaymentRequestAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypaymentrequest', [], true),
                 'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
                 'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
                 'applePayIdCart' => $this->context->cart->id
