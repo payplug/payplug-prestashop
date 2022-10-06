@@ -22,9 +22,23 @@
 var $document, $window;
 window[module_name+'ModuleApplePay'] = {
     init: function () {
-        $('apple-pay-button').click(function() {
+        $('apple-pay-button:visible').click(function() {
+            var data='';
+            $.ajax({
+                method: "POST",
+                url: applePayPaymentRequestAjaxURL,
+                async: false
+            })
+            .success(function (datas) {
+                data = JSON.parse(datas);
+            })
+            .error(function () {
+                $('#apple-pay-button').css('pointer-events', 'auto');
+                payplugModule.popup.set(payplug_transaction_error_message);
+            })
+
             // Define ApplePayPaymentRequest
-            const request = applePayPaymentRequest;
+            const request = data.applePayPaymentRequest;
 
             // Create ApplePaySession
             const session = new ApplePaySession(3, request);
