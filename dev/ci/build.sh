@@ -19,6 +19,9 @@ composer archive --file tmp --format zip
 echo "Unzip tmp.zip..."
 unzip tmp.zip -d tmp
 
+echo "... then add composer.json to the temporary folder..."
+cp composer.json tmp/composer.json
+
 echo "... then list the file contained"
 php dev/ci/list_module_files.php tmp
 
