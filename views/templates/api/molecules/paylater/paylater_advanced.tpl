@@ -109,7 +109,7 @@
     {capture assign="cartOneyCtaContent"}
     {/capture}
 
-    {assign var='paylaterAdvancedOptions' value=[
+    {assign var='paylaterBasicOptions' value=[
         [
             'className' => 'thresholds',
             'title' => $thresholdsTitle,
@@ -121,7 +121,10 @@
             'title' => $optimizedTitle,
             'content' => $optimizedContent,
             'switch' => $optimizedSwitch
-        ],
+        ]
+
+    ]}
+    {assign var="paylaterCartAndProductOptions" value=[
         [
             'className' => 'productOneyCta',
             'title' => $productOneyCtaTitle,
@@ -135,6 +138,12 @@
             'switch' => $cartOneyCtaSwitch
         ]
     ]}
+    {if !($oney_belgium || $oney_spain)}
+        {assign var='paylaterAdvancedOptions' value = $paylaterBasicOptions|array_merge:$paylaterCartAndProductOptions}
+    {else}
+        {assign var='paylaterAdvancedOptions' value = $paylaterBasicOptions}
+    {/if}
+
     {foreach $paylaterAdvancedOptions as $paylaterAdvancedOption}
         {include file='./paylater_advanced_option.tpl'
             paylaterAdvancedOptionClassName=$paylaterAdvancedOption.className
