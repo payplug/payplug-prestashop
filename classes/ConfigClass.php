@@ -875,7 +875,7 @@ class ConfigClass
         ), 'BE')['result'] ;
 
 
-        $oney_spain =$this->isValidFeature('feature_belgium_oney') &&  $oneyValidator->isOneyAllowedCountry($this->config->get(
+        $oney_spain =$this->isValidFeature('feature_spain_oney') &&  $oneyValidator->isOneyAllowedCountry($this->config->get(
             $this->dependencies->getConfigurationKey(
                 'oneyAllowedCountries'
             )
