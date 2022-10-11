@@ -1429,8 +1429,18 @@ class PaymentClass
         if ($iso != 'IT' && $iso != 'FR') {
             $iso = $this->config->get($this->dependencies->getConfigurationKey('companyIso'));
         }
+        $shipping_address = $this->getShippingAddress($this->address, $this->context->cart);
+        $billing_address = $this->getBillingAddress($this->address, $this->context->cart);
+        $shipping_iso = $this->getShippingIso($shipping_address);
+        $billing_iso = $this->getBillingIso($billing_address);
 
-        $available_oney_payments = $this->oney->oneyEntity->getOperations();
+        if ($this->dependencies->configClass->isValidFeature('feature_belgium_oney')
+            && in_array('BE', explode(",", $this->config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries'))))
+            && ($shipping_iso == $billing_iso) && ($shipping_iso == 'BE')) {
+            $available_oney_payments = $this->oney->oneyEntity->getOperations(["x4_without_fees", "x4_with_fees"]);
+        } else {
+            $available_oney_payments = $this->oney->oneyEntity->getOperations();
+        }
         foreach ($available_oney_payments as $oney_payment) {
             $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
@@ -2486,6 +2496,25 @@ class PaymentClass
         return (bool)$this->context->cookie->__get($this->dependencies->name . 'Errors');
     }
 
+    public function getShippingAddress($address, $cart)
+    {
+        return $address->get((int)$cart->id_address_delivery);
+    }
+
+    public function getBillingAddress($address, $cart)
+    {
+        return $address->get((int)$cart->id_address_invoice);
+    }
+
+    public function getShippingIso($shipping_address)
+    {
+        return $this->dependencies->configClass->getIsoCodeByCountryId((int)$shipping_address->id_country);
+    }
+
+    public function getBillingIso($billing_address)
+    {
+        return $this->dependencies->configClass->getIsoCodeByCountryId((int)$billing_address->id_country);
+    }
     public function getBrowser()
     {
         $arr_browsers = ["Opera", "Edg", "Chrome", "Safari", "Firefox", "MSIE", "Trident"];
