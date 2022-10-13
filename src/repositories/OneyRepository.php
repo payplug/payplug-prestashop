@@ -549,9 +549,15 @@ class OneyRepository extends BaseClass
      */
     public function getOneyCTA($env = null)
     {
+        $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
+        $amount = $this->contextAdapter->getContext()->cart->getOrderTotal($use_taxes);
+        $is_elligible = $this->isValidOneyAmount($amount);
+        $is_elligible = $is_elligible['result'];
+
         $this->assign->assign([
             'env' => $env,
-            'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository')
+            'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
+            'payplug_is_oney_elligible' => $is_elligible
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
