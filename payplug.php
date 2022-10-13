@@ -451,7 +451,7 @@ class Payplug extends PaymentModule
             }
 
             // Clean external files
-            \PayPlug\src\utilities\helpers\FilesHelper::clean();
+            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
 
             return $flag;
         }
