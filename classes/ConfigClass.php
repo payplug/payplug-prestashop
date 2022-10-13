@@ -1182,7 +1182,7 @@ class ConfigClass
             return null;
         }
         if (!is_object($country)) {
-            $country = $this->country->get($country);
+            $country = $this->country->get((int)$country);
         }
         if (!$this->validate->validate('isLoadedObject', $country)) {
             return null;

@@ -140,7 +140,7 @@ class OrderStateRepository extends BaseClass
             $id_order_state = $this->getOrderStateByConfiguration($state['cfg']);
             if ($id_order_state) {
                 // Valide order state
-                $os = $this->order_state_adapter->get($id_order_state);
+                $os = $this->order_state_adapter->get((int)$id_order_state);
                 if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
                     return $this->configuration->updateValue($key_config, $os->id);
                 }
@@ -163,7 +163,7 @@ class OrderStateRepository extends BaseClass
         }
 
         // Check if order state is valid
-        $order_state = $this->order_state_adapter->get($id_order_state);
+        $order_state = $this->order_state_adapter->get((int)$id_order_state);
         if (!$this->validate->validate('isLoadedObject', $order_state)
             || (isset($order_state->deleted) && $order_state->deleted)) {
             $id_order_state = $this->add($name, $state, $sandbox);
