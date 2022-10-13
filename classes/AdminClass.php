@@ -214,7 +214,7 @@ class AdminClass
                     $this->dependencies->getConfigurationKey('deferredState')
                 )) {
                 $id_order_state = $this->tools->tool('getValue', 'payplug_deferred_state');
-                $order_state = $this->orderState->get($id_order_state, $this->context->language->id);
+                $order_state = $this->orderState->get((int)$id_order_state, $this->context->language->id);
                 if ($this->tools->tool('getValue', 'payplug_deferred')) {
                     $this->context->smarty->assign([
                         'updated_deferred_state' => true,

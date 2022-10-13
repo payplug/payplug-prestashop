@@ -564,7 +564,7 @@ class OneyRepository extends BaseClass
      */
     public function getOneyDeliveryContext()
     {
-        $cart = $this->cartAdapter->get($this->contextAdapter->getContext()->cart->id);
+        $cart = $this->cartAdapter->get((int)$this->contextAdapter->getContext()->cart->id);
 
         if ($this->cartAdapter->isVirtualCart($cart)) {
             return [
@@ -574,7 +574,7 @@ class OneyRepository extends BaseClass
             ];
         }
 
-        $carrier = $this->carrierAdapter->get($cart->id_carrier);
+        $carrier = $this->carrierAdapter->get((int)$cart->id_carrier);
 
         if ($this->validateAdapter->validate('isLoadedObject', $carrier)) {
             return [
@@ -602,7 +602,7 @@ class OneyRepository extends BaseClass
     public function getOneyPaymentContext()
     {
         $cart_context = [];
-        $cart = $this->cartAdapter->get($this->contextAdapter->getContext()->cart->id);
+        $cart = $this->cartAdapter->get((int)$this->contextAdapter->getContext()->cart->id);
         if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return ['cart' => $cart_context];
         }

@@ -248,7 +248,7 @@ class HookClass
                         $ps_order_state_name .= ' [PayPlug]';
                     }
 
-                    $ps_order_state = $this->orderStateAdapter->get($this->config->get(
+                    $ps_order_state = $this->orderStateAdapter->get((int)$this->config->get(
                         $this->dependencies->concatenateModuleNameTo($payplug_conf)
                     ));
                     $ps_order_state->name[$params['lang']->id] = $ps_order_state_name;
