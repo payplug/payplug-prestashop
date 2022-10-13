@@ -430,8 +430,6 @@ class Payplug extends PaymentModule
         if ($this->module) {
             $flag = true;
 
-            \PayPlug\src\utilities\helpers\FilesHelper::clean();
-
             // Use for update module is not fully installed
             if (!$soft_install) {
                 $this->payplug_dependencies = null;
@@ -451,6 +449,9 @@ class Payplug extends PaymentModule
                     $flag = $flag && $this->registerHook($hook);
                 }
             }
+
+            // Clean external files
+            \PayPlug\src\utilities\helpers\FilesHelper::clean();
 
             return $flag;
         }
