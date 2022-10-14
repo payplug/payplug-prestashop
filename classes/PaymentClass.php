@@ -992,8 +992,8 @@ class PaymentClass
                             'enabledLabel' => 'On',
                             'disabledLabel' => 'Off',
                             'dataName' => 'bancontactCountrySwitch',
-                            'checked' => $this->config->get(
-                                $this->dependencies->getConfigurationKey('bancontact_country')
+                            'checked' => (bool)$this->config->get(
+                                $this->dependencies->getConfigurationKey('bancontactCountry')
                             ),
                             'className' => "bancontactCountrySwitch",
                             'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('bancontactCountry')),
@@ -1246,13 +1246,12 @@ class PaymentClass
 
     private function getBancontactPaymentOption($payment_options)
     {
-        if ($this->config->get($this->dependencies->getConfigurationKey('bancontactCountry'))) {
-            return $payment_options;
-        }
-
         $shipping_address = $this->address->get((int)$this->context->cart->id_address_delivery);
         $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int)$shipping_address->id_country);
-        if ($shipping_iso == 'BE') {
+        $invoice_address = $this->address->get((int)$this->context->cart->id_address_invoice);
+        $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int)$invoice_address->id_country);
+
+        if ((bool)$this->config->get($this->dependencies->getConfigurationKey('bancontactCountry')) && ($shipping_iso != 'BE' || $invoice_iso != 'BE')) {
             return $payment_options;
         }
 
