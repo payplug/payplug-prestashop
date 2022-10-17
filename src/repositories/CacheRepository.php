@@ -25,6 +25,8 @@ namespace PayPlug\src\repositories;
 
 use PayPlug\src\application\dependencies\BaseClass;
 use PayPlug\src\exceptions\BadParameterException;
+use DateInterval;
+use DateTime;
 
 class CacheRepository extends BaseClass
 {
@@ -174,10 +176,10 @@ class CacheRepository extends BaseClass
         $cache = reset($result);
 
         // if the cache is older than 48 hours, return false after delete it
-        $lifetime = new \DateInterval('P2D');
-        $date_limit = new \DateTime('now');
+        $lifetime = new DateInterval('P2D');
+        $date_limit = new DateTime('now');
         $date_limit->sub($lifetime);
-        $date_add = new \DateTime($cache['date_add']);
+        $date_add = new DateTime($cache['date_add']);
         if ($date_limit >= $date_add) {
             $this->deleteCacheByKey($cache_key);
 

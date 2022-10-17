@@ -53,6 +53,7 @@ class BaseOneyRepository extends RepositoryBase
             $this->context,
             $this->country,
             $this->currency,
+            $this->media,
             $this->dependencies,
             $this->logger,
             $this->myLogPhp,

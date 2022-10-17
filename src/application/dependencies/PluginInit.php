@@ -225,6 +225,7 @@ class PluginInit extends BaseClass
             $this->context,
             $this->country,
             $this->currency,
+            $this->media,
             $this->dependencies,
             $this->logger,
             $this->myLogPhp,

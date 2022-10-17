@@ -199,28 +199,33 @@ class InstallRepository extends BaseClass
             ];
         }
         $date = date('Y-m-d');
-        $queries = [];
+        $query = $this->dependencies->getPlugin()->getQuery();
+
         foreach ($prestashop_order_states as $key => $type) {
             $id_order_state = $this->config->get($key);
-            $getTypeQuery = ' 
-                SELECT `type` 
-                FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
-                WHERE  `id_order_state` = ' . $id_order_state;
-            $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
-            if ($sqlGetType && $sqlGetType != $type) {
-                $queries[] = 'UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
-                                 SET `type` = ' . "'{$type}'" . ' 
-                                 WHERE  `id_order_state` = ' . $id_order_state;
+
+            $order_state_type = $query
+                ->select()
+                ->fields('`type`')
+                ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
+                ->where('id_order_state = ' . (int)$id_order_state)
+                ->build('unique_value');
+
+            if ($order_state_type && $type == $order_state_type) {
+                $query
+                    ->update()
+                    ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
+                    ->set('type = "' . $query->escape($type) . '"')
+                    ->where('id_order_state = ' . (int)$id_order_state)
+                    ->build();
             } else {
-                $queries[] = 'INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
-                                (`id_order_state`, `type`, `date_add`, `date_upd`)
-                                VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
-            }
-        }
-        if ($queries) {
-            foreach ($queries as $sql) {
-                Db::getInstance()->execute($sql);
-                unset($sql);
+                $query
+                    ->insert()
+                    ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
+                    ->fields('id_order_state')->values((int)$id_order_state)
+                    ->fields('type')->values($query->escape($type))
+                    ->fields('date_add')->values($query->escape($date))
+                    ->fields('date_upd')->values($query->escape($date));
             }
         }
 

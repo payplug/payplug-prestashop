@@ -30,7 +30,6 @@ use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 class OneyRepository extends BaseClass
 {
     private $addressAdapter;
-    private $amountCurrencyClass;
     private $cache;
     private $dependencies;
     private $log;
@@ -39,6 +38,7 @@ class OneyRepository extends BaseClass
     private $contextAdapter;
     private $countryAdapter;
     private $currencyAdapter;
+    private $mediaAdapter;
     private $toolsAdapter;
     private $validateAdapter;
     private $assign;
@@ -53,6 +53,7 @@ class OneyRepository extends BaseClass
         $contextAdapter,
         $countryAdapter,
         $currencyAdapter,
+        $mediaAdapter,
         $dependencies,
         $logger,
         $myLogPHP,
@@ -70,6 +71,7 @@ class OneyRepository extends BaseClass
         $this->contextAdapter = $contextAdapter;
         $this->countryAdapter = $countryAdapter;
         $this->currencyAdapter = $currencyAdapter;
+        $this->mediaAdapter = $mediaAdapter;
         $this->toolsAdapter = $toolsAdapter;
         $this->validateAdapter = $validateAdapter;
         $this->oneyEntity = $oneyEntity;
@@ -117,7 +119,7 @@ class OneyRepository extends BaseClass
             && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart);
         } else {
-            $amount = $cart->getOrderTotal(true, \Cart::BOTH);
+            $amount = $cart->getOrderTotal(true);
             $is_elligible = $this->isValidOneyAmount($amount);
         }
         $this->assign->assign([
@@ -1239,7 +1241,7 @@ class OneyRepository extends BaseClass
         if ($this->validateAdapter->validate('isLoadedObject', $id_currency)) {
             $currency = $id_currency;
         } elseif (is_int($id_currency)) {
-            $currency = new \Currency($id_currency);
+            $currency = $this->currencyAdapter->get((int)$id_currency);
         } else {
             return false;
         }
@@ -1295,7 +1297,7 @@ class OneyRepository extends BaseClass
         }
 
         // check if current amount is between min and max values
-        $amount = $amount ? $amount : $cart->getOrderTotal(true, \Cart::BOTH);
+        $amount = $amount ? $amount : $cart->getOrderTotal(true);
         $is_valid_amount = $this->isValidOneyAmount($amount);
         if (!$is_valid_amount['result']) {
             $limits = $this->getOneyPriceLimit(true, $cart->id_currency);
@@ -1333,11 +1335,11 @@ class OneyRepository extends BaseClass
      */
     public function isValidOneyAddresses($id_shipping, $id_billing)
     {
-        $shipping = new \Address($id_shipping);
-        $shipping_country = new \Country($shipping->id_country);
+        $shipping = $this->addressAdapter->get((int)$id_shipping);
+        $shipping_country = $this->countryAdapter->get((int)$shipping->id_country);
 
-        $billing = new \Address($id_billing);
-        $billing_country = new \Country($billing->id_country);
+        $billing = $this->addressAdapter->get((int)$id_billing);
+        $billing_country = $this->countryAdapter->get((int)$billing->id_country);
 
         return $this->isValidOneyCountry($shipping_country->iso_code, $billing_country->iso_code);
     }
