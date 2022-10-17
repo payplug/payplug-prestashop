@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\MediaClass;
-use Media;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class HookRepository extends BaseClass
@@ -33,8 +31,6 @@ class HookRepository extends BaseClass
     protected $dependencies;
     protected $context;
     protected $tools;
-
-    private $mediaClass;
 
     public function __construct($dependencies, $constant, $context, $tools)
     {

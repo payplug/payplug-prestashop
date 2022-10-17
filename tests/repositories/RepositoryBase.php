@@ -53,6 +53,7 @@ class RepositoryBase extends TestCase
     protected $country;
     protected $currency;
     protected $language;
+    protected $media;
     protected $product;
     protected $shop;
     protected $tools;
@@ -96,6 +97,7 @@ class RepositoryBase extends TestCase
         $this->country              = MockHelper::createMockFactory('PayPlug\src\application\adapter\CountryAdapter');
         $this->currency             = MockHelper::createMockFactory('PayPlug\src\application\adapter\CurrencyAdapter');
         $this->language             = MockHelper::createMockFactory('PayPlug\src\application\adapter\LanguageAdapter');
+        $this->media                = MockHelper::createMockFactory('PayPlug\src\application\adapter\MediaAdapter');
         $this->order_state_adapter = MockHelper::createMockFactory('PayPlug\src\application\adapter\OrderStateAdapter');
         $this->product              = MockHelper::createMockFactory('PayPlug\src\application\adapter\ProductAdapter');
         $this->shop                 = MockHelper::createMockFactory('PayPlug\src\application\adapter\ShopAdapter');
