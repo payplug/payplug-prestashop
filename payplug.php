@@ -451,6 +451,7 @@ class Payplug extends PaymentModule
             }
 
             // Clean external files
+            //todo: Uncomment this line when clean script is ready
             // \PayPlug\src\utilities\helpers\FilesHelper::clean();
 
             return $flag;
@@ -494,7 +495,8 @@ class Payplug extends PaymentModule
     {
         if ($this->module) {
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
-            \PayPlug\src\utilities\helpers\FilesHelper::clean();
+            //todo: Uncomment this line when clean script is ready
+            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
         }
 
         return parent::runUpgradeModule();
