@@ -27,10 +27,10 @@
             titleText=$paymentMethodOption.title}
         <p class="_description">
             {$paymentMethodOption.description|escape:'htmlall':'UTF-8'}
-            {if isset($paymentMethodOption.externalLink) && $paymentMethodOption.externalLink}
+            {if isset($paymentMethodOption.link) && $paymentMethodOption.link}
                 {include file='./../../atoms/link/link.tpl'
                     linkText={l s='paymentMethodOption.link' mod='payplug'}
-                    linkHref=$paymentMethodOption.externalLink|escape:'htmlall':'UTF-8'
+                    linkHref=$paymentMethodOption.link|escape:'htmlall':'UTF-8'
                     linkTarget='_blank'
                     linkData='data-link'}
             {/if}
