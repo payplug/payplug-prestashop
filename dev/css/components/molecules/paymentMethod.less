@@ -5,7 +5,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    margin: @margin-4 0 0;
+    margin: @margin-4 0 @margin-6;
     position: relative;
 
     ._logo {
@@ -67,7 +67,7 @@
     ._additionnal {
       display: none;
       width: 100%;
-      padding: @padding-8 0 0 @padding-15;
+      padding: @padding-6 0 0 @padding-15;
       flex-direction: column;
 
       &.-show {
@@ -109,7 +109,7 @@
 
     ._advancedOption {
       &s {
-        margin: @margin-10 0 0 0;
+        margin: @margin-10 0 @margin-6 0;
 
         > div {
           width: 100%;
@@ -192,8 +192,8 @@
       }
     }
 
-    & + .paymentOption {
-      margin: 42px 0 0;
+    & + .paymentMethod {
+      margin: @margin-4 0 @margin-6;
     }
 
     &.-sandbox {
