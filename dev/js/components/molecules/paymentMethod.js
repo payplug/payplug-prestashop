@@ -13,10 +13,10 @@ class PaymentMethod {
     handleEvents() {
         $(document)
             .on('click', 'input[name=payplug_sandbox]', paymentMethod.handleSandbox)
-            .on('change', '.paymentOption_switch input', paymentMethod.handlePaymentOption)
-            .on('change', '.oneClickSwitch input', paymentMethod.handleOneClickPermission)
-            .on('change', '.deferredSwitch input', paymentMethod.handleDeferredPermission)
-            .on('change', '.installmentSwitch input', paymentMethod.handleInstallmentPermission);
+            .on('change', '.paymentMethod_switch input', paymentMethod.handlePaymentOption)
+            .on('change', 'input[name="payplug_one_click"]', paymentMethod.handleOneClickPermission)
+            .on('change', 'input[name="payplug_deferred"]', paymentMethod.handleDeferredPermission)
+            .on('change', 'input[name="payplug_inst"]', paymentMethod.handleInstallmentPermission);
         $(window)
             .on('reloadEvent', paymentMethod.handleReloadContent)
             .on('resetThresholders', paymentMethod.resetThresholders);
@@ -29,7 +29,7 @@ class PaymentMethod {
 
     handleDeferredPermission(event) {
         const $input = $(event.target),
-            $switch = $input.parents('.deferredSwitch'),
+            $switch = $input.parents('._switch').eq(0),
             $sandbox = $('input[name=payplug_sandbox]:checked');
 
         if (!parseInt($sandbox.val())) {
@@ -41,7 +41,7 @@ class PaymentMethod {
 
     handleInstallmentPermission(event) {
         const $input = $(event.target),
-            $switch = $input.parents('.installmentSwitch'),
+            $switch = $input.parents('._switch').eq(0),
             $sandbox = $('input[name=payplug_sandbox]:checked');
 
         if (!parseInt($sandbox.val())) {
@@ -52,7 +52,7 @@ class PaymentMethod {
     }
 
     handleOneClickPermission(event) {
-        const $switch = $(event.target).parents('.oneClickSwitch'),
+        const $switch = $(event.target).parents('._switch').eq(0),
             $sandbox = $('input[name=payplug_sandbox]:checked'),
             isSandBox = parseInt($sandbox.val());
 
@@ -64,16 +64,16 @@ class PaymentMethod {
     }
 
     checkPaymentOptionInformation() {
-        const $paymentOptions = $('.paymentOption');
+        const $paymentOptions = $('.paymentMethod');
 
         $paymentOptions.map((k, v) => {
-            const $switch = $(v).find('.paymentOption_switch');
+            const $switch = $(v).find('.paymentMethod_switch');
             paymentMethod.tooglePaymentOptionInformation($switch);
         })
     }
 
     handlePaymentOption(event) {
-        const $switch = $(event.target).parents('.paymentOption_switch');
+        const $switch = $(event.target).parents('.paymentMethod_switch');
         const $sandbox = $('input[name=payplug_sandbox]:checked');
         const isSandBox = parseInt($sandbox.val());
 
@@ -122,13 +122,13 @@ class PaymentMethod {
         if (!$switch.length) {
             return;
         }
-        const $paymentOption = $switch.parents('.paymentOption');
-        const checked = $switch.find('input').prop('checked');
+        const $paymentOption = $switch.parents('.paymentMethod'),
+            checked = $switch.find('input').prop('checked');
 
         if (checked) {
-            $paymentOption.find('._informations').addClass('-show');
+            $paymentOption.find('._additionnal').addClass('-show');
         } else {
-            $paymentOption.find('._informations').removeClass('-show');
+            $paymentOption.find('._additionnal').removeClass('-show');
         }
     }
 
@@ -144,7 +144,7 @@ class PaymentMethod {
             return;
         }
 
-        $('.paymentOption_switch').each(function() {
+        $('.paymentMethod_switch').each(function() {
             if ($(this).find('input').attr('name') != $switch.find('input').attr('name') && checked === true) {
                 $(this).find('input').attr('disabled', 'disabled');
             }
@@ -236,17 +236,19 @@ class PaymentMethod {
                         'You will find more explanation in JS console.');
                     console.log(jqXHR, textStatus, errorThrown);
                 }
-                $('.paymentOption_switch input').removeAttr('disabled');
+                $('.paymentMethod_switch input').removeAttr('disabled');
             },
             success: function (result) {
                 if (typeof result != 'undefined') {
                     if (switchToggle) {
                         if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName]) {
                             paymentMethod.handlePaymentMethod(paymentMethodName);
+                        } else if ('payplug_applepay' == paymentMethodName && !result['applepay_allowed_domains']) {
+                            paymentMethod.handlePaymentMethod(paymentMethodName);
                         } else {
                             paymentMethod.checkPaymentOptionInformation();
                         }
-                        $('.paymentOption_switch input').removeAttr('disabled');
+                        $('.paymentMethod_switch input').removeAttr('disabled');
                         return result;
                     } else {
                         paymentMethod.paymentMethodToggle(result, sandBoxValue);
@@ -255,6 +257,7 @@ class PaymentMethod {
             }
         });
     }
+
 
     paymentMethodToggle(permissions, sandBoxValue) {
         if (!sandBoxValue) {
@@ -268,13 +271,19 @@ class PaymentMethod {
     }
 
     togglePaymentOption(hide) {
-        const $container = $('.' + paymentMethod.props.container);
-        if ($container.find('.paymentOption').length) {
-            if (hide) {
-                $container.find('.paymentOption').addClass('-test');
-            } else {
-                $container.find('.paymentOption').removeClass('-test');
-            }
+        const $container = $('.' + paymentMethod.props.container),
+            $paymentMethods = $container.find('.paymentMethod');
+        if ($paymentMethods.length) {
+            $paymentMethods.map((i,e) => {
+                let $paymentMethod = $(e);
+                if (!$paymentMethod.is('.-useSandbox')) {
+                    if (hide) {
+                        $paymentMethod.addClass('-sandbox');
+                    } else {
+                        $paymentMethod.removeClass('-sandbox');
+                    }
+                }
+            });
         }
     }
 
@@ -288,6 +297,9 @@ class PaymentMethod {
                 break;
             case 'payplug_applepay' :
                 var checkpremium = 'applepayPremium';
+                break;
+            case 'payplug_amex' :
+                var checkpremium = 'amexPremium';
                 break;
             default :
                 var checkpremium = 'premium';

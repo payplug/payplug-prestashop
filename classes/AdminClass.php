@@ -23,13 +23,6 @@
 
 namespace PayPlug\classes;
 
-use OrderHistory;
-use OrderState;
-use PayPlug\backward\PayPlugBackward;
-use PayPlug\src\specific\ContextSpecific;
-use Tools;
-use Validate;
-
 class AdminClass
 {
     private $assign;
@@ -37,17 +30,25 @@ class AdminClass
     private $dependencies;
     private $config;
     private $html = '';
+    private $order;
+    private $orderHistory;
+    private $orderState;
     private $paymentRepository;
     private $tools;
+    private $validate;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->assign = $this->dependencies->getPlugin()->getAssign();
-        $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->order = $this->dependencies->getPlugin()->getOrder();
+        $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
+        $this->orderState = $this->dependencies->getPlugin()->getOrderStateAdapter();
+        $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->tools = $this->dependencies->getPlugin()->getTools();
+        $this->validate = $this->dependencies->getPlugin()->getValidate();
     }
 
     /**
@@ -55,21 +56,19 @@ class AdminClass
      * @param int $id_order
      * @return string
      */
-    public static function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
+    public function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
-        $context = (new ContextSpecific())->getContext();
-        $dependencies = new DependenciesClass();
         if ($controller_name == 'AdminModules') {
-            switch ($dependencies->name) {
+            switch ($this->dependencies->name) {
                 case 'pspaylater':
-                    $admin_ajax_url = $context->link->getAdminLink('AdminPsPayLater');
+                    $admin_ajax_url = $this->context->link->getAdminLink('AdminPsPayLater');
                     break;
                 case 'payplug':
-                    $admin_ajax_url = $context->link->getAdminLink('AdminPayplug');
+                    $admin_ajax_url = $this->context->link->getAdminLink('AdminPayplug');
                     break;
             }
         } elseif ($controller_name == 'AdminOrders') {
-            $admin_ajax_url = $context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
+            $admin_ajax_url = $this->context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
                 . '&vieworder';
         }
 
@@ -81,14 +80,13 @@ class AdminClass
      * @param int $id_order
      * @return string
      */
-    public static function getAdminUrl($controller_name = 'AdminModules', $params = [])
+    public function getAdminUrl($controller_name = 'AdminModules', $params = [])
     {
         if (!empty($params) && !is_array($params)) {
             return false;
         }
 
-        $context = (new ContextSpecific())->getContext();
-        $admin_url = $context->link->getAdminLink($controller_name);
+        $admin_url = $this->context->link->getAdminLink($controller_name);
         if (!empty($params)) {
             foreach ($params as $key => $value) {
                 $admin_url .= '&' . $key . (empty($value) ? '' : '=' . $value);
@@ -113,7 +111,7 @@ class AdminClass
 
         $this->dependencies->configClass->assignContentVar();
 
-        if ($this->dependencies->getPlugin()->getTools()->tool('getValue', 'show_components')) {
+        if ($this->tools->tool('getValue', 'show_components')) {
             return $this->dependencies->configClass->fetchTemplate('/views/templates/admin/components.tpl');
         }
 
@@ -149,9 +147,9 @@ class AdminClass
                 $args = [];
                 foreach ($keys as $key) {
                     if ($key !== 'embedded') {
-                        $args[$key] = (int)Tools::getValue($key);
+                        $args[$key] = (int)$this->tools->tool('getValue', $key);
                     } else {
-                        $args[$key] = (string)Tools::getValue($key);
+                        $args[$key] = (string)$this->tools->tool('getValue', $key);
                     }
                 }
             }
@@ -174,6 +172,20 @@ class AdminClass
                     }
                 } elseif ($this->tools->tool('getValue', 'type') == 'applepayPremium') {
                     $link = 'mailto:support@payplug.com';
+                } elseif ($this->tools->tool('getValue', 'type') == 'amexPremium') {
+                    switch ($this->context->language->iso_code) {
+                        case 'fr':
+                            $link = 'https://support.payplug.com/hc/fr/requests/new';
+                            break;
+
+                        case 'it':
+                            $link = 'https://support.payplug.com/hc/it/requests/new';
+                            break;
+
+                        default:
+                            $link = 'https://support.payplug.com/hc/en-gb/requests/new';
+                            break;
+                    }
                 } else {
                     $link = 'https://www.payplug.com/contact';
                 }
@@ -202,14 +214,14 @@ class AdminClass
                     $this->dependencies->getConfigurationKey('deferredState')
                 )) {
                 $id_order_state = $this->tools->tool('getValue', 'payplug_deferred_state');
-                $order_state = new OrderState($id_order_state, $this->context->language->id);
+                $order_state = $this->orderState->get((int)$id_order_state, $this->context->language->id);
                 if ($this->tools->tool('getValue', 'payplug_deferred')) {
                     $this->context->smarty->assign([
                         'updated_deferred_state' => true,
                         'updated_deferred_state_id' => $this->tools->tool('getValue', 'payplug_deferred_state'),
                         'updated_deferred_state_name' => $order_state->name,
                         'admin_orders_link' => $this->dependencies->configClass
-                            ->getSpecificPrestaClasse()
+                            ->getAdapterPrestaClasse()
                             ->getOrdersByStateLink(
                                 $this->tools->tool('getValue', 'payplug_deferred_state')
                             ),
@@ -250,7 +262,11 @@ class AdminClass
 
         if ($this->tools->tool('getValue', 'submitPwd')) {
             $password = $this->tools->tool('getValue', 'password');
-            if (!$password || !PayPlugBackward::isPlaintextPassword($password)) {
+            $isPlaintextPassword = $this->dependencies->configClass
+                ->getAdapterPrestaClasse()
+                ->isPlaintextPassword($password);
+
+            if (!$password || !$isPlaintextPassword) {
                 die(json_encode([
                     'content' => null,
                     'error' => $this->dependencies->l('payplug.adminAjaxController.passwordInvalid', 'adminclass')
@@ -304,49 +320,24 @@ class AdminClass
         if ((int)$this->tools->tool('getValue', 'checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
-            $return = [];
-            if ($permissions) {
-                foreach ($permissions as $key => $value) {
-                    switch ($key) {
-                        case 'use_live_mode':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_sandbox'] = $value;
-                            }
-                            break;
-                        case 'can_save_cards':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_one_click'] = $value;
-                            }
-                            break;
-                        case 'can_use_oney':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_oney'] = $value;
-                            }
-                            break;
-                        case 'can_use_bancontact':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_bancontact'] = $value;
-                            }
-                            break;
-                        case 'can_use_applepay':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_applepay'] = $value;
-                            }
-                            break;
-                        case 'can_create_installment_plan':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_inst'] = $value;
-                            }
-                            break;
-
-                        case 'can_create_deferred_payment':
-                            if (isset($permissions[$key])) {
-                                $return['payplug_deferred'] = $value;
-                            }
-                            break;
-                    }
+            $applepay_allowed_domains = false;
+            if (isset($permissions['apple_pay_allowed_domains'])) {
+                if (in_array($this->config->get('PS_SHOP_DOMAIN'), $permissions['apple_pay_allowed_domains'])) {
+                    $applepay_allowed_domains = true;
                 }
             }
+
+            $return = [
+                'payplug_sandbox' => $permissions['use_live_mode'],
+                'payplug_one_click' => $permissions['can_save_cards'],
+                'payplug_oney' => $permissions['can_use_oney'],
+                'payplug_bancontact' => $permissions['can_use_bancontact'],
+                'payplug_applepay' => $permissions['can_use_applepay'],
+                'payplug_amex' => $permissions['can_use_amex'],
+                'payplug_inst' => $permissions['can_create_installment_plan'],
+                'payplug_deferred' => $permissions['can_create_deferred_payment'],
+                'applepay_allowed_domains' => $applepay_allowed_domains ,
+            ];
             die(json_encode($return));
         }
 
@@ -403,11 +394,11 @@ class AdminClass
                 }
             }
 
-            $order = new Order((int)$id_order);
-            if (Validate::isLoadedObject($order)) {
+            $order = $this->order->get((int)$id_order);
+            if ($this->validate->validate('isLoadedObject', $order)) {
                 $current_state = (int)$order->getCurrentState();
                 if ($current_state != 0 && $current_state != $new_state) {
-                    $history = new OrderHistory();
+                    $history = $this->orderHistory->get();
                     $history->id_order = (int)$order->id;
                     $history->changeIdOrderState($new_state, (int)$order->id, true);
                     $history->addWithemail();
@@ -463,8 +454,7 @@ class AdminClass
             switch ($this->tools->tool('getValue', 'type')) {
                 case 'orderState':
                     $idOrderState = $this->tools->tool('getValue', 'idOrderState');
-                    $order_state_specific = $this->dependencies->getPlugin()->getOrderStateSpecific();
-                    $order_state = $order_state_specific->get($idOrderState, $this->context->language->id);
+                    $order_state = $this->orderState->get($idOrderState, $this->context->language->id);
                     if ($order_state->id) {
                         $this->assign->assign([
                             'orderStateName' => $order_state->name,

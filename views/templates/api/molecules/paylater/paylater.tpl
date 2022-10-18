@@ -20,62 +20,84 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 {* paylater Block *}
-{capture assign="paylaterBlock_title"}{l s='paylater.block.title' mod='payplug'}{/capture}
-{capture assign="payLaterBlock_description"}{l s='paylater.block.description' mod='payplug'}{/capture}
 {capture assign="paylaterBlock_content"}
-    {capture assign="paylaterTitle"}{l s='paylater.block.detailsTitle' mod='payplug'}{/capture}
-    {capture assign="paylaterDescription"}{l s='paylater.block.detailsDescription' mod='payplug'}{/capture}
-    {capture assign='paylaterAdvanced'}
-        {* PayLater Options: oney with or without fees *}
-        {capture assign="oneyWithFeesTitle"}{l s='paylater.block.oneyWithFeesTitle' mod='payplug'}{/capture}
-        {capture assign="oneyWithFeesDescription"}{l s='paylater.block.oneyWithFeesDescription' mod='payplug'}{/capture}
-        {capture assign="oneyWithoutFeesTitle"}{l s='paylater.block.oneyWithoutFeesTitle' mod='payplug'}{/capture}
-        {capture assign="oneyWithoutFeesDescription"}{l s='paylater.block.oneyWithoutFeesDescription' mod='payplug'}{/capture}
-        {assign var=items value=[
-        ['value'=>"1", "dataName" =>'oneyWithFees' ,"text" => $oneyWithFeesTitle, "subText" => $oneyWithFeesDescription, className=>'_paylaterLabel'],
-        ['value'=>"0", "dataName" =>'oneyWithoutFees' ,"text" => $oneyWithoutFeesTitle, "subText" => $oneyWithoutFeesDescription, className=>'_paylaterLabel']
-        ]}
-        {include file='./../../atoms/options/options.tpl'
-        optionsSelected=$payplug_switch.oney_fees.checked
-        optionsClassName='_paylaterOptions'
-        optionsName=$payplug_switch.oney_fees.name}
-
-        {* Hide optimisedOption for pspaylater module *}
-        {if $module_name=='pspaylater'}
-            {include file='./../../atoms/input/input.tpl'
-            inputType = 'hidden'
-            inputValue = '1'
-            inputName = $payplug_switch.oney_optimized.name}
-        {/if}
-
-{*         Advanced Paylater Settings *}
-        {include file='./paylater_advanced.tpl'}
-    {/capture}
-
-    {capture assign="oneyWithFeesTitle"}
-        {l s='paylater.block.oneyWithFeesTitle' mod='payplug'}
-    {/capture}
-
     {if 'pspaylater' == $module_name}
         {assign var="paylaterChecked" value=1}
     {else}
         {assign var="paylaterChecked" value=$payplug_switch.oney.checked}
     {/if}
 
-    {include file='./../payment/paymentMethod.tpl'
-        paymentOptionClassName = $module_name
-        paymentOptionIdentifier = 'oney'
-        paymentOptionName = $paylaterTitle
-        paymentOptionDescription = $paylaterDescription
-        paymentOptionChecked = $paylaterChecked
-        paymentOptionLink = $faq_links.oney}
+    <div class="paymentMethod -{$paymentMethods.oney.name|escape:'htmlall':'UTF-8'}">
+        {include file='./../../atoms/switch/switch.tpl'
+            switchClassName='paymentMethod_switch -premium'
+            switchDataName='paymentMethod_oney'
+            switchName=$paymentMethods.oney.name|escape:'htmlall':'UTF-8'
+            switchChecked=$paymentMethods.oney.checked}
+
+        <div class="_text">
+            {include
+                file='./../../atoms/title/title.tpl'
+                titleClassName='_title'
+                titleText=$paymentMethods.oney.title|escape:'htmlall':'UTF-8'}
+
+            <p {if isset($paymentMethods.oney.description) && $paymentMethods.oney.description != ''}
+                class="-live _description" {/if}>
+                {$paymentMethods.oney.description|escape:'htmlall':'UTF-8'}
+                {if isset($paymentMethods.oney.link) && $paymentMethods.oney.link}
+                    {include
+                        file='./../../atoms/link/link.tpl'
+                        linkText={l s='paymentMethod.link' mod='payplug'}
+                        linkHref=$paymentMethods.oney.link|escape:'htmlall':'UTF-8'
+                        linkTarget='_blank'
+                        linkData='data-link'}
+                {/if}
+            </p>
+
+        </div>
+        <div class="_additionnal">
+            {* PayLater Options: oney with or without fees *}
+            {assign var=items value=[
+                [
+                    'value' => '1',
+                    'dataName' => 'oneyWithFees' ,
+                    'text' => {l s='paylater.block.oneyWithFeesTitle' mod='payplug'},
+                    'subText' => {l s='paylater.block.oneyWithFeesDescription' mod='payplug'},
+                    'className' => '_paylaterLabel'
+                ],
+                [
+                    'value'=> '0',
+                    'dataName' => 'oneyWithoutFees' ,
+                    'text' => {l s='paylater.block.oneyWithoutFeesTitle' mod='payplug'},
+                    'subText' => {l s='paylater.block.oneyWithoutFeesDescription' mod='payplug'},
+                    'className' => '_paylaterLabel'
+                ]
+            ]}
+
+            {include file='./../../atoms/options/options.tpl'
+                optionsItems=$items
+                optionsSelected=$payplug_switch.oney_fees.checked
+                optionsClassName='_paylaterOptions'
+                optionsName=$payplug_switch.oney_fees.name}
+
+            {* Hide optimisedOption for pspaylater module *}
+            {if $module_name=='pspaylater'}
+                {include file='./../../atoms/input/input.tpl'
+                inputType = 'hidden'
+                inputValue = '1'
+                inputName = $payplug_switch.oney_optimized.name}
+            {/if}
+
+            {* Advanced Paylater Settings *}
+            {include file='./paylater_advanced.tpl'}
+        </div>
+    </div>
 {/capture}
 
 {assign var='paylaterBlock_className' value='paylaterBlock'}
 
 {include file='./../../atoms/block/block.tpl'
-    blockTitle=$paylaterBlock_title
-    blockDescription=$payLaterBlock_description
+    blockTitle={l s='paylater.block.title' mod='payplug'}
+    blockDescription={l s='paylater.block.description' mod='payplug'}
     blockContent=$paylaterBlock_content
     blockData='blockPaylater'
     blockDisabled=!$connected || !$payplug_switch.show.checked

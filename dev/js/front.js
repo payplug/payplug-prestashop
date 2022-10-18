@@ -291,7 +291,7 @@ var $document, $window, __moduleName__Module = {
                             event.error.message = 'A generic error occured';
                         }
                         addLogger(event.error.name + " : " + event.error.message);
-                        // Error specific on Invalid Key (try to replace the one in DB)
+                        // Error adapter on Invalid Key (try to replace the one in DB)
                         if (event.error.name === 'AUTHENTICATION_INVALID') {
                             // Ajax request to execute setPublishableKeys
                             integrated.form.updatePublishableKey();

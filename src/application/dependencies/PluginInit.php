@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\application\dependencies;
 
-use PayPlug\classes\ConfigClass;
-use PayPlug\classes\AmountCurrencyClass;
 use PayPlug\classes\MyLogPHP;
 
 use PayPlug\src\application\dependencies\BaseClass;
@@ -48,25 +46,29 @@ use PayPlug\src\models\entities\PaymentEntity;
 use PayPlug\src\models\entities\PluginEntity;
 use PayPlug\src\models\entities\OrderStateEntity;
 
-use PayPlug\src\specific\AddressSpecific;
-use PayPlug\src\specific\AssignSpecific;
-use PayPlug\src\specific\CarrierSpecific;
-use PayPlug\src\specific\CartSpecific;
-use PayPlug\src\specific\ConfigurationSpecific;
-use PayPlug\src\specific\ConstantSpecific;
-use PayPlug\src\specific\ContextSpecific;
-use PayPlug\src\specific\CountrySpecific;
-use PayPlug\src\specific\CurrencySpecific;
-use PayPlug\src\specific\CustomerSpecific;
-use PayPlug\src\specific\LanguageSpecific;
-use PayPlug\src\specific\ModuleSpecific;
-use PayPlug\src\specific\OrderSpecific;
-use PayPlug\src\specific\OrderHistorySpecific;
-use PayPlug\src\specific\OrderStateSpecific;
-use PayPlug\src\specific\ProductSpecific;
-use PayPlug\src\specific\ShopSpecific;
-use PayPlug\src\specific\ToolsSpecific;
-use PayPlug\src\specific\ValidateSpecific;
+use PayPlug\src\application\adapter\AddressAdapter;
+use PayPlug\src\application\adapter\AssignAdapter;
+use PayPlug\src\application\adapter\CarrierAdapter;
+use PayPlug\src\application\adapter\CartAdapter;
+use PayPlug\src\application\adapter\ConfigurationAdapter;
+use PayPlug\src\application\adapter\ConstantAdapter;
+use PayPlug\src\application\adapter\ContextAdapter;
+use PayPlug\src\application\adapter\CountryAdapter;
+use PayPlug\src\application\adapter\CurrencyAdapter;
+use PayPlug\src\application\adapter\CustomerAdapter;
+use PayPlug\src\application\adapter\DispatcherAdapter;
+use PayPlug\src\application\adapter\LanguageAdapter;
+use PayPlug\src\application\adapter\MediaAdapter;
+use PayPlug\src\application\adapter\MessageAdapter;
+use PayPlug\src\application\adapter\ModuleAdapter;
+use PayPlug\src\application\adapter\OrderAdapter;
+use PayPlug\src\application\adapter\OrderHistoryAdapter;
+use PayPlug\src\application\adapter\OrderSlipAdapter;
+use PayPlug\src\application\adapter\OrderStateAdapter;
+use PayPlug\src\application\adapter\ProductAdapter;
+use PayPlug\src\application\adapter\ShopAdapter;
+use PayPlug\src\application\adapter\ToolsAdapter;
+use PayPlug\src\application\adapter\ValidateAdapter;
 
 class PluginInit extends BaseClass
 {
@@ -80,13 +82,11 @@ class PluginInit extends BaseClass
     private $order_state_entity;
 
     // Repositories & necessary classes
-    private $amountCurrencyClass;
     private $apiClass;
     private $cache;
     private $card;
     private $hook;
     private $install;
-//    private $installment;
     private $logger;
     private $myLogPhp;
     private $oney;
@@ -96,7 +96,7 @@ class PluginInit extends BaseClass
     private $sql;
     private $translate;
 
-    // Specific classes
+    // Adapter classes
     private $address;
     private $assign;
     private $carrier;
@@ -107,16 +107,19 @@ class PluginInit extends BaseClass
     private $country;
     private $currency;
     private $customer;
+    private $dispatcher;
     private $language;
+    private $media;
+    private $message;
     private $module;
     private $order;
     private $order_history;
-    private $order_state_specific;
+    private $order_slip;
+    private $order_state_adapter;
     private $product;
     private $shop;
     private $tools;
     private $validate;
-    private $constantSpecific;
 
     public function __construct($dependencies = null)
     {
@@ -124,14 +127,13 @@ class PluginInit extends BaseClass
         $this->myLogPhp = new MyLogPHP();
 
         $this->setEntities();
-        $this->setSpecific();
+        $this->setAdapter();
         $this->setRepositories();
 
         $this->plugin
             ->setApiClass($this->apiClass)
             ->setApiVersion('2019-08-06')
             ->setAddress($this->address)
-            ->setAmountCurrencyClass($this->amountCurrencyClass)
             ->setAssign($this->assign)
             ->setCache($this->cache)
             ->setCard($this->card)
@@ -143,11 +145,13 @@ class PluginInit extends BaseClass
             ->setCountry($this->country)
             ->setCurrency($this->currency)
             ->setCustomer($this->customer)
+            ->setDispatcher($this->dispatcher)
             ->setHook($this->hook)
             ->setInstall($this->install)
-//            ->setInstallment($this->installment)
             ->setLanguage($this->language)
             ->setLogger($this->logger)
+            ->setMedia($this->media)
+            ->setMessage($this->message)
             ->setModule($this->module)
             ->setPayment($this->payment)
             ->setProduct($this->product)
@@ -155,12 +159,15 @@ class PluginInit extends BaseClass
             ->setOrder($this->order)
             ->setOrderHistory($this->order_history)
             ->setOrderState($this->order_state)
-            ->setOrderStateSpecific($this->order_state_specific)
+            ->setOrderSlip($this->order_slip)
+            ->setOrderStateAdapter($this->order_state_adapter)
             ->setQuery($this->query)
             ->setSql($this->sql)
+            ->setShop($this->shop)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate);
+
         $this->setEntity($this->plugin);
     }
 
@@ -175,10 +182,6 @@ class PluginInit extends BaseClass
 
     private function setRepositories()
     {
-        $this->amountCurrencyClass = new AmountCurrencyClass(
-            $this->tools,
-            $this->dependencies
-        );
         $this->logger = new LoggerRepository($this->dependencies);
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository();
@@ -241,7 +244,7 @@ class PluginInit extends BaseClass
             $this->constant,
             $this->dependencies,
             $this->language,
-            $this->order_state_specific,
+            $this->order_state_adapter,
             $this->query,
             $this->tools,
             $this->validate,
@@ -265,7 +268,7 @@ class PluginInit extends BaseClass
             $this->dependencies,
             $this->order_state,
             $this->order_state_entity,
-            $this->order_state_specific,
+            $this->order_state_adapter,
             $this->shop,
             $this->sql,
             $this->tools,
@@ -274,26 +277,30 @@ class PluginInit extends BaseClass
         );
     }
 
-    private function setSpecific()
+    private function setAdapter()
     {
-        $this->address = new AddressSpecific();
-        $this->assign = new AssignSpecific();
-        $this->carrier = new CarrierSpecific();
-        $this->cart = new CartSpecific();
-        $this->configuration = new ConfigurationSpecific();
-        $this->constant = new ConstantSpecific();
-        $this->context = new ContextSpecific();
-        $this->country = new CountrySpecific();
-        $this->currency  = new CurrencySpecific();
-        $this->customer  = new CustomerSpecific();
-        $this->language = new LanguageSpecific();
-        $this->module = new ModuleSpecific();
-        $this->order = new OrderSpecific();
-        $this->order_history = new OrderHistorySpecific();
-        $this->order_state_specific = new OrderStateSpecific();
-        $this->product = new ProductSpecific();
-        $this->shop = new ShopSpecific();
-        $this->tools = new ToolsSpecific();
-        $this->validate = new ValidateSpecific();
+        $this->address = new AddressAdapter();
+        $this->assign = new AssignAdapter();
+        $this->carrier = new CarrierAdapter();
+        $this->cart = new CartAdapter();
+        $this->configuration = new ConfigurationAdapter();
+        $this->constant = new ConstantAdapter();
+        $this->context = new ContextAdapter();
+        $this->country = new CountryAdapter();
+        $this->currency  = new CurrencyAdapter();
+        $this->customer  = new CustomerAdapter();
+        $this->dispatcher  = new DispatcherAdapter();
+        $this->language = new LanguageAdapter();
+        $this->media = new MediaAdapter();
+        $this->message = new MessageAdapter();
+        $this->module = new ModuleAdapter();
+        $this->order = new OrderAdapter();
+        $this->order_history = new OrderHistoryAdapter();
+        $this->order_slip = new OrderSlipAdapter();
+        $this->order_state_adapter = new OrderStateAdapter();
+        $this->product = new ProductAdapter();
+        $this->shop = new ShopAdapter();
+        $this->tools = new ToolsAdapter();
+        $this->validate = new ValidateAdapter();
     }
 }

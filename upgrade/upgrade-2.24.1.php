@@ -34,5 +34,5 @@ function upgrade_module_2_24_1($object)
 
     require_once(_PS_MODULE_DIR_.$object->name.'/classes/PayplugBackward.php');
     require_once(_PS_MODULE_DIR_.$object->name.'/classes/MyLogPHP.php');
-    return PayplugBackward::updateConfiguration('PAYPLUG_DEBUG_MODE', 0);
+    return Configuration::updateValue('PAYPLUG_DEBUG_MODE', 0);
 }

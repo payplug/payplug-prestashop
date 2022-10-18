@@ -23,7 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\src\specific\OrderStateSpecific;
+use PayPlug\src\application\adapter\OrderStateAdapter;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class OrderStateRepository extends BaseClass
@@ -41,7 +41,7 @@ class OrderStateRepository extends BaseClass
     private $language;
 
     /** @var object */
-    private $order_state_specific;
+    private $order_state_adapter;
 
     /** @var object */
     private $query;
@@ -57,7 +57,7 @@ class OrderStateRepository extends BaseClass
         $constant,
         $dependencies,
         $language,
-        $order_state_specific,
+        $order_state_adapter,
         $query,
         $tools,
         $validate,
@@ -67,7 +67,7 @@ class OrderStateRepository extends BaseClass
         $this->constant = $constant;
         $this->dependencies = $dependencies;
         $this->language = $language;
-        $this->order_state_specific = $order_state_specific;
+        $this->order_state_adapter = $order_state_adapter;
         $this->query = $query;
         $this->tools = $tools;
         $this->validate = $validate;
@@ -82,7 +82,7 @@ class OrderStateRepository extends BaseClass
         }
 
         $this->log->info('Creating new order state.');
-        $order_state = $this->order_state_specific->get();
+        $order_state = $this->order_state_adapter->get();
         $order_state->logable = $state['logable'];
         $order_state->send_email = $state['send_email'];
         $order_state->paid = $state['paid'];
@@ -140,7 +140,7 @@ class OrderStateRepository extends BaseClass
             $id_order_state = $this->getOrderStateByConfiguration($state['cfg']);
             if ($id_order_state) {
                 // Valide order state
-                $os = $this->order_state_specific->get($id_order_state);
+                $os = $this->order_state_adapter->get((int)$id_order_state);
                 if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
                     return $this->configuration->updateValue($key_config, $os->id);
                 }
@@ -163,7 +163,7 @@ class OrderStateRepository extends BaseClass
         }
 
         // Check if order state is valid
-        $order_state = $this->order_state_specific->get($id_order_state);
+        $order_state = $this->order_state_adapter->get((int)$id_order_state);
         if (!$this->validate->validate('isLoadedObject', $order_state)
             || (isset($order_state->deleted) && $order_state->deleted)) {
             $id_order_state = $this->add($name, $state, $sandbox);
@@ -397,7 +397,7 @@ class OrderStateRepository extends BaseClass
         $used_os_id_list = $this->getIdsUsedByPayPlug();
         foreach ($payplug_os_id_list as $payplug_os_id) {
             if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
-                $os = new OrderStateSpecific($payplug_os_id);
+                $os = new OrderStateAdapter($payplug_os_id);
                 $deleted = $deleted && $os->softDelete();
             }
         }

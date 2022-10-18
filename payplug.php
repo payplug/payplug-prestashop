@@ -56,7 +56,7 @@ class Payplug extends PaymentModule
         $this->need_instance = true;
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.9.3';
+        $this->version = '3.10.0';
 
         parent::__construct();
 
@@ -140,11 +140,11 @@ class Payplug extends PaymentModule
             'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
             'actionAdminPerformanceControllerAfter',
-            'actionCarrierUpdate',
+            //'actionCarrierUpdate',
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
             'actionExportGDPRData',
-            'actionObjectCarrierAddAfter',
+            //'actionObjectCarrierAddAfter',
             'actionOrderStatusUpdate',
             'actionObjectOrderStateAddAfter',
             'actionObjectOrderStateUpdateAfter',
@@ -159,11 +159,11 @@ class Payplug extends PaymentModule
             'displayProductPriceBlock',
             'displayAdminStatusesForm',
             'header',
-            'moduleRoutes',
+            //'moduleRoutes',
             'payment',
             'paymentReturn',
             'paymentOptions',
-            'registerGDPRConsent',
+            //'registerGDPRConsent',
         ];
     }
 
@@ -401,10 +401,10 @@ class Payplug extends PaymentModule
      * @param $params
      * @return mixed
      */
-    public function hookPaymentOptions($params)
+    public function hookPaymentOptions()
     {
         if ($this->module) {
-            return $this->payplug_dependencies->hookClass->paymentOptions($params);
+            return $this->payplug_dependencies->hookClass->paymentOptions();
         }
     }
 

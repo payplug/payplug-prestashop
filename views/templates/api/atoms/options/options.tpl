@@ -21,17 +21,17 @@
 *}
 <div class="payplugUIIOptions
     {if isset($optionsClassName) && $optionsClassName} {$optionsClassName|escape:'htmlall':'UTF-8'}{/if}">
-    {foreach $items as $item}
-        <label class="{if isset($item.className) && $item.className} {$item.className|escape:'htmlall':'UTF-8'}{/if}{if isset($item.disabled) && $item.disabled} -disabled{/if}" {if isset($item.dataName) && $item.dataName} data-e2e-name="{$item.dataName|escape:'htmlall':'UTF-8'}"{/if}>
+    {foreach $optionsItems as $optionsItem}
+        <label class="{if isset($optionsItem.className) && $optionsItem.className} {$optionsItem.className|escape:'htmlall':'UTF-8'}{/if}{if isset($optionsItem.disabled) && $optionsItem.disabled} -disabled{/if}" {if isset($optionsItem.dataName) && $optionsItem.dataName} data-e2e-name="{$optionsItem.dataName|escape:'htmlall':'UTF-8'}"{/if}>
             <input
                     type="radio" name="{$optionsName|escape:'htmlall':'UTF-8'}"
-            value="{$item.value|escape:'htmlall':'UTF-8'}"
-                    {if isset($optionsSelected) && isset($item.value) && $optionsSelected == $item.value } checked="checked" {/if}
-                    {if isset($item.disabled) && $item.disabled} disabled{/if}
-                    data-notallowed="{if isset($item.notallowed) && $item.notallowed}{$item.notallowed|escape:'htmlall':'UTF-8'}{else}0{/if}">
+            value="{$optionsItem.value|escape:'htmlall':'UTF-8'}"
+                    {if isset($optionsSelected) && isset($optionsItem.value) && $optionsSelected == $optionsItem.value } checked="checked" {/if}
+                    {if isset($optionsItem.disabled) && $optionsItem.disabled} disabled{/if}
+                    data-notallowed="{if isset($optionsItem.notallowed) && $optionsItem.notallowed}{$optionsItem.notallowed|escape:'htmlall':'UTF-8'}{else}0{/if}">
             <span>
-                {if isset($item.text) && $item.text}{$item.text|escape:'htmlall':'UTF-8'}{/if}
-                {if isset($item.subText) && $item.subText}<span>{$item.subText}</span>{/if}
+                {if isset($optionsItem.text) && $optionsItem.text}{$optionsItem.text|escape:'htmlall':'UTF-8'}{/if}
+                {if isset($optionsItem.subText) && $optionsItem.subText}<span>{$optionsItem.subText}</span>{/if}
             </span>
         </label>
     {/foreach}

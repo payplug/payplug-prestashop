@@ -91,6 +91,11 @@ class MockHelper extends Mockery
             ->andReturnUsing(function ($param, $param1, $param2) {
                 return substr($param, $param1, $param2);
             });
+        $tools
+            ->shouldReceive('jsonDecode')
+            ->andReturnUsing(function ($param, $param1) {
+                return json_decode($param, $param1);
+            });
         return $tools;
     }
 

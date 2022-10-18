@@ -1,9 +1,9 @@
 .__moduleName__Configuration {
   ._paylaterAdvanced {
-    margin: 36px 0 0;
+    margin: @margin-9 0 0;
 
     &Option {
-      padding: 12px 0;
+      padding: @padding-4 0 @padding-3 0;
       display: flex;
 
       ._img {
@@ -18,7 +18,7 @@
         flex-direction: column;
         align-self: center;
         width: calc(100% - 200px);
-        padding: 0 50px 0 40px;
+        padding: 0 @padding-12 0 @padding-10;
 
         @media (@screen-mobile) {
           padding: 0;
@@ -98,6 +98,10 @@
           display:flex;
           align-items: center; /* use center to align on the secondary axis */
         }
+      }
+
+      & + ._paylaterAdvancedOption {
+        padding: @padding-3 0;
       }
     }
   }

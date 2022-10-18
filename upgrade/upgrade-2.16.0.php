@@ -35,9 +35,9 @@ function upgrade_module_2_16_0($object)
     require_once(_PS_MODULE_DIR_.$object->name.'/classes/PayplugBackward.php');
     $flag = true;
 
-    if (!PayplugBackward::updateConfiguration('PAYPLUG_INST', 0)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_INST_MODE', 3)
-        || !PayplugBackward::updateConfiguration('PAYPLUG_INST_MIN_AMOUNT', 150)
+    if (!Configuration::updateValue('PAYPLUG_INST', 0)
+        || !Configuration::updateValue('PAYPLUG_INST_MODE', 3)
+        || !Configuration::updateValue('PAYPLUG_INST_MIN_AMOUNT', 150)
     ) {
         $flag = false;
     }

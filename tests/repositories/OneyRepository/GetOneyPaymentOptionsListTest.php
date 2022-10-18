@@ -58,7 +58,7 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
             ->with('PAYPLUG_ONEY_FEES')
             ->andReturn(true);
 
-        $this->context = MockHelper::createContextMock('Payplug\src\specific\ContextSpecific');
+        $this->context = MockHelper::createContextMock('Payplug\src\application\adapter\ContextAdapter');
 
         $this->repo
             ->shouldAllowMockingProtectedMethods();

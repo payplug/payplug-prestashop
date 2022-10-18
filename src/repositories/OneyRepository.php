@@ -30,49 +30,49 @@ use PayPlug\src\application\dependencies\BaseClass;
 
 class OneyRepository extends BaseClass
 {
-    private $addressSpecific;
+    private $addressAdapter;
     private $amountCurrencyClass;
     private $cache;
     private $dependencies;
     private $log;
     private $logger;
-    private $configurationSpecific;
-    private $contextSpecific;
-    private $countrySpecific;
-    private $currencySpecific;
-    private $toolsSpecific;
-    private $validateSpecific;
+    private $configurationAdapter;
+    private $contextAdapter;
+    private $countryAdapter;
+    private $currencyAdapter;
+    private $toolsAdapter;
+    private $validateAdapter;
     private $assign;
 
     public function __construct(
-        $addressSpecific,
+        $addressAdapter,
         $assign,
         $cache,
-        $carrierSpecific,
-        $cartSpecific,
-        $configurationSpecific,
-        $contextSpecific,
-        $countrySpecific,
-        $currencySpecific,
+        $carrierAdapter,
+        $cartAdapter,
+        $configurationAdapter,
+        $contextAdapter,
+        $countryAdapter,
+        $currencyAdapter,
         $dependencies,
         $logger,
         $myLogPHP,
         $oneyEntity,
-        $toolsSpecific,
-        $validateSpecific
+        $toolsAdapter,
+        $validateAdapter
     ) {
         $this->dependencies = $dependencies;
         $this->cache = $cache;
         $this->logger = $logger;
-        $this->addressSpecific = $addressSpecific;
-        $this->cartSpecific = $cartSpecific;
-        $this->carrierSpecific = $carrierSpecific;
-        $this->configurationSpecific = $configurationSpecific;
-        $this->contextSpecific = $contextSpecific;
-        $this->countrySpecific = $countrySpecific;
-        $this->currencySpecific = $currencySpecific;
-        $this->toolsSpecific = $toolsSpecific;
-        $this->validateSpecific = $validateSpecific;
+        $this->addressAdapter = $addressAdapter;
+        $this->cartAdapter = $cartAdapter;
+        $this->carrierAdapter = $carrierAdapter;
+        $this->configurationAdapter = $configurationAdapter;
+        $this->contextAdapter = $contextAdapter;
+        $this->countryAdapter = $countryAdapter;
+        $this->currencyAdapter = $currencyAdapter;
+        $this->toolsAdapter = $toolsAdapter;
+        $this->validateAdapter = $validateAdapter;
         $this->oneyEntity = $oneyEntity;
         $this->log = $myLogPHP;
         $this->assign = $assign;
@@ -87,7 +87,7 @@ class OneyRepository extends BaseClass
     {
         $js_var = [
             'loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
-            'can_use_oney' => $this->configurationSpecific->get(
+            'can_use_oney' => $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oney')
             ),
         ];
@@ -104,13 +104,13 @@ class OneyRepository extends BaseClass
      */
     public function assignOneyPaymentOptions($cart)
     {
-        if (!$this->configurationSpecific->get(
+        if (!$this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('oney')
         )) {
             return false;
         }
 
-        if ($this->validateSpecific->validate('isLoadedObject', $cart)
+        if ($this->validateAdapter->validate('isLoadedObject', $cart)
             && $cart->id_address_invoice
             && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart);
@@ -141,9 +141,9 @@ class OneyRepository extends BaseClass
      */
     public function assignOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
-        $tools = $this->toolsSpecific;
+        $tools = $this->toolsAdapter;
 
-        if ($this->validateSpecific->validate('isLoadedObject', $cart)
+        if ($this->validateAdapter->validate('isLoadedObject', $cart)
             && $cart->id_address_invoice
             && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart, $amount, $country);
@@ -187,18 +187,18 @@ class OneyRepository extends BaseClass
     public function assignLegalNotice()
     {
         $limits = $this->getOneyPriceLimit();
-        $learnMoreLink = $this->configurationSpecific->get(
+        $learnMoreLink = $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('companyIso')
         ) == 'IT' &&
-        $this->toolsSpecific->tool('strtolower', $this->contextSpecific->getContext()->language->iso_code) == 'it';
+        $this->toolsAdapter->tool('strtolower', $this->contextAdapter->getContext()->language->iso_code) == 'it';
         $this->assign->assign([
             'learnMoreLink' => (bool)$learnMoreLink,
-            'oneyWithFees' => (bool)$this->configurationSpecific->get(
+            'oneyWithFees' => (bool)$this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             ),
-            'oneyMinAmounts' => $this->toolsSpecific->tool('displayPrice', $limits['min']),
-            'oneyMaxAmounts' => $this->toolsSpecific->tool('displayPrice', $limits['max']),
-            'oneyUrl' => 'https://www.oney.' . $this->contextSpecific->getContext()->language->iso_code,
+            'oneyMinAmounts' => $this->toolsAdapter->tool('displayPrice', $limits['min']),
+            'oneyMaxAmounts' => $this->toolsAdapter->tool('displayPrice', $limits['max']),
+            'oneyUrl' => 'https://www.oney.' . $this->contextAdapter->getContext()->language->iso_code,
         ]);
     }
 
@@ -210,8 +210,8 @@ class OneyRepository extends BaseClass
      */
     public function checkOneyRequiredFields($payment_data)
     {
-        $tools = $this->toolsSpecific;
-        $validate = $this->validateSpecific;
+        $tools = $this->toolsAdapter;
+        $validate = $this->validateAdapter;
         $errors = [];
 
         if (!$payment_data || !is_array($payment_data)) {
@@ -234,11 +234,11 @@ class OneyRepository extends BaseClass
                     break;
                 case 'mobile_phone_number':
                     $id_address = $type == 'shipping' ?
-                        $this->contextSpecific->getContext()->cart->id_address_delivery :
-                        $this->contextSpecific->getContext()->cart->id_address_invoice;
-                    $address = $this->addressSpecific->getAddress($id_address);
-                    $country = $this->countrySpecific->getCountry($address->id_country);
-                    $valid = ConfigClass::isValidMobilePhoneNumber($country->iso_code, $data);
+                        $this->contextAdapter->getContext()->cart->id_address_delivery :
+                        $this->contextAdapter->getContext()->cart->id_address_invoice;
+                    $address = $this->addressAdapter->getAddress($id_address);
+                    $country = $this->countryAdapter->getCountry($address->id_country);
+                    $valid = $this->dependencies->configClass->isValidMobilePhoneNumber($country->iso_code, $data);
                     if (!$valid) {
                         $errors[] = $this->dependencies->l('Please enter your mobile phone number.', 'oneyrepository');
                     }
@@ -302,7 +302,7 @@ class OneyRepository extends BaseClass
      */
     public function deleteOneyConfig()
     {
-        $config = $this->configurationSpecific;
+        $config = $this->configurationAdapter;
 
         return ($config->deleteByName(
             $this->dependencies->getConfigurationKey('oney')
@@ -324,12 +324,12 @@ class OneyRepository extends BaseClass
     {
         $this->assignLegalNotice();
         $this->assign->assign([
-            'use_fees' => (bool)$this->configurationSpecific->get(
+            'use_fees' => (bool)$this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             ),
-            'iso_code' => $this->toolsSpecific->tool(
+            'iso_code' => $this->toolsAdapter->tool(
                 'strtoupper',
-                $this->contextSpecific->getContext()->language->iso_code
+                $this->contextAdapter->getContext()->language->iso_code
             )
         ]);
         return $this->dependencies->configClass->fetchTemplate('oney/popin.tpl');
@@ -344,22 +344,22 @@ class OneyRepository extends BaseClass
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
-        $withFirstSchedule = $this->contextSpecific->getContext()->language->iso_code == 'it';
+        $withFirstSchedule = $this->contextAdapter->getContext()->language->iso_code == 'it';
         $vars = [
-            'use_fees' => (bool)$this->configurationSpecific->get(
+            'use_fees' => (bool)$this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             ),
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
-                'value' => $this->toolsSpecific->tool('displayPrice', $amount),
+                'value' => $this->toolsAdapter->tool('displayPrice', $amount),
             ],
             'withFirstSchedule' => $withFirstSchedule,
-            'iso_code' => $this->toolsSpecific->tool(
+            'iso_code' => $this->toolsAdapter->tool(
                 'strtoupper',
-                $this->contextSpecific->getContext()->language->iso_code
+                $this->contextAdapter->getContext()->language->iso_code
             ),
-            'merchant_company_iso' => $this->configurationSpecific->get(
+            'merchant_company_iso' => $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('companyIso')
             )
         ];
@@ -377,12 +377,12 @@ class OneyRepository extends BaseClass
     public function displayOneyPaymentOptions()
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $cart = $this->contextSpecific->getContext()->cart;
-            if ($this->validateSpecific->validate('isLoadedObject', $cart)
+            $cart = $this->contextAdapter->getContext()->cart;
+            if ($this->validateAdapter->validate('isLoadedObject', $cart)
                 && $cart->id_address_invoice && $cart->id_address_delivery) {
                 $is_elligible = $this->isOneyElligible($cart);
             } else {
-                if ($this->validateSpecific->validate('isLoadedObject', $cart)) {
+                if ($this->validateAdapter->validate('isLoadedObject', $cart)) {
                     $amount = $cart->getOrderTotal(true);
                 } else {
                     $amount = 0;
@@ -395,7 +395,7 @@ class OneyRepository extends BaseClass
             $oneyImagex4 = '/modules/' . $this->dependencies->name . '/views/img/oney/x4_with';
             $oneyImage = '';
 
-            $use_fees = (bool)$this->configurationSpecific->get(
+            $use_fees = (bool)$this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             );
             if (!$use_fees) {
@@ -404,8 +404,8 @@ class OneyRepository extends BaseClass
 
             $oneyImage .= '_fees';
 
-            $iso = $this->toolsSpecific->tool('strtoupper', $this->contextSpecific->getContext()->language->iso_code);
-            $merchant_company_iso = (string)$this->configurationSpecific->get(
+            $iso = $this->toolsAdapter->tool('strtoupper', $this->contextAdapter->getContext()->language->iso_code);
+            $merchant_company_iso = (string)$this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('companyIso')
             );
             if ($use_fees === false) {
@@ -473,7 +473,7 @@ class OneyRepository extends BaseClass
      */
     public function formatOneyResource($operation = false, $resource = [], $total_amount = false)
     {
-        $tools = $this->toolsSpecific;
+        $tools = $this->toolsAdapter;
 
         if (!in_array($operation, $this->oneyEntity->getOperations()) || !$operation) {
             return false;
@@ -549,9 +549,15 @@ class OneyRepository extends BaseClass
      */
     public function getOneyCTA($env = null)
     {
+        $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
+        $amount = $this->contextAdapter->getContext()->cart->getOrderTotal($use_taxes);
+        $is_elligible = $this->isValidOneyAmount($amount);
+        $is_elligible = $is_elligible['result'];
+
         $this->assign->assign([
             'env' => $env,
-            'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository')
+            'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
+            'payplug_is_oney_elligible' => $is_elligible
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
@@ -564,30 +570,30 @@ class OneyRepository extends BaseClass
      */
     public function getOneyDeliveryContext()
     {
-        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
+        $cart = $this->cartAdapter->get((int)$this->contextAdapter->getContext()->cart->id);
 
-        if ($this->cartSpecific->isVirtualCart($cart)) {
+        if ($this->cartAdapter->isVirtualCart($cart)) {
             return [
-                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'delivery_label' => $this->configurationAdapter->get('PS_SHOP_NAME'),
                 'expected_delivery_date' => date('Y-m-d'),
                 'delivery_type' => 'edelivery',
             ];
         }
 
-        $carrier = $this->carrierSpecific->get($cart->id_carrier);
+        $carrier = $this->carrierAdapter->get((int)$cart->id_carrier);
 
-        if ($this->validateSpecific->validate('isLoadedObject', $carrier)) {
+        if ($this->validateAdapter->validate('isLoadedObject', $carrier)) {
             return [
-                'delivery_label' => $carrier->name ? $carrier->name : $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'delivery_label' => $carrier->name ? $carrier->name : $this->configurationAdapter->get('PS_SHOP_NAME'),
                 'expected_delivery_date' => date(
                     'Y-m-d',
-                    strtotime('+' . $this->carrierSpecific->getDefaultDelay() . ' day')
+                    strtotime('+' . $this->carrierAdapter->getDefaultDelay() . ' day')
                 ),
-                'delivery_type' => $this->carrierSpecific->getDefaultDeliveryType()
+                'delivery_type' => $this->carrierAdapter->getDefaultDeliveryType()
             ];
         } else {
             return [
-                'delivery_label' => $this->configurationSpecific->get('PS_SHOP_NAME'),
+                'delivery_label' => $this->configurationAdapter->get('PS_SHOP_NAME'),
                 'expected_delivery_date' => date('Y-m-d'),
                 'delivery_type' => 'edelivery',
             ];
@@ -602,12 +608,12 @@ class OneyRepository extends BaseClass
     public function getOneyPaymentContext()
     {
         $cart_context = [];
-        $cart = $this->cartSpecific->get($this->contextSpecific->getContext()->cart->id);
-        if (!$this->validateSpecific->validate('isLoadedObject', $cart)) {
+        $cart = $this->cartAdapter->get((int)$this->contextAdapter->getContext()->cart->id);
+        if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return ['cart' => $cart_context];
         }
 
-        $products = $this->cartSpecific->getProducts($cart);
+        $products = $this->cartAdapter->getProducts($cart);
         $delivery_context = $this->getOneyDeliveryContext();
 
         foreach ($products as $product) {
@@ -618,13 +624,13 @@ class OneyRepository extends BaseClass
 
             $item = [
                 'merchant_item_id' => $product['id_product'],
-                'name' =>  $this->toolsSpecific->substr($productName, 0, 250),
+                'name' =>  $this->toolsAdapter->substr($productName, 0, 250),
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
                 'total_amount' => (string)$unit_price * $product['cart_quantity'],
                 'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
-                    $this->toolsSpecific->substr($product['manufacturer_name'], 0, 250) :
-                    $this->configurationSpecific->get('PS_SHOP_NAME')
+                    $this->toolsAdapter->substr($product['manufacturer_name'], 0, 250) :
+                    $this->configurationAdapter->get('PS_SHOP_NAME')
             ];
 
             $cart_context[] = array_merge($item, $delivery_context);
@@ -653,7 +659,7 @@ class OneyRepository extends BaseClass
         $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
 
         if (!$country) {
-            $iso_code_list = $this->configurationSpecific->get(
+            $iso_code_list = $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyAllowedCountries')
             );
             if (!$iso_code_list) {
@@ -665,12 +671,12 @@ class OneyRepository extends BaseClass
                 $country = reset($iso_list);
             }
         }
-        $country = $this->toolsSpecific->tool('strtoupper', $country);
+        $country = $this->toolsAdapter->tool('strtoupper', $country);
 
         $available_oney_payments = $this->oneyEntity->getOperations();
         $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
 
-        $use_fees = (bool)$this->configurationSpecific->get(
+        $use_fees = (bool)$this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('oneyFees')
         );
         foreach (array_keys($oney_simulations['simulations']) as $key) {
@@ -708,7 +714,7 @@ class OneyRepository extends BaseClass
      */
     public function getOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
-        if ($this->validateSpecific->validate('isLoadedObject', $cart)
+        if ($this->validateAdapter->validate('isLoadedObject', $cart)
             && $cart->id_address_invoice
             && $cart->id_address_delivery) {
             $is_elligible = $this->isOneyElligible($cart, $amount, $country);
@@ -728,13 +734,13 @@ class OneyRepository extends BaseClass
                 : $this->dependencies->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
         );
 
-        $withFirstSchedule = $this->contextSpecific->getContext()->language->iso_code == 'it';
+        $withFirstSchedule = $this->contextAdapter->getContext()->language->iso_code == 'it';
 
         $this->assign->assign([
             'payplug_oney_required_field' => $cart ? $this->displayOneyRequiredFields() : false,
             'payplug_oney_amount' => [
                 'amount' => $amount,
-                'value' => $this->toolsSpecific->tool('displayPrice', $amount),
+                'value' => $this->toolsAdapter->tool('displayPrice', $amount),
             ],
             'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
             'payplug_oney_error' => $error,
@@ -765,11 +771,11 @@ class OneyRepository extends BaseClass
      */
     public function setCustomOneyLimit($custom_oney_amount)
     {
-        $config = $this->configurationSpecific;
-        $tools = $this->toolsSpecific;
+        $config = $this->configurationAdapter;
+        $tools = $this->toolsAdapter;
 
         $id_currency = $config->get('PS_CURRENCY_DEFAULT');
-        $currency = $this->currencySpecific->getCurrency($id_currency);
+        $currency = $this->currencyAdapter->getCurrency($id_currency);
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
 
@@ -787,20 +793,20 @@ class OneyRepository extends BaseClass
      */
     public function getOneyPriceLimit($custom = true, $id_currency = false)
     {
-        $config = $this->configurationSpecific;
-        $tools = $this->toolsSpecific;
+        $config = $this->configurationAdapter;
+        $tools = $this->toolsAdapter;
 
-        if ($this->validateSpecific->validate('isLoadedObject', $id_currency)) {
+        if ($this->validateAdapter->validate('isLoadedObject', $id_currency)) {
             $currency = $id_currency;
         } else {
-            if (!is_int($id_currency) && $this->validateSpecific->validate('isLanguageIsoCode', $id_currency)) {
-                $id_currency = $this->countrySpecific->getByIso($id_currency);
+            if (!is_int($id_currency) && $this->validateAdapter->validate('isLanguageIsoCode', $id_currency)) {
+                $id_currency = $this->countryAdapter->getByIso($id_currency);
             }
             if (!$id_currency) {
                 $id_currency = $config->get('PS_CURRENCY_DEFAULT');
             }
 
-            $currency = $this->currencySpecific->getCurrency($id_currency);
+            $currency = $this->currencyAdapter->getCurrency($id_currency);
         }
 
         $limits = [
@@ -808,7 +814,7 @@ class OneyRepository extends BaseClass
             'max' => false
         ];
 
-        if (!$this->validateSpecific->validate('isLoadedObject', $currency)) {
+        if (!$this->validateAdapter->validate('isLoadedObject', $currency)) {
             return $limits;
         }
 
@@ -872,22 +878,22 @@ class OneyRepository extends BaseClass
     public function getOneyRequiredFields()
     {
         $fields = [];
-        $customer = $this->contextSpecific->getContext()->customer;
-        if (!$this->validateSpecific->validate("isLoadedObject", $customer)) {
+        $customer = $this->contextAdapter->getContext()->customer;
+        if (!$this->validateAdapter->validate("isLoadedObject", $customer)) {
             return $fields;
         }
-        $id_address_delivery = $this->contextSpecific->getContext()->cart->id_address_delivery;
-        $id_address_invoice = $this->contextSpecific->getContext()->cart->id_address_invoice;
+        $id_address_delivery = $this->contextAdapter->getContext()->cart->id_address_delivery;
+        $id_address_invoice = $this->contextAdapter->getContext()->cart->id_address_invoice;
         $is_same = $id_address_delivery == $id_address_invoice;
 
         $shipping_fields = [];
-        $shipping_address = $this->addressSpecific->getAddress($id_address_delivery);
+        $shipping_address = $this->addressAdapter->getAddress($id_address_delivery);
 
-        if (!$this->validateSpecific->validate("isLoadedObject", $shipping_address)) {
+        if (!$this->validateAdapter->validate("isLoadedObject", $shipping_address)) {
             return $fields;
         }
         $shipping_data = [
-            'email' => $this->contextSpecific->getContext()->customer->email,
+            'email' => $this->contextAdapter->getContext()->customer->email,
             'mobile_phone_number' => $shipping_address->phone_mobile
                 ? $shipping_address->phone_mobile
                 : $shipping_address->phone,
@@ -957,9 +963,9 @@ class OneyRepository extends BaseClass
             }
 
             $billing_fields = [];
-            $billing_address = $this->addressSpecific->getAddress($id_address_invoice);
+            $billing_address = $this->addressAdapter->getAddress($id_address_invoice);
 
-            if (!$this->validateSpecific->validate("isLoadedObject", $billing_address)) {
+            if (!$this->validateAdapter->validate("isLoadedObject", $billing_address)) {
                 return $fields;
             }
 
@@ -1044,7 +1050,7 @@ class OneyRepository extends BaseClass
      */
     public function getOneySimulations($amount, $country, $operation)
     {
-        $tools = $this->toolsSpecific;
+        $tools = $this->toolsAdapter;
         $cache_key = $this->cache->setCacheKey($amount, $country, $operation);
 
         if (!$cache_key['result']) {
@@ -1059,7 +1065,7 @@ class OneyRepository extends BaseClass
         $cache = $this->cache->getCacheByKey($cache_key['result']);
 
         if ($cache['result']) {
-            return $tools->tool('jsonDecode', $cache['result']['cache_value'], true);
+            return $tools->jsonDecode($cache['result']['cache_value'], true);
         }
 
 
@@ -1121,7 +1127,7 @@ class OneyRepository extends BaseClass
             return false;
         }
 
-        $tools = $this->toolsSpecific;
+        $tools = $this->toolsAdapter;
 
         // Check the shipping fields
         $shipping = $payment_data['shipping'];
@@ -1133,7 +1139,7 @@ class OneyRepository extends BaseClass
         }
 
         // Validate phone number
-        $valid_shipping_mobile = ConfigClass::isValidMobilePhoneNumber(
+        $valid_shipping_mobile = $this->dependencies->configClass->isValidMobilePhoneNumber(
             $shipping['country'],
             $shipping['mobile_phone_number']
         );
@@ -1150,7 +1156,7 @@ class OneyRepository extends BaseClass
         $billing = $payment_data['billing'];
 
         // Validate phone number
-        $valid_billing_mobile = ConfigClass::isValidMobilePhoneNumber(
+        $valid_billing_mobile = $this->dependencies->configClass->isValidMobilePhoneNumber(
             $billing['country'],
             $billing['mobile_phone_number']
         );
@@ -1174,7 +1180,7 @@ class OneyRepository extends BaseClass
      */
     public function isOneyAllowedCurrency($id_currency)
     {
-        if ($this->validateSpecific->validate('isLoadedObject', $id_currency)) {
+        if ($this->validateAdapter->validate('isLoadedObject', $id_currency)) {
             $currency = $id_currency;
         } elseif (is_int($id_currency)) {
             $currency = new \Currency($id_currency);
@@ -1182,16 +1188,16 @@ class OneyRepository extends BaseClass
             return false;
         }
 
-        if (!$this->validateSpecific->validate('isLoadedObject', $currency)) {
+        if (!$this->validateAdapter->validate('isLoadedObject', $currency)) {
             return false;
         }
 
         // we use the Oney limit to get allowed currencies
-        $oney_min_amounts = $this->toolsSpecific->tool(
+        $oney_min_amounts = $this->toolsAdapter->tool(
             'strtoupper',
-            $this->configurationSpecific->get($this->dependencies->getConfigurationKey('oneyMinAmounts'))
+            $this->configurationAdapter->get($this->dependencies->getConfigurationKey('oneyMinAmounts'))
         );
-        $iso_code = $this->toolsSpecific->tool('strtoupper', $currency->iso_code);
+        $iso_code = $this->toolsAdapter->tool('strtoupper', $currency->iso_code);
 
         return strpos($oney_min_amounts, $iso_code) !== false;
     }
@@ -1252,8 +1258,8 @@ class OneyRepository extends BaseClass
     public function isOneyAllowed()
     {
         return $this->dependencies->configClass->isAllowed()
-            && $this->configurationSpecific->get($this->dependencies->getConfigurationKey('oney'))
-            && $this->isOneyAllowedCurrency($this->contextSpecific->getContext()->currency);
+            && $this->configurationAdapter->get($this->dependencies->getConfigurationKey('oney'))
+            && $this->isOneyAllowedCurrency($this->contextAdapter->getContext()->currency);
     }
 
     /**
@@ -1291,8 +1297,8 @@ class OneyRepository extends BaseClass
                 'result' => false,
                 'error' => sprintf(
                     $this->dependencies->l('The total amount of your order should be between %s and %s to pay with Oney.', 'oneyrepository'),
-                    $this->toolsSpecific->tool('displayPrice', $limits['min']),
-                    $this->toolsSpecific->tool('displayPrice', $limits['max'])
+                    $this->toolsAdapter->tool('displayPrice', $limits['min']),
+                    $this->toolsAdapter->tool('displayPrice', $limits['max'])
                 )
             ];
         }
@@ -1307,14 +1313,14 @@ class OneyRepository extends BaseClass
      */
     public function isValidOneyCart($cart)
     {
-        if (!$this->validateSpecific->validate('isLoadedObject', $cart)) {
+        if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return [
                 'result' => false,
                 'error' => $this->dependencies->l('The cart is unvalid', 'oneyrepository')
             ];
         }
 
-        $nb_products = $this->cartSpecific->nbProducts($cart);
+        $nb_products = $this->cartAdapter->nbProducts($cart);
 
         // todo: set as a constant
         $max = 1000;
@@ -1350,10 +1356,10 @@ class OneyRepository extends BaseClass
         }
 
         // check if the shipping country are different then return false
-        $iso_code = $this->toolsSpecific->tool('strtoupper', $shipping_iso);
-        $allow_countries = $this->toolsSpecific->tool(
+        $iso_code = $this->toolsAdapter->tool('strtoupper', $shipping_iso);
+        $allow_countries = $this->toolsAdapter->tool(
             'strtoupper',
-            $this->configurationSpecific->get(
+            $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyAllowedCountries')
             )
         );
@@ -1374,9 +1380,9 @@ class OneyRepository extends BaseClass
             /*
             $list = [];
             foreach ($iso_list as $iso) {
-                $id_country = $this->countrySpecific->getByIso($iso);
-                $list[] = $this->countrySpecific->getNameById(
-                    $this->contextSpecific->getContext()->language->id,
+                $id_country = $this->countryAdapter->getByIso($iso);
+                $list[] = $this->countryAdapter->getNameById(
+                    $this->contextAdapter->getContext()->language->id,
                     $id_country
                 );
             }
@@ -1404,8 +1410,8 @@ class OneyRepository extends BaseClass
      */
     public function isValidOneyEmail($email)
     {
-        $tools = $this->toolsSpecific;
-        $validate = $this->validateSpecific;
+        $tools = $this->toolsAdapter;
+        $validate = $this->validateAdapter;
         $error = false;
 
         if (!is_string($email) || empty($email) || !$validate->validate('isEmail', $email)) {

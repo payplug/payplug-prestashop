@@ -19,15 +19,34 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-var $document, $window;
+var $document, $window, session = null;
 window[module_name+'ModuleApplePay'] = {
     init: function () {
         $('apple-pay-button').click(function() {
+            if (session != null) {
+                return;
+            }
+
+            var data='';
+            $.ajax({
+                method: "POST",
+                url: applePayPaymentRequestAjaxURL,
+                async: false
+            })
+                .success(function (datas) {
+                    data = JSON.parse(datas);
+                })
+                .error(function () {
+                    $('#apple-pay-button').css('pointer-events', 'auto');
+                    session = null;
+                    payplugModule.popup.set(payplug_transaction_error_message);
+                })
+
             // Define ApplePayPaymentRequest
-            const request = applePayPaymentRequest;
+            const request = data.applePayPaymentRequest;
 
             // Create ApplePaySession
-            const session = new ApplePaySession(3, request);
+            session = new ApplePaySession(3, request);
             var paymentId= null;
 
             $.ajax({
@@ -41,101 +60,95 @@ window[module_name+'ModuleApplePay'] = {
                     $('#apple-pay-button').css('pointer-events', 'none');
                 }
             })
-            .success(function (datas) {
-                var datas = JSON.parse(datas);
-                if (!datas.result) {
-                    console.log(datas.error_message);
-                    $('#apple-pay-button').css('pointer-events', 'auto');
-                    payplugModule.popup.set(payplug_transaction_error_message);
-                    return;
-                }
-
-                try {
-                    var merchant_session_object = datas.apiResponse.merchant_session;
-                    paymentId = datas.idPayment;
-                    var id_cart = datas.idCart;
-                } catch (error) {
-                    console.error(error);
-                    payplugModule.popup.set(payplug_transaction_error_message);
-                    return;
-                }
-
-                session.onvalidatemerchant = async event => {
-                    try {
-                        session.completeMerchantValidation(datas.apiResponse.merchant_session);
-                    } catch (err) {
-                        console.error(err);
-                    }
-                };
-
-                /*session.onpaymentmethodselected = event => {
-                    // Define ApplePayPaymentMethodUpdate based on the selected payment method.
-                    // No updates or errors are needed, pass an empty object.
-                    const update = {};
-                    session.completePaymentMethodSelection(update);
-                };*/
-
-                session.onshippingmethodselected = event => {
-                    // Define ApplePayShippingMethodUpdate based on the selected shipping method.
-                    // No updates or errors are needed, pass an empty object.
-                    const update = {};
-                    session.completeShippingMethodSelection(update);
-                };
-
-                session.onshippingcontactselected = event => {
-                    // Define ApplePayShippingContactUpdate based on the selected shipping contact.
-                    const update = {};
-                    session.completeShippingContactSelection(update);
-                };
-
-                session.onpaymentauthorized = event => {
-                    // Define ApplePayPaymentAuthorizationResult
-                    $.ajax({
-                        method: "POST",
-                        url: payplug_ajax_url,
-                        data: {
-                            _ajax: 1,
-                            token: event.payment.token,
-                            pay_id: paymentId,
-                            cart_id: id_cart,
-                            patchPayment: 1
-                        }
-                    })
-                    .success(function (datas) {
-                        var datas = JSON.parse(datas);
-
-                        if (!datas.result) {
-                            session.completePayment({ "status": ApplePaySession.STATUS_FAILURE });
-                            $('#apple-pay-button').css('pointer-events', 'auto');
-                            payplugModule.popup.set(payplug_transaction_error_message);
-                            return;
-                        }
-
-                        session.completePayment({ "status": ApplePaySession.STATUS_SUCCESS });
-                        window.location.replace(datas.return_url);
-                    })
-                    .error(function () {
+                .success(function (datas) {
+                    var datas = JSON.parse(datas);
+                    if (!datas.result) {
+                        console.log(datas.error_message);
                         $('#apple-pay-button').css('pointer-events', 'auto');
+                        session = null;
                         payplugModule.popup.set(payplug_transaction_error_message);
-                    })
-                };
+                        return;
+                    }
 
-                session.oncancel = event => {
-                    // Payment cancelled by WebKit
+                    try {
+                        var merchant_session_object = datas.apiResponse.merchant_session;
+                        paymentId = datas.idPayment;
+                        var id_cart = datas.idCart;
+                    } catch (error) {
+                        console.error(error);
+                        payplugModule.popup.set(payplug_transaction_error_message);
+                        return;
+                    }
+
+                    session.onvalidatemerchant = async event => {
+                        try {
+                            session.completeMerchantValidation(datas.apiResponse.merchant_session);
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    };
+
+                    session.onshippingmethodselected = event => {
+                        // Define ApplePayShippingMethodUpdate based on the selected shipping method.
+                        // No updates or errors are needed, pass an empty object.
+                        const update = {};
+                        session.completeShippingMethodSelection(update);
+                    };
+
+                    session.onshippingcontactselected = event => {
+                        // Define ApplePayShippingContactUpdate based on the selected shipping contact.
+                        const update = {};
+                        session.completeShippingContactSelection(update);
+                    };
+
+                    session.onpaymentauthorized = event => {
+                        // Define ApplePayPaymentAuthorizationResult
+                        $.ajax({
+                            method: "POST",
+                            url: payplug_ajax_url,
+                            data: {
+                                _ajax: 1,
+                                token: event.payment.token,
+                                pay_id: paymentId,
+                                cart_id: id_cart,
+                                patchPayment: 1
+                            }
+                        })
+                            .success(function (datas) {
+                                var datas = JSON.parse(datas);
+
+                                if (!datas.result) {
+                                    session.completePayment({ "status": ApplePaySession.STATUS_FAILURE });
+                                    $('#apple-pay-button').css('pointer-events', 'auto');
+                                    session = null;
+                                    payplugModule.popup.set(payplug_transaction_error_message);
+                                    return;
+                                }
+
+                                session.completePayment({ "status": ApplePaySession.STATUS_SUCCESS });
+                                window.location.replace(datas.return_url);
+                            })
+                            .error(function () {
+                                $('#apple-pay-button').css('pointer-events', 'auto');
+                                session = null;
+                                payplugModule.popup.set(payplug_transaction_error_message);
+                            })
+                    };
+
+                    session.oncancel = event => {
+                        // Payment cancelled by WebKit
+                        $('#apple-pay-button').css('pointer-events', 'auto');
+                        session = null;
+                        console.log('payment cancel');
+                    };
+
+                    session.begin();
+                })
+                .error(function () {
                     $('#apple-pay-button').css('pointer-events', 'auto');
-                    console.log('payment cancel');
-                };
-
-                session.begin();
-            })
-            .error(function () {
-                $('#apple-pay-button').css('pointer-events', 'auto');
-                payplugModule.popup.set(payplug_transaction_error_message);
-            })
+                    session = null;
+                    payplugModule.popup.set(payplug_transaction_error_message);
+                })
         })
     }
 };
-
-$(document).ready(function () {
-    window[module_name+'ModuleApplePay'].init();
-});

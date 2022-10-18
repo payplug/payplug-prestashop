@@ -23,22 +23,7 @@
 
 namespace PayPlug\classes;
 
-use Address;
-use Db;
-use Cart;
-use Configuration;
-use Context;
-use Country;
-use Currency;
-use Customer;
 use Exception;
-use Language;
-use Message;
-use Order;
-use OrderHistory;
-use Shop;
-use Tools;
-use Validate;
 
 use Payplug\Notification;
 use Payplug\Exception\UnknownAPIResourceException;
@@ -56,6 +41,7 @@ class PayPlugNotifications
     public $cart = null;
     public $except;
     public $flag;
+    public $is_amex = false;
     public $is_applepay = false;
     public $is_oney = false;
     public $is_installment = false;
@@ -71,13 +57,33 @@ class PayPlugNotifications
     public $resp;
     public $sandbox;
     public $type;
+    public $query;
+
+    private $dependencies;
+
+    /* Plugin adapter */
+    private $addressAdapter;
+    private $cartAdapter;
+    private $configAdapter;
+    private $constantAdapter;
+    private $contextAdapter;
+    private $countryAdapter;
+    private $currencyAdapter;
+    private $customerAdapter;
+    private $languageAdapter;
+    private $messageAdapter;
+    private $orderAdapter;
+    private $orderHistoryAdapter;
+    private $shopAdapter;
+    private $toolsAdapter;
+    private $validateAdapter;
 
     private $amountCurrencyClass;
     private $apiClass;
-    private $dependencies;
     private $orderClass;
     private $paymentClass;
     private $installmentClass;
+    private $payplugLock;
     private $module;
     private $plugin;
 
@@ -124,10 +130,10 @@ class PayPlugNotifications
     private function dispatchPayment()
     {
         $this->logger->addLog('Notification: dispatchPayment');
-        $id_order = Order::getOrderByCartId($this->cart->id);
+        $id_order = $this->orderAdapter->getOrderByCartId($this->cart->id);
         if ($id_order) {
-            $this->order = new Order((int)$id_order);
-            if (!Validate::isLoadedObject($this->order)) {
+            $this->order = $this->orderAdapter->get((int)$id_order);
+            if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
                 $this->exitProcess('Order cannot be loaded.', 500);
             }
             $this->processUpdateOrder();
@@ -148,7 +154,7 @@ class PayPlugNotifications
             $this->logger->addLog($str);
         }
         if ($this->lock_key) {
-            if (!PayplugLock::deleteLockG2($this->lock_key)) {
+            if (!$this->payplugLock->deleteLockG2($this->lock_key)) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -206,15 +212,15 @@ class PayPlugNotifications
     private function getResource()
     {
         $this->logger->addLog('Notification: getResource');
-        $body = Tools::file_get_contents('php://input');
+        $body = $this->toolsAdapter->tool('file_get_contents', 'php://input');
 
         try {
             $resource = json_decode($body);
             $this->api_key = (bool)$resource->is_live ?
-                Configuration::get(
+                $this->configAdapter->get(
                     $this->dependencies->getConfigurationKey('liveApiKey')
                 ) :
-                Configuration::get(
+                $this->configAdapter->get(
                     $this->dependencies->getConfigurationKey('testApiKey')
                 );
             $this->apiClass->setSecretKey($this->api_key);
@@ -284,7 +290,7 @@ class PayPlugNotifications
 
         $currency = (int)$this->cart->id_currency;
         try {
-            $customer = new Customer((int)$this->cart->id_customer);
+            $customer = $this->customerAdapter->get((int)$this->cart->id_customer);
         } catch (Exception $exception) {
             $this->logger->addLog(
                 'Customer cannot be loaded: ' . $exception->getMessage(),
@@ -292,7 +298,7 @@ class PayPlugNotifications
             );
             $this->exitProcess($exception->getMessage(), 500);
         }
-        if (!Validate::isLoadedObject($customer)) {
+        if (!$this->validateAdapter->validate('isLoadedObject', $customer)) {
             $this->logger->addLog('Customer cannot be loaded.', 'error');
             $this->exitProcess('Customer cannot be loaded.', 500);
         }
@@ -344,11 +350,13 @@ class PayPlugNotifications
             $module_name = $this->dependencies->l('notification.createOrder.bancontact', 'payplugnotifications');
         } elseif ($this->is_applepay) {
             $module_name = $this->dependencies->l('notification.createOrder.applepay', 'payplugnotifications');
+        } elseif ($this->is_amex) {
+            $module_name = $this->dependencies->l('notification.createOrder.amex', 'payplugnotifications');
         }
 
         // Create Order
         try {
-            $cart_amount = (float)$this->cart->getOrderTotal(true, Cart::BOTH);
+            $cart_amount = (float)$this->cart->getOrderTotal(true);
 
             if ($amount != $cart_amount) {
                 $this->logger->addLog('Cart amount is different and may occurred an error');
@@ -378,8 +386,8 @@ class PayPlugNotifications
         $this->logger->addLog('Order validated.');
 
         // Then load it
-        $this->order = new Order($this->module->currentOrder);
-        if (!Validate::isLoadedObject($this->order)) {
+        $this->order = $this->orderAdapter->get((int)$this->module->currentOrder);
+        if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
             $this->logger->addLog('Order cannot be loaded.', 'error');
             $this->exitProcess('Order cannot be loaded.', 500);
         }
@@ -401,7 +409,7 @@ class PayPlugNotifications
 
             $this->logger->addLog('Payment patched.', 'debug');
 
-            if (!$this->orderClass->addPayplugOrderPayment($this->order->id, $this->payment->id)) {
+            if (!$this->orderClass->addPayplugOrderPayment((int)$this->order->id, $this->payment->id)) {
                 $this->logger->addLog(
                     'IPN Failed: unable to create order payment.',
                     'error'
@@ -421,8 +429,14 @@ class PayPlugNotifications
 
         // Check number of order using this cart
         $this->logger->addLog('Checking number of order passed with this id_cart');
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_cart` = ' . $this->cart->id;
-        $res_nb_orders = Db::getInstance()->executeS($sql);
+
+
+        $res_nb_orders = $this->query
+            ->select()
+            ->fields('*')
+            ->from($this->constantAdapter->get('_DB_PREFIX_') . 'orders')
+            ->where('id_cart = ' . (int)$this->cart->id)
+            ->build();
         if (!$res_nb_orders) {
             $this->logger->addLog(
                 'No order can be found using id_cart ' . (int)$this->cart->id,
@@ -565,27 +579,27 @@ class PayPlugNotifications
                 $this->exitProcess('Can\'t be refunded, because there is an error during retrieving Cart ID.', 500);
             }
 
-            $this->cart = new Cart($cart_id);
+            $this->cart = $this->cartAdapter->get((int)$cart_id);
 
-            if (!Validate::isLoadedObject($this->cart)) {
+            if (!$this->validateAdapter->validate('isLoadedObject', $this->cart)) {
                 $this->logger->addLog('Cart cannot be loaded.', 'error');
                 $this->logger->addLog('$cart_id : ' . $cart_id, 'debug');
                 $this->exitProcess('Cart cannot be loaded.', 500);
             }
 
-            $id_order = (int)Order::getOrderByCartId($cart_id);
-            $this->order = new Order($id_order);
+            $id_order = (int)$this->orderAdapter->getOrderByCartId((int)$cart_id);
+            $this->order = $this->orderAdapter->get((int)$id_order);
             $this->logger->addLog('Order ID : ' . $this->order->id);
-            if (!Validate::isLoadedObject($this->order)) {
+            if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
                 $this->logger->addLog('Order cannot be loaded.', 'error');
                 $this->exitProcess('Order cannot be loaded.', 500);
             }
 
             // Set lock Lock the process with id_cart from order object
             do {
-                $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
+                $cart_lock = $this->payplugLock->createLockG2((int)$this->cart->id, 'ipn');
                 if (!$cart_lock) {
-                    $checkReturn = PayplugLock::check($this->cart->id);
+                    $checkReturn = $this->payplugLock->check((int)$this->cart->id);
                     if ($checkReturn == "stop ipn") {
                         $this->exitProcess('Lock cannot be created.', 500);
                     }
@@ -600,24 +614,7 @@ class PayPlugNotifications
             $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {
-                $this->logger->addLog('Changing status to \'refunded\': ' . $new_order_state);
-                $order_history = new OrderHistory();
-                $order_history->id_order = $id_order;
-                try {
-                    $order_history->changeIdOrderState((int)$new_order_state, $this->order->id, true);
-                    $order_history->save();
-                    $this->exitProcess('Order state has been updated.');
-                } catch (Exception $exception) {
-                    $this->logger->addLog(
-                        'Order history cannot be saved: ' . $exception->getMessage(),
-                        'error'
-                    );
-                    $this->logger->addLog(
-                        'Please check if order state ' . (int)$new_order_state . ' exists.',
-                        'error'
-                    );
-                    $this->exitProcess($exception->getMessage(), 500);
-                }
+                $this->updateOrderState($new_order_state);
             } else {
                 $this->logger->addLog('Order status is already \'refunded\'');
                 $this->exitProcess('Order status is already \'refunded\'');
@@ -745,7 +742,7 @@ class PayPlugNotifications
         $this->logger->addLog('Is valid amount: ' . ($is_valid_amount ? 'ok' : 'ko'));
 
         if (!$is_valid_amount) {
-            $message = new Message();
+            $message = $this->messageAdapter->get();
             $msg = $this->dependencies->l('The amount collected by PayPlug is not the same', 'payplugnotifications');
             $msg .= $this->dependencies->l(' as the total value of the order', 'payplugnotifications');
             $message->message = $msg;
@@ -841,7 +838,7 @@ class PayPlugNotifications
         $this->logger->addLog('Type: ' . $type);
 
         $this->type = $type ?: 'undefined';
-        $method = 'processType' . Tools::ucfirst($this->type);
+        $method = 'processType' . $this->toolsAdapter->tool('ucfirst', $this->type);
         $this->$method();
     }
 
@@ -852,11 +849,12 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: setCartFromResource');
         if ($this->is_installment) {
-            $sql = 'SELECT `id_cart` 
-                    FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_payment` 
-                    WHERE `id_payment` = "' . pSQL($this->payment->installment_plan_id) . '"';
-            $id_cart = Db::getInstance()->getValue($sql);
-
+            $id_cart = $this->query
+                ->select()
+                ->fields('id_cart')
+                ->from($this->constantAdapter->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
+                ->where('`id_payment` = "' . pSQL($this->payment->installment_plan_id) . '"')
+                ->build('unique_value');
             if (!$id_cart) {
                 if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
                     $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
@@ -867,10 +865,12 @@ class PayPlugNotifications
                 $this->exitProcess($error_msg, 500);
             }
         } else {
-            $sql = 'SELECT `id_cart` 
-                    FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_payment` 
-                    WHERE `id_payment` = "' . pSQL($this->resource->id) . '"';
-            $id_cart = Db::getInstance()->getValue($sql);
+            $id_cart = $this->query
+                ->select()
+                ->fields('id_cart')
+                ->from($this->constantAdapter->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
+                ->where('`id_payment` = "' . pSQL($this->resource->id) . '"')
+                ->build('unique_value');
 
             if (!$id_cart) {
                 if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
@@ -883,11 +883,34 @@ class PayPlugNotifications
             }
         }
 
-        $this->cart = new Cart($id_cart);
-        if (!Validate::isLoadedObject($this->cart)) {
+        $this->cart = $this->cartAdapter->get((int)$id_cart);
+        if (!$this->validateAdapter->validate('isLoadedObject', $this->cart)) {
             $this->logger->addLog('The cart cannot be loaded with id ' . $id_cart, 'error');
             $this->exitProcess('The cart cannot be loaded.', 500);
         }
+    }
+
+    /**
+     * @description Set adapter use for the notification
+     *
+     */
+    private function setAdapters()
+    {
+        $this->addressAdapter       = $this->dependencies->getPlugin()->getAddress();
+        $this->cartAdapter          = $this->dependencies->getPlugin()->getCart();
+        $this->configAdapter        = $this->dependencies->getPlugin()->getConfiguration();
+        $this->constantAdapter      = $this->dependencies->getPlugin()->getConstant();
+        $this->contextAdapter       = $this->dependencies->getPlugin()->getContext();
+        $this->countryAdapter       = $this->dependencies->getPlugin()->getCountry();
+        $this->currencyAdapter      = $this->dependencies->getPlugin()->getCurrency();
+        $this->customerAdapter      = $this->dependencies->getPlugin()->getCustomer();
+        $this->languageAdapter      = $this->dependencies->getPlugin()->getLanguage();
+        $this->messageAdapter       = $this->dependencies->getPlugin()->getMessage();
+        $this->orderAdapter         = $this->dependencies->getPlugin()->getOrder();
+        $this->orderHistoryAdapter  = $this->dependencies->getPlugin()->getOrderHistory();
+        $this->shopAdapter          = $this->dependencies->getPlugin()->getShop();
+        $this->toolsAdapter         = $this->dependencies->getPlugin()->getTools();
+        $this->validateAdapter      = $this->dependencies->getPlugin()->getValidate();
     }
 
     /**
@@ -902,13 +925,18 @@ class PayPlugNotifications
         $this->except = null;
         $this->resp = [];
         $this->dependencies = new DependenciesClass();
+        $this->setAdapters();
+
         $this->apiClass = $this->dependencies->apiClass;
         $this->orderClass =  $this->dependencies->orderClass;
         $this->paymentClass =  $this->dependencies->paymentClass;
         $this->installmentClass =  $this->dependencies->installmentClass;
         $this->amountCurrencyClass = $this->dependencies->amountCurrencyClass;
+        $this->payplugLock = $this->dependencies->payplugLock;
+
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-        $this->sandbox = Configuration::get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $this->sandbox = $this->configAdapter->get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $this->query = $this->dependencies->getPlugin()->getQuery();
 
         $this->setLogger();
         $this->getResource();
@@ -922,17 +950,17 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: setContext');
         if (!isset($this->context)) {
-            $this->context = Context::getContext();
+            $this->context = $this->contextAdapter->get();
         }
 
         $this->context->cart = $this->cart;
-        $address = new Address((int)$this->cart->id_address_invoice);
-        $this->context->country = new Country((int)$address->id_country);
-        $this->context->customer = new Customer((int)$this->cart->id_customer);
-        $this->context->language = new Language((int)$this->cart->id_lang);
-        $this->context->currency = new Currency((int)$this->cart->id_currency);
+        $address = $this->addressAdapter->get((int)$this->cart->id_address_invoice);
+        $this->context->country = $this->countryAdapter->get((int)$address->id_country);
+        $this->context->customer = $this->customerAdapter->get((int)$this->cart->id_customer);
+        $this->context->language = $this->languageAdapter->get((int)$this->cart->id_lang);
+        $this->context->currency = $this->currencyAdapter->get((int)$this->cart->id_currency);
         if (isset($this->cart->id_shop)) {
-            $this->context->shop = new Shop($this->cart->id_shop);
+            $this->context->shop = $this->shopAdapter->get((int)$this->cart->id_shop);
         }
 
         $this->logger->addLog('Context setted');
@@ -945,9 +973,9 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: setLock');
         do {
-            $cart_lock = PayplugLock::createLockG2($this->cart->id, 'ipn');
+            $cart_lock = $this->payplugLock->createLockG2($this->cart->id, 'ipn');
             if (!$cart_lock) {
-                $checkReturn = PayplugLock::check($this->cart->id);
+                $checkReturn = $this->payplugLock->check($this->cart->id);
                 if ($checkReturn == "stop ipn") {
                     $this->exitProcess('Lock cannot be created.', 500);
                 }
@@ -977,28 +1005,28 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: setOrderStates');
         $state_addons = ($this->payment->is_live ? '' : '_TEST');
         $this->order_states = [
-            'pending' => Configuration::get(
+            'pending' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
             ),
-            'paid' => Configuration::get(
+            'paid' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
             ),
-            'error' => Configuration::get(
+            'error' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR') . $state_addons
             ),
-            'auth' => Configuration::get(
+            'auth' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_AUTH') . $state_addons
             ),
-            'expired' => Configuration::get(
+            'expired' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_EXP') . $state_addons
             ),
-            'oney' => Configuration::get(
+            'oney' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG') . $state_addons
             ),
-            'cancelled' => Configuration::get(
+            'cancelled' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_CANCELED')
             ),
-            'refund' => Configuration::get(
+            'refund' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
             )
         ];
@@ -1082,6 +1110,12 @@ class PayPlugNotifications
             $this->is_applepay = $this->payment->payment_method['type'] == 'apple_pay';
         }
         $this->logger->addLog('Notification: is_applepay: ' . ($this->is_applepay ? 'ok' : 'nok'));
+
+        // Define if payment is amex resource
+        if (isset($this->payment->payment_method) && isset($this->payment->payment_method['type'])) {
+            $this->is_amex = $this->payment->payment_method['type'] == 'american_express';
+        }
+        $this->logger->addLog('Notification: is_amex ' . ($this->is_amex ? 'ok' : 'nok'));
     }
 
     /**
@@ -1117,7 +1151,7 @@ class PayPlugNotifications
         }
 
         try {
-            $order_history = new OrderHistory();
+            $order_history = $this->orderHistoryAdapter->get();
             $order_history->id_order = (int)$this->order->id;
             $order_history->changeIdOrderState((int)$new_order_state, $this->order->id, true);
             $order_history->save();
@@ -1133,7 +1167,7 @@ class PayPlugNotifications
             $this->exitProcess($exception->getMessage(), 500);
         }
 
-        $this->order = new Order((int)$this->order->id);
+        $this->order = $this->orderAdapter->get((int)$this->order->id);
         $this->order->current_state = $order_history->id_order_state;
         try {
             $this->order->update();

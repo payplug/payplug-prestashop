@@ -210,6 +210,7 @@
                 ]
             ]}
             {include file='./../atoms/options/options.tpl'
+                optionsItems=$items
                 optionsClassName='_sandboxRadioButton'
                 optionsSelected=$payplug_switch.sandbox.checked
                 optionsName=$payplug_switch.sandbox.name}

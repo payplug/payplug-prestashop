@@ -56,6 +56,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $is_oney = (bool)($method === 'oney' && $oney_type);
             $is_bancontact = (bool)($method === 'bancontact');
             $is_applepay = (bool)($method === 'applepay');
+            $is_amex = (bool)($method === 'amex');
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
@@ -70,6 +71,19 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             if ($options['oney'] && $is_oney) {
                 $payment = $this->dependenciesClass->paymentClass->preparePayment(['is_oney' => $oney_type]);
                 if (!$payment['result']) {
+                    $this->toolsAdapter->tool('redirect', $error_url);
+                } else {
+                    $this->toolsAdapter->tool('redirect', $payment['return_url']);
+                }
+            } elseif ($options['amex'] && $is_amex) {
+                $payment_options = [
+                    'is_amex' => $is_amex,
+                ];
+                $payment = $this->dependenciesClass->paymentClass->preparePayment($payment_options);
+                if (!$payment['result']) {
+                    $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
+                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.')
+                    ]);
                     $this->toolsAdapter->tool('redirect', $error_url);
                 } else {
                     $this->toolsAdapter->tool('redirect', $payment['return_url']);
