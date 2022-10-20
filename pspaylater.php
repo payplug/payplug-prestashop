@@ -54,9 +54,12 @@ class PsPaylater extends PaymentModule
         $this->displayName = 'PrestaShop Paylater with PayPlug and Oney';
         $this->module_key = '5c403c88b9f9097fca7fd50c4f25b86d';
         $this->need_instance = true;
-        $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
         $this->version = '0.4.0';
+
+        if (version_compare(_PS_VERSION_, '8', '<')) {
+            $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7'];
+        }
 
         parent::__construct();
 
