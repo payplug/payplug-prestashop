@@ -290,7 +290,7 @@ class PaymentRepository extends BaseClass
         // Before create a new payment, delete the previous one, if exists and it's not a oneclick payment
         // to avoid double order creation
         if ($apiPayment = $this->checkPaymentTable($paymentDetails['cartId'])) {
-            if (!in_array($apiPayment['payment_method'], ['oneclick', 'bancontact', 'apple_pay', 'oney'])) {
+            if (!in_array($apiPayment['payment_method'], ['oneclick', 'bancontact', 'apple_pay', 'oney', 'amex'])) {
                 $payment = $this->dependencies->apiClass->retrievePayment($apiPayment['id_payment']);
                 if ($payment['result'] && !$payment['resource']->failure) {
                     $this->logger->addLog('Payment already exists: ' . $apiPayment['id_payment'] . ', so we delete it before create a new one');
@@ -381,6 +381,7 @@ class PaymentRepository extends BaseClass
         if (isset($this->apiPayment->hosted_payment->payment_url)) {
             $paymentDetails['paymentUrl'] = $this->apiPayment->hosted_payment->payment_url;
         }
+
         return [
             'result' => true,
             'paymentDetails' => $paymentDetails,
