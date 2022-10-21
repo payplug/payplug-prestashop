@@ -1190,7 +1190,7 @@ class PaymentClass
 
     private function getApplepayPaymentOption($payment_options)
     {
-        if (!$this->getBrowser() == 'Safari') {
+        if ('Safari' != $this->getBrowser()) {
             return $payment_options;
         }
 
