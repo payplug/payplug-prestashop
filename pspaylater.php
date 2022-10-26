@@ -416,8 +416,7 @@ class PsPaylater extends PaymentModule
         if ($this->module) {
             $flag = true;
 
-            //todo: Uncomment this line when clean script is ready
-            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
+            \PayPlug\src\utilities\helpers\FilesHelper::clean();
 
             // Use for update module is not fully installed
             if (!$soft_install) {
@@ -502,8 +501,7 @@ class PsPaylater extends PaymentModule
     {
         if ($this->module) {
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
-            //todo: Uncomment this line when clean script is ready
-            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
+            \PayPlug\src\utilities\helpers\FilesHelper::clean();
         }
 
         return parent::runUpgradeModule();
