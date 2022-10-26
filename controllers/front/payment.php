@@ -18,7 +18,7 @@
  * @author    PayPlug SAS
  * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ * International Registered Trademark & Property of PayPlug SAS
  */
 
 class PayplugPaymentModuleFrontController extends ModuleFrontController

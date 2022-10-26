@@ -19,7 +19,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 var allow_debug = true, debug = function (str) {
     if (allow_debug) {
         console.log(str);

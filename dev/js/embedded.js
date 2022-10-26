@@ -19,7 +19,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 $(document).ready(function() {
     if(typeof payplug_errors != 'undefined' && payplug_errors) {
         return false;

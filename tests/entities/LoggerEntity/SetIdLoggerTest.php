@@ -21,8 +21,6 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
-
-
 use PayPlug\src\models\entities\LoggerEntity;
 use PayPlug\src\exceptions\BadParameterException;
 use PHPUnit\Framework\TestCase;
