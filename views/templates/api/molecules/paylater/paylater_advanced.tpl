@@ -21,6 +21,12 @@
 *}
 
 {* Advanced Paylater Settings *}
+{if $oney_belgium}
+    {include file='./../../atoms/textAlert/textAlert.tpl'
+    textAlertType='warning'
+    textAlertText={l s='paylater.alertContent' tags=['<br>'] mod='payplug'}}
+{/if}
+
 {capture assign="paylaterAdvancedTitle"}{l s='paylater.block.accordionTitle' mod='payplug'}{/capture}
 {capture assign="paylaterAdvancedContent"}
     {capture assign="thresholdsTitle"}{l s='paylater.block.thresholdsTitle' mod='payplug'}{/capture}
@@ -103,7 +109,7 @@
     {capture assign="cartOneyCtaContent"}
     {/capture}
 
-    {assign var='paylaterAdvancedOptions' value=[
+    {assign var='paylaterBasicOptions' value=[
         [
             'className' => 'thresholds',
             'title' => $thresholdsTitle,
@@ -115,7 +121,10 @@
             'title' => $optimizedTitle,
             'content' => $optimizedContent,
             'switch' => $optimizedSwitch
-        ],
+        ]
+
+    ]}
+    {assign var="paylaterCartAndProductOptions" value=[
         [
             'className' => 'productOneyCta',
             'title' => $productOneyCtaTitle,
@@ -129,6 +138,12 @@
             'switch' => $cartOneyCtaSwitch
         ]
     ]}
+    {if !($oney_belgium || $oney_spain)}
+        {assign var='paylaterAdvancedOptions' value = $paylaterBasicOptions|array_merge:$paylaterCartAndProductOptions}
+    {else}
+        {assign var='paylaterAdvancedOptions' value = $paylaterBasicOptions}
+    {/if}
+
     {foreach $paylaterAdvancedOptions as $paylaterAdvancedOption}
         {include file='./paylater_advanced_option.tpl'
             paylaterAdvancedOptionClassName=$paylaterAdvancedOption.className

@@ -1,6 +1,8 @@
 {
   "features": [
     "feature_oney",
-    "feature_ps_account"
+    "feature_ps_account",
+    "feature_belgium_oney",
+    "feature_spain_oney"
   ]
 }

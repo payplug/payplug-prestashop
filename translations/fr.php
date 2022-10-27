@@ -361,6 +361,7 @@ $_MODULE['<{payplug}prestashop>paylater_advanced_6ac582bbcc5ea9159e91318fddbfdac
 $_MODULE['<{payplug}prestashop>paylater_advanced_7d1099b228b2b96f30eaaa8bd5052fe2'] = 'Afficher le logo Oney sur la page produit';
 $_MODULE['<{payplug}prestashop>paylater_advanced_80142c6e69c0f9cbfb72359668d152d4'] = 'et';
 $_MODULE['<{payplug}prestashop>paylater_advanced_8d604a04ff58a0ac82ba9df9a1aff105'] = 'Vos clients pourront voir le détail de leurs échéances en 3 ou 4 fois. [1]En savoir plus[/1].';
+$_MODULE['<{payplug}prestashop>paylater_advanced_8e3ffade00001a4b882076cdd72414b7'] = 'Attention : en raison de la réglementation belge sur les micro-crédits, le paiement en 4 fois n\'est pas disponible. [1] Seul le paiement en 3 fois apparaîtra sur votre boutique.';
 $_MODULE['<{payplug}prestashop>paylater_advanced_912c4c5bcef386d618d4069652369009'] = 'Paramètrages avancés';
 $_MODULE['<{payplug}prestashop>paylater_advanced_afafab57d74470e88a32b75fbf7585c8'] = 'Personnalisez votre offre de paiement fractionné';
 $_MODULE['<{payplug}prestashop>paylater_advanced_ef7c4029dae4055307a23b8ea0f301cd'] = 'Proposer le paiement fractionné garanti pour des montants entre';

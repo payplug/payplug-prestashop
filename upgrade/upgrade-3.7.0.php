@@ -18,7 +18,7 @@
  * @author    PayPlug SAS
  * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ * International Registered Trademark & Property of PayPlug SAS
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -33,18 +33,27 @@ function upgrade_module_3_7_0($object)
     $prestashop_order_states = [
         'PS_OS_PAYMENT' => 'paid',
         'PS_OS_WS_PAYMENT' => 'nothing',
-        'PS_OS_OUTOFSTOCK_PAID' => 'paid',
         'PS_OS_CANCELED' => 'cancelled',
         'PS_OS_REFUND' => 'refund',
         'PS_OS_ERROR' => 'error',
-        'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
         'PS_OS_CHEQUE' => 'nothing',
         'PS_OS_BANKWIRE' => 'nothing',
-        'PS_OS_COD_VALIDATION' =>'nothing',
         'PS_OS_PREPARATION' =>'nothing',
         'PS_OS_SHIPPING' =>'nothing',
         'PS_OS_DELIVERED'=>'nothing',
     ];
+    if (version_compare(_PS_VERSION_, '1.6.0.14', '<')) {
+        $prestashop_order_states += [
+            'PS_OS_OUTOFSTOCK' =>  'nothing'
+        ];
+    } else {
+        $prestashop_order_states += [
+            'PS_OS_OUTOFSTOCK_PAID' => 'paid',
+            'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
+            'PS_OS_COD_VALIDATION' =>'nothing',
+        ];
+    }
+
     $date = date('Y-m-d');
     $payplug_order_states_sql = [];
     foreach ($prestashop_order_states as $key => $type) {

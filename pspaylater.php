@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 /**
  * Check if prestashop Context.
  */
@@ -54,9 +53,12 @@ class PsPaylater extends PaymentModule
         $this->displayName = 'PrestaShop Paylater with PayPlug and Oney';
         $this->module_key = '5c403c88b9f9097fca7fd50c4f25b86d';
         $this->need_instance = true;
-        $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '0.3.0';
+        $this->version = '0.4.0';
+
+        if (version_compare(_PS_VERSION_, '8', '<')) {
+            $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7'];
+        }
 
         parent::__construct();
 
@@ -414,6 +416,9 @@ class PsPaylater extends PaymentModule
         if ($this->module) {
             $flag = true;
 
+            //todo: Uncomment this line when clean script is ready
+            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
+
             // Use for update module is not fully installed
             if (!$soft_install) {
                 $this->payplug_dependencies = null;
@@ -497,6 +502,8 @@ class PsPaylater extends PaymentModule
     {
         if ($this->module) {
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
+            //todo: Uncomment this line when clean script is ready
+            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
         }
 
         return parent::runUpgradeModule();

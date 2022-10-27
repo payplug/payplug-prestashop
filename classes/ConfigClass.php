@@ -24,6 +24,7 @@
 namespace PayPlug\classes;
 
 use libphonenumberlight;
+use PayPlug\src\utilities\validators\oneyValidator;
 
 class ConfigClass
 {
@@ -728,7 +729,6 @@ class ConfigClass
         }
 
         $this->checkConfiguration();
-
         $this->configurations = [
             'show' => $this->config->get($this->dependencies->getConfigurationKey('show')),
             'email' => $this->config->get($this->dependencies->getConfigurationKey('email')),
@@ -866,6 +866,33 @@ class ConfigClass
                 'inst_min_amount' => $this->config->get($this->dependencies->getConfigurationKey('instMinAmount'))
             ]
         );
+        $oneyValidator = new OneyValidator();
+
+        $oney_belgium =  $this->isValidFeature('feature_belgium_oney') && $oneyValidator->isOneyAllowedCountry($this->config->get(
+            $this->dependencies->getConfigurationKey(
+                'oneyAllowedCountries'
+            )
+        ), 'BE')['result'] ;
+
+
+        $oney_spain =$this->isValidFeature('feature_spain_oney') &&  $oneyValidator->isOneyAllowedCountry($this->config->get(
+            $this->dependencies->getConfigurationKey(
+                'oneyAllowedCountries'
+            )
+        ), 'ES')['result'];
+        // check if oney CTA should be displayed in the BO
+        if ($oney_belgium || $oney_spain) {
+            $this->config->updateValue(
+                $this->dependencies->getConfigurationKey('oneyProductCta'),
+                0
+            );
+            $this->config->updateValue(
+                $this->dependencies->getConfigurationKey('oneyCartCta'),
+                0
+            );
+        }
+        $this->configurations['oney_product_cta'] = $this->config->get($this->dependencies->getConfigurationKey('oneyProductCta'));
+        $this->configurations['oney_cart_cta'] = $this->config->get($this->dependencies->getConfigurationKey('oneyCartCta'));
 
         $this->context->smarty->assign([
             'form_action' => (string)($_SERVER['REQUEST_URI']),
@@ -908,6 +935,8 @@ class ConfigClass
             'oney_custom_max_amounts' => $oney_custom_max_amounts,
             'oney_custom_min_amounts' => $oney_custom_min_amounts,
             'iso' => $this->context->language->iso_code,
+            'oney_belgium' => $oney_belgium,
+            'oney_spain' => $oney_spain,
             'onboardingOneyCompleted' => $this->isOnboardingOneyCompleted(),
             'paymentMethods' => $this->dependencies->paymentClass->getPaymentMethods(),
             'onBoardingCheck' => false
@@ -1422,7 +1451,6 @@ class ConfigClass
                     $this->tools->tool('getValue', 'payplug_email')
                 );
                 $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 1);
-
                 $this->assignContentVar();
                 $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 

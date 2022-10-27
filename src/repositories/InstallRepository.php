@@ -176,18 +176,27 @@ class InstallRepository extends BaseClass
         $prestashop_order_states = [
             'PS_OS_PAYMENT' => 'paid',
             'PS_OS_WS_PAYMENT' => 'nothing',
-            'PS_OS_OUTOFSTOCK_PAID' => 'paid',
             'PS_OS_CANCELED' => 'cancelled',
             'PS_OS_REFUND' => 'refund',
             'PS_OS_ERROR' => 'error',
-            'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
             'PS_OS_CHEQUE' => 'nothing',
             'PS_OS_BANKWIRE' => 'nothing',
-            'PS_OS_COD_VALIDATION' =>'nothing',
             'PS_OS_PREPARATION' =>'nothing',
             'PS_OS_SHIPPING' =>'nothing',
             'PS_OS_DELIVERED'=>'nothing',
         ];
+
+        if (version_compare(_PS_VERSION_, '1.6.0.14', '<')) {
+            $prestashop_order_states += [
+                'PS_OS_OUTOFSTOCK' =>  'nothing'
+            ];
+        } else {
+            $prestashop_order_states += [
+                'PS_OS_OUTOFSTOCK_PAID' => 'paid',
+                'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
+                'PS_OS_COD_VALIDATION' =>'nothing',
+            ];
+        }
         $date = date('Y-m-d');
         $queries = [];
         foreach ($prestashop_order_states as $key => $type) {

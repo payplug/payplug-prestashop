@@ -33,8 +33,17 @@ class OneyEntity
     /**
      * @return array
      */
-    public function getOperations()
+    public function getOperations($oneyXtimes=false)
     {
+        // exclude oney Xtimes  in the checkout only for Belgium clients
+        if ($oneyXtimes) {
+            foreach ($oneyXtimes as $oney) {
+                $result = array_search($oney, $this->operations, true);
+                if ($result !== false) {
+                    unset($this->operations[$result]);
+                }
+            }
+        }
         return $this->operations;
     }
 

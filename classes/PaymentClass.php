@@ -1046,26 +1046,26 @@ class PaymentClass
             ],
             'advancedOptions' => [
                 'thresholds' => [
-                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-thresholds.svg',
+                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-thresholds.jpg',
                     'title' => $this->dependencies->l('paymentMethod.oneyThresholdsOption.title', 'paymentclass'),
                     'switch' => false,
                 ],
                 'optimised' => [
-                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-optimized.svg',
+                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-optimized.jpg',
                     'title' => $this->dependencies->l('paymentMethod.oneyOptimisedOption.title', 'paymentclass'),
                     'switch' => true,
                     'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_optimized')),
                     'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_optimized')),
                 ],
                 'product' => [
-                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-productOneyCta',
+                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-productOneyCta.jpg',
                     'title' => $this->dependencies->l('paymentMethod.productOneyCta.title', 'paymentclass'),
                     'switch' => true,
                     'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_product_cta')),
                     'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_product_cta')),
                 ],
                 'cart' => [
-                    'image_url' => $views_path . 'img/svg/screen/' . $this->dependencies->name . '-cartOneyCta',
+                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-cartOneyCta.jpg',
                     'title' => $this->dependencies->l('paymentMethod.productOneyCta.title', 'paymentclass'),
                     'switch' => true,
                     'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_cart_cta')),
@@ -1135,7 +1135,7 @@ class PaymentClass
         return $payment_options;
     }
 
-    private function getAmexPaymentOption($payment_options)
+    private function getAmexPaymentOption($payment_options, $options = [])
     {
         $payment_options['amex'] = [
             'name' => 'amex',
@@ -1190,7 +1190,7 @@ class PaymentClass
 
     private function getApplepayPaymentOption($payment_options)
     {
-        if ($this->getBrowser() != 'Safari') {
+        if ('Safari' != $this->getBrowser()) {
             return $payment_options;
         }
 
@@ -1430,8 +1430,18 @@ class PaymentClass
         if ($iso != 'IT' && $iso != 'FR') {
             $iso = $this->config->get($this->dependencies->getConfigurationKey('companyIso'));
         }
+        $shipping_address = $this->getShippingAddress($this->address, $this->context->cart);
+        $billing_address = $this->getBillingAddress($this->address, $this->context->cart);
+        $shipping_iso = $this->getShippingIso($shipping_address);
+        $billing_iso = $this->getBillingIso($billing_address);
 
-        $available_oney_payments = $this->oney->oneyEntity->getOperations();
+        if ($this->dependencies->configClass->isValidFeature('feature_belgium_oney')
+            && in_array('BE', explode(",", $this->config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries'))))
+            && ($shipping_iso == $billing_iso) && ($shipping_iso == 'BE')) {
+            $available_oney_payments = $this->oney->oneyEntity->getOperations(["x4_without_fees", "x4_with_fees"]);
+        } else {
+            $available_oney_payments = $this->oney->oneyEntity->getOperations();
+        }
         foreach ($available_oney_payments as $oney_payment) {
             $with_fees = (bool)strpos($oney_payment, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
@@ -2487,6 +2497,25 @@ class PaymentClass
         return (bool)$this->context->cookie->__get($this->dependencies->name . 'Errors');
     }
 
+    public function getShippingAddress($address, $cart)
+    {
+        return $address->get((int)$cart->id_address_delivery);
+    }
+
+    public function getBillingAddress($address, $cart)
+    {
+        return $address->get((int)$cart->id_address_invoice);
+    }
+
+    public function getShippingIso($shipping_address)
+    {
+        return $this->dependencies->configClass->getIsoCodeByCountryId((int)$shipping_address->id_country);
+    }
+
+    public function getBillingIso($billing_address)
+    {
+        return $this->dependencies->configClass->getIsoCodeByCountryId((int)$billing_address->id_country);
+    }
     public function getBrowser()
     {
         $arr_browsers = ["Opera", "Edg", "Chrome", "Safari", "Firefox", "MSIE", "Trident"];

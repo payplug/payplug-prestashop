@@ -24,7 +24,6 @@
 /**
  * @since 1.6.0
  */
-
 require_once(_PS_MODULE_DIR_.'payplug/payplug.php');
 include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
 

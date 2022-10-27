@@ -54,9 +54,12 @@ class Payplug extends PaymentModule
         $this->displayName = 'PayPlug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.8'];
         $this->tab = 'payments_gateways';
-        $this->version = '3.10.0';
+        $this->version = '3.11.0';
+
+        if (version_compare(_PS_VERSION_, '8', '<')) {
+            $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7'];
+        }
 
         parent::__construct();
 
@@ -450,6 +453,10 @@ class Payplug extends PaymentModule
                 }
             }
 
+            // Clean external files
+            //todo: Uncomment this line when clean script is ready
+            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
+
             return $flag;
         }
 
@@ -491,6 +498,8 @@ class Payplug extends PaymentModule
     {
         if ($this->module) {
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
+            //todo: Uncomment this line when clean script is ready
+            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
         }
 
         return parent::runUpgradeModule();

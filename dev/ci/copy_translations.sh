@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export languageCodes="es de pt nl"
+export languageCodes="de pt nl"
 
 currDir=${PWD##*/}
 

@@ -361,6 +361,7 @@ $_MODULE['<{payplug}prestashop>paylater_advanced_6ac582bbcc5ea9159e91318fddbfdac
 $_MODULE['<{payplug}prestashop>paylater_advanced_7d1099b228b2b96f30eaaa8bd5052fe2'] = 'Display the Oney logo on the product page';
 $_MODULE['<{payplug}prestashop>paylater_advanced_80142c6e69c0f9cbfb72359668d152d4'] = 'and';
 $_MODULE['<{payplug}prestashop>paylater_advanced_8d604a04ff58a0ac82ba9df9a1aff105'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose whether or not you want to pay all the fees. [1]Find out more.[/1]';
+$_MODULE['<{payplug}prestashop>paylater_advanced_8e3ffade00001a4b882076cdd72414b7'] = 'Please note: due to Belgian microcredit regulations, payment in 4x instalments is not available.[1] Only the 3x instalments payment option will appear on your store.';
 $_MODULE['<{payplug}prestashop>paylater_advanced_912c4c5bcef386d618d4069652369009'] = 'Advanced settings';
 $_MODULE['<{payplug}prestashop>paylater_advanced_afafab57d74470e88a32b75fbf7585c8'] = 'Customise your split payment offer';
 $_MODULE['<{payplug}prestashop>paylater_advanced_ef7c4029dae4055307a23b8ea0f301cd'] = 'Offer guaranteed split payments for amounts between';

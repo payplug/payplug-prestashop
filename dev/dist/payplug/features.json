@@ -1,5 +1,6 @@
 {
     "features": [
+        "feature_amex",
         "feature_applepay",
         "feature_bancontact",
         "feature_deferred",

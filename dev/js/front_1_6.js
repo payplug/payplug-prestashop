@@ -20,8 +20,6 @@
  *  @version   2.26.0
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
-// (function ($) {
 var $document,
     $window,
     payplugModule = {
@@ -932,5 +930,3 @@ $(document).ready(function () {
     $window = $(window);
     payplugModule.init();
 });
-
-// })(window.jQuery);
