@@ -322,7 +322,7 @@ class AdminClass
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
             $applepay_allowed_domains = false;
             if (isset($permissions['apple_pay_allowed_domains'])) {
-                if (in_array($this->config->get('PS_SHOP_DOMAIN'), $permissions['apple_pay_allowed_domains'])) {
+                if (in_array($this->context->shop->domain, $permissions['apple_pay_allowed_domains'])) {
                     $applepay_allowed_domains = true;
                 }
             }
