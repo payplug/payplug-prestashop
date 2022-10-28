@@ -797,7 +797,11 @@ class HookClass
 
     public function actionAdminControllerSetMedia()
     {
-        if ($this->dispatcher->getInstance()->getController() == 'AdminOrders' && $this->tools->tool('getValue', 'id_order')) {
+        $controller = $this->dispatcher->getInstance()->getController();
+        if ($controller
+            && 'adminorders' == strtolower($controller)
+            && $this->tools->tool('getValue', 'id_order')
+        ) {
             $order = $this->order->get($this->tools->tool('getValue', 'id_order'));
 
             if ($order->module == $this->dependencies->name) {
