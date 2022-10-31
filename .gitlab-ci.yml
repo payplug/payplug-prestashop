@@ -181,5 +181,4 @@ run_test:
       -F ref=master
       -F "variables[PS_SOURCE_BRANCH]=${CI_COMMIT_REF_NAME}"
       -F "variables[STAGES_TO_RUN]=smoke_presta_16, smoke_presta_17"
-      -F "variables[PSP]=dalenys"
       https://git.payplug.com/api/v4/projects/41/trigger/pipeline
