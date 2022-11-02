@@ -105,7 +105,7 @@ class PrestashopAdapter16
                 $is_elligible = $this->oney->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
             } else {
-                $amount = $cart->getOrderTotal(true, Cart::BOTH);
+                $amount = $cart->getOrderTotal(true);
                 $is_elligible = $this->oney->isValidOneyAmount($amount);
                 $error = !$is_elligible['result'];
             }
