@@ -105,7 +105,7 @@ class PayPlugAjax
                         '_ajax' => 1,
                     ];
                     $payment = $this->paymentClass->preparePayment($options);
-                    die($tools->tool('jsonEncode', $payment));
+                    die(json_encode($payment));
                 } else {
                     $cookie = $this->context->cookie;
                     $id_customer = (int)$cookie->id_customer;
@@ -125,11 +125,11 @@ class PayPlugAjax
                 if (!$this->config->get(
                     $this->dependencies->getConfigurationKey('oney')
                 )) {
-                    die($tools->tool('jsonEncode', ['result' => false, 'error' => false]));
+                    die(json_encode(['result' => false, 'error' => false]));
                 }
                 $id_shipping = $tools->tool('getValue', 'id_address_delivery');
                 $id_billing = $tools->tool('getValue', 'id_address_invoice');
-                die($tools->tool('jsonEncode', $this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
+                die(json_encode($this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool)$this->config->get('PS_TAX');
 
@@ -166,7 +166,7 @@ class PayPlugAjax
                     }
                 }
 
-                die($tools->tool('jsonEncode', $is_elligible));
+                die(json_encode($is_elligible));
             } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
                 $use_taxes = (bool)$this->config->get('PS_TAX');
 
@@ -202,33 +202,33 @@ class PayPlugAjax
                 try {
                     $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
                 } catch (Exception $e) {
-                    die($tools->tool('jsonEncode', [
+                    die(json_encode([
                         'result' => false,
                         'error' => $this->translate->translate(5) //('Oney is momentarily unavailable.')
                     ]));
                 }
 
-                die($tools->tool('jsonEncode', $payment_options));
+                die(json_encode($payment_options));
             } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
                 $errors = $this->paymentClass->getPaymentErrorsCookie();
 
                 if ($errors) {
-                    die($tools->tool('jsonEncode', ['result' => $this->paymentClass->displayPaymentErrors($errors)]));
+                    die(json_encode(['result' => $this->paymentClass->displayPaymentErrors($errors)]));
                 }
 
-                die($tools->tool('jsonEncode', ['result' => false]));
+                die(json_encode(['result' => false]));
             } elseif ($tools->tool('getIsset', 'savePaymentData')) {
                 $payment_data = $tools->tool('getValue', 'payment_data');
 
                 try {
                     if (empty($payment_data)) {
-                        die($tools->tool('jsonEncode', [
+                        die(json_encode([
                             'result' => false,
                             'message' => $this->translate->translate(1) //('Empty payment data')
                         ]));
                     } elseif ($this->oney->checkOneyRequiredFields($payment_data)) {
-                        die($tools->tool('jsonEncode', [
+                        die(json_encode([
                             'result' => false,
                             'message' => $this->translate->translate(2)
                         ]));
@@ -239,7 +239,7 @@ class PayPlugAjax
 
                 $result = $this->paymentClass->setPaymentDataCookie($payment_data);
 
-                die($tools->tool('jsonEncode', [
+                die(json_encode([
                     'result' => $result,
                     'message' => $result ?
                         $this->translate->translate(3) : //('Your information has been saved')

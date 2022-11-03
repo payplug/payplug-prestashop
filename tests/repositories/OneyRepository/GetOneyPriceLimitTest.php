@@ -78,7 +78,7 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
 
     public function testWithCurrencyObject()
     {
-        $this->currency->shouldReceive('getCurrency')
+        $this->currency->shouldReceive('get')
             ->andReturn($this->currencyMock);
 
         $this->assertSame(
@@ -88,7 +88,7 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
     }
     public function testIsValidCustomOneyMax()
     {
-        $this->currency->shouldReceive('getCurrency')
+        $this->currency->shouldReceive('get')
             ->andReturn($this->currencyMock);
         $custom_amount = $this->repo->getOneyPriceLimit(true, $this->currencyMock);
         $amount = $this->repo->getOneyPriceLimit(false, $this->currencyMock);
@@ -99,7 +99,7 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
     }
     public function testIsValidCustomOneyMin()
     {
-        $this->currency->shouldReceive('getCurrency')
+        $this->currency->shouldReceive('get')
             ->andReturn($this->currencyMock);
         $custom_amount = $this->repo->getOneyPriceLimit(true, $this->currencyMock);
         $amount =  $this->repo->getOneyPriceLimit(false, $this->currencyMock);
@@ -122,7 +122,7 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
      */
     public function testWithValidDataProvider($data)
     {
-        $this->currency->shouldReceive('getCurrency')
+        $this->currency->shouldReceive('get')
             ->andReturn($this->currencyMock);
 
         $this->assertSame(
@@ -133,7 +133,7 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
 
     public function testWithNoCurrencyFound()
     {
-        $this->currency->shouldReceive('getCurrency')
+        $this->currency->shouldReceive('get')
             ->andReturn(false);
 
         $this->assertSame(

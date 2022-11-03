@@ -524,7 +524,7 @@ class PayPlugValidation
                     true,
                     $exception->getCode()
                 );
-                die($this->toolsAdapter->tools('jsonEncode', $this->response));
+                die(json_encode($this->response));
             }
 
             if (!$validateOrder_result) {

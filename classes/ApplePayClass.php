@@ -42,7 +42,7 @@ class ApplePayClass
     public function getPaymentRequest($page)
     {
         $additionalPaymentRequestDatas = array();
-        $currency = $this->currency->getCurrency($this->context->cart->id_currency);
+        $currency = $this->currency->get((int)$this->context->cart->id_currency);
 
         // Uncomment this when page panier developments will starts
         /*if ($page != 'order') {

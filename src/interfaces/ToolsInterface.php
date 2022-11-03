@@ -27,5 +27,4 @@ interface ToolsInterface
 {
     public function tool($action, $param1, $param2, $param3, $param4);
     public function substr($string, $offset, $length);
-    public function jsonDecode($data, $assoc, $depth, $options);
 }

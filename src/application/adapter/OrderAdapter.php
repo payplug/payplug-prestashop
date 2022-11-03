@@ -30,9 +30,15 @@ class OrderAdapter implements OrderInterface
 {
     public function get($idOrder = null)
     {
+        if (!is_int($idOrder)) {
+            $idOrder = false;
+        }
         return new Order($idOrder);
     }
 
+    /**
+     * @deprecated since 1.7.1.0 Use getIdByCartId() instead
+     */
     public function getOrderByCartId($idCart = null)
     {
         return Order::getOrderByCartId($idCart);

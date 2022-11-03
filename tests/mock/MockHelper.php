@@ -64,8 +64,6 @@ class MockHelper extends Mockery
             ->shouldReceive('tool')
             ->andReturnUsing(function ($action, $value, $params2 = false) {
                 switch ($action) {
-                    case 'jsonDecode':
-                        return json_decode($value, $params2);
                     case 'strlen':
                         return strlen($value);
                     case 'strpos':
@@ -90,11 +88,6 @@ class MockHelper extends Mockery
             ->shouldReceive('substr')
             ->andReturnUsing(function ($param, $param1, $param2) {
                 return substr($param, $param1, $param2);
-            });
-        $tools
-            ->shouldReceive('jsonDecode')
-            ->andReturnUsing(function ($param, $param1) {
-                return json_decode($param, $param1);
             });
         return $tools;
     }
@@ -149,7 +142,7 @@ class MockHelper extends Mockery
     {
         $address = self::createMockFactory($classPathname);
         $address
-            ->shouldReceive('getAddress')
+            ->shouldReceive('get')
             ->andReturn(AddressMock::get());
         return $address;
     }
