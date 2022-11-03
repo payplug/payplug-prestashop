@@ -236,7 +236,7 @@ class OneyRepository extends BaseClass
                     $id_address = $type == 'shipping' ?
                         $this->contextAdapter->getContext()->cart->id_address_delivery :
                         $this->contextAdapter->getContext()->cart->id_address_invoice;
-                    $address = $this->addressAdapter->getAddress($id_address);
+                    $address = $this->addressAdapter->get((int)$id_address);
                     $country = $this->countryAdapter->getCountry($address->id_country);
                     $valid = $this->dependencies->configClass->isValidMobilePhoneNumber($country->iso_code, $data);
                     if (!$valid) {
@@ -775,7 +775,7 @@ class OneyRepository extends BaseClass
         $tools = $this->toolsAdapter;
 
         $id_currency = $config->get('PS_CURRENCY_DEFAULT');
-        $currency = $this->currencyAdapter->getCurrency($id_currency);
+        $currency = $this->currencyAdapter->get((int)$id_currency);
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
 
@@ -806,7 +806,7 @@ class OneyRepository extends BaseClass
                 $id_currency = $config->get('PS_CURRENCY_DEFAULT');
             }
 
-            $currency = $this->currencyAdapter->getCurrency($id_currency);
+            $currency = $this->currencyAdapter->get((int)$id_currency);
         }
 
         $limits = [
@@ -887,7 +887,7 @@ class OneyRepository extends BaseClass
         $is_same = $id_address_delivery == $id_address_invoice;
 
         $shipping_fields = [];
-        $shipping_address = $this->addressAdapter->getAddress($id_address_delivery);
+        $shipping_address = $this->addressAdapter->get((int)$id_address_delivery);
 
         if (!$this->validateAdapter->validate("isLoadedObject", $shipping_address)) {
             return $fields;
@@ -963,7 +963,7 @@ class OneyRepository extends BaseClass
             }
 
             $billing_fields = [];
-            $billing_address = $this->addressAdapter->getAddress($id_address_invoice);
+            $billing_address = $this->addressAdapter->get((int)$id_address_invoice);
 
             if (!$this->validateAdapter->validate("isLoadedObject", $billing_address)) {
                 return $fields;
@@ -1065,7 +1065,7 @@ class OneyRepository extends BaseClass
         $cache = $this->cache->getCacheByKey($cache_key['result']);
 
         if ($cache['result']) {
-            return $tools->jsonDecode($cache['result']['cache_value'], true);
+            return json_decode($cache['result']['cache_value'], true);
         }
 
 

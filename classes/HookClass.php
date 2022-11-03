@@ -713,7 +713,7 @@ class HookClass
             }
         }
 
-        $currency = $this->currency->getCurrency($id_currency);
+        $currency = $this->currency->get((int)$id_currency);
         if (!$this->validate->validate('isLoadedObject', $currency)) {
             return false;
         }
@@ -1146,7 +1146,7 @@ class HookClass
 
         $cart = $params['cart'];
 
-        $result_currency = $this->currency->getCurrency($cart->id_currency);
+        $result_currency = $this->currency->get((int)$cart->id_currency);
         $supported_currencies = \explode(';', $this->config->get(
             $this->dependencies->getConfigurationKey('currencies')
         ));
