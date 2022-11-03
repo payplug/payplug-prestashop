@@ -449,15 +449,15 @@ class PayPlugValidation
              * Maybe due to migration or Prestashop's Update
              */
             $secure_key = false;
-            if (isset($this->customerAdapter->secure_key) && !empty($this->customerAdapter->secure_key)) {
+            if (isset($customer->secure_key) && !empty($customer->secure_key)) {
                 if (isset($cart->secure_key)
                     && !empty($cart->secure_key)
-                    && $cart->secure_key !== $this->customerAdapter->secure_key
+                    && $cart->secure_key !== $customer->secure_key
                 ) {
                     $secure_key = $cart->secure_key;
                     $this->logger->addLog('Secure keys do not match.', 'error');
                 } else {
-                    $secure_key = $this->customerAdapter->secure_key;
+                    $secure_key = $customer->secure_key;
                 }
             }
 
