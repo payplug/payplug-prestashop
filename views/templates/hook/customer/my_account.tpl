@@ -20,36 +20,19 @@
 *  International Registered Trademark & Property of PayPlug SAS
 *}
 <!-- MODULE Payplug -->
-{if $version < 1.5}
-    <li>
-        <a title="{l s='Saved cards' mod='payplug'}" href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}">
-            <img class="icon" alt="{l s='Saved cards' mod='payplug'}" src="{$payplug_icon_url|escape:'htmlall':'UTF-8'}">
-        </a>
-        <a title="Bons de réduction" href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}">{l s='Saved cards' mod='payplug'}</a>
-    </li>
-{elseif $version < 1.6}
-    <li>
-        <a title="{l s='Saved cards' mod='payplug'}" href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}">
-            <img class="icon" alt="{l s='Saved cards' mod='payplug'}" src="{$payplug_icon_url|escape:'htmlall':'UTF-8'}">
-             {l s='Saved cards' mod='payplug'}
-        </a>
-    </li>
-{elseif $version < 1.7}
+{if $version < 1.7}
     <li>
         <a href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}" title="{l s='Saved cards' mod='payplug'}">
             <i class="icon-credit-card"></i>
             <span>{l s='Saved cards' mod='payplug'}</span>
         </a>
     </li>
-{elseif $version < 1.8}
+{else}
     <a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" id="savedcards-link" href="{$payplug_cards_url|escape:'htmlall':'UTF-8'}">
           <span class="link-item">
             <i class="material-icons">&#xE870;</i>
               {l s='Saved cards' mod='payplug'}
-{*              {l s='Saved cards' d='Modules.Payplug.Shop'}*}
           </span>
     </a>
-{else}
-    <p>{l s='Your Prestashop version is not compatible' mod='payplug'}</p>
 {/if}
 <!-- END : MODULE Payplug -->
