@@ -320,24 +320,27 @@ class AdminClass
         if ((int)$this->tools->tool('getValue', 'checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
-            $applepay_allowed_domains = false;
-            if (isset($permissions['apple_pay_allowed_domains'])) {
-                if (in_array($this->context->shop->domain, $permissions['apple_pay_allowed_domains'])) {
-                    $applepay_allowed_domains = true;
+            $return = [];
+            if (isset($permissions) && !is_bool($permissions)) {
+                $applepay_allowed_domains = false;
+                if (isset($permissions['apple_pay_allowed_domains'])) {
+                    if (in_array($this->context->shop->domain, $permissions['apple_pay_allowed_domains'])) {
+                        $applepay_allowed_domains = true;
+                    }
                 }
-            }
 
-            $return = [
-                'payplug_sandbox' => $permissions['use_live_mode'],
-                'payplug_one_click' => $permissions['can_save_cards'],
-                'payplug_oney' => $permissions['can_use_oney'],
-                'payplug_bancontact' => $permissions['can_use_bancontact'],
-                'payplug_applepay' => $permissions['can_use_applepay'],
-                'payplug_amex' => $permissions['can_use_amex'],
-                'payplug_inst' => $permissions['can_create_installment_plan'],
-                'payplug_deferred' => $permissions['can_create_deferred_payment'],
-                'applepay_allowed_domains' => $applepay_allowed_domains ,
-            ];
+                $return = [
+                    'payplug_sandbox' => $permissions['use_live_mode'],
+                    'payplug_one_click' => $permissions['can_save_cards'],
+                    'payplug_oney' => $permissions['can_use_oney'],
+                    'payplug_bancontact' => $permissions['can_use_bancontact'],
+                    'payplug_applepay' => $permissions['can_use_applepay'],
+                    'payplug_amex' => $permissions['can_use_amex'],
+                    'payplug_inst' => $permissions['can_create_installment_plan'],
+                    'payplug_deferred' => $permissions['can_create_deferred_payment'],
+                    'applepay_allowed_domains' => $applepay_allowed_domains ,
+                ];
+            }
             die(json_encode($return));
         }
 
