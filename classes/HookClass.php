@@ -802,15 +802,16 @@ class HookClass
             && 'adminorders' == strtolower($controller)
             && $this->tools->tool('getValue', 'id_order')
         ) {
-            $order = $this->order->get($this->tools->tool('getValue', 'id_order'));
-
+            $order = $this->order->get((int)$this->tools->tool('getValue', 'id_order'));
             if ($order->module == $this->dependencies->name) {
                 $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
-                $this->dependencies->mediaClass->setMedia([
-                    $module_url . 'views/css/admin_order-v'.$this->dependencies->version.'.css',
-                    $module_url . 'views/js/admin_order-v'.$this->dependencies->version.'.js',
-                    $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
-                ]);
+                $this->dependencies->mediaClass->setMedia(
+                    [
+                        $module_url . 'views/css/admin_order-v' . $this->dependencies->version . '.css',
+                        $module_url . 'views/js/admin_order-v' . $this->dependencies->version . '.js',
+                        $module_url . 'views/js/utilities-v' . $this->dependencies->version . '.js',
+                    ]
+                );
             }
         }
     }
