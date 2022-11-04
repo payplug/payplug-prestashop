@@ -802,7 +802,8 @@ class HookClass
             && 'adminorders' == strtolower($controller)
             && $this->tools->tool('getValue', 'id_order')
         ) {
-            $order = $this->order->get($this->tools->tool('getValue', 'id_order'));
+            $id_order = $this->tools->tool('getValue', 'id_order');
+            $order = $this->order->get((int)$id_order);
 
             if ($order->module == $this->dependencies->name) {
                 $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
