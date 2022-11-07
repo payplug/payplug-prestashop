@@ -77,7 +77,7 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             [
                 'cart' => [
                     [
-                        'merchant_item_id' => 1,
+                        'merchant_item_id' => '1',
                         'name' => 'Pull imprimé colibri - Size : S',
                         'price' => 3446,
                         'quantity' => 1,
@@ -136,7 +136,7 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             [
                 'cart' => [
                     [
-                        'merchant_item_id' => 5,
+                        'merchant_item_id' => '5',
                         'name' => 'Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun
                 Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours 
                 brun Coussin ours brun C',
