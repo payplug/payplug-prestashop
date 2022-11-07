@@ -623,7 +623,7 @@ class OneyRepository extends BaseClass
                     : '');
 
             $item = [
-                'merchant_item_id' => $product['id_product'],
+                'merchant_item_id' => (string)$product['id_product'],
                 'name' =>  $this->toolsAdapter->substr($productName, 0, 250),
                 'price' => (int)$unit_price,
                 'quantity' => (int)$product['cart_quantity'],
