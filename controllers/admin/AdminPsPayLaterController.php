@@ -19,17 +19,16 @@
  * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
- */
-require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
+ */ require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
 use PayLaterModule\classes\DependenciesClass;
 
 class AdminPsPayLaterController extends ModuleAdminController
 {
+    public $module;
     private $constant;
     private $dependencies;
     private $logger;
-    public $module;
 
     public function __construct()
     {
@@ -45,8 +44,6 @@ class AdminPsPayLaterController extends ModuleAdminController
 
     /**
      * Initialize the content by adding Boostrap and loading the TPL
-     *
-     * @return void
      */
     public function initContent()
     {
@@ -61,13 +58,13 @@ class AdminPsPayLaterController extends ModuleAdminController
         $this->dependencies->configClass->assignContentVar();
 
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addJS($views_path . '/js/admin-v'.$this->dependencies->version.'.js');
-        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
-        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
-        $this->context->controller->addJS($views_path . '/js/components-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addJS($views_path . '/js/admin-v' . $this->dependencies->version . '.js');
+        $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
+        $this->context->controller->addCSS($views_path . '/css/admin-v' . $this->dependencies->version . '.css');
+        $this->context->controller->addJS($views_path . '/js/components-v' . $this->dependencies->version . '.js');
 
         $this->context->smarty->assign([
-            'module_name' => $this->dependencies->name
+            'module_name' => $this->dependencies->name,
         ]);
 
         $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
@@ -87,7 +84,7 @@ class AdminPsPayLaterController extends ModuleAdminController
             $contextPsAccounts = $accountsFacade->getPsAccountsPresenter()->present($this->module->name);
 
             // update modal language
-            $languages = ['es','de','pt','nl'];
+            $languages = ['es', 'de', 'pt', 'nl'];
             $isoCode = $this->context->language->iso_code;
             $isoCode = !in_array($isoCode, $languages) ? $isoCode : 'en';
             $contextPsAccounts['accountsUiUrl'] = $contextPsAccounts['accountsUiUrl'] . '/' . $isoCode . '/link-shop';

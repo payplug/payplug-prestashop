@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\OrderHistoryInterface;
 use OrderHistory;
+use PayPlug\src\interfaces\OrderHistoryInterface;
 
 class OrderHistoryAdapter implements OrderHistoryInterface
 {

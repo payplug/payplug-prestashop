@@ -26,5 +26,6 @@ namespace PayPlug\src\interfaces;
 interface OrderSlipInterface
 {
     public function get($idOrderSlip);
+
     public function getOrdersSlip($idCustomer, $idOrder);
 }

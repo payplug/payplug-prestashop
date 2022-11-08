@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -32,6 +31,7 @@ function upgrade_module_2_1_1($object)
         return true;
     }
 
-    require_once(_PS_MODULE_DIR_.$object->name.'/classes/PayplugBackward.php');
+    require_once _PS_MODULE_DIR_ . $object->name . '/classes/PayplugBackward.php';
+
     return Configuration::updateValue('PAYPLUG_DEBUG_MODE', 1);
 }

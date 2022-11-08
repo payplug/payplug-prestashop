@@ -20,15 +20,12 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
-/**
- * Check if prestashop Context
- */
+// Check if prestashop Context
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(dirname(__FILE__) . '/vendor/autoload.php');
+require_once dirname(__FILE__) . '/vendor/autoload.php';
 
 class Payplug extends PaymentModule
 {
@@ -40,7 +37,6 @@ class Payplug extends PaymentModule
     /**
      * Constructor
      *
-     * @return void
      * @throws Exception
      */
     public function __construct()
@@ -66,11 +62,11 @@ class Payplug extends PaymentModule
         $this->module = false;
         $this->controllers = [
             'AdminPayplug',
-            'AdminPayPlugInstallment'
+            'AdminPayPlugInstallment',
         ];
         $this->adminControllers = [
             [
-                'className' => 'AdminPayplug'
+                'className' => 'AdminPayplug',
             ],
             [
                 'className' => 'AdminPayPlugInstallment',
@@ -79,9 +75,9 @@ class Payplug extends PaymentModule
                     'en' => 'Installment Plans',
                     'gb' => 'Installment Plans',
                     'it' => 'Pagamenti frazionati',
-                    'fr' => 'Paiements en plusieurs fois'
-                ]
-            ]
+                    'fr' => 'Paiements en plusieurs fois',
+                ],
+            ],
         ];
 
         if ($this->isValidPHPVersion()) {
@@ -92,9 +88,10 @@ class Payplug extends PaymentModule
 
     /**
      * @param bool $force_all
-     * @return bool
-     * @see Module::disable()
      *
+     * @return bool
+     *
+     * @see Module::disable()
      */
     public function disable($force_all = false)
     {
@@ -105,6 +102,7 @@ class Payplug extends PaymentModule
 
     /**
      * @return string
+     *
      * @see Module::getContent()
      */
     public function getContent()
@@ -135,42 +133,6 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description Get the module hook list from current Prestashop version
-     */
-    private function getHookList()
-    {
-        return [
-            'actionAdminControllerSetMedia',
-            'actionAdminLanguagesControllerSaveAfter',
-            'actionAdminPerformanceControllerAfter',
-            //'actionCarrierUpdate',
-            'actionClearCompileCache',
-            'actionDeleteGDPRCustomer',
-            'actionExportGDPRData',
-            //'actionObjectCarrierAddAfter',
-            'actionOrderStatusUpdate',
-            'actionObjectOrderStateAddAfter',
-            'actionObjectOrderStateUpdateAfter',
-            'actionObjectOrderStateDeleteAfter',
-            'actionUpdateLangAfter',
-            'adminOrder',
-            'customerAccount',
-            'displayAdminOrderMain',
-            'displayBackOfficeFooter',
-            'displayBeforeShoppingCartBlock',
-            'displayExpressCheckout',
-            'displayProductPriceBlock',
-            'displayAdminStatusesForm',
-            'header',
-            //'moduleRoutes',
-            'payment',
-            'paymentReturn',
-            'paymentOptions',
-            //'registerGDPRConsent',
-        ];
-    }
-
-    /**
      * Load asset on the back office
      */
     public function hookActionAdminControllerSetMedia()
@@ -182,7 +144,9 @@ class Payplug extends PaymentModule
 
     /**
      * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     *
      * @param $params   $this->setDependencies();
+     *
      * @return mixed
      */
     public function hookActionAdminPerformanceControllerAfter($params)
@@ -195,7 +159,9 @@ class Payplug extends PaymentModule
 
     /**
      * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
+     *
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionClearCompileCache($params)
@@ -208,6 +174,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionDeleteGDPRCustomer($params)
@@ -219,6 +186,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionExportGDPRData($params)
@@ -230,6 +198,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionOrderStatusUpdate($params)
@@ -241,6 +210,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionObjectOrderStateAddAfter($params)
@@ -279,6 +249,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookActionUpdateLangAfter($params)
@@ -290,7 +261,9 @@ class Payplug extends PaymentModule
 
     /**
      * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
+     *
      * @param $params
+     *
      * @return mixed
      */
     public function hookAdminOrder($params)
@@ -302,6 +275,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookCustomerAccount($params)
@@ -313,6 +287,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookDisplayAdminOrderMain($params)
@@ -334,6 +309,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookDisplayBackOfficeFooter($params)
@@ -345,7 +321,9 @@ class Payplug extends PaymentModule
 
     /**
      * @description Display Oney CTA on Shopping cart page
+     *
      * @param $params
+     *
      * @return mixed
      */
     public function hookDisplayBeforeShoppingCartBlock($params)
@@ -367,6 +345,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookDisplayProductPriceBlock($params)
@@ -378,6 +357,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookHeader($params)
@@ -389,6 +369,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      *
      * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
@@ -402,6 +383,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookPaymentOptions()
@@ -413,6 +395,7 @@ class Payplug extends PaymentModule
 
     /**
      * @param $params
+     *
      * @return mixed
      */
     public function hookPaymentReturn($params)
@@ -424,8 +407,11 @@ class Payplug extends PaymentModule
 
     /**
      * @description Install plugin
+     *
      * @param bool $soft_install
+     *
      * @return bool
+     *
      * @see Module::install()
      */
     public function install($soft_install = false)
@@ -465,6 +451,7 @@ class Payplug extends PaymentModule
 
     /**
      * @description Check if mobile is validated installation
+     *
      * @return bool
      */
     public function isValidInstallation()
@@ -472,11 +459,13 @@ class Payplug extends PaymentModule
         if (Validate::isLoadedObject($this)) {
             return Configuration::hasKey(Tools::strtoupper($this->name) . '_COMPANY_ID');
         }
+
         return true;
     }
 
     /**
      * @description test if php requiremnt is valid
+     *
      * @return array
      */
     public function isValidPHPVersion()
@@ -510,14 +499,11 @@ class Payplug extends PaymentModule
         $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
     }
 
-    private function setModule()
-    {
-        $this->module = $this->payplug_dependencies->dependencies;
-    }
-
     /**
      * @description Uninstall plugin
+     *
      * @return bool|mixed
+     *
      * @see Module::uninstall()
      */
     public function uninstall()
@@ -527,5 +513,46 @@ class Payplug extends PaymentModule
         }
 
         return parent::uninstall();
+    }
+
+    /**
+     * @description Get the module hook list from current Prestashop version
+     */
+    private function getHookList()
+    {
+        return [
+            'actionAdminControllerSetMedia',
+            'actionAdminLanguagesControllerSaveAfter',
+            'actionAdminPerformanceControllerAfter',
+            //'actionCarrierUpdate',
+            'actionClearCompileCache',
+            'actionDeleteGDPRCustomer',
+            'actionExportGDPRData',
+            //'actionObjectCarrierAddAfter',
+            'actionOrderStatusUpdate',
+            'actionObjectOrderStateAddAfter',
+            'actionObjectOrderStateUpdateAfter',
+            'actionObjectOrderStateDeleteAfter',
+            'actionUpdateLangAfter',
+            'adminOrder',
+            'customerAccount',
+            'displayAdminOrderMain',
+            'displayBackOfficeFooter',
+            'displayBeforeShoppingCartBlock',
+            'displayExpressCheckout',
+            'displayProductPriceBlock',
+            'displayAdminStatusesForm',
+            'header',
+            //'moduleRoutes',
+            'payment',
+            'paymentReturn',
+            'paymentOptions',
+            //'registerGDPRConsent',
+        ];
+    }
+
+    private function setModule()
+    {
+        $this->module = $this->payplug_dependencies->dependencies;
     }
 }

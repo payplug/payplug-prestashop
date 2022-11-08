@@ -20,8 +20,7 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
-require_once(_PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.php');
+require_once _PS_MODULE_DIR_ . 'payplug/classes/MyLogPHP.php';
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -30,7 +29,9 @@ if (!defined('_PS_VERSION_')) {
 /**
  * @description Install PayPlug Cache DB in case of an upgrade of the module.
  *
- * @return boolean
+ * @param mixed $object
+ *
+ * @return bool
  */
 function upgrade_module_2_29_0($object)
 {
@@ -44,14 +45,12 @@ function upgrade_module_2_29_0($object)
     // install table `payplug_cache`
     $sql = '
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_cache` (
-            `id_'.$object->name.'_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `id_' . $object->name . '_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `cache_key` VARCHAR(255) NOT NULL,
             `cache_value` TEXT NOT NULL,
             `date_add` DATETIME NULL,
             `date_upd` DATETIME NULL
             ) ENGINE=' . _MYSQL_ENGINE_;
 
-    $flag = $flag && Db::getInstance()->execute($sql);
-
-    return $flag;
+    return $flag && Db::getInstance()->execute($sql);
 }

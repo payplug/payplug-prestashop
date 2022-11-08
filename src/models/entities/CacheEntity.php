@@ -106,8 +106,10 @@ class CacheEntity
 
     /**
      * @param string $cache_key
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setCacheKey($cache_key)
     {
@@ -116,13 +118,16 @@ class CacheEntity
         }
 
         $this->cache_key = $cache_key;
+
         return $this;
     }
 
     /**
      * @param string $cache_value
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setCacheValue($cache_value)
     {
@@ -131,13 +136,16 @@ class CacheEntity
         }
 
         $this->cache_value = $cache_value;
+
         return $this;
     }
 
     /**
      * @param string $date_add with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setDateAdd($date_add)
     {
@@ -150,13 +158,16 @@ class CacheEntity
         }
 
         $this->date_add = $date_add;
+
         return $this;
     }
 
     /**
      * @param string $date_upd with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setDateUpd($date_upd)
     {
@@ -169,13 +180,16 @@ class CacheEntity
         }
 
         $this->date_upd = $date_upd;
+
         return $this;
     }
 
     /**
      * @param array $definition
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setDefinition($definition)
     {
@@ -184,13 +198,16 @@ class CacheEntity
         }
 
         $this->definition = $definition;
+
         return $this;
     }
 
     /**
      * @param string $id_payplug_cache
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setIdPayPlugCache($id_payplug_cache)
     {
@@ -199,13 +216,16 @@ class CacheEntity
         }
 
         $this->id_payplug_cache = $id_payplug_cache;
+
         return $this;
     }
 
     /**
      * @param string $table
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setTable($table)
     {
@@ -214,6 +234,7 @@ class CacheEntity
         }
 
         $this->table = $table;
+
         return $this;
     }
 }

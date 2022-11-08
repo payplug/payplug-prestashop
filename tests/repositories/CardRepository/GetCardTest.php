@@ -32,6 +32,9 @@ use PayPlug\tests\mock\PayPlugCardMock;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetCardTest extends BaseCardRepository
 {
@@ -49,11 +52,12 @@ final class GetCardTest extends BaseCardRepository
         yield [null];
         yield [false];
         yield ['wrong parameter'];
-        yield [['key'=>'value']];
+        yield [['key' => 'value']];
     }
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $customerId
      * @param $payplugCardId
      * @param $companyId
@@ -70,12 +74,14 @@ final class GetCardTest extends BaseCardRepository
                 'select' => $this->query,
                 'fields' => $this->query,
                 'from' => $this->query,
-                'where' => $this->query
-            ]);
+                'where' => $this->query,
+            ])
+        ;
 
         $this->query
             ->shouldReceive('build')
-            ->andThrow('Exception', 'Build method throw exception', 500);
+            ->andThrow('Exception', 'Build method throw exception', 500)
+        ;
 
         $this->assertFalse($this->repo->getCard($this->payplug_card['id_payplug_card']));
     }
@@ -88,8 +94,9 @@ final class GetCardTest extends BaseCardRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => []
-            ]);
+                'build' => [],
+            ])
+        ;
 
         $this->assertFalse($this->repo->getCard($this->payplug_card['id_payplug_card']));
     }
@@ -102,8 +109,9 @@ final class GetCardTest extends BaseCardRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => [$this->payplug_card]
-            ]);
+                'build' => [$this->payplug_card],
+            ])
+        ;
 
         $this->assertSame(
             $this->payplug_card,

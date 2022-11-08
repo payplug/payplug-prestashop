@@ -20,15 +20,17 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
-use PayPlug\src\models\entities\LoggerEntity;
 use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\models\entities\LoggerEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
  * @group logger
  * @group logger_entity
+ *
+ * @internal
+ * @coversNothing
  */
 final class SetDefinitionLoggerTest extends TestCase
 {

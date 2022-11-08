@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ConfigurationInterface;
 use Configuration;
+use PayPlug\src\interfaces\ConfigurationInterface;
 
 class ConfigurationAdapter implements ConfigurationInterface
 {
@@ -45,18 +45,21 @@ class ConfigurationAdapter implements ConfigurationInterface
         // Old PHP configs can't accept $this->classVar::staticMethod()
         // But only $var::staticMethod()
         $config = $this->psConfiguration;
+
         return $config::get($configuration_name);
     }
 
     public function updateValue($key, $value)
     {
         $config = $this->psConfiguration;
+
         return $config::updateValue($key, $value);
     }
 
     public function deleteByName($key)
     {
         $config = $this->psConfiguration;
+
         return $config::deleteByName($key);
     }
 

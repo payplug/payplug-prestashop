@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 /*
  * @todo: Petit rappel, avant de créer la doc
  * Comment ça marche :
@@ -110,6 +109,16 @@ class QueryRepository extends BaseClass
         $this->adapter_class = QueryAdapter::factory();
     }
 
+    /**
+     * Converts object to string
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->build();
+    }
+
     public static function factory()
     {
         return new QueryRepository();
@@ -118,48 +127,56 @@ class QueryRepository extends BaseClass
     public function select()
     {
         $this->query['type'] = 'SELECT';
+
         return $this;
     }
 
     public function insert()
     {
         $this->query['type'] = 'INSERT';
+
         return $this;
     }
 
     public function update()
     {
         $this->query['type'] = 'UPDATE';
+
         return $this;
     }
 
     public function truncate()
     {
         $this->query['type'] = 'TRUNCATE';
+
         return $this;
     }
 
     public function delete()
     {
         $this->query['type'] = 'DELETE';
+
         return $this;
     }
 
     public function create()
     {
         $this->query['type'] = 'CREATE';
+
         return $this;
     }
 
     public function ifExists()
     {
         $this->query['type'] = 'SHOW TABLES LIKE';
+
         return $this;
     }
 
     public function drop()
     {
         $this->query['type'] = 'DROP';
+
         return $this;
     }
 
@@ -168,6 +185,7 @@ class QueryRepository extends BaseClass
         if (!empty($fields)) {
             $this->query['fields'][] = $fields;
         }
+
         return $this;
     }
 
@@ -176,6 +194,7 @@ class QueryRepository extends BaseClass
         if (!empty($values) || $values == 0) {
             $this->query['values'][] = '\'' . $values . '\'';
         }
+
         return $this;
     }
 
@@ -318,14 +337,14 @@ class QueryRepository extends BaseClass
 
     public function limit($limit, $offset = 0)
     {
-        $offset = (int)$offset;
+        $offset = (int) $offset;
         if ($offset < 0) {
             $offset = 0;
         }
 
         $this->query['limit'] = [
             'offset' => $offset,
-            'limit' => (int)$limit,
+            'limit' => (int) $limit,
         ];
 
         return $this;
@@ -347,7 +366,8 @@ class QueryRepository extends BaseClass
             $sql = 'SELECT ' . ((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*') . "\n";
             if (!$this->query['from']) {
                 $this->query = null;
-                die('Table name not set in QueryRepository (->from() is empty / not set / null). 
+
+                exit('Table name not set in QueryRepository (->from() is empty / not set / null). 
                 Cannot build a valid SQL query.');
             }
 
@@ -393,7 +413,7 @@ class QueryRepository extends BaseClass
             $condition = (isset($this->query['condition']) && (!empty($this->query['condition']))) ?
                 ', ' . implode(' ', $this->query['condition']) :
                 '';
-            $sql .= '(' . implode(",\n", $this->query['fields']) . "\n $condition)\n";
+            $sql .= '(' . implode(",\n", $this->query['fields']) . "\n {$condition})\n";
             if (isset($this->query['engine']) && (!empty($this->query['engine']))) {
                 $sql .= "\n" . 'ENGINE = ' . implode($this->query['engine']);
             }
@@ -434,14 +454,14 @@ class QueryRepository extends BaseClass
         }
 
         if ((isset($this->query['limit']))
-            &&
-            (($this->query['limit']['limit'] > 0) || ($this->query['limit']['offset'] > 0))) {
+            && (($this->query['limit']['limit'] > 0) || ($this->query['limit']['offset'] > 0))) {
             $limit = $this->query['limit'];
             $sql .= 'LIMIT ' . ($limit['offset'] ? $limit['offset'] . ', ' : '') . $limit['limit'];
         }
 
         if (isset($param) && $param == 'debug') {
             var_dump($sql);
+
             exit;
         }
 
@@ -462,17 +482,8 @@ class QueryRepository extends BaseClass
 
         $this->query = null;
         $sql = null;
-        return $result;
-    }
 
-    /**
-     * Converts object to string
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->build();
+        return $result;
     }
 
     public function escape($string, $htmlOK = false)

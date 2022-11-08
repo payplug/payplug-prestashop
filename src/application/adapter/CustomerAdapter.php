@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CustomerInterface;
 use Customer;
+use PayPlug\src\interfaces\CustomerInterface;
 
 class CustomerAdapter implements CustomerInterface
 {

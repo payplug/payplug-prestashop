@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -33,11 +32,11 @@ function upgrade_module_2_27_1($object)
 
     $flag = true;
 
-    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0) ||
-        !Configuration::updateValue('PAYPLUG_ONEY', 0) ||
-        !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '') ||
-        !Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000') ||
-        !Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
+    if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)
+        || !Configuration::updateValue('PAYPLUG_ONEY', 0)
+        || !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')
+        || !Configuration::updateValue('PAYPLUG_ONEY_MAX_AMOUNTS', 'EUR:2000')
+        || !Configuration::updateValue('PAYPLUG_ONEY_MIN_AMOUNTS', 'EUR:150')
     ) {
         $flag = false;
     }

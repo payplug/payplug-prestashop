@@ -30,6 +30,9 @@ namespace PayPlug\tests\repositories\CardRepository;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetByCustomerTest extends BaseCardRepository
 {
@@ -48,8 +51,8 @@ final class GetByCustomerTest extends BaseCardRepository
                 'exp_year' => 2023,
                 'exp_month' => 03,
                 'brand' => 'Visa',
-                'id_payplug_card' => 2
-            ]
+                'id_payplug_card' => 2,
+            ],
         ];
     }
 
@@ -63,8 +66,10 @@ final class GetByCustomerTest extends BaseCardRepository
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $id_customer
      * @param $id_payplug_card
+     * @param mixed $active_only
      */
     public function testWithInvalidParams($id_customer, $active_only)
     {
@@ -82,8 +87,9 @@ final class GetByCustomerTest extends BaseCardRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => false
-            ]);
+                'build' => false,
+            ])
+        ;
 
         $this->assertSame(
             [],
@@ -99,13 +105,15 @@ final class GetByCustomerTest extends BaseCardRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => $this->cards
-            ]);
+                'build' => $this->cards,
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
-                'isValidExpiration' => false
-            ]);
+                'isValidExpiration' => false,
+            ])
+        ;
 
         $this->assertSame(
             [
@@ -118,7 +126,7 @@ final class GetByCustomerTest extends BaseCardRepository
                     'id_payplug_card' => 2,
                     'expired' => true,
                     'expiry_date' => '03 / 23',
-                ]
+                ],
             ],
             $this->repo->getByCustomer($this->id_customer, false)
         );
@@ -132,13 +140,15 @@ final class GetByCustomerTest extends BaseCardRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => $this->cards
-            ]);
+                'build' => $this->cards,
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
-                'isValidExpiration' => false
-            ]);
+                'isValidExpiration' => false,
+            ])
+        ;
 
         $this->assertSame(
             [],
@@ -154,13 +164,15 @@ final class GetByCustomerTest extends BaseCardRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => $this->cards
-            ]);
+                'build' => $this->cards,
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
-                'isValidExpiration' => true
-            ]);
+                'isValidExpiration' => true,
+            ])
+        ;
 
         $this->assertSame(
             [
@@ -173,7 +185,7 @@ final class GetByCustomerTest extends BaseCardRepository
                     'id_payplug_card' => 2,
                     'expired' => false,
                     'expiry_date' => '03 / 23',
-                ]
+                ],
             ],
             $this->repo->getByCustomer($this->id_customer, false)
         );

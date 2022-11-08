@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\OrderStateInterface;
 use OrderState;
+use PayPlug\src\interfaces\OrderStateInterface;
 
 class OrderStateAdapter implements OrderStateInterface
 {
@@ -33,6 +33,7 @@ class OrderStateAdapter implements OrderStateInterface
     public function __construct($id = null)
     {
         $this->orderState = new OrderState($id);
+
         return $this;
     }
 
@@ -60,8 +61,8 @@ class OrderStateAdapter implements OrderStateInterface
     {
         if (method_exists($this->orderState, 'softDelete')) {
             return $this->orderState->softDelete();
-        } else {
-            return $this->delete();
         }
+
+        return $this->delete();
     }
 }

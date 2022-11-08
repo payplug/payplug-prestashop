@@ -28,7 +28,7 @@ class PayPlugCardMock
 {
     public static function get()
     {
-        $card = [
+        return [
             'id_payplug_card' => 1,
             'id_customer' => 1,
             'id_company' => 123456,
@@ -41,14 +41,13 @@ class PayPlugCardMock
             'country' => 'FR',
             'metadata' => 'N;',
         ];
-
-        return $card;
     }
 
     public static function getExpired()
     {
         $card = self::get();
         $card['exp_year'] = 2020;
+
         return $card;
     }
 }

@@ -35,6 +35,7 @@ class CustomerMock
         $customer->email = 'customer@payplug.com';
         $customer->date_add = '2020-12-21 12:03:52';
         $customer->date_upd = '2021-01-11 11:24:31';
+
         return $customer;
     }
 }

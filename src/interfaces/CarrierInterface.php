@@ -26,5 +26,6 @@ namespace PayPlug\src\interfaces;
 interface CarrierInterface
 {
     public function get($idCarrier);
+
     public function getCarriers($id_lang, $active, $delete, $id_zone, $ids_group, $modules_filters);
 }

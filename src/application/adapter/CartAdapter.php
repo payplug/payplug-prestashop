@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CartInterface;
 use Cart;
+use PayPlug\src\interfaces\CartInterface;
 
 class CartAdapter implements CartInterface
 {
@@ -38,6 +38,7 @@ class CartAdapter implements CartInterface
         if (!is_int($id_cart)) {
             $id_cart = false;
         }
+
         return new Cart($id_cart);
     }
 
@@ -46,6 +47,7 @@ class CartAdapter implements CartInterface
         if (!is_object($cart)) {
             return false;
         }
+
         return $cart->isVirtualCart();
     }
 
@@ -54,6 +56,7 @@ class CartAdapter implements CartInterface
         if (!is_object($cart)) {
             return false;
         }
+
         return $cart->getProducts();
     }
 
@@ -62,6 +65,7 @@ class CartAdapter implements CartInterface
         if (!is_object($cart)) {
             return false;
         }
+
         return $cart->nbProducts();
     }
 
@@ -70,6 +74,7 @@ class CartAdapter implements CartInterface
         if (!is_int($idCart)) {
             return false;
         }
+
         return Cart::isGuestCartByCartId($idCart);
     }
 }

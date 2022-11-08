@@ -30,6 +30,9 @@ namespace PayPlug\tests\repositories\CardRepository;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class ConfirmeDeleteCardMessageTest extends BaseCardRepository
 {

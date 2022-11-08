@@ -33,6 +33,7 @@ class ShopAdapter implements ShopInterface
         if (!is_int($idShop)) {
             $idShop = false;
         }
+
         return new Shop($idShop);
     }
 

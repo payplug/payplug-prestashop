@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\OneyRepository;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class IsValidOneyAmountTest extends BaseOneyRepository
 {
@@ -42,13 +45,14 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
 
         $this->limits = [
             'min' => 100,
-            'max' => 3000
+            'max' => 3000,
         ];
 
         $this->repo
             ->shouldReceive([
-                'getOneyPriceLimit' => $this->limits
-            ]);
+                'getOneyPriceLimit' => $this->limits,
+            ])
+        ;
     }
 
     public function testWithTooLowAmount()
@@ -59,7 +63,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'The total amount of your order should be between 100,00 € and 3,000,00 € to pay with Oney.'
+                'error' => 'The total amount of your order should be between 100,00 € and 3,000,00 € to pay with Oney.',
             ],
             $this->repo->isValidOneyAmount($amount)
         );
@@ -72,7 +76,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'The total amount of your order should be between 100,00 € and 3,000,00 € to pay with Oney.'
+                'error' => 'The total amount of your order should be between 100,00 € and 3,000,00 € to pay with Oney.',
             ],
             $this->repo->isValidOneyAmount($amount)
         );
@@ -88,7 +92,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => true,
-                'error' => false
+                'error' => false,
             ],
             $this->repo->isValidOneyAmount($amount)
         );

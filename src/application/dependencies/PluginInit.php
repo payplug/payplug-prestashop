@@ -24,28 +24,6 @@
 namespace PayPlug\src\application\dependencies;
 
 use PayPlug\classes\MyLogPHP;
-
-use PayPlug\src\application\dependencies\BaseClass;
-
-use PayPlug\src\repositories\CacheRepository;
-use PayPlug\src\repositories\CardRepository;
-use PayPlug\src\repositories\HookRepository;
-use PayPlug\src\repositories\InstallRepository;
-use PayPlug\src\repositories\LoggerRepository;
-use PayPlug\src\repositories\OneyRepository;
-use PayPlug\src\repositories\OrderStateRepository;
-use PayPlug\src\repositories\PaymentRepository;
-use PayPlug\src\repositories\QueryRepository;
-use PayPlug\src\repositories\SQLtableRepository;
-use PayPlug\src\repositories\TranslationsRepository;
-
-
-use PayPlug\src\models\entities\CacheEntity;
-use PayPlug\src\models\entities\OneyEntity;
-use PayPlug\src\models\entities\PaymentEntity;
-use PayPlug\src\models\entities\PluginEntity;
-use PayPlug\src\models\entities\OrderStateEntity;
-
 use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
 use PayPlug\src\application\adapter\CarrierAdapter;
@@ -69,6 +47,22 @@ use PayPlug\src\application\adapter\ProductAdapter;
 use PayPlug\src\application\adapter\ShopAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
+use PayPlug\src\models\entities\CacheEntity;
+use PayPlug\src\models\entities\OneyEntity;
+use PayPlug\src\models\entities\OrderStateEntity;
+use PayPlug\src\models\entities\PaymentEntity;
+use PayPlug\src\models\entities\PluginEntity;
+use PayPlug\src\repositories\CacheRepository;
+use PayPlug\src\repositories\CardRepository;
+use PayPlug\src\repositories\HookRepository;
+use PayPlug\src\repositories\InstallRepository;
+use PayPlug\src\repositories\LoggerRepository;
+use PayPlug\src\repositories\OneyRepository;
+use PayPlug\src\repositories\OrderStateRepository;
+use PayPlug\src\repositories\PaymentRepository;
+use PayPlug\src\repositories\QueryRepository;
+use PayPlug\src\repositories\SQLtableRepository;
+use PayPlug\src\repositories\TranslationsRepository;
 
 class PluginInit extends BaseClass
 {
@@ -166,7 +160,8 @@ class PluginInit extends BaseClass
             ->setShop($this->shop)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
-            ->setValidate($this->validate);
+            ->setValidate($this->validate)
+        ;
 
         $this->setEntity($this->plugin);
     }
@@ -185,7 +180,6 @@ class PluginInit extends BaseClass
         $this->logger = new LoggerRepository($this->dependencies);
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository();
-
 
         $this->sql = new SQLtableRepository(
             $this->dependencies,
@@ -212,7 +206,7 @@ class PluginInit extends BaseClass
             $this->tools
         );
 
-        $this->cache    = new CacheRepository(
+        $this->cache = new CacheRepository(
             $this->cacheEntity,
             $this->query,
             $this->configuration,
@@ -287,9 +281,9 @@ class PluginInit extends BaseClass
         $this->constant = new ConstantAdapter();
         $this->context = new ContextAdapter();
         $this->country = new CountryAdapter();
-        $this->currency  = new CurrencyAdapter();
-        $this->customer  = new CustomerAdapter();
-        $this->dispatcher  = new DispatcherAdapter();
+        $this->currency = new CurrencyAdapter();
+        $this->customer = new CustomerAdapter();
+        $this->dispatcher = new DispatcherAdapter();
         $this->language = new LanguageAdapter();
         $this->media = new MediaAdapter();
         $this->message = new MessageAdapter();

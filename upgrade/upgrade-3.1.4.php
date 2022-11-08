@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -36,7 +35,7 @@ function upgrade_module_3_1_4($object)
     }
 
     $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_payment` (
-    `id_'.$object->name.'_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `id_' . $object->name . '_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `id_payment` VARCHAR(255) NULL,
     `payment_method` VARCHAR(255) NULL,
     `payment_url` VARCHAR(255) NULL,
@@ -48,7 +47,5 @@ function upgrade_module_3_1_4($object)
     `is_pending` TINYINT(1) NOT NULL DEFAULT 0,
     `date_upd` DATETIME NULL, CONSTRAINT lock_cart_unique UNIQUE (id_cart)) ENGINE=' . _MYSQL_ENGINE_;
 
-    $flag = $flag && Db::getInstance()->execute($sql);
-
-    return $flag;
+    return $flag && Db::getInstance()->execute($sql);
 }

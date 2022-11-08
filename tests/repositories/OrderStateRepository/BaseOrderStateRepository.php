@@ -25,7 +25,6 @@
 namespace PayPlug\tests\repositories\OrderStateRepository;
 
 use PayPlug\src\repositories\OrderStateRepository;
-use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\RepositoryBase;
 
 class BaseOrderStateRepository extends RepositoryBase
@@ -36,11 +35,13 @@ class BaseOrderStateRepository extends RepositoryBase
 
         $this->constant->shouldReceive('get')
             ->with('_DB_PREFIX_')
-            ->andReturn('');
+            ->andReturn('')
+        ;
 
         $this->constant->shouldReceive('get')
             ->with('_PS_MODULE_DIR_')
-            ->andReturn('');
+            ->andReturn('')
+        ;
 
         $this->repo = \Mockery::mock(OrderStateRepository::class, [
             $this->config,
@@ -51,7 +52,7 @@ class BaseOrderStateRepository extends RepositoryBase
             $this->query,
             $this->tools,
             $this->validate,
-            $this->myLogPhp
+            $this->myLogPhp,
         ])->makePartial();
     }
 }

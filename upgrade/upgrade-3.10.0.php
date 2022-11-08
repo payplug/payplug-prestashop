@@ -19,9 +19,7 @@
  * @copyright 2013 - 2021 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
- */
-
-if (!defined('_PS_VERSION_')) {
+ */ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
@@ -30,10 +28,8 @@ function upgrade_module_3_10_0()
     $flag = true;
 
     // add  PAYPLUG_APPLEPAY to database
-    $flag = $flag && Configuration::updateValue(
+    return $flag && Configuration::updateValue(
         'PAYPLUG_AMEX',
         null
     );
-
-    return $flag;
 }

@@ -6,12 +6,12 @@ namespace PayPlug\tests\mock;
  * Il s'agit de la variable $paymentDetails créée dans payplug.php
  * qui servira à tout le processus de création de paiement dans PaymentRepository
  * Class PaymentDetailsMock
- * @package PayPlug\tests\mock
  */
 class PaymentDetailsMock
 {
     /**
      * $paymentDetails d'un paiement standard
+     *
      * @return array
      */
     public static function getPaymentDetailsStandard()
@@ -21,11 +21,13 @@ class PaymentDetailsMock
         $paymentDetails['paymentTab'] = PaymentTabMock::getStandard();
         $paymentDetails['paymentId'] = 'pay_6PSW2vfJxvT0Ji9c8iPZsw';
         $paymentDetails['isPaid'] = false;
+
         return $paymentDetails;
     }
 
     /**
      * $paymentDetails d'un paiement fractionné 3x
+     *
      * @return array
      */
     public static function getPaymentDetailsInstallment()
@@ -35,6 +37,7 @@ class PaymentDetailsMock
         $paymentDetails['paymentTab'] = PaymentTabMock::getInstallment();
         $paymentDetails['paymentId'] = 'inst_13TPOO67A5prqs9zZXW3qW';
         $paymentDetails['isPaid'] = null;
+
         return $paymentDetails;
     }
 
@@ -52,7 +55,7 @@ class PaymentDetailsMock
             'isDeferred' => false,
             'isEmbedded' => '0',
             'isMobileDevice' => false,
-            (object)['cart' => [
+            (object) ['cart' => [
                 'id' => 21,
                 'id_shop_group' => '1',
                 'id_shop' => '1',
@@ -148,27 +151,27 @@ class PaymentDetailsMock
                             0 => [
                                 'id_feature' => '1',
                                 'id_product' => '3',
-                                'id_feature_value' => '6']
+                                'id_feature_value' => '6', ],
                         ],
                         'attributes' => 'Dimension  => 40x60cm',
                         'attributes_small' => '40x60cm',
                         'rate' => 20.0,
-                        'tax_name' => 'TVA FR 20%']],
+                        'tax_name' => 'TVA FR 20%', ], ],
                 '_taxCalculationMethod' => '0',
                 'webserviceParameters' => [
                     'fields' => [
                         'id_address_delivery' => [
-                            'xlink_resource' => 'addresses'],
+                            'xlink_resource' => 'addresses', ],
                         'id_address_invoice' => [
-                            'xlink_resource' => 'addresses'],
+                            'xlink_resource' => 'addresses', ],
                         'id_currency' => [
-                            'xlink_resource' => 'currencies'],
+                            'xlink_resource' => 'currencies', ],
                         'id_customer' => [
-                            'xlink_resource' => 'customers'],
+                            'xlink_resource' => 'customers', ],
                         'id_guest' => [
-                            'xlink_resource' => 'guests'],
+                            'xlink_resource' => 'guests', ],
                         'id_lang' => [
-                            'xlink_resource' => 'languages']
+                            'xlink_resource' => 'languages', ],
                     ],
                     'associations' => [
                         'cart_rows' => [
@@ -177,28 +180,26 @@ class PaymentDetailsMock
                             'fields' => [
                                 'id_product' => [
                                     'required' => true,
-                                    'xlink_resource' => 'products'],
+                                    'xlink_resource' => 'products', ],
                                 'id_product_attribute' => [
                                     'required' => true,
-                                    'xlink_resource' => 'combinations'],
+                                    'xlink_resource' => 'combinations', ],
                                 'id_address_delivery' => [
                                     'required' => true,
-                                    'xlink_resource' => 'addresses'],
+                                    'xlink_resource' => 'addresses', ],
                                 'id_customization' => [
                                     'required' => false,
-                                    'xlink_resource' => 'customizations'],
+                                    'xlink_resource' => 'customizations', ],
                                 'quantity' => [
-                                    'required' => true]
-                            ]
-                        ]
-                    ]
+                                    'required' => true, ],
+                            ],
+                        ],
+                    ],
                 ],
-                (object)['configuration' =>
-                    ['shop' => null,
-                        'parameters' => null]
+                (object) ['configuration' => ['shop' => null,
+                    'parameters' => null, ],
                 ],
-                (object)['addressFactory' =>
-                    []],
+                (object) ['addressFactory' => []],
                 'shouldSplitGiftProductsQuantity' => false,
                 'shouldExcludeGiftsDiscount' => false,
                 'id_shop_list' => [],
@@ -207,9 +208,9 @@ class PaymentDetailsMock
                 'identifier' => 'id_cart',
                 'fieldsRequired' => [
                     0 => 'id_currency',
-                    1 => 'id_lang'],
+                    1 => 'id_lang', ],
                 'fieldsSize' => [
-                    'secure_key' => 32],
+                    'secure_key' => 32, ],
                 'fieldsValidate' => [
                     'id_shop_group' => 'isUnsignedId',
                     'id_shop' => 'isUnsignedId',
@@ -226,7 +227,7 @@ class PaymentDetailsMock
                     'mobile_theme' => 'isBool',
                     'allow_seperated_package' => 'isBool',
                     'date_add' => 'isDate',
-                    'date_upd' => 'isDate'],
+                    'date_upd' => 'isDate', ],
                 'fieldsRequiredLang' => [],
                 'fieldsSizeLang' => [],
                 'fieldsValidateLang' => [],
@@ -240,87 +241,87 @@ class PaymentDetailsMock
                     'fields' => [
                         'id_shop_group' => [
                             'type' => 1,
-                            'validate' => 'isUnsignedId'
+                            'validate' => 'isUnsignedId',
                         ],
                         'id_shop' => [
                             'type' => 1,
-                            'validate' => 'isUnsignedId'
+                            'validate' => 'isUnsignedId',
                         ],
                         'id_address_delivery' => [
                             'type' => 1,
-                            'validate' => 'isUnsignedId'
+                            'validate' => 'isUnsignedId',
                         ],
                         'id_address_invoice' => [
                             'type' => 1,
-                            'validate' => 'isUnsignedId'
+                            'validate' => 'isUnsignedId',
                         ],
                         'id_carrier' => [
                             'type' => 1,
-                            'validate' => 'isUnsignedId'
+                            'validate' => 'isUnsignedId',
                         ],
                         'id_currency' => [
                             'type' => 1,
                             'validate' => 'isUnsignedId',
-                            'required' => true
+                            'required' => true,
                         ],
                         'id_customer' => [
                             'type' => 1,
-                            'validate' => 'isUnsignedId'
+                            'validate' => 'isUnsignedId',
                         ],
                         'id_guest' => [
                             'type' => 1,
-                            'validate' => 'isUnsignedId'
+                            'validate' => 'isUnsignedId',
                         ],
                         'id_lang' => [
                             'type' => 1,
                             'validate' => 'isUnsignedId',
-                            'required' => true
+                            'required' => true,
                         ],
                         'recyclable' => [
                             'type' => 2,
-                            'validate' => 'isBool'
+                            'validate' => 'isBool',
                         ],
                         'gift' => [
                             'type' => 2,
-                            'validate' => 'isBool'
+                            'validate' => 'isBool',
                         ],
                         'gift_message' => [
                             'type' => 3,
-                            'validate' => 'isMessage'
+                            'validate' => 'isMessage',
                         ],
                         'mobile_theme' => [
                             'type' => 2,
-                            'validate' => 'isBool'
+                            'validate' => 'isBool',
                         ],
                         'delivery_option' => [
-                            'type' => 3
+                            'type' => 3,
                         ],
                         'secure_key' => [
                             'type' => 3,
-                            'size' => 32
+                            'size' => 32,
                         ],
                         'allow_seperated_package' => [
                             'type' => 2,
-                            'validate' => 'isBool'
+                            'validate' => 'isBool',
                         ],
                         'date_add' => [
                             'type' => 5,
-                            'validate' => 'isDate'
+                            'validate' => 'isDate',
                         ],
                         'date_upd' => [
                             'type' => 5,
-                            'validate' => 'isDate'
-                        ]
+                            'validate' => 'isDate',
+                        ],
                     ],
-                    'classname' => 'Cart'
+                    'classname' => 'Cart',
                 ],
                 'update_fields' => null,
-                'force_id' => false
+                'force_id' => false,
             ],
             ],
             'cartId' => 21,
             'cartHash' => null,
-            'forceHash' => true
+            'forceHash' => true,
         ];
     }
 }

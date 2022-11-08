@@ -38,12 +38,13 @@ class CarrierMock
         $cart->name = 'Carrier name';
         $cart->date_add = '2021-01-01 00:00:00';
         $cart->date_upd = '2021-01-01 00:00:00';
+
         return $cart;
     }
 
     public static function getProducts()
     {
-        $products = [
+        return [
             [
                 'id_product' => 1,
                 'cart_quantity' => 1,
@@ -74,9 +75,7 @@ class CarrierMock
                 'manufacturer_name' => 'Studio Design',
                 'price_wt' => 22.68,
                 'attributes' => 'Color : White',
-            ]
+            ],
         ];
-
-        return $products;
     }
 }

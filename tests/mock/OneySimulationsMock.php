@@ -99,7 +99,7 @@ class OneySimulationsMock
                 'total_amount' => [
                     'amount' => number_format(15003.5, 2),
                     'value' => '15,003,50 €',
-                ]
+                ],
             ],
             'x4_with_fees' => [
                 'installments' => [
@@ -135,21 +135,21 @@ class OneySimulationsMock
                     'amount' => number_format(15005.31, 2),
                     'value' => '15,005,31 €',
                 ],
-            ]
+            ],
         ];
     }
 
     public static function getNotAvailable()
     {
         return [
-            'details' => 'Access to this feature is not available.'
+            'details' => 'Access to this feature is not available.',
         ];
     }
 
     public static function getIsError()
     {
         return [
-            'object' => 'error'
+            'object' => 'error',
         ];
     }
 
@@ -157,8 +157,9 @@ class OneySimulationsMock
     {
         $cache_value = [
             'result' => true,
-            'simulations' => self::get()
+            'simulations' => self::get(),
         ];
+
         return [
             'cache_key' => 'cache_key',
             'cache_value' => json_encode($cache_value),

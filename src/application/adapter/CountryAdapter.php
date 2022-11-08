@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CountryInterface;
 use Country;
+use PayPlug\src\interfaces\CountryInterface;
 
 class CountryAdapter implements CountryInterface
 {
@@ -38,6 +38,7 @@ class CountryAdapter implements CountryInterface
         if (!is_int($idCountry)) {
             $idCountry = false;
         }
+
         return new Country($idCountry);
     }
 

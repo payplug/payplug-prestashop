@@ -45,6 +45,7 @@ class AmountCurrencyClass
      * Check if amount is correct
      *
      * @param object $cart
+     *
      * @return bool
      */
     public function checkAmount($cart)
@@ -53,7 +54,7 @@ class AmountCurrencyClass
             return false;
         }
 
-        $currency = $this->currency->get((int)$cart->id_currency);
+        $currency = $this->currency->get((int) $cart->id_currency);
         if (!$this->validate->validate('isLoadedObject', $currency)) {
             return false;
         }
@@ -63,16 +64,17 @@ class AmountCurrencyClass
 
         if ($amount < $amounts_by_currency['min_amount'] || $amount > $amounts_by_currency['max_amount']) {
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     /**
      * Check if amount is correct
      *
-     * @param int $amount
+     * @param int    $amount
      * @param object $order
+     *
      * @return bool
      */
     public function checkAmountPaidIsCorrect($amount, $order)
@@ -85,17 +87,19 @@ class AmountCurrencyClass
 
         if ($amount != 0) {
             return abs($order_amount - $amount) / $amount < 0.00001;
-        } elseif ($order_amount != 0) {
-            return abs($amount - $order_amount) / $order_amount < 0.00001;
-        } else {
-            return true;
         }
+        if ($order_amount != 0) {
+            return abs($amount - $order_amount) / $order_amount < 0.00001;
+        }
+
+        return true;
     }
 
     /**
      * Check amount to refund
      *
      * @param int $amount
+     *
      * @return string
      */
     public function checkAmountToRefund($amount)
@@ -107,6 +111,7 @@ class AmountCurrencyClass
      * check if currency is allowed
      *
      * @param object $cart
+     *
      * @return bool
      */
     public function checkCurrency($cart)
@@ -115,7 +120,7 @@ class AmountCurrencyClass
             return false;
         }
 
-        $currency = $this->currency->get((int)($cart->id_currency));
+        $currency = $this->currency->get((int) ($cart->id_currency));
         if (!$this->validate->validate('isLoadedObject', $currency)) {
             return false;
         }
@@ -132,6 +137,7 @@ class AmountCurrencyClass
      *
      * @param $amount
      * @param bool $to_cents
+     *
      * @return float|int
      */
     public function convertAmount($amount = 0, $to_cents = false)
@@ -141,12 +147,45 @@ class AmountCurrencyClass
         }
 
         if ($to_cents) {
-            return (float)($amount / 100);
-        } else {
-            $amount = (float)($amount * 1000); // we use this trick to avoid rounding while converting to int
-            $amount = (float)($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
-            return (int)($this->tools->tool('ps_round', $amount));
+            return (float) ($amount / 100);
         }
+        $amount = (float) ($amount * 1000); // we use this trick to avoid rounding while converting to int
+            $amount = (float) ($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
+
+            return (int) ($this->tools->tool('ps_round', $amount));
+    }
+
+    /**
+     * Get amounts with the right currency
+     *
+     * @param string $iso_code
+     *
+     * @return array
+     */
+    public function getAmountsByCurrency($iso_code)
+    {
+        $min_amounts = [];
+        $max_amounts = [];
+        $min = $this->config->get(
+            $this->dependencies->getConfigurationKey('minAmounts')
+        );
+        $max = $this->config->get(
+            $this->dependencies->getConfigurationKey('maxAmounts')
+        );
+        foreach (explode(';', $this->tools->tool('strtoupper', $min)) as $amount_cur) {
+            $cur = [];
+            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
+            $min_amounts[$cur[1]] = (int) $cur[2];
+        }
+        foreach (explode(';', $this->tools->tool('strtoupper', $max)) as $amount_cur) {
+            $cur = [];
+            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
+            $max_amounts[$cur[1]] = (int) $cur[2];
+        }
+        $current_min_amount = $min_amounts[$this->tools->tool('strtoupper', $iso_code)];
+        $current_max_amount = $max_amounts[$this->tools->tool('strtoupper', $iso_code)];
+
+        return ['min_amount' => $current_min_amount, 'max_amount' => $current_max_amount];
     }
 
     /**
@@ -166,37 +205,5 @@ class AmountCurrencyClass
         }
 
         return $currencies;
-    }
-
-    /**
-     * Get amounts with the right currency
-     *
-     * @param string $iso_code
-     * @return array
-     */
-    public function getAmountsByCurrency($iso_code)
-    {
-        $min_amounts = [];
-        $max_amounts = [];
-        $min = $this->config->get(
-            $this->dependencies->getConfigurationKey('minAmounts')
-        );
-        $max = $this->config->get(
-            $this->dependencies->getConfigurationKey('maxAmounts')
-        );
-        foreach (explode(';', $this->tools->tool('strtoupper', $min)) as $amount_cur) {
-            $cur = [];
-            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $min_amounts[$cur[1]] = (int)$cur[2];
-        }
-        foreach (explode(';', $this->tools->tool('strtoupper', $max)) as $amount_cur) {
-            $cur = [];
-            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
-            $max_amounts[$cur[1]] = (int)$cur[2];
-        }
-        $current_min_amount = $min_amounts[$this->tools->tool('strtoupper', $iso_code)];
-        $current_max_amount = $max_amounts[$this->tools->tool('strtoupper', $iso_code)];
-
-        return ['min_amount' => $current_min_amount, 'max_amount' => $current_max_amount];
     }
 }

@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -32,7 +31,7 @@ function upgrade_module_2_14_0($object)
         return true;
     }
 
-    return ($object->registerHook('registerGDPRConsent') &&
-        $object->registerHook('actionDeleteGDPRCustomer') &&
-        $object->registerHook('actionExportGDPRData'));
+    return $object->registerHook('registerGDPRConsent')
+        && $object->registerHook('actionDeleteGDPRCustomer')
+        && $object->registerHook('actionExportGDPRData');
 }

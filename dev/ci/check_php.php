@@ -7,7 +7,7 @@ function getPath($list = [], $path = false)
         $path = dirname(dirname(__FILE__));
     }
 
-    $files = array_diff(scandir($path), array('..', '.'));
+    $files = array_diff(scandir($path), ['..', '.']);
 
     if (count($files) < 1) {
         return $list;

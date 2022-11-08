@@ -13,10 +13,38 @@ class Translations
     }
 
     /**
+     * @description Return all module's translations
+     *
+     * @return array
+     */
+    public function getTranslations()
+    {
+        $this->setMethod('l');
+        $this->setFiles();
+        $this->setTrans();
+        $this->fillTranslations();
+
+        return $this->trans;
+    }
+
+    /*
+     * @description get the module Name from composer.json
+     * @return mixed
+     */
+    public function getModuleName()
+    {
+        $configuration = json_decode(file_get_contents(dirname(__FILE__) . '/../../../composer.json'));
+
+        return $configuration->moduleName;
+    }
+
+    /**
      * @description Get the only file who contain translation
+     *
      * @param $files
      * @param string $type_clear
      * @param string $path
+     *
      * @return mixed
      */
     private function clearFiles($files, $type_clear = 'file', $path = '')
@@ -46,7 +74,6 @@ class Translations
 
     /**
      * @description Update translation from current files
-     *
      */
     private function fillTranslations()
     {
@@ -66,6 +93,7 @@ class Translations
 
     /**
      * @description Get file who could countain translation
+     *
      * @param $path
      * @param $array_files
      * @param $module_name
@@ -82,7 +110,7 @@ class Translations
             foreach ($files_for_module as $file) {
                 $array_files[] = [
                     'path' => $path,
-                    'name' => $file
+                    'name' => $file,
                 ];
             }
         }
@@ -97,22 +125,11 @@ class Translations
     }
 
     /**
-     * @description Return all module's translations
-     * @return array
-     */
-    public function getTranslations()
-    {
-        $this->setMethod('l');
-        $this->setFiles();
-        $this->setTrans();
-        $this->fillTranslations();
-        return $this->trans;
-    }
-
-    /**
      * @description Hydrate translation from adapter file
+     *
      * @param bool $path
      * @param bool $file
+     *
      * @return bool
      */
     private function hydrateFromLangFile($path = false, $file = false)
@@ -140,13 +157,14 @@ class Translations
 
     /**
      * @description Get translation use in a given file
+     *
      * @param $content
      * @param bool $type_file
+     *
      * @return array
      */
     private function parseFile($content, $type_file = false)
     {
-
         // Parsing modules file
         if ($type_file == 'php') {
             $regex = '/->' . $this->method . '\(\s*(\')(.*[^\\\\])\'(\s*,\s*?\'(.+)\')?(\s*,\s*?(.+))?\s*\)/Ums';
@@ -182,11 +200,13 @@ class Translations
                 $strings[] = $string;
             }
         }
+
         return array_unique($strings, SORT_REGULAR);
     }
 
     /**
      * @description Set the files
+     *
      * @return array
      */
     private function setFiles()
@@ -194,11 +214,13 @@ class Translations
         $array_files = [];
         $path = dirname(__FILE__) . '/../../../';
         $this->getRecursiveFiles($path, $array_files, $this->moduleName);
+
         return $this->files = $array_files;
     }
 
     /**
      * @description Set the method
+     *
      * @param $method
      */
     private function setMethod($method)
@@ -208,7 +230,6 @@ class Translations
 
     /**
      * @description Set the translations
-     *
      */
     private function setTrans()
     {
@@ -245,7 +266,7 @@ class Translations
                     }
 
                     $md5_key = md5($key);
-                    $trans_key = '<{'. $this->moduleName .'}prestashop>';
+                    $trans_key = '<{' . $this->moduleName . '}prestashop>';
                     $trans_key .= strtolower($template_name) . '_' . $md5_key;
 
                     // to avoid duplicate entry
@@ -259,15 +280,5 @@ class Translations
                 }
             }
         }
-    }
-
-    /***
-     * @description get the module Name from composer.json
-     * @return mixed
-     */
-    public function getModuleName()
-    {
-        $configuration = json_decode(file_get_contents(dirname(__FILE__)."/../../../composer.json"));
-        return $configuration->moduleName;
     }
 }

@@ -23,10 +23,9 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\ConfigClass;
+use PayPlug\src\application\dependencies\BaseClass;
 use PayPlug\src\exceptions\BadParameterException;
 use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
-use PayPlug\src\application\dependencies\BaseClass;
 
 class OneyRepository extends BaseClass
 {
@@ -91,6 +90,7 @@ class OneyRepository extends BaseClass
                 $this->dependencies->getConfigurationKey('oney')
             ),
         ];
+
         return \Media::addJsDef($js_var);
     }
 
@@ -99,8 +99,10 @@ class OneyRepository extends BaseClass
      * Assign Oney var
      *
      * @param $cart Cart
-     * @return bool
+     *
      * @throws Exception
+     *
+     * @return bool
      */
     public function assignOneyPaymentOptions($cart)
     {
@@ -133,7 +135,7 @@ class OneyRepository extends BaseClass
      * @param $cart Cart
      * @param $amount
      * @param bool $country
-     * @return void
+     *
      * @throws BadParameterException
      * @throws ConfigurationNotSetException
      * @throws \PrestaShopDatabaseException
@@ -169,7 +171,7 @@ class OneyRepository extends BaseClass
                 'value' => $tools->tool('displayPrice', $amount),
             ],
             'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
-            'payplug_oney_error' => $error
+            'payplug_oney_error' => $error,
         ]);
 
         if ($oney_payment_options) {
@@ -189,11 +191,11 @@ class OneyRepository extends BaseClass
         $limits = $this->getOneyPriceLimit();
         $learnMoreLink = $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('companyIso')
-        ) == 'IT' &&
-        $this->toolsAdapter->tool('strtolower', $this->contextAdapter->getContext()->language->iso_code) == 'it';
+        ) == 'IT'
+        && $this->toolsAdapter->tool('strtolower', $this->contextAdapter->getContext()->language->iso_code) == 'it';
         $this->assign->assign([
-            'learnMoreLink' => (bool)$learnMoreLink,
-            'oneyWithFees' => (bool)$this->configurationAdapter->get(
+            'learnMoreLink' => (bool) $learnMoreLink,
+            'oneyWithFees' => (bool) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             ),
             'oneyMinAmounts' => $this->toolsAdapter->tool('displayPrice', $limits['min']),
@@ -206,6 +208,9 @@ class OneyRepository extends BaseClass
      * @description Check Oney required fields in form
      *
      * todo: to clean or update
+     *
+     * @param mixed $payment_data
+     *
      * @return array
      */
     public function checkOneyRequiredFields($payment_data)
@@ -225,24 +230,29 @@ class OneyRepository extends BaseClass
             if (isset($parsed[1])) {
                 $field = $parsed[1];
             }
+
             switch ($field) {
                 case 'email':
                     $is_valid_email = $this->isValidOneyEmail($data);
                     if (!$is_valid_email['result']) {
                         $errors[] = $is_valid_email['message'];
                     }
+
                     break;
+
                 case 'mobile_phone_number':
                     $id_address = $type == 'shipping' ?
                         $this->contextAdapter->getContext()->cart->id_address_delivery :
                         $this->contextAdapter->getContext()->cart->id_address_invoice;
-                    $address = $this->addressAdapter->get((int)$id_address);
+                    $address = $this->addressAdapter->get((int) $id_address);
                     $country = $this->countryAdapter->getCountry($address->id_country);
                     $valid = $this->dependencies->configClass->isValidMobilePhoneNumber($country->iso_code, $data);
                     if (!$valid) {
                         $errors[] = $this->dependencies->l('Please enter your mobile phone number.', 'oneyrepository');
                     }
+
                     break;
+
                 case 'first_name':
                     if (!$validate->validate('isName', $data)) {
                         $text = $type == 'shipping' ?
@@ -250,7 +260,9 @@ class OneyRepository extends BaseClass
                             $this->dependencies->l('Please enter your billing firstname.', 'oneyrepository');
                         $errors[] = $text;
                     }
+
                     break;
+
                 case 'last_name':
                     if (!$validate->validate('isName', $data)) {
                         $text = $type == 'shipping' ?
@@ -258,7 +270,9 @@ class OneyRepository extends BaseClass
                             $this->dependencies->l('Please enter your billing lastname.', 'oneyrepository');
                         $errors[] = $text;
                     }
+
                     break;
+
                 case 'address1':
                     if (!$validate->validate('isAddress', $data)) {
                         $text = $type == 'shipping' ?
@@ -266,7 +280,9 @@ class OneyRepository extends BaseClass
                             $this->dependencies->l('Please enter your billing address.', 'oneyrepository');
                         $errors[] = $text;
                     }
+
                     break;
+
                 case 'postcode':
                     if (!$validate->validate('isPostCode', $data)) {
                         $text = $type == 'shipping' ?
@@ -274,7 +290,9 @@ class OneyRepository extends BaseClass
                             $this->dependencies->l('Please enter your billing postcode.', 'oneyrepository');
                         $errors[] = $text;
                     }
+
                     break;
+
                 case 'city':
                     if (!$validate->validate('isCityName', $data)) {
                         $text = $type == 'shipping' ?
@@ -286,7 +304,9 @@ class OneyRepository extends BaseClass
                             . $this->dependencies->l('Please change it to another one or select another payment method.', 'oneyrepository');
                         $errors[] = $text;
                     }
+
                     break;
+
                 default:
                     break;
             }
@@ -304,7 +324,7 @@ class OneyRepository extends BaseClass
     {
         $config = $this->configurationAdapter;
 
-        return ($config->deleteByName(
+        return $config->deleteByName(
             $this->dependencies->getConfigurationKey('oney')
         ) && $config->deleteByName(
             $this->dependencies->getConfigurationKey('oneyAllowedCountries')
@@ -312,7 +332,7 @@ class OneyRepository extends BaseClass
             $this->dependencies->getConfigurationKey('oneyMaxAmounts')
         ) && $config->deleteByName(
             $this->dependencies->getConfigurationKey('oneyMinAmounts')
-        ));
+        );
     }
 
     /**
@@ -324,29 +344,33 @@ class OneyRepository extends BaseClass
     {
         $this->assignLegalNotice();
         $this->assign->assign([
-            'use_fees' => (bool)$this->configurationAdapter->get(
+            'use_fees' => (bool) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             ),
             'iso_code' => $this->toolsAdapter->tool(
                 'strtoupper',
                 $this->contextAdapter->getContext()->language->iso_code
-            )
+            ),
         ]);
+
         return $this->dependencies->configClass->fetchTemplate('oney/popin.tpl');
     }
 
     /**
      * @description Display Oney Schedule
+     *
      * @param $oney_payment
      * @param $amount
-     * @return string
+     *
      * @throws LocalizationException
+     *
+     * @return string
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
         $withFirstSchedule = $this->contextAdapter->getContext()->language->iso_code == 'it';
         $vars = [
-            'use_fees' => (bool)$this->configurationAdapter->get(
+            'use_fees' => (bool) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             ),
             'oney_payment_option' => $oney_payment,
@@ -361,18 +385,20 @@ class OneyRepository extends BaseClass
             ),
             'merchant_company_iso' => $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('companyIso')
-            )
+            ),
         ];
         $this->assign->assign($vars);
+
         return $this->dependencies->configClass->fetchTemplate('oney/schedule.tpl');
     }
 
     /**
      * @description Display Oney popin payment option
      *
-     * @return mixed
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     *
+     * @return mixed
      */
     public function displayOneyPaymentOptions()
     {
@@ -395,7 +421,7 @@ class OneyRepository extends BaseClass
             $oneyImagex4 = '/modules/' . $this->dependencies->name . '/views/img/oney/x4_with';
             $oneyImage = '';
 
-            $use_fees = (bool)$this->configurationAdapter->get(
+            $use_fees = (bool) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             );
             if (!$use_fees) {
@@ -405,7 +431,7 @@ class OneyRepository extends BaseClass
             $oneyImage .= '_fees';
 
             $iso = $this->toolsAdapter->tool('strtoupper', $this->contextAdapter->getContext()->language->iso_code);
-            $merchant_company_iso = (string)$this->configurationAdapter->get(
+            $merchant_company_iso = (string) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('companyIso')
             );
             if ($use_fees === false) {
@@ -413,7 +439,7 @@ class OneyRepository extends BaseClass
                     $iso = $merchant_company_iso;
                 }
 
-                $oneyImage .= '_'.$iso;
+                $oneyImage .= '_' . $iso;
             }
 
             if ($is_elligible['result'] !== true) {
@@ -422,9 +448,9 @@ class OneyRepository extends BaseClass
 
             $oneyImage .= '.svg';
             $oneyImageUrls = [
-                'optimized' => $oneyImageOptimized.$oneyImage,
-                'x3' => $oneyImagex3.$oneyImage,
-                'x4' => $oneyImagex4.$oneyImage
+                'optimized' => $oneyImageOptimized . $oneyImage,
+                'x3' => $oneyImagex3 . $oneyImage,
+                'x4' => $oneyImagex4 . $oneyImage,
             ];
 
             $this->assign->assign([
@@ -433,7 +459,7 @@ class OneyRepository extends BaseClass
                 'oney_required_fields' => $this->getOneyRequiredFields(),
                 'iso_code' => $iso,
                 'merchant_company_iso' => $merchant_company_iso,
-                'oney_image' => $oneyImageUrls
+                'oney_image' => $oneyImageUrls,
             ]);
 
             return $this->dependencies->configClass->fetchTemplate('oney/payment/payment.tpl');
@@ -444,9 +470,10 @@ class OneyRepository extends BaseClass
      * ONLY PS 1.6
      * Display Oney required fields template
      *
-     * @return mixed
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     *
+     * @return mixed
      */
     public function displayOneyRequiredFields()
     {
@@ -457,7 +484,7 @@ class OneyRepository extends BaseClass
         }
 
         $this->assign->assign([
-            'oney_required_fields' => $fields
+            'oney_required_fields' => $fields,
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('oney/required.tpl');
@@ -466,9 +493,10 @@ class OneyRepository extends BaseClass
     /**
      * @description Format Oney simulation from resource
      *
-     * @param bool $operation
+     * @param bool  $operation
      * @param array $resource
-     * @param bool $total_amount
+     * @param bool  $total_amount
+     *
      * @return array
      */
     public function formatOneyResource($operation = false, $resource = [], $total_amount = false)
@@ -491,7 +519,7 @@ class OneyRepository extends BaseClass
         $resource['nominal_annual_percentage_rate'] = number_format($resource['nominal_annual_percentage_rate'], 2);
         $resource['effective_annual_percentage_rate'] = number_format($resource['effective_annual_percentage_rate'], 2);
 
-        $resource['split'] = (int)str_replace('x', '', $type[0]);
+        $resource['split'] = (int) str_replace('x', '', $type[0]);
         $resource['title'] = sprintf($this->dependencies->l('Payment in %sx', 'oneyrepository'), $resource['split']);
 
         // format price
@@ -527,6 +555,7 @@ class OneyRepository extends BaseClass
      * todo: remove when it's fix in API
      *
      * @param $iso_country
+     *
      * @return string
      */
     public function getOneyCountry($iso_country)
@@ -538,6 +567,7 @@ class OneyRepository extends BaseClass
         if (in_array($iso_country, $overseas_iso, true)) {
             return 'FR';
         }
+
         return $iso_country;
     }
 
@@ -545,6 +575,7 @@ class OneyRepository extends BaseClass
      * @description Get Oney call to action
      *
      * @param string $env
+     *
      * @return mixed
      */
     public function getOneyCTA($env = null)
@@ -557,7 +588,7 @@ class OneyRepository extends BaseClass
         $this->assign->assign([
             'env' => $env,
             'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
-            'payplug_is_oney_elligible' => $is_elligible
+            'payplug_is_oney_elligible' => $is_elligible,
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
@@ -570,7 +601,7 @@ class OneyRepository extends BaseClass
      */
     public function getOneyDeliveryContext()
     {
-        $cart = $this->cartAdapter->get((int)$this->contextAdapter->getContext()->cart->id);
+        $cart = $this->cartAdapter->get((int) $this->contextAdapter->getContext()->cart->id);
 
         if ($this->cartAdapter->isVirtualCart($cart)) {
             return [
@@ -580,7 +611,7 @@ class OneyRepository extends BaseClass
             ];
         }
 
-        $carrier = $this->carrierAdapter->get((int)$cart->id_carrier);
+        $carrier = $this->carrierAdapter->get((int) $cart->id_carrier);
 
         if ($this->validateAdapter->validate('isLoadedObject', $carrier)) {
             return [
@@ -589,15 +620,15 @@ class OneyRepository extends BaseClass
                     'Y-m-d',
                     strtotime('+' . $this->carrierAdapter->getDefaultDelay() . ' day')
                 ),
-                'delivery_type' => $this->carrierAdapter->getDefaultDeliveryType()
-            ];
-        } else {
-            return [
-                'delivery_label' => $this->configurationAdapter->get('PS_SHOP_NAME'),
-                'expected_delivery_date' => date('Y-m-d'),
-                'delivery_type' => 'edelivery',
+                'delivery_type' => $this->carrierAdapter->getDefaultDeliveryType(),
             ];
         }
+
+        return [
+            'delivery_label' => $this->configurationAdapter->get('PS_SHOP_NAME'),
+            'expected_delivery_date' => date('Y-m-d'),
+            'delivery_type' => 'edelivery',
+        ];
     }
 
     /**
@@ -608,7 +639,7 @@ class OneyRepository extends BaseClass
     public function getOneyPaymentContext()
     {
         $cart_context = [];
-        $cart = $this->cartAdapter->get((int)$this->contextAdapter->getContext()->cart->id);
+        $cart = $this->cartAdapter->get((int) $this->contextAdapter->getContext()->cart->id);
         if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return ['cart' => $cart_context];
         }
@@ -618,19 +649,19 @@ class OneyRepository extends BaseClass
 
         foreach ($products as $product) {
             $unit_price = $this->dependencies->amountCurrencyClass->convertAmount($product['price_wt']);
-            $productName = (string)$product['name'] . (isset($product['attributes'])
+            $productName = (string) $product['name'] . (isset($product['attributes'])
                     ? ' - ' . $product['attributes']
                     : '');
 
             $item = [
-                'merchant_item_id' => (string)$product['id_product'],
-                'name' =>  $this->toolsAdapter->substr($productName, 0, 250),
-                'price' => (int)$unit_price,
-                'quantity' => (int)$product['cart_quantity'],
-                'total_amount' => (string)$unit_price * $product['cart_quantity'],
+                'merchant_item_id' => (string) $product['id_product'],
+                'name' => $this->toolsAdapter->substr($productName, 0, 250),
+                'price' => (int) $unit_price,
+                'quantity' => (int) $product['cart_quantity'],
+                'total_amount' => (string) $unit_price * $product['cart_quantity'],
                 'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
                     $this->toolsAdapter->substr($product['manufacturer_name'], 0, 250) :
-                    $this->configurationAdapter->get('PS_SHOP_NAME')
+                    $this->configurationAdapter->get('PS_SHOP_NAME'),
             ];
 
             $cart_context[] = array_merge($item, $delivery_context);
@@ -642,11 +673,13 @@ class OneyRepository extends BaseClass
     /**
      * @description Get Oney payment options
      *
-     * @param int $amount
+     * @param int  $amount
      * @param bool $country
-     * @return array
+     *
      * @throws BadParameterException
      * @throws ConfigurationNotSetException
+     *
+     * @return array
      */
     public function getOneyPaymentOptionsList($amount = 0, $country = false)
     {
@@ -676,11 +709,11 @@ class OneyRepository extends BaseClass
         $available_oney_payments = $this->oneyEntity->getOperations();
         $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
 
-        $use_fees = (bool)$this->configurationAdapter->get(
+        $use_fees = (bool) $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('oneyFees')
         );
         foreach (array_keys($oney_simulations['simulations']) as $key) {
-            $with_fees = (bool)strpos($key, 'with_fees') !== false;
+            $with_fees = (bool) strpos($key, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 unset($oney_simulations['simulations'][$key]);
             }
@@ -708,9 +741,11 @@ class OneyRepository extends BaseClass
      * @param $cart Cart
      * @param $amount
      * @param bool $country
-     * @return array
+     *
      * @throws BadParameterException
      * @throws ConfigurationNotSetException
+     *
+     * @return array
      */
     public function getOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -755,6 +790,7 @@ class OneyRepository extends BaseClass
 
         $popin_tpl = $this->displayOneyPopin();
         $payment_tpl = $this->displayOneyPaymentOptions();
+
         return [
             'result' => $is_elligible['result'] && $oney_payment_options,
             'error' => $error,
@@ -763,10 +799,11 @@ class OneyRepository extends BaseClass
         ];
     }
 
-
     /**
      * @description   get custom oney ammount from BO form
+     *
      * @param $custom_oney_amount
+     *
      * @return string
      */
     public function setCustomOneyLimit($custom_oney_amount)
@@ -775,7 +812,7 @@ class OneyRepository extends BaseClass
         $tools = $this->toolsAdapter;
 
         $id_currency = $config->get('PS_CURRENCY_DEFAULT');
-        $currency = $this->currencyAdapter->get((int)$id_currency);
+        $currency = $this->currencyAdapter->get((int) $id_currency);
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
 
@@ -783,12 +820,16 @@ class OneyRepository extends BaseClass
             'currency' => $iso_code . ':',
             'ammount' => $custom_oney_amount,
         ];
+
         return implode($oneyAmount);
     }
+
     /**
      * @description Get Oney price limit
      *
-     * @param boolean $id_currency
+     * @param bool  $id_currency
+     * @param mixed $custom
+     *
      * @return array
      */
     public function getOneyPriceLimit($custom = true, $id_currency = false)
@@ -806,12 +847,12 @@ class OneyRepository extends BaseClass
                 $id_currency = $config->get('PS_CURRENCY_DEFAULT');
             }
 
-            $currency = $this->currencyAdapter->get((int)$id_currency);
+            $currency = $this->currencyAdapter->get((int) $id_currency);
         }
 
         $limits = [
             'min' => false,
-            'max' => false
+            'max' => false,
         ];
 
         if (!$this->validateAdapter->validate('isLoadedObject', $currency)) {
@@ -838,7 +879,8 @@ class OneyRepository extends BaseClass
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
-                $limits['min'] = (int)$min[1];
+                $limits['min'] = (int) $min[1];
+
                 break;
             }
         }
@@ -860,7 +902,8 @@ class OneyRepository extends BaseClass
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
             if ($max[0] == $iso_code) {
-                $limits['max'] = (int)$max[1];
+                $limits['max'] = (int) $max[1];
+
                 break;
             }
         }
@@ -871,15 +914,16 @@ class OneyRepository extends BaseClass
     /**
      * @description Get the Oney required fields from Context
      *
-     * @return array
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     *
+     * @return array
      */
     public function getOneyRequiredFields()
     {
         $fields = [];
         $customer = $this->contextAdapter->getContext()->customer;
-        if (!$this->validateAdapter->validate("isLoadedObject", $customer)) {
+        if (!$this->validateAdapter->validate('isLoadedObject', $customer)) {
             return $fields;
         }
         $id_address_delivery = $this->contextAdapter->getContext()->cart->id_address_delivery;
@@ -887,9 +931,9 @@ class OneyRepository extends BaseClass
         $is_same = $id_address_delivery == $id_address_invoice;
 
         $shipping_fields = [];
-        $shipping_address = $this->addressAdapter->get((int)$id_address_delivery);
+        $shipping_address = $this->addressAdapter->get((int) $id_address_delivery);
 
-        if (!$this->validateAdapter->validate("isLoadedObject", $shipping_address)) {
+        if (!$this->validateAdapter->validate('isLoadedObject', $shipping_address)) {
             return $fields;
         }
         $shipping_data = [
@@ -905,6 +949,7 @@ class OneyRepository extends BaseClass
 
             if ($errors) {
                 $message = reset($errors);
+
                 switch ($key) {
                     case 'email':
                     case 'mobile_phone_number':
@@ -914,11 +959,13 @@ class OneyRepository extends BaseClass
                                 [
                                     'name' => $key,
                                     'value' => $data,
-                                    'type' => 'text'
-                                ]
+                                    'type' => 'text',
+                                ],
                             ],
                         ];
+
                         break;
+
                     case 'city':
                         $shipping_fields['city'] = [
                             'text' => $message,
@@ -926,30 +973,31 @@ class OneyRepository extends BaseClass
                                 [
                                     'name' => 'first_name',
                                     'value' => $shipping_address->firstname,
-                                    'type' => 'text'
+                                    'type' => 'text',
                                 ],
                                 [
                                     'name' => 'last_name',
                                     'value' => $shipping_address->lastname,
-                                    'type' => 'text'
+                                    'type' => 'text',
                                 ],
                                 [
                                     'name' => 'address1',
                                     'value' => $shipping_address->address1,
-                                    'type' => 'text'
+                                    'type' => 'text',
                                 ],
                                 [
                                     'name' => 'postcode',
                                     'value' => $shipping_address->postcode,
-                                    'type' => 'text'
+                                    'type' => 'text',
                                 ],
                                 [
                                     'name' => $key,
                                     'value' => $data,
-                                    'type' => 'text'
+                                    'type' => 'text',
                                 ],
                             ],
                         ];
+
                         break;
                 }
             }
@@ -963,9 +1011,9 @@ class OneyRepository extends BaseClass
             }
 
             $billing_fields = [];
-            $billing_address = $this->addressAdapter->get((int)$id_address_invoice);
+            $billing_address = $this->addressAdapter->get((int) $id_address_invoice);
 
-            if (!$this->validateAdapter->validate("isLoadedObject", $billing_address)) {
+            if (!$this->validateAdapter->validate('isLoadedObject', $billing_address)) {
                 return $fields;
             }
 
@@ -981,6 +1029,7 @@ class OneyRepository extends BaseClass
 
                 if ($errors) {
                     $message = reset($errors);
+
                     switch ($key) {
                         case 'mobile_phone_number':
                             $billing_fields[$key] = [
@@ -989,11 +1038,13 @@ class OneyRepository extends BaseClass
                                     [
                                         'name' => $key,
                                         'value' => $data,
-                                        'type' => 'text'
-                                    ]
+                                        'type' => 'text',
+                                    ],
                                 ],
                             ];
+
                             break;
+
                         case 'city':
                             $billing_fields['city'] = [
                                 'text' => $message,
@@ -1001,30 +1052,31 @@ class OneyRepository extends BaseClass
                                     [
                                         'name' => 'first_name',
                                         'value' => $billing_address->firstname,
-                                        'type' => 'text'
+                                        'type' => 'text',
                                     ],
                                     [
                                         'name' => 'last_name',
                                         'value' => $billing_address->lastname,
-                                        'type' => 'text'
+                                        'type' => 'text',
                                     ],
                                     [
                                         'name' => 'address1',
                                         'value' => $billing_address->address1,
-                                        'type' => 'text'
+                                        'type' => 'text',
                                     ],
                                     [
                                         'name' => 'postcode',
                                         'value' => $billing_address->postcode,
-                                        'type' => 'text'
+                                        'type' => 'text',
                                     ],
                                     [
                                         'name' => $key,
                                         'value' => $data,
-                                        'type' => 'text'
+                                        'type' => 'text',
                                     ],
                                 ],
                             ];
+
                             break;
                     }
                 }
@@ -1041,12 +1093,14 @@ class OneyRepository extends BaseClass
     /**
      * @description Get Oney Payment Simulations
      *
-     * @param int $amount
+     * @param int    $amount
      * @param string $country
-     * @param array $operation contain x3|4_with_fees or x3|4_without_fees
-     * @return array
+     * @param array  $operation contain x3|4_with_fees or x3|4_without_fees
+     *
      * @throws BadParameterException
      * @throws ConfigurationNotSetException
+     *
+     * @return array
      */
     public function getOneySimulations($amount, $country, $operation)
     {
@@ -1056,7 +1110,7 @@ class OneyRepository extends BaseClass
         if (!$cache_key['result']) {
             return [
                 'result' => false,
-                'error' => $cache_key['message']
+                'error' => $cache_key['message'],
             ];
         }
 
@@ -1067,7 +1121,6 @@ class OneyRepository extends BaseClass
         if ($cache['result']) {
             return json_decode($cache['result']['cache_value'], true);
         }
-
 
         $data = [
             'amount' => $amount,
@@ -1082,7 +1135,7 @@ class OneyRepository extends BaseClass
 
             return [
                 'result' => false,
-                'error' => $simulations['message']
+                'error' => $simulations['message'],
             ];
         }
 
@@ -1090,13 +1143,14 @@ class OneyRepository extends BaseClass
         if (isset($simulations['object']) && $simulations['object'] == 'error') {
             return [
                 'result' => false,
-                'error' => $simulations['message']
+                'error' => $simulations['message'],
             ];
-        } elseif ($simulations) {
+        }
+        if ($simulations) {
             ksort($simulations);
             $to_cache = [
                 'result' => true,
-                'simulations' => $simulations
+                'simulations' => $simulations,
             ];
 
             // $cache_id = cache_key in db
@@ -1111,7 +1165,7 @@ class OneyRepository extends BaseClass
 
         return [
             'result' => true,
-            'simulations' => $simulations
+            'simulations' => $simulations,
         ];
     }
 
@@ -1119,6 +1173,7 @@ class OneyRepository extends BaseClass
      * @description Get the Oney required fields from Context
      *
      * @param array $payment_data
+     *
      * @return bool
      */
     public function hasOneyRequiredFields($payment_data = [])
@@ -1176,7 +1231,8 @@ class OneyRepository extends BaseClass
      * @description Check if Oney allow a given currency
      *
      * @param $id_currency
-     * @return boolean
+     *
+     * @return bool
      */
     public function isOneyAllowedCurrency($id_currency)
     {
@@ -1207,10 +1263,12 @@ class OneyRepository extends BaseClass
      *
      * @param $cart Cart
      * @param bool $amount
-     * @param boolean $country
-     * @return array
+     * @param bool $country
+     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     *
+     * @return array
      */
     public function isOneyElligible($cart, $amount = false, $country = false)
     {
@@ -1220,7 +1278,7 @@ class OneyRepository extends BaseClass
             return [
                 'result' => false,
                 'error_type' => 'invalid_cart',
-                'error' => $is_valid_cart['error']
+                'error' => $is_valid_cart['error'],
             ];
         }
 
@@ -1231,7 +1289,7 @@ class OneyRepository extends BaseClass
                 return [
                     'result' => false,
                     'error_type' => 'invalid_addresses',
-                    'error' => $is_valid_addresses['error']
+                    'error' => $is_valid_addresses['error'],
                 ];
             }
         }
@@ -1253,7 +1311,7 @@ class OneyRepository extends BaseClass
     /**
      * @description Check if Oney is allowed
      *
-     * @return boolean
+     * @return bool
      */
     public function isOneyAllowed()
     {
@@ -1267,9 +1325,11 @@ class OneyRepository extends BaseClass
      *
      * @param int $id_shipping
      * @param int $id_billing
-     * @return array
+     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
+     *
+     * @return array
      */
     public function isValidOneyAddresses($id_shipping, $id_billing)
     {
@@ -1286,6 +1346,7 @@ class OneyRepository extends BaseClass
      * @description Check if amount is valid for Oney
      *
      * @param float $amount
+     *
      * @return array
      */
     public function isValidOneyAmount($amount)
@@ -1299,9 +1360,10 @@ class OneyRepository extends BaseClass
                     $this->dependencies->l('The total amount of your order should be between %s and %s to pay with Oney.', 'oneyrepository'),
                     $this->toolsAdapter->tool('displayPrice', $limits['min']),
                     $this->toolsAdapter->tool('displayPrice', $limits['max'])
-                )
+                ),
             ];
         }
+
         return ['result' => true, 'error' => false];
     }
 
@@ -1309,6 +1371,7 @@ class OneyRepository extends BaseClass
      * @description Check if cart is valid for Oney
      *
      * @param Cart $cart
+     *
      * @return array
      */
     public function isValidOneyCart($cart)
@@ -1316,7 +1379,7 @@ class OneyRepository extends BaseClass
         if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return [
                 'result' => false,
-                'error' => $this->dependencies->l('The cart is unvalid', 'oneyrepository')
+                'error' => $this->dependencies->l('The cart is unvalid', 'oneyrepository'),
             ];
         }
 
@@ -1327,9 +1390,10 @@ class OneyRepository extends BaseClass
 
         if ($nb_products >= $max) {
             $error = 'The payment with Oney is not available because you have more than 1000 items in your cart.';
+
             return [
                 'result' => false,
-                'error' => $this->dependencies->l($error, 'oneyrepository')
+                'error' => $this->dependencies->l($error, 'oneyrepository'),
             ];
         }
 
@@ -1341,6 +1405,7 @@ class OneyRepository extends BaseClass
      *
      * @param string $shipping_iso
      * @param string $billing_iso
+     *
      * @return array
      */
     public function isValidOneyCountry($shipping_iso, $billing_iso)
@@ -1348,10 +1413,11 @@ class OneyRepository extends BaseClass
         // check if the billing country and the shipping country are different then return false
         if ($shipping_iso != $billing_iso) {
             $error = 'Delivery and billing addresses must be in the same country to pay with Oney.';
+
             return [
                 'result' => false,
                 'type' => 'different',
-                'error' => $this->dependencies->l($error, 'oneyrepository')
+                'error' => $this->dependencies->l($error, 'oneyrepository'),
             ];
         }
 
@@ -1367,7 +1433,7 @@ class OneyRepository extends BaseClass
             return [
                 'result' => false,
                 'type' => 'no_country',
-                'error' => $this->dependencies->l('No countries are configured to use oney.', 'oneyrepository')
+                'error' => $this->dependencies->l('No countries are configured to use oney.', 'oneyrepository'),
             ];
         }
 
@@ -1396,7 +1462,7 @@ class OneyRepository extends BaseClass
                 'result' => false,
                 'type' => 'invalid',
                 'error' => $this->dependencies->l('For a payment with Oney, delivery and billing addresses must be in', 'oneyrepository') . ' ' .
-                $str_list
+                $str_list,
             ];
         }
 
@@ -1405,7 +1471,9 @@ class OneyRepository extends BaseClass
 
     /**
      * @description Check given email is valid to use Oney payment
+     *
      * @param $email
+     *
      * @return array
      */
     public function isValidOneyEmail($email)

@@ -25,8 +25,8 @@
 namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\tests\mock\CarrierMock;
-use PayPlug\tests\mock\OneySimulationsMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\mock\OneySimulationsMock;
 
 /**
  * @group unit
@@ -35,6 +35,9 @@ use PayPlug\tests\mock\MockHelper;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
 {
@@ -47,21 +50,24 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
         $this->carrier->shouldReceive([
             'get' => CarrierMock::get(),
             'getDefaultDelay' => 0,
-            'getDefaultDeliveryType' => 'storepickup'
+            'getDefaultDeliveryType' => 'storepickup',
         ]);
 
         $this->config->shouldReceive('get')
             ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            ->andReturn('FR');
+            ->andReturn('FR')
+        ;
 
         $this->config->shouldReceive('get')
             ->with('PAYPLUG_ONEY_FEES')
-            ->andReturn(true);
+            ->andReturn(true)
+        ;
 
         $this->context = MockHelper::createContextMock('Payplug\src\application\adapter\ContextAdapter');
 
         $this->repo
-            ->shouldAllowMockingProtectedMethods();
+            ->shouldAllowMockingProtectedMethods()
+        ;
 
         $this->list = OneySimulationsMock::getFormated();
     }
@@ -76,6 +82,7 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
 
     /**
      * @dataProvider validListDataProvider
+     *
      * @param $amount
      * @param $country
      * @group mytestlist
@@ -86,9 +93,10 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
             ->shouldReceive([
                 'getOneySimulations' => [
                     'result' => true,
-                    'simulations' => OneySimulationsMock::get()
-                ]
-            ]);
+                    'simulations' => OneySimulationsMock::get(),
+                ],
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->getOneyPaymentOptionsList($amount, $country),
@@ -106,6 +114,9 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
 
     /**
      * @dataProvider invalidListDataProvider
+     *
+     * @param mixed $amount
+     * @param mixed $country
      */
     public function testGetListWithWrongAmount($amount, $country)
     {
@@ -122,9 +133,10 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
                 'getOneySimulations' => [
                     'result' => false,
                     'error' => 'There is an error',
-                    'simulations' => []
-                ]
-            ]);
+                    'simulations' => [],
+                ],
+            ])
+        ;
 
         $this->assertSame(
             [],

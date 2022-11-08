@@ -30,6 +30,9 @@ namespace PayPlug\tests\repositories\CardRepository;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class DeleteCardFromAPITest extends BaseCardRepository
 {
@@ -49,13 +52,15 @@ final class DeleteCardFromAPITest extends BaseCardRepository
         yield [null];
         yield [false];
         yield [42];
-        yield [['key'=>'value']];
+        yield [['key' => 'value']];
     }
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $id_customer
      * @param $id_payplug_card
+     * @param mixed $id_card
      */
     public function testWithInvalidParams($id_card)
     {
@@ -68,8 +73,8 @@ final class DeleteCardFromAPITest extends BaseCardRepository
             'deleteCard' => [
                 'code' => 500,
                 'result' => false,
-                'message' => 'An error occured'
-            ]
+                'message' => 'An error occured',
+            ],
         ]);
 
         $this->assertTrue($this->repo->deleteCardFromAPI($this->id_card));
@@ -81,8 +86,8 @@ final class DeleteCardFromAPITest extends BaseCardRepository
             'deleteCard' => [
                 'code' => 404,
                 'result' => false,
-                'message' => 'Card not found'
-            ]
+                'message' => 'Card not found',
+            ],
         ]);
 
         $this->assertTrue($this->repo->deleteCardFromAPI($this->id_card));
@@ -96,10 +101,10 @@ final class DeleteCardFromAPITest extends BaseCardRepository
                 'result' => true,
                 'resource' => [
                     'httpResponse' => [
-                        'object' => 'error'
-                    ]
-                ]
-            ]
+                        'object' => 'error',
+                    ],
+                ],
+            ],
         ]);
 
         $this->assertFalse($this->repo->deleteCardFromAPI($this->id_card));
@@ -113,10 +118,10 @@ final class DeleteCardFromAPITest extends BaseCardRepository
                 'result' => true,
                 'resource' => [
                     'httpResponse' => [
-                        'object' => 'success'
-                    ]
-                ]
-            ]
+                        'object' => 'success',
+                    ],
+                ],
+            ],
         ]);
 
         $this->assertTrue($this->repo->deleteCardFromAPI($this->id_card));

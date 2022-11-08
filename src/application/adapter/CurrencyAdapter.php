@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CurrencyInterface;
 use Currency;
+use PayPlug\src\interfaces\CurrencyInterface;
 
 class CurrencyAdapter implements CurrencyInterface
 {
@@ -38,6 +38,7 @@ class CurrencyAdapter implements CurrencyInterface
         if (!is_int($idCurrency)) {
             $idCurrency = false;
         }
+
         return new Currency($idCurrency);
     }
 

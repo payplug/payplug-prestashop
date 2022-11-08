@@ -23,12 +23,16 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\ConfigClass;
 use Db;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class InstallRepository extends BaseClass
 {
+    /** @var array */
+    public $errors;
+
+    /** @var object */
+    public $log;
     /** @var object */
     protected $config;
 
@@ -40,12 +44,6 @@ class InstallRepository extends BaseClass
 
     /** @var object */
     protected $dependencies;
-
-    /** @var array */
-    public $errors;
-
-    /** @var object */
-    public $log;
 
     /** @var object OrderStateRepository */
     protected $order_state;
@@ -109,8 +107,8 @@ class InstallRepository extends BaseClass
             // Check live OrderState
             $key_config_live = $this->dependencies->concatenateModuleNameTo('ORDER_STATE_')
                 . $this->tools->tool('strtoupper', $key);
-            $id_order_state_live = (int)$this->config->get($key_config_live);
-            $order_state_live = $this->order_state_adapter->get((int)$id_order_state_live);
+            $id_order_state_live = (int) $this->config->get($key_config_live);
+            $order_state_live = $this->order_state_adapter->get((int) $id_order_state_live);
             if (!$this->validate->validate('isLoadedObject', $order_state_live)
                 || (isset($order_state_live->deleted) && $order_state_live->deleted)) {
                 $this->order_state->create($key, $state, false, true);
@@ -118,8 +116,8 @@ class InstallRepository extends BaseClass
 
             // Check sandbox OrderState
             $key_config_sandbox = $key_config_live . '_TEST';
-            $id_order_state_sandbox = (int)$this->config->get($key_config_sandbox);
-            $order_state_sandbox = $this->order_state_adapter->get((int)$id_order_state_sandbox);
+            $id_order_state_sandbox = (int) $this->config->get($key_config_sandbox);
+            $order_state_sandbox = $this->order_state_adapter->get((int) $id_order_state_sandbox);
             if (!$this->validate->validate('isLoadedObject', $order_state_sandbox)
                 || (isset($order_state_sandbox->deleted) && $order_state_sandbox->deleted)) {
                 $this->order_state->create($key, $state, true, true);
@@ -131,6 +129,7 @@ class InstallRepository extends BaseClass
 
     /**
      * @description Create usual status
+     *
      * @return bool
      */
     public function createOrderStates()
@@ -142,11 +141,13 @@ class InstallRepository extends BaseClass
         }
 
         $this->order_state->removeIdsUnusedByPayPlug();
+
         return true;
     }
 
     /**
      * @description Create usual status
+     *
      * @return bool
      */
     public function createOrderStatesType()
@@ -159,7 +160,7 @@ class InstallRepository extends BaseClass
             $id_order_state_live = $this->config->get($live_key);
             $this->log->info('Live key : ' . $live_key . ' / Id Order State: ' . $id_order_state_live);
             if ($id_order_state_live) {
-                $res = $this->order_state->saveType((int)$id_order_state_live, $state['type']);
+                $res = $this->order_state->saveType((int) $id_order_state_live, $state['type']);
                 $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
             }
 
@@ -168,7 +169,7 @@ class InstallRepository extends BaseClass
             $id_order_state_sandbox = $this->config->get($sandbox_key);
             $this->log->info('Sandbox key : ' . $sandbox_key . ' / Id Order State: ' . $id_order_state_sandbox);
             if ($id_order_state_sandbox) {
-                $res = $this->order_state->setType((int)$id_order_state_sandbox, $state['type']);
+                $res = $this->order_state->setType((int) $id_order_state_sandbox, $state['type']);
                 $this->log->info('Save type: ' . $state['type'] . ' - result: ' . ($res ? 'ok' : 'ko'));
             }
         }
@@ -181,20 +182,20 @@ class InstallRepository extends BaseClass
             'PS_OS_ERROR' => 'error',
             'PS_OS_CHEQUE' => 'nothing',
             'PS_OS_BANKWIRE' => 'nothing',
-            'PS_OS_PREPARATION' =>'nothing',
-            'PS_OS_SHIPPING' =>'nothing',
-            'PS_OS_DELIVERED'=>'nothing',
+            'PS_OS_PREPARATION' => 'nothing',
+            'PS_OS_SHIPPING' => 'nothing',
+            'PS_OS_DELIVERED' => 'nothing',
         ];
 
         if (version_compare(_PS_VERSION_, '1.6.0.14', '<')) {
             $prestashop_order_states += [
-                'PS_OS_OUTOFSTOCK' =>  'nothing'
+                'PS_OS_OUTOFSTOCK' => 'nothing',
             ];
         } else {
             $prestashop_order_states += [
                 'PS_OS_OUTOFSTOCK_PAID' => 'paid',
                 'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
-                'PS_OS_COD_VALIDATION' =>'nothing',
+                'PS_OS_COD_VALIDATION' => 'nothing',
             ];
         }
         $date = date('Y-m-d');
@@ -206,9 +207,9 @@ class InstallRepository extends BaseClass
                 FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
                 WHERE  `id_order_state` = ' . $id_order_state;
             $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
-            if ($sqlGetType  && $sqlGetType  != $type) {
+            if ($sqlGetType && $sqlGetType != $type) {
                 $queries[] = 'UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
-                                 SET `type` = ' . "'$type'" . ' 
+                                 SET `type` = ' . "'{$type}'" . ' 
                                  WHERE  `id_order_state` = ' . $id_order_state;
             } else {
                 $queries[] = 'INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
@@ -227,23 +228,12 @@ class InstallRepository extends BaseClass
     }
 
     /**
-     * @description Delete basic configuration
-     * @return bool
-     */
-    private function deleteConfig()
-    {
-        foreach (array_keys($this->dependencies->configurationKeys) as $key) {
-            $this->config->deleteByName(
-                $this->dependencies->getConfigurationKey($key)
-            );
-        };
-        return true;
-    }
-
-    /**
      * @description Install PayPlug Module
+     *
      * @param bool $soft_install
+     *
      * @return bool
+     *
      * @see Module::install()
      */
     public function install()
@@ -293,6 +283,7 @@ class InstallRepository extends BaseClass
         }
 
         $this->log->info('Install successful.');
+
         return true;
     }
 
@@ -303,6 +294,7 @@ class InstallRepository extends BaseClass
 
     /**
      * @description Create basic configuration
+     *
      * @return bool
      */
     public function setConfig()
@@ -321,13 +313,16 @@ class InstallRepository extends BaseClass
                     );
                 }
             }
-        };
+        }
+
         return true;
     }
 
     /**
      * @description Set error on module install
+     *
      * @param $error
+     *
      * @return bool
      */
     public function setInstallError($error = '')
@@ -342,6 +337,59 @@ class InstallRepository extends BaseClass
         $this->uninstall();
 
         return false;
+    }
+
+    /**
+     * @description Set error on module uninstall
+     *
+     * @param $error
+     *
+     * @return bool
+     */
+    public function setUninstallError($error = '')
+    {
+        $this->log->error($error);
+
+        return false;
+    }
+
+    /**
+     * @description Uninstall PayPlug Module
+     *
+     * @return bool
+     */
+    public function uninstall()
+    {
+        $this->log->info('Starting to uninstall.');
+
+        $keep_cards = (bool) $this->config->get('PAYPLUG_KEEP_CARDS');
+        if (!$keep_cards) {
+            $this->log->info('Saved cards will be deleted.');
+
+            if (!$this->dependencies->cardClass->uninstallCards()) {
+                return $this->setUninstallError('Unable to delete saved cards.');
+            }
+
+            $this->log->info('Saved cards successfully deleted.');
+        } else {
+            $this->log->info('Cards will be kept.');
+        }
+
+        if (!$this->deleteConfig()) {
+            return $this->setUninstallError('Uninstall failed: configuration.');
+        }
+
+        if (!$this->sql->uninstallSQL($keep_cards)) {
+            return $this->setUninstallError('Uninstall failed: sql.');
+        }
+
+        if (!$this->dependencies->loadAdapterPresta()->uninstallTab()) {
+            return $this->setUninstallError('Uninstall failed: tab.');
+        }
+
+        $this->log->info('Uninstall succeeded.');
+
+        return true;
     }
 
     /**
@@ -501,55 +549,23 @@ class InstallRepository extends BaseClass
                     'it' => 'Oney - Pending',
                 ],
                 'type' => 'pending',
-            ]
+            ],
         ]);
     }
 
     /**
-     * @description Set error on module uninstall
-     * @param $error
+     * @description Delete basic configuration
+     *
      * @return bool
      */
-    public function setUninstallError($error = '')
+    private function deleteConfig()
     {
-        $this->log->error($error);
-        return false;
-    }
-
-    /**
-     * @description Uninstall PayPlug Module
-     * @return bool
-     */
-    public function uninstall()
-    {
-        $this->log->info('Starting to uninstall.');
-
-        $keep_cards = (bool)$this->config->get('PAYPLUG_KEEP_CARDS');
-        if (!$keep_cards) {
-            $this->log->info('Saved cards will be deleted.');
-
-            if (!$this->dependencies->cardClass->uninstallCards()) {
-                return $this->setUninstallError('Unable to delete saved cards.');
-            }
-
-            $this->log->info('Saved cards successfully deleted.');
-        } else {
-            $this->log->info('Cards will be kept.');
+        foreach (array_keys($this->dependencies->configurationKeys) as $key) {
+            $this->config->deleteByName(
+                $this->dependencies->getConfigurationKey($key)
+            );
         }
 
-        if (!$this->deleteConfig()) {
-            return $this->setUninstallError('Uninstall failed: configuration.');
-        }
-
-        if (!$this->sql->uninstallSQL($keep_cards)) {
-            return $this->setUninstallError('Uninstall failed: sql.');
-        }
-
-        if (!$this->dependencies->loadAdapterPresta()->uninstallTab()) {
-            return $this->setUninstallError('Uninstall failed: tab.');
-        }
-
-        $this->log->info('Uninstall succeeded.');
         return true;
     }
 }

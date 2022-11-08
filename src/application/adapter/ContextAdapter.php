@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ContextInterface;
 use Context;
+use PayPlug\src\interfaces\ContextInterface;
 
 class ContextAdapter implements ContextInterface
 {

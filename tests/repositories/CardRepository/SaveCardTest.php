@@ -32,10 +32,14 @@ use PayPlug\tests\mock\PaymentMock;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class SaveCardTest extends BaseCardRepository
 {
     private $payment;
+
     public function setUp()
     {
         parent::setUp();
@@ -44,26 +48,30 @@ final class SaveCardTest extends BaseCardRepository
         $this->config
             ->shouldReceive('get')
             ->with('PAYPLUG_SANDBOX_MODE')
-            ->andReturn(false);
+            ->andReturn(false)
+        ;
         $this->config
             ->shouldReceive('get')
             ->with('PAYPLUG_COMPANY_ID')
-            ->andReturn(4242);
+            ->andReturn(4242)
+        ;
     }
 
     public function invalidDataProvider()
     {
-        yield[false];
-        yield[null];
-        yield[42];
-        yield['wrong parameter'];
-        yield[['key'=>'value']];
+        yield [false];
+        yield [null];
+        yield [42];
+        yield ['wrong parameter'];
+        yield [['key' => 'value']];
     }
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $month
      * @param $year
+     * @param mixed $payment
      */
     public function testWithInvalidParams($payment)
     {
@@ -74,8 +82,9 @@ final class SaveCardTest extends BaseCardRepository
     {
         $this->repo
             ->shouldReceive([
-                'checkExists' => true
-            ]);
+                'checkExists' => true,
+            ])
+        ;
 
         $this->assertFalse($this->repo->saveCard($this->payment));
     }
@@ -84,8 +93,9 @@ final class SaveCardTest extends BaseCardRepository
     {
         $this->repo
             ->shouldReceive([
-                'checkExists' => false
-            ]);
+                'checkExists' => false,
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
@@ -93,11 +103,13 @@ final class SaveCardTest extends BaseCardRepository
                 'into' => $this->query,
                 'fields' => $this->query,
                 'values' => $this->query,
-            ]);
+            ])
+        ;
 
         $this->query
             ->shouldReceive('build')
-            ->andThrow('Exception', 'Build method throw exception', 500);
+            ->andThrow('Exception', 'Build method throw exception', 500)
+        ;
 
         $this->assertFalse($this->repo->saveCard($this->payment));
     }
@@ -106,8 +118,9 @@ final class SaveCardTest extends BaseCardRepository
     {
         $this->repo
             ->shouldReceive([
-                'checkExists' => false
-            ]);
+                'checkExists' => false,
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
@@ -116,7 +129,8 @@ final class SaveCardTest extends BaseCardRepository
                 'fields' => $this->query,
                 'values' => $this->query,
                 'build' => false,
-            ]);
+            ])
+        ;
 
         $this->assertFalse($this->repo->saveCard($this->payment));
     }
@@ -125,8 +139,9 @@ final class SaveCardTest extends BaseCardRepository
     {
         $this->repo
             ->shouldReceive([
-                'checkExists' => false
-            ]);
+                'checkExists' => false,
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
@@ -135,7 +150,8 @@ final class SaveCardTest extends BaseCardRepository
                 'fields' => $this->query,
                 'values' => $this->query,
                 'build' => true,
-            ]);
+            ])
+        ;
 
         $this->assertTrue($this->repo->saveCard($this->payment));
     }

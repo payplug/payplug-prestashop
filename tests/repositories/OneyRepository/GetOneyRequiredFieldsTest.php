@@ -34,6 +34,9 @@ use PayPlug\tests\mock\ContextMock;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 {
@@ -50,9 +53,11 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     {
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
-            ->andReturn([]);
+            ->andReturn([])
+        ;
         $this->assertSame(
             [],
             $this->repo->getOneyRequiredFields()
@@ -63,14 +68,17 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     {
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('shipping-email', $arr)) {
                     return ['error message: shipping-email'];
                 }
+
                 return [];
-            });
+            })
+        ;
 
         $response = $this->repo->getOneyRequiredFields();
         $expected = [
@@ -81,11 +89,11 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
                         [
                             'name' => 'email',
                             'value' => 'customer@payplug.com',
-                            'type' => 'text'
-                        ]
+                            'type' => 'text',
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertSame($expected, $response);
@@ -95,14 +103,17 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     {
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('shipping-mobile_phone_number', $arr)) {
                     return ['error message: shipping-mobile_phone_number'];
                 }
+
                 return [];
-            });
+            })
+        ;
 
         $response = $this->repo->getOneyRequiredFields();
         $expected = [
@@ -113,11 +124,11 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
                         [
                             'name' => 'mobile_phone_number',
                             'value' => $this->addressMock->phone_mobile,
-                            'type' => 'text'
-                        ]
+                            'type' => 'text',
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertSame($expected, $response);
@@ -127,14 +138,17 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     {
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('shipping-city', $arr)) {
                     return ['error message: shipping-city'];
                 }
+
                 return [];
-            });
+            })
+        ;
 
         $response = $this->repo->getOneyRequiredFields();
         $expected = [
@@ -145,31 +159,31 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
                         [
                             'name' => 'first_name',
                             'value' => $this->addressMock->firstname,
-                            'type' => 'text'
+                            'type' => 'text',
                         ],
                         [
                             'name' => 'last_name',
                             'value' => $this->addressMock->lastname,
-                            'type' => 'text'
+                            'type' => 'text',
                         ],
                         [
                             'name' => 'address1',
                             'value' => $this->addressMock->address1,
-                            'type' => 'text'
+                            'type' => 'text',
                         ],
                         [
                             'name' => 'postcode',
                             'value' => $this->addressMock->postcode,
-                            'type' => 'text'
+                            'type' => 'text',
                         ],
                         [
                             'name' => 'city',
                             'value' => $this->addressMock->city,
-                            'type' => 'text'
-                        ]
+                            'type' => 'text',
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertSame($expected, $response);
@@ -179,14 +193,17 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     {
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('billing-mobile_phone_number', $arr)) {
                     return ['error message: billing-mobile_phone_number'];
                 }
+
                 return [];
-            });
+            })
+        ;
 
         $response = $this->repo->getOneyRequiredFields();
         $expected = [
@@ -197,11 +214,11 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
                         [
                             'name' => 'mobile_phone_number',
                             'value' => $this->addressMock->phone_mobile,
-                            'type' => 'text'
-                        ]
+                            'type' => 'text',
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertSame($expected, $response);
@@ -211,14 +228,17 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     {
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
             ->andReturnUsing(function ($arr) {
                 if (array_key_exists('billing-city', $arr)) {
                     return ['error message: shipping-city'];
                 }
+
                 return [];
-            });
+            })
+        ;
 
         $response = $this->repo->getOneyRequiredFields();
         $expected = [
@@ -229,31 +249,31 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
                         [
                             'name' => 'first_name',
                             'value' => $this->addressMock->firstname,
-                            'type' => 'text'
+                            'type' => 'text',
                         ],
                         [
                             'name' => 'last_name',
                             'value' => $this->addressMock->lastname,
-                            'type' => 'text'
+                            'type' => 'text',
                         ],
                         [
                             'name' => 'address1',
                             'value' => $this->addressMock->address1,
-                            'type' => 'text'
+                            'type' => 'text',
                         ],
                         [
                             'name' => 'postcode',
                             'value' => $this->addressMock->postcode,
-                            'type' => 'text'
+                            'type' => 'text',
                         ],
                         [
                             'name' => 'city',
                             'value' => $this->addressMock->city,
-                            'type' => 'text'
-                        ]
+                            'type' => 'text',
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertSame($expected, $response);
@@ -266,7 +286,8 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn($contextWithoutCustomer);
+            ->andReturn($contextWithoutCustomer)
+        ;
 
         $this->assertSame([], $this->repo->getOneyRequiredFields());
     }

@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -29,7 +28,7 @@ function upgrade_module_0_4_0()
 {
     $flag = true;
     if (Configuration::get('PSPAYLATER_ONEY_ALLOWED_COUNTRIES') != null
-        && in_array('BE', explode(",", Configuration::get('PSPAYLATER_ONEY_ALLOWED_COUNTRIES')))) {
+        && in_array('BE', explode(',', Configuration::get('PSPAYLATER_ONEY_ALLOWED_COUNTRIES')))) {
         // set Oney advanced Options to 0 for belgian merchants of the pspaylater module.
         $flag = $flag && Configuration::updateValue('PSPAYLATER_ONEY_CART_CTA', 0)
             && Configuration::updateValue(
@@ -37,5 +36,6 @@ function upgrade_module_0_4_0()
                 0
             );
     }
+
     return $flag;
 }

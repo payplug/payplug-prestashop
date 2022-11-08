@@ -48,9 +48,9 @@ class PayplugLock
     /**
      * Check
      *
-     * @param int $id_cart
-     * @param int $loop_time
-     * @return void
+     * @param int   $id_cart
+     * @param int   $loop_time
+     * @param mixed $process
      */
     public function check($id_cart, $loop_time = 1, $process = 'none')
     {
@@ -75,7 +75,6 @@ class PayplugLock
                     $this->usleep($loop_time * 1000);
                 }
 
-
                 // If lock take too much time, end the process
                 if ($time > $end_of_life) {
                     if ($process == 'validation') {
@@ -88,22 +87,6 @@ class PayplugLock
                 $time = new DateTime('now');
             }
         }
-    }
-
-    /**
-     * Sleep time
-     *
-     * @param  int $seconds
-     * @return void
-     */
-    private function usleep($seconds)
-    {
-        $start = microtime();
-
-        do {
-            // Wait !
-            $current = microtime();
-        } while (($current - $start) < $seconds);
     }
 
     //TODO: check multishop si cart_id identiques ou uniques
@@ -124,13 +107,14 @@ class PayplugLock
         // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
         try {
             $req_lock = $this->query
-            ->insert()
-            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_lock')
-            ->fields('id_cart')->values((int)$id_cart)
-            ->fields('id_order')->values(pSQL($process_print))
-            ->fields('date_add')->values(date('Y-m-d H:i:s'))
-            ->fields('date_upd')->values(date('Y-m-d H:i:s'))
-            ->build();
+                ->insert()
+                ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_lock')
+                ->fields('id_cart')->values((int) $id_cart)
+                ->fields('id_order')->values(pSQL($process_print))
+                ->fields('date_add')->values(date('Y-m-d H:i:s'))
+                ->fields('date_upd')->values(date('Y-m-d H:i:s'))
+                ->build()
+            ;
         } catch (PrestaShopDatabaseException $e) {
             $req_lock = false;
         } catch (Exception $e) {
@@ -138,14 +122,13 @@ class PayplugLock
         }
         if (!$req_lock) {
             return false;
-        } else {
-            $lock = $this->existsLockG2($id_cart);
-            if (!$lock) {
-                return false;
-            } else {
-                return $lock['id_order'];
-            }
         }
+        $lock = $this->existsLockG2($id_cart);
+        if (!$lock) {
+            return false;
+        }
+
+        return $lock['id_order'];
     }
 
     public function deleteLockG2($id_cart)
@@ -153,12 +136,14 @@ class PayplugLock
         $req_lock = $this->query
             ->delete()
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_lock')
-            ->where('`id_cart` = ' . (int)$id_cart)
-            ->build();
+            ->where('`id_cart` = ' . (int) $id_cart)
+            ->build()
+        ;
 
         if (!$req_lock) {
             return false;
         }
+
         return true;
     }
 
@@ -168,12 +153,29 @@ class PayplugLock
             ->select()
             ->fields('*')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_lock')
-            ->where('id_cart = ' . (int)$id_cart)
-            ->build('unique_row');
+            ->where('id_cart = ' . (int) $id_cart)
+            ->build('unique_row')
+        ;
 
         if (!$req_lock) {
             return false;
         }
+
         return $req_lock;
+    }
+
+    /**
+     * Sleep time
+     *
+     * @param int $seconds
+     */
+    private function usleep($seconds)
+    {
+        $start = microtime();
+
+        do {
+            // Wait !
+            $current = microtime();
+        } while (($current - $start) < $seconds);
     }
 }

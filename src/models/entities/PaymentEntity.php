@@ -40,8 +40,10 @@ class PaymentEntity
 
     /**
      * @param $apiPayment
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setApiPayment($apiPayment)
     {
@@ -50,6 +52,7 @@ class PaymentEntity
         }
 
         $this->apiPayment = $apiPayment;
+
         return $this;
     }
 }

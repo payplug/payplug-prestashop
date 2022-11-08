@@ -34,8 +34,10 @@ class MockHelper extends Mockery
             ->shouldReceive('setCache')
             ->andReturnUsing(function ($cache_id, $to_cache) use (&$arrayCache) {
                 $arrayCache[$cache_id] = $to_cache;
+
                 return $arrayCache;
-            });
+            })
+        ;
     }
 
     public static function createAddLogMock($loggerMock, &$arrayLog)
@@ -44,15 +46,18 @@ class MockHelper extends Mockery
             ->shouldReceive('addLog')
             ->andReturnUsing(function ($message, $level = 'info') use (&$arrayLog) {
                 $arrayLog[] = ['level' => $level, 'message' => $message];
+
                 return $arrayLog;
-            });
+            })
+        ;
     }
 
     public static function createMockFactory($classPathname)
     {
         $mock = \Mockery::mock('alias:' . $classPathname);
         $mock->shouldReceive('factory')
-            ->andReturnSelf();
+            ->andReturnSelf()
+        ;
 
         return $mock;
     }
@@ -66,29 +71,40 @@ class MockHelper extends Mockery
                 switch ($action) {
                     case 'strlen':
                         return strlen($value);
+
                     case 'strpos':
                         return strpos($value, $params2);
+
                     case 'strtoupper':
                         return strtoupper($value);
+
                     case 'strtolower':
                         return strtolower($value);
+
                     case 'displayPrice':
                         $value = number_format($value, 2) . ' €';
+
                         return str_replace('.', ',', $value);
+
                     case 'ps_round':
                         return round($value, $params2);
+
                     default:
                         throw new Mockery\Exception('ERROR : Missing method "' . $action . '" in createToolsMock (MockHelper.php)');
+
                         break;
                 }
 
                 return false;
-            });
+            })
+        ;
         $tools
             ->shouldReceive('substr')
             ->andReturnUsing(function ($param, $param1, $param2) {
                 return substr($param, $param1, $param2);
-            });
+            })
+        ;
+
         return $tools;
     }
 
@@ -99,7 +115,9 @@ class MockHelper extends Mockery
             ->shouldReceive('translate')
             ->andReturnUsing(function ($module_class, $string, $repository_name) {
                 return $string;
-            });
+            })
+        ;
+
         return $translate;
     }
 
@@ -115,18 +133,20 @@ class MockHelper extends Mockery
                 if ($action == 'isLoadedObject' && !is_object($object)) {
                     return false;
                 }
+
                 return true;
-            });
+            })
+        ;
+
         return $validate;
     }
 
     public static function createContextMock($classPathname)
     {
-        $context = \Mockery::mock($classPathname);
+        return \Mockery::mock($classPathname);
 //        $context
 //            ->shouldReceive('getContext')
 //            ->andReturn(ContextMock::get());
-        return $context;
     }
 
     public static function createSetParamstMock($classPathname)
@@ -134,7 +154,9 @@ class MockHelper extends Mockery
         $context = \Mockery::mock($classPathname);
         $context
             ->shouldReceive('setParams')
-            ->andReturnSelf();
+            ->andReturnSelf()
+        ;
+
         return $context;
     }
 
@@ -143,7 +165,9 @@ class MockHelper extends Mockery
         $address = self::createMockFactory($classPathname);
         $address
             ->shouldReceive('get')
-            ->andReturn(AddressMock::get());
+            ->andReturn(AddressMock::get())
+        ;
+
         return $address;
     }
 
@@ -152,7 +176,9 @@ class MockHelper extends Mockery
         $assign = self::createMockFactory($classPathname);
         $assign
             ->shouldReceive('assign')
-            ->andReturn(true);
+            ->andReturn(true)
+        ;
+
         return $assign;
     }
 
@@ -163,7 +189,9 @@ class MockHelper extends Mockery
             ->shouldReceive('escape')
             ->andReturnUsing(function ($string, $htmlOk = false) {
                 return $string;
-            });
+            })
+        ;
+
         return $query;
     }
 }
