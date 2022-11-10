@@ -33,6 +33,9 @@ use PayPlug\tests\mock\CartMock;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class IsValidOneyCartTest extends BaseOneyRepository
 {
@@ -42,15 +45,18 @@ final class IsValidOneyCartTest extends BaseOneyRepository
         yield [['cart array']];
         yield [null];
     }
+
     /**
      * @dataProvider invalidCartDataProvider
+     *
+     * @param mixed $cart
      */
     public function testWithInvalidCart($cart)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'The cart is unvalid'
+                'error' => 'The cart is unvalid',
             ],
             $this->repo->isValidOneyCart($cart)
         );
@@ -60,15 +66,16 @@ final class IsValidOneyCartTest extends BaseOneyRepository
     {
         $this->cart
             ->shouldReceive([
-                'nbProducts' => 1001
-            ]);
+                'nbProducts' => 1001,
+            ])
+        ;
 
         $cart = CartMock::get();
 
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'The payment with Oney is not available because you have more than 1000 items in your cart.'
+                'error' => 'The payment with Oney is not available because you have more than 1000 items in your cart.',
             ],
             $this->repo->isValidOneyCart($cart)
         );
@@ -78,15 +85,16 @@ final class IsValidOneyCartTest extends BaseOneyRepository
     {
         $this->cart
             ->shouldReceive([
-                'nbProducts' => 999
-            ]);
+                'nbProducts' => 999,
+            ])
+        ;
 
         $cart = CartMock::get();
 
         $this->assertSame(
             [
                 'result' => true,
-                'error' => false
+                'error' => false,
             ],
             $this->repo->isValidOneyCart($cart)
         );

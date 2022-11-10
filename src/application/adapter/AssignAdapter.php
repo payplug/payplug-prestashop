@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\AssignInterface;
 use Context;
+use PayPlug\src\interfaces\AssignInterface;
 
 class AssignAdapter implements AssignInterface
 {

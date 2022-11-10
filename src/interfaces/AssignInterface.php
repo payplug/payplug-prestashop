@@ -26,5 +26,6 @@ namespace PayPlug\src\interfaces;
 interface AssignInterface
 {
     public static function factory();
+
     public function assign($parameters);
 }

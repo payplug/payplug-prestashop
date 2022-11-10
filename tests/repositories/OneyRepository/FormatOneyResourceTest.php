@@ -33,6 +33,9 @@ use PayPlug\tests\mock\OneySimulationsMock;
  * @group format_oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class FormatOneyResourceTest extends BaseOneyRepository
 {
@@ -51,8 +54,9 @@ final class FormatOneyResourceTest extends BaseOneyRepository
             ->shouldReceive([
                 'getMethods' => [
                     'x3_with_fees',
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->operation = 'x3_with_fees';
         $this->resource = OneySimulationsMock::get()[$this->operation];
@@ -100,8 +104,8 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     {
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
-            'amount'=> number_format(3.5, 2),
-            'value'=> '3,50 €'
+            'amount' => number_format(3.5, 2),
+            'value' => '3,50 €',
         ];
         $this->assertSame(
             $expected_value,
@@ -114,7 +118,7 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
             'amount' => number_format(83.92, 2),
-            'value' => '83,92 €'
+            'value' => '83,92 €',
         ];
         $this->assertSame(
             $expected_value,
@@ -136,7 +140,7 @@ final class FormatOneyResourceTest extends BaseOneyRepository
             [
                 'date' => '2021-02-19T01:00:00.000Z',
                 'amount' => number_format(80.42, 2),
-                'value' => '80,42 €'
+                'value' => '80,42 €',
             ],
             $response['installments'][0]
         );
@@ -144,7 +148,7 @@ final class FormatOneyResourceTest extends BaseOneyRepository
             [
                 'date' => '2021-03-19T01:00:00.000Z',
                 'amount' => number_format(80.41, 2),
-                'value' => '80,41 €'
+                'value' => '80,41 €',
             ],
             $response['installments'][1]
         );
@@ -163,7 +167,7 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
             'amount' => number_format(3.5, 2),
-            'value' => '3,50 €'
+            'value' => '3,50 €',
         ];
         $this->assertSame(
             $expected_value,
@@ -176,7 +180,7 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, 100);
         $expected_value = [
             'amount' => number_format(4.5, 2),
-            'value' => '4,50 €'
+            'value' => '4,50 €',
         ];
         $this->assertSame(
             $expected_value,

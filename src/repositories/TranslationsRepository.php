@@ -29,6 +29,7 @@ class TranslationsRepository extends BaseClass
 {
     /**
      * @description
+     *
      * @return self
      */
     public static function factory()
@@ -38,7 +39,9 @@ class TranslationsRepository extends BaseClass
 
     /**
      * @description Return trnaslation for index
+     *
      * @param $id
+     *
      * @return bool|mixed
      */
     public function translate($id)

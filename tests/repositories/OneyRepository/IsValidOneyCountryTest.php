@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\OneyRepository;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class IsValidOneyCountryTest extends BaseOneyRepository
 {
@@ -44,7 +47,7 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
             [
                 'result' => false,
                 'type' => 'different',
-                'error' => $error
+                'error' => $error,
             ],
             $this->repo->isValidOneyCountry($shipping_iso, $billing_iso)
         );
@@ -59,28 +62,36 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
                 switch ($key) {
                     case 'PS_CURRENCY_DEFAULT':
                         return 1;
+
                     case 'PAYPLUG_ONEY_MIN_AMOUNTS':
                         return 'EUR:10000';
+
                     case 'PAYPLUG_ONEY_MAX_AMOUNTS':
                         return 'EUR:300000';
+
                     case 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS':
                         return 'EUR:100';
+
                     case 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS':
                         return 'EUR:3000';
+
                     case 'PS_SHOP_NAME':
                         return 'Payplug';
+
                     case 'PAYPLUG_ONEY_ALLOWED_COUNTRIES':
                         return '';
+
                     default:
                         return true;
                 }
-            });
+            })
+        ;
 
         $this->assertSame(
             [
                 'result' => false,
                 'type' => 'no_country',
-                'error' => 'No countries are configured to use oney.'
+                'error' => 'No countries are configured to use oney.',
             ],
             $this->repo->isValidOneyCountry($shipping_iso, $billing_iso)
         );
@@ -93,7 +104,8 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
         $this->config
             ->shouldReceive('get')
             ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            ->andReturn('FR');
+            ->andReturn('FR')
+        ;
 
         $error = 'For a payment with Oney, delivery and billing addresses must be in ';
         $error .= 'France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana';
@@ -102,7 +114,7 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
             [
                 'result' => false,
                 'type' => 'invalid',
-                'error' => $error
+                'error' => $error,
             ],
             $this->repo->isValidOneyCountry($shipping_iso, $billing_iso)
         );
@@ -115,12 +127,13 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
         $this->config
             ->shouldReceive('get')
             ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            ->andReturn('FR');
+            ->andReturn('FR')
+        ;
 
         $this->assertSame(
             [
                 'result' => true,
-                'error' => false
+                'error' => false,
             ],
             $this->repo->isValidOneyCountry($shipping_iso, $billing_iso)
         );
@@ -131,10 +144,11 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
         // check if the billing country and the shipping country are different then return false
         if ($shipping_iso != $billing_iso) {
             $error = 'Delivery and billing addresses must be in the same country to pay with Oney.';
+
             return [
                 'result' => false,
                 'type' => 'different',
-                'error' => $this->l($error)
+                'error' => $this->l($error),
             ];
         }
 
@@ -148,7 +162,7 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
             return [
                 'result' => false,
                 'type' => 'no_country',
-                'error' => $this->l('No countries are configured to use oney.')
+                'error' => $this->l('No countries are configured to use oney.'),
             ];
         }
 
@@ -163,7 +177,7 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
                 'result' => false,
                 'type' => 'invalid',
                 'error' => $this->l('For a payment with Oney, delivery and billing addresses must be in') . ' ' .
-                    $str_list
+                    $str_list,
             ];
         }
 

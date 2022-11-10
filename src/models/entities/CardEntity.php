@@ -238,8 +238,10 @@ class CardEntity
 
     /**
      * @param array $allowed_brand
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setAllowedBrand($allowed_brand)
     {
@@ -248,13 +250,16 @@ class CardEntity
         }
 
         $this->allowed_brand = $allowed_brand;
+
         return $this;
     }
 
     /**
      * @param string $brand
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setBrand($brand)
     {
@@ -263,13 +268,16 @@ class CardEntity
         }
 
         $this->brand = $brand;
+
         return $this;
     }
 
     /**
      * @param string $country
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setCountry($country)
     {
@@ -278,13 +286,16 @@ class CardEntity
         }
 
         $this->country = $country;
+
         return $this;
     }
 
     /**
      * @param array $definition
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setDefinition($definition)
     {
@@ -293,13 +304,16 @@ class CardEntity
         }
 
         $this->definition = $definition;
+
         return $this;
     }
 
     /**
      * @param string $exp_month
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setExpMonth($exp_month)
     {
@@ -308,13 +322,16 @@ class CardEntity
         }
 
         $this->exp_month = $exp_month;
+
         return $this;
     }
 
     /**
      * @param string $exp_year
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setExpYear($exp_year)
     {
@@ -323,13 +340,16 @@ class CardEntity
         }
 
         $this->exp_year = $exp_year;
+
         return $this;
     }
 
     /**
      * @param array $fieldsRequired
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setFieldsRequired($fieldsRequired)
     {
@@ -338,43 +358,50 @@ class CardEntity
         }
 
         $this->fieldsRequired = $fieldsRequired;
+
         return $this;
     }
 
     /**
      * @param array $fieldsSize
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setFieldsSize($fieldsSize)
     {
         if (!is_array($fieldsSize)) {
             throw (new BadParameterException('Invalid fieldsSize, param $fieldsSize must be an array'));
-        } else {
-            $this->fieldsSize = $fieldsSize;
-            return $this;
         }
+        $this->fieldsSize = $fieldsSize;
+
+        return $this;
     }
 
     /**
      * @param array $fieldsValidate
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setFieldsValidate($fieldsValidate)
     {
         if (!is_array($fieldsValidate)) {
             throw (new BadParameterException('Invalid fields validate, param $fieldsValidate must be an array'));
-        } else {
-            $this->fieldsValidate = $fieldsValidate;
-            return $this;
         }
+        $this->fieldsValidate = $fieldsValidate;
+
+        return $this;
     }
 
     /**
      * @param int $id
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setId($id)
     {
@@ -383,13 +410,16 @@ class CardEntity
         }
 
         $this->id = $id;
+
         return $this;
     }
 
     /**
      * @param string $id_card card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setIdCard($id_card)
     {
@@ -401,13 +431,16 @@ class CardEntity
         }
 
         $this->id_card = $id_card;
+
         return $this;
     }
 
     /**
      * @param int $id_company
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setIdCompany($id_company)
     {
@@ -416,13 +449,16 @@ class CardEntity
         }
 
         $this->id_company = $id_company;
+
         return $this;
     }
 
     /**
      * @param int $id_customer
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setIdCustomer($id_customer)
     {
@@ -431,28 +467,33 @@ class CardEntity
         }
 
         $this->id_customer = $id_customer;
+
         return $this;
     }
 
     /**
      * @param string $identifier
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setIdentifier($identifier)
     {
         if (!is_string($identifier)) {
             throw (new BadParameterException('Invalid identifier, param $identifier must be a string'));
-        } else {
-            $this->identifier = $identifier;
-            return $this;
         }
+        $this->identifier = $identifier;
+
+        return $this;
     }
 
     /**
      * @param bool $is_sandbox
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setIsSandbox($is_sandbox)
     {
@@ -461,13 +502,16 @@ class CardEntity
         }
 
         $this->is_sandbox = $is_sandbox;
+
         return $this;
     }
 
     /**
      * @param string $last4
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setLast4($last4)
     {
@@ -476,13 +520,16 @@ class CardEntity
         }
 
         $this->last4 = $last4;
+
         return $this;
     }
 
     /**
      * @param string $metadata
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setMetadata($metadata)
     {
@@ -491,31 +538,36 @@ class CardEntity
         }
 
         $this->metadata = $metadata;
+
         return $this;
     }
 
     /**
      * @param object $module
+     *
      * @return self
      */
     public function setModule($module)
     {
         $this->module = $module;
+
         return $this;
     }
 
     /**
      * @param string $table
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setTable($table)
     {
         if (!is_string($table)) {
             throw (new BadParameterException('Invalid table, param $table must be a string'));
-        } else {
-            $this->table = $table;
-            return $this;
         }
+        $this->table = $table;
+
+        return $this;
     }
 }

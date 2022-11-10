@@ -46,19 +46,13 @@ class PPPaymentInstallment extends PPPayment
         }
         $installment = $this->dependencies->apiClass->retrieveInstallment($id);
         if (!$installment['result']) {
-            $data = [
+            return [
                 'result' => false,
                 'response' => $installment['message'],
             ];
-            return $data;
         }
 
         return $installment['resource'];
-    }
-
-    private function populateFromInstallment($installment)
-    {
-        $this->resource = $installment;
     }
 
     public function getPaymentList()
@@ -71,12 +65,13 @@ class PPPaymentInstallment extends PPPayment
                     $list[$index] = [
                         'pay_id' => $pay_id,
                         'date' => $schedule->date,
-                        'amount' => $schedule->amount
+                        'amount' => $schedule->amount,
                     ];
-                    $index ++;
+                    ++$index;
                 }
             }
         }
+
         return $list;
     }
 
@@ -84,8 +79,7 @@ class PPPaymentInstallment extends PPPayment
     {
         $payment_list = $this->getPaymentList();
         if (count($payment_list) > 0) {
-            $payment = new PPPayment($payment_list[0]['pay_id'], $this->dependencies);
-            return $payment;
+            return new PPPayment($payment_list[0]['pay_id'], $this->dependencies);
         }
     }
 
@@ -94,8 +88,15 @@ class PPPaymentInstallment extends PPPayment
         $payment_list = $this->getPaymentList();
         if (count($payment_list) > 0) {
             $payment = new PPPayment($payment_list[0]['pay_id'], $this->dependencies);
+
             return $payment->isDeferred();
         }
+
         return false;
+    }
+
+    private function populateFromInstallment($installment)
+    {
+        $this->resource = $installment;
     }
 }

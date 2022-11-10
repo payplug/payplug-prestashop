@@ -43,6 +43,7 @@ class CartMock
         $cart->delivery_option = '{1, 2}';
         $cart->date_add = '2021-01-01 00:00:00';
         $cart->date_upd = '2021-01-01 00:00:00';
+
         return $cart;
     }
 
@@ -91,7 +92,7 @@ class CartMock
                  Design Studio Design Studio Design Studio Design Studio Design Studio Design',
                 'price_wt' => 22.68,
                 'attributes' => 'Color : White',
-            ]
+            ],
         ];
     }
 }

@@ -29,14 +29,15 @@ class PaymentMock
             'metadata' => [
                 'ID Client' => 4,
                 'ID Cart' => 17,
-                'Website' => 'http://localhost'
+                'Website' => 'http://localhost',
             ],
-        ]
+        ],
     ];
 
     public static function getStandard($parameters = [])
     {
         $resource = self::getDefault($parameters);
+
         return Payment::fromAttributes($resource);
     }
 
@@ -79,7 +80,7 @@ class PaymentMock
             'metadata' => [
                 'ID Client' => 4,
                 'ID Cart' => 17,
-                'Website' => 'http://localhost'
+                'Website' => 'http://localhost',
             ],
             'failure' => null,
             'installment_plan_id' => null,
@@ -100,7 +101,7 @@ class PaymentMock
                 'email' => 'ctouma@payplug.com',
                 'mobile_phone_number' => null,
                 'landline_phone_number' => '+33667899297',
-                'language' => 'fr'
+                'language' => 'fr',
             ],
             'shipping' => [
                 'title' => null,
@@ -117,7 +118,7 @@ class PaymentMock
                 'mobile_phone_number' => null,
                 'landline_phone_number' => '+33667899297',
                 'language' => 'fr',
-                'delivery_type' => 'BILLING'
+                'delivery_type' => 'BILLING',
             ],
         ];
 
@@ -126,6 +127,7 @@ class PaymentMock
                 $defaultConfiguration[$key] = $value;
             }
         }
+
         return $defaultConfiguration;
     }
 
@@ -147,46 +149,46 @@ class PaymentMock
             'hosted_payment' => [
                 'return_url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/validation?ps=1&cartid=17',
                 'cancel_url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/validation?ps=2&cartid=17',
-                'payment_url' => 'https://secure-qa.payplug.com/pay/3nfaejGO3m9dyHFIwfsUTR'
+                'payment_url' => 'https://secure-qa.payplug.com/pay/3nfaejGO3m9dyHFIwfsUTR',
             ],
             'notification' => [
-                'url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/ipn'
+                'url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/ipn',
             ],
             'schedule' => [
                 0 => [
                     'date' => '2021-03-05',
                     'amount' => 10440,
                     'payment_ids' => [
-                        0 => 'pay_3nfaejGO3m9dyHFIwfsUTR'
-                    ]
+                        0 => 'pay_3nfaejGO3m9dyHFIwfsUTR',
+                    ],
                 ],
                 1 => [
                     'date' => '2021-04-04',
                     'amount' => 10440,
-                    'payment_ids' => []
+                    'payment_ids' => [],
                 ],
                 2 => ['date' => '2021-05-04',
                     'amount' => 10440,
-                    'payment_ids' => []
-                ]
+                    'payment_ids' => [],
+                ],
             ],
             'is_live' => true,
             'billing' => [
-                    'title' => null,
-                    'first_name' => 'Cedric',
-                    'last_name' => 'PayPlug',
-                    'address1' => '110 avenue de France',
-                    'address2' => null,
-                    'company_name' => 'Cedric PayPlug',
-                    'postcode' => '75013',
-                    'city' => 'Paris',
-                    'state' => null,
-                    'country' => 'FR',
-                    'email' => 'ctouma@payplug.com',
-                    'mobile_phone_number' => null,
-                    'landline_phone_number' => '+33667899297',
-                    'language' => 'fr'
-                ],
+                'title' => null,
+                'first_name' => 'Cedric',
+                'last_name' => 'PayPlug',
+                'address1' => '110 avenue de France',
+                'address2' => null,
+                'company_name' => 'Cedric PayPlug',
+                'postcode' => '75013',
+                'city' => 'Paris',
+                'state' => null,
+                'country' => 'FR',
+                'email' => 'ctouma@payplug.com',
+                'mobile_phone_number' => null,
+                'landline_phone_number' => '+33667899297',
+                'language' => 'fr',
+            ],
             'shipping' => [
                 'title' => null,
                 'first_name' => 'Cedric',
@@ -202,8 +204,8 @@ class PaymentMock
                 'mobile_phone_number' => null,
                 'landline_phone_number' => '+33667899297',
                 'language' => 'fr',
-                'delivery_type' => 'BILLING'
-            ]
+                'delivery_type' => 'BILLING',
+            ],
         ];
         if (!empty($parameters)) {
             foreach ($parameters as $key => $value) {
@@ -212,6 +214,7 @@ class PaymentMock
         }
 
         $resource = self::getDefault($defaultInstallment);
+
         return InstallmentPlan::fromAttributes(self::$payment_parameters['oneclick']);
     }
 

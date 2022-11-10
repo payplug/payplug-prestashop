@@ -26,6 +26,8 @@ namespace PayPlug\src\interfaces;
 interface ShopInterface
 {
     public function get($idShop);
+
     public function isFeatureActive();
+
     public function setContext();
 }

@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 use PayPlug\src\models\entities\CacheEntity;
 use PHPUnit\Framework\TestCase;
 
@@ -28,6 +27,9 @@ use PHPUnit\Framework\TestCase;
  * @group entity
  * @group cache
  * @group cache_entity
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetIdPayPlugCacheCacheTest extends TestCase
 {

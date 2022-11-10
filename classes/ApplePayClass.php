@@ -33,16 +33,16 @@ class ApplePayClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->carrier =   $this->dependencies->getPlugin()->getCarrier();
-        $this->logger =   $this->dependencies->getPlugin()->getLogger();
+        $this->carrier = $this->dependencies->getPlugin()->getCarrier();
+        $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->currency = $this->dependencies->getPlugin()->getCurrency();
     }
 
     public function getPaymentRequest($page)
     {
-        $additionalPaymentRequestDatas = array();
-        $currency = $this->currency->get((int)$this->context->cart->id_currency);
+        $additionalPaymentRequestDatas = [];
+        $currency = $this->currency->get((int) $this->context->cart->id_currency);
 
         // Uncomment this when page panier developments will starts
         /*if ($page != 'order') {
@@ -80,29 +80,28 @@ class ApplePayClass
             );
         }*/
 
-        $applePayPaymentRequest = array(
+        $applePayPaymentRequest = [
             'countryCode' => $this->context->country->iso_code,
             'currencyCode' => $currency->iso_code,
-            'merchantCapabilities' => array(
-                'supports3DS'
-            ),
-            'supportedNetworks' => array(
+            'merchantCapabilities' => [
+                'supports3DS',
+            ],
+            'supportedNetworks' => [
                 'visa',
                 'masterCard',
                 //'amex', Amex is not supported yet by PayPlug
-                'discover'
-            ),
-            'total' => array(
+                'discover',
+            ],
+            'total' => [
                 'label' => $this->context->shop->name,
                 'type' => 'final',
-                'amount' => $this->context->cart->getOrderTotal()
-            ),
-            'applicationData' => base64_encode(json_encode(array(
-                'apple_pay_domain' => $this->context->shop->domain_ssl
-            )))
-        );
+                'amount' => $this->context->cart->getOrderTotal(),
+            ],
+            'applicationData' => base64_encode(json_encode([
+                'apple_pay_domain' => $this->context->shop->domain_ssl,
+            ])),
+        ];
 
-        $applePayPaymentRequest = array_merge($applePayPaymentRequest, $additionalPaymentRequestDatas);
-        return $applePayPaymentRequest;
+        return array_merge($applePayPaymentRequest, $additionalPaymentRequestDatas);
     }
 }

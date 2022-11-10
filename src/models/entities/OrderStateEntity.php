@@ -40,8 +40,11 @@ class OrderStateEntity
 
     /**
      * @param $apiPayment
-     * @return self
+     * @param mixed $list
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setList($list)
     {
@@ -50,6 +53,7 @@ class OrderStateEntity
         }
 
         $this->list = $list;
+
         return $this;
     }
 }

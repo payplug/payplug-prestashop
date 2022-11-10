@@ -20,12 +20,12 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 /**
  * @since 1.6.0
  */
-require_once(_PS_MODULE_DIR_.'payplug/payplug.php');
-include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
+require_once _PS_MODULE_DIR_ . 'payplug/payplug.php';
+
+include_once _PS_MODULE_DIR_ . 'payplug/classes/DependenciesClass.php';
 
 class AdminPayPlugInstallmentController extends ModuleAdminController
 {
@@ -50,8 +50,8 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
             o.reference AS `reference`
         ';
         $this->_join = '
-            LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`) 
-            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = a.`id_order`)';
+            LEFT JOIN `' . _DB_PREFIX_ . 'customer` c ON (c.`id_customer` = a.`id_customer`) 
+            LEFT JOIN `' . _DB_PREFIX_ . 'orders` o ON (o.`id_order` = a.`id_order`)';
         $this->_orderBy = 'id_payplug_installment';
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
@@ -67,12 +67,12 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
             'id_installment' => [
                 'title' => $this->l('Installment ID'),
                 'align' => 'text-center',
-                'class' => 'fixed-width-xs'
+                'class' => 'fixed-width-xs',
             ],
             'id_payment' => [
                 'title' => $this->l('Payment ID'),
                 'align' => 'text-center',
-                'class' => 'fixed-width-xs'
+                'class' => 'fixed-width-xs',
             ],
             'reference' => [
                 'title' => $this->l('Order reference'),
@@ -119,16 +119,17 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     public static function setOrderCurrency($amount, $tr)
     {
         $order = new Order($tr['id_order']);
-        return Tools::displayPrice(($amount / 100), (int)$order->id_currency);
+
+        return Tools::displayPrice(($amount / 100), (int) $order->id_currency);
     }
 
     // Impossible to write this function in camelCase, Presta 1.6 & 1.7 need it as is
     public function viewPayplugInstallment()
     {
-        $id_payplug_installment = (int)(Tools::getValue('id_payplug_installment'));
+        $id_payplug_installment = (int) (Tools::getValue('id_payplug_installment'));
         $id_order = $this->getOrderIdByPayplugInstallmentId($id_payplug_installment);
         Tools::redirectAdmin(
-            'index.php?tab=AdminOrders&id_order='.$id_order.'&vieworder&token='.
+            'index.php?tab=AdminOrders&id_order=' . $id_order . '&vieworder&token=' .
             Tools::getAdminTokenLite('AdminOrders')
         );
     }
@@ -136,8 +137,8 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     public function getOrderIdByPayplugInstallmentId($id_payplug_installment)
     {
         $sql = 'SELECT DISTINCT id_order
-                FROM `'._DB_PREFIX_.$this->table.'`
-                WHERE `id_'.$this->dependencies->name.'_installment` = ' . (int)$id_payplug_installment;
+                FROM `' . _DB_PREFIX_ . $this->table . '`
+                WHERE `id_' . $this->dependencies->name . '_installment` = ' . (int) $id_payplug_installment;
 
         return Db::getInstance()->getValue($sql);
     }
@@ -147,6 +148,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         if (Tools::isSubmit('viewpayplug_installment')) {
             $this->viewPayplugInstallment();
         }
+
         return parent::postProcess();
     }
 
@@ -154,8 +156,8 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     {
         if ($this->allow_export) {
             $this->toolbar_btn['export'] = [
-                'href' => self::$currentIndex.'&export'.$this->table.'&token='.$this->token,
-                'desc' => $this->l('Export')
+                'href' => self::$currentIndex . '&export' . $this->table . '&token=' . $this->token,
+                'desc' => $this->l('Export'),
             ];
         }
         parent::initToolbar();

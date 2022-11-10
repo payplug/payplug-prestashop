@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class ReturnPaymentErrorTest extends BasePaymentRepository
 {
@@ -49,13 +52,15 @@ final class ReturnPaymentErrorTest extends BasePaymentRepository
 
     public function InvalidElementDataProvider()
     {
-        yield[null];
-        yield['wrong_parameter'];
-        yield[42];
+        yield [null];
+        yield ['wrong_parameter'];
+        yield [42];
     }
 
     /**
      * @dataProvider InvalidElementDataProvider
+     *
+     * @param mixed $element
      */
     public function testMethodWithEmptyElement($element)
     {
@@ -70,13 +75,15 @@ final class ReturnPaymentErrorTest extends BasePaymentRepository
 
     public function InvalidMessageDataProvider()
     {
-        yield[null];
-        yield[['wrong error message']];
-        yield[42];
+        yield [null];
+        yield [['wrong error message']];
+        yield [42];
     }
 
     /**
      * @dataProvider InvalidMessageDataProvider
+     *
+     * @param mixed $message
      */
     public function testMethodWithWrongMessage($message)
     {
@@ -89,7 +96,7 @@ final class ReturnPaymentErrorTest extends BasePaymentRepository
             [
                 'result' => false,
                 'unit_test' => '"empty message"',
-                'response' => '[PaymentRepository] Error during payment creation process.'
+                'response' => '[PaymentRepository] Error during payment creation process.',
             ],
             $this->repo->returnPaymentError($element, $message)
         );
@@ -108,7 +115,7 @@ final class ReturnPaymentErrorTest extends BasePaymentRepository
             [
                 'result' => false,
                 'unit_test' => '"empty message"',
-                'response' => 'Test valide return error method'
+                'response' => 'Test valide return error method',
             ],
             $this->repo->returnPaymentError($element, $message)
         );

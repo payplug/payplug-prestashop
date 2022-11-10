@@ -38,6 +38,7 @@ class AddressAdapter implements AddressInterface
         if (!is_int($idAddress)) {
             $idAddress = false;
         }
+
         return new Address($idAddress);
     }
 

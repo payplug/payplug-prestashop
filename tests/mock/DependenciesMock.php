@@ -28,8 +28,7 @@ class DependenciesMock
 {
     public static function get()
     {
-        $name = true;
-        return $name;
+        return true;
     }
 
     public function l($string = false, $name = false)

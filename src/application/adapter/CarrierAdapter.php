@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\CarrierInterface;
 use Carrier;
+use PayPlug\src\interfaces\CarrierInterface;
 
 class CarrierAdapter implements CarrierInterface
 {
@@ -44,6 +44,7 @@ class CarrierAdapter implements CarrierInterface
         if (!is_int($id_carrier)) {
             $id_carrier = false;
         }
+
         return new Carrier($id_carrier);
     }
 

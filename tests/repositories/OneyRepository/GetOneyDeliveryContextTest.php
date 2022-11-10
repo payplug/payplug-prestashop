@@ -24,8 +24,8 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
+use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\ContextMock;
 
 /**
@@ -35,6 +35,9 @@ use PayPlug\tests\mock\ContextMock;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetOneyDeliveryContextTest extends BaseOneyRepository
 {
@@ -43,27 +46,33 @@ final class GetOneyDeliveryContextTest extends BaseOneyRepository
         parent::setUp();
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
 
         $this->config->shouldReceive('get')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'PS_CURRENCY_DEFAULT':
                         return 1;
+
                     case 'PS_SHOP_NAME':
                         return 'Payplug';
+
                     default:
                         return true;
                 }
-            });
+            })
+        ;
     }
 
     public function testGetContextFromVirtual()
     {
         $this->cart->shouldReceive('get')
-            ->andReturn(CartMock::get());
+            ->andReturn(CartMock::get())
+        ;
         $this->cart->shouldReceive('isVirtualCart')
-            ->andReturn(true);
+            ->andReturn(true)
+        ;
 
         $this->assertSame(
             [
@@ -78,20 +87,26 @@ final class GetOneyDeliveryContextTest extends BaseOneyRepository
     public function testGetContext()
     {
         $this->cart->shouldReceive('get')
-            ->andReturn(CartMock::get());
+            ->andReturn(CartMock::get())
+        ;
         $this->cart->shouldReceive('isVirtualCart')
-            ->andReturn(false);
+            ->andReturn(false)
+        ;
 
         $this->carrier->shouldReceive('get')
-            ->andReturn(CarrierMock::get());
+            ->andReturn(CarrierMock::get())
+        ;
         $this->carrier->shouldReceive('getDefaultDelay')
-            ->andReturn(0);
+            ->andReturn(0)
+        ;
         $this->carrier->shouldReceive('getDefaultDeliveryType')
-            ->andReturn('storepickup');
+            ->andReturn('storepickup')
+        ;
 
         $this->config->shouldReceive('get')
             ->with('PS_SHOP_NAME')
-            ->andReturn('Payplug');
+            ->andReturn('Payplug')
+        ;
 
         $this->assertSame(
             [

@@ -33,6 +33,7 @@ class ContextMock
         $context->customer = CustomerMock::get();
         $context->currency = CurrencyMock::get();
         $context->language = LanguageMock::get();
+
         return $context;
     }
 }

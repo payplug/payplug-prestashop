@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\ModuleInterface;
 use Module;
+use PayPlug\src\interfaces\ModuleInterface;
 
 class ModuleAdapter implements ModuleInterface
 {

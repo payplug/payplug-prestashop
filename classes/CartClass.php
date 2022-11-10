@@ -23,8 +23,8 @@
 
 namespace PayPlug\classes;
 
-use DateTime;
 use DateInterval;
+use DateTime;
 
 class CartClass
 {
@@ -44,6 +44,7 @@ class CartClass
      * @description Create a lock from a Cart ID
      *
      * @param int $id_cart
+     *
      * @return bool
      */
     public function createLockFromCartId($id_cart = 0)
@@ -71,6 +72,7 @@ class CartClass
                         'Try to create lock during ' . $duration . ' sec, but can\'t proceed',
                         'error'
                     );
+
                     return false;
                 }
             } else {
@@ -85,6 +87,7 @@ class CartClass
      * @description Delete payplug lock for given id cart
      *
      * @param int $id_cart
+     *
      * @return bool
      */
     public function deleteLockFromCartId($id_cart = 0)
@@ -100,7 +103,8 @@ class CartClass
      * @description Get cart installment
      *
      * @param int $id_cart
-     * @return integer
+     *
+     * @return int
      */
     public function getPayplugInstallmentCart($id_cart = 0)
     {
@@ -108,20 +112,22 @@ class CartClass
             return 0;
         }
 
-        $id_payment = $this->query
+        return $this->query
             ->select()
             ->fields('id_payment')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int)$id_cart)
-            ->build('unique_value');
-
-        return $id_payment;
+            ->where('id_cart = ' . (int) $id_cart)
+            ->build('unique_value')
+        ;
     }
 
     /**
      * @description get cart installment backward
+     *
      * @param int $id_cart
+     *
      * @return mixed
+     *
      * @deprecated use for installment from PayPlug 3.1.3 or further
      */
     public function getPayplugInstallmentCartBackward($id_cart = 0)
@@ -130,13 +136,12 @@ class CartClass
             return 0;
         }
 
-        $id_payment = $this->query
+        return $this->query
             ->select()
             ->fields('id_installment')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment_cart')
-            ->where('id_cart = ' . (int)$id_cart)
-            ->build('unique_value');
-
-        return $id_payment;
+            ->where('id_cart = ' . (int) $id_cart)
+            ->build('unique_value')
+        ;
     }
 }

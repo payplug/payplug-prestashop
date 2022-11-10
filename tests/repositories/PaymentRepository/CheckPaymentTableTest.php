@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class CheckPaymentTableTest extends BasePaymentRepository
 {
@@ -42,22 +45,24 @@ final class CheckPaymentTableTest extends BasePaymentRepository
     public function checkPaymentTableParameters()
     {
         yield [null, 'cart id: null'];
-        yield [(string)'I am a string!', 'cart id: "I am a string!"'];
+        yield [(string) 'I am a string!', 'cart id: "I am a string!"'];
     }
 
     /**
      * Test methods with nulled $paiementDetails
      *
      * @dataProvider checkPaymentTableParameters
-     * @param array $parameter
+     *
+     * @param array  $parameter
      * @param string $logMessage
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->checkPaymentTable($parameter),
@@ -74,7 +79,8 @@ final class CheckPaymentTableTest extends BasePaymentRepository
                 'from' => $this->query,
                 'where' => $this->query,
                 'build' => ['item1', 'item2'],
-            ]);
+            ])
+        ;
 
         $this->assertSame(
             'item2',
@@ -91,7 +97,8 @@ final class CheckPaymentTableTest extends BasePaymentRepository
                 'from' => $this->query,
                 'where' => $this->query,
                 'build' => false,
-            ]);
+            ])
+        ;
 
         $this->assertSame(
             false,

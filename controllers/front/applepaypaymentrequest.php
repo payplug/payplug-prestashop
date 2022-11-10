@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 class PayplugApplePayPaymentRequestModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
@@ -30,8 +29,8 @@ class PayplugApplePayPaymentRequestModuleFrontController extends ModuleFrontCont
 
         $applePayPaymentRequest = $dependencies->applePayClass->getPaymentRequest($dispatcher->getInstance()->getController());
 
-        die(json_encode([
-            'applePayPaymentRequest' =>  $applePayPaymentRequest
+        exit(json_encode([
+            'applePayPaymentRequest' => $applePayPaymentRequest,
         ]));
     }
 }

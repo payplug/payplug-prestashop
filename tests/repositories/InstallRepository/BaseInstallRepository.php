@@ -24,9 +24,8 @@
 
 namespace PayPlug\tests\repositories\InstallRepository;
 
-use PayPlug\classes\DependenciesClass;
-use PayPlug\src\repositories\InstallRepository;
 use PayPlug\src\models\entities\OrderStateEntity;
+use PayPlug\src\repositories\InstallRepository;
 use PayPlug\tests\repositories\RepositoryBase;
 
 class BaseInstallRepository extends RepositoryBase
@@ -41,7 +40,8 @@ class BaseInstallRepository extends RepositoryBase
 
         $this->constant->shouldReceive('get')
             ->with('_PS_MODULE_DIR_')
-            ->andReturn('');
+            ->andReturn('')
+        ;
 
         $this->repo = \Mockery::mock(InstallRepository::class, [
             $this->config,
@@ -55,13 +55,15 @@ class BaseInstallRepository extends RepositoryBase
             $this->sql,
             $this->tools,
             $this->validate,
-            $this->myLogPhp
+            $this->myLogPhp,
         ])
             ->shouldAllowMockingProtectedMethods()
-            ->makePartial();
+            ->makePartial()
+        ;
 
         $this->shop
             ->shouldReceive('isFeatureActive')
-            ->andReturn(false);
+            ->andReturn(false)
+        ;
     }
 }

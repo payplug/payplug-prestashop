@@ -32,6 +32,9 @@ use PayPlug\tests\mock\CartMock;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetHashedCartTest extends BasePaymentRepository
 {
@@ -41,7 +44,7 @@ final class GetHashedCartTest extends BasePaymentRepository
     {
         parent::setUp();
 
-        $startTestDate = date("Y-m-d H:i:s");
+        $startTestDate = date('Y-m-d H:i:s');
         $cartMock = CartMock::get();
         $cart = \Mockery::mock('cart');
         $cart->id = $cartMock->id;
@@ -71,6 +74,7 @@ final class GetHashedCartTest extends BasePaymentRepository
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $parameter
      * @param $logMessage
      */
@@ -78,8 +82,9 @@ final class GetHashedCartTest extends BasePaymentRepository
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->getHashedCart($parameter),
@@ -98,7 +103,6 @@ final class GetHashedCartTest extends BasePaymentRepository
         $this->repo->getHashedCart($this->paymentDetails);
     }
 
-
     public function invalidCartDataProvider()
     {
         yield ['id_address_delivery', 42];
@@ -110,6 +114,7 @@ final class GetHashedCartTest extends BasePaymentRepository
 
     /**
      * @dataProvider invalidCartDataProvider
+     *
      * @param $type
      * @param $value
      */
@@ -124,7 +129,7 @@ final class GetHashedCartTest extends BasePaymentRepository
 
         $firstHash = $this->repo->getHashedCart($this->paymentDetails);
 
-        $this->paymentDetails['cart']->$type = $value;
+        $this->paymentDetails['cart']->{$type} = $value;
         $secondHash = $this->repo->getHashedCart($this->paymentDetails);
         $this->assertNotSame($firstHash, $secondHash);
     }
@@ -133,7 +138,7 @@ final class GetHashedCartTest extends BasePaymentRepository
     {
         $this->paymentDetails['cart']
             ->shouldReceive([
-                'getProducts' => CartMock::getProducts()
+                'getProducts' => CartMock::getProducts(),
             ])
         ;
         $this->paymentDetails['cart']
@@ -160,14 +165,15 @@ final class GetHashedCartTest extends BasePaymentRepository
 
         $this->paymentDetails['cart']
             ->shouldReceive([
-                'getProducts' => false
+                'getProducts' => false,
             ])
         ;
 
         $this->repo
             ->shouldReceive([
                 'returnPaymentError' => $logMessage,
-            ]);
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->getHashedCart($this->paymentDetails),

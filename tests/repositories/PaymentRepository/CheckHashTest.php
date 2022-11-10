@@ -33,6 +33,9 @@ use PayPlug\tests\mock\CartMock;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class CheckHashTest extends BasePaymentRepository
 {
@@ -44,14 +47,14 @@ final class CheckHashTest extends BasePaymentRepository
 
         $cart = CartMock::get();
         $cart->date_add = $cart->date_upd = null;
-        $cart->id_address_delivery = (string)$cart->id_address_delivery;
-        $cart->id_address_invoice = (string)$cart->id_address_invoice;
+        $cart->id_address_delivery = (string) $cart->id_address_delivery;
+        $cart->id_address_invoice = (string) $cart->id_address_invoice;
 
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
             'paymentMethod' => 'payment_method',
-            'forceHash' => false
+            'forceHash' => false,
         ];
     }
 
@@ -66,13 +69,17 @@ final class CheckHashTest extends BasePaymentRepository
 
     /**
      * @dataProvider InvalidDataProvider
+     *
+     * @param mixed $parameter
+     * @param mixed $logMessage
      */
     public function testMethodWithInvalidData($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->checkHash($parameter),
@@ -88,7 +95,7 @@ final class CheckHashTest extends BasePaymentRepository
             'paymentUrl' => 'url',
             'paymentReturnUrl' => 'url',
             'authorizedAt' => 'date',
-            'isPaid' => true
+            'isPaid' => true,
         ];
 
         $this->paymentDetails = array_merge($this->paymentDetails, $tempPaymentDetails);
@@ -103,7 +110,8 @@ final class CheckHashTest extends BasePaymentRepository
                 'set' => $this->query,
                 'where' => $this->query,
                 'build' => true,
-            ]);
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
@@ -114,16 +122,17 @@ final class CheckHashTest extends BasePaymentRepository
                 'createPayment' => [
                     'result' => true,
                     'paymentDetails' => $this->paymentDetails,
-                    'response' => '[createPayment] Payment successfully created'
+                    'response' => '[createPayment] Payment successfully created',
                 ],
-                'getHashedCart' => 'b0a30e26e83b2a'
-            ]);
+                'getHashedCart' => 'b0a30e26e83b2a',
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => true,
                 'paymentDetails' => $this->paymentDetails,
-                'response' => 'Payment created and updated successfully'
+                'response' => 'Payment created and updated successfully',
             ],
             $this->repo->checkHash($this->paymentDetails)
         );
@@ -135,7 +144,7 @@ final class CheckHashTest extends BasePaymentRepository
 
         $expected_error = [
             ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            $error_message
+            $error_message,
         ];
 
         $this->repo
@@ -146,12 +155,12 @@ final class CheckHashTest extends BasePaymentRepository
                 ],
                 'createPayment' => [
                     'result' => false,
-                    'response' => $error_message
+                    'response' => $error_message,
                 ],
                 'returnPaymentError' => $expected_error,
-                'getHashedCart' => 'b0a30e26e83b2a'
-            ]);
-
+                'getHashedCart' => 'b0a30e26e83b2a',
+            ])
+        ;
 
         $this->assertSame(
             $expected_error,
@@ -165,7 +174,7 @@ final class CheckHashTest extends BasePaymentRepository
 
         $expected_error = [
             ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            $error_message
+            $error_message,
         ];
 
         $this->repo
@@ -177,16 +186,17 @@ final class CheckHashTest extends BasePaymentRepository
                 'createPayment' => [
                     'result' => true,
                     'paymentDetails' => $this->paymentDetails,
-                    'response' => '[createPayment] Payment successfully created'
+                    'response' => '[createPayment] Payment successfully created',
                 ],
                 'updatePaymentTable' => [
                     'result' => false,
                     'response' => $error_message,
-                    'paymentDetails' => $this->paymentDetails
+                    'paymentDetails' => $this->paymentDetails,
                 ],
                 'returnPaymentError' => $expected_error,
-                'getHashedCart' => 'b0a30e26e83b2a'
-            ]);
+                'getHashedCart' => 'b0a30e26e83b2a',
+            ])
+        ;
 
         $this->assertSame(
             $expected_error,
@@ -205,21 +215,22 @@ final class CheckHashTest extends BasePaymentRepository
                 'createPayment' => [
                     'result' => true,
                     'paymentDetails' => $this->paymentDetails,
-                    'response' => '[createPayment] Payment successfully created'
+                    'response' => '[createPayment] Payment successfully created',
                 ],
                 'updatePaymentTable' => [
                     'result' => true,
                     'response' => 'Success message',
-                    'paymentDetails' => $this->paymentDetails
+                    'paymentDetails' => $this->paymentDetails,
                 ],
-                'getHashedCart' => 'b0a30e26e83b2a'
-            ]);
+                'getHashedCart' => 'b0a30e26e83b2a',
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => true,
                 'paymentDetails' => $this->paymentDetails,
-                'response' => 'Payment created and updated successfully'
+                'response' => 'Payment created and updated successfully',
             ],
             $this->repo->checkHash($this->paymentDetails)
         );

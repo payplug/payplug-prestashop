@@ -33,6 +33,9 @@ use PayPlug\tests\mock\CartMock;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class CheckTimeoutPaymentTest extends BasePaymentRepository
 {
@@ -44,13 +47,13 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
 
         $cart = CartMock::get();
         $cart->date_add = $cart->date_upd = null;
-        $cart->id_address_delivery = (string)$cart->id_address_delivery;
-        $cart->id_address_invoice = (string)$cart->id_address_invoice;
+        $cart->id_address_delivery = (string) $cart->id_address_delivery;
+        $cart->id_address_invoice = (string) $cart->id_address_invoice;
 
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method'
+            'paymentMethod' => 'payment_method',
         ];
     }
 
@@ -66,8 +69,8 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
 
         // Test if (!is_int($idCart))
         yield [
-            (string)'I am a string!',
-            'id cart: "I am a string!"'
+            (string) 'I am a string!',
+            'id cart: "I am a string!"',
         ];
     }
 
@@ -75,16 +78,19 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
      * Test methods with nulled $paiementDetails
      *
      * @dataProvider checkTimeoutPaymentParameters
-     * @param array $parameter
+     *
+     * @param array  $parameter
      * @param string $logMessage
+     *
      * @throws \Exception
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->checkTimeoutPayment($parameter),
@@ -97,9 +103,10 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'checkPaymentTable' => [
-                    'date_upd' => (new \DateTime('-2 min'))->format('Y-m-d H:i:s')
-                ]
-            ]);
+                    'date_upd' => (new \DateTime('-2 min'))->format('Y-m-d H:i:s'),
+                ],
+            ])
+        ;
 
         $this->assertSame(
             true,
@@ -112,9 +119,10 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'checkPaymentTable' => [
-                    'date_upd' => (new \DateTime('+5 min'))->format('Y-m-d H:i:s')
-                ]
-            ]);
+                    'date_upd' => (new \DateTime('+5 min'))->format('Y-m-d H:i:s'),
+                ],
+            ])
+        ;
 
         $this->assertSame(
             false,

@@ -41,22 +41,23 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
      * Method that is executed after init() and checkAccess().
      * Used to process user input.
      *
-     * @return bool|void
      * @throws Exception
+     *
+     * @return bool|void
      */
     public function postProcess()
     {
         if ($method = $this->toolsAdapter->tool('getValue', 'method')) {
-            $id_cart = (int)$this->toolsAdapter->tool('getValue', 'id_cart');
+            $id_cart = (int) $this->toolsAdapter->tool('getValue', 'id_cart');
             $id_card = $this->toolsAdapter->tool('getValue', 'pc');
-            $is_deferred = (bool)$this->toolsAdapter->tool('getValue', 'def');
-            $is_one_click = (bool)($method === 'one_click');
-            $is_installment = (bool)($method === 'installment');
+            $is_deferred = (bool) $this->toolsAdapter->tool('getValue', 'def');
+            $is_one_click = (bool) ($method === 'one_click');
+            $is_installment = (bool) ($method === 'installment');
             $oney_type = $this->toolsAdapter->tool('getValue', $this->dependenciesClass->name . 'Oney_type');
-            $is_oney = (bool)($method === 'oney' && $oney_type);
-            $is_bancontact = (bool)($method === 'bancontact');
-            $is_applepay = (bool)($method === 'applepay');
-            $is_amex = (bool)($method === 'amex');
+            $is_oney = (bool) ($method === 'oney' && $oney_type);
+            $is_bancontact = (bool) ($method === 'bancontact');
+            $is_applepay = (bool) ($method === 'applepay');
+            $is_amex = (bool) ($method === 'amex');
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
@@ -82,7 +83,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 $payment = $this->dependenciesClass->paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
                     $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
-                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.')
+                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.'),
                     ]);
                     $this->toolsAdapter->tool('redirect', $error_url);
                 } else {
@@ -96,7 +97,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 $payment = $this->dependenciesClass->paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
                     $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
-                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.')
+                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.'),
                     ]);
                     $this->toolsAdapter->tool('redirect', $error_url);
                 } else {
@@ -112,7 +113,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 $payment = $this->dependenciesClass->paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
                     $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
-                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.')
+                        $this->dependenciesClass->l('The transaction was not completed and your card was not charged.'),
                     ]);
                     $this->toolsAdapter->tool('redirect', $error_url);
                 } else {
@@ -121,35 +122,35 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             } elseif ($options['applepay'] && $is_applepay) {
                 $payment_options = [
                     'is_applepay' => $is_applepay,
-                    'payment_context' => array(
-                        'apple_pay' => array(
+                    'payment_context' => [
+                        'apple_pay' => [
                             'domain_name' => $this->context->shop->domain_ssl,
-                            'application_data' => base64_encode(json_encode(array(
-                                'apple_pay_domain' => $this->context->shop->domain_ssl
-                            )))
-                        )
-                    )
+                            'application_data' => base64_encode(json_encode([
+                                'apple_pay_domain' => $this->context->shop->domain_ssl,
+                            ])),
+                        ],
+                    ],
                 ];
                 $payment = $this->dependenciesClass->paymentClass->preparePayment($payment_options);
                 if (!$payment['result']) {
-                    die(json_encode([
+                    exit(json_encode([
                         'result' => false,
-                        'message' => 'Failed preparePayment'
-                    ]));
-                } else {
-                    die(json_encode([
-                        'result' => true,
-                        'apiResponse' => $payment['resource']->payment_method,
-                        'idPayment' => $payment['paymentDetails']['paymentId'],
-                        'idCart' => $this->context->cart->id
+                        'message' => 'Failed preparePayment',
                     ]));
                 }
+
+                exit(json_encode([
+                    'result' => true,
+                    'apiResponse' => $payment['resource']->payment_method,
+                    'idPayment' => $payment['paymentDetails']['paymentId'],
+                    'idCart' => $this->context->cart->id,
+                ]));
             } else {
                 // else reload the page with lightbox arg
                 $return_url = 'index.php?controller=order&step=3&embedded=1'
                     . ($is_installment ? '&inst=1' : '')
                     . ($is_one_click ? '&pc=' . $id_card : '')
-                    . '&def=' . (int)$is_deferred
+                    . '&def=' . (int) $is_deferred
                     . '&modulename=' . $this->dependenciesClass->name;
 
                 $this->toolsAdapter->tool('redirect', $return_url);

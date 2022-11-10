@@ -34,17 +34,19 @@ class CardClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->card =       $this->dependencies->getPlugin()->getCard();
-        $this->constant =   $this->dependencies->getPlugin()->getConstant();
-        $this->query =      $this->dependencies->getPlugin()->getQuery();
-        $this->sql =        $this->dependencies->getPlugin()->getSql();
+        $this->card = $this->dependencies->getPlugin()->getCard();
+        $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->sql = $this->dependencies->getPlugin()->getSql();
     }
 
     /**
      * @description Delete saved cards when uninstalling module
      * todo: move this method in CardRepository
-     * @return bool
+     *
      * @throws Exception
+     *
+     * @return bool
      */
     public function uninstallCards()
     {
@@ -53,13 +55,14 @@ class CardClass
                 ->select()
                 ->fields('*')
                 ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_card')
-                ->build();
+                ->build()
+            ;
 
             if ($cards) {
                 foreach ($cards as $card) {
                     $id_customer = $card['id_customer'];
                     $id_payplug_card = $card['id_payplug_card'];
-                    if (!$this->card->deleteCard((int)$id_customer, (int)$id_payplug_card)) {
+                    if (!$this->card->deleteCard((int) $id_customer, (int) $id_payplug_card)) {
                         return false;
                     }
                 }

@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -34,7 +33,7 @@ function upgrade_module_2_0_7($object)
 
     //sql
     $req_payplug_lock = '
-        ALTER TABLE '._DB_PREFIX_.$object->name.'_lock 
+        ALTER TABLE ' . _DB_PREFIX_ . $object->name . '_lock 
         ADD COLUMN `id_order` VARCHAR(100) 
         AFTER `id_cart`';
     $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
@@ -43,34 +42,34 @@ function upgrade_module_2_0_7($object)
     //$suppr_files = true;
     //$suppr_dirs = true;
     $old_files = [
-        dirname(__FILE__).'/../classes/PayplugTools.php',
-        dirname(__FILE__).'/../controllers/dispatcher.php',
-        dirname(__FILE__).'/../controllers/FrontAjaxPayplug.php',
-        dirname(__FILE__).'/../controllers/savedCads.php',
-        dirname(__FILE__).'/../css/admin.css',
-        dirname(__FILE__).'/../css/front.css',
-        dirname(__FILE__).'/../css/index.php',
-        dirname(__FILE__).'/../img/index.php',
-        dirname(__FILE__).'/../img/logoPayPlug.png',
-        dirname(__FILE__).'/../img/payplug.png',
-        dirname(__FILE__).'/../img/payplug_en.png',
-        dirname(__FILE__).'/../img/payplug_fr.png',
-        dirname(__FILE__).'/../upgrade/Upgrade-0.9.2.php',
-        dirname(__FILE__).'/../upgrade/Upgrade-0.9.7.php',
-        dirname(__FILE__).'/../upgrade/Upgrade-1.1.0.php',
-        dirname(__FILE__).'/../views/templates/front/cards_list_1_5.tpl',
-        dirname(__FILE__).'/../views/templates/front/cards_list_1_6.tpl',
-        dirname(__FILE__).'/../views/templates/front/maximumAmount.tpl',
-        dirname(__FILE__).'/../views/templates/front/needEuro.tpl',
-        dirname(__FILE__).'/../views/templates/hook/payment.tpl',
-        dirname(__FILE__).'/../views/templates/hook/payment_16.tpl',
-        dirname(__FILE__).'/../installPayplug.php',
-        dirname(__FILE__).'/../ipn.php'
+        dirname(__FILE__) . '/../classes/PayplugTools.php',
+        dirname(__FILE__) . '/../controllers/dispatcher.php',
+        dirname(__FILE__) . '/../controllers/FrontAjaxPayplug.php',
+        dirname(__FILE__) . '/../controllers/savedCads.php',
+        dirname(__FILE__) . '/../css/admin.css',
+        dirname(__FILE__) . '/../css/front.css',
+        dirname(__FILE__) . '/../css/index.php',
+        dirname(__FILE__) . '/../img/index.php',
+        dirname(__FILE__) . '/../img/logoPayPlug.png',
+        dirname(__FILE__) . '/../img/payplug.png',
+        dirname(__FILE__) . '/../img/payplug_en.png',
+        dirname(__FILE__) . '/../img/payplug_fr.png',
+        dirname(__FILE__) . '/../upgrade/Upgrade-0.9.2.php',
+        dirname(__FILE__) . '/../upgrade/Upgrade-0.9.7.php',
+        dirname(__FILE__) . '/../upgrade/Upgrade-1.1.0.php',
+        dirname(__FILE__) . '/../views/templates/front/cards_list_1_5.tpl',
+        dirname(__FILE__) . '/../views/templates/front/cards_list_1_6.tpl',
+        dirname(__FILE__) . '/../views/templates/front/maximumAmount.tpl',
+        dirname(__FILE__) . '/../views/templates/front/needEuro.tpl',
+        dirname(__FILE__) . '/../views/templates/hook/payment.tpl',
+        dirname(__FILE__) . '/../views/templates/hook/payment_16.tpl',
+        dirname(__FILE__) . '/../installPayplug.php',
+        dirname(__FILE__) . '/../ipn.php',
     ];
 
     $old_dirs = [
-        dirname(__FILE__).'/../css',
-        dirname(__FILE__).'/../img',
+        dirname(__FILE__) . '/../css',
+        dirname(__FILE__) . '/../img',
     ];
 
     foreach ($old_files as $file) {

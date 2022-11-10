@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -30,8 +29,8 @@ function upgrade_module_3_0_0($object)
     $flag = true;
 
     // check order state paid & update if different than prestashop state
-    $order_state = (int)Configuration::get('PS_OS_PAYMENT');
-    $payplug_order_state = (int)Configuration::get('PAYPLUG_ORDER_STATE_PAID');
+    $order_state = (int) Configuration::get('PS_OS_PAYMENT');
+    $payplug_order_state = (int) Configuration::get('PAYPLUG_ORDER_STATE_PAID');
     if ($order_state != $payplug_order_state) {
         $flag = $flag && Configuration::updateValue('PAYPLUG_ORDER_STATE_PAID', $order_state);
     }
@@ -40,7 +39,5 @@ function upgrade_module_3_0_0($object)
     $flag = $flag && $object->registerHook('actionAdminControllerSetMedia');
 
     // plug module on the hook displayAdminOrderMain
-    $flag = $flag && $object->registerHook('displayAdminOrderMain');
-
-    return $flag;
+    return $flag && $object->registerHook('displayAdminOrderMain');
 }

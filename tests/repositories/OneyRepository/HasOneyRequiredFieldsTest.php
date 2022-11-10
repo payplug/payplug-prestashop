@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\OneyRepository;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 {
@@ -44,20 +47,24 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                 if (!$phone) {
                     return false;
                 }
+
                 return true;
-            });
+            })
+        ;
     }
 
     public function invalidPaymentDataProvider()
     {
-        yield[false];
-        yield[[]];
-        yield['wrong_parameters'];
-        yield[42];
+        yield [false];
+        yield [[]];
+        yield ['wrong_parameters'];
+        yield [42];
     }
 
     /**
      * @dataProvider invalidPaymentDataProvider
+     *
+     * @param mixed $payment_data
      */
     public function testWithInvalidPaymentData($payment_data)
     {
@@ -73,14 +80,15 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
             ->shouldReceive([
                 'isValidOneyEmail' => [
                     'result' => false,
-                    'error' => ''
-                ]
-            ]);
+                    'error' => '',
+                ],
+            ])
+        ;
 
         $payment_data = [
             'shipping' => [
-                'email' => 'customer@payplug.com'
-            ]
+                'email' => 'customer@payplug.com',
+            ],
         ];
 
         $this->assertSame(
@@ -93,22 +101,24 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => 3500
-            ]);
+                'isValidMobilePhoneNumber' => 3500,
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
                 'isValidOneyEmail' => [
-                    'result' => true
-                ]
-            ]);
+                    'result' => true,
+                ],
+            ])
+        ;
 
         $payment_data = [
             'shipping' => [
                 'email' => 'customer@payplug.com',
                 'mobile_phone_number' => false,
-                'country' => 'FR'
-            ]
+                'country' => 'FR',
+            ],
         ];
 
         $this->assertSame(
@@ -122,21 +132,23 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         $this->repo
             ->shouldReceive([
                 'isValidOneyEmail' => [
-                    'result' => true
-                ]
-            ]);
+                    'result' => true,
+                ],
+            ])
+        ;
         $this->dependencies->configClass
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => true
-            ]);
+                'isValidMobilePhoneNumber' => true,
+            ])
+        ;
 
         $payment_data = [
             'shipping' => [
                 'email' => 'customer@payplug.com',
                 'mobile_phone_number' => true,
                 'country' => 'FR',
-                'city' => 'nom de ville de plus de 32 caracteres de long'
-            ]
+                'city' => 'nom de ville de plus de 32 caracteres de long',
+            ],
         ];
 
         $this->assertSame(
@@ -150,26 +162,28 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         $this->repo
             ->shouldReceive([
                 'isValidOneyEmail' => [
-                    'result' => true
-                ]
-            ]);
+                    'result' => true,
+                ],
+            ])
+        ;
         $this->dependencies->configClass
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => true
-            ]);
+                'isValidMobilePhoneNumber' => true,
+            ])
+        ;
 
         $payment_data = [
             'shipping' => [
                 'email' => 'customer@payplug.com',
                 'mobile_phone_number' => true,
                 'country' => 'FR',
-                'city' => 'paris'
+                'city' => 'paris',
             ],
             'billing' => [
                 'mobile_phone_number' => false,
                 'country' => 'FR',
-                'city' => 'paris'
-            ]
+                'city' => 'paris',
+            ],
         ];
 
         $this->assertSame(
@@ -183,26 +197,28 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         $this->repo
             ->shouldReceive([
                 'isValidOneyEmail' => [
-                    'result' => true
-                ]
-            ]);
+                    'result' => true,
+                ],
+            ])
+        ;
         $this->dependencies->configClass
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => true
-            ]);
+                'isValidMobilePhoneNumber' => true,
+            ])
+        ;
 
         $payment_data = [
             'shipping' => [
                 'email' => 'customer@payplug.com',
                 'mobile_phone_number' => true,
                 'country' => 'FR',
-                'city' => 'paris'
+                'city' => 'paris',
             ],
             'billing' => [
                 'mobile_phone_number' => true,
                 'country' => 'FR',
-                'city' => 'nom de ville de plus de 32 caracteres de long'
-            ]
+                'city' => 'nom de ville de plus de 32 caracteres de long',
+            ],
         ];
 
         $this->assertSame(
@@ -216,26 +232,28 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         $this->repo
             ->shouldReceive([
                 'isValidOneyEmail' => [
-                    'result' => true
-                ]
-            ]);
+                    'result' => true,
+                ],
+            ])
+        ;
         $this->dependencies->configClass
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => true
-            ]);
+                'isValidMobilePhoneNumber' => true,
+            ])
+        ;
 
         $payment_data = [
             'shipping' => [
                 'email' => 'customer@payplug.com',
                 'mobile_phone_number' => true,
                 'country' => 'FR',
-                'city' => 'paris'
+                'city' => 'paris',
             ],
             'billing' => [
                 'mobile_phone_number' => true,
                 'country' => 'FR',
-                'city' => 'paris'
-            ]
+                'city' => 'paris',
+            ],
         ];
 
         $this->assertSame(

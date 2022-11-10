@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\MediaInterface;
 use Media;
+use PayPlug\src\interfaces\MediaInterface;
 
 class MediaAdapter implements MediaInterface
 {
@@ -35,6 +35,7 @@ class MediaAdapter implements MediaInterface
                 $file = addslashes($file);
             }
         }
+
         return Media::addJsDef($files);
     }
 

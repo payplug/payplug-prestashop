@@ -33,6 +33,9 @@ use PayPlug\tests\mock\OrderStateMock;
  * @group order_state_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class CreateTest extends BaseOrderStateRepository
 {
@@ -56,19 +59,22 @@ final class CreateTest extends BaseOrderStateRepository
         $this->repo
             ->shouldReceive([
                 'getConfigKey' => $this->configKey,
-                'setType' => true
-            ]);
+                'setType' => true,
+            ])
+        ;
 
         $this->config
             ->shouldReceive('get')
             ->with($this->configKey)
-            ->andReturn(false);
+            ->andReturn(false)
+        ;
 
         $this->config
             ->shouldReceive('updateValue')
             ->andReturnUsing(function ($key, $value) {
-                return $key .'-'. $value;
-            });
+                return $key . '-' . $value;
+            })
+        ;
     }
 
     public function invalidDataProvider()
@@ -88,6 +94,9 @@ final class CreateTest extends BaseOrderStateRepository
 
     /**
      * @dataProvider invalidDataProvider
+     *
+     * @param mixed $name
+     * @param mixed $state
      */
     public function testWithInvalidDataProvider($name, $state)
     {
@@ -101,13 +110,15 @@ final class CreateTest extends BaseOrderStateRepository
     {
         $this->repo
             ->shouldReceive([
-                'getOrderStateByConfiguration' => $this->orderStateMock->id
-            ]);
+                'getOrderStateByConfiguration' => $this->orderStateMock->id,
+            ])
+        ;
 
         $this->order_state_adapter
             ->shouldReceive([
-                'get' => $this->orderStateMock
-            ]);
+                'get' => $this->orderStateMock,
+            ])
+        ;
 
         $this->assertSame(
             $this->configKey . '-' . $this->orderStateMock->id,
@@ -121,12 +132,14 @@ final class CreateTest extends BaseOrderStateRepository
             ->shouldReceive([
                 'getOrderStateByConfiguration' => false,
                 'getOrderStateByTemplate' => $this->orderStateMock->id,
-            ]);
+            ])
+        ;
 
         $this->order_state_adapter
             ->shouldReceive([
-                'get' => $this->orderStateMock
-            ]);
+                'get' => $this->orderStateMock,
+            ])
+        ;
 
         $this->assertSame(
             $this->configKey . '-' . $this->orderStateMock->id,
@@ -141,12 +154,14 @@ final class CreateTest extends BaseOrderStateRepository
                 'getOrderStateByConfiguration' => false,
                 'getOrderStateByTemplate' => false,
                 'findByName' => $this->orderStateMock->id,
-            ]);
+            ])
+        ;
 
         $this->order_state_adapter
             ->shouldReceive([
-                'get' => $this->orderStateMock
-            ]);
+                'get' => $this->orderStateMock,
+            ])
+        ;
 
         $this->assertSame(
             $this->configKey . '-' . $this->orderStateMock->id,
@@ -162,12 +177,14 @@ final class CreateTest extends BaseOrderStateRepository
                 'getOrderStateByTemplate' => false,
                 'findByName' => false,
                 'add' => $this->orderStateMock->id,
-            ]);
+            ])
+        ;
 
         $this->order_state_adapter
             ->shouldReceive([
-                'get' => $this->orderStateMock
-            ]);
+                'get' => $this->orderStateMock,
+            ])
+        ;
 
         $this->assertSame(
             $this->configKey . '-' . $this->orderStateMock->id,
@@ -185,12 +202,14 @@ final class CreateTest extends BaseOrderStateRepository
                 'getOrderStateByTemplate' => false,
                 'findByName' => $this->orderStateMock->id,
                 'add' => $new_order_state,
-            ]);
+            ])
+        ;
 
         $this->order_state_adapter
             ->shouldReceive([
-                'get' => $this->orderStateMock
-            ]);
+                'get' => $this->orderStateMock,
+            ])
+        ;
 
         $response = $this->repo->create($this->state['name'], $this->state, false, true);
 
@@ -210,14 +229,16 @@ final class CreateTest extends BaseOrderStateRepository
                 'getOrderStateByTemplate' => false,
                 'findByName' => $this->orderStateMock->id,
                 'add' => $new_order_state,
-            ]);
+            ])
+        ;
 
         $this->orderStateMock->deleted = 1;
 
         $this->order_state_adapter
             ->shouldReceive([
-                'get' => $this->orderStateMock
-            ]);
+                'get' => $this->orderStateMock,
+            ])
+        ;
 
         $this->assertSame(
             $this->configKey . '-' . $new_order_state,
@@ -235,14 +256,16 @@ final class CreateTest extends BaseOrderStateRepository
                 'getOrderStateByTemplate' => false,
                 'findByName' => $this->orderStateMock->id,
                 'add' => $new_order_state,
-            ]);
+            ])
+        ;
 
         $this->orderStateMock->deleted = 1;
 
         $this->order_state_adapter
             ->shouldReceive([
-                'get' => $this->orderStateMock
-            ]);
+                'get' => $this->orderStateMock,
+            ])
+        ;
 
         $this->assertSame(
             $this->configKey . '-' . $new_order_state,

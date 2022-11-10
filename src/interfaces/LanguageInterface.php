@@ -26,6 +26,8 @@ namespace PayPlug\src\interfaces;
 interface LanguageInterface
 {
     public function get($idLanguage);
+
     public function getLanguages($active);
+
     public function loadLanguages();
 }

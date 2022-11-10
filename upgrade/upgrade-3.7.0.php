@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -38,26 +37,26 @@ function upgrade_module_3_7_0($object)
         'PS_OS_ERROR' => 'error',
         'PS_OS_CHEQUE' => 'nothing',
         'PS_OS_BANKWIRE' => 'nothing',
-        'PS_OS_PREPARATION' =>'nothing',
-        'PS_OS_SHIPPING' =>'nothing',
-        'PS_OS_DELIVERED'=>'nothing',
+        'PS_OS_PREPARATION' => 'nothing',
+        'PS_OS_SHIPPING' => 'nothing',
+        'PS_OS_DELIVERED' => 'nothing',
     ];
     if (version_compare(_PS_VERSION_, '1.6.0.14', '<')) {
         $prestashop_order_states += [
-            'PS_OS_OUTOFSTOCK' =>  'nothing'
+            'PS_OS_OUTOFSTOCK' => 'nothing',
         ];
     } else {
         $prestashop_order_states += [
             'PS_OS_OUTOFSTOCK_PAID' => 'paid',
             'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
-            'PS_OS_COD_VALIDATION' =>'nothing',
+            'PS_OS_COD_VALIDATION' => 'nothing',
         ];
     }
 
     $date = date('Y-m-d');
     $payplug_order_states_sql = [];
     foreach ($prestashop_order_states as $key => $type) {
-        $id_order_state =  (int)Configuration::get(($key));
+        $id_order_state = (int) Configuration::get(($key));
         $getTypeQuery = ' 
             SELECT `type` 
             FROM `' . _DB_PREFIX_ . $object->name . '_order_state` 
@@ -73,7 +72,7 @@ function upgrade_module_3_7_0($object)
 
     if ($payplug_order_states_sql) {
         foreach ($payplug_order_states_sql as $sql) {
-            $flag = $flag &&  Db::getInstance()->execute($sql);
+            $flag = $flag && Db::getInstance()->execute($sql);
             unset($sql);
         }
     }

@@ -60,7 +60,9 @@ class FilesHelper
 
     /**
      * @description Get the list of all the files from a given dir
+     *
      * @param string $dir
+     *
      * @return array
      */
     public static function get($dir = '')
@@ -88,6 +90,7 @@ class FilesHelper
 
     /**
      * @description Get the list of all the module files from the whitelist
+     *
      * @return array
      */
     private static function getList()
@@ -111,9 +114,10 @@ class FilesHelper
     /**
      * @description Filter the type of files from a given array
      *
-     * @param array $files
+     * @param array  $files
      * @param string $type_clear
      * @param string $path
+     *
      * @return array
      */
     private static function clearFiles($files = [], $type_clear = 'file', $path = '')
@@ -148,8 +152,10 @@ class FilesHelper
 
     /**
      * @description Get recursives files from a given path
+     *
      * @param $path
      * @param $array_files
+     *
      * @return array
      */
     private static function getRecursiveFiles($path, &$array_files = [])

@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\QueryInterface;
 use Db;
+use PayPlug\src\interfaces\QueryInterface;
 
 class QueryAdapter implements QueryInterface
 {
@@ -46,7 +46,9 @@ class QueryAdapter implements QueryInterface
 
     /**
      * @description Called from src/repositories/QueryRepository.php
+     *
      * @param $SQLRequest
+     *
      * @return mixed
      */
     public function query($SQLRequest)
@@ -62,7 +64,7 @@ class QueryAdapter implements QueryInterface
                 $action = 'ExecuteS';
             }
 
-            return $this->db->$action($SQLRequest);
+            return $this->db->{$action}($SQLRequest);
         } catch (\Exception $e) {
             var_dump($e);
         }

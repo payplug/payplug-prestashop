@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 class PayplugPaymentModuleFrontController extends ModuleFrontController
 {
     private $dependencies;
@@ -47,13 +46,13 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $with_fees = null;
         if ((isset($type)) && ($type == 'oney')) {
             if (isset($io)) {
-                (bool)Configuration::get('PAYPLUG_ONEY_FEES') ? $with_fees = 'with_fees' : $with_fees = 'without_fees';
-                $is_oney = 'x'.$io.'_'.$with_fees;
+                (bool) Configuration::get('PAYPLUG_ONEY_FEES') ? $with_fees = 'with_fees' : $with_fees = 'without_fees';
+                $is_oney = 'x' . $io . '_' . $with_fees;
             }
         }
         $options = [
             'is_oney' => $is_oney,
-            '_ajax' => 1
+            '_ajax' => 1,
         ];
 
         $payment_data = $this->paymentClass->preparePayment($options);
@@ -63,7 +62,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $error_url = $context->link->getPageLink($page, true, $context->language->id, [
             'has_error' => 1,
             'step' => 3,
-            'modulename' => 'payplug'
+            'modulename' => 'payplug',
         ]);
 
         // Invalid payment then return error
@@ -85,7 +84,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         }
 
         if ((isset($payment_data['response'])) || (isset($payment_data_16['response']))) {
-            die($payment_data['response']);
+            exit($payment_data['response']);
         }
     }
 }
