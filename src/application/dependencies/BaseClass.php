@@ -27,9 +27,9 @@ use PayPlug\src\application\adapter\TranslationAdapter;
 
 class BaseClass
 {
-    private $entity;
     protected $name;
     protected $payplug;
+    private $entity;
 
     public static function factory()
     {
@@ -39,6 +39,7 @@ class BaseClass
     public function setName()
     {
         $this->name = (new \ReflectionClass($this))->getShortName();
+
         return $this;
     }
 
@@ -50,8 +51,10 @@ class BaseClass
     public function setEntity($entity)
     {
         $this->entity = $entity;
+
         return $this;
     }
+
     public function getEntity()
     {
         return $this->entity;
@@ -60,6 +63,7 @@ class BaseClass
     public function l($string)
     {
         $this->setName();
+
         return TranslationAdapter::translate($this->payplug, $string, $this->getName());
     }
 }

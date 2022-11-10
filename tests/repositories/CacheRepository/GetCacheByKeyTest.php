@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\CacheRepository;
  * @group cache_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetCacheByKeyTest extends BaseCacheRepository
 {
@@ -43,7 +46,8 @@ final class GetCacheByKeyTest extends BaseCacheRepository
         $this->cacheKey = 'Payplug::OneySimulations_15000_FR_operation_live';
         $this->constant
             ->shouldReceive('get')
-            ->andReturn(true);
+            ->andReturn(true)
+        ;
     }
 
     public function invalidDataProvider()
@@ -56,13 +60,15 @@ final class GetCacheByKeyTest extends BaseCacheRepository
 
     /**
      * @dataProvider invalidDataProvider
+     *
+     * @param mixed $cacheKey
      */
     public function testWithInvalidDataProvider($cacheKey)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Invalid cache key format'
+                'message' => 'Invalid cache key format',
             ],
             $this->repo->getCacheByKey($cacheKey)
         );
@@ -76,13 +82,14 @@ final class GetCacheByKeyTest extends BaseCacheRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => false
-            ]);
+                'build' => false,
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'No cache found'
+                'message' => 'No cache found',
             ],
             $this->repo->getCacheByKey($this->cacheKey)
         );
@@ -97,7 +104,7 @@ final class GetCacheByKeyTest extends BaseCacheRepository
         $cache = [
             'cache_key' => $this->cacheKey,
             'date_add' => $date_limit->format('Y-m-d H:i:s'),
-            'date_upd' => $date_limit->format('Y-m-d H:i:s')
+            'date_upd' => $date_limit->format('Y-m-d H:i:s'),
         ];
 
         $this->query
@@ -106,17 +113,19 @@ final class GetCacheByKeyTest extends BaseCacheRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => [$cache]
-            ]);
+                'build' => [$cache],
+            ])
+        ;
 
         $this->repo
             ->shouldReceive('deleteCacheByKey')
-            ->andReturn(true);
+            ->andReturn(true)
+        ;
 
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'The current cache has been deleted'
+                'message' => 'The current cache has been deleted',
             ],
             $this->repo->getCacheByKey($this->cacheKey)
         );
@@ -128,7 +137,7 @@ final class GetCacheByKeyTest extends BaseCacheRepository
         $cache = [
             'cache_key' => $this->cacheKey,
             'date_add' => $date_limit->format('Y-m-d H:i:s'),
-            'date_upd' => $date_limit->format('Y-m-d H:i:s')
+            'date_upd' => $date_limit->format('Y-m-d H:i:s'),
         ];
 
         $this->query
@@ -137,13 +146,14 @@ final class GetCacheByKeyTest extends BaseCacheRepository
                 'fields' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => [$cache]
-            ]);
+                'build' => [$cache],
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => $cache,
-                'message' => 'Success'
+                'message' => 'Success',
             ],
             $this->repo->getCacheByKey($this->cacheKey)
         );

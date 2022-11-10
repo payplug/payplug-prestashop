@@ -43,7 +43,6 @@ class MediaClass
      *
      * @param string $css_uri
      * @param string $css_media_type
-     * @return void
      */
     public function addCSSRC($css_uri, $css_media_type = 'all')
     {
@@ -54,7 +53,6 @@ class MediaClass
      * @description  Include js script in template
      *
      * @param string $js_uri
-     * @return void
      */
     public function addJsRC($js_uri)
     {
@@ -65,8 +63,9 @@ class MediaClass
      * @description  Display messages template
      *
      * @param array $messages
-     * @param bool $with_msg_button
-     * @param bool $with_yes_no_buttons
+     * @param bool  $with_msg_button
+     * @param bool  $with_yes_no_buttons
+     *
      * @return bool|string
      */
     public function displayMessages($messages = [], $with_msg_button = false, $with_yes_no_buttons = false)
@@ -79,14 +78,14 @@ class MediaClass
         foreach ($messages as $message) {
             $formated[] = [
                 'type' => 'string',
-                'value' => $message
+                'value' => $message,
             ];
         }
 
         $this->context->smarty->assign([
             'messages' => $formated,
             'with_msg_button' => $with_msg_button,
-            'with_yes_no_buttons' => $with_yes_no_buttons
+            'with_yes_no_buttons' => $with_yes_no_buttons,
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('_partials/messages.tpl');
@@ -96,7 +95,8 @@ class MediaClass
      * @description Display the right pop-in
      *
      * @param string $type
-     * @param array $args
+     * @param array  $args
+     *
      * @return string
      */
     public function displayPopin($type, $args = null)
@@ -137,31 +137,44 @@ class MediaClass
             case 'pwd':
             case 'activate':
                 $title = $this->dependencies->l('payplug.displayPopin.liveMode', 'mediaclass');
+
                 break;
+
             case 'premium':
             case 'confirm':
                 $title = $this->dependencies->l('payplug.displayPopin.saveSettings', 'mediaclass');
+
                 break;
+
             case 'deactivate':
                 $title = $this->dependencies->l('payplug.displayPopin.deactivate', 'mediaclass');
+
                 break;
+
             case 'refund':
                 $title = $this->dependencies->l('payplug.displayPopin.refund', 'mediaclass');
+
                 break;
+
             case 'abort':
                 $title = $this->dependencies->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
+
                 break;
+
             case 'deferred':
                 $title = $this->dependencies->l('payplug.displayPopin.deferred', 'mediaclass');
+
                 break;
+
             default:
                 $title = '';
+
                 break;
         }
 
         foreach ($this->dependencies->configClass->features_json->features as $key => $value) {
             $this->context->smarty->assign([
-                $value => $value
+                $value => $value,
             ]);
         }
 
@@ -176,25 +189,26 @@ class MediaClass
 
         $this->html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
 
-        die(json_encode(['content' => $this->html]));
+        exit(json_encode(['content' => $this->html]));
     }
 
     /**
      * @description  Fetch smarty template
      *
      * @param string $file
+     *
      * @return string
      */
     public function fetchTemplateRC($file)
     {
-        $output = $this->dependencies->configClass->fetchTemplate($file);
-        return $output;
+        return $this->dependencies->configClass->fetchTemplate($file);
     }
 
     /**
      * @description To load JS and CSS medias
      *
      * @param array|string $medias
+     *
      * @return bool
      */
     public function setMedia($medias)

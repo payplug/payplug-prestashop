@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -36,8 +35,8 @@ function upgrade_module_2_26_1($object)
 
     // Update payplug lock table
     $sql_requests = [
-        'TRUNCATE TABLE `'._DB_PREFIX_.$object->name.'_lock`',
-        'ALTER TABLE `'._DB_PREFIX_.$object->name.'_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
+        'TRUNCATE TABLE `' . _DB_PREFIX_ . $object->name . '_lock`',
+        'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_lock` ADD CONSTRAINT lock_cart_unique UNIQUE (id_cart)',
     ];
 
     try {

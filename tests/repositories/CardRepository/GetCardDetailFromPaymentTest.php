@@ -32,6 +32,9 @@ use PayPlug\tests\mock\PaymentMock;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetCardDetailFromPaymentTest extends BaseCardRepository
 {
@@ -44,7 +47,6 @@ final class GetCardDetailFromPaymentTest extends BaseCardRepository
         $this->payment = PaymentMock::getOneClick();
     }
 
-
     public function invalidDataProvider()
     {
         // invalid int $customerId
@@ -52,14 +54,16 @@ final class GetCardDetailFromPaymentTest extends BaseCardRepository
         yield [null];
         yield [false];
         yield ['I am a string!'];
-        yield [['key'=>'value']];
+        yield [['key' => 'value']];
     }
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $customerId
      * @param $payplugCardId
      * @param $companyId
+     * @param mixed $payment
      */
     public function testWithInvalidParams($payment)
     {

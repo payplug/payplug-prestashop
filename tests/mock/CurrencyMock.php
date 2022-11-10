@@ -31,6 +31,7 @@ class CurrencyMock
         $currency = new \stdClass();
         $currency->id = 1;
         $currency->iso_code = 'EUR';
+
         return $currency;
     }
 }

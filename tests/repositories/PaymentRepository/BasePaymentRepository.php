@@ -54,7 +54,7 @@ class BasePaymentRepository extends RepositoryBase
             $this->logger,
             $this->paymentEntity,
             $this->query,
-            $this->constant
+            $this->constant,
         ])->makePartial();
 
         $this->arrayCache = [];
@@ -64,20 +64,23 @@ class BasePaymentRepository extends RepositoryBase
 
         $this->dependencies->paymentClass
             ->shouldReceive('setPaymentErrorsCookie')
-            ->andReturn(true);
+            ->andReturn(true)
+        ;
 
         $this->dependencies
-            ->shouldReceive('l');
+            ->shouldReceive('l')
+        ;
 
         $this->constant
             ->shouldReceive('get')
-            ->andReturn('constant');
+            ->andReturn('constant')
+        ;
 
         $this->apiCall();
     }
 
     public function apiCall()
     {
-        $this->paymentApi = Mockery::mock('alias:'.Payment::class);
+        $this->paymentApi = Mockery::mock('alias:' . Payment::class);
     }
 }

@@ -46,6 +46,7 @@ class AddressMock
         $address->date_add = '2021-01-01 00:00:00';
         $address->date_upd = '2021-01-01 00:00:00';
         $address->id = 1;
+
         return $address;
     }
 
@@ -54,6 +55,7 @@ class AddressMock
         $deliveryAddress = self::get();
         $deliveryAddress->alias = 'Adresse de livraison';
         $deliveryAddress->id = 2;
+
         return $deliveryAddress;
     }
 
@@ -62,6 +64,7 @@ class AddressMock
         $invoiceAddress = self::get();
         $invoiceAddress->alias = 'Adresse de facturation';
         $invoiceAddress->id = 3;
+
         return $invoiceAddress;
     }
 }

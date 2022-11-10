@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -30,8 +29,8 @@ function upgrade_module_3_3_0($object)
     $flag = true;
 
     // Create new table to qualify order state
-    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name.'_order_state` (
-                `id_'.$object->name.'_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_order_state` (
+                `id_' . $object->name . '_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 `id_order_state` INT(11) UNSIGNED NOT NULL,
                 `type` VARCHAR(64) NOT NULL,
                 `date_add` DATETIME NULL,
@@ -62,14 +61,14 @@ function upgrade_module_3_3_0($object)
         $payplug_order_states_sql[] = '
             INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` 
             (`id_order_state`, `type`, `date_add`, `date_upd`) 
-            VALUES ('.$id_order_state.', "' . $type . '", "' . $date . '", "' . $date . '")';
+            VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
 
         // update sandbox status
         $id_order_state = Configuration::get('PAYPLUG_ORDER_STATE_' . Tools::strtoupper($key) . '_TEST');
         $payplug_order_states_sql[] = '
             INSERT INTO `' . _DB_PREFIX_ . $object->name . '_order_state` 
             (`id_order_state`, `type`, `date_add`, `date_upd`) 
-            VALUES ('.$id_order_state.', "' . $type . '", "' . $date . '", "' . $date . '")';
+            VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
     }
 
     if ($payplug_order_states_sql) {
@@ -89,7 +88,5 @@ function upgrade_module_3_3_0($object)
     $flag = $flag && $object->registerHook('actionObjectOrderStateDeleteAfter');
 
     // plug module on the hook displayAdminStatusesForm
-    $flag = $flag && $object->registerHook('displayAdminStatusesForm');
-
-    return $flag;
+    return $flag && $object->registerHook('displayAdminStatusesForm');
 }

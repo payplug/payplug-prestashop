@@ -33,6 +33,9 @@ use PayPlug\tests\mock\CartMock;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class InsertPaymentTableTest extends BasePaymentRepository
 {
@@ -52,7 +55,7 @@ final class InsertPaymentTableTest extends BasePaymentRepository
             'paymentMethod' => 'standard',
             'paymentUrl' => 'payment_return_url',
             'paymentReturnUrl' => 'payment_return_url',
-            'cart' => CartMock::get()
+            'cart' => CartMock::get(),
         ];
     }
 
@@ -64,7 +67,7 @@ final class InsertPaymentTableTest extends BasePaymentRepository
     public function invalidDataProvider()
     {
         yield [null, 'paymentDetails: null'];
-        yield [[(string)'I am a string!'], 'paymentDetails: ["I am a string!"]'];
+        yield [[(string) 'I am a string!'], 'paymentDetails: ["I am a string!"]'];
         yield [['paymentId' => null], 'paymentDetails: {"paymentId":null}'];
     }
 
@@ -72,15 +75,17 @@ final class InsertPaymentTableTest extends BasePaymentRepository
      * Test methods with nulled $paiementDetails
      *
      * @dataProvider invalidDataProvider
-     * @param array $parameter
+     *
+     * @param array  $parameter
      * @param string $logMessage
      */
     public function testMethodWithInvalidData($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->insertPaymentTable($parameter),
@@ -94,8 +99,9 @@ final class InsertPaymentTableTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'getHashedCart' => ['result' => false],
-                'returnPaymentError' => $error
-            ]);
+                'returnPaymentError' => $error,
+            ])
+        ;
 
         $this->assertSame(
             $error,
@@ -109,12 +115,14 @@ final class InsertPaymentTableTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'getHashedCart' => ['result' => true],
-                'returnPaymentError' => $error
-            ]);
+                'returnPaymentError' => $error,
+            ])
+        ;
         $this->repo
             ->shouldReceive([
-                                'getPayment' => false,
-                            ]);
+                'getPayment' => false,
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
@@ -122,7 +130,8 @@ final class InsertPaymentTableTest extends BasePaymentRepository
                 'into' => $this->query,
                 'fields' => $this->query,
                 'values' => $this->query,
-            ]);
+            ])
+        ;
 
         $this->query
             ->shouldReceive('build')
@@ -141,12 +150,14 @@ final class InsertPaymentTableTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'getHashedCart' => ['result' => true],
-                'returnPaymentError' => $error
-            ]);
+                'returnPaymentError' => $error,
+            ])
+        ;
         $this->repo
             ->shouldReceive([
-                                'getPayment' => false,
-                            ]);
+                'getPayment' => false,
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
@@ -155,7 +166,8 @@ final class InsertPaymentTableTest extends BasePaymentRepository
                 'fields' => $this->query,
                 'values' => $this->query,
                 'build' => false,
-            ]);
+            ])
+        ;
 
         $this->assertSame(
             $error,
@@ -167,12 +179,14 @@ final class InsertPaymentTableTest extends BasePaymentRepository
     {
         $this->repo
             ->shouldReceive([
-                'getHashedCart' => ['result' => true]
-            ]);
+                'getHashedCart' => ['result' => true],
+            ])
+        ;
         $this->repo
             ->shouldReceive([
-                                'getPayment' => false,
-                            ]);
+                'getPayment' => false,
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
@@ -181,13 +195,14 @@ final class InsertPaymentTableTest extends BasePaymentRepository
                 'fields' => $this->query,
                 'values' => $this->query,
                 'build' => true,
-            ]);
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => true,
                 'paymentDetails' => $this->paymentDetails,
-                'response' => 'Insert data in DB successfully'
+                'response' => 'Insert data in DB successfully',
             ],
             $this->repo->insertPaymentTable($this->paymentDetails)
         );

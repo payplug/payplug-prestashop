@@ -32,6 +32,15 @@ class PayPlugDependencies
     /** @var ApiClass */
     public $apiClass;
 
+    /** @var OneyRepository */
+    public $oney;
+
+    /** @var object */
+    public $dependencies;
+
+    /** @var object */
+    public $payment;
+
     /** @var ConfigClass */
     private $configClass;
 
@@ -44,21 +53,17 @@ class PayPlugDependencies
     /** @var MyLogPHP */
     private $mylogphp;
 
-    /** @var OneyRepository */
-    public $oney;
-
-    /** @var object */
-    public $dependencies;
-
-    /** @var object */
-    public $payment;
-
     /** @var PluginEntity */
     private $plugin;
 
     public function __construct()
     {
         $this->initializeAccessors();
+    }
+
+    public function getDependency($dependency)
+    {
+        return $this->{$dependency};
     }
 
     private function initializeAccessors()
@@ -73,10 +78,5 @@ class PayPlugDependencies
         $this->hookClass = $this->dependencies->hookClass;
         $this->configClass = $this->dependencies->configClass;
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . $this->dependencies->name . '/log/install-log.csv');
-    }
-
-    public function getDependency($dependency)
-    {
-        return $this->$dependency;
     }
 }

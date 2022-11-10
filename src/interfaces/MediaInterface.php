@@ -26,5 +26,6 @@ namespace PayPlug\src\interfaces;
 interface MediaInterface
 {
     public function addJsDef($files);
+
     public function getJsDef();
 }

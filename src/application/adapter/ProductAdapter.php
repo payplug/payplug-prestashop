@@ -35,6 +35,12 @@ class ProductAdapter implements ProductInterface
         }
     }
 
+    /**
+     * @deprecated since 1.6.1.X Use getIdProductAttributeByIdAttributes() instead
+     *
+     * @param mixed $idProduct
+     * @param mixed $group
+     */
     public function getIdProductAttributesByIdAttributes($idProduct, $group)
     {
         return Product::getIdProductAttributesByIdAttributes($idProduct, $group);

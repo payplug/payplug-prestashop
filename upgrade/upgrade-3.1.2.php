@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -46,17 +45,16 @@ function upgrade_module_3_1_2($object)
     if ($exists) {
         $sql_payplug_card = [
             'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` 
-                CHANGE `id_'.$object->name.'_card` `position` INT(11) UNSIGNED NOT NULL',
+                CHANGE `id_' . $object->name . '_card` `position` INT(11) UNSIGNED NOT NULL',
             'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` DROP PRIMARY KEY',
             'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` DROP `position`',
             'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_card` 
-                ADD `id_'.$object->name.'_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
-                ADD PRIMARY KEY (`id_'.$object->name.'_card`)',
+                ADD `id_' . $object->name . '_card` INT(11) NOT NULL AUTO_INCREMENT FIRST, 
+                ADD PRIMARY KEY (`id_' . $object->name . '_card`)',
         ];
 
         $sql_requests = array_merge($sql_requests, $sql_payplug_card);
     }
-
 
     try {
         foreach ($sql_requests as $sql_request) {

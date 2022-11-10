@@ -30,6 +30,9 @@ namespace PayPlug\tests\repositories\CardRepository;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class DeleteCardsTest extends BaseCardRepository
 {
@@ -47,7 +50,7 @@ final class DeleteCardsTest extends BaseCardRepository
             'exp_year' => 2023,
             'exp_month' => 03,
             'brand' => 'Visa',
-            'id_payplug_card' => 2
+            'id_payplug_card' => 2,
         ]];
     }
 
@@ -60,6 +63,8 @@ final class DeleteCardsTest extends BaseCardRepository
 
     /**
      * @dataProvider invalidDataProvider
+     *
+     * @param mixed $id_customer
      */
     public function testWithInvalidParams($id_customer)
     {
@@ -70,7 +75,8 @@ final class DeleteCardsTest extends BaseCardRepository
     {
         $this->repo
             ->shouldReceive('getByCustomer')
-            ->andReturn([]);
+            ->andReturn([])
+        ;
 
         $this->assertTrue($this->repo->deleteCards($this->id_customer));
     }
@@ -80,8 +86,9 @@ final class DeleteCardsTest extends BaseCardRepository
         $this->repo
             ->shouldReceive([
                 'getByCustomer' => $this->cards,
-                'deleteCard' => false
-            ]);
+                'deleteCard' => false,
+            ])
+        ;
 
         $this->assertFalse($this->repo->deleteCards($this->id_customer));
     }
@@ -91,8 +98,9 @@ final class DeleteCardsTest extends BaseCardRepository
         $this->repo
             ->shouldReceive([
                 'getByCustomer' => $this->cards,
-                'deleteCard' => true
-            ]);
+                'deleteCard' => true,
+            ])
+        ;
 
         $this->assertTrue($this->repo->deleteCards($this->id_customer));
     }

@@ -26,5 +26,6 @@ namespace PayPlug\src\interfaces;
 interface ContextInterface
 {
     public function get();
+
     public function getContext();
 }

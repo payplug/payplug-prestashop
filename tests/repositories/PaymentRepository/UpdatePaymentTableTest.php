@@ -33,6 +33,9 @@ use PayPlug\tests\mock\CartMock;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class UpdatePaymentTableTest extends BasePaymentRepository
 {
@@ -50,7 +53,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
             'paymentReturnUrl' => 'htt://www.monsite.com',
             'authorizedAt' => '2021-01-01 00:00:00',
             'isPaid' => true,
-            'cartId' => 1
+            'cartId' => 1,
         ];
     }
 
@@ -62,7 +65,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
     public function invalidDataProvider()
     {
         yield [null, 'paymentDetails: null'];
-        yield [[(string)'I am a string!'], 'paymentDetails: ["I am a string!"]'];
+        yield [[(string) 'I am a string!'], 'paymentDetails: ["I am a string!"]'];
         yield [['cart' => null], 'paymentDetails: {"cart":null}'];
     }
 
@@ -70,15 +73,17 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
      * Test methods with nulled $paiementDetails
      *
      * @dataProvider invalidDataProvider
-     * @param array $parameter
+     *
+     * @param array  $parameter
      * @param string $logMessage
      */
     public function testMethodWithInvalidData($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->updatePaymentTable($parameter),
@@ -90,7 +95,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
     {
         $expected_error = [
             ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            '[updatePaymentTable] Unable to fetch the query on DB. Error: Build method throw exception'
+            '[updatePaymentTable] Unable to fetch the query on DB. Error: Build method throw exception',
         ];
 
         $this->query
@@ -98,18 +103,21 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
                 'update' => $this->query,
                 'table' => $this->query,
                 'set' => $this->query,
-                'where' => $this->query
-            ]);
+                'where' => $this->query,
+            ])
+        ;
 
         $this->query
             ->shouldReceive('build')
-            ->andThrow('Exception', 'Build method throw exception', 500);
+            ->andThrow('Exception', 'Build method throw exception', 500)
+        ;
 
         $this->repo
             ->shouldReceive([
                 'returnPaymentError' => $expected_error,
-                'getHashedCart' => 'b0a30e26e83b2a'
-            ]);
+                'getHashedCart' => 'b0a30e26e83b2a',
+            ])
+        ;
 
         $this->assertSame(
             $expected_error,
@@ -121,7 +129,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
     {
         $expected_error = [
             ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            '[updatePaymentTable] Unable to fetch the query on DB but no throw'
+            '[updatePaymentTable] Unable to fetch the query on DB but no throw',
         ];
 
         $this->query
@@ -130,14 +138,16 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
                 'table' => $this->query,
                 'set' => $this->query,
                 'where' => $this->query,
-                'build' => false
-            ]);
+                'build' => false,
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
                 'returnPaymentError' => $expected_error,
-                'getHashedCart' => 'b0a30e26e83b2a'
-            ]);
+                'getHashedCart' => 'b0a30e26e83b2a',
+            ])
+        ;
 
         $this->assertSame(
             $expected_error,
@@ -154,18 +164,20 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
                 'set' => $this->query,
                 'where' => $this->query,
                 'build' => true,
-            ]);
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
-                'getHashedCart' => 'b0a30e26e83b2a'
-            ]);
+                'getHashedCart' => 'b0a30e26e83b2a',
+            ])
+        ;
 
         $this->assertSame(
             [
                 'result' => true,
                 'paymentDetails' => $this->paymentDetails,
-                'response' => 'Update DB with new payment creation successfully'
+                'response' => 'Update DB with new payment creation successfully',
             ],
             $this->repo->updatePaymentTable($this->paymentDetails)
         );
@@ -181,7 +193,7 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
                 'table' => $this->query,
                 'set' => $this->query,
                 'where' => $this->query,
-                'build' => true
+                'build' => true,
             ])
         ;
 

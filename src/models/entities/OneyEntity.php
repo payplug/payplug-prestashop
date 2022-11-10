@@ -31,9 +31,11 @@ class OneyEntity
     private $operations;
 
     /**
+     * @param mixed $oneyXtimes
+     *
      * @return array
      */
-    public function getOperations($oneyXtimes=false)
+    public function getOperations($oneyXtimes = false)
     {
         // exclude oney Xtimes  in the checkout only for Belgium clients
         if ($oneyXtimes) {
@@ -44,13 +46,16 @@ class OneyEntity
                 }
             }
         }
+
         return $this->operations;
     }
 
     /**
      * @param array $operations
-     * @return self
+     *
      * @throws BadParameterException
+     *
+     * @return self
      */
     public function setOperations($operations)
     {
@@ -59,6 +64,7 @@ class OneyEntity
         }
 
         $this->operations = $operations;
+
         return $this;
     }
 }

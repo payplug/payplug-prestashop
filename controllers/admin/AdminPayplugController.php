@@ -20,8 +20,7 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
-require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
+require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
 use PayPlug\classes\DependenciesClass;
 
@@ -42,8 +41,6 @@ class AdminPayplugController extends ModuleAdminController
 
     /**
      * Initialize the content by adding Boostrap and loading the TPL
-     *
-     * @return void
      */
     public function initContent()
     {
@@ -59,20 +56,20 @@ class AdminPayplugController extends ModuleAdminController
         $this->dependencies->configClass->assignContentVar();
 
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addJS($views_path . '/js/admin-v'.$this->dependencies->version.'.js');
-        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
-        $this->context->controller->addCSS($views_path . '/css/admin-v'.$this->dependencies->version.'.css');
-        $this->context->controller->addJS($views_path . '/js/components-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addJS($views_path . '/js/admin-v' . $this->dependencies->version . '.js');
+        $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
+        $this->context->controller->addCSS($views_path . '/css/admin-v' . $this->dependencies->version . '.css');
+        $this->context->controller->addJS($views_path . '/js/components-v' . $this->dependencies->version . '.js');
 
         $this->context->smarty->assign([
-            'module_name' => $this->dependencies->name
+            'module_name' => $this->dependencies->name,
         ]);
 
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
-            $content =  $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->dependencies->name.'/views/templates/admin/admin.tpl');
+            $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/admin.tpl');
 
             $this->context->smarty->assign([
-                'content' => $this->content . $content
+                'content' => $this->content . $content,
             ]);
         } else {
             $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');

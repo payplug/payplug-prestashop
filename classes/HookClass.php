@@ -224,8 +224,8 @@ class HookClass
         $id_order_states = $this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
         $payplug_order_states = \explode(',', $id_order_states);
 
-        if (empty($payplug_order_states) ||
-            !\in_array($params['lang']->iso_code, $this->dependencies->configClass->payplugLanguages)) {
+        if (empty($payplug_order_states)
+            || !\in_array($params['lang']->iso_code, $this->dependencies->configClass->payplugLanguages)) {
             return true;
         }
 
@@ -248,7 +248,7 @@ class HookClass
                         $ps_order_state_name .= ' [PayPlug]';
                     }
 
-                    $ps_order_state = $this->orderStateAdapter->get((int)$this->config->get(
+                    $ps_order_state = $this->orderStateAdapter->get((int) $this->config->get(
                         $this->dependencies->concatenateModuleNameTo($payplug_conf)
                     ));
                     $ps_order_state->name[$params['lang']->id] = $ps_order_state_name;
@@ -264,6 +264,7 @@ class HookClass
      * @description retrocompatibility of hookDisplayAdminOrderMain for version before 1.7.7.0
      *
      * @param $params
+     *
      * @return false|string|void
      */
     public function adminOrder($params)
@@ -338,12 +339,12 @@ class HookClass
         $amount_refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
 
         $inst_id = null;
-        $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCart((int)$order->id_cart);
+        $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCart((int) $order->id_cart);
         $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
 
         // Backward if order validated before
         if (!$payment_id) {
-            $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCartBackward((int)$order->id_cart);
+            $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCartBackward((int) $order->id_cart);
         }
 
         if ($payment_id && \strpos($payment_id, 'inst') !== false) {
@@ -549,12 +550,12 @@ class HookClass
                 'oney_x4_without_fees',
             ];
 
-            $is_oney = isset($payment->payment_method)
-                && isset($payment->payment_method['type'])
+            $is_oney = isset($payment->payment_method, $payment->payment_method['type'])
+
                 && \in_array($payment->payment_method['type'], $oney_payment_method);
 
-            $is_bancontact = isset($payment->payment_method)
-                && isset($payment->payment_method['type'])
+            $is_bancontact = isset($payment->payment_method, $payment->payment_method['type'])
+
                 && $payment->payment_method['type'] == 'bancontact';
 
             // Update order state if is pending
@@ -608,7 +609,7 @@ class HookClass
             $current_state = (int) $order->getCurrentState();
 
             if ((int) $payment->is_paid == 0) {
-                if (isset($payment->failure) && isset($payment->failure->message)) {
+                if (isset($payment->failure, $payment->failure->message)) {
                     $pay_error = '(' . $payment->failure->message . ')';
                 } else {
                     $pay_error = '';
@@ -713,7 +714,7 @@ class HookClass
             }
         }
 
-        $currency = $this->currency->getCurrency($id_currency);
+        $currency = $this->currency->get((int) $id_currency);
         if (!$this->validate->validate('isLoadedObject', $currency)) {
             return false;
         }
@@ -797,15 +798,20 @@ class HookClass
 
     public function actionAdminControllerSetMedia()
     {
-        if ($this->dispatcher->getInstance()->getController() == 'AdminOrders' && $this->tools->tool('getValue', 'id_order')) {
-            $order = $this->order->get($this->tools->tool('getValue', 'id_order'));
+        $controller = $this->dispatcher->getInstance()->getController();
+        if ($controller
+            && 'adminorders' == strtolower($controller)
+            && $this->tools->tool('getValue', 'id_order')
+        ) {
+            $id_order = $this->tools->tool('getValue', 'id_order');
+            $order = $this->order->get((int) $id_order);
 
             if ($order->module == $this->dependencies->name) {
                 $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
                 $this->dependencies->mediaClass->setMedia([
-                    $module_url . 'views/css/admin_order-v'.$this->dependencies->version.'.css',
-                    $module_url . 'views/js/admin_order-v'.$this->dependencies->version.'.js',
-                    $module_url . 'views/js/utilities-v'.$this->dependencies->version.'.js',
+                    $module_url . 'views/css/admin_order-v' . $this->dependencies->version . '.css',
+                    $module_url . 'views/js/admin_order-v' . $this->dependencies->version . '.js',
+                    $module_url . 'views/js/utilities-v' . $this->dependencies->version . '.js',
                 ]);
             }
         }
@@ -822,7 +828,7 @@ class HookClass
                 'js_def' => $this->media->getJsDef(),
             ]);
 
-            return$this->dependencies->configClass->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
+            return $this->dependencies->configClass->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
         }
     }
 
@@ -835,8 +841,8 @@ class HookClass
      */
     public function displayBeforeShoppingCartBlock($params)
     {
-        if (!$this->oney->isOneyAllowed() ||
-            (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
+        if (!$this->oney->isOneyAllowed()
+            || (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
             $this->config->get(
                 $this->dependencies->getConfigurationKey('companyIso')
             )) {
@@ -864,8 +870,8 @@ class HookClass
      */
     public function displayExpressCheckout()
     {
-        if (!$this->oney->isOneyAllowed() ||
-            (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
+        if (!$this->oney->isOneyAllowed()
+            || (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
             $this->config->get($this->dependencies->getConfigurationKey('companyIso'))
         ) {
             return false;
@@ -883,7 +889,7 @@ class HookClass
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
 
-        return$this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
+        return $this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -1023,7 +1029,7 @@ class HookClass
                 'applePayPaymentRequestAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypaymentrequest', [], true),
                 'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
                 'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
-                'applePayIdCart' => $this->context->cart->id
+                'applePayIdCart' => $this->context->cart->id,
             ]);
         }
 
@@ -1112,7 +1118,7 @@ class HookClass
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
 
-        return$this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
+        return $this->dependencies->configClass->fetchTemplate('oney/cta.tpl');
     }
 
     /**
@@ -1142,7 +1148,7 @@ class HookClass
 
         $cart = $params['cart'];
 
-        $result_currency = $this->currency->getCurrency($cart->id_currency);
+        $result_currency = $this->currency->get((int) $cart->id_currency);
         $supported_currencies = \explode(';', $this->config->get(
             $this->dependencies->getConfigurationKey('currencies')
         ));
@@ -1175,7 +1181,7 @@ class HookClass
             'price2display' => $price2display,
         ]);
 
-        return$this->dependencies->configClass->fetchTemplate('checkout/payment/display.tpl');
+        return $this->dependencies->configClass->fetchTemplate('checkout/payment/display.tpl');
     }
 
     /**
@@ -1253,6 +1259,6 @@ class HookClass
         }
         $this->assign->assign($context);
 
-        return$this->dependencies->configClass->fetchTemplate('checkout/order-confirmation.tpl');
+        return $this->dependencies->configClass->fetchTemplate('checkout/order-confirmation.tpl');
     }
 }

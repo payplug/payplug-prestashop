@@ -48,19 +48,13 @@ class PPPayment
     {
         $payment = $this->dependencies->apiClass->retrievePayment($id);
         if (!$payment['result']) {
-            $data = [
+            return [
                 'result' => false,
                 'response' => $payment['message'],
             ];
-            return $data;
         }
 
         return $payment['resource'];
-    }
-
-    private function populateFromPayment($payment)
-    {
-        $this->resource = $payment;
     }
 
     public function capture()
@@ -75,13 +69,19 @@ class PPPayment
 
     public function isDeferred()
     {
-        return ($this->resource->authorization !== null);
+        return $this->resource->authorization !== null;
     }
 
     public function refresh()
     {
         $payment = $this->retrieve($this->resource->id);
         $this->populateFromPayment($payment);
+
         return $this;
+    }
+
+    private function populateFromPayment($payment)
+    {
+        $this->resource = $payment;
     }
 }

@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\OrderSlipInterface;
 use OrderSlip;
+use PayPlug\src\interfaces\OrderSlipInterface;
 
 class OrderSlipAdapter implements OrderSlipInterface
 {
@@ -32,6 +32,7 @@ class OrderSlipAdapter implements OrderSlipInterface
     {
         return new OrderSlip($idOrderSlip);
     }
+
     public function getOrdersSlip($idCustomer, $idOrder = false)
     {
         return OrderSlip::getOrdersSlip($idCustomer, $idOrder);

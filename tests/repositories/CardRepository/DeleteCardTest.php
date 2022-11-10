@@ -32,6 +32,9 @@ use PayPlug\tests\mock\PayPlugCardMock;
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class DeleteCardTest extends BaseCardRepository
 {
@@ -50,17 +53,18 @@ final class DeleteCardTest extends BaseCardRepository
         yield [null, 42];
         yield [false, 42];
         yield ['I am a string!', 42];
-        yield [['key'=>'value'], 42];
+        yield [['key' => 'value'], 42];
 
         // invalid int $id_payplug_card
         yield [42, null];
         yield [42, false];
         yield [42, 'I am a string!'];
-        yield [42, ['key'=>'value']];
+        yield [42, ['key' => 'value']];
     }
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $id_customer
      * @param $id_payplug_card
      */
@@ -73,8 +77,9 @@ final class DeleteCardTest extends BaseCardRepository
     {
         $this->repo
             ->shouldReceive([
-                'getCard' => false
-            ]);
+                'getCard' => false,
+            ])
+        ;
 
         $this->assertFalse($this->repo->deleteCard(
             $this->payplug_card['id_customer'],
@@ -89,7 +94,8 @@ final class DeleteCardTest extends BaseCardRepository
                 'getCard' => $this->payplug_card,
                 'isValidExpiration' => true,
                 'deleteCardFromAPI' => false,
-            ]);
+            ])
+        ;
 
         $this->assertFalse($this->repo->deleteCard(
             $this->payplug_card['id_customer'],
@@ -104,18 +110,21 @@ final class DeleteCardTest extends BaseCardRepository
                 'getCard' => $this->payplug_card,
                 'isValidExpiration' => true,
                 'deleteCardFromAPI' => true,
-            ]);
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
                 'delete' => $this->query,
                 'from' => $this->query,
-                'where' => $this->query
-            ]);
+                'where' => $this->query,
+            ])
+        ;
 
         $this->query
             ->shouldReceive('build')
-            ->andThrow('Exception', 'Build method throw exception', 500);
+            ->andThrow('Exception', 'Build method throw exception', 500)
+        ;
 
         $this->assertFalse($this->repo->deleteCard(
             $this->payplug_card['id_customer'],
@@ -130,15 +139,17 @@ final class DeleteCardTest extends BaseCardRepository
                 'getCard' => $this->payplug_card,
                 'isValidExpiration' => true,
                 'deleteCardFromAPI' => true,
-            ]);
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
                 'delete' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => false
-            ]);
+                'build' => false,
+            ])
+        ;
 
         $this->assertFalse($this->repo->deleteCard(
             $this->payplug_card['id_customer'],
@@ -153,15 +164,17 @@ final class DeleteCardTest extends BaseCardRepository
                 'getCard' => $this->payplug_card,
                 'isValidExpiration' => true,
                 'deleteCardFromAPI' => true,
-            ]);
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
                 'delete' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => true
-            ]);
+                'build' => true,
+            ])
+        ;
 
         $this->assertTrue($this->repo->deleteCard(
             $this->payplug_card['id_customer'],
@@ -175,15 +188,17 @@ final class DeleteCardTest extends BaseCardRepository
             ->shouldReceive([
                 'getCard' => $this->payplug_card,
                 'isValidExpiration' => false,
-            ]);
+            ])
+        ;
 
         $this->query
             ->shouldReceive([
                 'delete' => $this->query,
                 'from' => $this->query,
                 'where' => $this->query,
-                'build' => true
-            ]);
+                'build' => true,
+            ])
+        ;
 
         $this->assertTrue($this->repo->deleteCard(
             $this->payplug_card['id_customer'],

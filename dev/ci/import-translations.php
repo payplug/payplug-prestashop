@@ -6,7 +6,7 @@ global $_MODULE;
 $_MODULE = array();
 ';
 
-$configuration = json_decode(file_get_contents(dirname(__FILE__)."/../../composer.json"));
+$configuration = json_decode(file_get_contents(dirname(__FILE__) . '/../../composer.json'));
 $moduleName = $configuration->moduleName;
 
 $available_languages = ['fr', 'en', 'gb', 'it', 'es'];
@@ -14,7 +14,7 @@ $language_index = [];
 $translations = [];
 
 // Hydrate $translations from CSV file
-$path = dirname(dirname(__FILE__)) . '/dist/' . $moduleName .'/translations.csv';
+$path = dirname(dirname(__FILE__)) . '/dist/' . $moduleName . '/translations.csv';
 
 if (file_exists($path)) {
     if ($csvfile = fopen($path, 'r')) {
@@ -37,7 +37,7 @@ if (file_exists($path)) {
                     }
                 }
             }
-            $count++;
+            ++$count;
         }
         fclose($csvfile);
     }
@@ -58,7 +58,7 @@ if (!empty($translations)) {
     foreach ($translations as $translation_key => $translation) {
         foreach ($translation as $lang => $value) {
             if (in_array($lang, $available_languages) && $value) {
-                $value = str_replace("’", "'", $value);
+                $value = str_replace('’', "'", $value);
                 $t = addcslashes($value, "'");
                 if ($t && $t != '') {
                     $row = '$_MODULE[\'' . $translation_key . '\'] = \'' . $t . '\';' . PHP_EOL;

@@ -24,14 +24,15 @@
 
 namespace PayPlug\tests\repositories\CardRepository;
 
-use PayPlug\tests\mock\PaymentMock;
-
 /**
  * @group unit
  * @group repository
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class IsValidExpirationTest extends BaseCardRepository
 {
@@ -41,13 +42,13 @@ final class IsValidExpirationTest extends BaseCardRepository
         yield [null, 42];
         yield [false, 42];
         yield ['I am a string!', 42];
-        yield [['key'=>'value'], 42];
+        yield [['key' => 'value'], 42];
 
         // invalid int $year
         yield [42, null];
         yield [42, false];
         yield [42, 'I am a string!'];
-        yield [42, ['key'=>'value']];
+        yield [42, ['key' => 'value']];
 
         // invalid year $year
         yield [1, 30];
@@ -60,6 +61,7 @@ final class IsValidExpirationTest extends BaseCardRepository
 
     /**
      * @dataProvider invalidDataProvider
+     *
      * @param $month
      * @param $year
      */
@@ -77,6 +79,7 @@ final class IsValidExpirationTest extends BaseCardRepository
 
     /**
      * @dataProvider validDataProvider
+     *
      * @param $month
      * @param $year
      */

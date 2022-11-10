@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\DispatcherInterface;
 use Dispatcher;
+use PayPlug\src\interfaces\DispatcherInterface;
 
 class DispatcherAdapter implements DispatcherInterface
 {

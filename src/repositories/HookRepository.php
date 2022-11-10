@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\classes\MediaClass;
-use Media;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class HookRepository extends BaseClass
@@ -47,18 +45,21 @@ class HookRepository extends BaseClass
     /**
      * @description This is a hook function that allows
      * creating a new type of the order state
+     *
      * @param $param
      */
     public function actionObjectOrderStateAddAfter($param)
     {
         $order_state = $param['object'];
         $type = $this->tools->tool('getValue', 'order_state_type');
-        return $this->dependencies->getPlugin()->getOrderState()->saveType((int)$order_state->id, $type);
+
+        return $this->dependencies->getPlugin()->getOrderState()->saveType((int) $order_state->id, $type);
     }
 
     /**
      * @description This is a hook function that allows
      * to update the type of the order state
+     *
      * @param $param
      */
     public function actionObjectOrderStateUpdateAfter($param)
@@ -67,25 +68,30 @@ class HookRepository extends BaseClass
         if (isset($order_state->deleted) && $order_state->deleted) {
             return $this->actionObjectOrderStateDeleteAfter($param);
         }
+
         return $this->actionObjectOrderStateAddAfter($param);
     }
 
     /**
      * @description This is a hook function that deletes
      * an order state
+     *
      * @param $param
      */
     public function actionObjectOrderStateDeleteAfter($param)
     {
         $order_state = $param['object'];
-        return $this->dependencies->getPlugin()->getOrderState()->deleteType((int)$order_state->id);
+
+        return $this->dependencies->getPlugin()->getOrderState()->deleteType((int) $order_state->id);
     }
 
     /**
      * @description This hook is used to display
      * a select box in the order state page (BO)
      * in order to create/update a type
+     *
      * @param $param
+     *
      * @return mixed
      */
     public function displayAdminStatusesForm()
@@ -102,14 +108,14 @@ class HookRepository extends BaseClass
         ];
 
         $id_order_state = $this->tools->tool('getValue', 'id_order_state');
-        $current_order_state_type = $this->dependencies->getPlugin()->getOrderState()->getType((int)$id_order_state);
+        $current_order_state_type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $id_order_state);
         $payplug_order_state_url = 'https://support.payplug.com/hc/'
             . $this->context->getContext()->language->iso_code
             . '/articles/4406805105298';
         $this->context->getContext()->smarty->assign([
             'payplug_order_state_url' => $payplug_order_state_url,
             'current_order_state_type' => $current_order_state_type,
-            'order_state_types' => $types
+            'order_state_types' => $types,
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('order_state/type.tpl');
@@ -124,6 +130,6 @@ class HookRepository extends BaseClass
             return false;
         }
 
-        return $this->$method($params);
+        return $this->{$method}($params);
     }
 }

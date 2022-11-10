@@ -23,27 +23,23 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Configuration;
 use Language;
-use PayPlug\classes\ConfigClass;
+use Media;
 use PayPlug\classes\DependenciesClass;
-use PayPlug\classes\MyLogPHP;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\Dotenv\Dotenv;
-use Media;
 use Tab;
 use Tools;
 use Validate;
 
 class PrestashopAdapter17
 {
+    public $payplug;
     private $config;
     private $constant;
     private $context;
     private $dependencies;
     private $oney;
-
-    public $payplug;
 
     public function __construct()
     {
@@ -59,29 +55,29 @@ class PrestashopAdapter17
     public function displayHeader()
     {
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addCSS($views_path . '/css/front-v'.$this->dependencies->version.'.css');
-        $this->context->controller->addJS($views_path . '/js/utilities-v'.$this->dependencies->version.'.js');
-        $this->context->controller->addJS($views_path . '/js/front-v'.$this->dependencies->version.'.js');
+        $this->context->controller->addCSS($views_path . '/css/front-v' . $this->dependencies->version . '.css');
+        $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
+        $this->context->controller->addJS($views_path . '/js/front-v' . $this->dependencies->version . '.js');
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')
-            && (bool)$this->config->get($this->dependencies->getConfigurationKey('applepay')) === true) {
+            && (bool) $this->config->get($this->dependencies->getConfigurationKey('applepay')) === true) {
             Media::addJsDef(
                 [
                     $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
-                        array(
-                            $this->dependencies->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopadapter17')
-                        )
-                    )
+                        [
+                            $this->dependencies->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopadapter17'),
+                        ]
+                    ),
                 ]
             );
 
-            $this->context->controller->addJS($views_path . 'js/applepay-v'.$this->dependencies->version.'.js');
+            $this->context->controller->addJS($views_path . 'js/applepay-v' . $this->dependencies->version . '.js');
         }
     }
 
     public function displayPaymentOption($payment_options)
     {
         if ($this->dependencies->configClass->isValidFeature('feature_integrated')
-            && (string)$this->config->get(
+            && (string) $this->config->get(
                 $this->dependencies->getConfigurationKey('embeddedMode')
             ) == 'integrated'
             && $this->dependencies->configClass->isValidFeature('feature_standard')
@@ -94,14 +90,15 @@ class PrestashopAdapter17
             $payment_method = $payment_option['name'];
             $paymentOption = new PaymentOption();
             if (isset($payment_option['expiry_date_card'])) {
-                $payment_option['callToActionText'] .= ' - '. $payment_option['expiry_date_card'];
+                $payment_option['callToActionText'] .= ' - ' . $payment_option['expiry_date_card'];
             }
 
             $paymentOption
                 ->setLogo($payment_option['logo'])
                 ->setCallToActionText($payment_option['callToActionText'])
                 ->setModuleName($payment_option['moduleName'])
-                ->setInputs($payment_option['inputs']);
+                ->setInputs($payment_option['inputs'])
+            ;
 
             // No action for Apple Pay payments
             if (array_key_exists('action', $payment_option)) {
@@ -142,13 +139,15 @@ class PrestashopAdapter17
     /**
      * @description  creation payment option
      * for integreated payment
+     *
      * @param $payment_options
+     *
      * @return mixed
      */
     public function setIntegratedPaymentOption($payment_options)
     {
         $dotenv = new Dotenv();
-        $dotenvFile = dirname(__FILE__, 4) . "/payplugroutes/.env";
+        $dotenvFile = dirname(__FILE__, 4) . '/payplugroutes/.env';
         if (file_exists($dotenvFile)) {
             $dotenv->load($dotenvFile);
             $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
@@ -171,10 +170,10 @@ class PrestashopAdapter17
         $integrated['extra_classes'] = 'payplug integrated';
         $this->context->smarty->assign([
             'integrated_payment_js_url' => $integrated_payment_js_url,
-            'is_one_click_activated' => (bool)$this->config->get(
+            'is_one_click_activated' => (bool) $this->config->get(
                 $this->dependencies->getConfigurationKey('oneClick')
             ),
-            'is_deferred_activated' => (bool)$this->config->get(
+            'is_deferred_activated' => (bool) $this->config->get(
                 $this->dependencies->getConfigurationKey('deferred')
             ),
             'placeholderCardholder' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
@@ -187,9 +186,9 @@ class PrestashopAdapter17
             $this->dependencies->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
 
         $payment_options['standard'] = $integrated;
+
         return $payment_options;
     }
-
 
     // todo: set Tab install process in a adapter
     public function installTab()
@@ -206,7 +205,7 @@ class PrestashopAdapter17
 
                 if (isset($adminController['name'])) {
                     foreach (Language::getLanguages(false) as $language) {
-                        $id_lang = (int)$language['id_lang'];
+                        $id_lang = (int) $language['id_lang'];
                         $iso_code = Tools::strtolower($language['iso_code']);
                         if (isset($adminController['name'][$iso_code])) {
                             $tab->name[$id_lang] = $adminController['name'][$iso_code];
@@ -258,17 +257,17 @@ class PrestashopAdapter17
      * @description Link to order by order state
      *
      * @param int $order_state
+     *
      * @return string
      */
     public function getOrdersByStateLink($order_state)
     {
-        $link = $this->context->link->getAdminLink(
+        return $this->context->link->getAdminLink(
             'AdminOrders',
             true,
             [],
             ['order[filters][osname]' => $order_state]
         );
-        return $link;
     }
 
     public function assignSwitchConfiguration($configurations)
@@ -382,7 +381,7 @@ class PrestashopAdapter17
         ];
 
         $this->context->smarty->assign([
-            'payplug_switch' => $switch
+            'payplug_switch' => $switch,
         ]);
     }
 
@@ -391,6 +390,7 @@ class PrestashopAdapter17
      *
      * @param $plaintextPasswd
      * @param int $size
+     *
      * @return bool
      */
     public function isPlaintextPassword($plaintextPasswd, $size = 5)

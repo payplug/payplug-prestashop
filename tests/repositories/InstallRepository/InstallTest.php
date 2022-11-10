@@ -24,8 +24,6 @@
 
 namespace PayPlug\tests\repositories\InstallRepository;
 
-use Mockery\Mock;
-
 /**
  * @group unit
  * @group repository
@@ -33,6 +31,9 @@ use Mockery\Mock;
  * @group install_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class InstallTest extends BaseInstallRepository
 {
@@ -44,7 +45,8 @@ final class InstallTest extends BaseInstallRepository
             ->shouldReceive('setInstallError')
             ->andReturnUsing(function ($string) {
                 return $string;
-            });
+            })
+        ;
     }
 
     public function testWithInvalidPHPRequirement()
@@ -67,8 +69,9 @@ final class InstallTest extends BaseInstallRepository
                         'installed' => false,
                         'up2date' => false,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->assertSame(
             'Install failed: PHP Requirement.',
@@ -90,8 +93,9 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => false,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->assertSame(
             'Install failed: cURL Requirement.',
@@ -113,8 +117,9 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => false,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->assertSame(
             'Install failed: OpenSSL Requirement.',
@@ -136,13 +141,15 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
-                'setConfig' => false
-            ]);
+                'setConfig' => false,
+            ])
+        ;
 
         $this->assertSame(
             'Install failed:setConfig()',
@@ -164,18 +171,21 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
-                'setConfig' => true
-            ]);
+                'setConfig' => true,
+            ])
+        ;
 
         $this->sql
             ->shouldReceive([
-                'installSQL' => false
-            ]);
+                'installSQL' => false,
+            ])
+        ;
 
         $this->assertSame(
             'Install failed: Install SQL tables.',
@@ -197,19 +207,22 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->repo
-        ->shouldReceive([
-            'setConfig' => true,
-            'createOrderStates' => false
-        ]);
+            ->shouldReceive([
+                'setConfig' => true,
+                'createOrderStates' => false,
+            ])
+        ;
 
         $this->sql
             ->shouldReceive([
-                'installSQL' => true
-            ]);
+                'installSQL' => true,
+            ])
+        ;
 
         $this->assertSame(
             'Install failed: Create order states.',
@@ -231,20 +244,23 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
                 'setConfig' => true,
                 'createOrderStates' => true,
-                'createOrderStatesType' => false
-            ]);
+                'createOrderStatesType' => false,
+            ])
+        ;
 
         $this->sql
             ->shouldReceive([
-                'installSQL' => true
-            ]);
+                'installSQL' => true,
+            ])
+        ;
 
         $this->assertSame(
             'Install failed: Create order states type.',
@@ -266,29 +282,34 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
                 'setConfig' => true,
                 'createOrderStates' => true,
-                'createOrderStatesType' => true
-            ]);
+                'createOrderStatesType' => true,
+            ])
+        ;
 
         $this->sql
             ->shouldReceive([
-                'installSQL' => true
-            ]);
+                'installSQL' => true,
+            ])
+        ;
 
         $adapter = \Mockery::mock();
         $this->dependencies
             ->shouldReceive('loadAdapterPresta')
-            ->andReturn($adapter);
+            ->andReturn($adapter)
+        ;
         $adapter
             ->shouldReceive([
-                'installTab' => false
-            ]);
+                'installTab' => false,
+            ])
+        ;
 
         $this->assertSame(
             'Install failed: Install Tab',
@@ -310,29 +331,34 @@ final class InstallTest extends BaseInstallRepository
                     'openssl' => [
                         'up2date' => true,
                     ],
-                ]
-            ]);
+                ],
+            ])
+        ;
 
         $this->repo
             ->shouldReceive([
                 'setConfig' => true,
                 'createOrderStates' => true,
-                'createOrderStatesType' => true
-            ]);
+                'createOrderStatesType' => true,
+            ])
+        ;
 
         $this->sql
             ->shouldReceive([
-                'installSQL' => true
-            ]);
+                'installSQL' => true,
+            ])
+        ;
 
         $adapter = \Mockery::mock();
         $this->dependencies
             ->shouldReceive('loadAdapterPresta')
-            ->andReturn($adapter);
+            ->andReturn($adapter)
+        ;
         $adapter
             ->shouldReceive([
-                'installTab' => true
-            ]);
+                'installTab' => true,
+            ])
+        ;
 
         $this->assertSame(
             true,

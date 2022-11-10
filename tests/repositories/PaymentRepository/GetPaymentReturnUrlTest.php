@@ -33,6 +33,9 @@ use PayPlug\tests\mock\CartMock;
  * @group payment_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetPaymentReturnUrlTest extends BasePaymentRepository
 {
@@ -44,8 +47,8 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
         $cart = CartMock::get();
         $cart->date_add = $cart->date_upd = null;
-        $cart->id_address_delivery = (string)$cart->id_address_delivery;
-        $cart->id_address_invoice = (string)$cart->id_address_invoice;
+        $cart->id_address_delivery = (string) $cart->id_address_delivery;
+        $cart->id_address_invoice = (string) $cart->id_address_invoice;
 
         $this->paymentDetails = [
             'cartId' => $cart->id,
@@ -58,7 +61,6 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
             'paymentReturnUrl' => 'payment_return_url',
             'paymentUrl' => 'payment_return_url',
             'isIntegrated' => false,
-
         ];
     }
 
@@ -81,7 +83,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
                 'embedded' => true,
                 'redirect' => true,
                 'return_url' => 'payment_return_url',
-            ]
+            ],
         ];
         yield [
             'oney',
@@ -90,7 +92,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
                 'embedded' => false,
                 'redirect' => true,
                 'return_url' => 'payment_return_url',
-            ]
+            ],
         ];
         yield [
             'standard',
@@ -99,7 +101,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
                 'embedded' => false,
                 'redirect' => true,
                 'return_url' => 'payment_return_url',
-            ]
+            ],
         ];
         yield [
             'installment',
@@ -108,7 +110,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
                 'embedded' => false,
                 'redirect' => true,
                 'return_url' => 'payment_return_url',
-            ]
+            ],
         ];
     }
 
@@ -122,13 +124,17 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     /**
      * @dataProvider invalidPaymentDetailDataProvider
+     *
+     * @param mixed $parameter
+     * @param mixed $logMessage
      */
     public function testMethodWithEmptyParams($parameter, $logMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $logMessage
-            ]);
+                'returnPaymentError' => $logMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->getpaymentReturnUrl($parameter),
@@ -138,13 +144,17 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     /**
      * @dataProvider validPaymentMethodDataProvider
+     *
+     * @param mixed $paymentMethod
+     * @param mixed $paymentReturnUrl
      */
     public function testMethodWithValidData($paymentMethod, $paymentReturnUrl)
     {
         $this->repo
             ->shouldReceive([
-                'checkPaymentTable' => ['key' => 'value']
-            ]);
+                'checkPaymentTable' => ['key' => 'value'],
+            ])
+        ;
 
         $this->paymentDetails['paymentMethod'] = $paymentMethod;
 
@@ -152,7 +162,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
             [
                 'result' => true,
                 'url' => $paymentReturnUrl,
-                'response' => 'Return URL successfully generated'
+                'response' => 'Return URL successfully generated',
             ],
             $this->repo->getPaymentReturnUrl($this->paymentDetails)
         );
@@ -165,8 +175,9 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'checkPaymentTable' => false,
-                'returnPaymentError' => $errorMessage
-            ]);
+                'returnPaymentError' => $errorMessage,
+            ])
+        ;
 
         $this->assertSame(
             $errorMessage,
@@ -176,6 +187,8 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     /**
      * @dataProvider invalidPaymentMethodDataProvider
+     *
+     * @param mixed $paymentMethod
      */
     public function testMethodWithInvalidPaymentMethod($paymentMethod)
     {
@@ -183,8 +196,9 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'checkPaymentTable' => ['key' => 'value'],
-                'returnPaymentError' => $errorMessage
-            ]);
+                'returnPaymentError' => $errorMessage,
+            ])
+        ;
 
         $this->paymentDetails['paymentMethod'] = $paymentMethod;
 

@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\OneyRepository;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetOneyCountryTest extends BaseOneyRepository
 {

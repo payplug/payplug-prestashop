@@ -20,7 +20,6 @@
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -40,11 +39,10 @@ function upgrade_module_2_19_0($object)
     Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG');
     Configuration::deleteByName('PAYPLUG_ORDER_STATE_INST_PG_TEST');
 
-
     //sql
     $req_payplug_installment = '
-        CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.$object->name.'_installment` (
-            `id_'.$object->name.'_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_installment` (
+            `id_' . $object->name . '_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `id_installment` VARCHAR(255) NOT NULL,
             `id_payment` VARCHAR(255) NULL,
             `id_order` INT(11) UNSIGNED NOT NULL,
@@ -54,7 +52,8 @@ function upgrade_module_2_19_0($object)
             `amount` INT(11) UNSIGNED NOT NULL,
             `status` INT(11) UNSIGNED NOT NULL,
             `scheduled_date` DATETIME NOT NULL
-        ) ENGINE='._MYSQL_ENGINE_;
+        ) ENGINE=' . _MYSQL_ENGINE_;
+
     try {
         $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
         if (!$res_payplug_installment) {

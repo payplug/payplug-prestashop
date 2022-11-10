@@ -19,10 +19,7 @@
  * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
- */
-/**
- * Check if prestashop Context.
- */
+ */ // Check if prestashop Context.
 if (!\defined('_PS_VERSION_')) {
     exit;
 }
@@ -32,10 +29,10 @@ require_once \dirname(__FILE__) . '/vendor/autoload.php';
 class PsPaylater extends PaymentModule
 {
     public $payplug_dependencies;
-    private $container;
 
     /** @var array */
     public $adminControllers;
+    private $container;
 
     /**
      * Constructor.
@@ -64,13 +61,13 @@ class PsPaylater extends PaymentModule
 
         $this->module = false;
         $this->controllers = [
-            'AdminPsPayLater'
+            'AdminPsPayLater',
         ];
         $this->adminControllers = [
             [
                 'className' => 'AdminPsPayLater',
-                'parent' => -1
-            ]
+                'parent' => -1,
+            ],
         ];
 
         if ($this->isValidPHPVersion()) {
@@ -109,44 +106,11 @@ class PsPaylater extends PaymentModule
     }
 
     /**
-     * @description Get the module hook list from current Prestashop version
-     */
-    private function getHookList()
-    {
-        return [
-            'actionAdminControllerSetMedia',
-            'actionAdminLanguagesControllerSaveAfter',
-            'actionAdminPerformanceControllerAfter',
-            'actionCarrierUpdate',
-            'actionClearCompileCache',
-            'actionDeleteGDPRCustomer',
-            'actionExportGDPRData',
-            'actionObjectCarrierAddAfter',
-            'actionOrderStatusUpdate',
-            'actionObjectOrderStateAddAfter',
-            'actionObjectOrderStateUpdateAfter',
-            'actionObjectOrderStateDeleteAfter',
-            'actionUpdateLangAfter',
-            'adminOrder',
-            'displayAdminOrderMain',
-            'displayBackOfficeFooter',
-            'displayBeforeShoppingCartBlock',
-            'displayExpressCheckout',
-            'displayProductPriceBlock',
-            'displayAdminStatusesForm',
-            'header',
-            'moduleRoutes',
-            'paymentReturn',
-            'paymentOptions',
-            'registerGDPRConsent',
-        ];
-    }
-
-    /**
      * @param bool $force_all
-     * @return bool
-     * @see Module::disable()
      *
+     * @return bool
+     *
+     * @see Module::disable()
      */
     public function disable($force_all = false)
     {
@@ -514,11 +478,6 @@ class PsPaylater extends PaymentModule
         $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
     }
 
-    private function setModule()
-    {
-        $this->module = $this->payplug_dependencies->dependencies;
-    }
-
     /**
      * @description Uninstall plugin
      *
@@ -533,5 +492,44 @@ class PsPaylater extends PaymentModule
         }
 
         return parent::uninstall();
+    }
+
+    /**
+     * @description Get the module hook list from current Prestashop version
+     */
+    private function getHookList()
+    {
+        return [
+            'actionAdminControllerSetMedia',
+            'actionAdminLanguagesControllerSaveAfter',
+            'actionAdminPerformanceControllerAfter',
+            'actionCarrierUpdate',
+            'actionClearCompileCache',
+            'actionDeleteGDPRCustomer',
+            'actionExportGDPRData',
+            'actionObjectCarrierAddAfter',
+            'actionOrderStatusUpdate',
+            'actionObjectOrderStateAddAfter',
+            'actionObjectOrderStateUpdateAfter',
+            'actionObjectOrderStateDeleteAfter',
+            'actionUpdateLangAfter',
+            'adminOrder',
+            'displayAdminOrderMain',
+            'displayBackOfficeFooter',
+            'displayBeforeShoppingCartBlock',
+            'displayExpressCheckout',
+            'displayProductPriceBlock',
+            'displayAdminStatusesForm',
+            'header',
+            'moduleRoutes',
+            'paymentReturn',
+            'paymentOptions',
+            'registerGDPRConsent',
+        ];
+    }
+
+    private function setModule()
+    {
+        $this->module = $this->payplug_dependencies->dependencies;
     }
 }

@@ -24,8 +24,8 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CarrierMock;
+use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\ContextMock;
 
 /**
@@ -35,6 +35,9 @@ use PayPlug\tests\mock\ContextMock;
  * @group oney_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class GetOneyPaymentContextTest extends BaseOneyRepository
 {
@@ -44,16 +47,18 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
 
         $this->context
             ->shouldReceive('getContext')
-            ->andReturn(ContextMock::get());
+            ->andReturn(ContextMock::get())
+        ;
         $this->carrier->shouldReceive([
             'get' => CarrierMock::get(),
             'getDefaultDelay' => 0,
-            'getDefaultDeliveryType' => 'storepickup'
+            'getDefaultDeliveryType' => 'storepickup',
         ]);
 
         $this->config->shouldReceive('get')
             ->with('PS_SHOP_NAME')
-            ->andReturn('Payplug');
+            ->andReturn('Payplug')
+        ;
 
         $this->dependencies
             ->shouldReceive('convertAmount')
@@ -61,8 +66,10 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
                 if ($cent) {
                     return round($amount / 100, 2);
                 }
-                return (int)$amount * 100;
-            });
+
+                return (int) $amount * 100;
+            })
+        ;
     }
 
     public function testGetContext()
@@ -70,14 +77,14 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
         $this->cart->shouldReceive([
             'get' => CartMock::get(),
             'getProducts' => [CartMock::getProducts()[0]],
-            'isVirtualCart' => false
+            'isVirtualCart' => false,
         ]);
 
         $this->assertSame(
             [
                 'cart' => [
                     [
-                        'merchant_item_id' => 1,
+                        'merchant_item_id' => '1',
                         'name' => 'Pull imprimé colibri - Size : S',
                         'price' => 3446,
                         'quantity' => 1,
@@ -86,8 +93,8 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
                         'delivery_label' => 'Carrier name',
                         'expected_delivery_date' => date('Y-m-d'),
                         'delivery_type' => 'storepickup',
-                    ]
-                ]
+                    ],
+                ],
             ],
             $this->repo->getOneyPaymentContext()
         );
@@ -98,12 +105,12 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
         $this->cart->shouldReceive([
             'get' => CartMock::get(),
             'getProducts' => [],
-            'isVirtualCart' => false
+            'isVirtualCart' => false,
         ]);
 
         $this->assertSame(
             [
-                'cart' => []
+                'cart' => [],
             ],
             $this->repo->getOneyPaymentContext()
         );
@@ -114,11 +121,11 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
         $this->cart->shouldReceive([
             'get' => null,
             'getProducts' => [],
-            'isVirtualCart' => false
+            'isVirtualCart' => false,
         ]);
         $this->assertSame(
             [
-                'cart' => []
+                'cart' => [],
             ],
             $this->repo->getOneyPaymentContext()
         );
@@ -129,14 +136,14 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
         $this->cart->shouldReceive([
             'get' => CartMock::get(),
             'getProducts' => [CartMock::getProducts()[4]],
-            'isVirtualCart' => false
+            'isVirtualCart' => false,
         ]);
 
         $this->assertSame(
             [
                 'cart' => [
                     [
-                        'merchant_item_id' => 5,
+                        'merchant_item_id' => '5',
                         'name' => 'Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun
                 Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours brun Coussin ours 
                 brun Coussin ours brun C',
@@ -149,8 +156,8 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
                         'delivery_label' => 'Carrier name',
                         'expected_delivery_date' => date('Y-m-d'),
                         'delivery_type' => 'storepickup',
-                    ]
-                ]
+                    ],
+                ],
             ],
             $this->repo->getOneyPaymentContext()
         );

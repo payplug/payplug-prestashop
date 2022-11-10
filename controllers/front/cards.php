@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
-
 class PayplugCardsModuleFrontController extends ModuleFrontController
 {
     private $card;
@@ -33,8 +32,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->auth = true;
         parent::__construct();
 
-
-        include_once(_PS_MODULE_DIR_.'payplug/classes/DependenciesClass.php');
+        include_once _PS_MODULE_DIR_ . 'payplug/classes/DependenciesClass.php';
 
         $this->dependencies = new \PayPlug\classes\DependenciesClass();
 
@@ -42,7 +40,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->card = $this->plugin->getCard();
         $this->contextAdapter = $this->plugin->getContext();
 
-        include_once(_PS_MODULE_DIR_.'payplug/payplug.php');
+        include_once _PS_MODULE_DIR_ . 'payplug/payplug.php';
     }
 
     /**
@@ -62,12 +60,12 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
     {
         \Payplug\Payplug::init([
             'secretKey' => $this->dependencies->apiClass->current_api_key,
-            'apiVersion' => $this->plugin->getApiVersion()
+            'apiVersion' => $this->plugin->getApiVersion(),
         ]);
 
         $customer = $this->contextAdapter->getContext()->customer;
-        $payplug_cards = $this->card->getByCustomer((int)$customer->id);
-        $payplug_delete_card_url  = $this->contextAdapter->getContext()->link->getModuleLink(
+        $payplug_cards = $this->card->getByCustomer((int) $customer->id);
+        $payplug_delete_card_url = $this->contextAdapter->getContext()->link->getModuleLink(
             'payplug',
             'ajax',
             ['_ajax' => 1],
@@ -87,7 +85,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $card_deleted_msg = $this->dependencies->mediaClass->displayMessages([$msg], true, false);
         Media::addJsDef(
             [
-                $this->dependencies->name . '_delete_card_url' => $payplug_delete_card_url
+                $this->dependencies->name . '_delete_card_url' => $payplug_delete_card_url,
             ]
         );
 
@@ -100,7 +98,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             Media::addJsDef(
                 [
                     'card_confirm_deleted_msg' => $popup_confirm_delete_message,
-                    'card_deleted_msg' => $card_deleted_msg
+                    'card_deleted_msg' => $card_deleted_msg,
                 ]
             );
 

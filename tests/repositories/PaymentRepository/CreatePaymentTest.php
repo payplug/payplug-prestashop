@@ -34,6 +34,9 @@ use PayPlug\tests\mock\PaymentMock;
  * @group create_payment
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class CreatePaymentTest extends BasePaymentRepository
 {
@@ -132,15 +135,19 @@ final class CreatePaymentTest extends BasePaymentRepository
 
     /**
      * @dataProvider paymentDetailsParameters
-     * @param array $parameter
+     *
+     * @param array  $parameter
      * @param string $logMessage
+     * @param mixed  $parameters
+     * @param mixed  $returnMessage
      */
     public function testMethodWithWrongParameters($parameters, $returnMessage)
     {
         $this->repo
             ->shouldReceive([
-                'returnPaymentError' => $returnMessage
-            ]);
+                'returnPaymentError' => $returnMessage,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->createPayment($parameters),
@@ -152,15 +159,16 @@ final class CreatePaymentTest extends BasePaymentRepository
     {
         $this->config
             ->shouldReceive([
-                'get' => false
-            ]);
+                'get' => false,
+            ])
+        ;
 
         $this->assertSame(
             $this->repo->createPayment($this->paymentDetails),
             [
                 'result' => false,
                 'Configuration::get' => 'false',
-                'response' => '[createPayment] Try to create standard payment with PAYPLUG_STANDARD disabled'
+                'response' => '[createPayment] Try to create standard payment with PAYPLUG_STANDARD disabled',
             ]
         );
     }
@@ -169,34 +177,35 @@ final class CreatePaymentTest extends BasePaymentRepository
     {
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->repo->shouldReceive([
             'checkPaymentTable' => [
                 'id_payment' => 'pay_123456789',
                 'payment_method' => 'standard',
-            ]
+            ],
         ]);
 
         $this->dependencies->apiClass->shouldReceive([
             'retrievePayment' => [
                 'code' => 200,
                 'result' => true,
-                'resource' => PaymentMock::getStandard()
+                'resource' => PaymentMock::getStandard(),
             ],
             'abortPayment' => [
                 'code' => 500,
                 'result' => false,
-                'message' => 'Payment cannot be aborted'
-            ]
+                'message' => 'Payment cannot be aborted',
+            ],
         ]);
 
         $this->assertSame(
             [
                 'result' => false,
                 'paymentId' => json_encode('pay_123456789'),
-                'response' => '[createPayment] Exception. Unable to abort payment. Error: Payment cannot be aborted'
+                'response' => '[createPayment] Exception. Unable to abort payment. Error: Payment cannot be aborted',
             ],
             $this->repo->createPayment($this->paymentDetails)
         );
@@ -206,19 +215,20 @@ final class CreatePaymentTest extends BasePaymentRepository
     {
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->repo->shouldReceive([
-            'checkPaymentTable' => []
+            'checkPaymentTable' => [],
         ]);
 
         $this->dependencies->apiClass->shouldReceive([
             'createPayment' => [
                 'code' => 500,
                 'result' => false,
-                'message' => 'Payment cannot be created'
-            ]
+                'message' => 'Payment cannot be created',
+            ],
         ]);
 
         $this->truncatedPaymentDetails = array_diff_key($this->paymentDetails, array_flip(['paymentTab']));
@@ -227,7 +237,7 @@ final class CreatePaymentTest extends BasePaymentRepository
             [
                 'result' => false,
                 'paymentDetails' => json_encode($this->truncatedPaymentDetails),
-                'response' => '[createPayment] Exception. Unable to create payment. Error: Payment cannot be created'
+                'response' => '[createPayment] Exception. Unable to create payment. Error: Payment cannot be created',
             ],
             $this->repo->createPayment($this->paymentDetails)
         );
@@ -240,19 +250,20 @@ final class CreatePaymentTest extends BasePaymentRepository
 
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->repo->shouldReceive([
-            'checkPaymentTable' => []
+            'checkPaymentTable' => [],
         ]);
 
         $this->dependencies->apiClass->shouldReceive([
             'createInstallment' => [
                 'code' => 500,
                 'result' => false,
-                'message' => 'Installment plan cannot be created'
-            ]
+                'message' => 'Installment plan cannot be created',
+            ],
         ]);
 
         $this->truncatedPaymentDetails = array_diff_key($paymentDetails, array_flip(['paymentTab']));
@@ -261,7 +272,7 @@ final class CreatePaymentTest extends BasePaymentRepository
             [
                 'result' => false,
                 'paymentDetails' => json_encode($this->truncatedPaymentDetails),
-                'response' => '[createPayment] Exception. Unable to create installment plan. Error: Installment plan cannot be created'
+                'response' => '[createPayment] Exception. Unable to create installment plan. Error: Installment plan cannot be created',
             ],
             $this->repo->createPayment($paymentDetails)
         );
@@ -272,11 +283,12 @@ final class CreatePaymentTest extends BasePaymentRepository
     {
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->repo->shouldReceive([
-            'checkPaymentTable' => []
+            'checkPaymentTable' => [],
         ]);
 
         $payment = $this->payment;
@@ -286,15 +298,15 @@ final class CreatePaymentTest extends BasePaymentRepository
             'createPayment' => [
                 'code' => 200,
                 'result' => true,
-                'message' => $this->payment
-            ]
+                'message' => $this->payment,
+            ],
         ]);
 
         $this->assertSame(
             [
                 'result' => false,
                 'paymentDetails' => json_encode($this->paymentDetails),
-                'response' => '[createPayment] Exception. Unable to create installment plan. Error: Installment plan cannot be created'
+                'response' => '[createPayment] Exception. Unable to create installment plan. Error: Installment plan cannot be created',
             ],
             $this->repo->createPayment($this->paymentDetails)
         );
@@ -320,19 +332,20 @@ final class CreatePaymentTest extends BasePaymentRepository
 
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->repo->shouldReceive([
-            'checkPaymentTable' => []
+            'checkPaymentTable' => [],
         ]);
 
         $this->dependencies->apiClass->shouldReceive([
             'createPayment' => [
                 'code' => 200,
                 'result' => true,
-                'resource' => $paymentMock
-            ]
+                'resource' => $paymentMock,
+            ],
         ]);
 
         $this->truncatedPaymentDetails = array_diff_key($paymentDetails, array_flip(['paymentTab']));
@@ -343,7 +356,7 @@ final class CreatePaymentTest extends BasePaymentRepository
             [
                 'result' => false,
                 'paymentDetails' => json_encode($this->truncatedPaymentDetails),
-                'response' => "[createPayment] payment return URL is null.",
+                'response' => '[createPayment] payment return URL is null.',
             ]
         );
     }
@@ -360,19 +373,20 @@ final class CreatePaymentTest extends BasePaymentRepository
 
         $this->config
             ->shouldReceive([
-                'get' => true
-            ]);
+                'get' => true,
+            ])
+        ;
 
         $this->repo->shouldReceive([
-            'checkPaymentTable' => []
+            'checkPaymentTable' => [],
         ]);
 
         $this->dependencies->apiClass->shouldReceive([
             'createPayment' => [
                 'code' => 200,
                 'result' => true,
-                'resource' => $paymentMock
-            ]
+                'resource' => $paymentMock,
+            ],
         ]);
 
         $this->assertSame(
@@ -381,7 +395,7 @@ final class CreatePaymentTest extends BasePaymentRepository
                 'result' => true,
                 'paymentDetails' => $paymentDetails,
                 'resource' => $paymentMock,
-                'response' => "[createPayment] Payment successfully created",
+                'response' => '[createPayment] Payment successfully created',
             ]
         );
     }

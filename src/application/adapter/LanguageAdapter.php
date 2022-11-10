@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\application\adapter;
 
-use PayPlug\src\interfaces\LanguageInterface;
 use Language;
+use PayPlug\src\interfaces\LanguageInterface;
 
 class LanguageAdapter implements LanguageInterface
 {

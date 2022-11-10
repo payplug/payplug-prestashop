@@ -140,7 +140,7 @@ class OrderStateRepository extends BaseClass
             $id_order_state = $this->getOrderStateByConfiguration($state['cfg']);
             if ($id_order_state) {
                 // Valide order state
-                $os = $this->order_state_adapter->get((int)$id_order_state);
+                $os = $this->order_state_adapter->get((int) $id_order_state);
                 if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
                     return $this->configuration->updateValue($key_config, $os->id);
                 }
@@ -163,7 +163,7 @@ class OrderStateRepository extends BaseClass
         }
 
         // Check if order state is valid
-        $order_state = $this->order_state_adapter->get((int)$id_order_state);
+        $order_state = $this->order_state_adapter->get((int) $id_order_state);
         if (!$this->validate->validate('isLoadedObject', $order_state)
             || (isset($order_state->deleted) && $order_state->deleted)) {
             $id_order_state = $this->add($name, $state, $sandbox);
@@ -174,6 +174,7 @@ class OrderStateRepository extends BaseClass
 
     /**
      * @param int $id_order_state
+     *
      * @return bool
      */
     public function deleteType($id_order_state)
@@ -186,10 +187,11 @@ class OrderStateRepository extends BaseClass
         $this->query
             ->delete()
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->where('id_order_state = ' . (int)$id_order_state)
-            -> build();
+            ->where('id_order_state = ' . (int) $id_order_state)
+            ->build()
+        ;
 
-        return  true;
+        return true;
     }
 
     public static function factory()
@@ -201,32 +203,33 @@ class OrderStateRepository extends BaseClass
      * Find id_order_state by name
      *
      * @param array $name
-     * @param bool $test_mode
+     * @param bool  $test_mode
+     *
      * @return int OR bool
      */
     public function findByName($name, $test_mode = false)
     {
         if (!is_array($name) || empty($name)) {
             return false;
-        } else {
-            $this->query
-                ->select()
-                ->fields('DISTINCT osl.`id_order_state`')
-                ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
-                ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
-                ->where(
-                    'osl.`name` LIKE \'' . $this->query->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
+        }
+        $this->query
+            ->select()
+            ->fields('DISTINCT osl.`id_order_state`')
+            ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
+            ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
+            ->where(
+                'osl.`name` LIKE \'' . $this->query->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
                     OR osl.`name` LIKE \'' . $this->query->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
                     OR osl.`name` LIKE \'' . $this->query->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
                     OR osl.`name` LIKE \'' . $this->query->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
-                );
+            )
+        ;
 
-            if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
-                $this->query->where('os.`deleted` = 0');
-            }
-
-            return $this->query->build('unique_value');
+        if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
+            $this->query->where('os.`deleted` = 0');
         }
+
+        return $this->query->build('unique_value');
     }
 
     public function getConfigKey($name = false, $sandbox = false)
@@ -255,35 +258,35 @@ class OrderStateRepository extends BaseClass
             || !isset($definition['pdf_delivery'])
         ) {
             return false;
-        } else {
-            $this->query
-                ->select()
-                ->fields('os.id_order_state')
-                ->from(_DB_PREFIX_ . 'order_state', 'os')
-                ->leftJoin(
-                    _DB_PREFIX_ . 'order_state_lang',
-                    'osl',
-                    'osl.id_order_state = os.id_order_state 
-                     AND osl.template = \'' . pSQL($definition['template']) . '\''
-                )
-                ->where('os.invoice = ' . (int)$definition['invoice'])
-                ->where('os.send_email = ' . (int)$definition['send_email'])
-                ->where('os.hidden = ' . (int)$definition['hidden'])
-                ->where('os.logable = ' . (int)$definition['logable'])
-                ->where('os.delivery = ' . (int)$definition['delivery'])
-                ->where('os.shipped = ' . (int)$definition['shipped'])
-                ->where('os.paid = ' . (int)$definition['paid'])
-                ->where('os.pdf_invoice = ' . (int)$definition['pdf_invoice'])
-                ->where('os.pdf_delivery = ' . (int)$definition['pdf_delivery'])
-                ->limit(1, 1);
-
-            return (int)$this->query->build('unique_value');
         }
+        $this->query
+            ->select()
+            ->fields('os.id_order_state')
+            ->from(_DB_PREFIX_ . 'order_state', 'os')
+            ->leftJoin(
+                _DB_PREFIX_ . 'order_state_lang',
+                'osl',
+                'osl.id_order_state = os.id_order_state 
+                     AND osl.template = \'' . pSQL($definition['template']) . '\''
+            )
+            ->where('os.invoice = ' . (int) $definition['invoice'])
+            ->where('os.send_email = ' . (int) $definition['send_email'])
+            ->where('os.hidden = ' . (int) $definition['hidden'])
+            ->where('os.logable = ' . (int) $definition['logable'])
+            ->where('os.delivery = ' . (int) $definition['delivery'])
+            ->where('os.shipped = ' . (int) $definition['shipped'])
+            ->where('os.paid = ' . (int) $definition['paid'])
+            ->where('os.pdf_invoice = ' . (int) $definition['pdf_invoice'])
+            ->where('os.pdf_delivery = ' . (int) $definition['pdf_delivery'])
+            ->limit(1, 1)
+        ;
+
+        return (int) $this->query->build('unique_value');
     }
 
     public function getIdByKey($key)
     {
-        return (int)$this->configuration->get($key);
+        return (int) $this->configuration->get($key);
     }
 
     public function getIdByName($name)
@@ -293,7 +296,8 @@ class OrderStateRepository extends BaseClass
             ->fields('osl.id_order_state')
             ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
             ->where('osl.name = \'' . $this->query->escape($name) . '\'')
-            ->limit(1, 1);
+            ->limit(1, 1)
+        ;
 
         return $this->query->build('unique_value');
     }
@@ -306,10 +310,11 @@ class OrderStateRepository extends BaseClass
             ->fields('os.id_order_state')
             ->from(_DB_PREFIX_ . 'order_state', 'os')
             ->where('os.module_name = \'' . $this->query->escape($module_name) . '\'')
-            ->build();
+            ->build()
+        ;
 
         foreach ($res as $os) {
-            array_push($ids, (int)$os['id_order_state']);
+            array_push($ids, (int) $os['id_order_state']);
         }
 
         return $ids;
@@ -323,10 +328,11 @@ class OrderStateRepository extends BaseClass
             ->fields('c.value')
             ->from(_DB_PREFIX_ . 'configuration', 'c')
             ->where('c.name LIKE \'%PAYPLUG_ORDER_STATE_%\'')
-            ->build();
+            ->build()
+        ;
 
         foreach ($res as $os) {
-            array_push($ids, (int)$os['value']);
+            array_push($ids, (int) $os['value']);
         }
 
         return $ids;
@@ -352,21 +358,21 @@ class OrderStateRepository extends BaseClass
             ->fields('DISTINCT `id_order_state`')
             ->from($this->constant->get('_DB_PREFIX_') . 'order_state_lang')
             ->where('template = "' . $this->query->escape($template) . '"')
-            ->limit(1, 1);
+            ->limit(1, 1)
+        ;
 
         return $this->query->build('unique_value');
     }
 
     public function getType($id_order_state)
     {
-        $type = $this->query
+        return $this->query
             ->select()
             ->fields('type')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->where('id_order_state = ' . (int)$id_order_state)
-            ->build('unique_value');
-
-        return $type;
+            ->where('id_order_state = ' . (int) $id_order_state)
+            ->build('unique_value')
+        ;
     }
 
     public function isUsedByOrders($module_name)
@@ -378,11 +384,12 @@ class OrderStateRepository extends BaseClass
             ->from(_DB_PREFIX_ . 'orders', 'o')
             ->where('o.module = \'' . $this->query->escape($module_name) . '\'')
             ->groupBy('o.current_state')
-            ->build();
+            ->build()
+        ;
 
         foreach ($res as $os) {
             if ($os) {
-                array_push($ids, (int)$os['current_state']);
+                array_push($ids, (int) $os['current_state']);
             }
         }
 
@@ -401,6 +408,7 @@ class OrderStateRepository extends BaseClass
                 $deleted = $deleted && $os->softDelete();
             }
         }
+
         return $deleted;
     }
 
@@ -443,7 +451,8 @@ class OrderStateRepository extends BaseClass
             ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
             ->set('type = \'' . $this->query->escape($type) . '\'')
             ->set('date_upd = \'' . $this->query->escape($date) . '\'')
-            ->where('id_order_state = ' . (int)$id_order_state);
+            ->where('id_order_state = ' . (int) $id_order_state)
+        ;
 
         return $this->query->build();
     }

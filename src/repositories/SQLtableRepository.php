@@ -63,10 +63,12 @@ class SQLtableRepository
             ->fields('`date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
             ->fields('`date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
             ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_LOCK.');
+
             return false;
         }
 
@@ -85,10 +87,12 @@ class SQLtableRepository
             ->fields('`brand` varchar(255) DEFAULT NULL')
             ->fields('`country` varchar(3) NOT NULL')
             ->fields('`metadata` varchar(255) DEFAULT NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_CARD.');
+
             return false;
         }
 
@@ -102,10 +106,12 @@ class SQLtableRepository
             ->fields('`cart_hash` VARCHAR(64) NOT NULL')
             ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_PAYMENT_CART.');
+
             return false;
         }
 
@@ -130,6 +136,7 @@ class SQLtableRepository
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_PAYMENT.');
+
             return false;
         }
 
@@ -142,10 +149,12 @@ class SQLtableRepository
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_INSTALLMENT_CART.');
+
             return false;
         }
 
@@ -163,10 +172,12 @@ class SQLtableRepository
             ->fields('`amount` INT(11) UNSIGNED NOT NULL')
             ->fields('`status` INT(11) UNSIGNED NOT NULL')
             ->fields('`scheduled_date` DATETIME NOT NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_INSTALLMENT.');
+
             return false;
         }
 
@@ -179,10 +190,12 @@ class SQLtableRepository
             ->fields('`content` TEXT NOT NULL')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_LOGGER.');
+
             return false;
         }
 
@@ -195,10 +208,12 @@ class SQLtableRepository
             ->fields('`cache_value` TEXT NOT NULL')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_CACHE.');
+
             return false;
         }
 
@@ -209,10 +224,12 @@ class SQLtableRepository
             ->fields('`id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_order` INT(11) UNSIGNED NOT NULL')
             ->fields('`id_payment` VARCHAR(255) NOT NULL')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_ORDER_PAYMENT.');
+
             return false;
         }
 
@@ -226,14 +243,17 @@ class SQLtableRepository
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
             ->condition('CONSTRAINT order_state_unique UNIQUE (id_order_state)')
-            ->engine(_MYSQL_ENGINE_);
+            ->engine(_MYSQL_ENGINE_)
+        ;
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_ORDER_STATE.');
+
             return false;
         }
 
         $log->info('Installation SQL ended.');
+
         return true;
     }
 
@@ -241,6 +261,7 @@ class SQLtableRepository
      * Remove SQL tables used by module
      *
      * @param $keep_cards
+     *
      * @return bool
      */
     public function uninstallSQL($keep_cards = false)
@@ -271,13 +292,16 @@ class SQLtableRepository
         }
 
         $log->info('Uninstallation SQL ended.');
+
         return $flag;
     }
 
     /**
      * Check if existing table
-     * @param string $table
-     * @param int|bool $canUsePayplugLogger
+     *
+     * @param string   $table
+     * @param bool|int $canUsePayplugLogger
+     *
      * @return bool
      */
     public function checkExistingTable($table, $canUsePayplugLogger = 1)
@@ -306,7 +330,8 @@ class SQLtableRepository
 
         $this->query
             ->ifExists()
-            ->table($table);
+            ->table($table)
+        ;
         if (!$this->query->build()) {
             if ($log) {
                 $log->error('[SQLtableRepository] checkExistingTable() : '

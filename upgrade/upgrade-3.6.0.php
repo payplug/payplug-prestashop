@@ -20,7 +20,6 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PayPlug SAS
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -30,7 +29,7 @@ function upgrade_module_3_6_0()
     $flag = true;
 
     // update embedded configuration
-    $embedded_mode = (int)Configuration::get('PAYPLUG_EMBEDDED_MODE');
+    $embedded_mode = (int) Configuration::get('PAYPLUG_EMBEDDED_MODE');
     if ($embedded_mode) {
         $flag = $flag && Configuration::updateValue('PAYPLUG_EMBEDDED_MODE', 'popup');
     } else {
@@ -38,10 +37,8 @@ function upgrade_module_3_6_0()
     }
 
     // add  PAYPLUG_BANCONTACT to database
-    $flag = $flag && Configuration::updateValue(
+    return $flag && Configuration::updateValue(
         'PAYPLUG_BANCONTACT',
         null
     );
-
-    return $flag;
 }

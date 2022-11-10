@@ -31,6 +31,9 @@ namespace PayPlug\tests\repositories\CacheRepository;
  * @group cache_repository
  *
  * @runTestsInSeparateProcesses
+ *
+ * @internal
+ * @coversNothing
  */
 final class SetCacheKeyTest extends BaseCacheRepository
 {
@@ -43,13 +46,18 @@ final class SetCacheKeyTest extends BaseCacheRepository
 
     /**
      * @dataProvider invalidDataProvider
+     *
+     * @param mixed $amount
+     * @param mixed $country
+     * @param mixed $operations
+     * @param mixed $errorMsg
      */
     public function testWithInvalidDataProvider($amount, $country, $operations, $errorMsg)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'message' => $errorMsg
+                'message' => $errorMsg,
             ],
             $this->repo->setCacheKey($amount, $country, $operations)
         );
@@ -58,12 +66,12 @@ final class SetCacheKeyTest extends BaseCacheRepository
     public function testWithValidData()
     {
         $this->config->shouldReceive([
-            'get' => false
+            'get' => false,
         ]);
         $this->assertSame(
             [
                 'result' => 'Payplug::OneySimulations_15000_FR_operation_live',
-                'message' => 'success'
+                'message' => 'success',
             ],
             $this->repo->setCacheKey(15000, 'FR', ['operation'])
         );
