@@ -40,11 +40,9 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ->andReturn(false)
         ;
 
-        $this->logger
-            ->shouldReceive([
-                'setParams' => true,
-            ])
-        ;
+        $this->logger->shouldReceive([
+            'setProcess' => $this->logger,
+        ]);
 
         $this->simulations = OneySimulationsMock::get()[$this->operation];
     }

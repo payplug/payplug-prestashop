@@ -1526,7 +1526,7 @@ class ConfigClass
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->myLogPHP = new MyLogPHP();
 
-        $this->logger->setParams(['process' => 'payplug.php']);
+        $this->logger->setProcess('config');
     }
 
     /**

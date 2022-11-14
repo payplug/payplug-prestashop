@@ -6,16 +6,22 @@ use PayPlug\src\utilities\validators\oneyValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group unit
+ * @group validator
+ * @group oney_validator
+ *
+ * @runTestsInSeparateProcesses
+ *
  * @internal
  * @coversNothing
  */
-class isOneySettingsCtaAllowed extends TestCase
+class isOneySettingsCtaAllowedTest extends TestCase
 {
     protected $oneyValidator;
 
     protected function setUp()
     {
-        $this->oneyValidator = new OneyValidator();
+        $this->oneyValidator = new oneyValidator();
     }
 
     public function invalidOneyCountryFeatureDataProvider()

@@ -56,7 +56,7 @@ class PaymentRepository extends BaseClass
         $this->query = $query;
         $this->constant = $constant;
 
-        $this->logger->setParams(['process' => 'payment']);
+        $this->logger->setProcess('payment');
     }
 
     /**
@@ -197,7 +197,7 @@ class PaymentRepository extends BaseClass
             $this->dependencies->l('The transaction was not completed and your card was not charged.', 'paymentrepository'),
         ]);
 
-        $this->logger->setParams(['process' => 'paymentRepository']);
+        $this->logger->setProcess('payment');
         $this->logger->addLog($errorMessage, $level);
 
         if (!is_array($element) || empty($element)) {

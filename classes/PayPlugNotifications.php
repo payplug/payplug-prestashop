@@ -99,7 +99,7 @@ class PayPlugNotifications
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->logger->addLog('Notification: setLogger');
         $this->logger = $this->dependencies->getPlugin()->getLogger();
-        $this->logger->setParams(['process' => 'notification']);
+        $this->logger->setProcess('notification');
     }
 
     /**
@@ -182,7 +182,7 @@ class PayPlugNotifications
     private function exitProcess($str = '', $http_code = 200)
     {
         $this->logger->addLog('Notification: exitProcess');
-        if ($str) {
+        if (is_string($str) && $str) {
             $this->logger->addLog($str);
         }
         if ($this->lock_key) {

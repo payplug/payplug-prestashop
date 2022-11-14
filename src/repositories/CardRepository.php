@@ -60,7 +60,7 @@ class CardRepository extends BaseClass
         $idCompany = $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
         );
-        $this->logger->setParams(['process' => 'cardRepository']);
+        $this->logger->setProcess('card');
 
         $this->cardEntity
             ->setAllowedBrand(['mastercard', 'visa'])

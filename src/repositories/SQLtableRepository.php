@@ -311,7 +311,7 @@ class SQLtableRepository
 
         if ($canUsePayplugLogger) {
             $logger = new LoggerRepository($this->dependencies);
-            $logger->setParams(['process' => 'SQLtableRepository']);
+            $logger->setProcess('sql');
         }
 
         if (!$table || !is_string($table)) {

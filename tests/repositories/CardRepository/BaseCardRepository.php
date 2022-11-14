@@ -29,9 +29,9 @@ class BaseCardRepository extends RepositoryBase
             ->shouldReceive('get')
         ;
 
-        $this->logger
-            ->shouldReceive('setParams')
-        ;
+        $this->logger->shouldReceive([
+            'setProcess' => $this->logger,
+        ]);
 
         $this->repo = Mockery::mock(CardRepository::class, [
             $this->config,

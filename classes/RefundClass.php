@@ -114,7 +114,7 @@ class RefundClass
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
-        $this->logger->setParams(['process' => 'refundClass']);
+        $this->logger->setProcess('refund');
 
         $sandbox = $this->tools->tool('strtoupper', $pay_mode) == 'TEST';
         $this->dependencies->apiClass->initializeApi($sandbox);

@@ -98,7 +98,7 @@ class PayPlugValidation
     public function setLogger()
     {
         $this->logger = $this->plugin->getLogger();
-        $this->logger->setParams(['process' => 'validation']);
+        $this->logger->setProcess('validation');
         $this->logger->addLog('New validation');
     }
 
@@ -175,10 +175,9 @@ class PayPlugValidation
         $amount = 0;
         if (!$pay_id = $this->paymentClass->getPaymentByCart((int) $cart_id)) {
             if (!$inst_id = $this->installmentClass->getInstallmentByCart((int) $cart_id)) {
-                $this->logger->addLog($inst_id);
-                $this->logger->addLog('Payment is not stored or is already consumed.');
+                $this->logger->addLog('Payment is not stored or is already consumed : ' . $inst_id);
                 $id_order = $this->orderAdapter->getOrderByCartId((int) $cart->id);
-                $this->logger->addLog($id_order);
+                $this->logger->addLog('Id order form current cart: ' . $id_order);
                 $customer = $this->customerAdapter->get((int) $cart->id_customer);
                 $link_redirect = __PS_BASE_URI__ . $order_confirmation_url . 'id_cart=' . $cart->id
                     . '&id_module=' . $this->moduleInstance->id . '&id_order=' . $id_order
@@ -190,8 +189,7 @@ class PayPlugValidation
                 }
                 $this->toolsAdapter->tool('redirect', $link_redirect);
             } elseif ($inst_id = $this->installmentClass->getInstallmentByCart((int) $cart_id)) {
-                $this->logger->addLog($inst_id);
-                $this->logger->addLog('Installment is not consumed yet.');
+                $this->logger->addLog('Installment is not consumed yet: ' . $inst_id);
                 $amount = 0;
                 $pay_id = false;
                 $this->type = 'installment';
@@ -377,10 +375,9 @@ class PayPlugValidation
         $this->logger->addLog('Total : ' . $amount);
 
         $id_order = $this->orderAdapter->getOrderByCartId((int) $cart->id);
-        $this->logger->addLog($id_order);
 
         if ($id_order) {
-            $this->logger->addLog('Order already exists.');
+            $this->logger->addLog('Order already exists: ' . $id_order);
             if ($this->type == 'payment') {
                 $this->logger->addLog('Deleting stored payment.');
                 if ($this->paymentClass->isTransactionPending((int) $cart_id)) {

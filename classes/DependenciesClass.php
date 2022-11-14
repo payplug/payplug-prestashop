@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\utilities\validators\loggerValidator;
 use Tools;
 
 if (!defined('_PS_VERSION_')) {
@@ -468,6 +469,8 @@ class DependenciesClass
 
     private function setvalidators()
     {
-        $this->validators = [];
+        $this->validators = [
+            'logger' => new loggerValidator(),
+        ];
     }
 }
