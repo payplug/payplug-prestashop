@@ -327,12 +327,14 @@ class DependenciesClass
     public $refundClass;
 
     private $plugin;
+    private $validators;
 
     public function __construct()
     {
         $configuration = $this->getPluginConfiguration();
         $this->name = $configuration->moduleName;
         $this->version = $configuration->version;
+        $this->setvalidators();
         $this->initializeAccessors();
     }
 
@@ -457,5 +459,15 @@ class DependenciesClass
         }
 
         return json_decode($jsonContent);
+    }
+
+    public function getValidators()
+    {
+        return $this->validators;
+    }
+
+    private function setvalidators()
+    {
+        $this->validators = [];
     }
 }
