@@ -131,6 +131,80 @@ class PaymentMock
         return $defaultConfiguration;
     }
 
+    public static function getDeferred($parameters = [])
+    {
+        $defaultDeferred = [
+            'object' => 'installment_plan',
+            'id' => 'inst_1gDmrsoMdIAJfV2MxzkBPX',
+            'is_active' => true,
+            'is_fully_paid' => false,
+            'metadata' => [
+                'ID Cart' => 17,
+                'Website' => 'http://localhost',
+                'ID Client' => 4,
+            ],
+            'currency' => 'EUR',
+            'failure' => null,
+            'created_at' => 1614940725,
+            'hosted_payment' => [
+                'return_url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/validation?ps=1&cartid=17',
+                'cancel_url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/validation?ps=2&cartid=17',
+                'payment_url' => 'https://secure-qa.payplug.com/pay/3nfaejGO3m9dyHFIwfsUTR',
+            ],
+            'notification' => [
+                'url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/ipn',
+            ],
+            'authorization' => [
+                'authorized_amount' => 16658,
+                'authorized_at' => 1668699788,
+                'expires_at' => 1669248000,
+            ],
+            'is_live' => true,
+            'billing' => [
+                'title' => null,
+                'first_name' => 'Cedric',
+                'last_name' => 'PayPlug',
+                'address1' => '110 avenue de France',
+                'address2' => null,
+                'company_name' => 'Cedric PayPlug',
+                'postcode' => '75013',
+                'city' => 'Paris',
+                'state' => null,
+                'country' => 'FR',
+                'email' => 'ctouma@payplug.com',
+                'mobile_phone_number' => null,
+                'landline_phone_number' => '+33667899297',
+                'language' => 'fr',
+            ],
+            'shipping' => [
+                'title' => null,
+                'first_name' => 'Cedric',
+                'last_name' => 'PayPlug',
+                'address1' => '110 avenue de France',
+                'address2' => null,
+                'company_name' => 'Cedric PayPlug',
+                'postcode' => '75013',
+                'city' => 'Paris',
+                'state' => null,
+                'country' => 'FR',
+                'email' => 'ctouma@payplug.com',
+                'mobile_phone_number' => null,
+                'landline_phone_number' => '+33667899297',
+                'language' => 'fr',
+                'delivery_type' => 'BILLING',
+            ],
+        ];
+        if (!empty($parameters)) {
+            foreach ($parameters as $key => $value) {
+                $defaultDeferred[$key] = $value;
+            }
+        }
+
+        $resource = self::getDefault($defaultDeferred);
+
+        return Payment::fromAttributes($resource);
+    }
+
     public static function getInstallment($parameters = [])
     {
         $defaultInstallment = [

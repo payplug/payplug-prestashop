@@ -34,6 +34,7 @@ class RefundClass
     private $orderSlip;
     private $tools;
     private $validate;
+    private $validators;
 
     public function __construct($dependencies)
     {
@@ -46,6 +47,7 @@ class RefundClass
         $this->orderSlip = $this->dependencies->getPlugin()->getOrderSlip();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
     }
 
     /**
@@ -118,7 +120,7 @@ class RefundClass
 
         $sandbox = $this->tools->tool('strtoupper', $pay_mode) == 'TEST';
         $this->dependencies->apiClass->initializeApi($sandbox);
-
+        $response = [];
         if ($pay_id == null) {
             if ($inst_id) {
                 $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
@@ -170,19 +172,16 @@ class RefundClass
                         }
                     }
 
-                    if ($truly_refundable_amount < $total_amount) {
-                        return 'error';
-                    }
-
-                    if (!empty($refund_to_go)) {
+                    if ($this->validators['payment']->canBeRefund($pay_id, $refund_to_go, $truly_refundable_amount, $total_amount)['result']) {
                         foreach ($refund_to_go as $ref) {
                             $response = $this->dependencies->apiClass->refundPayment($ref['id'], $ref['data']);
                             if (!$response['result']) {
                                 return 'error';
                             }
                         }
+                    } else {
+                        return 'error';
                     }
-
                     $this->dependencies->installmentClass->updatePayplugInstallment($installment);
                 } else {
                     return 'error';
@@ -195,10 +194,11 @@ class RefundClass
                 'amount' => (int) $amount,
                 'metadata' => $metadata,
             ];
-
-            $response = $this->dependencies->apiClass->refundPayment($pay_id, $data);
-            if (!$response['result']) {
-                return 'error';
+            if ($this->validators['payment']->canBeRefund($pay_id, $data)['result']) {
+                $response = $this->dependencies->apiClass->refundPayment($pay_id, $data);
+                if (!$response['result']) {
+                    return 'error';
+                }
             }
         }
 

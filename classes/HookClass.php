@@ -1202,6 +1202,7 @@ class HookClass
         ]);
 
         // Données sous forme de tableau (pour 1.6 et 1.7)
+
         $payment_options = $this->dependencies->paymentClass->getPaymentOptions();
 
         // Transforme tableau en object
