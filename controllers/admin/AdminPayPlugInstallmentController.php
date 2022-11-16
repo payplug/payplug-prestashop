@@ -30,10 +30,13 @@ include_once _PS_MODULE_DIR_ . 'payplug/classes/DependenciesClass.php';
 class AdminPayPlugInstallmentController extends ModuleAdminController
 {
     private $dependencies;
+    private $orderClass;
 
     public function __construct()
     {
         $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->orderClass = $this->dependencies->orderClass;
+
         $this->bootstrap = true;
         $this->table = $this->dependencies->name . '_installment';
         $this->id = 'id_payplug_installment';
@@ -127,20 +130,11 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     public function viewPayplugInstallment()
     {
         $id_payplug_installment = (int) (Tools::getValue('id_payplug_installment'));
-        $id_order = $this->getOrderIdByPayplugInstallmentId($id_payplug_installment);
+        $id_order = $this->orderClass->getOrderIdByPayplugInstallmentId($id_payplug_installment);
         Tools::redirectAdmin(
             'index.php?tab=AdminOrders&id_order=' . $id_order . '&vieworder&token=' .
             Tools::getAdminTokenLite('AdminOrders')
         );
-    }
-
-    public function getOrderIdByPayplugInstallmentId($id_payplug_installment)
-    {
-        $sql = 'SELECT DISTINCT id_order
-                FROM `' . _DB_PREFIX_ . $this->table . '`
-                WHERE `id_' . $this->dependencies->name . '_installment` = ' . (int) $id_payplug_installment;
-
-        return Db::getInstance()->getValue($sql);
     }
 
     public function postProcess()

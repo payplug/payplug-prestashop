@@ -264,6 +264,7 @@ class PluginInit extends BaseClass
             $this->order_state,
             $this->order_state_entity,
             $this->order_state_adapter,
+            $this->query,
             $this->shop,
             $this->sql,
             $this->tools,

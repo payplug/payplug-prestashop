@@ -23,10 +23,10 @@
 
 namespace PayPlug\src\repositories;
 
-use PayPlug\src\application\dependencies\BaseClass;
-use PayPlug\src\exceptions\BadParameterException;
 use DateInterval;
 use DateTime;
+use PayPlug\src\application\dependencies\BaseClass;
+use PayPlug\src\exceptions\BadParameterException;
 
 class CacheRepository extends BaseClass
 {
