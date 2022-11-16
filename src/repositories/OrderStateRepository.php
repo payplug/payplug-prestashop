@@ -217,13 +217,10 @@ class OrderStateRepository extends BaseClass
             ->fields('DISTINCT osl.`id_order_state`')
             ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
             ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
-            ->where(
-                'osl.`name` LIKE \'' . $this->query->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . $this->query->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . $this->query->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . $this->query->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
-            )
-        ;
+            ->where('osl.`name` LIKE \'' . $this->query->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
+            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
+            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
+            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')));
 
         if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
             $this->query->where('os.`deleted` = 0');

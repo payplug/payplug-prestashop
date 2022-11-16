@@ -1241,7 +1241,7 @@ class OneyRepository extends BaseClass
         if ($this->validateAdapter->validate('isLoadedObject', $id_currency)) {
             $currency = $id_currency;
         } elseif (is_int($id_currency)) {
-            $currency = $this->currencyAdapter->get((int)$id_currency);
+            $currency = $this->currencyAdapter->get((int) $id_currency);
         } else {
             return false;
         }
@@ -1335,11 +1335,11 @@ class OneyRepository extends BaseClass
      */
     public function isValidOneyAddresses($id_shipping, $id_billing)
     {
-        $shipping = $this->addressAdapter->get((int)$id_shipping);
-        $shipping_country = $this->countryAdapter->get((int)$shipping->id_country);
+        $shipping = $this->addressAdapter->get((int) $id_shipping);
+        $shipping_country = $this->countryAdapter->get((int) $shipping->id_country);
 
-        $billing = $this->addressAdapter->get((int)$id_billing);
-        $billing_country = $this->countryAdapter->get((int)$billing->id_country);
+        $billing = $this->addressAdapter->get((int) $id_billing);
+        $billing_country = $this->countryAdapter->get((int) $billing->id_country);
 
         return $this->isValidOneyCountry($shipping_country->iso_code, $billing_country->iso_code);
     }

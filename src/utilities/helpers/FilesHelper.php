@@ -34,8 +34,8 @@ class FilesHelper
     {
         // If we are on local environment then don't run the cleaning
         if (isset($_SERVER['SERVER_NAME']) && (
-            $_SERVER['SERVER_NAME'] == "localhost"
-                || preg_match("/ngrok.io/i", $_SERVER['SERVER_NAME'])
+            $_SERVER['SERVER_NAME'] == 'localhost'
+                || preg_match('/ngrok.io/i', $_SERVER['SERVER_NAME'])
         )
         ) {
             return;

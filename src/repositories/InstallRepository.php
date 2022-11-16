@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use Db;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class InstallRepository extends BaseClass
@@ -55,6 +54,9 @@ class InstallRepository extends BaseClass
     protected $order_state_adapter;
 
     /** @var object */
+    protected $query;
+
+    /** @var object */
     protected $shop;
 
     /** @var object */
@@ -74,6 +76,7 @@ class InstallRepository extends BaseClass
         $order_state,
         $order_state_entity,
         $order_state_adapter,
+        $query,
         $shop,
         $sql,
         $tools,
@@ -87,6 +90,7 @@ class InstallRepository extends BaseClass
         $this->order_state = $order_state;
         $this->order_state_entity = $order_state_entity;
         $this->order_state_adapter = $order_state_adapter;
+        $this->query = $query;
         $this->shop = $shop;
         $this->sql = $sql;
         $this->tools = $tools;
@@ -203,29 +207,30 @@ class InstallRepository extends BaseClass
 
         foreach ($prestashop_order_states as $key => $type) {
             $id_order_state = $this->config->get($key);
-
-            $order_state_type = $query
+            $this->query
                 ->select()
-                ->fields('`type`')
+                ->fields('type')
                 ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-                ->where('id_order_state = ' . (int)$id_order_state)
-                ->build('unique_value');
+                ->where('id_order_state = ' . (int) $id_order_state);
 
-            if ($order_state_type && $type == $order_state_type) {
-                $query
+            $sqlGetType = $this->query->build();
+
+            if ($sqlGetType && $sqlGetType != $type) {
+                $this->query
                     ->update()
                     ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-                    ->set('type = "' . $query->escape($type) . '"')
-                    ->where('id_order_state = ' . (int)$id_order_state)
+                    ->set('type = "' . $this->query->escape($type) . '"')
+                    ->where('id_order_state = ' . (int) $id_order_state)
                     ->build();
             } else {
-                $query
+                $this->query
                     ->insert()
                     ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-                    ->fields('id_order_state')->values((int)$id_order_state)
-                    ->fields('type')->values($query->escape($type))
-                    ->fields('date_add')->values($query->escape($date))
-                    ->fields('date_upd')->values($query->escape($date));
+                    ->fields('id_order_state')->values((int) $id_order_state)
+                    ->fields('type')->values($this->query->escape($type))
+                    ->fields('date_add')->values(date('Y-m-d H:i:s'))
+                    ->fields('date_upd')->values(date('Y-m-d H:i:s'))
+                    ->build();
             }
         }
 
