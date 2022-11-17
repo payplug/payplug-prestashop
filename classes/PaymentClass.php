@@ -695,8 +695,12 @@ class PaymentClass
             'oney' => false,
         ];
 
+        $is_shown = $this->validators['module']->canBeShown(
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+        );
+
         if (!$this->active
-            || !$this->config->get($this->dependencies->getConfigurationKey('show'))
+            || !$is_shown['result']
             || !$this->dependencies->amountCurrencyClass->checkCurrency($cart)
             || !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
             return $options;

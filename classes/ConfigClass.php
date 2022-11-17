@@ -237,6 +237,7 @@ class ConfigClass
     private $tools;
     private $validate;
     private $validationErrors = [];
+    private $validators = [];
 
     public function __construct($dependencies)
     {
@@ -254,11 +255,13 @@ class ConfigClass
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
 
+        $this->validators = $this->dependencies->getValidators();
+
         $this->setLoggers();
         $this->setConfigurationProperties();
 
         if (file_exists(dirname(__FILE__) . '/../features.json')) {
-            $this->features_json = json_decode($this->tools->tool('file_get_contents', dirname(__FILE__) . '/../features.json'));
+            $this->features_json = json_decode($this->tools->tool('file_get_contents', dirname(__FILE__) . '/../features.json'), true);
         } else {
             $this->features_json = [];
         }
@@ -371,20 +374,23 @@ class ConfigClass
      */
     public function isAllowed()
     {
-        if (!$this->module->isEnabled($this->dependencies->name)
-            || !$this->config->get($this->dependencies->getConfigurationKey('show'))) {
-            return false;
-        }
+        $is_shown = $this->validators['module']->canBeShown(
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+        );
+        $is_allowed = $this->validators['module']->isAllowed(
+            (bool) $this->module->isEnabled($this->dependencies->name),
+            $is_shown['result']
+        );
 
-        return true;
+        return $is_allowed['result'];
     }
 
     /**
      * Check various configurations
      *
-     * @todo remove this function which is not used anymore in new BO
-     *
      * @return string
+     *
+     * @todo remove this function which is not used anymore in new BO
      */
     public function getCheckFieldset()
     {
@@ -456,9 +462,8 @@ class ConfigClass
             $this->check_configuration['status']['ssl'] = 'close';
         }
 
-        if ($is_payplug_configured) {
-        } else {
-            $this->config->get($this->dependencies->getConfigurationKey('show'), 0);
+        if (!$is_payplug_configured) {
+            $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 0);
             $this->check_configuration['status']['check'] = 'check';
         }
 
@@ -620,7 +625,7 @@ class ConfigClass
                         if ((int) $this->tools->tool('getValue', 'payplug_inst') === 1) {
                             if (((int) $this->tools->tool('getValue', 'payplug_inst_min_amount') >= 4)
                                 && ((int) $this->tools->tool('getValue', 'payplug_inst_mode') < 5)
-                            && ((int) $this->tools->tool('getValue', 'payplug_inst_mode') > 1)) {
+                                && ((int) $this->tools->tool('getValue', 'payplug_inst_mode') > 1)) {
                                 $this->config->updateValue($key, $value);
                             }
                         }
@@ -699,8 +704,13 @@ class ConfigClass
         }
 
         $this->checkConfiguration();
+
+        $is_shown = $this->validators['module']->canBeShown(
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+        );
+
         $this->configurations = [
-            'show' => $this->config->get($this->dependencies->getConfigurationKey('show')),
+            'show' => $is_shown['result'],
             'email' => $this->config->get($this->dependencies->getConfigurationKey('email')),
             'sandbox_mode' => $this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),
             'embedded_mode' => $this->config->get($this->dependencies->getConfigurationKey('embeddedMode')),
@@ -1183,8 +1193,7 @@ class ConfigClass
             ->fields('*')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_card')
             ->where('id_customer = ' . (int) $id_customer)
-            ->build()
-        ;
+            ->build();
 
         if (!$res_payplug_card) {
             $cards = null;
@@ -1448,17 +1457,9 @@ class ConfigClass
 
     public function isValidFeature($name)
     {
-        if (empty($this->features_json)) {
-            return false;
-        }
+        $is_valid_feature = $this->validators['module']->isFeature($this->features_json, $name);
 
-        foreach ($this->features_json->features as $feature) {
-            if ($feature == $name) {
-                return true;
-            }
-        }
-
-        return false;
+        return $is_valid_feature['result'];
     }
 
     public function fetchTemplate($file)
@@ -1478,8 +1479,7 @@ class ConfigClass
         return $this
             ->module
             ->getInstanceByName($this->dependencies->name)
-            ->display(_PS_MODULE_DIR_ . $this->dependencies->name . '/' . $this->dependencies->name . '.php', $file)
-        ;
+            ->display(_PS_MODULE_DIR_ . $this->dependencies->name . '/' . $this->dependencies->name . '.php', $file);
     }
 
     /**
