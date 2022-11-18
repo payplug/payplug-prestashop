@@ -1095,7 +1095,7 @@ class ConfigClass
      *
      * @param int $country_id
      *
-     * @return int | false
+     * @return false|int
      */
     public function getIsoCodeByCountryId($country_id)
     {
@@ -1121,7 +1121,7 @@ class ConfigClass
      * Get all country iso-code of ISO 3166-1 alpha-2 norm
      * Source: DB PayPlug
      *
-     * @return array | null
+     * @return null|array
      */
     public function getIsoCodeList()
     {
