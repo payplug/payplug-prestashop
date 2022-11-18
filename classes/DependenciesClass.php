@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
 use PayPlug\src\utilities\validators\loggerValidator;
@@ -475,6 +476,7 @@ class DependenciesClass
     private function setvalidators()
     {
         $this->validators = [
+            'account' => new accountValidator(),
             'browser' => new browserValidator(),
             'card' => new cardValidator(),
             'logger' => new loggerValidator(),

@@ -362,7 +362,11 @@ class AdminClass
         }
 
         if ($this->tools->tool('getValue', 'has_live_key')) {
-            exit(json_encode(['result' => $this->dependencies->apiClass->hasLiveKey()]));
+            exit(json_encode(['result' => $this->validators['account']->hasLiveKey(
+                $this->config->get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                )
+            )]));
         }
 
         if ((int) $this->tools->tool('getValue', 'refund') == 1) {
