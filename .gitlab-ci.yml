@@ -43,6 +43,7 @@ check php version:
 coverage test:
   image: php:7.2.1
   stage: coverage and tests
+  coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
     - pecl install xdebug
     - docker-php-ext-enable xdebug

@@ -64,7 +64,7 @@ class PaymentRepository extends BaseClass
      *
      * @param $paymentDetails
      *
-     * @return string | array
+     * @return array|string
      */
     public function getHashedCart($paymentDetails)
     {

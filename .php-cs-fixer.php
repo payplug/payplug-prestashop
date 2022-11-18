@@ -37,7 +37,9 @@ return (new PhpCsFixer\Config)
         'phpdoc_order' => true,
         'phpdoc_trim' => true,
         'single_line_comment_style' => true,
-        'phpdoc_align' => true
+        'phpdoc_align' => true,
+        'php_unit_internal_class' => false,
+        'php_unit_test_class_requires_covers' => false
     ])
     ->setFinder($finder)
 ;
