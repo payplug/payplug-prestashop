@@ -3,6 +3,7 @@
 namespace PayPlug\tests\repositories;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
 use PayPlug\src\utilities\validators\moduleValidator;
 use PayPlug\src\utilities\validators\paymentValidator;
@@ -111,6 +112,7 @@ class RepositoryBase extends TestCase
                 'getValidators' => [
                     'card' => \Mockery::mock(cardValidator::class)->makePartial(),
                     'module' => \Mockery::mock(moduleValidator::class)->makePartial(),
+                    'browser' => \Mockery::mock(browserValidator::class)->makePartial(),
                     'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
                 ],
             ])
