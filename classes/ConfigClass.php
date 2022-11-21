@@ -418,7 +418,7 @@ class ConfigClass
         $payplug_test_api_key = $this->config->get($this->dependencies->getConfigurationKey('testApiKey'));
         $payplug_live_api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
 
-        $report = $this->checkRequirements();
+        $report = $this->getReportRequirements();
 
         if (empty($payplug_email) || (empty($payplug_test_api_key) && empty($payplug_live_api_key))) {
             $is_payplug_connected = false;
@@ -431,16 +431,8 @@ class ConfigClass
             $is_payplug_connected = false;
         }
 
-        if ($report['curl']['installed']
-            && $report['php']['up2date']
-            && $report['openssl']['installed']
-            && $report['openssl']['up2date']
-            && $is_payplug_connected
-        ) {
-            $is_payplug_configured = true;
-        } else {
-            $is_payplug_configured = false;
-        }
+        $check_requirement = $this->validators['module']->isAllRequirementsChecked($report);
+        $is_payplug_configured = $check_requirement['result'] && $is_payplug_connected;
 
         $this->check_configuration = ['status' => []];
 
@@ -475,17 +467,11 @@ class ConfigClass
      */
     public function checkState()
     {
-        $report = $this->checkRequirements();
+        $state = $this->validators['module']->isAllRequirementsChecked(
+            $this->getReportRequirements()
+        );
 
-        if ($report['curl']['installed']
-            && $report['php']['up2date']
-            && $report['openssl']['installed']
-            && $report['openssl']['up2date']
-        ) {
-            return true;
-        }
-
-        return false;
+        return $state['result'];
     }
 
     /**
@@ -497,20 +483,13 @@ class ConfigClass
     public function checkPsAccount()
     {
         if ($this->dependencies->name == 'pspaylater') {
-            try {
-                $module = $this->module->getInstanceByName($this->dependencies->name);
-                $accountsFacade = $module->getService('ps_accounts.facade');
-                $accountsService = $accountsFacade->getPsAccountsService();
+            $module = $this->module->getInstanceByName($this->dependencies->name);
+            $check_ps_account = $this->validators['module']->isAccountLinkedToPsAccount($module);
 
-                return $accountsService->isAccountLinked();
-            } catch (\PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException $e) {
-                return false;
-            } catch (\PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException $e) {
-                return false;
-            }
-        } else {
-            return true;
+            return $check_ps_account['result'];
         }
+
+        return true;
     }
 
     /**
@@ -1224,7 +1203,7 @@ class ConfigClass
      *
      * @return array
      */
-    public function checkRequirements()
+    public function getReportRequirements()
     {
         $php_min_version = 50600;
         $curl_min_version = '7.21';
