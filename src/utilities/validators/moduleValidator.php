@@ -71,7 +71,7 @@ class moduleValidator
             ];
         }
 
-        if (!is_string($name) || empty($name)) {
+        if (!is_string($name) || !$name) {
             return [
                 'result' => false,
                 'message' => 'Invalid parameters given, $name must be an non empty string',
@@ -135,5 +135,126 @@ class moduleValidator
             'result' => true,
             'message' => '',
         ];
+    }
+
+    /**
+     * @description Check the requirement for the usage of the module.
+     *
+     * @param array $report
+     *
+     * @return array
+     */
+    public function isAllRequirementsChecked($report = [])
+    {
+        if (!is_array($report) || empty($report)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid parameters given, $report must be an non empty array',
+            ];
+        }
+
+        if (!isset($report['php']) || !is_array($report['php']) || empty($report['php'])) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $report[php] must be a non empty array',
+            ];
+        }
+        if (!isset($report['php']['up2date'])) {
+            return [
+                'result' => false,
+                'message' => 'Missing array key: $report[php][up2date]',
+            ];
+        }
+        if (!(bool) $report['php']['up2date']) {
+            return [
+                'result' => false,
+                'message' => 'Wrong requirement: The minimum requirement for PHP is not respected',
+            ];
+        }
+
+        if (!isset($report['curl']) || !is_array($report['curl']) || empty($report['curl'])) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $report[curl] must be a non empty array',
+            ];
+        }
+        if (!isset($report['curl']['installed'])) {
+            return [
+                'result' => false,
+                'message' => 'Missing array key: $report[curl][installed]',
+            ];
+        }
+        if (!(bool) $report['curl']['installed']) {
+            return [
+                'result' => false,
+                'message' => 'Wrong requirement: The minimum requirement for Curl is not respected',
+            ];
+        }
+
+        if (!isset($report['openssl']) || !is_array($report['openssl']) || empty($report['openssl'])) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $report[openssl] must be a non empty array',
+            ];
+        }
+        if (!isset($report['openssl']['installed']) || !isset($report['openssl']['up2date'])) {
+            return [
+                'result' => false,
+                'message' => 'Missing array key: $report[openssl][installed] and/or $report[openssl][up2date]',
+            ];
+        }
+        if (!(bool) $report['openssl']['installed'] || !(bool) $report['openssl']['up2date']) {
+            return [
+                'result' => false,
+                'message' => 'Wrong requirement: The minimum requirement for OpenSSL is not respected',
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => '',
+        ];
+    }
+
+    /**
+     * @description Check if the account is linked to ps account
+     *
+     * @param object $module
+     *
+     * @return array
+     */
+    public function isAccountLinkedToPsAccount($module = null)
+    {
+        if (!is_object($module) || !$module) {
+            return [
+                'result' => false,
+                'message' => 'Invalid parameters given, $module must be an non empty object',
+            ];
+        }
+
+        try {
+            $accountsFacade = $module->getService('ps_accounts.facade');
+            $accountsService = $accountsFacade->getPsAccountsService();
+
+            return [
+                'result' => (bool) $accountsService->isAccountLinked(),
+                'message' => '',
+            ];
+        } catch (\PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException $e) {
+            return [
+                'result' => false,
+                'message' => $e->getMessage(),
+            ];
+        } catch (\PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException $e) {
+            return [
+                'result' => false,
+                'message' => $e->getMessage(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'result' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
     }
 }

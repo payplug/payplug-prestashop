@@ -11,9 +11,6 @@ use PHPUnit\Framework\TestCase;
  * @group module_validator
  *
  * @runTestsInSeparateProcesses
- *
- * @internal
- * @coversNothing
  */
 class canBeShownTest extends TestCase
 {

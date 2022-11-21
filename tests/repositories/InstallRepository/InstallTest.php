@@ -28,7 +28,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'version' => 0,
                         'installed' => true,
@@ -58,7 +58,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'up2date' => true,
                     ],
@@ -82,7 +82,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'up2date' => true,
                     ],
@@ -106,7 +106,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'up2date' => true,
                     ],
@@ -136,7 +136,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'up2date' => true,
                     ],
@@ -172,7 +172,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'up2date' => true,
                     ],
@@ -209,7 +209,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'up2date' => true,
                     ],
@@ -247,7 +247,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'up2date' => true,
                     ],
@@ -296,7 +296,7 @@ final class InstallTest extends BaseInstallRepository
     {
         $this->dependencies->configClass
             ->shouldReceive([
-                'checkRequirements' => [
+                'getReportRequirements' => [
                     'php' => [
                         'up2date' => true,
                     ],
