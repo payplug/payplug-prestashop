@@ -85,6 +85,7 @@ class PayPlugNotifications
     private $payplugLock;
     private $module;
     private $plugin;
+    private $validators;
 
     public function __construct()
     {
@@ -325,6 +326,12 @@ class PayPlugNotifications
         ];
 
         $amount = $this->amountCurrencyClass->convertAmount($amount, true);
+        $cart_amount = $this->cart->getOrderTotal(true);
+        $check_amount = $this->validators['order']->isSameAmount((float) $amount, (float) $cart_amount);
+        if (!$check_amount['result']) {
+            $this->logger->addLog($check_amount['message']);
+            $this->logger->addLog('Cart amount:' . $cart_amount);
+        }
 
         $currency = (int) $this->cart->id_currency;
 
@@ -404,13 +411,6 @@ class PayPlugNotifications
 
         // Create Order
         try {
-            $cart_amount = (float) $this->cart->getOrderTotal(true);
-
-            if ($amount != $cart_amount) {
-                $this->logger->addLog('Cart amount is different and may occurred an error');
-                $this->logger->addLog('Cart amount:' . $cart_amount);
-            }
-
             $this->logger->addLog('Order create with amount:' . $amount);
             $is_order_validated = $this->module->validateOrder(
                 $this->cart->id,
@@ -435,8 +435,9 @@ class PayPlugNotifications
 
         // Then load it
         $this->order = $this->orderAdapter->get((int) $this->module->currentOrder);
-        if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
-            $this->logger->addLog('Order cannot be loaded.', 'error');
+        $check_order = $this->validators['order']->isCreated($this->order, (int) $this->cart->id);
+        if (!$check_order['result']) {
+            $this->logger->addLog($check_order['message'], 'error');
             $this->exitProcess('Order cannot be loaded.', 500);
         }
         $this->logger->addLog('Order loaded.', 'debug');
@@ -973,6 +974,7 @@ class PayPlugNotifications
         $this->except = null;
         $this->resp = [];
         $this->dependencies = new DependenciesClass();
+        $this->validators = $this->dependencies->getValidators();
         $this->setAdapters();
 
         $this->apiClass = $this->dependencies->apiClass;

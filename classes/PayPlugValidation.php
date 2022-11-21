@@ -53,9 +53,12 @@ class PayPlugValidation
     private $toolsAdapter;
     private $payplugLock;
 
+    private $validators;
+
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
+        $this->validators = $this->dependencies->getValidators();
         $this->apiClass = $this->dependencies->apiClass;
         $this->cartAdapter = $this->dependencies->getPlugin()->getCart();
         $this->configAdapter = $this->dependencies->getPlugin()->getConfiguration();
@@ -356,6 +359,12 @@ class PayPlugValidation
             }
         }
         $amount = $this->amountCurrencyClass->convertAmount($amount, true);
+        $cart_amount = $cart->getOrderTotal(true);
+        $check_amount = $this->validators['order']->isSameAmount((float) $amount, (float) $cart_amount);
+        if (!$check_amount['result']) {
+            $this->logger->addLog($check_amount['message']);
+            $this->logger->addLog('Cart amount:' . $cart_amount);
+        }
 
         // Check if valid customer
         $customer = $this->customerAdapter->get((int) $cart->id_customer);
@@ -502,13 +511,7 @@ class PayPlugValidation
                 $module_name = $this->dependencies->l('validation.createOrder.amex', 'payplugvalidation');
             }
 
-            $cart_amount = (float) $cart->getOrderTotal(true);
-
             try {
-                if ($amount != $cart_amount) {
-                    $this->logger->addLog('Cart amount is different and may occurred an error');
-                    $this->logger->addLog('Cart amount:' . $cart_amount);
-                }
                 $validateOrder_result = $this->moduleInstance->validateOrder(
                     $cart->id,
                     $order_state,
@@ -545,6 +548,21 @@ class PayPlugValidation
 
             if (!$validateOrder_result) {
                 $this->logger->addLog('Order not validated', 'error');
+                $cart_unlock = $this->payplugLock->deleteLockG2($cart->id);
+                if (!$cart_unlock) {
+                    $this->logger->addLog('Lock cannot be deleted.', 'error');
+                } else {
+                    $this->logger->addLog('Lock deleted.', 'debug');
+                }
+                $this->paymentClass->setPaymentErrorsCookie([
+                    $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation'),
+                ]);
+                $this->toolsAdapter->tool('redirect', $redirect_url_error);
+            }
+
+            $check_order = $this->validators['order']->isCreated($order, (int) $cart->id);
+            if (!$check_order['result']) {
+                $this->logger->addLog($check_order['message'], 'error');
                 $cart_unlock = $this->payplugLock->deleteLockG2($cart->id);
                 if (!$cart_unlock) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
