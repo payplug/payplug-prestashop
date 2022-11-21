@@ -11,9 +11,6 @@ use PHPUnit\Framework\TestCase;
  * @group logger_validator
  *
  * @runTestsInSeparateProcesses
- *
- * @internal
- * @coversNothing
  */
 class isAllowedProcessTest extends TestCase
 {
