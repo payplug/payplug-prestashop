@@ -29,6 +29,7 @@ use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
 use PayPlug\src\utilities\validators\loggerValidator;
 use PayPlug\src\utilities\validators\moduleValidator;
+use PayPlug\src\utilities\validators\orderValidator;
 use PayPlug\src\utilities\validators\paymentValidator;
 use Tools;
 
@@ -474,11 +475,12 @@ class DependenciesClass
     private function setvalidators()
     {
         $this->validators = [
+            'browser' => new browserValidator(),
             'card' => new cardValidator(),
             'logger' => new loggerValidator(),
-            'payment' => new paymentValidator(),
             'module' => new moduleValidator(),
-            'browser' => new browserValidator(),
+            'order' => new orderValidator(),
+            'payment' => new paymentValidator(),
         ];
     }
 }
