@@ -1270,7 +1270,6 @@ class PaymentClass
             } else {
                 $iso_code = 'FR';
             }
-
             if (!$shipping_iso) {
                 $shipping_country = $this->country->get($shipping_address->id_country);
                 $metadata['cms_shipping_country'] = $shipping_country->iso_code;
@@ -1538,7 +1537,7 @@ class PaymentClass
                 $this->dependencies->getConfigurationKey('embeddedMode')
             ) !== 'redirected',
             'isIntegrated' => $options['is_integrated'],
-            'isMobileDevice' => $this->dependencies->configClass->isMobiledevice(),
+            'isMobileDevice' => ($this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result']),
             'cart' => $cart,
             'cartId' => (int) $payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
@@ -2108,7 +2107,8 @@ class PaymentClass
 
     private function getApplepayPaymentOption($payment_options)
     {
-        if ('Safari' != $this->getBrowser()) {
+        $isApplePayCompatible = $this->validators['browser']->isApplePayCompatible($this->getBrowser());
+        if (!$isApplePayCompatible['result']) {
             return $payment_options;
         }
 

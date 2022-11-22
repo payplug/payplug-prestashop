@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
 use PayPlug\src\utilities\validators\loggerValidator;
 use PayPlug\src\utilities\validators\moduleValidator;
@@ -477,6 +478,7 @@ class DependenciesClass
             'logger' => new loggerValidator(),
             'payment' => new paymentValidator(),
             'module' => new moduleValidator(),
+            'browser' => new browserValidator(),
         ];
     }
 }
