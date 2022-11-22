@@ -55,7 +55,6 @@ final class CheckHashTest extends BasePaymentRepository
                 'returnPaymentError' => $logMessage,
             ])
         ;
-
         $this->assertSame(
             $this->repo->checkHash($parameter),
             $logMessage

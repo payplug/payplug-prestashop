@@ -24,7 +24,6 @@
 namespace PayPlug\classes;
 
 use libphonenumberlight;
-use PayPlug\src\utilities\validators\oneyValidator;
 
 class ConfigClass
 {
@@ -254,6 +253,7 @@ class ConfigClass
         $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
 
         $this->validators = $this->dependencies->getValidators();
 
@@ -306,7 +306,6 @@ class ConfigClass
         }
 
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
-
         $available_options = [
             'standard' => (bool) $this->config->get($this->dependencies->getConfigurationKey('standard')),
             'live' => !(bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),
@@ -335,30 +334,30 @@ class ConfigClass
             $available_options['applepay'] = false;
             $available_options['amex'] = false;
         } else {
-            if (!$permissions['use_live_mode']
+            if (!$this->validators['payment']->hasPermissions($permissions, 'use_live_mode')['result']
                 || $this->config->get($this->dependencies->getConfigurationKey('liveApiKey')) === null
             ) {
                 $available_options['live'] = false;
             }
-            if (!$permissions['can_save_cards']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result']) {
                 $available_options['one_click'] = false;
             }
-            if (!$permissions['can_create_installment_plan']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result']) {
                 $available_options['installment'] = false;
             }
-            if (!$permissions['can_create_deferred_payment']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_create_deferred_payment')['result']) {
                 $available_options['deferred'] = false;
             }
-            if (!$permissions['can_use_oney']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_oney')['result']) {
                 $available_options['oney'] = false;
             }
-            if (!$permissions['can_use_bancontact']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_bancontact')['result']) {
                 $available_options['bancontact'] = false;
             }
-            if (!$permissions['can_use_applepay'] || !$available_options['live']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_applepay')['result'] || !$available_options['live']) {
                 $available_options['applepay'] = false;
             }
-            if (!$permissions['can_use_amex'] || !$available_options['live']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_amex')['result'] || !$available_options['live']) {
                 $available_options['amex'] = false;
             }
         }
@@ -735,13 +734,13 @@ class ConfigClass
             if (!$permissions) {
                 exit('An error occured while getting account');
             }
-            $premium = $permissions['can_save_cards'] && $permissions['can_create_installment_plan'];
+            $premium = $this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result'] && $this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result'];
         } else {
             $premium = false;
         }
         if (!empty($this->configurations['live_api_key'])) {
             $permissions = $this->dependencies->apiClass->getAccount($this->configurations['live_api_key']);
-            $verified = !empty($permissions) ? $permissions['is_live'] : false;
+            $verified = $this->validators['payment']->hasPermissions($permissions, 'is_live')['result'];
         } else {
             $verified = false;
         }
@@ -823,15 +822,14 @@ class ConfigClass
                 'inst_min_amount' => $this->config->get($this->dependencies->getConfigurationKey('instMinAmount')),
             ]
         );
-        $oneyValidator = new OneyValidator();
 
-        $oney_belgium = $this->isValidFeature('feature_belgium_oney') && $oneyValidator->isOneyAllowedCountry($this->config->get(
+        $oney_belgium = $this->isValidFeature('feature_belgium_oney') && $this->validators['payment']->isAllowedCountry($this->config->get(
             $this->dependencies->getConfigurationKey(
                 'oneyAllowedCountries'
             )
         ), 'BE')['result'];
 
-        $oney_spain = $this->isValidFeature('feature_spain_oney') && $oneyValidator->isOneyAllowedCountry($this->config->get(
+        $oney_spain = $this->isValidFeature('feature_spain_oney') && $this->validators['payment']->isAllowedCountry($this->config->get(
             $this->dependencies->getConfigurationKey(
                 'oneyAllowedCountries'
             )
@@ -923,11 +921,8 @@ class ConfigClass
     {
         $onboardingOneyCompleted = false;
         $livepermissions = $this->getLivePermissions();
-        if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
-            $onboardingOneyCompleted = (bool) $livepermissions['onboardingOneyCompleted'];
-        }
 
-        return $onboardingOneyCompleted;
+        return (bool) $this->validators['payment']->hasPermissions($livepermissions, 'onboardingOneyCompleted')['result'];
     }
 
     /**

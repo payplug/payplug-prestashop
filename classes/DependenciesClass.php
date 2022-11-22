@@ -28,6 +28,7 @@ use PayPlug\src\application\dependencies\PluginInit;
 use PayPlug\src\utilities\validators\cardValidator;
 use PayPlug\src\utilities\validators\loggerValidator;
 use PayPlug\src\utilities\validators\moduleValidator;
+use PayPlug\src\utilities\validators\paymentValidator;
 use Tools;
 
 if (!defined('_PS_VERSION_')) {
@@ -474,6 +475,7 @@ class DependenciesClass
         $this->validators = [
             'card' => new cardValidator(),
             'logger' => new loggerValidator(),
+            'payment' => new paymentValidator(),
             'module' => new moduleValidator(),
         ];
     }

@@ -45,6 +45,7 @@ class PaymentClass
     private $query;
     private $tools;
     private $validate;
+    private $validators;
 
     public function __construct($dependencies)
     {
@@ -70,6 +71,7 @@ class PaymentClass
         $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
     }
 
     /**
@@ -476,13 +478,12 @@ class PaymentClass
             }
             $payment_details['type_code'] = $payment->payment_method['type'];
         }
-
+        $paymentCanBeCaptured = $this->validators['payment']->canBeCaptured($payment, $is_oney);
+        $payment_details['can_be_captured'] = $payment_details['can_be_cancelled'] = $paymentCanBeCaptured['result'];
         if ($payment->authorization !== null && !$is_oney) {
             $payment_details['authorization'] = true;
             if ($payment->is_paid) {
                 $payment_details['date'] = date('d/m/Y', $payment->paid_at);
-                $payment_details['can_be_cancelled'] = false;
-                $payment_details['can_be_captured'] = false;
                 if (!isset($payment_details['type'])) {
                     $payment_details['status_message'] = '(' . $this
                         ->dependencies
@@ -492,11 +493,7 @@ class PaymentClass
                 $expiration = date('d/m/Y', $payment->authorization->expires_at);
                 if (isset($payment->authorization->expires_at) && $payment->authorization->expires_at - time() > 0) {
                     if (isset($payment->failure) && $payment->failure) {
-                        $payment_details['can_be_cancelled'] = false;
-                        $payment_details['can_be_captured'] = false;
                     } else {
-                        $payment_details['can_be_captured'] = true;
-                        $payment_details['can_be_cancelled'] = true;
                         $payment_details['status_message'] = sprintf(
                             '(' . $this
                                 ->dependencies
@@ -514,18 +511,11 @@ class PaymentClass
                     && $payment->authorization->authorized_at != null
                 ) {
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
-                    $payment_details['can_be_cancelled'] = false;
-                    $payment_details['can_be_captured'] = false;
-                } else {
-                    $payment_details['can_be_cancelled'] = false;
-                    $payment_details['can_be_captured'] = false;
                 }
             }
         } else {
             $payment_details['authorization'] = false;
             $payment_details['date'] = date('d/m/Y', $payment->created_at);
-            $payment_details['can_be_cancelled'] = false;
-            $payment_details['can_be_captured'] = false;
         }
 
         if (isset($payment->failure, $payment->failure->message)) {
@@ -1271,6 +1261,7 @@ class PaymentClass
         // ISO
         $billing_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $billing_address->id_country);
         $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+
         if (!$shipping_iso || !$billing_iso) {
             $default_language = $this->language->get((int) $this->config->get('PS_LANG_DEFAULT'));
             $iso_code_list = $this->dependencies->configClass->getIsoCodeList();
@@ -1279,6 +1270,7 @@ class PaymentClass
             } else {
                 $iso_code = 'FR';
             }
+
             if (!$shipping_iso) {
                 $shipping_country = $this->country->get($shipping_address->id_country);
                 $metadata['cms_shipping_country'] = $shipping_country->iso_code;
@@ -2177,7 +2169,12 @@ class PaymentClass
         $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
         $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
 
-        if ((bool) $this->config->get($this->dependencies->getConfigurationKey('bancontactCountry')) && ($shipping_iso != 'BE' || $invoice_iso != 'BE')) {
+        if ((bool) $this->config->get(
+            $this->dependencies->getConfigurationKey('bancontactCountry')
+        ) && !($this->validators['payment']->isAllowedCountry(
+            'BE',
+            $shipping_iso
+        )['result'] || !($this->validators['payment']->isAllowedCountry('BE', $invoice_iso)['result']))) {
             return $payment_options;
         }
 

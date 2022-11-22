@@ -38,6 +38,7 @@ class PaymentRepository extends BaseClass
     private $paymentEntity;
     private $query;
     private $constant;
+    private $validators;
 
     public function __construct(
         $cartAdapter,
@@ -57,6 +58,7 @@ class PaymentRepository extends BaseClass
         $this->constant = $constant;
 
         $this->logger->setProcess('payment');
+        $this->validators = $this->dependencies->getValidators();
     }
 
     /**
@@ -323,7 +325,8 @@ class PaymentRepository extends BaseClass
 
         if ($paymentDetails['paymentMethod'] !== 'installment') {
             $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
-            if (!$payment['result']) {
+
+            if ($this->validators['payment']->hasError($payment)['result']) {
                 unset($paymentDetails['paymentTab']);
 
                 return $this->returnPaymentError(
@@ -335,7 +338,7 @@ class PaymentRepository extends BaseClass
             $this->paymentEntity->setApiPayment($payment['resource']);
         } else {
             $payment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
-            if (!$payment['result']) {
+            if ($this->validators['payment']->hasError($payment)['result']) {
                 unset($paymentDetails['paymentTab']);
 
                 return $this->returnPaymentError(
