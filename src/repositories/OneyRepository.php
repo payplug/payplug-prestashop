@@ -42,6 +42,7 @@ class OneyRepository extends BaseClass
     private $toolsAdapter;
     private $validateAdapter;
     private $assign;
+    private $validators;
 
     public function __construct(
         $addressAdapter,
@@ -62,6 +63,7 @@ class OneyRepository extends BaseClass
         $validateAdapter
     ) {
         $this->dependencies = $dependencies;
+        $this->validators = $this->dependencies->getValidators();
         $this->cache = $cache;
         $this->logger = $logger;
         $this->addressAdapter = $addressAdapter;
@@ -1354,8 +1356,15 @@ class OneyRepository extends BaseClass
     public function isValidOneyAmount($amount)
     {
         $limits = $this->getOneyPriceLimit();
-        $convert_amount = ($this->dependencies->amountCurrencyClass->convertAmount($amount)) / 100;
-        if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
+        $is_valid_amount = $this->validators['payment']->isAmount(
+            $this->dependencies->amountCurrencyClass->convertAmount($amount),
+            [
+                'min' => $this->dependencies->amountCurrencyClass->convertAmount($limits['min']),
+                'max' => $this->dependencies->amountCurrencyClass->convertAmount($limits['max']),
+            ]
+        );
+
+        if (!$is_valid_amount['result']) {
             return [
                 'result' => false,
                 'error' => sprintf(

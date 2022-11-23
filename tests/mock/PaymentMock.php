@@ -133,74 +133,23 @@ class PaymentMock
 
     public static function getDeferred($parameters = [])
     {
-        $defaultDeferred = [
-            'object' => 'installment_plan',
-            'id' => 'inst_1gDmrsoMdIAJfV2MxzkBPX',
-            'is_active' => true,
-            'is_fully_paid' => false,
-            'metadata' => [
-                'ID Cart' => 17,
-                'Website' => 'http://localhost',
-                'ID Client' => 4,
-            ],
-            'currency' => 'EUR',
-            'failure' => null,
-            'created_at' => 1614940725,
-            'hosted_payment' => [
-                'return_url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/validation?ps=1&cartid=17',
-                'cancel_url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/validation?ps=2&cartid=17',
-                'payment_url' => 'https://secure-qa.payplug.com/pay/3nfaejGO3m9dyHFIwfsUTR',
-            ],
-            'notification' => [
-                'url' => 'http://localhost/prestashop_1.7.6.9/fr/module/payplug/ipn',
-            ],
+        $default_parameters = [
+            'authorized_amount' => 424242,
             'authorization' => [
-                'authorized_amount' => 16658,
-                'authorized_at' => 1668699788,
-                'expires_at' => 1669248000,
-            ],
-            'is_live' => true,
-            'billing' => [
-                'title' => null,
-                'first_name' => 'Cedric',
-                'last_name' => 'PayPlug',
-                'address1' => '110 avenue de France',
-                'address2' => null,
-                'company_name' => 'Cedric PayPlug',
-                'postcode' => '75013',
-                'city' => 'Paris',
-                'state' => null,
-                'country' => 'FR',
-                'email' => 'ctouma@payplug.com',
-                'mobile_phone_number' => null,
-                'landline_phone_number' => '+33667899297',
-                'language' => 'fr',
-            ],
-            'shipping' => [
-                'title' => null,
-                'first_name' => 'Cedric',
-                'last_name' => 'PayPlug',
-                'address1' => '110 avenue de France',
-                'address2' => null,
-                'company_name' => 'Cedric PayPlug',
-                'postcode' => '75013',
-                'city' => 'Paris',
-                'state' => null,
-                'country' => 'FR',
-                'email' => 'ctouma@payplug.com',
-                'mobile_phone_number' => null,
-                'landline_phone_number' => '+33667899297',
-                'language' => 'fr',
-                'delivery_type' => 'BILLING',
+                'authorized_amount' => 424242,
+                'authorized_at' => strtotime('-2 days'),
+                'expires_at' => strtotime('+2 days'),
             ],
         ];
-        if (!empty($parameters)) {
-            foreach ($parameters as $key => $value) {
-                $defaultDeferred[$key] = $value;
+
+        foreach ($default_parameters as $key => $value) {
+            if (!isset($parameters[$key])) {
+                $parameters[$key] = $value;
             }
         }
 
-        $resource = self::getDefault($defaultDeferred);
+        $resource = self::getDefault($parameters);
+        unset($resource['amount']);
 
         return Payment::fromAttributes($resource);
     }
@@ -295,5 +244,38 @@ class PaymentMock
     public static function getOneClick()
     {
         return Payment::fromAttributes(self::$payment_parameters['oneclick']);
+    }
+
+    public static function getOney($parameters = [])
+    {
+        $resource = self::getDefault($parameters);
+        unset($resource['amount']);
+        $resource['authorized_amount'] = 20880;
+        $resource['payment_method'] = [
+            'type' => 'oney_x3_with_fees',
+            'is_pending' => false,
+        ];
+        $resource['payment_context'] = [
+            'cart' => [
+                [
+                    'merchant_item_id' => '3',
+                    'name' => 'Affiche encadrée The best is yet to come - Dimension : 40x60cm',
+                    'price' => 3480,
+                    'quantity' => 6,
+                    'total_amount' => 20880,
+                    'brand' => 'Graphic Corner',
+                    'delivery_label' => 'Click and collect',
+                    'expected_delivery_date' => '2022-11-23',
+                    'delivery_type' => 'storepickup',
+                ],
+            ],
+        ];
+        $resource['authorization'] = [
+            'authorized_amount' => 20880,
+            'authorized_at' => '',
+            'expires_at' => '',
+        ];
+
+        return Payment::fromAttributes($resource);
     }
 }

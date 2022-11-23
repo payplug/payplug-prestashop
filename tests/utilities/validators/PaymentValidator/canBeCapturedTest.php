@@ -1,5 +1,7 @@
 <?php
 
+namespace PayPlug\tests\utilities\validators\PaymentValidator;
+
 use PayPlug\src\utilities\validators\paymentValidator;
 use PayPlug\tests\mock\PaymentMock;
 use PHPUnit\Framework\TestCase;
@@ -8,12 +10,12 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group validator
  * @group payment_validator
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
 class canBeCapturedTest extends TestCase
 {
-    protected $oneyValidator;
     private $paymentValidator;
     private $deferred;
     private $installment;
@@ -25,11 +27,6 @@ class canBeCapturedTest extends TestCase
         $this->installment = PaymentMock::getInstallment();
     }
 
-    /**
-     * @Description invalid payment data provider
-     *
-     * @return Generator
-     */
     public function invalidPaymentDataProvider()
     {
         yield [false];
@@ -40,71 +37,97 @@ class canBeCapturedTest extends TestCase
     }
 
     /**
-     * @Description invalid is_oney data provider
-     *
-     * @return Generator
-     */
-    public function invalidIsOneyDataProvider()
-    {
-        yield [1001];
-        yield ['a string'];
-        yield [['key' => 'value']];
-        yield [null];
-    }
-
-    /**
-     * @description  test canBeCapturedWith invalid $payment
      * @dataProvider invalidPaymentDataProvider
      *
      * @param mixed $payment
      */
     public function testWithInvalidPaymentData($payment)
     {
-        $is_oney = true;
         $this->assertSame(
             [
+                'result' => false,
+                'message' => 'Invalid argument, $payment must be a non empty object.',
+            ],
+            $this->paymentValidator->canBeCaptured($payment)
+        );
+    }
+
+    public function testWhenPaymentPropAuthorizationIsNull()
+    {
+        $payment = PaymentMock::getStandard();
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Missing props, $payment does not contain authorization',
+            ],
+            $this->paymentValidator->canBeCaptured($payment)
+        );
+    }
+
+    public function testWhenAuthorizationPropsExpiresAtIsMissing()
+    {
+        $parameters = [
+            'authorization' => [
+                'authorized_amount' => 424242,
+                'authorized_at' => 1669248000,
+            ],
+        ];
+        $payment = PaymentMock::getDeferred($parameters);
+        $this->assertSame([
             'result' => false,
-            'message' => 'Invalid argument, $payment must be a non empty object.',
-                          ],
-            $this->paymentValidator->canBeCaptured($payment, $is_oney)
-        );
+            'message' => 'Missing props, $payment->authorization->expires_at should be defined',
+        ], $this->paymentValidator->canBeCaptured($payment));
     }
 
-    /**
-     * @description  test canBeCaptured with invalid $is_oney
-     * @dataProvider invalidIsOneyDataProvider
-     *
-     * @param mixed $is_oney
-     */
-    public function testWithInvalidIsOneyData($is_oney)
+    public function testWhenGivenPaymentHasFailure()
     {
-        $payment = $this->deferred;
-        $this->assertSame(
-            [
-                              'result' => false,
-                              'message' => 'Invalid argument, $is_oney must be a boolean type.',
-                          ],
-            $this->paymentValidator->canBeCaptured($payment, $is_oney)
-        );
+        $parameters = [
+            'failure' => [
+                'code' => 'timeout',
+                'message' => 'failure message',
+            ],
+        ];
+        $payment = PaymentMock::getDeferred($parameters);
+        $this->assertSame([
+            'result' => false,
+            'message' => 'Payment in failure, can not be be captured.',
+        ], $this->paymentValidator->canBeCaptured($payment));
     }
 
-    /**
-     * @description test deferred payment capture
-     */
-    public function testWhenAuthorizationIsNotNull()
+    public function testWhenThePaymentIsPaid()
     {
-        $this->assertTrue(
-            $this->paymentValidator->canBeCaptured($this->deferred, false)['result']
-        );
+        $parameters = [
+            'is_paid' => true,
+        ];
+        $payment = PaymentMock::getDeferred($parameters);
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The given payment resource is already captured',
+        ], $this->paymentValidator->canBeCaptured($payment));
     }
 
-    /**
-     * @description test standard, oney and installment payment capture
-     */
-    public function testWhenAuthorizationIsNull()
+    public function testWhenThePaymentCaptureIsExpired()
     {
-        $this->assertFalse(
-            $this->paymentValidator->canBeCaptured($this->installment, false)['result']
-        );
+        $parameters = [
+            'authorization' => [
+                'authorized_amount' => 424242,
+                'authorized_at' => strtotime('-9 days'),
+                'expires_at' => strtotime('-2 days'),
+            ],
+        ];
+        $payment = PaymentMock::getDeferred($parameters);
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The payment capture is expired',
+        ], $this->paymentValidator->canBeCaptured($payment));
+    }
+
+    public function testWhenThePaymentCanBeCaptured()
+    {
+        $payment = PaymentMock::getDeferred();
+        $this->assertSame([
+            'result' => true,
+            'message' => 'Payment can be captured.',
+        ], $this->paymentValidator->canBeCaptured($payment));
     }
 }

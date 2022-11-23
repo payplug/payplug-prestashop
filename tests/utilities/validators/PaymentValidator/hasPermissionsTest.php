@@ -1,5 +1,7 @@
 <?php
 
+namespace PayPlug\tests\utilities\validators\PaymentValidator;
+
 use PayPlug\src\utilities\validators\paymentValidator;
 use PHPUnit\Framework\TestCase;
 
