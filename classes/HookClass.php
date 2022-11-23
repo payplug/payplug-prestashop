@@ -48,6 +48,7 @@ class HookClass
     private $sql;
     private $tools;
     private $validate;
+    private $validators;
 
     public function __construct($dependencies)
     {
@@ -74,6 +75,7 @@ class HookClass
         $this->sql = $this->dependencies->getPlugin()->getSql();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
     }
 
     public function actionAdminLanguagesControllerSaveAfter($params)
@@ -480,7 +482,11 @@ class HookClass
             $inst_aborted = !$installment->is_active;
             $ppInstallment = new PPPaymentInstallment($installment->id, $this->dependencies);
             $instPaymentOne = $ppInstallment->getFirstPayment();
-            $inst_can_be_aborted = !($inst_aborted || ($instPaymentOne->isDeferred() && !$instPaymentOne->isPaid()));
+
+            $inst_can_be_aborted = !($inst_aborted || (
+                $this->validators['payment']->isDeferred($instPaymentOne->resource)['result']
+                    && !$instPaymentOne->isPaid()
+            ));
             $inst_paid = $installment->is_fully_paid;
             $this->assign->assign([
                 'inst_id' => $inst_id,

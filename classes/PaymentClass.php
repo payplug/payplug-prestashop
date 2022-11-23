@@ -478,8 +478,15 @@ class PaymentClass
             }
             $payment_details['type_code'] = $payment->payment_method['type'];
         }
-        $paymentCanBeCaptured = $this->validators['payment']->canBeCaptured($payment, $is_oney);
-        $payment_details['can_be_captured'] = $payment_details['can_be_cancelled'] = $paymentCanBeCaptured['result'];
+
+        $is_deferred_payment = $this->validators['payment']->isDeferred($payment);
+        if ($is_deferred_payment['result']) {
+            $can_be_captured = $this->validators['payment']->canBeCaptured($payment);
+            $payment_details['can_be_captured'] = $can_be_captured['result'];
+        } else {
+            $payment_details['can_be_captured'] = false;
+        }
+
         if ($payment->authorization !== null && !$is_oney) {
             $payment_details['authorization'] = true;
             if ($payment->is_paid) {
@@ -2168,6 +2175,8 @@ class PaymentClass
         $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
         $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
         $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
+
+        // canUseBancontact
 
         if ((bool) $this->config->get(
             $this->dependencies->getConfigurationKey('bancontactCountry')

@@ -48,9 +48,9 @@ class loggerValidator
     {
         if (!is_string($process) || !$process) {
             return [
-                'result' => false,
-                'message' => 'Invalid argument given, $process must be a non empty string',
-            ];
+            'result' => false,
+            'message' => 'Invalid argument given, $process must be a non empty string',
+        ];
         }
 
         if (!in_array($process, $this->allowed_process)) {

@@ -288,7 +288,7 @@ class PayPlugNotifications
         if ($this->is_installment) {
             $installment = new PPPaymentInstallment($this->resource->installment_plan_id, $this->dependencies);
             $first_payment = $installment->getFirstPayment();
-            if ($first_payment->isDeferred()) {
+            if ($this->validators['payment']->isDeferred($first_payment->resource)['result']) {
                 $order_state = $this->order_states['auth'];
             } else {
                 $order_state = $this->order_states['paid'];
@@ -1126,10 +1126,7 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
         // Define if payment is deferred resource
-        if (isset($this->payment->authorization) && !$this->is_oney) {
-            $this->is_deferred = isset($this->payment->authorization->authorized_at)
-                && $this->payment->authorization->authorized_at;
-        }
+        $this->is_deferred = !$this->is_oney && $this->validators['payment']->isDeferred($this->payment)['result'];
         $this->logger->addLog('Notification: is_deferred: ' . ($this->is_deferred ? 'ok' : 'nok'));
 
         // Define if payment is from installment
