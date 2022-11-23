@@ -537,7 +537,7 @@ class QueryRepository extends BaseClass
                     if ($data_type[0]['DATA_TYPE'] == 'tinyint') {
                         $data_type[0]['DATA_TYPE'] = 'int';
                     }
-                    $where = $column[0] . $comparator . 'CAST(' . trim($column[1]) . ' AS ' . $data_type[0]['DATA_TYPE'] . ')';
+                    $where = $column[0] . $comparator . 'CAST(' . trim($column[1]) . ' AS SIGNED ' . $data_type[0]['DATA_TYPE'] . ')';
                 }
             }
 
@@ -608,7 +608,7 @@ class QueryRepository extends BaseClass
                     if ($data_type[0]['DATA_TYPE'] == 'tinyint') {
                         $data_type[0]['DATA_TYPE'] = 'int';
                     }
-                    $whereOr = $column[0] . $comparator . 'CAST(' . trim($column[1]) . ' AS ' . $data_type[0]['DATA_TYPE'] . ')';
+                    $whereOr = $column[0] . $comparator . 'CAST(' . trim($column[1]) . ' AS SIGNED ' . $data_type[0]['DATA_TYPE'] . ')';
                 }
             }
 
