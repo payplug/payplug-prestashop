@@ -179,7 +179,7 @@ run_test:
     - curl -s
       -X POST
       -F token=$CI_JOB_TOKEN
-      -F ref=master
+      -F ref=fnd_290_trigger_pipelines
       -F "variables[PS_SOURCE_BRANCH]=${CI_COMMIT_REF_NAME}"
       -F "variables[STAGES_TO_RUN]=smoke_presta_16, smoke_presta_17"
       https://git.payplug.com/api/v4/projects/41/trigger/pipeline
