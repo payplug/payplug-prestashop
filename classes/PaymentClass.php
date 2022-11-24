@@ -1042,59 +1042,59 @@ class PaymentClass
         return false;
     }
 
-    /**
-     * @description Check if a payment for the same id cart is pending
-     * @unused
-     *
-     * @param int $id_cart
-     *
-     * @return bool
-     */
-    public function isPaymentPending($id_cart)
-    {
-        $current_time = strtotime(date('Y-m-d H:i:s'));
-        $timeout_delay = 9;
-
-        $payment_cart = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->where('id_payment LIKE "pending"')
-            ->build()
-        ;
-
-        $payment_cart = reset($payment_cart);
-
-        if (!$payment_cart || (($current_time - strtotime($payment_cart['date_upd'])) >= $timeout_delay)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @description Get id_payment from a pending transaction for a given cart
-     *
-     * @param int $id_cart
-     *
-     * @return string id_payment OR bool
-     */
-    public function isTransactionPending($id_cart)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return false;
-        }
-
-        return $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->where('is_pending = 1')
-            ->build('unique_value')
-        ;
-    }
+//    /**
+//     * @description Check if a payment for the same id cart is pending
+//     * @unused
+//     *
+//     * @param int $id_cart
+//     *
+//     * @return bool
+//     */
+//    public function isPaymentPending($id_cart)
+//    {
+//        $current_time = strtotime(date('Y-m-d H:i:s'));
+//        $timeout_delay = 9;
+//
+//        $payment_cart = $this->query
+//            ->select()
+//            ->fields('*')
+//            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
+//            ->where('id_cart = ' . (int) $id_cart)
+//            ->where('id_payment LIKE "pending"')
+//            ->build()
+//        ;
+//
+//        $payment_cart = reset($payment_cart);
+//
+//        if (!$payment_cart || (($current_time - strtotime($payment_cart['date_upd'])) >= $timeout_delay)) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
+//
+//    /**
+//     * @description Get id_payment from a pending transaction for a given cart
+//     *
+//     * @param int $id_cart
+//     *
+//     * @return string id_payment OR bool
+//     */
+//    public function isTransactionPending($id_cart)
+//    {
+//        if (!$id_cart || !is_int($id_cart)) {
+//            return false;
+//        }
+//
+//        return $this->query
+//            ->select()
+//            ->fields('id_payment')
+//            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
+//            ->where('id_cart = ' . (int) $id_cart)
+//            ->where('is_pending = 1')
+//            ->build('unique_value')
+//        ;
+//    }
 
     /**
      * @description Prepare the tab to create the payment resource
@@ -1430,27 +1430,27 @@ class PaymentClass
             }
 
             // check billing phonenumber
-            if (!$payment_tab['billing']['mobile_phone_number'] || !$this->dependencies->configClass->isValidMobilePhoneNumber(
+            if (!$payment_tab['billing']['mobile_phone_number'] || !$this->validators['payment']->isPhoneNumber(
                 $payment_tab['billing']['country'],
                 $payment_tab['billing']['mobile_phone_number']
             )) {
-                if ($this->dependencies->configClass->isValidMobilePhoneNumber(
+                if ($this->validators['payment']->isPhoneNumber(
                     $payment_tab['billing']['country'],
                     $payment_tab['billing']['landline_phone_number']
-                )) {
+                )['result']) {
                     $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
                 }
             }
 
             // check shipping phonenumber
-            if (!$payment_tab['shipping']['mobile_phone_number'] || !$this->dependencies->configClass->isValidMobilePhoneNumber(
+            if (!$payment_tab['shipping']['mobile_phone_number'] || !$this->validators['payment']->isPhoneNumber(
                 $payment_tab['shipping']['country'],
                 $payment_tab['shipping']['mobile_phone_number']
-            )) {
-                if ($this->dependencies->configClass->isValidMobilePhoneNumber(
+            )['result']) {
+                if ($this->validators['payment']->isPhoneNumber(
                     $payment_tab['shipping']['country'],
                     $payment_tab['shipping']['landline_phone_number']
-                )) {
+                )['result']) {
                     $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
                 }
             }

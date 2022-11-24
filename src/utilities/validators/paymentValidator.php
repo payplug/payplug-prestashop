@@ -23,6 +23,9 @@
 
 namespace PayPlug\src\utilities\validators;
 
+use libphonenumberlight;
+use PayPlug\classes\DependenciesClass;
+
 class paymentValidator
 {
     private $uncancellable_payment_method = ['oneclick', 'bancontact', 'apple_pay', 'oney', 'amex'];
@@ -468,5 +471,87 @@ class paymentValidator
             'result' => true,
             'message' => 'Current ressource is a deferred payment',
         ];
+    }
+
+    /**
+     * @description check if the payment of a given cart is pending
+     *
+     * @param int $id_cart
+     *
+     * @return array
+     */
+    public function isPendingPayment($id_cart)
+    {
+        if (!$id_cart || !is_int($id_cart)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $id_cart must be a non empty integer.', ];
+        }
+        $dependencies = new DependenciesClass();
+        $query = $dependencies->getPlugin()->getQuery();
+        $constant = $dependencies->getPlugin()->getConstant();
+        //TODO: call payment repositories to execute this query
+        $payment = $query
+            ->select()
+            ->fields('id_payment')
+            ->from($constant->get('_DB_PREFIX_') . $dependencies->name . '_payment')
+            ->where('id_cart = ' . (int) $id_cart)
+            ->where('is_pending = 1')
+            ->build('unique_value');
+
+        if (!$payment) {
+            return [
+                'result' => false,
+                'message' => 'this payment is not in a pending',
+            ];
+        }
+
+        return [
+                'result' => true,
+                'message' => 'this paymeent is a pending payment',
+            ];
+    }
+
+    /**
+     * @description Check if given phone number is valid mobile phone number
+     *
+     * @param $iso_code
+     * @param $phone_number
+     *
+     * @return array
+     */
+    public function isPhoneNumber($iso_code, $phone_number)
+    {
+        if (empty($phone_number) || !is_string($phone_number) || !($phone_number)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $phone_number must be a non empty string.', ];
+        }
+
+        if (!is_string($iso_code) || !($iso_code)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $iso_code must be a non empty string.', ];
+        }
+        if (!preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
+            return ['result' => false,
+                'message' => 'this is a non phone number.', ];
+        }
+
+        try {
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $parsed = $phone_util->parse($phone_number, $iso_code);
+
+            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
+                return ['result' => false,
+                    'message' => 'Region code of this phone number does not match with the given $iso_code', ];
+            }
+
+            $is_mobile = $phone_util->getNumberType($parsed);
+
+            return ['result' => (bool) (in_array($is_mobile, [1, 2], true)), 'message' => 'sccess: this is a valid phone number'];
+        } catch (libphonenumberlight\NumberParseException $e) {
+            return ['result' => false, 'message' => 'exception occured while calling the liphonenumberlight library'];
+        }
     }
 }

@@ -997,38 +997,38 @@ class ConfigClass
         return false;
     }
 
-    /**
-     * Check if given phone number is valid mobile phone number
-     *
-     * @param string $phone_number
-     * @param string $iso_code
-     *
-     * @throws libphonenumberlight\NumberParseException
-     *
-     * @return bool
-     */
-    public function isValidMobilePhoneNumber($iso_code, $phone_number = false)
-    {
-        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
-            return false;
-        }
-
-        try {
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
-            $parsed = $phone_util->parse($phone_number, $iso_code);
-
-            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
-                return false;
-            }
-
-            $is_mobile = $phone_util->getNumberType($parsed);
-
-            return (bool) (in_array($is_mobile, [1, 2], true));
-        } catch (libphonenumberlight\NumberParseException $e) {
-            // @todo : Add Log
-            return false;
-        }
-    }
+//    /**
+//     * Check if given phone number is valid mobile phone number
+//     *
+//     * @param string $phone_number
+//     * @param string $iso_code
+//     *
+//     * @throws libphonenumberlight\NumberParseException
+//     *
+//     * @return bool
+//     */
+//    public function isValidMobilePhoneNumber($iso_code, $phone_number = false)
+//    {
+//        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
+//            return false;
+//        }
+//
+//        try {
+//            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+//            $parsed = $phone_util->parse($phone_number, $iso_code);
+//
+//            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
+//                return false;
+//            }
+//
+//            $is_mobile = $phone_util->getNumberType($parsed);
+//
+//            return (bool) (in_array($is_mobile, [1, 2], true));
+//        } catch (libphonenumberlight\NumberParseException $e) {
+//            // @todo : Add Log
+//            return false;
+//        }
+//    }
 
     /**
      * Return international formatted phone number (norm E.164)

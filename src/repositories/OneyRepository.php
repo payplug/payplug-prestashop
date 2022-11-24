@@ -250,7 +250,7 @@ class OneyRepository extends BaseClass
                         $this->contextAdapter->getContext()->cart->id_address_invoice;
                     $address = $this->addressAdapter->get((int) $id_address);
                     $country = $this->countryAdapter->getCountry($address->id_country);
-                    $valid = $this->dependencies->configClass->isValidMobilePhoneNumber($country->iso_code, $data);
+                    $valid = $this->validators['payment']->isPhoneNumber($country->iso_code, $data)['result'];
                     if (!$valid) {
                         $errors[] = $this->dependencies->l('Please enter your mobile phone number.', 'oneyrepository');
                     }
@@ -1198,10 +1198,10 @@ class OneyRepository extends BaseClass
         }
 
         // Validate phone number
-        $valid_shipping_mobile = $this->dependencies->configClass->isValidMobilePhoneNumber(
+        $valid_shipping_mobile = $this->validators['payment']->isPhoneNumber(
             $shipping['country'],
             $shipping['mobile_phone_number']
-        );
+        )['result'];
         if (!$valid_shipping_mobile) {
             return true;
         }
@@ -1215,10 +1215,10 @@ class OneyRepository extends BaseClass
         $billing = $payment_data['billing'];
 
         // Validate phone number
-        $valid_billing_mobile = $this->dependencies->configClass->isValidMobilePhoneNumber(
+        $valid_billing_mobile = $this->validators['payment']->isPhoneNumber(
             $billing['country'],
             $billing['mobile_phone_number']
-        );
+        )['result'];
         if (!$valid_billing_mobile) {
             return true;
         }

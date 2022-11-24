@@ -507,7 +507,8 @@ class HookClass
 
             $this->dependencies->installmentClass->updatePayplugInstallment($installment);
         } else {
-            if (!$pay_id = $this->dependencies->paymentClass->isTransactionPending($order->id_cart)) {
+            //TODo: test this
+            if (!$this->validators['payment']->isPendingPayment($order->id_cart)) {
                 $pay_id = $this->dependencies->orderClass->getPayplugOrderPayment($order->id);
 
                 if (!$pay_id) {
