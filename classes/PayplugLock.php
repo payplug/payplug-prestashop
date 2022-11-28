@@ -36,6 +36,7 @@ class PayplugLock
     private $dependencies;
     private $constant;
     private $query;
+    private $validators;
 
     public function __construct($dependencies)
     {
@@ -43,6 +44,7 @@ class PayplugLock
 
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->validators = $this->dependencies->getValidators();
     }
 
     /**
@@ -67,7 +69,6 @@ class PayplugLock
             $creation_date = new DateTime($lock_exists['date_add']);
             $end_of_life = $creation_date->add($lifetime);
             $time = new DateTime('now');
-
             while (($this->existsLockG2($id_cart) !== false) && ($time < $last_check)) {
                 if (function_exists('usleep')) {
                     usleep($loop_time * 1000000);
@@ -95,11 +96,8 @@ class PayplugLock
         // check if has lock
         $lock_exists = $this->existsLockG2($id_cart);
         if ($lock_exists) {
-            $lifetime = new DateInterval('PT2M');
-            $date_limit = new DateTime('now');
-            $date_limit->sub($lifetime);
             $date_add = new DateTime($lock_exists['date_add']);
-            if ($date_limit > $date_add) {
+            if ($this->validators['lock']->isExpired($date_add)['result']) {
                 $this->deleteLockG2($id_cart);
             }
         }

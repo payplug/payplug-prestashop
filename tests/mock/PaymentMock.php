@@ -131,6 +131,29 @@ class PaymentMock
         return $defaultConfiguration;
     }
 
+    public static function getDeferred($parameters = [])
+    {
+        $default_parameters = [
+            'authorized_amount' => 424242,
+            'authorization' => [
+                'authorized_amount' => 424242,
+                'authorized_at' => strtotime('-2 days'),
+                'expires_at' => strtotime('+2 days'),
+            ],
+        ];
+
+        foreach ($default_parameters as $key => $value) {
+            if (!isset($parameters[$key])) {
+                $parameters[$key] = $value;
+            }
+        }
+
+        $resource = self::getDefault($parameters);
+        unset($resource['amount']);
+
+        return Payment::fromAttributes($resource);
+    }
+
     public static function getInstallment($parameters = [])
     {
         $defaultInstallment = [
@@ -221,5 +244,38 @@ class PaymentMock
     public static function getOneClick()
     {
         return Payment::fromAttributes(self::$payment_parameters['oneclick']);
+    }
+
+    public static function getOney($parameters = [])
+    {
+        $resource = self::getDefault($parameters);
+        unset($resource['amount']);
+        $resource['authorized_amount'] = 20880;
+        $resource['payment_method'] = [
+            'type' => 'oney_x3_with_fees',
+            'is_pending' => false,
+        ];
+        $resource['payment_context'] = [
+            'cart' => [
+                [
+                    'merchant_item_id' => '3',
+                    'name' => 'Affiche encadrée The best is yet to come - Dimension : 40x60cm',
+                    'price' => 3480,
+                    'quantity' => 6,
+                    'total_amount' => 20880,
+                    'brand' => 'Graphic Corner',
+                    'delivery_label' => 'Click and collect',
+                    'expected_delivery_date' => '2022-11-23',
+                    'delivery_type' => 'storepickup',
+                ],
+            ],
+        ];
+        $resource['authorization'] = [
+            'authorized_amount' => 20880,
+            'authorized_at' => '',
+            'expires_at' => '',
+        ];
+
+        return Payment::fromAttributes($resource);
     }
 }

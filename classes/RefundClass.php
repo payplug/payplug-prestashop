@@ -34,6 +34,7 @@ class RefundClass
     private $orderSlip;
     private $tools;
     private $validate;
+    private $validators;
 
     public function __construct($dependencies)
     {
@@ -46,6 +47,7 @@ class RefundClass
         $this->orderSlip = $this->dependencies->getPlugin()->getOrderSlip();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
     }
 
     /**
@@ -114,11 +116,11 @@ class RefundClass
      */
     public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
-        $this->logger->setParams(['process' => 'refundClass']);
+        $this->logger->setProcess('refund');
 
         $sandbox = $this->tools->tool('strtoupper', $pay_mode) == 'TEST';
         $this->dependencies->apiClass->initializeApi($sandbox);
-
+        $response = [];
         if ($pay_id == null) {
             if ($inst_id) {
                 $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
@@ -170,19 +172,16 @@ class RefundClass
                         }
                     }
 
-                    if ($truly_refundable_amount < $total_amount) {
-                        return 'error';
-                    }
-
-                    if (!empty($refund_to_go)) {
+                    if ($this->validators['payment']->canBeRefund($pay_id, $refund_to_go, $truly_refundable_amount, $total_amount)['result']) {
                         foreach ($refund_to_go as $ref) {
                             $response = $this->dependencies->apiClass->refundPayment($ref['id'], $ref['data']);
                             if (!$response['result']) {
                                 return 'error';
                             }
                         }
+                    } else {
+                        return 'error';
                     }
-
                     $this->dependencies->installmentClass->updatePayplugInstallment($installment);
                 } else {
                     return 'error';
@@ -195,10 +194,11 @@ class RefundClass
                 'amount' => (int) $amount,
                 'metadata' => $metadata,
             ];
-
-            $response = $this->dependencies->apiClass->refundPayment($pay_id, $data);
-            if (!$response['result']) {
-                return 'error';
+            if ($this->validators['payment']->canBeRefund($pay_id, $data)['result']) {
+                $response = $this->dependencies->apiClass->refundPayment($pay_id, $data);
+                if (!$response['result']) {
+                    return 'error';
+                }
             }
         }
 
@@ -214,31 +214,57 @@ class RefundClass
     {
         $this->logger->addLog('[Payplug] Start refund', 'notice');
         $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
-
-        if (!$this->dependencies->amountCurrencyClass->checkAmountToRefund($amount)) {
-            $this->logger->addLog('Incorrect amount to refund', 'notice');
-
-            exit(json_encode([
-                'status' => 'error',
-                'data' => $this->dependencies->l('payplug.refundPayment.incorrectAmount', 'refundclass'),
-            ]));
-        }
-        if ($this->dependencies->amountCurrencyClass->checkAmountToRefund($amount) && ($amount < 0.10)) {
-            $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
-
-            exit(json_encode([
-                'status' => 'error',
-                'data' => $this->dependencies->l('payplug.refundPayment.amountAtLeast', 'refundclass'),
-            ]));
-        }
-        $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
-        $amount = (float) ($amount * 1000); // we use this trick to avoid rounding while converting to int
-            $amount = (float) ($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
-            $amount = (int) $amount;
-
         $id_order = $this->tools->tool('getValue', 'id_order');
         $pay_id = $this->tools->tool('getValue', 'pay_id');
         $inst_id = $this->tools->tool('getValue', 'inst_id');
+
+        $amount_available = 0;
+        if ($inst_id) {
+            $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+            foreach ($installment['resource']->schedule as $schedule) {
+                foreach ($schedule->payment_ids as $p_id) {
+                    $payment = $this->dependencies->apiClass->retrievePayment($p_id);
+                    if ($payment['resource']->is_paid && !$payment['resource']->is_refunded) {
+                        $amount_available += $payment['resource']->amount - $payment['resource']->amount_refunded;
+                    }
+                }
+            }
+        } else {
+            $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            $amount_available = $payment['resource']->amount - $payment['resource']->amount_refunded;
+        }
+
+        $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+
+        $is_refundable_amount = $this->validators['payment']->isRefundableAmount(
+            (int) $amount,
+            (int) $amount_available
+        );
+
+        if (!$is_refundable_amount['result']) {
+            switch ($is_refundable_amount['code']) {
+                case 'format':
+                    $this->logger->addLog('Incorrect amount to refund', 'notice');
+                    exit(json_encode([
+                        'status' => 'error',
+                        'data' => $this->dependencies->l('payplug.refundPayment.incorrectAmount', 'refundclass'),
+                    ]));
+                case 'lower':
+                    $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
+                    exit(json_encode([
+                        'status' => 'error',
+                        'data' => $this->dependencies->l('payplug.refundPayment.amountAtLeast', 'refundclass'),
+                    ]));
+                case 'upper':
+                default:
+                    $this->logger->addLog('Cannot refund that amount.', 'notice');
+                    exit(json_encode([
+                        'status' => 'error',
+                        'data' => $this->dependencies->l('payplug.refundPayment.cannotRefund', 'refundclass'),
+                    ]));
+            }
+        }
+
         $metadata = [
             'ID Client' => (int) $this->tools->tool('getValue', 'id_customer'),
             'reason' => 'Refunded with Prestashop',

@@ -85,6 +85,7 @@ class PayPlugNotifications
     private $payplugLock;
     private $module;
     private $plugin;
+    private $validators;
 
     public function __construct()
     {
@@ -99,7 +100,7 @@ class PayPlugNotifications
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->logger->addLog('Notification: setLogger');
         $this->logger = $this->dependencies->getPlugin()->getLogger();
-        $this->logger->setParams(['process' => 'notification']);
+        $this->logger->setProcess('notification');
     }
 
     /**
@@ -182,7 +183,7 @@ class PayPlugNotifications
     private function exitProcess($str = '', $http_code = 200)
     {
         $this->logger->addLog('Notification: exitProcess');
-        if ($str) {
+        if (is_string($str) && $str) {
             $this->logger->addLog($str);
         }
         if ($this->lock_key) {
@@ -207,7 +208,7 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: getNewOrderState');
         // Check if order is refused by oney
-        if ($this->is_oney && $this->payment->failure) {
+        if ($this->is_oney && $this->validators['payment']->isFailed($this->payment)['result']) {
             $this->logger->addLog('NewOrderState: cancelled');
 
             return [
@@ -227,7 +228,7 @@ class PayPlugNotifications
         }
 
         // Check if payment has failure
-        if ($this->payment->failure) {
+        if ($this->validators['payment']->isFailed($this->payment)['result']) {
             $this->logger->addLog('NewOrderState: error');
 
             return [
@@ -287,7 +288,7 @@ class PayPlugNotifications
         if ($this->is_installment) {
             $installment = new PPPaymentInstallment($this->resource->installment_plan_id, $this->dependencies);
             $first_payment = $installment->getFirstPayment();
-            if ($first_payment->isDeferred()) {
+            if ($this->validators['payment']->isDeferred($first_payment->resource)['result']) {
                 $order_state = $this->order_states['auth'];
             } else {
                 $order_state = $this->order_states['paid'];
@@ -325,6 +326,12 @@ class PayPlugNotifications
         ];
 
         $amount = $this->amountCurrencyClass->convertAmount($amount, true);
+        $cart_amount = $this->cart->getOrderTotal(true);
+        $check_amount = $this->validators['order']->isSameAmount((float) $amount, (float) $cart_amount);
+        if (!$check_amount['result']) {
+            $this->logger->addLog($check_amount['message']);
+            $this->logger->addLog('Cart amount:' . $cart_amount);
+        }
 
         $currency = (int) $this->cart->id_currency;
 
@@ -404,13 +411,6 @@ class PayPlugNotifications
 
         // Create Order
         try {
-            $cart_amount = (float) $this->cart->getOrderTotal(true);
-
-            if ($amount != $cart_amount) {
-                $this->logger->addLog('Cart amount is different and may occurred an error');
-                $this->logger->addLog('Cart amount:' . $cart_amount);
-            }
-
             $this->logger->addLog('Order create with amount:' . $amount);
             $is_order_validated = $this->module->validateOrder(
                 $this->cart->id,
@@ -435,8 +435,9 @@ class PayPlugNotifications
 
         // Then load it
         $this->order = $this->orderAdapter->get((int) $this->module->currentOrder);
-        if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
-            $this->logger->addLog('Order cannot be loaded.', 'error');
+        $check_order = $this->validators['order']->isCreated($this->order, (int) $this->cart->id);
+        if (!$check_order['result']) {
+            $this->logger->addLog($check_order['message'], 'error');
             $this->exitProcess('Order cannot be loaded.', 500);
         }
         $this->logger->addLog('Order loaded.', 'debug');
@@ -973,6 +974,7 @@ class PayPlugNotifications
         $this->except = null;
         $this->resp = [];
         $this->dependencies = new DependenciesClass();
+        $this->validators = $this->dependencies->getValidators();
         $this->setAdapters();
 
         $this->apiClass = $this->dependencies->apiClass;
@@ -1124,10 +1126,7 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
         // Define if payment is deferred resource
-        if (isset($this->payment->authorization) && !$this->is_oney) {
-            $this->is_deferred = isset($this->payment->authorization->authorized_at)
-                && $this->payment->authorization->authorized_at;
-        }
+        $this->is_deferred = !$this->is_oney && $this->validators['payment']->isDeferred($this->payment)['result'];
         $this->logger->addLog('Notification: is_deferred: ' . ($this->is_deferred ? 'ok' : 'nok'));
 
         // Define if payment is from installment

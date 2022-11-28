@@ -30,6 +30,7 @@ use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 class OneyRepository extends BaseClass
 {
     private $addressAdapter;
+    private $cartAdapter;
     private $cache;
     private $dependencies;
     private $log;
@@ -42,6 +43,7 @@ class OneyRepository extends BaseClass
     private $toolsAdapter;
     private $validateAdapter;
     private $assign;
+    private $validators;
 
     public function __construct(
         $addressAdapter,
@@ -62,6 +64,7 @@ class OneyRepository extends BaseClass
         $validateAdapter
     ) {
         $this->dependencies = $dependencies;
+        $this->validators = $this->dependencies->getValidators();
         $this->cache = $cache;
         $this->logger = $logger;
         $this->addressAdapter = $addressAdapter;
@@ -248,7 +251,11 @@ class OneyRepository extends BaseClass
                         $this->contextAdapter->getContext()->cart->id_address_invoice;
                     $address = $this->addressAdapter->get((int) $id_address);
                     $country = $this->countryAdapter->getCountry($address->id_country);
-                    $valid = $this->dependencies->configClass->isValidMobilePhoneNumber($country->iso_code, $data);
+                    $is_valid_phone = $this
+                        ->validators['payment']
+                        ->isPhoneNumber($data)['result'];
+                    $valid = $is_valid_phone
+                        && $this->dependencies->configClass->isValidMobilePhoneNumber($country->iso_code, $data);
                     if (!$valid) {
                         $errors[] = $this->dependencies->l('Please enter your mobile phone number.', 'oneyrepository');
                     }
@@ -1132,7 +1139,7 @@ class OneyRepository extends BaseClass
         $simulations = $this->dependencies->apiClass->getOneySimulations($data);
 
         if (!$simulations['result']) {
-            $this->logger->setParams(['process' => '[Oney Repository] OneySimulation::getSimulations']);
+            $this->logger->setProcess('oney');
             $this->logger->addLog($simulations['message'], 'error');
 
             return [
@@ -1158,7 +1165,7 @@ class OneyRepository extends BaseClass
             // $cache_id = cache_key in db
             // $to_cache = cache_value in db
             if (!$this->cache->setCache($cache_key['result'], $to_cache)) {
-                $this->logger->setParams(['process' => '[Oney Repository] getOneySimulations']);
+                $this->logger->setProcess('oney');
                 $error_message = 'Error during setting Oney Simulation in DB cache [OneyRepository]';
                 $error_level = 'error';
                 $this->logger->addLog($error_message, $error_level);
@@ -1196,7 +1203,10 @@ class OneyRepository extends BaseClass
         }
 
         // Validate phone number
-        $valid_shipping_mobile = $this->dependencies->configClass->isValidMobilePhoneNumber(
+        $is_valid_phone = $this
+            ->validators['payment']
+            ->isPhoneNumber($shipping['mobile_phone_number'])['result'];
+        $valid_shipping_mobile = $is_valid_phone && $this->dependencies->configClass->isValidMobilePhoneNumber(
             $shipping['country'],
             $shipping['mobile_phone_number']
         );
@@ -1213,7 +1223,10 @@ class OneyRepository extends BaseClass
         $billing = $payment_data['billing'];
 
         // Validate phone number
-        $valid_billing_mobile = $this->dependencies->configClass->isValidMobilePhoneNumber(
+        $is_valid_phone = $this
+            ->validators['payment']
+            ->isPhoneNumber($billing['mobile_phone_number'])['result'];
+        $valid_billing_mobile = $is_valid_phone && $this->dependencies->configClass->isValidMobilePhoneNumber(
             $billing['country'],
             $billing['mobile_phone_number']
         );
@@ -1251,13 +1264,18 @@ class OneyRepository extends BaseClass
         }
 
         // we use the Oney limit to get allowed currencies
-        $oney_min_amounts = $this->toolsAdapter->tool(
-            'strtoupper',
-            $this->configurationAdapter->get($this->dependencies->getConfigurationKey('oneyMinAmounts'))
-        );
+        $currencies = [];
+        foreach (explode(';', $this->configurationAdapter->get(
+            $this->dependencies->getConfigurationKey('oneyMinAmounts')
+        )) as $amount_cur) {
+            $cur = [];
+            preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
+            $currencies[] = $this->toolsAdapter->tool('strtoupper', $cur[1]);
+        }
         $iso_code = $this->toolsAdapter->tool('strtoupper', $currency->iso_code);
+        $is_valid_amount = $this->validators['payment']->isCurrency($iso_code, $currencies);
 
-        return strpos($oney_min_amounts, $iso_code) !== false;
+        return $is_valid_amount['result'];
     }
 
     /**
@@ -1274,37 +1292,53 @@ class OneyRepository extends BaseClass
      */
     public function isOneyElligible($cart, $amount = false, $country = false)
     {
-        // check if cart is valid
-        $is_valid_cart = $this->isValidOneyCart($cart);
-        if (!$is_valid_cart['result']) {
+        if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return [
                 'result' => false,
-                'error_type' => 'invalid_cart',
-                'error' => $is_valid_cart['error'],
+                'error' => $this->dependencies->l('The cart is unvalid', 'oneyrepository'),
             ];
         }
 
-        // check if cart address is valid
-        if ($country) {
-            $is_valid_addresses = $this->isValidOneyAddresses($cart->id_address_delivery, $cart->id_address_invoice);
-            if (!$is_valid_addresses['result']) {
-                return [
-                    'result' => false,
-                    'error_type' => 'invalid_addresses',
-                    'error' => $is_valid_addresses['error'],
-                ];
+        $is_valid_cart = $this->isValidOneyCart($cart);
+        $is_valid_addresses = $this->isValidOneyAddresses($cart->id_address_delivery, $cart->id_address_invoice);
+        $is_valid_amount = $this->isValidOneyAmount($amount ? $amount : $cart->getOrderTotal(true));
+
+        $is_elligible = $this->validators['payment']->isOneyElligible(
+            $is_valid_cart['result'],
+            $country ? $is_valid_addresses['result'] : true,
+            $is_valid_amount['result']
+        );
+
+        if (!$is_elligible['result']) {
+            switch ($is_elligible['code']) {
+                case 'product_quantity':
+                    return [
+                        'result' => false,
+                        'error_type' => 'invalid_cart',
+                        'error' => $is_valid_cart['error'],
+                    ];
+                case 'address':
+                    return [
+                        'result' => false,
+                        'error_type' => 'invalid_addresses',
+                        'error' => $is_valid_addresses['error'],
+                    ];
+                case 'amount':
+                    $limits = $this->getOneyPriceLimit(true, $cart->id_currency);
+                    $converted_amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+                    $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
+
+                    return [
+                        'result' => false,
+                        'error_type' => $error_type,
+                        'error' => $is_valid_amount['error'],
+                    ];
+                default:
+                    return [
+                        'result' => false,
+                        'error' => 'An error occured',
+                    ];
             }
-        }
-
-        // check if current amount is between min and max values
-        $amount = $amount ? $amount : $cart->getOrderTotal(true);
-        $is_valid_amount = $this->isValidOneyAmount($amount);
-        if (!$is_valid_amount['result']) {
-            $limits = $this->getOneyPriceLimit(true, $cart->id_currency);
-            $converted_amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
-            $error_type = $converted_amount > $limits['min'] ? 'invalid_amount_top' : 'invalid_amount_bottom';
-
-            return ['result' => false, 'error_type' => $error_type, 'error' => $is_valid_amount['error']];
         }
 
         return ['result' => true, 'error' => false];
@@ -1354,8 +1388,15 @@ class OneyRepository extends BaseClass
     public function isValidOneyAmount($amount)
     {
         $limits = $this->getOneyPriceLimit();
-        $convert_amount = ($this->dependencies->amountCurrencyClass->convertAmount($amount)) / 100;
-        if (($limits['min'] > $convert_amount) || ($convert_amount > $limits['max'])) {
+        $is_valid_amount = $this->validators['payment']->isAmount(
+            $this->dependencies->amountCurrencyClass->convertAmount($amount),
+            [
+                'min' => $this->dependencies->amountCurrencyClass->convertAmount($limits['min']),
+                'max' => $this->dependencies->amountCurrencyClass->convertAmount($limits['max']),
+            ]
+        );
+
+        if (!$is_valid_amount['result']) {
             return [
                 'result' => false,
                 'error' => sprintf(
@@ -1386,11 +1427,10 @@ class OneyRepository extends BaseClass
         }
 
         $nb_products = $this->cartAdapter->nbProducts($cart);
-
-        // todo: set as a constant
         $max = 1000;
+        $is_valid_cart_quantity = $this->validators['payment']->isValidProductQuantity($nb_products, $max);
 
-        if ($nb_products >= $max) {
+        if (!$is_valid_cart_quantity['result']) {
             $error = 'The payment with Oney is not available because you have more than 1000 items in your cart.';
 
             return [
@@ -1412,8 +1452,9 @@ class OneyRepository extends BaseClass
      */
     public function isValidOneyCountry($shipping_iso, $billing_iso)
     {
-        // check if the billing country and the shipping country are different then return false
-        if ($shipping_iso != $billing_iso) {
+        // Check if the billing country and the shipping country are different then return false
+        $is_valid_country = $this->validators['payment']->isOneyCountry($shipping_iso, $billing_iso);
+        if (!$is_valid_country['result']) {
             $error = 'Delivery and billing addresses must be in the same country to pay with Oney.';
 
             return [
@@ -1423,8 +1464,7 @@ class OneyRepository extends BaseClass
             ];
         }
 
-        // check if the shipping country are different then return false
-        $iso_code = $this->toolsAdapter->tool('strtoupper', $shipping_iso);
+        // Check if the allowed list is valid
         $allow_countries = $this->toolsAdapter->tool(
             'strtoupper',
             $this->configurationAdapter->get(
@@ -1439,22 +1479,15 @@ class OneyRepository extends BaseClass
             ];
         }
 
-        $iso_list = explode(',', $allow_countries);
-        if (!in_array($iso_code, $iso_list, true)) {
+        // Check if the shipping country is allowed
+        $iso_code = $this->toolsAdapter->tool('strtoupper', $shipping_iso);
+        $is_allowed_country = $this->validators['payment']->isAllowedCountry($allow_countries, $iso_code);
+        if (!$is_allowed_country['result']) {
+            $iso_list = explode(',', $allow_countries);
             /*
              * We first used Prestashop country list but translation was not ok so we had to write countries
              * directly in the code. Maybe later it will be ok and dynamic.
              */
-            /*
-            $list = [];
-            foreach ($iso_list as $iso) {
-                $id_country = $this->countryAdapter->getByIso($iso);
-                $list[] = $this->countryAdapter->getNameById(
-                    $this->contextAdapter->getContext()->language->id,
-                    $id_country
-                );
-            }
-            */
             $str_list = $this->dependencies->l('France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana', 'oneyrepository');
             if (in_array('IT', $iso_list)) {
                 $str_list = $this->dependencies->l('Italy', 'oneyrepository');
@@ -1480,25 +1513,39 @@ class OneyRepository extends BaseClass
      */
     public function isValidOneyEmail($email)
     {
-        $tools = $this->toolsAdapter;
-        $validate = $this->validateAdapter;
-        $error = false;
+        $is_valid_email = $this->validators['payment']->isOneyEmail($email);
+        if (!$is_valid_email['result']) {
+            $code = isset($is_valid_email['code']) ? $is_valid_email['code'] : 'invalid';
+            switch ($code) {
+                case 'length-char':
+                    $error = $this->dependencies->l('Your email address is too long and the + character is not valid', 'oneyrepository');
+                    $error .= $this->dependencies->l(' please change it to another address (max 100 characters).', 'oneyrepository');
 
-        if (!is_string($email) || empty($email) || !$validate->validate('isEmail', $email)) {
-            $error = $this->dependencies->l('Your email address is not a valid email', 'oneyrepository');
-        } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100
-            && $tools->tool('strpos', $email, '+') !== false) {
-            $error = $this->dependencies->l('Your email address is too long and the + character is not valid', 'oneyrepository');
-            $error .= $this->dependencies->l(' please change it to another address (max 100 characters).', 'oneyrepository');
-        } elseif ($tools->tool('strlen', $email, 'UTF-8') > 100) {
-            $error = $this->dependencies->l('Your email address is too long. Please change your email address (100 characters max).', 'oneyrepository');
-        } elseif (strpos($email, '+') !== false) {
-            $error = $this->dependencies->l('The + character is not valid. Please change your email address (100 characters max).', 'oneyrepository');
+                    break;
+                case 'char':
+                    $error = $this->dependencies->l('The + character is not valid. Please change your email address (100 characters max).', 'oneyrepository');
+
+                    break;
+                case 'length':
+                    $error = $this->dependencies->l('Your email address is too long. Please change your email address (100 characters max).', 'oneyrepository');
+
+                    break;
+                case 'format':
+                default:
+                    $error = $this->dependencies->l('Your email address is not a valid email', 'oneyrepository');
+
+                    break;
+            }
+
+            return [
+                'result' => false,
+                'message' => $error,
+            ];
         }
 
         return [
-            'result' => $error ? false : true,
-            'message' => $error,
+            'result' => true,
+            'message' => '',
         ];
     }
 

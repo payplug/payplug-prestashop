@@ -37,6 +37,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $productAdapter;
     private $toolsAdapter;
     private $translate;
+    private $validators;
 
     /**
      * @description
@@ -59,6 +60,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         require_once _PS_ROOT_DIR_ . '/config/config.inc.php';
 
         $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->validators = $this->dependencies->getValidators();
         $this->apiClass = $this->dependencies->apiClass;
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
@@ -274,7 +276,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $payment = $payment['resource'];
 
                 // Check if payment has failure
-                if ($payment->failure != null) {
+                if ($this->validators['payment']->isFailed($payment)['result']) {
                     exit(json_encode([
                         'result' => false,
                         'message' => $payment->failure->message,
@@ -370,7 +372,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $payment = $patchPayment['resource'];
 
                 // Check if payment has failure...
-                if ($payment->failure != null) {
+                if ($this->validators['payment']->isFailed($payment)['result']) {
                     exit(json_encode([
                         'result' => false,
                         'message' => $payment->failure->message,

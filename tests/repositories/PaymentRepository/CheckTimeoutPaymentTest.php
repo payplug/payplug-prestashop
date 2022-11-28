@@ -94,7 +94,7 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'checkPaymentTable' => [
-                    'date_upd' => (new \DateTime('+5 min'))->format('Y-m-d H:i:s'),
+                    'date_upd' => date('Y-m-d H:i:s', strtotime('-5 minutes')),
                 ],
             ])
         ;

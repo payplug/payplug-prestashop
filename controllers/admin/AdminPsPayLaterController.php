@@ -95,9 +95,9 @@ class AdminPsPayLaterController extends ModuleAdminController
             // Retrieve Account CDN
             $this->context->smarty->assign('urlAccountsCdn', $accountsService->getAccountsCdn());
         } catch (ModuleNotInstalledException $e) {
-            $this->logger->addLog($e->getMessage(), 'error');
+            $this->logger->addLog(($e->getMessage() ? $e->getMessage() : 'ModuleNotInstalledException'), 'error');
         } catch (ModuleVersionException $e) {
-            $this->logger->addLog($e->getMessage(), 'error');
+            $this->logger->addLog(($e->getMessage() ? $e->getMessage() : 'ModuleVersionException'), 'error');
         }
     }
 }

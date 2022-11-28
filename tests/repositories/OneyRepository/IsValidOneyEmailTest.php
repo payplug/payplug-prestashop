@@ -26,7 +26,7 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => true,
-                'message' => false,
+                'message' => '',
             ],
             $response
         );

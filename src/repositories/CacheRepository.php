@@ -52,7 +52,7 @@ class CacheRepository extends BaseClass
         $this->query = $query;
         $this->constant = $constant;
 
-        $this->logger->setParams(['process' => 'cache']);
+        $this->logger->setProcess('cache');
     }
 
     public static function factory()
