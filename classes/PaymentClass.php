@@ -2182,7 +2182,7 @@ class PaymentClass
         ];
 
         $this->assign->assign([
-            'language' => $this->context->language,
+            'iso_lang' => $this->context->language->iso_code,
         ]);
 
         return $payment_options;

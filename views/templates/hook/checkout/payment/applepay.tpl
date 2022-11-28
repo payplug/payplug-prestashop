@@ -19,14 +19,8 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PayPlug SAS
 *}
-{if isset($language) && $language}
-    {if is_array($language) && isset($language.iso_code)}
-        {assign var=iso_code value=$language.iso_code}
-    {elseif isset($language->iso_code)}
-        {assign var=iso_code value=$language->iso_code}
-    {else}
-        {assign var=iso_code value='fr'}
-    {/if}
+{if isset($iso_lang)}
+    {assign var=iso_code value=$iso_lang}
 {else}
     {assign var=iso_code value='fr'}
 {/if}
