@@ -17,7 +17,7 @@ class BaseCacheRepository extends RepositoryBase
 
         $this->cacheEntity = new CardEntity();
         $this->logger->shouldReceive([
-            'setParams' => $this->logger,
+            'setProcess' => $this->logger,
         ]);
 
         $this->repo = \Mockery::mock(CacheRepository::class, [

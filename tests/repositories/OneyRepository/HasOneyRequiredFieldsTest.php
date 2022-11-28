@@ -220,12 +220,12 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         $payment_data = [
             'shipping' => [
                 'email' => 'customer@payplug.com',
-                'mobile_phone_number' => true,
+                'mobile_phone_number' => '0123456789',
                 'country' => 'FR',
                 'city' => 'paris',
             ],
             'billing' => [
-                'mobile_phone_number' => true,
+                'mobile_phone_number' => '0123456789',
                 'country' => 'FR',
                 'city' => 'paris',
             ],

@@ -30,10 +30,12 @@ class AmountCurrencyClass
     private $dependencies;
     private $order;
     private $tools;
+    private $validators;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->validators = $this->dependencies->getValidators();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->currency = $this->dependencies->getPlugin()->getCurrency();
         $this->order = $this->dependencies->getPlugin()->getOrder();
@@ -125,11 +127,10 @@ class AmountCurrencyClass
             return false;
         }
 
-        if (!in_array($this->tools->tool('strtoupper', $currency->iso_code), $this->getSupportedCurrencies())) {
-            return false;
-        }
+        $currencies = $this->getSupportedCurrencies();
+        $is_valid_amount = $this->validators['payment']->isCurrency($currency->iso_code, $currencies);
 
-        return true;
+        return $is_valid_amount['result'];
     }
 
     /**

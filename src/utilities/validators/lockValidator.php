@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2022 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,41 +16,51 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @copyright 2013 - 2022 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
 namespace PayPlug\src\utilities\validators;
 
-class oneyValidator
+class lockValidator
 {
     /**
-     * @description  check if the oney is activated
-     * for belgium/spain
+     * @description Check if lock is epxired
      *
-     * @param $isOneyCountryValidFeature
-     * @param $oneyAllowedCountries
-     * @param $country
+     * @param string $date
+     *
+     * @return array
      */
-    public function isOneyAllowedCountry($oneyAllowedCountries = '', $country = '')
+    public function isExpired($date = '')
     {
-        if (!is_string($oneyAllowedCountries) || !$oneyAllowedCountries) {
+        if (!is_string($date) || !$date) {
             return [
                 'result' => false,
-                'message' => 'Invalid oney allowed countries format',
+                'message' => 'Invalid argument given, $date must be a non empty string',
             ];
         }
-        if (!is_string($country) || !$country) {
+
+        if (!(bool) preg_match('/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $date)) {
             return [
                 'result' => false,
-                'message' => 'Invalid country format',
+                'message' => 'Invalid argument given, $date must be a date in format Y-m-d H:i:s',
+            ];
+        }
+
+        $given_date = date('Y-m-d H:i:s', strtotime($date));
+        $limits_date = date('Y-m-d H:i:s', strtotime('-2 minutes'));
+
+        if ($given_date > $limits_date) {
+            return [
+                'result' => false,
+                'message' => 'Lock is not expired',
             ];
         }
 
         return [
-            'result' => in_array($country, explode(',', $oneyAllowedCountries)),
-            'message' => 'Success',
+            'result' => true,
+            'message' => '',
         ];
     }
 }

@@ -22,7 +22,7 @@ class BasePaymentRepository extends RepositoryBase
         $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
 
         $this->logger->shouldReceive([
-            'setParams' => $this->logger,
+            'setProcess' => $this->logger,
         ]);
 
         $this->repo = \Mockery::mock(PaymentRepository::class, [

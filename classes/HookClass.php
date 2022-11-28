@@ -43,11 +43,13 @@ class HookClass
     private $orderHistory;
     private $orderState;
     private $orderStateAdapter;
+    private $payment;
     private $product;
     private $query;
     private $sql;
     private $tools;
     private $validate;
+    private $validators;
 
     public function __construct($dependencies)
     {
@@ -69,11 +71,13 @@ class HookClass
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->orderState = $this->dependencies->getPlugin()->getOrderState();
         $this->orderStateAdapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
+        $this->payment = $this->dependencies->getPlugin()->getPayment();
         $this->product = $this->dependencies->getPlugin()->getProduct();
         $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->sql = $this->dependencies->getPlugin()->getSql();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
     }
 
     public function actionAdminLanguagesControllerSaveAfter($params)
@@ -183,18 +187,15 @@ class HookClass
         $active = $this->module->isEnabled($this->dependencies->name);
         if (!$active
             || $order->payment != $this->module->getInstanceByName($this->dependencies->name)->displayName
-            || !$this->config->get(
-                $this->dependencies->getConfigurationKey('deferred')
-            )
-            || !$this->config->get(
-                $this->dependencies->getConfigurationKey('deferredAuto')
-            )
+            || !$this->config->get($this->dependencies->getConfigurationKey('deferred'))
+            || !$this->config->get($this->dependencies->getConfigurationKey('deferredAuto'))
             || $params['newOrderStatus']->id != $this->config->get(
                 $this->dependencies->getConfigurationKey('deferredState')
             )
         ) {
             return;
         }
+
         $cart = $this->cart->get((int) $order->id_cart);
         $payment_method = $this->dependencies->paymentClass->getPaymentMethodByCart($cart);
         if ($payment_method['type'] == 'installment') {
@@ -203,8 +204,16 @@ class HookClass
         } else {
             $payment = new PPPayment($payment_method['id'], $this->dependencies);
         }
-        if (!$payment->isPaid()) {
-            $capture = $this->dependencies->apiClass->capturePayment($payment->id);
+
+        $is_paid = $this->validators['payment']->isPaid($payment)['result'];
+        $can_be_captured = $this->validators['payment']->isPayment($payment)['result']
+            && !$this->validators['payment']->isFailed($payment)['result']
+            && !$is_paid
+            && $this->validators['payment']->isDeferred($payment)['result']
+            && !$this->validators['payment']->isExpired($payment)['result'];
+
+        if ($can_be_captured) {
+            $capture = $this->dependencies->apiClass->capturePayment($payment->resource->id);
             if ($capture['result']) {
                 $payment = $capture['resource'];
                 if ($payment->card->id !== null) {
@@ -307,8 +316,8 @@ class HookClass
     /**
      * @param array $params
      *
-     * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws PrestaShopDatabaseException
      *
      * @return string
      */
@@ -480,7 +489,11 @@ class HookClass
             $inst_aborted = !$installment->is_active;
             $ppInstallment = new PPPaymentInstallment($installment->id, $this->dependencies);
             $instPaymentOne = $ppInstallment->getFirstPayment();
-            $inst_can_be_aborted = !($inst_aborted || ($instPaymentOne->isDeferred() && !$instPaymentOne->isPaid()));
+
+            $inst_can_be_aborted = !($inst_aborted || (
+                $this->validators['payment']->isDeferred($instPaymentOne->resource)['result']
+                    && !$instPaymentOne->isPaid()
+            ));
             $inst_paid = $installment->is_fully_paid;
             $this->assign->assign([
                 'inst_id' => $inst_id,
@@ -501,7 +514,10 @@ class HookClass
 
             $this->dependencies->installmentClass->updatePayplugInstallment($installment);
         } else {
-            if (!$pay_id = $this->dependencies->paymentClass->isTransactionPending($order->id_cart)) {
+            $payment = $this->payment->checkPaymentTable((int) $order->id_cart);
+            $pay_id = isset($payment['id_payment']) ? $payment['id_payment'] : false;
+
+            if (!$this->validators['payment']->isPending($payment)['result']) {
                 $pay_id = $this->dependencies->orderClass->getPayplugOrderPayment($order->id);
 
                 if (!$pay_id) {
@@ -572,9 +588,10 @@ class HookClass
                 // update order state from payment status
                 if ($order->getCurrentState() == $oney_state) {
                     $new_order_state = false;
-                    if ($payment->is_paid) {
+
+                    if ($this->validators['payment']->isPaid($payment)['result']) {
                         $new_order_state = $paid_state;
-                    } elseif (isset($payment->failure) && $payment->failure !== null) {
+                    } elseif ($this->validators['payment']->isFailed($payment)['result']) {
                         $new_order_state = $cancelled_state;
                     }
 
@@ -607,13 +624,14 @@ class HookClass
             );
 
             $current_state = (int) $order->getCurrentState();
-
-            if ((int) $payment->is_paid == 0) {
-                if (isset($payment->failure, $payment->failure->message)) {
+            if (!$this->validators['payment']->isPaid($payment)['result']) {
+                $is_failed = $this->validators['payment']->isFailed($payment);
+                if ($is_failed['result']) {
                     $pay_error = '(' . $payment->failure->message . ')';
                 } else {
                     $pay_error = '';
                 }
+
                 $display_refund = false;
                 if ($current_state != 0 && $current_state == $id_pending_order_state && !$is_bancontact) {
                     $show_menu_update = true;
@@ -1202,6 +1220,7 @@ class HookClass
         ]);
 
         // Données sous forme de tableau (pour 1.6 et 1.7)
+
         $payment_options = $this->dependencies->paymentClass->getPaymentOptions();
 
         // Transforme tableau en object
@@ -1209,8 +1228,8 @@ class HookClass
     }
 
     /**
-     * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws PrestaShopDatabaseException
      *
      * @return string
      */

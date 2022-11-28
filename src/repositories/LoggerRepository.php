@@ -24,6 +24,7 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\application\dependencies\BaseClass;
+use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\LoggerEntity;
 
 class LoggerRepository extends BaseClass
@@ -31,12 +32,14 @@ class LoggerRepository extends BaseClass
     private $dependencies;
     private $loggerEntity;
     private $query;
+    private $validators;
 
     public function __construct($dependencies)
     {
         $this->loggerEntity = new loggerEntity();
         $this->query = new QueryRepository();
         $this->dependencies = $dependencies;
+        $this->validators = $this->dependencies->getValidators();
         $this->setStdParams();
     }
 
@@ -82,23 +85,16 @@ class LoggerRepository extends BaseClass
     /**
      * @description Used to set $process and $type since other classes
      *
-     * @param array $params
+     * @param string $process
      */
-    public function setParams($params)
+    public function setProcess($process = '')
     {
-        $logger = $this->loggerEntity;
-
-        if (isset($params['process'])) {
-            $logger->setProcess($params['process']);
-        } else {
-            $logger->setProcess('');
+        $validate = $this->validators['logger']->isAllowedProcess($process);
+        if (!$validate['result']) {
+            throw (new BadParameterException($validate['message']));
         }
 
-        if (isset($params['type'])) {
-            $logger->setType($params['type']);
-        } else {
-            $logger->setType('notification');
-        }
+        $this->loggerEntity->setProcess($process);
     }
 
     /**
@@ -111,6 +107,11 @@ class LoggerRepository extends BaseClass
      */
     public function addLog($message, $level = 'info')
     {
+        $validate = $this->validators['logger']->isContent($message);
+        if (!$validate['result']) {
+            throw (new BadParameterException($validate['message']));
+        }
+
         // get content
         $content = json_decode($this->loggerEntity->getContent(), true);
         if (!$content) {

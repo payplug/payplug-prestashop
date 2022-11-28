@@ -24,7 +24,6 @@
 namespace PayPlug\classes;
 
 use libphonenumberlight;
-use PayPlug\src\utilities\validators\oneyValidator;
 
 class ConfigClass
 {
@@ -237,6 +236,7 @@ class ConfigClass
     private $tools;
     private $validate;
     private $validationErrors = [];
+    private $validators = [];
 
     public function __construct($dependencies)
     {
@@ -253,12 +253,15 @@ class ConfigClass
         $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
+
+        $this->validators = $this->dependencies->getValidators();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
 
         if (file_exists(dirname(__FILE__) . '/../features.json')) {
-            $this->features_json = json_decode($this->tools->tool('file_get_contents', dirname(__FILE__) . '/../features.json'));
+            $this->features_json = json_decode($this->tools->tool('file_get_contents', dirname(__FILE__) . '/../features.json'), true);
         } else {
             $this->features_json = [];
         }
@@ -303,7 +306,6 @@ class ConfigClass
         }
 
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
-
         $available_options = [
             'standard' => (bool) $this->config->get($this->dependencies->getConfigurationKey('standard')),
             'live' => !(bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),
@@ -332,30 +334,30 @@ class ConfigClass
             $available_options['applepay'] = false;
             $available_options['amex'] = false;
         } else {
-            if (!$permissions['use_live_mode']
+            if (!$this->validators['payment']->hasPermissions($permissions, 'use_live_mode')['result']
                 || $this->config->get($this->dependencies->getConfigurationKey('liveApiKey')) === null
             ) {
                 $available_options['live'] = false;
             }
-            if (!$permissions['can_save_cards']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result']) {
                 $available_options['one_click'] = false;
             }
-            if (!$permissions['can_create_installment_plan']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result']) {
                 $available_options['installment'] = false;
             }
-            if (!$permissions['can_create_deferred_payment']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_create_deferred_payment')['result']) {
                 $available_options['deferred'] = false;
             }
-            if (!$permissions['can_use_oney']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_oney')['result']) {
                 $available_options['oney'] = false;
             }
-            if (!$permissions['can_use_bancontact']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_bancontact')['result']) {
                 $available_options['bancontact'] = false;
             }
-            if (!$permissions['can_use_applepay'] || !$available_options['live']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_applepay')['result'] || !$available_options['live']) {
                 $available_options['applepay'] = false;
             }
-            if (!$permissions['can_use_amex'] || !$available_options['live']) {
+            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_amex')['result'] || !$available_options['live']) {
                 $available_options['amex'] = false;
             }
         }
@@ -371,20 +373,23 @@ class ConfigClass
      */
     public function isAllowed()
     {
-        if (!$this->module->isEnabled($this->dependencies->name)
-            || !$this->config->get($this->dependencies->getConfigurationKey('show'))) {
-            return false;
-        }
+        $is_shown = $this->validators['module']->canBeShown(
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+        );
+        $is_allowed = $this->validators['module']->isAllowed(
+            (bool) $this->module->isEnabled($this->dependencies->name),
+            $is_shown['result']
+        );
 
-        return true;
+        return $is_allowed['result'];
     }
 
     /**
      * Check various configurations
      *
-     * @todo remove this function which is not used anymore in new BO
-     *
      * @return string
+     *
+     * @todo remove this function which is not used anymore in new BO
      */
     public function getCheckFieldset()
     {
@@ -412,7 +417,7 @@ class ConfigClass
         $payplug_test_api_key = $this->config->get($this->dependencies->getConfigurationKey('testApiKey'));
         $payplug_live_api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
 
-        $report = $this->checkRequirements();
+        $report = $this->getReportRequirements();
 
         if (empty($payplug_email) || (empty($payplug_test_api_key) && empty($payplug_live_api_key))) {
             $is_payplug_connected = false;
@@ -425,16 +430,8 @@ class ConfigClass
             $is_payplug_connected = false;
         }
 
-        if ($report['curl']['installed']
-            && $report['php']['up2date']
-            && $report['openssl']['installed']
-            && $report['openssl']['up2date']
-            && $is_payplug_connected
-        ) {
-            $is_payplug_configured = true;
-        } else {
-            $is_payplug_configured = false;
-        }
+        $check_requirement = $this->validators['module']->isAllRequirementsChecked($report);
+        $is_payplug_configured = $check_requirement['result'] && $is_payplug_connected;
 
         $this->check_configuration = ['status' => []];
 
@@ -456,9 +453,8 @@ class ConfigClass
             $this->check_configuration['status']['ssl'] = 'close';
         }
 
-        if ($is_payplug_configured) {
-        } else {
-            $this->config->get($this->dependencies->getConfigurationKey('show'), 0);
+        if (!$is_payplug_configured) {
+            $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 0);
             $this->check_configuration['status']['check'] = 'check';
         }
 
@@ -470,17 +466,11 @@ class ConfigClass
      */
     public function checkState()
     {
-        $report = $this->checkRequirements();
+        $state = $this->validators['module']->isAllRequirementsChecked(
+            $this->getReportRequirements()
+        );
 
-        if ($report['curl']['installed']
-            && $report['php']['up2date']
-            && $report['openssl']['installed']
-            && $report['openssl']['up2date']
-        ) {
-            return true;
-        }
-
-        return false;
+        return $state['result'];
     }
 
     /**
@@ -492,20 +482,13 @@ class ConfigClass
     public function checkPsAccount()
     {
         if ($this->dependencies->name == 'pspaylater') {
-            try {
-                $module = $this->module->getInstanceByName($this->dependencies->name);
-                $accountsFacade = $module->getService('ps_accounts.facade');
-                $accountsService = $accountsFacade->getPsAccountsService();
+            $module = $this->module->getInstanceByName($this->dependencies->name);
+            $check_ps_account = $this->validators['module']->isAccountLinkedToPsAccount($module);
 
-                return $accountsService->isAccountLinked();
-            } catch (\PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException $e) {
-                return false;
-            } catch (\PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException $e) {
-                return false;
-            }
-        } else {
-            return true;
+            return $check_ps_account['result'];
         }
+
+        return true;
     }
 
     /**
@@ -620,7 +603,7 @@ class ConfigClass
                         if ((int) $this->tools->tool('getValue', 'payplug_inst') === 1) {
                             if (((int) $this->tools->tool('getValue', 'payplug_inst_min_amount') >= 4)
                                 && ((int) $this->tools->tool('getValue', 'payplug_inst_mode') < 5)
-                            && ((int) $this->tools->tool('getValue', 'payplug_inst_mode') > 1)) {
+                                && ((int) $this->tools->tool('getValue', 'payplug_inst_mode') > 1)) {
                                 $this->config->updateValue($key, $value);
                             }
                         }
@@ -699,8 +682,13 @@ class ConfigClass
         }
 
         $this->checkConfiguration();
+
+        $is_shown = $this->validators['module']->canBeShown(
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+        );
+
         $this->configurations = [
-            'show' => $this->config->get($this->dependencies->getConfigurationKey('show')),
+            'show' => $is_shown['result'],
             'email' => $this->config->get($this->dependencies->getConfigurationKey('email')),
             'sandbox_mode' => $this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),
             'embedded_mode' => $this->config->get($this->dependencies->getConfigurationKey('embeddedMode')),
@@ -746,13 +734,13 @@ class ConfigClass
             if (!$permissions) {
                 exit('An error occured while getting account');
             }
-            $premium = $permissions['can_save_cards'] && $permissions['can_create_installment_plan'];
+            $premium = $this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result'] && $this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result'];
         } else {
             $premium = false;
         }
         if (!empty($this->configurations['live_api_key'])) {
             $permissions = $this->dependencies->apiClass->getAccount($this->configurations['live_api_key']);
-            $verified = !empty($permissions) ? $permissions['is_live'] : false;
+            $verified = $this->validators['payment']->hasPermissions($permissions, 'is_live')['result'];
         } else {
             $verified = false;
         }
@@ -834,15 +822,14 @@ class ConfigClass
                 'inst_min_amount' => $this->config->get($this->dependencies->getConfigurationKey('instMinAmount')),
             ]
         );
-        $oneyValidator = new OneyValidator();
 
-        $oney_belgium = $this->isValidFeature('feature_belgium_oney') && $oneyValidator->isOneyAllowedCountry($this->config->get(
+        $oney_belgium = $this->isValidFeature('feature_belgium_oney') && $this->validators['payment']->isAllowedCountry($this->config->get(
             $this->dependencies->getConfigurationKey(
                 'oneyAllowedCountries'
             )
         ), 'BE')['result'];
 
-        $oney_spain = $this->isValidFeature('feature_spain_oney') && $oneyValidator->isOneyAllowedCountry($this->config->get(
+        $oney_spain = $this->isValidFeature('feature_spain_oney') && $this->validators['payment']->isAllowedCountry($this->config->get(
             $this->dependencies->getConfigurationKey(
                 'oneyAllowedCountries'
             )
@@ -934,11 +921,8 @@ class ConfigClass
     {
         $onboardingOneyCompleted = false;
         $livepermissions = $this->getLivePermissions();
-        if ($livepermissions != [] && !empty($livepermissions['onboardingOneyCompleted'])) {
-            $onboardingOneyCompleted = (bool) $livepermissions['onboardingOneyCompleted'];
-        }
 
-        return $onboardingOneyCompleted;
+        return (bool) $this->validators['payment']->hasPermissions($livepermissions, 'onboardingOneyCompleted')['result'];
     }
 
     /**
@@ -1183,8 +1167,7 @@ class ConfigClass
             ->fields('*')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_card')
             ->where('id_customer = ' . (int) $id_customer)
-            ->build()
-        ;
+            ->build();
 
         if (!$res_payplug_card) {
             $cards = null;
@@ -1215,7 +1198,7 @@ class ConfigClass
      *
      * @return array
      */
-    public function checkRequirements()
+    public function getReportRequirements()
     {
         $php_min_version = 50600;
         $curl_min_version = '7.21';
@@ -1448,17 +1431,9 @@ class ConfigClass
 
     public function isValidFeature($name)
     {
-        if (empty($this->features_json)) {
-            return false;
-        }
+        $is_valid_feature = $this->validators['module']->isFeature($this->features_json, $name);
 
-        foreach ($this->features_json->features as $feature) {
-            if ($feature == $name) {
-                return true;
-            }
-        }
-
-        return false;
+        return $is_valid_feature['result'];
     }
 
     public function fetchTemplate($file)
@@ -1478,8 +1453,7 @@ class ConfigClass
         return $this
             ->module
             ->getInstanceByName($this->dependencies->name)
-            ->display(_PS_MODULE_DIR_ . $this->dependencies->name . '/' . $this->dependencies->name . '.php', $file)
-        ;
+            ->display(_PS_MODULE_DIR_ . $this->dependencies->name . '/' . $this->dependencies->name . '.php', $file);
     }
 
     /**
@@ -1526,7 +1500,7 @@ class ConfigClass
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->myLogPHP = new MyLogPHP();
 
-        $this->logger->setParams(['process' => 'payplug.php']);
+        $this->logger->setProcess('config');
     }
 
     /**
