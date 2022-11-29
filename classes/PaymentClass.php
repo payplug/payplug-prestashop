@@ -2194,16 +2194,14 @@ class PaymentClass
         $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
 
         // canUseBancontact
-
         if ((bool) $this->config->get(
             $this->dependencies->getConfigurationKey('bancontactCountry')
         ) && !($this->validators['payment']->isAllowedCountry(
             'BE',
             $shipping_iso
-        )['result'] || !($this->validators['payment']->isAllowedCountry('BE', $invoice_iso)['result']))) {
+        )['result']) && !($this->validators['payment']->isAllowedCountry('BE', $invoice_iso)['result'])) {
             return $payment_options;
         }
-
         $payment_options['bancontact'] = [
             'name' => 'bancontact',
             'tpl' => 'bancontact.tpl',
