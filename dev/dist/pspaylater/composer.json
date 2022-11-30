@@ -2,7 +2,7 @@
     "name": "payplug/bnpl-prestashop",
     "moduleName": "pspaylater",
     "description": "Paylater: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "0.4.0",
+    "version": "0.3.1",
     "require": {
         "php": "5.6.*",
         "giggsey/libphonenumber-for-php": "^8.12",
