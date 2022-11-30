@@ -75,11 +75,13 @@ var $document, $window, __moduleName__Module = {
                         // Select Oney Option
                         var $required = $('.' + __moduleName__Module.oney.required.props.identifier);
                         if ($required.length) {
-                            var paymentOption = $('input[name=__moduleName__Oney_type]')
-                                    .parent('form')
-                                    .find('button[type=submit]')
-                                    .attr('id')
-                                    .replace('pay-with-', '');
+                            $oneyType = data.errors[0].replace('oney_required_field_', '');
+                            var paymentOption = $('input[value=' + $oneyType + ']')
+                                        .parent('form')
+                                        .find('button[type=submit]')
+                                        .attr('id')
+                                        .replace('pay-with-', '');
+
 
                             $('#' + paymentOption).trigger('click');
                         }

@@ -188,7 +188,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
                 if ($errors) {
                     exit(json_encode(
-                        ['result' => true, 'template' => $this->paymentClass->displayPaymentErrors($errors)]
+                        ['result' => true, 'template' => $this->paymentClass->displayPaymentErrors($errors), 'errors' => $errors]
                     ));
                 }
 
