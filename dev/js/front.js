@@ -36,9 +36,11 @@ var $document, $window, __moduleName__Module = {
         init: function () {
             // Styling
             var $options = $('input[data-module-name="__moduleName__"]');
+            var $id = this.id;
             $options.parents('.payment-option').addClass('__moduleName__PaymentOption')
             $options.each(function () {
                 var $form = $('#pay-with-' + this.id + '-form').find('form');
+                console.log(this.id);
                 if ($form.find('input[name=method]').val() == "oney") {
                     if ($form.find('input[name=__moduleName__Oney_type]').val().includes("without_fees")) {
                         $('#' + this.id + '-container').addClass('without_fees');
@@ -57,7 +59,7 @@ var $document, $window, __moduleName__Module = {
             if (typeof check_errors == 'undefined' || !check_errors) {
                 return;
             }
-
+            console.log();
             var data = {_ajax: 1, getPaymentErrors: 1};
 
             $.ajax({
@@ -69,20 +71,31 @@ var $document, $window, __moduleName__Module = {
                 dataType: 'json',
                 data: data,
                 success: function (data) {
+                    console.log(data.errors[0]);
                     if (data.result) {
                         __moduleName__Module.popup.set(data.template);
 
                         // Select Oney Option
                         var $required = $('.' + __moduleName__Module.oney.required.props.identifier);
-                        if ($required.length) {
-                            var paymentOption = $('input[name=__moduleName__Oney_type]')
-                                    .parent('form')
-                                    .find('button[type=submit]')
-                                    .attr('id')
-                                    .replace('pay-with-', '');
 
+                        if ($required.length) {
+                            // console.log($('input[name=__moduleName__Oney_type]').parent('form').find('button[type=submit]').attr('id'));
+                            $oneyType = data.errors[0].replace('oney_required_field_', '');
+                            // var paymentOption = $('input[value=' + $oneyType +']').parent('form').find('button[type=submit]').attr('id').replace('pay-with-', '');;
+                            var paymentOption = $('input[value=' + $oneyType + ']')
+                                                        .parent('form')
+                                                        .find('button[type=submit]')
+                                                        .attr('id')
+                                                        .replace('pay-with-', '');
+
+                            // $('input[name=__moduleName__Oney_type]')
+                            //         .parent('form')
+                            //         .find('button[type=submit]')
+                            //         .attr('id')
+                            //         .replace('pay-with-', '');
                             $('#' + paymentOption).trigger('click');
                         }
+
                     }
                 }
             });

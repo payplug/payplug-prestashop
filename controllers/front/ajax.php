@@ -188,7 +188,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
                 if ($errors) {
                     exit(json_encode(
-                        ['result' => true, 'template' => $this->paymentClass->displayPaymentErrors($errors)]
+                        ['result' => true, 'template' => $this->paymentClass->displayPaymentErrors($errors), 'errors' => $errors]
                     ));
                 }
 
@@ -205,6 +205,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
                 if ($this->oney->checkOneyRequiredFields($payment_data)) {
+
                     exit(json_encode([
                         'result' => false,
                         'message' => [
