@@ -16,7 +16,7 @@ stages:
   - releasy-release
 
 php cs fixer:
-  image: composer:1.9
+  image: composer:1.10
   stage: check php
   script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -53,7 +53,7 @@ coverage test:
     - vendor/bin/phpunit --coverage-text --colors=never
 
 check module translations:
-  image: composer:1.9
+  image: composer:1.10
   stage: translations
   script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -99,7 +99,7 @@ assets:
     expire_in: 1 day
 
 build zip release:
-  image: composer:1.9
+  image: composer:1.10
   stage: build
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -146,7 +146,7 @@ asset-pspaylater:
     expire_in: 1 day
 
 build-pspaylater:
-  image: composer:1.9
+  image: composer:1.10
   stage: build-pspaylater
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
@@ -171,7 +171,7 @@ build-pspaylater:
       - pspaylater_qa_$CI_COMMIT_REF_NAME.zip
 
 run_test:
-  image: composer:1.9
+  image: composer:1.10
   stage: run_test
   needs:
     - build-pspaylater
