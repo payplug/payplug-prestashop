@@ -28,13 +28,14 @@
     {/if}
 
     <div class="paymentMethod -{$paymentMethods.oney.name|escape:'htmlall':'UTF-8'}">
+        {if 'payplug' == $module_name}
         {include file='./../../atoms/switch/switch.tpl'
             switchClassName='paymentMethod_switch -premium'
             switchDataName='paymentMethod_oney'
             switchName=$paymentMethods.oney.name|escape:'htmlall':'UTF-8'
             switchChecked=$paymentMethods.oney.checked}
-
-        <div class="_text">
+        {/if}
+        <div class="_text {if 'pspaylater' == $module_name} -paylater {/if}">
             {include
                 file='./../../atoms/title/title.tpl'
                 titleClassName='_title'
@@ -54,7 +55,7 @@
             </p>
 
         </div>
-        <div class="_additionnal">
+        <div class="_additionnal {if 'pspaylater' == $module_name} -paylater {/if}">
             {* PayLater Options: oney with or without fees *}
             {assign var=items value=[
                 [
