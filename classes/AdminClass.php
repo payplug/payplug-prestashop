@@ -316,8 +316,6 @@ class AdminClass
                 'content' => null,
                 'error' => $this->dependencies->l('payplug.adminAjaxController.credentialsNotCorrect', 'adminclass'),
             ]));
-
-            $this->submitPopinPwd($password);
         }
 
         if ($this->tools->tool('getValue', 'submit') == 'submitPopin_abort') {
@@ -497,47 +495,6 @@ class AdminClass
                     ]));
             }
         }
-    }
-
-    /**
-     * @description submit password
-     *
-     * @param string $pwd
-     *
-     * @return string
-     */
-    public function submitPopinPwd($pwd)
-    {
-        $email = $this->config->get($this->dependencies->getConfigurationKey('email'));
-        $connected = $this->dependencies->apiClass->login($email, $pwd);
-        $use_live_mode = false;
-
-        if ($connected) {
-            if ($this->config->get($this->dependencies->getConfigurationKey('liveApiKey')) != '') {
-                $use_live_mode = true;
-
-                $valid_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
-                $permissions = $this->dependencies->apiClass->getAccount($valid_key);
-                $can_save_cards = $this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result'];
-                $can_create_installment_plan = $this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result'];
-            }
-        } else {
-            exit(json_encode(['content' => 'wrong_pwd']));
-        }
-        if (!$use_live_mode) {
-            exit(json_encode(['content' => 'activate']));
-        }
-        if ($can_save_cards && $can_create_installment_plan) {
-            exit(json_encode(['content' => 'live_ok']));
-        }
-        if ($can_save_cards && !$can_create_installment_plan) {
-            exit(json_encode(['content' => 'live_ok_no_inst']));
-        }
-        if (!$can_save_cards && $can_create_installment_plan) {
-            exit(json_encode(['content' => 'live_ok_no_oneclick']));
-        }
-
-        exit(json_encode(['content' => 'live_ok_not_premium']));
     }
 
     public function getLogin()
