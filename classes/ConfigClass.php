@@ -592,7 +592,8 @@ class ConfigClass
                     case 'payplug_oney_product_cta':
                     case 'payplug_oney_cart_cta':
                     case 'payplug_oney_fees':
-                        if ((int) $this->tools->tool('getValue', 'payplug_oney') === 1) {
+                        if ((int) $this->tools->tool('getValue', 'payplug_oney') === 1
+                            || $this->dependencies->name == 'pspaylater') {
                             $this->config->updateValue($key, $value);
                         }
 
