@@ -324,7 +324,7 @@ class OrderStateRepository extends BaseClass
             ->select()
             ->fields('c.value')
             ->from(_DB_PREFIX_ . 'configuration', 'c')
-            ->where('c.name LIKE \'%PAYPLUG_ORDER_STATE_%\'')
+            ->where('c.name LIKE \'%' . $this->tools->tool('strtoupper', $this->dependencies->name) . '_ORDER_STATE_%\'')
             ->build()
         ;
 
@@ -396,8 +396,8 @@ class OrderStateRepository extends BaseClass
     public function removeIdsUnusedByPayPlug()
     {
         $deleted = true;
-        $payplug_os_id_list = $this->getIdsByModuleName('payplug');
-        $used_order_os_id_list = $this->isUsedByOrders('payplug');
+        $payplug_os_id_list = $this->getIdsByModuleName($this->dependencies->name);
+        $used_order_os_id_list = $this->isUsedByOrders($this->dependencies->name);
         $used_os_id_list = $this->getIdsUsedByPayPlug();
         foreach ($payplug_os_id_list as $payplug_os_id) {
             if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
