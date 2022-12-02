@@ -234,7 +234,7 @@ class RefundClass
             $amount_available = $payment['resource']->amount - $payment['resource']->amount_refunded;
         }
 
-        $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+        $amount = is_numeric($amount) ? $this->dependencies->amountCurrencyClass->convertAmount($amount) : 0;
 
         $is_refundable_amount = $this->validators['payment']->isRefundableAmount(
             (int) $amount,
