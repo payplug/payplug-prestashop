@@ -9,7 +9,14 @@ if (isset($argv) && !empty($argv)) {
     $target_dir = isset($argv[1]) && $argv[1] ? $argv[1] . '/' : '';
 }
 
-$list = \PayPlug\src\utilities\helpers\FilesHelper::get($target_dir);
+if (class_exists('\PayPlug\src\utilities\helpers\FilesHelper')) {
+    $list = \PayPlug\src\utilities\helpers\FilesHelper::get($target_dir);
+} elseif (class_exists('\PayLaterModule\src\utilities\helpers\FilesHelper')) {
+    $list = \PayLaterModule\src\utilities\helpers\FilesHelper::get($target_dir);
+} else {
+    $list = [];
+}
+
 $path = dirname(__FILE__) . '/../../';
 $file_name = 'module_files.csv';
 

@@ -440,7 +440,8 @@ class Payplug extends PaymentModule
             }
 
             // Clean external files
-            \PayPlug\src\utilities\helpers\FilesHelper::clean();
+            $helpers = $this->module->getHelpers();
+            $helpers['files']::clean();
 
             return $flag;
         }
@@ -486,7 +487,8 @@ class Payplug extends PaymentModule
     {
         if ($this->module) {
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
-            \PayPlug\src\utilities\helpers\FilesHelper::clean();
+            $helpers = $this->module->getHelpers();
+            $helpers['files']::clean();
         }
 
         return parent::runUpgradeModule();
