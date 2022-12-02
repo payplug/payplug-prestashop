@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\utilities\helpers\FilesHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
@@ -334,6 +335,7 @@ class DependenciesClass
     public $refundClass;
 
     private $plugin;
+    private $helpers;
     private $validators;
 
     public function __construct()
@@ -341,7 +343,8 @@ class DependenciesClass
         $configuration = $this->getPluginConfiguration();
         $this->name = $configuration->moduleName;
         $this->version = $configuration->version;
-        $this->setvalidators();
+        $this->setValidators();
+        $this->setHelpers();
         $this->initializeAccessors();
     }
 
@@ -473,7 +476,12 @@ class DependenciesClass
         return $this->validators;
     }
 
-    private function setvalidators()
+    public function getHelpers()
+    {
+        return $this->helpers;
+    }
+
+    private function setValidators()
     {
         $this->validators = [
             'account' => new accountValidator(),
@@ -483,6 +491,13 @@ class DependenciesClass
             'module' => new moduleValidator(),
             'order' => new orderValidator(),
             'payment' => new paymentValidator(),
+        ];
+    }
+
+    private function setHelpers()
+    {
+        $this->helpers = [
+            'files' => new FilesHelper(),
         ];
     }
 }
