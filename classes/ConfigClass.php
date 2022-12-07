@@ -1086,20 +1086,20 @@ class ConfigClass
     {
         $iso_code_list = $this->getIsoCodeList();
         if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
-            return false;
+            return '';
         }
         if (!$this->validate->validate('isInt', $country_id)) {
-            return false;
-        }
-        $country = $this->country->get((int) $country_id);
-        if (!$this->validate->validate('isLoadedObject', $country)) {
-            return false;
-        }
-        if (!in_array($this->tools->tool('strtoupper', $country->iso_code), $iso_code_list, true)) {
-            return false;
+            return '';
         }
 
-        return $this->tools->tool('strtoupper', $country->iso_code);
+        $iso_code = $this->dependencies->getRepositories()['country']->getIsoCodeByCountry((int) $country_id);
+        $iso_code = $this->tools->tool('strtoupper', $iso_code);
+
+        if (!in_array($iso_code, $iso_code_list, true)) {
+            return '';
+        }
+
+        return $iso_code;
     }
 
     /**

@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\utilities\helpers\FilesHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
@@ -336,6 +337,7 @@ class DependenciesClass
 
     private $plugin;
     private $helpers;
+    private $repositories;
     private $validators;
 
     public function __construct()
@@ -343,8 +345,6 @@ class DependenciesClass
         $configuration = $this->getPluginConfiguration();
         $this->name = $configuration->moduleName;
         $this->version = $configuration->version;
-        $this->setValidators();
-        $this->setHelpers();
         $this->initializeAccessors();
     }
 
@@ -355,7 +355,10 @@ class DependenciesClass
 
     public function initializeAccessors()
     {
+        $this->setvalidators();
+        $this->setHelpers();
         $this->setPlugin((new PluginInit($this))->getEntity());
+        $this->setRepositories();
 
         $this->apiClass = new ApiClass($this);
         $this->applePayClass = new ApplePayClass($this);
@@ -476,12 +479,17 @@ class DependenciesClass
         return $this->validators;
     }
 
+    public function getRepositories()
+    {
+        return $this->repositories;
+    }
+
     public function getHelpers()
     {
         return $this->helpers;
     }
 
-    private function setValidators()
+    private function setvalidators()
     {
         $this->validators = [
             'account' => new accountValidator(),
@@ -491,6 +499,15 @@ class DependenciesClass
             'module' => new moduleValidator(),
             'order' => new orderValidator(),
             'payment' => new paymentValidator(),
+        ];
+    }
+
+    private function setRepositories()
+    {
+        $constant = $this->getPlugin()->getConstant();
+        $prefix = $constant->get('_DB_PREFIX_');
+        $this->repositories = [
+            'country' => new CountryRepository($prefix),
         ];
     }
 
