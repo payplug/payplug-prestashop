@@ -39,6 +39,7 @@ class PaymentClass
     private $language;
     private $logger;
     private $oney;
+    private $oney_allowed_iso_codes;
     private $order;
     private $orderHistory;
     private $payment;
@@ -65,6 +66,7 @@ class PaymentClass
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->oney_allowed_iso_codes = ['FR', 'IT', 'ES', 'NL'];
         $this->order = $this->dependencies->getPlugin()->getOrder();
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->payment = $this->dependencies->getPlugin()->getPayment();
@@ -2396,7 +2398,7 @@ class PaymentClass
         $delivery_address = $this->address->get($this->context->cart->id_address_delivery);
         $delivery_country = $this->country->get($delivery_address->id_country);
         $iso = $this->tools->tool('strtoupper', $this->context->language->iso_code);
-        if ($iso != 'IT' && $iso != 'FR') {
+        if (!in_array($iso, $this->oney_allowed_iso_codes)) {
             $iso = $this->config->get($this->dependencies->getConfigurationKey('companyIso'));
         }
         $shipping_address = $this->getShippingAddress($this->address, $this->context->cart);
