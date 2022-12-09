@@ -37,6 +37,7 @@ class CardRepository extends BaseClass
     private $query;
     private $logger;
     private $toolsAdapter;
+    private $validators;
 
     public function __construct(
         $configurationAdapter,
@@ -53,6 +54,7 @@ class CardRepository extends BaseClass
         $this->logger = $logger;
         $this->query = $query;
         $this->toolsAdapter = $tools;
+        $this->validators = $this->dependencies->getValidators();
 
         $isSandbox = $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
@@ -60,7 +62,7 @@ class CardRepository extends BaseClass
         $idCompany = $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
         );
-        $this->logger->setParams(['process' => 'cardRepository']);
+        $this->logger->setProcess('card');
 
         $this->cardEntity
             ->setAllowedBrand(['mastercard', 'visa'])
@@ -428,20 +430,9 @@ class CardRepository extends BaseClass
      */
     public function isValidExpiration($month = false, $year = false)
     {
-        if (!$month || !is_int($month) || !$year || !is_int($year)) {
-            $this->logger->addLog('Month or/and year is invalid [isValidExpiration]');
-            $this->logger->addLog('Month: ' . json_encode($month) . ' / Year: ' . json_encode($year), 'debug');
+        $validate_expiration = $this->validators['card']->isExpired((int) $month, (int) $year);
 
-            return false;
-        }
-
-        if ($year < (int) date('Y') || ($year == (int) date('Y') && $month < (int) date('m'))) {
-            $this->logger->addLog('Card is expired [isValidExpiration]', 'Error');
-
-            return false;
-        }
-
-        return true;
+        return $validate_expiration['result'];
     }
 
     /**

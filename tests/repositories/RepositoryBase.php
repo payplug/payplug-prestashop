@@ -1,30 +1,12 @@
 <?php
 
-/**
- * 2013 - 2021 PayPlug SAS
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0).
- * It is available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- * If you are unable to obtain it through the world-wide-web, please send an email
- * to contact@payplug.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
- * versions in the future.
- *
- * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
- */
-
 namespace PayPlug\tests\repositories;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\src\utilities\validators\browserValidator;
+use PayPlug\src\utilities\validators\cardValidator;
+use PayPlug\src\utilities\validators\moduleValidator;
+use PayPlug\src\utilities\validators\paymentValidator;
 use PayPlug\tests\mock\DependenciesMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
@@ -55,6 +37,7 @@ class RepositoryBase extends TestCase
     protected $country;
     protected $currency;
     protected $language;
+    protected $media;
     protected $product;
     protected $shop;
     protected $tools;
@@ -99,6 +82,7 @@ class RepositoryBase extends TestCase
         $this->country = MockHelper::createMockFactory('PayPlug\src\application\adapter\CountryAdapter');
         $this->currency = MockHelper::createMockFactory('PayPlug\src\application\adapter\CurrencyAdapter');
         $this->language = MockHelper::createMockFactory('PayPlug\src\application\adapter\LanguageAdapter');
+        $this->media = MockHelper::createMockFactory('PayPlug\src\application\adapter\MediaAdapter');
         $this->order_state_adapter = MockHelper::createMockFactory('PayPlug\src\application\adapter\OrderStateAdapter');
         $this->product = MockHelper::createMockFactory('PayPlug\src\application\adapter\ProductAdapter');
         $this->shop = MockHelper::createMockFactory('PayPlug\src\application\adapter\ShopAdapter');
@@ -122,6 +106,16 @@ class RepositoryBase extends TestCase
             ->andReturnUsing(function ($string, $name) {
                 return $string;
             })
+        ;
+        $this->dependencies
+            ->shouldReceive([
+                'getValidators' => [
+                    'card' => \Mockery::mock(cardValidator::class)->makePartial(),
+                    'module' => \Mockery::mock(moduleValidator::class)->makePartial(),
+                    'browser' => \Mockery::mock(browserValidator::class)->makePartial(),
+                    'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
+                ],
+            ])
         ;
         $this->dependencies
             ->shouldReceive('getConfigurationKey')

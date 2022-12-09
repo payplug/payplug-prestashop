@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use DateTime;
 use Exception;
 use PayPlug\src\application\dependencies\BaseClass;
 
@@ -38,6 +37,7 @@ class PaymentRepository extends BaseClass
     private $paymentEntity;
     private $query;
     private $constant;
+    private $validators;
 
     public function __construct(
         $cartAdapter,
@@ -56,7 +56,8 @@ class PaymentRepository extends BaseClass
         $this->query = $query;
         $this->constant = $constant;
 
-        $this->logger->setParams(['process' => 'payment']);
+        $this->logger->setProcess('payment');
+        $this->validators = $this->dependencies->getValidators();
     }
 
     /**
@@ -64,7 +65,7 @@ class PaymentRepository extends BaseClass
      *
      * @param $paymentDetails
      *
-     * @return string | array
+     * @return array|string
      */
     public function getHashedCart($paymentDetails)
     {
@@ -135,17 +136,17 @@ class PaymentRepository extends BaseClass
         }
 
         $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
-
         $cartHash = $this->getHashedCart($paymentDetails);
-
-        if ($paymentStored['cart_hash'] === $cartHash
-            && ($paymentStored['payment_method'] == $paymentDetails['paymentMethod'])) {
+        $is_cached_payment = $this->validators['payment']->isCachedPayment($paymentStored['cart_hash'], $cartHash);
+        if ($is_cached_payment['result'] == $cartHash
+            && $paymentStored['payment_method'] == $paymentDetails['paymentMethod']) {
             return [
                 'result' => true,
                 'paymentDetails' => $paymentDetails,
                 'response' => 'OK. Comparaison result: Same hash and same payment method.',
             ];
         }
+
         // Create payment or installment
         $createPayment = $this->createPayment($paymentDetails);
 
@@ -197,7 +198,7 @@ class PaymentRepository extends BaseClass
             $this->dependencies->l('The transaction was not completed and your card was not charged.', 'paymentrepository'),
         ]);
 
-        $this->logger->setParams(['process' => 'paymentRepository']);
+        $this->logger->setProcess('payment');
         $this->logger->addLog($errorMessage, $level);
 
         if (!is_array($element) || empty($element)) {
@@ -302,7 +303,8 @@ class PaymentRepository extends BaseClass
         // Before create a new payment, delete the previous one, if exists and it's not a oneclick payment
         // to avoid double order creation
         if ($apiPayment = $this->checkPaymentTable($paymentDetails['cartId'])) {
-            if (!in_array($apiPayment['payment_method'], ['oneclick', 'bancontact', 'apple_pay', 'oney', 'amex'])) {
+            $is_cancellable = $this->validators['payment']->isCancellable($apiPayment['payment_method']);
+            if ($is_cancellable['result']) {
                 $payment = $this->dependencies->apiClass->retrievePayment($apiPayment['id_payment']);
                 if ($payment['result'] && !$payment['resource']->failure) {
                     $this->logger->addLog('Payment already exists: ' . $apiPayment['id_payment'] . ', so we delete it before create a new one');
@@ -323,7 +325,8 @@ class PaymentRepository extends BaseClass
 
         if ($paymentDetails['paymentMethod'] !== 'installment') {
             $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
-            if (!$payment['result']) {
+
+            if ($this->validators['payment']->hasError($payment)['result']) {
                 unset($paymentDetails['paymentTab']);
 
                 return $this->returnPaymentError(
@@ -335,7 +338,7 @@ class PaymentRepository extends BaseClass
             $this->paymentEntity->setApiPayment($payment['resource']);
         } else {
             $payment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
-            if (!$payment['result']) {
+            if ($this->validators['payment']->hasError($payment)['result']) {
                 unset($paymentDetails['paymentTab']);
 
                 return $this->returnPaymentError(
@@ -348,7 +351,7 @@ class PaymentRepository extends BaseClass
 
         $this->apiPayment = $this->paymentEntity->getApiPayment();
 
-        if ($this->apiPayment->failure == true && !empty($this->apiPayment->failure->message)) {
+        if ($this->validators['payment']->isFailed($this->apiPayment)['result']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $this->apiPayment],
                 (string) $this->apiPayment->failure->message
@@ -500,19 +503,9 @@ class PaymentRepository extends BaseClass
         }
 
         $dateStored = $this->checkPaymentTable($idCart)['date_upd'];
+        $is_timeout_cache = $this->validators['payment']->isTimeoutCachedPayment($dateStored);
 
-        $date = new DateTime($dateStored);
-        $date2 = new DateTime('now');
-
-        if ($date->diff($date2)->y !== 0
-            || $date->diff($date2)->d !== 0
-            || $date->diff($date2)->h !== 0
-            || $date->diff($date2)->i > 3) {
-            // Plus de 3 minutes
-            return false;
-        }
-        // Moins de 3 minutes
-        return true;
+        return $is_timeout_cache['result'];
     }
 
     /**

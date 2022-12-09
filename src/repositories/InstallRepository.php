@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use Db;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class InstallRepository extends BaseClass
@@ -55,6 +54,9 @@ class InstallRepository extends BaseClass
     protected $order_state_adapter;
 
     /** @var object */
+    protected $query;
+
+    /** @var object */
     protected $shop;
 
     /** @var object */
@@ -74,6 +76,7 @@ class InstallRepository extends BaseClass
         $order_state,
         $order_state_entity,
         $order_state_adapter,
+        $query,
         $shop,
         $sql,
         $tools,
@@ -87,6 +90,7 @@ class InstallRepository extends BaseClass
         $this->order_state = $order_state;
         $this->order_state_entity = $order_state_entity;
         $this->order_state_adapter = $order_state_adapter;
+        $this->query = $query;
         $this->shop = $shop;
         $this->sql = $sql;
         $this->tools = $tools;
@@ -199,28 +203,34 @@ class InstallRepository extends BaseClass
             ];
         }
         $date = date('Y-m-d');
-        $queries = [];
+        $query = $this->dependencies->getPlugin()->getQuery();
+
         foreach ($prestashop_order_states as $key => $type) {
             $id_order_state = $this->config->get($key);
-            $getTypeQuery = ' 
-                SELECT `type` 
-                FROM `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
-                WHERE  `id_order_state` = ' . $id_order_state;
-            $sqlGetType = Db::getInstance()->executeS($getTypeQuery);
+            $this->query
+                ->select()
+                ->fields('type')
+                ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
+                ->where('id_order_state = ' . (int) $id_order_state);
+
+            $sqlGetType = $this->query->build();
+
             if ($sqlGetType && $sqlGetType != $type) {
-                $queries[] = 'UPDATE `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
-                                 SET `type` = ' . "'{$type}'" . ' 
-                                 WHERE  `id_order_state` = ' . $id_order_state;
+                $this->query
+                    ->update()
+                    ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
+                    ->set('type = "' . $this->query->escape($type) . '"')
+                    ->where('id_order_state = ' . (int) $id_order_state)
+                    ->build();
             } else {
-                $queries[] = 'INSERT INTO `' . _DB_PREFIX_ . $this->dependencies->name . '_order_state` 
-                                (`id_order_state`, `type`, `date_add`, `date_upd`)
-                                VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
-            }
-        }
-        if ($queries) {
-            foreach ($queries as $sql) {
-                Db::getInstance()->execute($sql);
-                unset($sql);
+                $this->query
+                    ->insert()
+                    ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
+                    ->fields('id_order_state')->values((int) $id_order_state)
+                    ->fields('type')->values($this->query->escape($type))
+                    ->fields('date_add')->values(date('Y-m-d H:i:s'))
+                    ->fields('date_upd')->values(date('Y-m-d H:i:s'))
+                    ->build();
             }
         }
 
@@ -241,7 +251,7 @@ class InstallRepository extends BaseClass
         $this->log->info('Starting to install again.');
 
         // check requirement
-        $report = $this->dependencies->configClass->checkRequirements();
+        $report = $this->dependencies->configClass->getReportRequirements();
         if (!$report['php']['up2date']) {
             return $this->setInstallError('Install failed: PHP Requirement.');
         }

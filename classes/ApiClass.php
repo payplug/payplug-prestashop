@@ -1251,7 +1251,9 @@ class ApiClass
             'can_use_applepay' => $can_use_applepay,
             'can_use_amex' => $can_use_amex,
             'onboardingOneyCompleted' => $onboardingOneyCompleted,
+            'apple_pay_allowed_domains' => [],
         ];
+
         if (isset($json_answer['payment_methods']['apple_pay']['allowed_domain_names'])) {
             $permissions['apple_pay_allowed_domains'] = $json_answer['payment_methods']['apple_pay']['allowed_domain_names'];
         }

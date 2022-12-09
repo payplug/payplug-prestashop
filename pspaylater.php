@@ -51,7 +51,7 @@ class PsPaylater extends PaymentModule
         $this->module_key = '5c403c88b9f9097fca7fd50c4f25b86d';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '0.4.0';
+        $this->version = '0.3.1';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7'];
@@ -380,8 +380,8 @@ class PsPaylater extends PaymentModule
         if ($this->module) {
             $flag = true;
 
-            //todo: Uncomment this line when clean script is ready
-            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
+            $helpers = $this->module->getHelpers();
+            $helpers['files']::clean();
 
             // Use for update module is not fully installed
             if (!$soft_install) {
@@ -466,8 +466,8 @@ class PsPaylater extends PaymentModule
     {
         if ($this->module) {
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
-            //todo: Uncomment this line when clean script is ready
-            // \PayPlug\src\utilities\helpers\FilesHelper::clean();
+            $helpers = $this->module->getHelpers();
+            $helpers['files']::clean();
         }
 
         return parent::runUpgradeModule();

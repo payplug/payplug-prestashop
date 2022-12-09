@@ -32,8 +32,6 @@ class HookRepository extends BaseClass
     protected $context;
     protected $tools;
 
-    private $mediaClass;
-
     public function __construct($dependencies, $constant, $context, $tools)
     {
         $this->dependencies = $dependencies;

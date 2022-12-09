@@ -217,13 +217,10 @@ class OrderStateRepository extends BaseClass
             ->fields('DISTINCT osl.`id_order_state`')
             ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
             ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
-            ->where(
-                'osl.`name` LIKE \'' . $this->query->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . $this->query->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . $this->query->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\' 
-                    OR osl.`name` LIKE \'' . $this->query->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\''
-            )
-        ;
+            ->where('osl.`name` LIKE \'' . $this->query->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
+            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
+            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
+            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')));
 
         if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
             $this->query->where('os.`deleted` = 0');
@@ -327,7 +324,7 @@ class OrderStateRepository extends BaseClass
             ->select()
             ->fields('c.value')
             ->from(_DB_PREFIX_ . 'configuration', 'c')
-            ->where('c.name LIKE \'%PAYPLUG_ORDER_STATE_%\'')
+            ->where('c.name LIKE \'%' . $this->tools->tool('strtoupper', $this->dependencies->name) . '_ORDER_STATE_%\'')
             ->build()
         ;
 
@@ -399,8 +396,8 @@ class OrderStateRepository extends BaseClass
     public function removeIdsUnusedByPayPlug()
     {
         $deleted = true;
-        $payplug_os_id_list = $this->getIdsByModuleName('payplug');
-        $used_order_os_id_list = $this->isUsedByOrders('payplug');
+        $payplug_os_id_list = $this->getIdsByModuleName($this->dependencies->name);
+        $used_order_os_id_list = $this->isUsedByOrders($this->dependencies->name);
         $used_os_id_list = $this->getIdsUsedByPayPlug();
         foreach ($payplug_os_id_list as $payplug_os_id) {
             if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {

@@ -25,6 +25,14 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\utilities\helpers\FilesHelper;
+use PayPlug\src\utilities\validators\accountValidator;
+use PayPlug\src\utilities\validators\browserValidator;
+use PayPlug\src\utilities\validators\cardValidator;
+use PayPlug\src\utilities\validators\loggerValidator;
+use PayPlug\src\utilities\validators\moduleValidator;
+use PayPlug\src\utilities\validators\orderValidator;
+use PayPlug\src\utilities\validators\paymentValidator;
 use Tools;
 
 if (!defined('_PS_VERSION_')) {
@@ -327,12 +335,16 @@ class DependenciesClass
     public $refundClass;
 
     private $plugin;
+    private $helpers;
+    private $validators;
 
     public function __construct()
     {
         $configuration = $this->getPluginConfiguration();
         $this->name = $configuration->moduleName;
         $this->version = $configuration->version;
+        $this->setValidators();
+        $this->setHelpers();
         $this->initializeAccessors();
     }
 
@@ -457,5 +469,35 @@ class DependenciesClass
         }
 
         return json_decode($jsonContent);
+    }
+
+    public function getValidators()
+    {
+        return $this->validators;
+    }
+
+    public function getHelpers()
+    {
+        return $this->helpers;
+    }
+
+    private function setValidators()
+    {
+        $this->validators = [
+            'account' => new accountValidator(),
+            'browser' => new browserValidator(),
+            'card' => new cardValidator(),
+            'logger' => new loggerValidator(),
+            'module' => new moduleValidator(),
+            'order' => new orderValidator(),
+            'payment' => new paymentValidator(),
+        ];
+    }
+
+    private function setHelpers()
+    {
+        $this->helpers = [
+            'files' => new FilesHelper(),
+        ];
     }
 }

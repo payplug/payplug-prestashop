@@ -172,9 +172,9 @@ class MediaClass
                 break;
         }
 
-        foreach ($this->dependencies->configClass->features_json->features as $key => $value) {
+        foreach ($this->dependencies->configClass->features_json['features'] as $key => $value) {
             $this->context->smarty->assign([
-                $value => $value,
+                $key => $value,
             ]);
         }
 

@@ -45,6 +45,7 @@ class PaymentClass
     private $query;
     private $tools;
     private $validate;
+    private $validators;
 
     public function __construct($dependencies)
     {
@@ -70,6 +71,7 @@ class PaymentClass
         $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
     }
 
     /**
@@ -477,12 +479,18 @@ class PaymentClass
             $payment_details['type_code'] = $payment->payment_method['type'];
         }
 
+        $is_paid = $this->validators['payment']->isPaid($payment)['result'];
+        $can_be_captured = $this->validators['payment']->isPayment($payment)['result']
+                            && !$this->validators['payment']->isFailed($payment)['result']
+                            && !$is_paid
+                            && $this->validators['payment']->isDeferred($payment)['result']
+                            && !$this->validators['payment']->isExpired($payment)['result'];
+        $payment_details['can_be_captured'] = $can_be_captured;
+
         if ($payment->authorization !== null && !$is_oney) {
             $payment_details['authorization'] = true;
-            if ($payment->is_paid) {
+            if ($is_paid) {
                 $payment_details['date'] = date('d/m/Y', $payment->paid_at);
-                $payment_details['can_be_cancelled'] = false;
-                $payment_details['can_be_captured'] = false;
                 if (!isset($payment_details['type'])) {
                     $payment_details['status_message'] = '(' . $this
                         ->dependencies
@@ -490,20 +498,13 @@ class PaymentClass
                 }
             } else {
                 $expiration = date('d/m/Y', $payment->authorization->expires_at);
-                if (isset($payment->authorization->expires_at) && $payment->authorization->expires_at - time() > 0) {
-                    if (isset($payment->failure) && $payment->failure) {
-                        $payment_details['can_be_cancelled'] = false;
-                        $payment_details['can_be_captured'] = false;
-                    } else {
-                        $payment_details['can_be_captured'] = true;
-                        $payment_details['can_be_cancelled'] = true;
-                        $payment_details['status_message'] = sprintf(
-                            '(' . $this
-                                ->dependencies
-                                ->l('payplug.buildPaymentDetails.captureAuthorizedBefore', 'paymentclass') . ')',
-                            $expiration
-                        );
-                    }
+                if ($can_be_captured) {
+                    $payment_details['status_message'] = sprintf(
+                        '(' . $this
+                            ->dependencies
+                            ->l('payplug.buildPaymentDetails.captureAuthorizedBefore', 'paymentclass') . ')',
+                        $expiration
+                    );
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
@@ -514,21 +515,14 @@ class PaymentClass
                     && $payment->authorization->authorized_at != null
                 ) {
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
-                    $payment_details['can_be_cancelled'] = false;
-                    $payment_details['can_be_captured'] = false;
-                } else {
-                    $payment_details['can_be_cancelled'] = false;
-                    $payment_details['can_be_captured'] = false;
                 }
             }
         } else {
             $payment_details['authorization'] = false;
             $payment_details['date'] = date('d/m/Y', $payment->created_at);
-            $payment_details['can_be_cancelled'] = false;
-            $payment_details['can_be_captured'] = false;
         }
 
-        if (isset($payment->failure, $payment->failure->message)) {
+        if ($this->validators['payment']->isFailed($payment)['result']) {
             $payment_details['error'] = '(' . $payment->failure->message . ')';
         }
 
@@ -695,8 +689,12 @@ class PaymentClass
             'oney' => false,
         ];
 
+        $is_shown = $this->validators['module']->canBeShown(
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+        );
+
         if (!$this->active
-            || !$this->config->get($this->dependencies->getConfigurationKey('show'))
+            || !$is_shown['result']
             || !$this->dependencies->amountCurrencyClass->checkCurrency($cart)
             || !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
             return $options;
@@ -979,7 +977,7 @@ class PaymentClass
             && (int) $payment->payment_method['is_pending'] == 1
         ) {
             $pay_status = 10; //oney pending
-        } elseif (isset($payment->failure) && $payment->failure && $pay_status != 9) {
+        } elseif ($this->validators['payment']->isFailed($payment)['result'] && $pay_status != 9) {
             if ($payment->failure->code == 'aborted') {
                 $pay_status = 7; //cancelled
             } elseif ($payment->failure->code == 'timeout') {
@@ -1225,10 +1223,17 @@ class PaymentClass
         }
 
         // Amount
-        $amount = $cart->getOrderTotal(true);
-        $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+        $cart_amount = $cart->getOrderTotal(true);
+        $amount = $this->dependencies->amountCurrencyClass->convertAmount($cart_amount);
         $current_amounts = $this->dependencies->amountCurrencyClass->getAmountsByCurrency($currency_iso_code);
-        if ($amount < $current_amounts['min_amount'] || $amount > $current_amounts['max_amount']) {
+        $is_valid_amount = $this->validators['payment']->isAmount(
+            $amount,
+            [
+                'min' => $current_amounts['min_amount'],
+                'max' => $current_amounts['max_amount'],
+            ]
+        );
+        if (!$is_valid_amount['result']) {
             // todo: add error log
             return [
                 'result' => false,
@@ -1267,6 +1272,7 @@ class PaymentClass
         // ISO
         $billing_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $billing_address->id_country);
         $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+
         if (!$shipping_iso || !$billing_iso) {
             $default_language = $this->language->get((int) $this->config->get('PS_LANG_DEFAULT'));
             $iso_code_list = $this->dependencies->configClass->getIsoCodeList();
@@ -1428,11 +1434,18 @@ class PaymentClass
             }
 
             // check billing phonenumber
-            if (!$payment_tab['billing']['mobile_phone_number'] || !$this->dependencies->configClass->isValidMobilePhoneNumber(
+            $is_valid_phone = $this
+                ->validators['payment']
+                ->isPhoneNumber($payment_tab['billing']['mobile_phone_number'])['result'];
+            if (!$is_valid_phone || !$this->dependencies->configClass->isValidMobilePhoneNumber(
                 $payment_tab['billing']['country'],
                 $payment_tab['billing']['mobile_phone_number']
             )) {
-                if ($this->dependencies->configClass->isValidMobilePhoneNumber(
+                $is_valid_phone = $this
+                    ->validators['payment']
+                    ->isPhoneNumber($payment_tab['billing']['landline_phone_number'])['result'];
+
+                if ($is_valid_phone && $this->dependencies->configClass->isValidMobilePhoneNumber(
                     $payment_tab['billing']['country'],
                     $payment_tab['billing']['landline_phone_number']
                 )) {
@@ -1441,11 +1454,17 @@ class PaymentClass
             }
 
             // check shipping phonenumber
-            if (!$payment_tab['shipping']['mobile_phone_number'] || !$this->dependencies->configClass->isValidMobilePhoneNumber(
+            $is_valid_phone = $this
+                ->validators['payment']
+                ->isPhoneNumber($payment_tab['shipping']['mobile_phone_number'])['result'];
+            if (!$is_valid_phone || !$this->dependencies->configClass->isValidMobilePhoneNumber(
                 $payment_tab['shipping']['country'],
                 $payment_tab['shipping']['mobile_phone_number']
             )) {
-                if ($this->dependencies->configClass->isValidMobilePhoneNumber(
+                $is_valid_phone = $this
+                    ->validators['payment']
+                    ->isPhoneNumber($payment_tab['shipping']['landline_phone_number'])['result'];
+                if ($is_valid_phone && $this->dependencies->configClass->isValidMobilePhoneNumber(
                     $payment_tab['shipping']['country'],
                     $payment_tab['shipping']['landline_phone_number']
                 )) {
@@ -1542,7 +1561,7 @@ class PaymentClass
                 $this->dependencies->getConfigurationKey('embeddedMode')
             ) !== 'redirected',
             'isIntegrated' => $options['is_integrated'],
-            'isMobileDevice' => $this->dependencies->configClass->isMobiledevice(),
+            'isMobileDevice' => ($this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result']),
             'cart' => $cart,
             'cartId' => (int) $payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
@@ -2112,7 +2131,8 @@ class PaymentClass
 
     private function getApplepayPaymentOption($payment_options)
     {
-        if ('Safari' != $this->getBrowser()) {
+        $isApplePayCompatible = $this->validators['browser']->isApplePayCompatible($this->getBrowser());
+        if (!$isApplePayCompatible['result']) {
             return $payment_options;
         }
 
@@ -2173,10 +2193,15 @@ class PaymentClass
         $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
         $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
 
-        if ((bool) $this->config->get($this->dependencies->getConfigurationKey('bancontactCountry')) && ($shipping_iso != 'BE' || $invoice_iso != 'BE')) {
+        // canUseBancontact
+        if ((bool) $this->config->get(
+            $this->dependencies->getConfigurationKey('bancontactCountry')
+        ) && !($this->validators['payment']->isAllowedCountry(
+            'BE',
+            $shipping_iso
+        )['result']) && !($this->validators['payment']->isAllowedCountry('BE', $invoice_iso)['result'])) {
             return $payment_options;
         }
-
         $payment_options['bancontact'] = [
             'name' => 'bancontact',
             'tpl' => 'bancontact.tpl',
@@ -2234,7 +2259,19 @@ class PaymentClass
         $use_taxes = (bool) $this->config->get('PS_TAX');
         $cart_amount = (float) $this->context->cart->getOrderTotal($use_taxes);
         $min_amount = (float) $this->config->get($this->dependencies->getConfigurationKey('instMinAmount'));
-        if ($min_amount > $cart_amount) {
+        $amount_limit = $this->dependencies->amountCurrencyClass->getAmountsByCurrency(
+            $this->context->currency->iso_code
+        );
+
+        $is_valid_amount = $this->validators['payment']->isAmount(
+            $this->dependencies->amountCurrencyClass->convertAmount($cart_amount),
+            [
+                'min' => $this->dependencies->amountCurrencyClass->convertAmount($min_amount),
+                'max' => $amount_limit['max_amount'],
+            ]
+        );
+
+        if (!$is_valid_amount['result']) {
             return $payment_options;
         }
 

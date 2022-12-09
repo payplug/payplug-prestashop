@@ -36,6 +36,7 @@ class AdminClass
     private $paymentRepository;
     private $tools;
     private $validate;
+    private $validators;
 
     public function __construct($dependencies)
     {
@@ -49,6 +50,7 @@ class AdminClass
         $this->paymentRepository = $this->dependencies->getPlugin()->getPayment();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
+        $this->validators = $this->dependencies->getValidators();
     }
 
     /**
@@ -314,8 +316,6 @@ class AdminClass
                 'content' => null,
                 'error' => $this->dependencies->l('payplug.adminAjaxController.credentialsNotCorrect', 'adminclass'),
             ]));
-
-            $this->submitPopinPwd($password);
         }
 
         if ($this->tools->tool('getValue', 'submit') == 'submitPopin_abort') {
@@ -337,33 +337,32 @@ class AdminClass
         if ((int) $this->tools->tool('getValue', 'checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
-            $return = [];
-            if (isset($permissions) && !is_bool($permissions)) {
-                $applepay_allowed_domains = false;
-                if (isset($permissions['apple_pay_allowed_domains'])) {
-                    if (in_array($this->context->shop->domain, $permissions['apple_pay_allowed_domains'])) {
-                        $applepay_allowed_domains = true;
-                    }
-                }
+            $applepay_allowed_domains = $this->validators['payment']->isApplepayAllowedDomain(
+                $this->context->shop->domain,
+                $permissions['apple_pay_allowed_domains']
+            )['result'];
 
-                $return = [
-                    'payplug_sandbox' => $permissions['use_live_mode'],
-                    'payplug_one_click' => $permissions['can_save_cards'],
-                    'payplug_oney' => $permissions['can_use_oney'],
-                    'payplug_bancontact' => $permissions['can_use_bancontact'],
-                    'payplug_applepay' => $permissions['can_use_applepay'],
-                    'payplug_amex' => $permissions['can_use_amex'],
-                    'payplug_inst' => $permissions['can_create_installment_plan'],
-                    'payplug_deferred' => $permissions['can_create_deferred_payment'],
+            $return = [
+                    'payplug_sandbox' => $this->validators['payment']->hasPermissions($permissions, 'use_live_mode')['result'],
+                    'payplug_one_click' => $this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result'],
+                    'payplug_oney' => $this->validators['payment']->hasPermissions($permissions, 'can_use_oney')['result'],
+                    'payplug_bancontact' => $this->validators['payment']->hasPermissions($permissions, 'can_use_bancontact')['result'],
+                    'payplug_applepay' => $this->validators['payment']->hasPermissions($permissions, 'can_use_applepay')['result'],
+                    'payplug_amex' => $this->validators['payment']->hasPermissions($permissions, 'can_use_amex')['result'],
+                    'payplug_inst' => $this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result'],
+                    'payplug_deferred' => $this->validators['payment']->hasPermissions($permissions, 'can_create_deferred_payment')['result'],
                     'applepay_allowed_domains' => $applepay_allowed_domains,
                 ];
-            }
 
             exit(json_encode($return));
         }
 
         if ($this->tools->tool('getValue', 'has_live_key')) {
-            exit(json_encode(['result' => $this->dependencies->apiClass->hasLiveKey()]));
+            exit(json_encode(['result' => $this->validators['account']->hasLiveKey(
+                $this->config->get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                )
+            )]));
         }
 
         if ((int) $this->tools->tool('getValue', 'refund') == 1) {
@@ -496,47 +495,6 @@ class AdminClass
                     ]));
             }
         }
-    }
-
-    /**
-     * @description submit password
-     *
-     * @param string $pwd
-     *
-     * @return string
-     */
-    public function submitPopinPwd($pwd)
-    {
-        $email = $this->config->get($this->dependencies->getConfigurationKey('email'));
-        $connected = $this->dependencies->apiClass->login($email, $pwd);
-        $use_live_mode = false;
-
-        if ($connected) {
-            if ($this->config->get($this->dependencies->getConfigurationKey('liveApiKey')) != '') {
-                $use_live_mode = true;
-
-                $valid_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
-                $permissions = $this->dependencies->apiClass->getAccount($valid_key);
-                $can_save_cards = $permissions['can_save_cards'];
-                $can_create_installment_plan = $permissions['can_create_installment_plan'];
-            }
-        } else {
-            exit(json_encode(['content' => 'wrong_pwd']));
-        }
-        if (!$use_live_mode) {
-            exit(json_encode(['content' => 'activate']));
-        }
-        if ($can_save_cards && $can_create_installment_plan) {
-            exit(json_encode(['content' => 'live_ok']));
-        }
-        if ($can_save_cards && !$can_create_installment_plan) {
-            exit(json_encode(['content' => 'live_ok_no_inst']));
-        }
-        if (!$can_save_cards && $can_create_installment_plan) {
-            exit(json_encode(['content' => 'live_ok_no_oneclick']));
-        }
-
-        exit(json_encode(['content' => 'live_ok_not_premium']));
     }
 
     public function getLogin()

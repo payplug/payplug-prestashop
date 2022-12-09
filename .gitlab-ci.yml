@@ -12,6 +12,7 @@ stages:
   - build
   - asset-pspaylater
   - build-pspaylater
+  - run_test
   - releasy-release
 
 php cs fixer:
@@ -42,6 +43,7 @@ check php version:
 coverage test:
   image: php:7.2.1
   stage: coverage and tests
+  coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
     - pecl install xdebug
     - docker-php-ext-enable xdebug
@@ -70,7 +72,7 @@ check module translations:
       - dev/dist/pspaylater/translations.csv
       - dev/dist/payplug/translations.csv
 
-assets compile and revision:
+assets:
   image: node:16
   stage: assets
   before_script:
@@ -117,7 +119,7 @@ build zip release:
       - payplug_$CI_COMMIT_REF_NAME.zip
       - payplug_qa_$CI_COMMIT_REF_NAME.zip
 
-assets compile and revision for bnpl:
+asset-pspaylater:
   image: node:16
   stage: asset-pspaylater
   before_script:
@@ -143,7 +145,7 @@ assets compile and revision for bnpl:
       - views/build-bnpl/*
     expire_in: 1 day
 
-build zip pspaylater:
+build-pspaylater:
   image: composer:1.9
   stage: build-pspaylater
   before_script:
@@ -167,3 +169,17 @@ build zip pspaylater:
     paths:
       - pspaylater_$CI_COMMIT_REF_NAME.zip
       - pspaylater_qa_$CI_COMMIT_REF_NAME.zip
+
+run_test:
+  image: composer:1.9
+  stage: run_test
+  needs:
+    - build-pspaylater
+  script:
+    - curl -s
+      -X POST
+      -F token=$CI_JOB_TOKEN
+      -F ref=master
+      -F "variables[PS_SOURCE_BRANCH]=${CI_COMMIT_REF_NAME}"
+      -F "variables[STAGES_TO_RUN]=smoke_presta_16, smoke_presta_17"
+      https://git.payplug.com/api/v4/projects/41/trigger/pipeline
