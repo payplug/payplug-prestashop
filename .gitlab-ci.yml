@@ -45,7 +45,7 @@ coverage test:
   stage: coverage and tests
   coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
-    - pecl install xdebug
+    - pecl install xdebug-3.1.0
     - docker-php-ext-enable xdebug
   script:
     - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
