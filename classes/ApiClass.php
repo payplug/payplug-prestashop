@@ -1268,7 +1268,7 @@ class ApiClass
         // If sandbox mode active, no allowed countries sent
         // Then set default as `FR,MQ,YT,RE,GF,GP,IT`
         if (isset($json_answer['is_live']) && !$json_answer['is_live']) {
-            $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
+            $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT,ES,BE';
         }
 
         // Get company country
