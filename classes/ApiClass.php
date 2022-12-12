@@ -1254,6 +1254,13 @@ class ApiClass
             'apple_pay_allowed_domains' => [],
         ];
 
+        // Do not allow Spain or Belgium on Payplug
+        if (($configuration['oney_allowed_countries'] === 'ES'
+                || $configuration['oney_allowed_countries'] === 'BE')
+            && $this->dependencies->name === 'payplug') {
+            $permissions['can_use_oney'] = false;
+        }
+
         if (isset($json_answer['payment_methods']['apple_pay']['allowed_domain_names'])) {
             $permissions['apple_pay_allowed_domains'] = $json_answer['payment_methods']['apple_pay']['allowed_domain_names'];
         }
