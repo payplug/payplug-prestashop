@@ -28,16 +28,6 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
             'getDefaultDeliveryType' => 'storepickup',
         ]);
 
-        $this->config->shouldReceive('get')
-            ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
-            ->andReturn('FR')
-        ;
-
-        $this->config->shouldReceive('get')
-            ->with('PAYPLUG_ONEY_FEES')
-            ->andReturn(true)
-        ;
-
         $this->context = MockHelper::createContextMock('Payplug\src\application\adapter\ContextAdapter');
 
         $this->repo
@@ -60,7 +50,6 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
      *
      * @param $amount
      * @param $country
-     * @group mytestlist
      */
     public function testGetList($amount, $country)
     {

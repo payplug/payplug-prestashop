@@ -35,11 +35,6 @@ final class GetOneySimulationsTest extends BaseOneyRepository
         // Method setup
         $this->oneyMock = MockHelper::createMockFactory('alias:Payplug\OneySimulation');
 
-        $this->config->shouldReceive('get')
-            ->with('PAYPLUG_SANDBOX_MODE')
-            ->andReturn(false)
-        ;
-
         $this->logger->shouldReceive([
             'setProcess' => $this->logger,
         ]);
