@@ -617,7 +617,8 @@ class ConfigClass
                             $this->tools->tool('getValue', $config),
                             $limit_oney['min'],
                             $limit_oney['max']
-                        )) {
+                        )
+                            || $this->dependencies->name == 'pspaylater') {
                             $this->config->updateValue(
                                 $key,
                                 $this->oney->setCustomOneyLimit(
@@ -634,7 +635,8 @@ class ConfigClass
                             (int) $this->tools->tool('getValue', $config),
                             $limit_oney['min'],
                             $limit_oney['max']
-                        )) {
+                        )
+                            || $this->dependencies->name == 'pspaylater') {
                             $this->config->updateValue(
                                 $key,
                                 $this->oney->setCustomOneyLimit(
