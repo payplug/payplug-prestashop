@@ -38,7 +38,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'The total amount of your order should be between 100,00 € and 3,000,00 € to pay with Oney.',
+                'error' => 'oney.isValidOneyAmount.unvalid',
             ],
             $this->repo->isValidOneyAmount($amount)
         );
@@ -51,7 +51,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'The total amount of your order should be between 100,00 € and 3,000,00 € to pay with Oney.',
+                'error' => 'oney.isValidOneyAmount.unvalid',
             ],
             $this->repo->isValidOneyAmount($amount)
         );
