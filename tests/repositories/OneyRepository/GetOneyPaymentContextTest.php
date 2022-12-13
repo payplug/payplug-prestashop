@@ -30,11 +30,6 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             'getDefaultDeliveryType' => 'storepickup',
         ]);
 
-        $this->config->shouldReceive('get')
-            ->with('PS_SHOP_NAME')
-            ->andReturn('Payplug')
-        ;
-
         $this->dependencies
             ->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent = false) {

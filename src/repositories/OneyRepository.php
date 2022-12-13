@@ -81,7 +81,7 @@ class OneyRepository extends BaseClass
         $this->log = $myLogPHP;
         $this->assign = $assign;
 
-        $this->setParams();
+        $this->setOperations();
     }
 
     /**
@@ -717,19 +717,19 @@ class OneyRepository extends BaseClass
 
         $available_oney_payments = $this->oneyEntity->getOperations();
         $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
+        if (!$oney_simulations['result']) {
+            return $payment_list;
+        }
 
         $use_fees = (bool) $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('oneyFees')
         );
+
         foreach (array_keys($oney_simulations['simulations']) as $key) {
             $with_fees = (bool) strpos($key, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 unset($oney_simulations['simulations'][$key]);
             }
-        }
-
-        if (!$oney_simulations['result']) {
-            return $payment_list;
         }
 
         foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
@@ -1549,13 +1549,26 @@ class OneyRepository extends BaseClass
         ];
     }
 
-    protected function setParams()
+    protected function setOperations()
     {
-        $this->oneyEntity->setOperations([
+        $options = [
             'x3_with_fees',
-            'x4_with_fees',
             'x3_without_fees',
+            'x4_with_fees',
             'x4_without_fees',
-        ]);
+        ];
+
+        $oney_allowed_countries = $this->configurationAdapter->get(
+            $this->dependencies->getConfigurationKey('oneyAllowedCountries')
+        );
+        if ('payplug' != $this->dependencies->name
+            && $this->validators['payment']->isAllowedCountry($oney_allowed_countries, 'BE')) {
+            $options = [
+                'x3_with_fees',
+                'x3_without_fees',
+            ];
+        }
+
+        $this->oneyEntity->setOperations($options);
     }
 }

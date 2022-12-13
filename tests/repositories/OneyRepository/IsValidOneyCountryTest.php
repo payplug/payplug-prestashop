@@ -2,6 +2,11 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
+use PayPlug\src\models\entities\OneyEntity;
+use PayPlug\src\repositories\OneyRepository;
+use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\repositories\RepositoryBase;
+
 /**
  * @group unit
  * @group repository
@@ -10,13 +15,45 @@ namespace PayPlug\tests\repositories\OneyRepository;
  *
  * @runTestsInSeparateProcesses
  */
-final class IsValidOneyCountryTest extends BaseOneyRepository
+final class IsValidOneyCountryTest extends RepositoryBase
 {
+    protected $oney;
+
+    public function setUp()
+    {
+        parent::setUp();
+    }
+
     public function testWithDifferentIsoCode()
     {
         $shipping_iso = 'FR';
         $billing_iso = 'IT';
         $error = 'Delivery and billing addresses must be in the same country to pay with Oney.';
+        $this->config
+            ->shouldReceive('get')
+            ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
+            ->andReturn('FR');
+
+        $this->oney = $this->oney ? $this->oney : new OneyEntity();
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        $this->repo = \Mockery::mock(OneyRepository::class, [
+            $this->address,
+            $this->assign,
+            $this->cache,
+            $this->carrier,
+            $this->cart,
+            $this->config,
+            $this->context,
+            $this->country,
+            $this->currency,
+            $this->media,
+            $this->dependencies,
+            $this->logger,
+            $this->myLogPhp,
+            $this->oney,
+            $this->tools,
+            $this->validate,
+        ])->makePartial();
 
         $this->assertSame(
             [
@@ -36,6 +73,27 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
             ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             ->andReturn('');
 
+        $this->oney = $this->oney ? $this->oney : new OneyEntity();
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        $this->repo = \Mockery::mock(OneyRepository::class, [
+            $this->address,
+            $this->assign,
+            $this->cache,
+            $this->carrier,
+            $this->cart,
+            $this->config,
+            $this->context,
+            $this->country,
+            $this->currency,
+            $this->media,
+            $this->dependencies,
+            $this->logger,
+            $this->myLogPhp,
+            $this->oney,
+            $this->tools,
+            $this->validate,
+        ])->makePartial();
+
         $this->assertSame(
             [
                 'result' => false,
@@ -54,6 +112,27 @@ final class IsValidOneyCountryTest extends BaseOneyRepository
             ->shouldReceive('get')
             ->with('PAYPLUG_ONEY_ALLOWED_COUNTRIES')
             ->andReturn('FR');
+
+        $this->oney = $this->oney ? $this->oney : new OneyEntity();
+        $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
+        $this->repo = \Mockery::mock(OneyRepository::class, [
+            $this->address,
+            $this->assign,
+            $this->cache,
+            $this->carrier,
+            $this->cart,
+            $this->config,
+            $this->context,
+            $this->country,
+            $this->currency,
+            $this->media,
+            $this->dependencies,
+            $this->logger,
+            $this->myLogPhp,
+            $this->oney,
+            $this->tools,
+            $this->validate,
+        ])->makePartial();
 
         $this->assertSame(
             [

@@ -2401,18 +2401,8 @@ class PaymentClass
         if (!in_array($iso, $this->oney_allowed_iso_codes)) {
             $iso = $this->config->get($this->dependencies->getConfigurationKey('companyIso'));
         }
-        $shipping_address = $this->getShippingAddress($this->address, $this->context->cart);
-        $billing_address = $this->getBillingAddress($this->address, $this->context->cart);
-        $shipping_iso = $this->getShippingIso($shipping_address);
-        $billing_iso = $this->getBillingIso($billing_address);
 
-        if ($this->dependencies->configClass->isValidFeature('feature_belgium_oney')
-            && in_array('BE', explode(',', $this->config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries'))))
-            && ($shipping_iso == $billing_iso) && ($shipping_iso == 'BE')) {
-            $available_oney_payments = $this->oney->oneyEntity->getOperations(['x4_without_fees', 'x4_with_fees']);
-        } else {
-            $available_oney_payments = $this->oney->oneyEntity->getOperations();
-        }
+        $available_oney_payments = $this->oney->oneyEntity->getOperations();
         foreach ($available_oney_payments as $oney_payment) {
             $with_fees = (bool) strpos($oney_payment, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {

@@ -23,21 +23,6 @@ final class GetOneyDeliveryContextTest extends BaseOneyRepository
             ->shouldReceive('getContext')
             ->andReturn(ContextMock::get())
         ;
-
-        $this->config->shouldReceive('get')
-            ->andReturnUsing(function ($key) {
-                switch ($key) {
-                    case 'PS_CURRENCY_DEFAULT':
-                        return 1;
-
-                    case 'PS_SHOP_NAME':
-                        return 'Payplug';
-
-                    default:
-                        return true;
-                }
-            })
-        ;
     }
 
     public function testGetContextFromVirtual()
@@ -76,11 +61,6 @@ final class GetOneyDeliveryContextTest extends BaseOneyRepository
         ;
         $this->carrier->shouldReceive('getDefaultDeliveryType')
             ->andReturn('storepickup')
-        ;
-
-        $this->config->shouldReceive('get')
-            ->with('PS_SHOP_NAME')
-            ->andReturn('Payplug')
         ;
 
         $this->assertSame(
