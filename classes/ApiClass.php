@@ -1265,12 +1265,6 @@ class ApiClass
             $permissions['apple_pay_allowed_domains'] = $json_answer['payment_methods']['apple_pay']['allowed_domain_names'];
         }
 
-        // If sandbox mode active, no allowed countries sent
-        // Then set default as `FR,MQ,YT,RE,GF,GP,IT`
-        if (isset($json_answer['is_live']) && !$json_answer['is_live']) {
-            $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT,ES,BE';
-        }
-
         // Get company country
         $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : false;
 
