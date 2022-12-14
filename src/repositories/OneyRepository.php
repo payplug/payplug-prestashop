@@ -1562,7 +1562,7 @@ class OneyRepository extends BaseClass
             $this->dependencies->getConfigurationKey('oneyAllowedCountries')
         );
         if ('payplug' != $this->dependencies->name
-            && $this->validators['payment']->isAllowedCountry($oney_allowed_countries, 'BE')) {
+            && $this->validators['payment']->isAllowedCountry($oney_allowed_countries, 'BE')['result']) {
             $options = [
                 'x3_with_fees',
                 'x3_without_fees',
