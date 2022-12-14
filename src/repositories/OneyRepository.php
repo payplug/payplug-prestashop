@@ -1401,8 +1401,8 @@ class OneyRepository extends BaseClass
                 'result' => false,
                 'error' => sprintf(
                     $this->dependencies->l('oney.isValidOneyAmount.unvalid', 'oneyrepository'),
-                    $this->toolsAdapter->tool('displayPrice', $limits['min']),
-                    $this->toolsAdapter->tool('displayPrice', $limits['max'])
+                    $limits['min'],
+                    $limits['max']
                 ),
             ];
         }
