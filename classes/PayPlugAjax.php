@@ -158,8 +158,10 @@ class PayPlugAjax
                     $amount = $this->context->cart->getOrderTotal($use_taxes);
                     $cart = $this->context->cart;
                     $delivery_address = $this->address->get((int) $this->context->cart->id_address_delivery);
-                    $delivery_country = $this->country->get((int) $delivery_address->id_country);
-                    $iso_code = $delivery_country->iso_code;
+                    $iso_code = $this
+                        ->dependencies
+                        ->configClass
+                        ->getIsoCodeByCountryId((int) $delivery_address->id_country);
 
                     if ($this->validate->validate('isLoadedObject', $cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
                         $is_elligible = $this->oney->isOneyElligible($cart, $amount, $iso_code);
@@ -197,8 +199,10 @@ class PayPlugAjax
                 } else {
                     $amount = $this->context->cart->getOrderTotal($use_taxes);
                     $delivery_address = $this->address->get((int) $this->context->cart->id_address_delivery);
-                    $delivery_country = $this->country->get((int) $delivery_address->id_country);
-                    $iso_code = $delivery_country->iso_code;
+                    $iso_code = $this
+                        ->dependencies
+                        ->configClass
+                        ->getIsoCodeByCountryId((int) $delivery_address->id_country);
                     $cart = $this->context->cart;
                 }
 

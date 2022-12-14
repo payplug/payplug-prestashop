@@ -1284,13 +1284,17 @@ class PaymentClass
                 $iso_code = 'FR';
             }
             if (!$shipping_iso) {
-                $shipping_country = $this->country->get($shipping_address->id_country);
-                $metadata['cms_shipping_country'] = $shipping_country->iso_code;
+                $metadata['cms_shipping_country'] = $this
+                    ->dependencies
+                    ->configClass
+                    ->getIsoCodeByCountryId((int) $shipping_address->id_country);
                 $shipping_iso = $iso_code;
             }
             if (!$billing_iso) {
-                $billing_country = $this->country->get($billing_address->id_country);
-                $metadata['cms_billing_country'] = $billing_country->iso_code;
+                $metadata['cms_billing_country'] = $this
+                    ->dependencies
+                    ->configClass
+                    ->getIsoCodeByCountryId((int) $billing_address->id_country);
                 $billing_iso = $iso_code;
             }
         }
@@ -2396,7 +2400,6 @@ class PaymentClass
 
         $use_fees = (bool) $this->config->get($this->dependencies->getConfigurationKey('oneyFees'));
         $delivery_address = $this->address->get($this->context->cart->id_address_delivery);
-        $delivery_country = $this->country->get($delivery_address->id_country);
         $iso = $this->tools->tool('strtoupper', $this->context->language->iso_code);
         if (!in_array($iso, $this->oney_allowed_iso_codes)) {
             $iso = $this->config->get($this->dependencies->getConfigurationKey('companyIso'));
@@ -2435,7 +2438,10 @@ class PaymentClass
                 'is_optimized' => $optimized,
                 'type' => $oney_payment,
                 'amount' => $cart_amount,
-                'iso_code' => $delivery_country->iso_code,
+                'iso_code' => $this
+                    ->dependencies
+                    ->configClass
+                    ->getIsoCodeByCountryId((int) $delivery_address->id_country),
                 'inputs' => [
                     'pc' => [
                         'name' => 'pc',
