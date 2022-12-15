@@ -257,12 +257,14 @@ $_MODULE['<{payplug}prestashop>oneyrepository_32c3e242c32d31c5f400ac11508dac56']
 $_MODULE['<{payplug}prestashop>oneyrepository_427d2eef786cda4bb73d9ec1429a34b9'] = 'Veuillez saisir votre nom.';
 $_MODULE['<{payplug}prestashop>oneyrepository_46170db793b9e6e143d187c02a572b7c'] = 'Veuillez saisir votre adresse de livraison.';
 $_MODULE['<{payplug}prestashop>oneyrepository_64f345381f968fbbd95f877090c2c984'] = 'Veuillez saisir votre adresse de facturation.';
+$_MODULE['<{payplug}prestashop>oneyrepository_6c1674d14bf5f95742f572cddb0641a7'] = 'Belgium';
 $_MODULE['<{payplug}prestashop>oneyrepository_7b5bf6aefa40695d2f2da3a883b9fe85'] = ', veuillez en saisir une autre qui ne dépasse pas 100 caractères.';
 $_MODULE['<{payplug}prestashop>oneyrepository_7cf56dac6ba06e2f2afce009f6da06b3'] = 'Merci de saisir votre ville.';
 $_MODULE['<{payplug}prestashop>oneyrepository_7eab6a6607c367867b134afc2df95e2e'] = 'Le paiement avec Oney n\'est pas disponible.';
 $_MODULE['<{payplug}prestashop>oneyrepository_80d89af49cffae6024239e2f8e5c6479'] = 'Merci de remplir les informations requises';
 $_MODULE['<{payplug}prestashop>oneyrepository_83de36c28c4741b8e97139ee98a632a3'] = 'Votre adresse e-mail est trop longue et le caractère + n\'est pas autorisé';
 $_MODULE['<{payplug}prestashop>oneyrepository_8f78c319b19bcd8df800ef94c3d38906'] = 'Veuillez saisir votre numéro de téléphone portable.';
+$_MODULE['<{payplug}prestashop>oneyrepository_907eba32d950bfab68227fd7ea22999b'] = 'Espagne';
 $_MODULE['<{payplug}prestashop>oneyrepository_aac66ee4fe28163f89c9a81633becc82'] = 'Paiement en %sx';
 $_MODULE['<{payplug}prestashop>oneyrepository_ad2063f6a03a8c2c0d94846e41154218'] = 'Le caractère + n\'est pas autorisé. Veuillez saisir une adresse e-mail qui ne dépasse pas 100 caractères.';
 $_MODULE['<{payplug}prestashop>oneyrepository_b286504b1d4d5ee1aeb919ad1e1255b8'] = 'France, Martinique, Guadeloupe, La Reunion, Mayotte ou Guyane';

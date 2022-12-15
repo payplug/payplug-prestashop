@@ -1492,6 +1492,12 @@ class OneyRepository extends BaseClass
             if (in_array('IT', $iso_list)) {
                 $str_list = $this->dependencies->l('Italy', 'oneyrepository');
             }
+            if (in_array('BE', $iso_list)) {
+                $str_list = $this->dependencies->l('Belgium', 'oneyrepository');
+            }
+            if (in_array('ES', $iso_list)) {
+                $str_list = $this->dependencies->l('Spain', 'oneyrepository');
+            }
 
             return [
                 'result' => false,
