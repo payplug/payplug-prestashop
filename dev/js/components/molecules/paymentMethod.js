@@ -23,6 +23,10 @@ class PaymentMethod {
     }
 
     handleReloadContent() {
+        if(!paymentMethod.isLogged()) {
+            return;
+        }
+
         paymentMethod.handleSandbox();
         paymentMethod.checkPaymentOptionInformation();
     }
@@ -306,6 +310,10 @@ class PaymentMethod {
                 break;
         }
         return checkpremium;
+    }
+
+    isLogged(){
+        return $('.generalBlock.-logged').length > 0;
     }
 }
 

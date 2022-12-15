@@ -336,6 +336,12 @@ class AdminClass
 
         if ((int) $this->tools->tool('getValue', 'checkPremium') == 1) {
             $api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
+
+            // If user isn't logged, then we do not proceed and return an empty json
+            if (!$api_key) {
+                exit(json_encode([]));
+            }
+
             $permissions = $this->dependencies->apiClass->getAccountPermissions($api_key);
             $applepay_allowed_domains = $this->validators['payment']->isApplepayAllowedDomain(
                 $this->context->shop->domain,
