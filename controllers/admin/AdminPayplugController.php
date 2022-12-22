@@ -72,7 +72,7 @@ class AdminPayplugController extends ModuleAdminController
                 'content' => $this->content . $content,
             ]);
         } else {
-            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
+            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin_lib.tpl');
             parent::initContent();
         }
     }
