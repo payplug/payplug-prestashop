@@ -138,6 +138,541 @@ class AdminClass
             return;
         }
 
+        exit('
+       {
+  "success": true,
+  "data": {
+    "settings": {
+      "logged": true,
+      "mode": 0,
+      "WP": {
+        "_wpnonce": "0b131d94c4"
+      }
+    },
+    "payplug_wooc_settings": {
+      "rest_route": "/payplug_api/login",
+      "action": "payplug_login",
+      "payplug_email": "testplugin+premium@payplug.com",
+      "payplug_password": "testplugin@21",
+      "enabled": "yes",
+      "title": "Pay by credit card",
+      "description": "sedfghj",
+      "email": "testplugin+premium@payplug.com",
+      "payplug_test_key": "sk_test_5viLdhhYB58UuSH0C49p0g",
+      "payplug_merchant_id": "433983",
+      "mode": "yes",
+      "payment_method": "popup",
+      "debug": "no",
+      "oneclick": "no",
+      "bancontact": "no",
+      "apple_pay": "no",
+      "american_express": "yes",
+      "oney": "no",
+      "oney_type": "with_fees",
+      "oney_thresholds": "",
+      "oney_thresholds_min": 100,
+      "oney_thresholds_max": 3000,
+      "oney_product_animation": "no",
+      "payplug_merchant_country": "FR"
+    },
+    "header": {
+      "title": "The payment solution that increases your turnover.",
+      "descriptions": {
+        "live": {
+          "description": "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools.",
+          "plugin_version": "2.0.1"
+        },
+        "sandbox": {
+          "description": "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools.",
+          "plugin_version": "2.0.1"
+        }
+      },
+      "options": {
+        "type": "select",
+        "name": "payplug_enable",
+        "disabled": false,
+        "options": [
+          {
+            "value": 1,
+            "label": "Enabled plugin",
+            "checked": true
+          },
+          {
+            "value": 0,
+            "label": "Disabled Plugin",
+            "checked": false
+          }
+        ]
+      }
+    },
+    "login": {
+      "name": "generalLogin",
+      "title": "General",
+      "descriptions": {
+        "live": {
+          "description": "Log in to your PayPlug account.",
+          "not_registered": "Not registered to PayPlug yet?",
+          "connect": "Connect account",
+          "email_label": "E-mail address",
+          "email_placeholder": "E-mail address",
+          "password_label": "Password",
+          "password_placeholder": "Password",
+          "link_forgot_password": {
+            "text": "Forgot your password?",
+            "url": "https://www.payplug.com/portal/forgot_password",
+            "target": "_blank"
+          }
+        },
+        "sandbox": {
+          "description": "Log in to your PayPlug account.",
+          "not_registered": "Not registered to PayPlug yet?",
+          "connect": "Connect account",
+          "email_label": "E-mail address",
+          "email_placeholder": "E-mail address",
+          "password_label": "Password",
+          "password_placeholder": "Password",
+          "link_forgot_password": {
+            "text": "Forgot your password?",
+            "url": "https://www.payplug.com/portal/forgot_password",
+            "target": "_blank"
+          }
+        }
+      }
+    },
+    "logged": {
+      "title": "General",
+      "descriptions": {
+        "live": {
+          "description": "General settings of the module",
+          "logout": "Disconnect",
+          "mode": "Environment",
+          "mode_description": "In LIVE mode, the payments will generate real transactions.",
+          "link_learn_more": {
+            "text": "Learn more",
+            "url": "https://support.payplug.com/hc/en-gb/articles/360021142492",
+            "target": "_blank"
+          },
+          "link_access_portal": {
+            "text": "Access my PayPlug portal",
+            "url": "https://www.payplug.com/portal",
+            "target": "_blank"
+          }
+        },
+        "sandbox": {
+          "description": "General settings of the module",
+          "logout": "Disconnect",
+          "mode": "Environment",
+          "mode_description": "In TEST mode, all payments will be simulations and will not generate real transactions.",
+          "link_learn_more": {
+            "text": "Learn more",
+            "url": "https://support.payplug.com/hc/en-gb/articles/360021142492",
+            "target": "_blank"
+          },
+          "link_access_portal": {
+            "text": "Access my PayPlug portal",
+            "url": "https://www.payplug.com/portal",
+            "target": "_blank"
+          }
+        }
+      },
+      "options": [
+        {
+          "name": "payplug_sandbox",
+          "label": "Live",
+          "value": 0,
+          "checked": true
+        },
+        {
+          "name": "payplug_sandbox",
+          "label": "Test",
+          "value": 1,
+          "checked": false
+        }
+      ],
+      "inactive_modal": {
+        "inactive": false,
+        "title": "LIVE mode",
+        "description": "Please enter your PayPlug account password.",
+        "password_label": "Password",
+        "cancel": "Cancel",
+        "ok": "OK"
+      },
+      "inactive_account": {
+        "warning": {
+          "title": "Congratulations, your account is connected!",
+          "description": "While your application is being reviewed, you can use the <a href=\'https://support.payplug.com/hc/en-gb/articles/360021142492\' target=\'_blank\'>TEST mode</a> to discover our module. <span id=\'inactiveModalClick\'>Click here</span> to switch to LIVE mode and collect payments from your customers."
+        },
+"error": {
+"title": "Your application is being processed.",
+"description": "For more information, please contact us at support@payplug.com"
+}
+}
+},
+"payment_methods": {
+    "name": "paymentMethodsBlock",
+      "title": "Payment methods",
+      "descriptions": {
+        "live": {
+            "description": "Choose the payment methods you wish to offer your customers."
+        },
+        "sandbox": {
+            "description": "Choose the payment methods you wish to offer your customers."
+        }
+      },
+      "options": [
+        {
+            "type": "payment_method",
+          "name": "standard",
+          "title": "Payment by card",
+          "image": "http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/standard.svg",
+          "checked": true,
+          "hide": true,
+          "available_test_mode": true,
+          "descriptions": {
+            "live": {
+                "description": "Offer payment by credit card to your customers. Only Euro payments can be processed with PayPlug.",
+              "advanced_options": "payplug_section_standard_payment_advanced_options_label"
+            },
+            "sandbox": {
+                "description": "Offer payment by credit card to your customers. Only Euro payments can be processed with PayPlug.",
+              "advanced_options": "payplug_section_standard_payment_advanced_options_label"
+            }
+          },
+          "options": [
+            {
+                "type": "payment_option",
+              "sub_type": "input",
+              "name": "standard_payment_title",
+              "title": "Title",
+              "value": "Pay by credit card",
+              "descriptions": {
+                "live": {
+                    "description": "The payment solution title displayed to your customers during checkout",
+                  "placeholder": "Pay by credit card"
+                },
+                "sandbox": {
+                    "description": "The payment solution title displayed to your customers during checkout",
+                  "placeholder": "Pay by credit card"
+                }
+              }
+            },
+            {
+                "type": "payment_option",
+              "sub_type": "input",
+              "name": "standard_payment_description",
+              "title": "Description",
+              "value": "sedfghj",
+              "descriptions": {
+                "live": {
+                    "description": "The payment solution description displayed to your customers during checkout",
+                  "placeholder": "Description"
+                },
+                "sandbox": {
+                    "description": "The payment solution description displayed to your customers during checkout",
+                  "placeholder": "Description"
+                }
+              }
+            },
+            {
+                "type": "payment_option",
+              "sub_type": "IOptions",
+              "name": "embeded",
+              "title": "Presentation of the payment page",
+              "descriptions": {
+                "live": {
+                    "description_redirect": "Your customers will be redirected to a customizable payment page hosted by PayPlug.",
+                  "description_popup": "Your customers will see a customizable payment pop-up window appear on the checkout page of your store.",
+                  "link_know_more": {
+                        "text": "Find out more.",
+                    "url": "https://support.payplug.com/hc/en-gb/articles/4409698334098",
+                    "target": "_blank"
+                  }
+                },
+                "sandbox": {
+                    "description_redirect": "Your customers will be redirected to a customizable payment page hosted by PayPlug.",
+                  "description_popup": "Your customers will see a customizable payment pop-up window appear on the checkout page of your store.",
+                  "link_know_more": {
+                        "text": "Find out more.",
+                    "url": "https://support.payplug.com/hc/en-gb/articles/4409698334098",
+                    "target": "_blank"
+                  }
+                }
+              },
+              "options": [
+                {
+                    "name": "payplug_embedded",
+                  "label": "Pop-up",
+                  "value": "popup",
+                  "checked": true
+                },
+                {
+                    "name": "payplug_embedded",
+                  "label": "Redirected",
+                  "value": "redirect",
+                  "checked": false
+                }
+              ]
+            },
+            {
+                "type": "payment_option",
+              "sub_type": "switch",
+              "name": "one_click",
+              "title": "Activate one-click payment",
+              "descriptions": {
+                "live": {
+                    "description": "Your customers will be able to register their card and make their next purchase in one click.",
+                  "link_know_more": {
+                        "text": "Find out more.",
+                    "url": "https://support.payplug.com/hc/en-gb/articles/4409698334098",
+                    "target": "_blank"
+                  }
+                },
+                "sandbox": {
+                    "description": "Your customers will be able to register their card and make their next purchase in one click.",
+                  "link_know_more": {
+                        "text": "Find out more.",
+                    "url": "https://support.payplug.com/hc/en-gb/articles/4409698334098",
+                    "target": "_blank"
+                  }
+                }
+              },
+              "checked": false
+            }
+          ]
+        },
+        {
+            "type": "payment_method",
+          "name": "american_express",
+          "title": "AmEx Payment",
+          "image": "http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/Amex_logo_color.svg",
+          "checked": true,
+          "available_test_mode": false,
+          "descriptions": {
+            "live": {
+                "description": "Allow your customers to pay with their American Express cards.",
+              "link_know_more": {
+                    "text": "Find out more.",
+                "url": "https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug",
+                "target": "_blank"
+              }
+            },
+            "sandbox": {
+                "description": "Unavailable in test mode",
+              "link_know_more": {
+                    "text": "Find out more.",
+                "url": "https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug",
+                "target": "_blank"
+              }
+            }
+          }
+        },
+        {
+            "type": "payment_method",
+          "name": "applepay",
+          "title": "Apple Pay payment",
+          "image": "http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/applepay.svg",
+          "checked": false,
+          "available_test_mode": false,
+          "descriptions": {
+            "live": {
+                "description": "Display the Apple Pay payment button on your store",
+              "link_know_more": {
+                    "text": "Find out more.",
+                "url": "https://support.payplug.com/hc/en-gb/articles/5149384347292",
+                "target": "_blank"
+              }
+            },
+            "sandbox": {
+                "description": "Unavailable in test mode",
+              "link_know_more": {
+                    "text": "Find out more.",
+                "url": "https://support.payplug.com/hc/en-gb/articles/5149384347292",
+                "target": "_blank"
+              }
+            }
+          }
+        },
+        {
+            "type": "payment_method",
+          "name": "bancontact",
+          "title": "Bancontact payment",
+          "image": "http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/bancontact.svg",
+          "checked": false,
+          "available_test_mode": false,
+          "descriptions": {
+            "live": {
+                "description": "Allow your customers to pay with their Bancontact cards.",
+              "link_know_more": {
+                    "text": "Find out more.",
+                "url": "https://support.payplug.com/hc/en-gb/articles/4408157435794",
+                "target": "_blank"
+              }
+            },
+            "sandbox": {
+                "description": "Unavailable in test mode",
+              "link_know_more": {
+                    "text": "Find out more.",
+                "url": "https://support.payplug.com/hc/en-gb/articles/4408157435794",
+                "target": "_blank"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "payment_paylater": {
+    "name": "paymentMethodsBlock",
+      "title": "PayLater",
+      "descriptions": {
+        "live": {
+            "description": "Allow your customers to pay in installments."
+        },
+        "sandbox": {
+            "description": "Allow your customers to pay in installments."
+        }
+      },
+      "options": {
+        "name": "oney",
+        "title": "3x 4x Oney payments",
+        "image": "http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/lg-oney.png",
+        "checked": false,
+        "descriptions": {
+            "live": {
+                "description": "Your customers can choose to pay for their orders in 3 or 4 installments. Choose below whether or not you want to pay all the fees.",
+            "link_know_more": {
+                    "text": "Find out more.",
+              "url": "https://support.payplug.com/hc/fr/articles/4408142346002",
+              "target": "_blank"
+            }
+          },
+          "sandbox": {
+                "description": "Your customers can choose to pay for their orders in 3 or 4 installments. Choose below whether or not you want to pay all the fees.",
+            "link_know_more": {
+                    "text": "Find out more.",
+              "url": "https://support.payplug.com/hc/fr/articles/4408142346002",
+              "target": "_blank"
+            }
+          },
+          "advanced": {
+                "0": "",
+            "description": "Advanced Settings"
+          }
+        },
+        "options": [
+          {
+              "name": "payplug_oney_type",
+            "className": "_paylaterLabel",
+            "label": "With fees",
+            "subText": "The fees are split between you and your customers.",
+            "value": "with_fees",
+            "checked": true
+          },
+          {
+              "name": "payplug_oney_type",
+            "className": "_paylaterLabel",
+            "label": "Without fees",
+            "subText": "You pay the fees.",
+            "value": "without_fees",
+            "checked": false
+          }
+        ],
+        "advanced_options": [
+          {
+              "name": "thresholds",
+            "image_url": "http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/thresholds.jpg",
+            "title": "Customise your split payment offer",
+            "descriptions": {
+              "description": "Offer guaranteed split payments for amounts between",
+              "min_amount": {
+                  "name": "oney_min_amounts",
+                "value": 100,
+                "placeholder": 100
+              },
+              "inter": "and",
+              "max_amount": {
+                  "name": "oney_max_amounts",
+                "value": 3000,
+                "placeholder": 3000
+              },
+              "error": {
+                  "text": "payplug_thresholds_error_msg"
+              }
+            },
+            "switch": false
+          },
+          {
+              "name": "oney_product_animation",
+            "image_url": "http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/product.jpg",
+            "title": "Display the installments on the Product page",
+            "descriptions": [
+              {
+                  "description": "Your customers can see the details of their 3 or 4 installments.",
+                "link_know_more": {
+                  "text": "Find out more.",
+                  "url": "https://support.payplug.com/hc/fr/articles/4408142346002",
+                  "target": "_blank"
+                }
+              }
+            ],
+            "switch": true,
+            "checked": false
+          }
+        ]
+      }
+    },
+    "status": {
+    "error": false,
+      "title": "Status",
+      "descriptions": {
+        "live": {
+            "description": "Control your environment to ensure that the module is in perfect working order.",
+          "errorMessage": "The configuration requirements for using the PayPlug module are not met. Once you have corrected the problems, please refresh the page or click on verify.",
+          "check": "Check"
+        },
+        "sandbox": {
+            "description": "Control your environment to ensure that the module is in perfect working order.",
+          "errorMessage": "The configuration requirements for using the PayPlug module are not met. Once you have corrected the problems, please refresh the page or click on verify.",
+          "check": "Check"
+        }
+      },
+      "requirements": [
+        {
+            "status": true,
+          "text": "PHP cURL extension must be enabled on your server."
+        },
+        {
+            "status": true,
+          "text": "The PHP version on your server is valid."
+        },
+        {
+            "status": true,
+          "text": "OpenSSL is up to date."
+        },
+        {
+            "status": true,
+          "text": "Your shop currency has been set up with Euro."
+        },
+        {
+            "status": true,
+          "text": "You must connect your PayPlug account."
+        }
+      ],
+      "debug": {
+        "live": {
+            "title": "Activate debug mode",
+          "description": "Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting)."
+        },
+        "sandbox": {
+            "title": "Activate debug mode",
+          "description": "Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting)."
+        }
+      },
+      "enable_debug_check": false
+    }
+  }
+}
+');
+
         if ($this->tools->tool('getValue', 'popin')) {
             $args = null;
             if ($this->tools->tool('getValue', 'type') == 'confirm') {
