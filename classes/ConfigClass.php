@@ -772,6 +772,11 @@ class ConfigClass
 
         // @todo : avoid addJsDef with translations (quotes are not escaped on 1.6 and break header)
         $this->media->addJsDef([
+            'payplug_admin_config' => [
+                'ajax_url' => $admin_ajax_url . '&_ajax=1&rest_route=/payplug_api',
+                'img_path' => $this->constant->get('__PS_BASE_URI__')
+                . 'modules/' . $this->dependencies->name . '/dist/',
+            ],
             'admin_ajax_url' => $admin_ajax_url,
             'error_installment' => $this->dependencies->l('payplug.assignContentVar.installment', 'configclass'),
             'error_deferred' => $this->dependencies->l('payplug.assignContentVar.deferred', 'configclass'),
@@ -1256,8 +1261,11 @@ class ConfigClass
 
     /**
      * @description Process account submit
+     *
+     * @param mixed $email
+     * @param mixed $password
      */
-    public function submitAccount()
+    public function submitAccount($email, $password)
     {
         $curl_exists = extension_loaded('curl');
         $openssl_exists = extension_loaded('openssl');
@@ -1266,8 +1274,8 @@ class ConfigClass
          * We can't use $password = $this->tools->tool('getValue', 'payplug_password');
          * Because pwd with special chars don't work
          */
-        $password = $_POST['payplug_password'];
-        $email = $this->tools->tool('getValue', 'payplug_email');
+        //$password = $_POST['payplug_password'];
+        //$email = $this->tools->tool('getValue', 'payplug_email');
 
         if (!$this->validate->validate('isEmail', $email)
             || !$this->getAdapterPrestaClasse()->isPlaintextPassword($password)) {
@@ -1278,22 +1286,22 @@ class ConfigClass
             ]);
 
             exit(json_encode([
-                'content' => false,
-                'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/error.tpl'),
-                'error' => $errorMessage,
+                'success' => false,
+                'data' => ['message' => $errorMessage],
+
             ]));
         }
         if ($curl_exists && $openssl_exists) {
             if ($this->dependencies->apiClass->login($email, $password)) {
                 $this->config->updateValue(
                     $this->dependencies->getConfigurationKey('email'),
-                    $this->tools->tool('getValue', 'payplug_email')
+                    $email
                 );
                 $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 1);
                 $this->assignContentVar();
                 $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
-                exit(json_encode(['content' => $content]));
+                exit(json_encode($this->vue->init()));
             }
             $errorMessage = $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass');
             $this->context->smarty->assign([
@@ -1302,10 +1310,9 @@ class ConfigClass
             ]);
 
             exit(json_encode([
-                'content' => false,
-                'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/error.tpl'),
-                'error' => $errorMessage,
-            ]));
+                                 'success' => false,
+                                 'data' => ['message' => $errorMessage],
+                             ]));
         }
     }
 
