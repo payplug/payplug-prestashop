@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\models\classes\Vue;
 use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\utilities\helpers\FilesHelper;
 use PayPlug\src\utilities\validators\accountValidator;
@@ -334,7 +335,9 @@ class DependenciesClass
     public $payplugLock;
     public $version;
     public $refundClass;
+    public $vue;
 
+    private $classes;
     private $plugin;
     private $helpers;
     private $repositories;
@@ -357,6 +360,7 @@ class DependenciesClass
     {
         $this->setvalidators();
         $this->setHelpers();
+        $this->setClasses();
         $this->setPlugin((new PluginInit($this))->getEntity());
         $this->setRepositories();
 
@@ -374,6 +378,7 @@ class DependenciesClass
         $this->orderClass = new OrderClass($this);
         $this->paymentClass = new PaymentClass($this);
         $this->refundClass = new RefundClass($this);
+        $this->vue = new Vue();
     }
 
     public function setPlugin($plugin)
@@ -489,6 +494,11 @@ class DependenciesClass
         return $this->helpers;
     }
 
+    public function getClasses()
+    {
+        return $this->classes;
+    }
+
     private function setvalidators()
     {
         $this->validators = [
@@ -515,6 +525,13 @@ class DependenciesClass
     {
         $this->helpers = [
             'files' => new FilesHelper(),
+        ];
+    }
+
+    private function setClasses()
+    {
+        $this->classes = [
+            'vue' => new Vue(),
         ];
     }
 }
