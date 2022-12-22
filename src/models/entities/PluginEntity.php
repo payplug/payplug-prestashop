@@ -138,6 +138,9 @@ class PluginEntity
     /** @var object */
     private $validate;
 
+    /** @var object */
+    private $vue;
+
     /**
      * @return object
      */
@@ -526,6 +529,14 @@ class PluginEntity
     public function getValidate()
     {
         return $this->validate;
+    }
+
+    /**
+     * @return object
+     */
+    public function getVue()
+    {
+        return $this->vue;
     }
 
     /**
@@ -1216,6 +1227,24 @@ class PluginEntity
         }
 
         $this->validate = $validate;
+
+        return $this;
+    }
+
+    /**
+     * @param object $vue
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setVue($vue)
+    {
+        if (!is_object($vue)) {
+            throw (new BadParameterException('Invalid argument, $vue must be Vue'));
+        }
+
+        $this->vue = $vue;
 
         return $this;
     }
