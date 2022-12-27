@@ -1258,7 +1258,7 @@ class ConfigClass
     /**
      * @description Process account submit
      */
-    public function submitAccount()
+    public function submitAccount($email, $password)
     {
         $curl_exists = extension_loaded('curl');
         $openssl_exists = extension_loaded('openssl');
@@ -1267,8 +1267,8 @@ class ConfigClass
          * We can't use $password = $this->tools->tool('getValue', 'payplug_password');
          * Because pwd with special chars don't work
          */
-        $password = $_POST['payplug_password'];
-        $email = $this->tools->tool('getValue', 'payplug_email');
+        //$password = $_POST['payplug_password'];
+        //$email = $this->tools->tool('getValue', 'payplug_email');
 
         if (!$this->validate->validate('isEmail', $email)
             || !$this->getAdapterPrestaClasse()->isPlaintextPassword($password)) {
@@ -1288,7 +1288,7 @@ class ConfigClass
             if ($this->dependencies->apiClass->login($email, $password)) {
                 $this->config->updateValue(
                     $this->dependencies->getConfigurationKey('email'),
-                    $this->tools->tool('getValue', 'payplug_email')
+                    $email
                 );
                 $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 1);
                 $this->assignContentVar();

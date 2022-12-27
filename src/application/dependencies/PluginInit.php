@@ -47,6 +47,7 @@ use PayPlug\src\application\adapter\ProductAdapter;
 use PayPlug\src\application\adapter\ShopAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
+use PayPlug\src\models\classes\Vue;
 use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\src\models\entities\OneyEntity;
 use PayPlug\src\models\entities\OrderStateEntity;
@@ -114,6 +115,7 @@ class PluginInit extends BaseClass
     private $shop;
     private $tools;
     private $validate;
+    private $vue;
 
     public function __construct($dependencies = null)
     {
@@ -123,6 +125,7 @@ class PluginInit extends BaseClass
         $this->setEntities();
         $this->setAdapter();
         $this->setRepositories();
+        $this->setClasses();
 
         $this->plugin
             ->setApiClass($this->apiClass)
@@ -161,6 +164,7 @@ class PluginInit extends BaseClass
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate)
+            ->setVue($this->vue)
         ;
 
         $this->setEntity($this->plugin);
@@ -298,5 +302,10 @@ class PluginInit extends BaseClass
         $this->shop = new ShopAdapter();
         $this->tools = new ToolsAdapter();
         $this->validate = new ValidateAdapter();
+    }
+
+    private function setClasses()
+    {
+        $this->vue = new Vue();
     }
 }
