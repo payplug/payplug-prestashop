@@ -142,7 +142,7 @@ class AdminClass
 
         $datas = json_decode(file_get_contents('php://input'));
         if (!$datas) {
-            $datas = (object)array();
+            $datas = (object) [];
             $datas->action = 'null';
         }
 
@@ -505,7 +505,6 @@ class AdminClass
                     ]));
             }
         }
-
 
         /*echo "<pre>";
         print_r($datas);
