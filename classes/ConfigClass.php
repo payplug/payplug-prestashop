@@ -256,6 +256,7 @@ class ConfigClass
         $this->validators = $this->dependencies->getValidators();
 
         $this->validators = $this->dependencies->getValidators();
+        $this->vue = $this->dependencies->getPlugin()->getVue();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
@@ -1257,6 +1258,9 @@ class ConfigClass
 
     /**
      * @description Process account submit
+     *
+     * @param mixed $email
+     * @param mixed $password
      */
     public function submitAccount($email, $password)
     {
@@ -1279,9 +1283,9 @@ class ConfigClass
             ]);
 
             exit(json_encode([
-                'content' => false,
-                'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/error.tpl'),
-                'error' => $errorMessage,
+                'success' => false,
+                'data' => ['message' => $errorMessage],
+
             ]));
         }
         if ($curl_exists && $openssl_exists) {
@@ -1294,7 +1298,7 @@ class ConfigClass
                 $this->assignContentVar();
                 $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
-                exit(json_encode(['content' => $content]));
+                exit(json_encode($this->vue->init()));
             }
             $errorMessage = $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass');
             $this->context->smarty->assign([
@@ -1303,10 +1307,9 @@ class ConfigClass
             ]);
 
             exit(json_encode([
-                'content' => false,
-                'modal' => $this->fetchTemplate('/views/templates/api/molecules/modal/error.tpl'),
-                'error' => $errorMessage,
-            ]));
+                                 'success' => false,
+                                 'data' => ['message' => $errorMessage],
+                             ]));
         }
     }
 
