@@ -773,7 +773,11 @@ class ConfigClass
 
         // @todo : avoid addJsDef with translations (quotes are not escaped on 1.6 and break header)
         $this->media->addJsDef([
-            'payplug_admin_config' => ['ajax_url' => $admin_ajax_url . '&_ajax=1&rest_route=/payplug_api'],
+            'payplug_admin_config' => [
+                'ajax_url' => $admin_ajax_url . '&_ajax=1&rest_route=/payplug_api',
+                'img_path' => $this->constant->get('__PS_BASE_URI__')
+                . 'modules/' . $this->dependencies->name . '/dist/',
+            ],
             'admin_ajax_url' => $admin_ajax_url,
             'error_installment' => $this->dependencies->l('payplug.assignContentVar.installment', 'configclass'),
             'error_deferred' => $this->dependencies->l('payplug.assignContentVar.deferred', 'configclass'),

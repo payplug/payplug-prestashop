@@ -23,37 +23,63 @@
 
 namespace PayPlug\src\models\classes;
 
+use PayPlug\classes\DependenciesClass;
+
 class Vue
 {
     public function init()
     {
-        return [
+        $dependencies = new DependenciesClass();
+        $config = $dependencies->getPlugin()->getConfiguration();
+        $payplug_email = $config->get($dependencies->getConfigurationKey('email'));
+
+        $datas = [
             'success' => true,
             'data' => [
-                'payplug_wooc_settings' => $this->payplug_section_wooc_settings(),
-                'settings' => $this->payplug_section_settings(),
+                //"payplug_wooc_settings" => $this->payplug_section_wooc_settings(),
+                //"settings" => $this->payplug_section_settings(),
                 'header' => $this->payplug_section_header(),
-                'login' => $this->payplug_section_login(),
-                'logged' => $this->payplug_section_logged(),
+                //"login" => $this->payplug_section_login(),
+                //"logged" => $this->payplug_section_logged(),
                 'payment_methods' => $this->payplug_section_payment_methods(),
                 'payment_paylater' => $this->payplug_section_paylater(),
                 'status' => $this->payplug_section_status(),
-                'help' => $this->payplug_section_help(),
+                //"help" => $this->payplug_section_help()
             ],
         ];
+
+        if ($payplug_email != '') {
+            $datas['data']['payplug_wooc_settings'] = $this->payplug_section_wooc_settings($config);
+            $datas['data']['settings'] = $this->payplug_section_settings(true);
+            $datas['data']['login'] = $this->payplug_section_login();
+            $datas['data']['logged'] = $this->payplug_section_logged();
+        } else {
+            $datas['data']['settings'] = $this->payplug_section_settings(false);
+            $datas['data']['login'] = $this->payplug_section_login();
+        }
+
+        /*echo "<pre>";
+        print_r($datas);
+        echo "</pre>";
+        die;*/
+
+        return $datas;
     }
 
-    public function payplug_section_wooc_settings()
+    public function payplug_section_wooc_settings($dependencies)
     {
+        $dependencies = new DependenciesClass();
+        $config = $dependencies->getPlugin()->getConfiguration();
+
         return [
             'rest_route' => '/payplug_api/login',
             'action' => 'payplug_login',
-            'payplug_email' => 'testplugin+premium@payplug.com',
+            'payplug_email' => $config->get($dependencies->getConfigurationKey('email')),
             'payplug_password' => 'testplugin@21',
             'enabled' => 'yes',
             'title' => 'Pay by credit card',
             'description' => 'sedfghj',
-            'email' => 'testplugin+premium@payplug.com',
+            'email' => $config->get($dependencies->getConfigurationKey('email')),
             'payplug_test_key' => 'sk_test_5viLdhhYB58UuSH0C49p0g',
             'payplug_merchant_id' => '433983',
             'mode' => 'yes',
@@ -73,7 +99,7 @@ class Vue
         ];
     }
 
-    public function payplug_section_settings()
+    public function payplug_section_settings($logged)
     {
         return [
             'email' => 'blablabla@blabalabl.com',
@@ -87,7 +113,7 @@ class Vue
                 'save_action' => 'payplug_save',
                 '_wpnonce' => '0b131d94c4',
             ],
-            'logged' => true,
+            'logged' => $logged,
             'mode' => 0,
         ];
     }
@@ -99,10 +125,10 @@ class Vue
         $enable = true;
 
         return [
-            'title' => 'payplug title',
+            'title' => 'La solution de paiement qui augmente vos ventes.',
             'descriptions' => [
                 'live' => [
-                    'description' => 'LIVE description',
+                    'description' => 'PayPlug, c\'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main.',
                     'plugin_version' => $module_version,
                 ],
                 'sandbox' => [
@@ -117,12 +143,12 @@ class Vue
                 'options' => [
                     [
                         'value' => 1,
-                        'label' => 'label 1',
+                        'label' => 'Module masqué',
                         'checked' => $enable === true ? true : false,
                     ],
                     [
                         'value' => 0,
-                        'label' => 'label 2',
+                        'label' => 'Module visible',
                         'checked' => $enable === false ? true : false,
                     ],
                 ],
@@ -246,7 +272,7 @@ class Vue
         ];
     }
 
-    public function payplug_section_payment_methods($options = [])
+    public function payplug_section_payment_methods()
     {
         return [
             'name' => 'paymentMethodsBlock',
@@ -260,11 +286,183 @@ class Vue
                 ],
             ],
             'options' => [
-                /*(new PaymentMethods())->payment_method_standard(),
-                PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes'),
-                PaymentMethods::payment_method_applepay(!empty($options) && $options['apple_pay'] === 'yes'),
-                PaymentMethods::payment_method_bancontact(!empty($options) &&$options['bancontact'] === 'yes')*/
-                [],
+                [
+                    'type' => 'payment_option',
+                    'sub_type' => 'input',
+                    'name' => 'standard_payment_title',
+                    'title' => 'Title',
+                    'value' => 'Pay by credit card',
+                    'descriptions' => [
+                        'live' => [
+                            'description' => 'The payment solution title displayed to your customers during checkout',
+                            'placeholder' => 'Pay by credit card',
+                        ],
+                        'sandbox' => [
+                            'description' => 'The payment solution title displayed to your customers during checkout',
+                            'placeholder' => 'Pay by credit card',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'payment_option',
+                    'sub_type' => 'input',
+                    'name' => 'standard_payment_description',
+                    'title' => 'Description',
+                    'value' => 'sedfghj',
+                    'descriptions' => [
+                        'live' => [
+                            'description' => 'The payment solution description displayed to your customers during checkout',
+                            'placeholder' => 'Description',
+                        ],
+                        'sandbox' => [
+                            'description' => 'The payment solution description displayed to your customers during checkout',
+                            'placeholder' => 'Description',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'payment_option',
+                    'sub_type' => 'IOptions',
+                    'name' => 'embeded',
+                    'title' => 'Presentation of the payment page',
+                    'descriptions' => [
+                        'live' => [
+                            'description_redirect' => 'Your customers will be redirected to a customizable payment page hosted by PayPlug.',
+                            'description_popup' => 'Your customers will see a customizable payment pop-up window appear on the checkout page of your store.',
+                            'link_know_more' => [
+                                'text' => 'Find out more.',
+                                'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
+                                'target' => '_blank',
+                            ],
+                        ],
+                        'sandbox' => [
+                            'description_redirect' => 'Your customers will be redirected to a customizable payment page hosted by PayPlug.',
+                            'description_popup' => 'Your customers will see a customizable payment pop-up window appear on the checkout page of your store.',
+                            'link_know_more' => [
+                                'text' => 'Find out more.',
+                                'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
+                                'target' => '_blank',
+                            ],
+                        ],
+                    ],
+                    'options' => [
+                        [
+                            'name' => 'payplug_embedded',
+                            'label' => 'Pop-up',
+                            'value' => 'popup',
+                            'checked' => true,
+                        ],
+                        [
+                            'name' => 'payplug_embedded',
+                            'label' => 'Redirected',
+                            'value' => 'redirect',
+                            'checked' => false,
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'payment_option',
+                    'sub_type' => 'switch',
+                    'name' => 'one_click',
+                    'title' => 'Activate one-click payment',
+                    'descriptions' => [
+                        'live' => [
+                            'description' => 'Your customers will be able to register their card and make their next purchase in one click.',
+                            'link_know_more' => [
+                                'text' => 'Find out more.',
+                                'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
+                                'target' => '_blank',
+                            ],
+                        ],
+                        'sandbox' => [
+                            'description' => 'Your customers will be able to register their card and make their next purchase in one click.',
+                            'link_know_more' => [
+                                'text' => 'Find out more.',
+                                'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
+                                'target' => '_blank',
+                            ],
+                        ],
+                    ],
+                    'checked' => false,
+                ],
+            ],
+            [
+                'type' => 'payment_method',
+                'name' => 'american_express',
+                'title' => 'AmEx Payment',
+                'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/Amex_logo_color.svg',
+                'checked' => true,
+                'available_test_mode' => false,
+                'descriptions' => [
+                    'live' => [
+                        'description' => 'Allow your customers to pay with their American Express cards.',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug',
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'sandbox' => [
+                        'description' => 'Unavailable in test mode',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug',
+                            'target' => '_blank',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'payment_method',
+                'name' => 'applepay',
+                'title' => 'Apple Pay payment',
+                'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/applepay.svg',
+                'checked' => false,
+                'available_test_mode' => false,
+                'descriptions' => [
+                    'live' => [
+                        'description' => 'Display the Apple Pay payment button on your store',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/en-gb/articles/5149384347292',
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'sandbox' => [
+                        'description' => 'Unavailable in test mode',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/en-gb/articles/5149384347292',
+                            'target' => '_blank',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'payment_method',
+                'name' => 'bancontact',
+                'title' => 'Bancontact payment',
+                'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/bancontact.svg',
+                'checked' => false,
+                'available_test_mode' => false,
+                'descriptions' => [
+                    'live' => [
+                        'description' => 'Allow your customers to pay with their Bancontact cards.',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/en-gb/articles/4408157435794',
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'sandbox' => [
+                        'description' => 'Unavailable in test mode',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/en-gb/articles/4408157435794',
+                            'target' => '_blank',
+                        ],
+                    ],
+                ],
             ],
         ];
     }
@@ -295,13 +493,22 @@ class Vue
                 'descriptions' => [
                     'live' => [
                         'description' => 'paylater description live description',
-                        'link_know_more' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                            'target' => '_blank',
+                        ],
                     ],
                     'sandbox' => [
                         'description' => 'paylater description test description',
-                        'link_know_more' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                            'target' => '_blank',
+                        ],
                     ],
                     'advanced' => [
+                        '0' => '',
                         'description' => 'paylater description advanced description',
                     ],
                 ],
@@ -368,8 +575,12 @@ class Vue
             'title' => 'show oney popup product title',
             'descriptions' => [[
                 'description' => 'show oney popup product description',
-                'link_know_more' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
-                ]],
+                'link_know_more' => [
+                    'text' => 'Find out more.',
+                    'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                    'target' => '_blank',
+                ],
+            ]],
             'switch' => true,
             'checked' => $active,
         ];
@@ -389,13 +600,13 @@ class Vue
                     'description' => 'Live description',
                     'errorMessage' => 'Live error message',
                     'check' => 'Live check',
-                    'check_success' => 'Live check success',
+                    //"check_success" => 'Live check success',
                 ],
                 'sandbox' => [
                     'description' => 'Test description',
                     'errorMessage' => 'Test error message',
                     'check' => 'Test check',
-                    'check_success' => 'Test check success',
+                    //"check_success" => 'Test check success',
                 ],
             ],
             'requirements' => [
@@ -404,7 +615,26 @@ class Vue
                 $payplug_requirements->openssl_requirement(),
                 $payplug_requirements->currency_requirement(), //MISSING THIS MESSAGES
                 $payplug_requirements->account_requirement(),*/
-                [],
+                [
+                    'status' => true,
+                    'text' => 'PHP cURL extension must be enabled on your server.',
+                ],
+                [
+                    'status' => true,
+                    'text' => 'The PHP version on your server is valid.',
+                ],
+                [
+                    'status' => true,
+                    'text' => 'OpenSSL is up to date.',
+                ],
+                [
+                    'status' => true,
+                    'text' => 'Your shop currency has been set up with Euro.',
+                ],
+                [
+                    'status' => true,
+                    'text' => 'You must connect your PayPlug account.',
+                ],
             ],
             'debug' => [
                 'live' => [
