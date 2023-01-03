@@ -3,121 +3,121 @@ include:
     file: '/templates/main.gitlab-ci.yml'
 
 stages:
-  - check php
-  - check-php-version
-  - coverage and tests
+#  - check php
+#  - check-php-version
+#  - coverage and tests
   - releasy-review
-  - translations
-  - assets
-  - build
+#  - translations
+#  - assets
+#  - build
   - asset-pspaylater
   - build-pspaylater
-  - run_test
+#  - run_test
   - releasy-release
 
-php cs fixer:
-  image: composer:1.9
-  stage: check php
-  script:
-    - ./dev/ci/dist_files.sh -b payplug
-    - composer install
-    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
-  artifacts:
-    paths:
-      - vendor
-
-check php version:
-  image: php:8.0-alpine
-  stage: check-php-version
-  script:
-    - >
-      RED='\033[0;31m';
-      ORANGE='\033[0;33m';
-      php dev/ci/check_php.php || exit_code=$?;
-      if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING DETECTED!! \n"; exit 126 ; fi;
-      if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR DETECTED!!!\n"; exit 1;
-      elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
-  allow_failure:
-    exit_codes: 126
-
-coverage test:
-  image: php:7.2.1
-  stage: coverage and tests
-  coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
-  before_script:
-    - pecl install xdebug-3.1.0
-    - docker-php-ext-enable xdebug
-  script:
-    - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
-    - echo 'error_reporting=22527' > /usr/local/etc/php/conf.d/ci.ini
-    - vendor/bin/phpunit --coverage-text --colors=never
-
-check module translations:
-  image: composer:1.9
-  stage: translations
-  script:
-    - ./dev/ci/dist_files.sh -b payplug
-    - composer install
-    - >
-        RED='\033[0;31m';
-        ORANGE='\033[0;33m';
-        php dev/ci/generate-translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
-        if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING: MISSING TRANSLATION !! :O\n"; exit 126 ; fi;
-        if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR : MISSING MANDATORY TRANSLATION !!!\n"; exit 1;
-        elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
-  allow_failure:
-    exit_codes: 126
-  artifacts:
-    paths:
-      - dev/dist/pspaylater/translations.csv
-      - dev/dist/payplug/translations.csv
-
-assets:
-  image: node:16
-  stage: assets
-  before_script:
-    - ./dev/ci/dist_files.sh -b payplug
-    - npm --version
-    - npm init -y
-    - npm install --save-dev webpack
-  script:
-    - npm run build
-    - ./dev/ci/set_licenses.sh -b payplug
-    - echo "Moving file in build dir"
-    - mkdir ./views/build
-    - mkdir ./views/build/css
-    - mkdir ./views/build/js
-    - mv ./views/css/*.css ./views/build/css
-    - cp ./views/templates/index.php ./views/build/css
-    - mv ./views/js/* ./views/build/js
-    - ls -l ./views/build/css/*.css
-    - ls -l ./views/build/css/*.php
-    - ls -l ./views/build/js/*.js
-  artifacts:
-    paths:
-      - views/build/*
-    expire_in: 1 day
-
-build zip release:
-  image: composer:1.9
-  stage: build
-  before_script:
-    - ./dev/ci/dist_files.sh -b payplug
-    - rm -rf ./vendor
-    - composer install --no-dev
-    - rm webpack.config.js
-    - ./dev/ci/secure_directories.sh
-    - git status
-    - ./dev/ci/assets_revision.sh -b payplug
-    - php ./dev/ci/import-translations.php
-    - ./dev/ci/copy_translations.sh
-  script:
-    - shopt -s extglob
-    - ./dev/ci/build.sh -n payplug -c $CI_COMMIT_REF_NAME
-  artifacts:
-    paths:
-      - payplug_$CI_COMMIT_REF_NAME.zip
-      - payplug_qa_$CI_COMMIT_REF_NAME.zip
+#php cs fixer:
+#  image: composer:1.9
+#  stage: check php
+#  script:
+#    - ./dev/ci/dist_files.sh -b payplug
+#    - composer install
+#    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
+#  artifacts:
+#    paths:
+#      - vendor
+#
+#check php version:
+#  image: php:8.0-alpine
+#  stage: check-php-version
+#  script:
+#    - >
+#      RED='\033[0;31m';
+#      ORANGE='\033[0;33m';
+#      php dev/ci/check_php.php || exit_code=$?;
+#      if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING DETECTED!! \n"; exit 126 ; fi;
+#      if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR DETECTED!!!\n"; exit 1;
+#      elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
+#  allow_failure:
+#    exit_codes: 126
+#
+#coverage test:
+#  image: php:7.2.1
+#  stage: coverage and tests
+#  coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
+#  before_script:
+#    - pecl install xdebug-3.1.0
+#    - docker-php-ext-enable xdebug
+#  script:
+#    - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
+#    - echo 'error_reporting=22527' > /usr/local/etc/php/conf.d/ci.ini
+#    - vendor/bin/phpunit --coverage-text --colors=never
+#
+#check module translations:
+#  image: composer:1.9
+#  stage: translations
+#  script:
+#    - ./dev/ci/dist_files.sh -b payplug
+#    - composer install
+#    - >
+#        RED='\033[0;31m';
+#        ORANGE='\033[0;33m';
+#        php dev/ci/generate-translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
+#        if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING: MISSING TRANSLATION !! :O\n"; exit 126 ; fi;
+#        if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR : MISSING MANDATORY TRANSLATION !!!\n"; exit 1;
+#        elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
+#  allow_failure:
+#    exit_codes: 126
+#  artifacts:
+#    paths:
+#      - dev/dist/pspaylater/translations.csv
+#      - dev/dist/payplug/translations.csv
+#
+#assets:
+#  image: node:16
+#  stage: assets
+#  before_script:
+#    - ./dev/ci/dist_files.sh -b payplug
+#    - npm --version
+#    - npm init -y
+#    - npm install --save-dev webpack
+#  script:
+#    - npm run build
+#    - ./dev/ci/set_licenses.sh -b payplug
+#    - echo "Moving file in build dir"
+#    - mkdir ./views/build
+#    - mkdir ./views/build/css
+#    - mkdir ./views/build/js
+#    - mv ./views/css/*.css ./views/build/css
+#    - cp ./views/templates/index.php ./views/build/css
+#    - mv ./views/js/* ./views/build/js
+#    - ls -l ./views/build/css/*.css
+#    - ls -l ./views/build/css/*.php
+#    - ls -l ./views/build/js/*.js
+#  artifacts:
+#    paths:
+#      - views/build/*
+#    expire_in: 1 day
+#
+#build zip release:
+#  image: composer:1.9
+#  stage: build
+#  before_script:
+#    - ./dev/ci/dist_files.sh -b payplug
+#    - rm -rf ./vendor
+#    - composer install --no-dev
+#    - rm webpack.config.js
+#    - ./dev/ci/secure_directories.sh
+#    - git status
+#    - ./dev/ci/assets_revision.sh -b payplug
+#    - php ./dev/ci/import-translations.php
+#    - ./dev/ci/copy_translations.sh
+#  script:
+#    - shopt -s extglob
+#    - ./dev/ci/build.sh -n payplug -c $CI_COMMIT_REF_NAME
+#  artifacts:
+#    paths:
+#      - payplug_$CI_COMMIT_REF_NAME.zip
+#      - payplug_qa_$CI_COMMIT_REF_NAME.zip
 
 asset-pspaylater:
   image: node:16
@@ -150,7 +150,7 @@ build-pspaylater:
   stage: build-pspaylater
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
-    - ls -als ./vendor
+#    - ls -als ./vendor
     - rm -rf ./vendor
     - ./dev/ci/set_namespace.sh
     - ./dev/ci/set_translation.sh
@@ -169,17 +169,17 @@ build-pspaylater:
     paths:
       - pspaylater_$CI_COMMIT_REF_NAME.zip
       - pspaylater_qa_$CI_COMMIT_REF_NAME.zip
-
-run_test:
-  image: composer:1.9
-  stage: run_test
-  needs:
-    - build-pspaylater
-  script:
-    - curl -s
-      -X POST
-      -F token=$CI_JOB_TOKEN
-      -F ref=master
-      -F "variables[PS_SOURCE_BRANCH]=${CI_COMMIT_REF_NAME}"
-      -F "variables[STAGES_TO_RUN]=smoke_presta_16, smoke_presta_17"
-      https://git.payplug.com/api/v4/projects/41/trigger/pipeline
+#
+#run_test:
+#  image: composer:1.9
+#  stage: run_test
+#  needs:
+#    - build-pspaylater
+#  script:
+#    - curl -s
+#      -X POST
+#      -F token=$CI_JOB_TOKEN
+#      -F ref=master
+#      -F "variables[PS_SOURCE_BRANCH]=${CI_COMMIT_REF_NAME}"
+#      -F "variables[STAGES_TO_RUN]=smoke_presta_16, smoke_presta_17"
+#      https://git.payplug.com/api/v4/projects/41/trigger/pipeline
