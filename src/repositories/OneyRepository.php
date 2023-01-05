@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS
+ * 2013 - 2023 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2022 PayPlug SAS
+ * @copyright 2013 - 2023 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -81,7 +81,7 @@ class OneyRepository extends BaseClass
         $this->log = $myLogPHP;
         $this->assign = $assign;
 
-        $this->setParams();
+        $this->setOperations();
     }
 
     /**
@@ -717,19 +717,19 @@ class OneyRepository extends BaseClass
 
         $available_oney_payments = $this->oneyEntity->getOperations();
         $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
+        if (!$oney_simulations['result']) {
+            return $payment_list;
+        }
 
         $use_fees = (bool) $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('oneyFees')
         );
+
         foreach (array_keys($oney_simulations['simulations']) as $key) {
             $with_fees = (bool) strpos($key, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 unset($oney_simulations['simulations'][$key]);
             }
-        }
-
-        if (!$oney_simulations['result']) {
-            return $payment_list;
         }
 
         foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
@@ -1400,9 +1400,9 @@ class OneyRepository extends BaseClass
             return [
                 'result' => false,
                 'error' => sprintf(
-                    $this->dependencies->l('The total amount of your order should be between %s and %s to pay with Oney.', 'oneyrepository'),
-                    $this->toolsAdapter->tool('displayPrice', $limits['min']),
-                    $this->toolsAdapter->tool('displayPrice', $limits['max'])
+                    $this->dependencies->l('oney.isValidOneyAmount.unvalid', 'oneyrepository'),
+                    $limits['min'],
+                    $limits['max']
                 ),
             ];
         }
@@ -1492,6 +1492,12 @@ class OneyRepository extends BaseClass
             if (in_array('IT', $iso_list)) {
                 $str_list = $this->dependencies->l('Italy', 'oneyrepository');
             }
+            if (in_array('BE', $iso_list)) {
+                $str_list = $this->dependencies->l('Belgium', 'oneyrepository');
+            }
+            if (in_array('ES', $iso_list)) {
+                $str_list = $this->dependencies->l('Spain', 'oneyrepository');
+            }
 
             return [
                 'result' => false,
@@ -1549,13 +1555,26 @@ class OneyRepository extends BaseClass
         ];
     }
 
-    protected function setParams()
+    protected function setOperations()
     {
-        $this->oneyEntity->setOperations([
+        $options = [
             'x3_with_fees',
-            'x4_with_fees',
             'x3_without_fees',
+            'x4_with_fees',
             'x4_without_fees',
-        ]);
+        ];
+
+        $oney_allowed_countries = $this->configurationAdapter->get(
+            $this->dependencies->getConfigurationKey('oneyAllowedCountries')
+        );
+        if ('payplug' != $this->dependencies->name
+            && $this->validators['payment']->isAllowedCountry($oney_allowed_countries, 'BE')['result']) {
+            $options = [
+                'x3_with_fees',
+                'x3_without_fees',
+            ];
+        }
+
+        $this->oneyEntity->setOperations($options);
     }
 }

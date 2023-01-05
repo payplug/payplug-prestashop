@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS
+ * 2013 - 2023 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2022 PayPlug SAS
+ * @copyright 2013 - 2023 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -1254,14 +1254,15 @@ class ApiClass
             'apple_pay_allowed_domains' => [],
         ];
 
-        if (isset($json_answer['payment_methods']['apple_pay']['allowed_domain_names'])) {
-            $permissions['apple_pay_allowed_domains'] = $json_answer['payment_methods']['apple_pay']['allowed_domain_names'];
+        // Do not allow Spain or Belgium on Payplug
+        if (($configuration['oney_allowed_countries'] === 'ES'
+                || $configuration['oney_allowed_countries'] === 'BE')
+            && $this->dependencies->name === 'payplug') {
+            $permissions['can_use_oney'] = false;
         }
 
-        // If sandbox mode active, no allowed countries sent
-        // Then set default as `FR,MQ,YT,RE,GF,GP,IT`
-        if (isset($json_answer['is_live']) && !$json_answer['is_live']) {
-            $configuration['oney_allowed_countries'] = 'FR,MQ,YT,RE,GF,GP,IT';
+        if (isset($json_answer['payment_methods']['apple_pay']['allowed_domain_names'])) {
+            $permissions['apple_pay_allowed_domains'] = $json_answer['payment_methods']['apple_pay']['allowed_domain_names'];
         }
 
         // Get company country

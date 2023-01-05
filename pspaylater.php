@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS.
+ * 2013 - 2023 PayPlug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2022 PayPlug SAS
+ * @copyright 2013 - 2023 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */ // Check if prestashop Context.
@@ -51,7 +51,7 @@ class PsPaylater extends PaymentModule
         $this->module_key = '5c403c88b9f9097fca7fd50c4f25b86d';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '0.3.1';
+        $this->version = '0.4.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7'];

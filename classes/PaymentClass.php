@@ -39,6 +39,7 @@ class PaymentClass
     private $language;
     private $logger;
     private $oney;
+    private $oney_allowed_iso_codes;
     private $order;
     private $orderHistory;
     private $payment;
@@ -65,6 +66,7 @@ class PaymentClass
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
+        $this->oney_allowed_iso_codes = ['FR', 'IT', 'ES', 'NL'];
         $this->order = $this->dependencies->getPlugin()->getOrder();
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->payment = $this->dependencies->getPlugin()->getPayment();
@@ -2396,21 +2398,11 @@ class PaymentClass
         $delivery_address = $this->address->get($this->context->cart->id_address_delivery);
         $delivery_country = $this->country->get($delivery_address->id_country);
         $iso = $this->tools->tool('strtoupper', $this->context->language->iso_code);
-        if ($iso != 'IT' && $iso != 'FR') {
+        if (!in_array($iso, $this->oney_allowed_iso_codes)) {
             $iso = $this->config->get($this->dependencies->getConfigurationKey('companyIso'));
         }
-        $shipping_address = $this->getShippingAddress($this->address, $this->context->cart);
-        $billing_address = $this->getBillingAddress($this->address, $this->context->cart);
-        $shipping_iso = $this->getShippingIso($shipping_address);
-        $billing_iso = $this->getBillingIso($billing_address);
 
-        if ($this->dependencies->configClass->isValidFeature('feature_belgium_oney')
-            && in_array('BE', explode(',', $this->config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries'))))
-            && ($shipping_iso == $billing_iso) && ($shipping_iso == 'BE')) {
-            $available_oney_payments = $this->oney->oneyEntity->getOperations(['x4_without_fees', 'x4_with_fees']);
-        } else {
-            $available_oney_payments = $this->oney->oneyEntity->getOperations();
-        }
+        $available_oney_payments = $this->oney->oneyEntity->getOperations();
         foreach ($available_oney_payments as $oney_payment) {
             $with_fees = (bool) strpos($oney_payment, 'with_fees') !== false;
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
