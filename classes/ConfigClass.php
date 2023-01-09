@@ -256,7 +256,7 @@ class ConfigClass
         $this->validators = $this->dependencies->getValidators();
 
         $this->validators = $this->dependencies->getValidators();
-        $this->vue = $this->dependencies->getPlugin()->getVue();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
 
         $this->setLoggers();
         $this->setConfigurationProperties();
@@ -1302,7 +1302,7 @@ class ConfigClass
                 $this->assignContentVar();
                 $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
-                exit(json_encode($this->vue->init()));
+                exit(json_encode($this->api_rest->init()));
             }
             $errorMessage = $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass');
             $this->context->smarty->assign([
