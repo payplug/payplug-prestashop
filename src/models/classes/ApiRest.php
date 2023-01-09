@@ -44,23 +44,27 @@ class ApiRest
         $configurationAction = $this->dependencies->getPlugin()->getConfigurationAction();
 
         switch ($action) {
-            case '/payplug_api/login':
+            case 'login':
                 $datas = json_decode(file_get_contents('php://input'), false);
                 $json = $configurationAction->loginAction($datas);
 
                 break;
-            case '/payplug_api/logout':
+            case 'logout':
                 $json = $configurationAction->logoutAction();
 
                 break;
-            case 'payplug_api/bancontact_permissions':
-            case '/payplug_api/american_express_permissions':
-            case '/payplug_api/oney_permissions':
-            case '/payplug_api/applepay_permissions':
-            case '/payplug_api/check_requirements':
-            case '/payplug_api/refresh_keys':
-            case '/payplug_api/save':
-            case '/payplug_api/init':
+            case 'bancontact_permissions':
+            case 'american_express_permissions':
+            case 'oney_permissions':
+            case 'applepay_permissions':
+            case 'check_requirements':
+            case 'refresh_keys':
+            case 'save':
+                $datas = json_decode(file_get_contents('php://input'), false);
+                $json = $configurationAction->saveAction($datas);
+
+            break;
+            case 'init':
             default:
                 $json = $configurationAction->renderConfiguration();
 
@@ -143,17 +147,26 @@ class ApiRest
         ];
     }
 
-    public function getHelpSection()
+    public function getFooterSection()
     {
+        $translation = $this->dependencies->getPlugin()
+            ->getTranslation()
+            ->getFooterTranslations();
+        $context = $this->dependencies->getPlugin()
+            ->getContext()
+            ->get();
+
         return [
-            'description1' => 'help description 1',
-            'description2' => 'help description 2',
-            /*"link_help" => Component::link(
-                'link help text',
-                'link help url',
-                "_blank"
-            ),*/
-            'link_help' => 'link help text',
+            'save_changes_text' => $translation['button']['text'],
+            'description' => [
+                $translation['faq']['top'],
+                $translation['faq']['bottom'],
+            ],
+            'link_help' => [
+                'text' => $translation['faq']['link'],
+                'url' => $this->dependencies->configClass->getFAQLinks($context->language->iso_code)['help'],
+                'target' => '_blank',
+            ],
         ];
     }
 
@@ -288,11 +301,11 @@ class ApiRest
             'name' => 'oney_product_animation',
             //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
             'image_url' => 'assets/images/product.jpg',
-            'title' => $paylater_translations['paylater']['oneyPopupProduct']['title'],
+            'title' => '', // $paylater_translations['paylater']['oneyPopupProduct']['title'],
             'descriptions' => [[
-                'description' => $paylater_translations['paylater']['oneyPopupProduct']['description'],
+                'description' => '', // $paylater_translations['paylater']['oneyPopupProduct']['description'],
                 'link_know_more' => [
-                    'text' => $paylater_translations['paylater']['oneyPopupProduct']['knowMore']['text'],
+                    'text' => '', // $paylater_translations['paylater']['oneyPopupProduct']['knowMore']['text'],
                     'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
                     'target' => '_blank',
                 ],
@@ -313,56 +326,56 @@ class ApiRest
 
         return [
             'name' => 'paymentMethodsBlock',
-            'title' => $paylater_translations['paylater']['title'],
+            'title' => '', // $paylater_translations['paylater']['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => $paylater_translations['paylater']['descriptions']['live']['description'],
+                    'description' => '', // $paylater_translations['paylater']['descriptions']['live']['description'],
                 ],
                 'sandbox' => [
-                    'description' => $paylater_translations['paylater']['descriptions']['test']['description'],
+                    'description' => '', // $paylater_translations['paylater']['descriptions']['test']['description'],
                 ],
             ],
             'options' => [
                 'name' => 'oney',
-                'title' => $paylater_translations['paylater']['options']['title'],
+                'title' => '', // $paylater_translations['paylater']['options']['title'],
                 'image' => 'assets/images/lg-oney.png',
                 'checked' => !empty($options) && $options['oney'] === 'yes',
                 'descriptions' => [
                     'live' => [
-                        'description' => $paylater_translations['paylater']['options']['descriptions']['live']['description'],
+                        'description' => '', // $paylater_translations['paylater']['options']['descriptions']['live']['description'],
                         'link_know_more' => [
-                            'text' => $paylater_translations['paylater']['options']['descriptions']['live']['knowMore']['text'],
+                            'text' => '', // $paylater_translations['paylater']['options']['descriptions']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => $paylater_translations['paylater']['options']['descriptions']['test']['description'],
+                        'description' => '', // $paylater_translations['paylater']['options']['descriptions']['test']['description'],
                         'link_know_more' => [
-                            'text' => $paylater_translations['paylater']['options']['descriptions']['test']['knowMore']['text'],
+                            'text' => '', // $paylater_translations['paylater']['options']['descriptions']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
                             'target' => '_blank',
                         ],
                     ],
                     'advanced' => [
                         '0' => '',
-                        'description' => $paylater_translations['paylater']['options']['descriptions']['advanced']['description'],
+                        'description' => '', // $paylater_translations['paylater']['options']['descriptions']['advanced']['description'],
                     ],
                 ],
                 'options' => [
                     [
                         'name' => 'payplug_oney_type',
                         'className' => '_paylaterLabel',
-                        'label' => $paylater_translations['paylater']['options']['option1']['label'],
-                        'subText' => $paylater_translations['paylater']['options']['option1']['subText'],
+                        'label' => '', // $paylater_translations['paylater']['options']['option1']['label'],
+                        'subText' => '', // $paylater_translations['paylater']['options']['option1']['subText'],
                         'value' => 'with_fees',
                         'checked' => !empty($options) && $options['oney_type'] === 'with_fees',
                     ],
                     [
                         'name' => 'payplug_oney_type',
                         'className' => '_paylaterLabel',
-                        'label' => $paylater_translations['paylater']['options']['option2']['label'],
-                        'subText' => $paylater_translations['paylater']['options']['option2']['subText'],
+                        'label' => '', // $paylater_translations['paylater']['options']['option2']['label'],
+                        'subText' => '', // $paylater_translations['paylater']['options']['option2']['subText'],
                         'value' => 'without_fees',
                         'checked' => !empty($options) && $options['oney_type'] === 'without_fees',
                     ],
@@ -382,13 +395,13 @@ class ApiRest
 
         return [
             'name' => 'paymentMethodsBlock',
-            'title' => $payment_methods_translations['paymentMethods']['title'],
+            'title' => '', // $payment_methods_translations['paymentMethods']['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => $payment_methods_translations['paymentMethods']['descriptions']['live']['description'],
+                    'description' => '', // $payment_methods_translations['paymentMethods']['descriptions']['live']['description'],
                 ],
                 'sandbox' => [
-                    'description' => $payment_methods_translations['paymentMethods']['descriptions']['test']['description'],
+                    'description' => '', // $payment_methods_translations['paymentMethods']['descriptions']['test']['description'],
                 ],
             ],
             'options' => [
@@ -396,16 +409,16 @@ class ApiRest
                     'type' => 'payment_option',
                     'sub_type' => 'input',
                     'name' => 'standard_payment_title',
-                    'title' => $payment_methods_translations['paymentMethods']['standard']['title']['title'],
-                    'value' => $payment_methods_translations['paymentMethods']['standard']['title']['value'],
+                    'title' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['title'],
+                    'value' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['value'],
                     'descriptions' => [
                         'live' => [
-                            'description' => $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['live']['description'],
-                            'placeholder' => $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['live']['placeholder'],
+                            'description' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['live']['description'],
+                            'placeholder' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['live']['placeholder'],
                         ],
                         'sandbox' => [
-                            'description' => $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['test']['description'],
-                            'placeholder' => $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['test']['placeholder'],
+                            'description' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['test']['description'],
+                            'placeholder' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['test']['placeholder'],
                         ],
                     ],
                 ],
@@ -413,16 +426,16 @@ class ApiRest
                     'type' => 'payment_option',
                     'sub_type' => 'input',
                     'name' => 'standard_payment_description',
-                    'title' => $payment_methods_translations['paymentMethods']['standard']['description']['title'],
-                    'value' => $payment_methods_translations['paymentMethods']['standard']['description']['value'],
+                    'title' => '', // $payment_methods_translations['paymentMethods']['standard']['description']['title'],
+                    'value' => '', // $payment_methods_translations['paymentMethods']['standard']['description']['value'],
                     'descriptions' => [
                         'live' => [
-                            'description' => $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['live']['description'],
-                            'placeholder' => $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['live']['placeholder'],
+                            'description' => '', // $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['live']['description'],
+                            'placeholder' => '', // $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['live']['placeholder'],
                         ],
                         'sandbox' => [
-                            'description' => $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['test']['description'],
-                            'placeholder' => $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['test']['placeholder'],
+                            'description' => '', // $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['test']['description'],
+                            'placeholder' => '', // $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['test']['placeholder'],
                         ],
                     ],
                 ],
@@ -430,22 +443,22 @@ class ApiRest
                     'type' => 'payment_option',
                     'sub_type' => 'IOptions',
                     'name' => 'embeded',
-                    'title' => $payment_methods_translations['paymentMethods']['embedded']['title'],
+                    'title' => '', // $payment_methods_translations['paymentMethods']['embedded']['title'],
                     'descriptions' => [
                         'live' => [
-                            'description_redirect' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['descriptionRedirect'],
-                            'description_popup' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['descriptionPopup'],
+                            'description_redirect' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['descriptionRedirect'],
+                            'description_popup' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['descriptionPopup'],
                             'link_know_more' => [
-                                'text' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['knowMore']['text'],
+                                'text' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['knowMore']['text'],
                                 'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
                                 'target' => '_blank',
                             ],
                         ],
                         'sandbox' => [
-                            'description_redirect' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['descriptionRedirect'],
-                            'description_popup' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['descriptionPopup'],
+                            'description_redirect' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['descriptionRedirect'],
+                            'description_popup' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['descriptionPopup'],
                             'link_know_more' => [
-                                'text' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['knowMore']['text'],
+                                'text' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['knowMore']['text'],
                                 'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
                                 'target' => '_blank',
                             ],
@@ -455,13 +468,13 @@ class ApiRest
                         [
                             'name' => 'payplug_embedded',
                             'label' => 'Pop-up',
-                            'value' => $payment_methods_translations['paymentMethods']['embedded']['popupValue'],
+                            'value' => '', // $payment_methods_translations['paymentMethods']['embedded']['popupValue'],
                             'checked' => true,
                         ],
                         [
                             'name' => 'payplug_embedded',
                             'label' => 'Redirected',
-                            'value' => $payment_methods_translations['paymentMethods']['embedded']['redirectValue'],
+                            'value' => '', // $payment_methods_translations['paymentMethods']['embedded']['redirectValue'],
                             'checked' => false,
                         ],
                     ],
@@ -470,20 +483,20 @@ class ApiRest
                     'type' => 'payment_option',
                     'sub_type' => 'switch',
                     'name' => 'one_click',
-                    'title' => $payment_methods_translations['paymentMethods']['oneClick']['title'],
+                    'title' => '', // $payment_methods_translations['paymentMethods']['oneClick']['title'],
                     'descriptions' => [
                         'live' => [
-                            'description' => $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['live']['description'],
+                            'description' => '', // $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['live']['description'],
                             'link_know_more' => [
-                                'text' => $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['live']['knowMore']['text'],
+                                'text' => '', // $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['live']['knowMore']['text'],
                                 'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
                                 'target' => '_blank',
                             ],
                         ],
                         'sandbox' => [
-                            'description' => $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['test']['description'],
+                            'description' => '', // $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['test']['description'],
                             'link_know_more' => [
-                                'text' => $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['test']['knowMore']['text'],
+                                'text' => '', // $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['test']['knowMore']['text'],
                                 'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
                                 'target' => '_blank',
                             ],
@@ -495,23 +508,23 @@ class ApiRest
             [
                 'type' => 'payment_method',
                 'name' => 'american_express',
-                'title' => $payment_methods_translations['paymentMethods']['americanExpress']['title'],
+                'title' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['title'],
                 'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/Amex_logo_color.svg',
                 'checked' => true,
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['live']['description'],
+                        'description' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['live']['description'],
                         'link_know_more' => [
-                            'text' => $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['live']['knowMore']['text'],
+                            'text' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['test']['description'],
+                        'description' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['test']['description'],
                         'link_know_more' => [
-                            'text' => $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['test']['knowMore']['text'],
+                            'text' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug',
                             'target' => '_blank',
                         ],
@@ -521,23 +534,23 @@ class ApiRest
             [
                 'type' => 'payment_method',
                 'name' => 'applepay',
-                'title' => $payment_methods_translations['paymentMethods']['applePay']['title'],
+                'title' => '', // $payment_methods_translations['paymentMethods']['applePay']['title'],
                 'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/applepay.svg',
                 'checked' => false,
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => $payment_methods_translations['paymentMethods']['applePay']['descriptions']['live']['description'],
+                        'description' => '', // $payment_methods_translations['paymentMethods']['applePay']['descriptions']['live']['description'],
                         'link_know_more' => [
-                            'text' => $payment_methods_translations['paymentMethods']['applePay']['descriptions']['live']['knowMore']['text'],
+                            'text' => '', // $payment_methods_translations['paymentMethods']['applePay']['descriptions']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/5149384347292',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => $payment_methods_translations['paymentMethods']['applePay']['descriptions']['test']['description'],
+                        'description' => '', // $payment_methods_translations['paymentMethods']['applePay']['descriptions']['test']['description'],
                         'link_know_more' => [
-                            'text' => $payment_methods_translations['paymentMethods']['applePay']['descriptions']['test']['knowMore']['text'],
+                            'text' => '', // $payment_methods_translations['paymentMethods']['applePay']['descriptions']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/5149384347292',
                             'target' => '_blank',
                         ],
@@ -547,23 +560,23 @@ class ApiRest
             [
                 'type' => 'payment_method',
                 'name' => 'bancontact',
-                'title' => $payment_methods_translations['paymentMethods']['bancontact']['title'],
+                'title' => '', // $payment_methods_translations['paymentMethods']['bancontact']['title'],
                 'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/bancontact.svg',
                 'checked' => false,
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['live']['description'],
+                        'description' => '', // $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['live']['description'],
                         'link_know_more' => [
-                            'text' => $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['live']['knowMore']['text'],
+                            'text' => '', // $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/4408157435794',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['test']['description'],
+                        'description' => '', // $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['test']['description'],
                         'link_know_more' => [
-                            'text' => $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['test']['knowMore']['text'],
+                            'text' => '', // $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/4408157435794',
                             'target' => '_blank',
                         ],
@@ -573,28 +586,8 @@ class ApiRest
         ];
     }
 
-    public function getSettingsSection($logged)
-    {
-        return [
-            'email' => 'blablabla@blabalabl.com',
-            'WP' => [
-                'ajax_url' => 'http://localhost:9000/',
-                'nonce' => 'xxxxxxxxx',
-                'login_action' => 'payplug_login',
-                'logout_action' => 'payplug_logout',
-                'check_permission_action' => 'payplug_check_permission',
-                'check_requirements_action' => 'payplug_check_requirements',
-                'save_action' => 'payplug_save',
-                '_wpnonce' => '0b131d94c4',
-            ],
-            'logged' => $logged,
-            'mode' => 0,
-        ];
-    }
-
     public function getRequirementsSection($options = [])
     {
-        //$getRequirementsSection = new PayplugGatewayRequirements(new PayplugGateway());
         $checked = !empty($options['debug']) && $options['debug'] === 'yes' ? true : false;
 
         $translation = $this->dependencies->getPlugin()->getTranslation();
@@ -659,6 +652,25 @@ class ApiRest
         ];
     }
 
+    public function getSettingsSection($logged)
+    {
+        return [
+            'email' => 'blablabla@blabalabl.com',
+            'WP' => [
+                'ajax_url' => 'http://localhost:9000/',
+                'nonce' => 'xxxxxxxxx',
+                'login_action' => 'payplug_login',
+                'logout_action' => 'payplug_logout',
+                'check_permission_action' => 'payplug_check_permission',
+                'check_requirements_action' => 'payplug_check_requirements',
+                'save_action' => 'payplug_save',
+                '_wpnonce' => '0b131d94c4',
+            ],
+            'logged' => $logged,
+            'mode' => 0,
+        ];
+    }
+
     public function getThresholdsOptions($max, $min)
     {
         $translation = $this->dependencies->getPlugin()->getTranslation();
@@ -668,32 +680,25 @@ class ApiRest
             'name' => 'thresholds',
             //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
             'image_url' => 'assets/images/thresholds.jpg',
-            'title' => $paylater_translations['paylater']['thresholds']['title'],
+            'title' => '', // $paylater_translations['paylater']['thresholds']['title'],
             'descriptions' => [
-                'description' => $paylater_translations['paylater']['thresholds']['description'],
+                'description' => '', // $paylater_translations['paylater']['thresholds']['description'],
                 'min_amount' => [
                     'name' => 'oney_min_amounts',
                     'value' => $min,
                     'placeholder' => $min,
                 ],
-                'inter' => $paylater_translations['paylater']['thresholds']['inter'],
+                'inter' => '', // $paylater_translations['paylater']['thresholds']['inter'],
                 'max_amount' => [
                     'name' => 'oney_max_amounts',
                     'value' => $max,
                     'placeholder' => $max,
                 ],
                 'error' => [
-                    'text' => $paylater_translations['paylater']['thresholds']['error']['text'],
+                    'text' => '', // $paylater_translations['paylater']['thresholds']['error']['text'],
                 ],
             ],
             'switch' => false,
         ];
     }
-
-    /*private function getRequirementsSection()
-    {
-        $getRequirementsSection = new PayplugGatewayRequirements(new PayplugGateway());
-
-        return $getRequirementsSection->satisfy_requirements();
-    }*/
 }

@@ -809,7 +809,7 @@ class OneyRepository extends BaseClass
     }
 
     /**
-     * @description   get custom oney ammount from BO form
+     * @description   get custom oney amount from BO form
      *
      * @param $custom_oney_amount
      *
@@ -827,7 +827,7 @@ class OneyRepository extends BaseClass
 
         $oneyAmount = [
             'currency' => $iso_code . ':',
-            'ammount' => $custom_oney_amount,
+            'amount' => $custom_oney_amount,
         ];
 
         return implode($oneyAmount);
