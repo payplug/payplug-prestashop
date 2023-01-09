@@ -27,7 +27,9 @@ use PayPlug\classes\DependenciesClass;
 class AdminPayplugController extends ModuleAdminController
 {
     private $dependencies;
+    private $api_rest;
     private $constant;
+    private $tools;
 
     public function __construct()
     {
@@ -36,7 +38,9 @@ class AdminPayplugController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
     }
 
     /**
@@ -46,6 +50,10 @@ class AdminPayplugController extends ModuleAdminController
     {
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
             parent::initContent();
+        }
+
+        if ($rest_route = $this->tools->tool('getValue', 'rest_route')) {
+            $this->api_rest->dispatch($rest_route);
         }
 
         if (Tools::getValue('_ajax')) {

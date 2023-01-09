@@ -242,11 +242,12 @@ class ConfigClass
     {
         $this->dependencies = $dependencies;
 
-        $this->install = $this->dependencies->getPlugin()->getInstall();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
+        $this->install = $this->dependencies->getPlugin()->getInstall();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
@@ -1301,7 +1302,7 @@ class ConfigClass
                 $this->assignContentVar();
                 $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
-                exit(json_encode($this->vue->init()));
+                exit(json_encode($this->api_rest->init()));
             }
             $errorMessage = $this->dependencies->l('payplug.submitAccount.credentialsNotCorrect', 'configclass');
             $this->context->smarty->assign([
