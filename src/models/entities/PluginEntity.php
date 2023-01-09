@@ -138,9 +138,6 @@ class PluginEntity
     /** @var object */
     private $validate;
 
-    /** @var object */
-    private $vue;
-
     /**
      * @return object
      */
@@ -532,14 +529,6 @@ class PluginEntity
     }
 
     /**
-     * @return object
-     */
-    public function getVue()
-    {
-        return $this->vue;
-    }
-
-    /**
      * @param object $address
      *
      * @throws BadParameterException
@@ -553,6 +542,36 @@ class PluginEntity
         }
 
         $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * @param object $apiClass
+     *
+     * @return PluginEntity
+     */
+    public function setApiClass($apiClass)
+    {
+        $this->apiClass = $apiClass;
+
+        return $this;
+    }
+
+    /**
+     * @param object $api_rest
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setApiRest($api_rest)
+    {
+        if (!is_object($api_rest)) {
+            throw (new BadParameterException('Invalid argument, $api_rest must be ApiRest'));
+        }
+
+        $this->api_rest = $api_rest;
 
         return $this;
     }
@@ -709,6 +728,24 @@ class PluginEntity
         }
 
         $this->configuration = $configuration;
+
+        return $this;
+    }
+
+    /**
+     * @param object $configurationAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setConfigurationAction($configurationAction)
+    {
+        if (!is_object($configurationAction)) {
+            throw (new BadParameterException('Invalid argument, $configurationAction must be a ConfigurationAction'));
+        }
+
+        $this->configurationAction = $configurationAction;
 
         return $this;
     }
@@ -1227,24 +1264,6 @@ class PluginEntity
         }
 
         $this->validate = $validate;
-
-        return $this;
-    }
-
-    /**
-     * @param object $vue
-     *
-     * @throws BadParameterException
-     *
-     * @return self
-     */
-    public function setVue($vue)
-    {
-        if (!is_object($vue)) {
-            throw (new BadParameterException('Invalid argument, $vue must be Vue'));
-        }
-
-        $this->vue = $vue;
 
         return $this;
     }

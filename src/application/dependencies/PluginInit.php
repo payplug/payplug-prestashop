@@ -122,7 +122,9 @@ class PluginInit extends BaseClass
     private $shop;
     private $tools;
     private $validate;
-    private $vue;
+
+    // Model classes
+    private $api_rest;
 
     // Model classes
     private $api_rest;
@@ -186,7 +188,6 @@ class PluginInit extends BaseClass
             ->setTranslate($this->translate)
             ->setTranslation($this->translation)
             ->setValidate($this->validate)
-            ->setVue($this->vue)
         ;
 
         $this->setEntity($this->plugin);
