@@ -45,6 +45,23 @@ class Translation
     /**
      * @return array
      */
+    public function getFooterTranslations()
+    {
+        return [
+            'button' => [
+                'text' => $this->dependencies->l('footer.button.text', 'footertranslation'),
+            ],
+            'faq' => [
+                'top' => $this->dependencies->l('footer.faq.top', 'footertranslation'),
+                'bottom' => $this->dependencies->l('footer.faq.bottom', 'footertranslation'),
+                'link' => $this->dependencies->l('footer.faq.link', 'footertranslation'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getHeaderTranslations()
     {
         return [

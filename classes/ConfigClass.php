@@ -574,7 +574,6 @@ class ConfigClass
             $this->dependencies->getConfigurationKey('applepay') => 'payplug_applepay',
             $this->dependencies->getConfigurationKey('amex') => 'payplug_amex',
         ];
-
         foreach ($configurationKeys as $key => $config) {
             $value = $this->tools->tool('getValue', $config);
 
@@ -774,7 +773,7 @@ class ConfigClass
         // @todo : avoid addJsDef with translations (quotes are not escaped on 1.6 and break header)
         $this->media->addJsDef([
             'payplug_admin_config' => [
-                'ajax_url' => $admin_ajax_url . '&_ajax=1&rest_route=/payplug_api',
+                'ajax_url' => $admin_ajax_url . '&_ajax=1',
                 'img_path' => $this->constant->get('__PS_BASE_URI__')
                 . 'modules/' . $this->dependencies->name . '/dist/',
             ],
@@ -946,6 +945,7 @@ class ConfigClass
         }
 
         return [
+            'help' => 'https://support.payplug.com/hc/' . $iso_code . '/requests/new',
             'activation' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021328991',
             'deferred' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360010088420',
             'install' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021389891',
