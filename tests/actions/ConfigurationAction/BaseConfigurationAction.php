@@ -12,11 +12,18 @@ class BaseConfigurationAction extends TestCase
     public $configuration;
     public $dependencies;
     public $logger;
+    public $oney;
     public $plugin;
 
     protected function setUp()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
+
+        $this->configuration = \Mockery::mock('Configuration');
+        $this->configuration
+            ->shouldReceive([
+                'get' => true,
+            ]);
 
         $this->logger = \Mockery::mock('Logger');
         $this->logger
@@ -24,26 +31,28 @@ class BaseConfigurationAction extends TestCase
                 'addLog' => true,
             ]);
 
-        $this->configuration = \Mockery::mock('Configuration');
-        $this->configuration
-            ->shouldReceive([
-                'get' => true,
-                'updateValue' => true,
-            ]);
+        $this->oney = \Mockery::mock('Oney');
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
                 'getLogger' => $this->logger,
                 'getConfiguration' => $this->configuration,
+                'getOney' => $this->oney,
             ]);
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies
             ->shouldReceive([
-                'getConfigurationKey' => true,
                 'getPlugin' => $this->plugin,
             ]);
+
+        $this->dependencies
+            ->shouldReceive('getConfigurationKey')
+            ->andReturnUsing(function ($key) {
+                return $key;
+            })
+        ;
 
         $this->action = \Mockery::mock(ConfigurationAction::class, [$this->dependencies])->makePartial();
     }

@@ -191,6 +191,10 @@ class loginActionTest extends BaseConfigurationAction
             'login' => true,
         ]);
 
+        $this->configuration->shouldReceive([
+            'updateValue' => true,
+        ]);
+
         $this->action->shouldReceive([
             'renderConfiguration' => [
                 'success' => true,
