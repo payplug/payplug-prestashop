@@ -24,6 +24,7 @@
 namespace PayPlug\src\application\dependencies;
 
 use PayPlug\classes\MyLogPHP;
+use PayPlug\src\actions\ConfigurationAction;
 use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
 use PayPlug\src\application\adapter\CarrierAdapter;
@@ -47,7 +48,7 @@ use PayPlug\src\application\adapter\ProductAdapter;
 use PayPlug\src\application\adapter\ShopAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
-use PayPlug\src\models\classes\Vue;
+use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\src\models\entities\OneyEntity;
 use PayPlug\src\models\entities\OrderStateEntity;
@@ -69,7 +70,10 @@ class PluginInit extends BaseClass
 {
     protected $dependencies;
 
-    // Entities
+    // Actions
+    private $configurationAction;
+
+    // EntitiesApiRest
     private $cacheEntity;
     private $oneyEntity;
     private $paymentEntity;
@@ -115,13 +119,16 @@ class PluginInit extends BaseClass
     private $shop;
     private $tools;
     private $validate;
-    private $vue;
+
+    // Model classes
+    private $api_rest;
 
     public function __construct($dependencies = null)
     {
         $this->dependencies = $dependencies;
         $this->myLogPhp = new MyLogPHP();
 
+        $this->setActions();
         $this->setEntities();
         $this->setAdapter();
         $this->setRepositories();
@@ -129,6 +136,7 @@ class PluginInit extends BaseClass
 
         $this->plugin
             ->setApiClass($this->apiClass)
+            ->setApiRest($this->api_rest)
             ->setApiVersion('2019-08-06')
             ->setAddress($this->address)
             ->setAssign($this->assign)
@@ -137,6 +145,7 @@ class PluginInit extends BaseClass
             ->setCarrier($this->carrier)
             ->setCart($this->cart)
             ->setConfiguration($this->configuration)
+            ->setConfigurationAction($this->configurationAction)
             ->setConstant($this->constant)
             ->setContext($this->context)
             ->setCountry($this->country)
@@ -164,10 +173,14 @@ class PluginInit extends BaseClass
             ->setTools($this->tools)
             ->setTranslate($this->translate)
             ->setValidate($this->validate)
-            ->setVue($this->vue)
         ;
 
         $this->setEntity($this->plugin);
+    }
+
+    private function setActions()
+    {
+        $this->configurationAction = new ConfigurationAction($this->dependencies);
     }
 
     private function setEntities()
@@ -306,6 +319,6 @@ class PluginInit extends BaseClass
 
     private function setClasses()
     {
-        $this->vue = new Vue();
+        $this->api_rest = new ApiRest($this->dependencies);
     }
 }

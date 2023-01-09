@@ -23,63 +23,66 @@
 
 namespace PayPlug\src\models\classes;
 
-use PayPlug\classes\DependenciesClass;
-
-class Vue
+class ApiRest
 {
-    public function init()
+    private $dependencies;
+
+    public function __construct($dependencies)
     {
-        $dependencies = new DependenciesClass();
-        $config = $dependencies->getPlugin()->getConfiguration();
-        $payplug_email = $config->get($dependencies->getConfigurationKey('email'));
-
-        $datas = [
-            'success' => true,
-            'data' => [
-                //"payplug_wooc_settings" => $this->payplug_section_wooc_settings(),
-                //"settings" => $this->payplug_section_settings(),
-                'header' => $this->payplug_section_header(),
-                //"login" => $this->payplug_section_login(),
-                //"logged" => $this->payplug_section_logged(),
-                'payment_methods' => $this->payplug_section_payment_methods(),
-                'payment_paylater' => $this->payplug_section_paylater(),
-                'status' => $this->payplug_section_status(),
-                //"help" => $this->payplug_section_help()
-            ],
-        ];
-
-        if ($payplug_email != '') {
-            $datas['data']['payplug_wooc_settings'] = $this->payplug_section_wooc_settings($config);
-            $datas['data']['settings'] = $this->payplug_section_settings(true);
-            $datas['data']['login'] = $this->payplug_section_login();
-            $datas['data']['logged'] = $this->payplug_section_logged();
-        } else {
-            $datas['data']['settings'] = $this->payplug_section_settings(false);
-            $datas['data']['login'] = $this->payplug_section_login();
-        }
-
-        /*echo "<pre>";
-        print_r($datas);
-        echo "</pre>";
-        die;*/
-
-        return $datas;
+        $this->dependencies = $dependencies;
     }
 
-    public function payplug_section_wooc_settings($dependencies)
+    public function dispatch($action = '')
     {
-        $dependencies = new DependenciesClass();
-        $config = $dependencies->getPlugin()->getConfiguration();
+        if (!is_string($action) || !$action) {
+            $logger = $this->dependencies->getPlugin()->getLogger();
+            $logger->addLog('ApiRest::dispatch: Invalid parameter given, $action must be a non empty string.');
+
+            return false;
+        }
+
+        $configurationAction = $this->dependencies->getPlugin()->getConfigurationAction();
+
+        switch ($action) {
+            case '/payplug_api/login':
+                $datas = json_decode(file_get_contents('php://input'), false);
+                $json = $configurationAction->loginAction($datas);
+
+                break;
+            case '/payplug_api/logout':
+                $json = $configurationAction->logoutAction();
+
+                break;
+            case 'payplug_api/bancontact_permissions':
+            case '/payplug_api/american_express_permissions':
+            case '/payplug_api/oney_permissions':
+            case '/payplug_api/applepay_permissions':
+            case '/payplug_api/check_requirements':
+            case '/payplug_api/refresh_keys':
+            case '/payplug_api/save':
+            case '/payplug_api/init':
+            default:
+                $json = $configurationAction->renderConfiguration();
+
+                break;
+        }
+
+        exit(json_encode($json));
+    }
+
+    public function getDataFields()
+    {
+        $config = $this->dependencies->getPlugin()->getConfiguration();
 
         return [
             'rest_route' => '/payplug_api/login',
             'action' => 'payplug_login',
-            'payplug_email' => $config->get($dependencies->getConfigurationKey('email')),
+            'payplug_email' => $config->get($this->dependencies->getConfigurationKey('email')),
             'payplug_password' => 'testplugin@21',
             'enabled' => 'yes',
             'title' => 'Pay by credit card',
             'description' => 'sedfghj',
-            'email' => $config->get($dependencies->getConfigurationKey('email')),
+            'email' => $config->get($this->dependencies->getConfigurationKey('email')),
             'payplug_test_key' => 'sk_test_5viLdhhYB58UuSH0C49p0g',
             'payplug_merchant_id' => '433983',
             'mode' => 'yes',
@@ -99,26 +102,7 @@ class Vue
         ];
     }
 
-    public function payplug_section_settings($logged)
-    {
-        return [
-            'email' => 'blablabla@blabalabl.com',
-            'WP' => [
-                'ajax_url' => 'http://localhost:9000/',
-                'nonce' => 'xxxxxxxxx',
-                'login_action' => 'payplug_login',
-                'logout_action' => 'payplug_logout',
-                'check_permission_action' => 'payplug_check_permission',
-                'check_requirements_action' => 'payplug_check_requirements',
-                'save_action' => 'payplug_save',
-                '_wpnonce' => '0b131d94c4',
-            ],
-            'logged' => $logged,
-            'mode' => 0,
-        ];
-    }
-
-    public function payplug_section_header()
+    public function getHeaderSection()
     {
         $module_version = '3.12.0';
         $disabled = false;
@@ -156,45 +140,21 @@ class Vue
         ];
     }
 
-    public function payplug_section_login()
+    public function getHelpSection()
     {
         return [
-            'name' => 'generalLogin',
-            'title' => 'Login title',
-            'descriptions' => [
-                'live' => [
-                    'description' => 'Live description',
-                    'not_registered' => 'Live not registered',
-                    'connect' => 'Live connect',
-                    'email_label' => 'Live email label',
-                    'email_placeholder' => 'Live email placeholder',
-                    'password_label' => 'Live password label',
-                    'password_placeholder' => 'Live password placeholder',
-                    'link_forgot_password' => [
-                        'text' => 'Live link forgot  password text',
-                        'url' => 'https://www.payplug.com/portal/forgot_password',
-                        'target' => '_blank',
-                    ],
-                ],
-                'sandbox' => [
-                    'description' => 'Test description',
-                    'not_registered' => 'Test not registered',
-                    'connect' => 'Test connect',
-                    'email_label' => 'Test email label',
-                    'email_placeholder' => 'Test email placeholder',
-                    'password_label' => 'Test password label',
-                    'password_placeholder' => 'Test password placeholder',
-                    'link_forgot_password' => [
-                        'text' => 'Test link forgot  password text',
-                        'url' => 'https://www.payplug.com/portal/forgot_password',
-                        'target' => '_blank',
-                    ],
-                ],
-            ],
+            'description1' => 'help description 1',
+            'description2' => 'help description 2',
+            /*"link_help" => Component::link(
+                'link help text',
+                'link help url',
+                "_blank"
+            ),*/
+            'link_help' => 'link help text',
         ];
     }
 
-    public function payplug_section_logged()
+    public function getLoggedSection()
     {
         return [
             'title' => 'Logged title',
@@ -272,7 +232,135 @@ class Vue
         ];
     }
 
-    public function payplug_section_payment_methods()
+    public function getLoginSection()
+    {
+        return [
+            'name' => 'generalLogin',
+            'title' => 'Login title',
+            'descriptions' => [
+                'live' => [
+                    'description' => 'Live description',
+                    'not_registered' => 'Live not registered',
+                    'connect' => 'Live connect',
+                    'email_label' => 'Live email label',
+                    'email_placeholder' => 'Live email placeholder',
+                    'password_label' => 'Live password label',
+                    'password_placeholder' => 'Live password placeholder',
+                    'link_forgot_password' => [
+                        'text' => 'Live link forgot  password text',
+                        'url' => 'https://www.payplug.com/portal/forgot_password',
+                        'target' => '_blank',
+                    ],
+                ],
+                'sandbox' => [
+                    'description' => 'Test description',
+                    'not_registered' => 'Test not registered',
+                    'connect' => 'Test connect',
+                    'email_label' => 'Test email label',
+                    'email_placeholder' => 'Test email placeholder',
+                    'password_label' => 'Test password label',
+                    'password_placeholder' => 'Test password placeholder',
+                    'link_forgot_password' => [
+                        'text' => 'Test link forgot  password text',
+                        'url' => 'https://www.payplug.com/portal/forgot_password',
+                        'target' => '_blank',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    public function getOneyPopupProduct($active = false)
+    {
+        return [
+            'name' => 'oney_product_animation',
+            //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
+            'image_url' => 'assets/images/product.jpg',
+            'title' => 'show oney popup product title',
+            'descriptions' => [[
+                'description' => 'show oney popup product description',
+                'link_know_more' => [
+                    'text' => 'Find out more.',
+                    'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                    'target' => '_blank',
+                ],
+            ]],
+            'switch' => true,
+            'checked' => $active,
+        ];
+    }
+
+    public function getPaylaterSection($options = [])
+    {
+        $max = !empty($options['oney_thresholds_max']) ? $options['oney_thresholds_max'] : 3000;
+        $min = !empty($options['oney_thresholds_min']) ? $options['oney_thresholds_min'] : 100;
+        $product_page = !empty($options['oney_product_animation']) && $options['oney_product_animation'] === 'yes' ? true : false;
+
+        return [
+            'name' => 'paymentMethodsBlock',
+            'title' => 'paylater title',
+            'descriptions' => [
+                'live' => [
+                    'description' => 'Live description',
+                ],
+                'sandbox' => [
+                    'description' => 'Test description',
+                ],
+            ],
+            'options' => [
+                'name' => 'oney',
+                'title' => 'paylater option title',
+                'image' => 'assets/images/lg-oney.png',
+                'checked' => !empty($options) && $options['oney'] === 'yes',
+                'descriptions' => [
+                    'live' => [
+                        'description' => 'paylater description live description',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'sandbox' => [
+                        'description' => 'paylater description test description',
+                        'link_know_more' => [
+                            'text' => 'Find out more.',
+                            'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'advanced' => [
+                        '0' => '',
+                        'description' => 'paylater description advanced description',
+                    ],
+                ],
+                'options' => [
+                    [
+                        'name' => 'payplug_oney_type',
+                        'className' => '_paylaterLabel',
+                        'label' => 'paylater option 1 label',
+                        'subText' => 'paylater option 1 subText',
+                        'value' => 'with_fees',
+                        'checked' => !empty($options) && $options['oney_type'] === 'with_fees',
+                    ],
+                    [
+                        'name' => 'payplug_oney_type',
+                        'className' => '_paylaterLabel',
+                        'label' => 'paylater option 2 label',
+                        'subText' => 'paylater option 2 label',
+                        'value' => 'without_fees',
+                        'checked' => !empty($options) && $options['oney_type'] === 'without_fees',
+                    ],
+                ],
+                'advanced_options' => [
+                    $this->getThresholdsOptions($max, $min),
+                    $this->getOneyPopupProduct($product_page),
+                ],
+            ],
+        ];
+    }
+
+    public function getPaymentMethodsSection()
     {
         return [
             'name' => 'paymentMethodsBlock',
@@ -467,132 +555,32 @@ class Vue
         ];
     }
 
-    public function payplug_section_paylater($options = [])
+    public function getSettingsSection($logged)
     {
-        $max = !empty($options['oney_thresholds_max']) ? $options['oney_thresholds_max'] : 3000;
-        $min = !empty($options['oney_thresholds_min']) ? $options['oney_thresholds_min'] : 100;
-        $product_page = !empty($options['oney_product_animation']) && $options['oney_product_animation'] === 'yes' ? true : false;
-
         return [
-            'name' => 'paymentMethodsBlock',
-            'title' => 'paylater title',
-            'descriptions' => [
-                'live' => [
-                    'description' => 'Live description',
-                ],
-                'sandbox' => [
-                    'description' => 'Test description',
-                ],
+            'email' => 'blablabla@blabalabl.com',
+            'WP' => [
+                'ajax_url' => 'http://localhost:9000/',
+                'nonce' => 'xxxxxxxxx',
+                'login_action' => 'payplug_login',
+                'logout_action' => 'payplug_logout',
+                'check_permission_action' => 'payplug_check_permission',
+                'check_requirements_action' => 'payplug_check_requirements',
+                'save_action' => 'payplug_save',
+                '_wpnonce' => '0b131d94c4',
             ],
-            'options' => [
-                'name' => 'oney',
-                'title' => 'paylater option title',
-                //"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/lg-oney.png' ),
-                'image' => 'assets/images/lg-oney.png',
-                'checked' => !empty($options) && $options['oney'] === 'yes',
-                'descriptions' => [
-                    'live' => [
-                        'description' => 'paylater description live description',
-                        'link_know_more' => [
-                            'text' => 'Find out more.',
-                            'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'sandbox' => [
-                        'description' => 'paylater description test description',
-                        'link_know_more' => [
-                            'text' => 'Find out more.',
-                            'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'advanced' => [
-                        '0' => '',
-                        'description' => 'paylater description advanced description',
-                    ],
-                ],
-                'options' => [
-                    [
-                        'name' => 'payplug_oney_type',
-                        'className' => '_paylaterLabel',
-                        'label' => 'paylater option 1 label',
-                        'subText' => 'paylater option 1 subText',
-                        'value' => 'with_fees',
-                        'checked' => !empty($options) && $options['oney_type'] === 'with_fees',
-                    ],
-                    [
-                        'name' => 'payplug_oney_type',
-                        'className' => '_paylaterLabel',
-                        'label' => 'paylater option 2 label',
-                        'subText' => 'paylater option 2 label',
-                        'value' => 'without_fees',
-                        'checked' => !empty($options) && $options['oney_type'] === 'without_fees',
-                    ],
-                ],
-                'advanced_options' => [
-                    $this->thresholds_option($max, $min),
-                    $this->show_oney_popup_product($product_page),
-                ],
-            ],
+            'logged' => $logged,
+            'mode' => 0,
         ];
     }
 
-    public function thresholds_option($max, $min)
+    public function getStatusSection($options = [])
     {
-        return [
-            'name' => 'thresholds',
-            //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
-            'image_url' => 'assets/images/thresholds.jpg',
-            'title' => 'thresholds option title',
-            'descriptions' => [
-                'description' => 'thresholds option desription',
-                'min_amount' => [
-                    'name' => 'oney_min_amounts',
-                    'value' => $min,
-                    'placeholder' => $min,
-                ],
-                'inter' => 'thresholds option and',
-                'max_amount' => [
-                    'name' => 'oney_max_amounts',
-                    'value' => $max,
-                    'placeholder' => $max,
-                ],
-                'error' => [
-                    'text' => 'thresholds option error text',
-                ],
-            ],
-            'switch' => false,
-        ];
-    }
-
-    public function show_oney_popup_product($active = false)
-    {
-        return [
-            'name' => 'oney_product_animation',
-            //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
-            'image_url' => 'assets/images/product.jpg',
-            'title' => 'show oney popup product title',
-            'descriptions' => [[
-                'description' => 'show oney popup product description',
-                'link_know_more' => [
-                    'text' => 'Find out more.',
-                    'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
-                    'target' => '_blank',
-                ],
-            ]],
-            'switch' => true,
-            'checked' => $active,
-        ];
-    }
-
-    public function payplug_section_status($options = [])
-    {
-        //$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
+        //$getRequirementsSection = new PayplugGatewayRequirements(new PayplugGateway());
         $checked = !empty($options['debug']) && $options['debug'] === 'yes' ? true : false;
 
         return [
-            //"error" => !$this->payplug_requirements(),
+            //"error" => !$this->getRequirementsSection(),
             'error' => false,
             'title' => 'status title',
             'descriptions' => [
@@ -610,11 +598,11 @@ class Vue
                 ],
             ],
             'requirements' => [
-                /*$payplug_requirements->curl_requirement(),
-                $payplug_requirements->php_requirement(),
-                $payplug_requirements->openssl_requirement(),
-                $payplug_requirements->currency_requirement(), //MISSING THIS MESSAGES
-                $payplug_requirements->account_requirement(),*/
+                /*$getRequirementsSection->curl_requirement(),
+                $getRequirementsSection->php_requirement(),
+                $getRequirementsSection->openssl_requirement(),
+                $getRequirementsSection->currency_requirement(), //MISSING THIS MESSAGES
+                $getRequirementsSection->account_requirement(),*/
                 [
                     'status' => true,
                     'text' => 'PHP cURL extension must be enabled on your server.',
@@ -650,24 +638,38 @@ class Vue
         ];
     }
 
-    public function payplug_section_help()
+    public function getThresholdsOptions($max, $min)
     {
         return [
-            'description1' => 'help description 1',
-            'description2' => 'help description 2',
-            /*"link_help" => Component::link(
-                'link help text',
-                'link help url',
-                "_blank"
-            ),*/
-            'link_help' => 'link help text',
+            'name' => 'thresholds',
+            //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
+            'image_url' => 'assets/images/thresholds.jpg',
+            'title' => 'thresholds option title',
+            'descriptions' => [
+                'description' => 'thresholds option desription',
+                'min_amount' => [
+                    'name' => 'oney_min_amounts',
+                    'value' => $min,
+                    'placeholder' => $min,
+                ],
+                'inter' => 'thresholds option and',
+                'max_amount' => [
+                    'name' => 'oney_max_amounts',
+                    'value' => $max,
+                    'placeholder' => $max,
+                ],
+                'error' => [
+                    'text' => 'thresholds option error text',
+                ],
+            ],
+            'switch' => false,
         ];
     }
 
-    private function payplug_requirements()
+    private function getRequirementsSection()
     {
-        $payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
+        $getRequirementsSection = new PayplugGatewayRequirements(new PayplugGateway());
 
-        return $payplug_requirements->satisfy_requirements();
+        return $getRequirementsSection->satisfy_requirements();
     }
 }
