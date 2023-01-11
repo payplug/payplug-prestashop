@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS
+ * 2013 - 2023 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2022 PayPlug SAS
+ *  @copyright 2013 - 2023 PayPlug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -108,15 +108,18 @@ class ApiRest
         $disabled = false;
         $enable = true;
 
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $header_translations = $translation->getHeaderTranslations();
+
         return [
-            'title' => 'La solution de paiement qui augmente vos ventes.',
+            'title' => $header_translations['header']['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => 'PayPlug, c\'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main.',
+                    'description' => $header_translations['header']['text'],
                     'plugin_version' => $module_version,
                 ],
                 'sandbox' => [
-                    'description' => 'TEST description',
+                    'description' => $header_translations['header']['text'],
                     'plugin_version' => $module_version,
                 ],
             ],
@@ -127,12 +130,12 @@ class ApiRest
                 'options' => [
                     [
                         'value' => 1,
-                        'label' => 'Module masqué',
+                        'label' => $header_translations['header']['hidden'],
                         'checked' => $enable === true ? true : false,
                     ],
                     [
                         'value' => 0,
-                        'label' => 'Module visible',
+                        'label' => $header_translations['header']['visible'],
                         'checked' => $enable === false ? true : false,
                     ],
                 ],
@@ -156,37 +159,40 @@ class ApiRest
 
     public function getLoggedSection()
     {
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $logged_translations = $translation->getLoggedTranslations();
+
         return [
-            'title' => 'Logged title',
+            'title' => $logged_translations['logged']['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => 'Live description',
-                    'logout' => 'Live logout',
-                    'mode' => 'Live mode',
-                    'mode_description' => 'Live mode description',
+                    'description' => $logged_translations['logged']['descriptions']['live']['description'],
+                    'logout' => $logged_translations['logged']['descriptions']['live']['logout'],
+                    'mode' => $logged_translations['logged']['descriptions']['live']['mode'],
+                    'mode_description' => $logged_translations['logged']['descriptions']['live']['modeDescription'],
                     'link_learn_more' => [
-                        'text' => 'Live learn more text',
+                        'text' => $logged_translations['logged']['descriptions']['live']['learnMore']['text'],
                         'url' => 'Live learn more url',
                         'target' => '_blank',
                     ],
                     'link_access_portal' => [
-                        'text' => 'Live access portal text',
+                        'text' => $logged_translations['logged']['descriptions']['live']['accessPortal']['text'],
                         'url' => 'https://www.payplug.com/portal',
                         'target' => '_blank',
                     ],
                 ],
                 'sandbox' => [
-                    'description' => 'Test description',
-                    'logout' => 'Test logout',
-                    'mode' => 'Test mode',
-                    'mode_description' => 'Test mode description',
+                    'description' => $logged_translations['logged']['descriptions']['test']['description'],
+                    'logout' => $logged_translations['logged']['descriptions']['test']['logout'],
+                    'mode' => $logged_translations['logged']['descriptions']['test']['mode'],
+                    'mode_description' => $logged_translations['logged']['descriptions']['test']['modeDescription'],
                     'link_learn_more' => [
-                        'text' => 'Test learn more text',
+                        'text' => $logged_translations['logged']['descriptions']['test']['learnMore']['text'],
                         'url' => 'Test learn more url',
                         'target' => '_blank',
                     ],
                     'link_access_portal' => [
-                        'text' => 'Test access portal text',
+                        'text' => $logged_translations['logged']['descriptions']['test']['accessPortal']['text'],
                         'url' => 'https://www.payplug.com/portal',
                         'target' => '_blank',
                     ],
@@ -195,14 +201,14 @@ class ApiRest
             'options' => [
                 [
                     'name' => 'payplug_sandbox',
-                    'label' => 'Live',
+                    'label' => $logged_translations['logged']['options']['live']['label'],
                     'value' => 0, //live
                     //"checked" => PayplugWoocommerceHelper::check_mode()
                     'checked' => true,
                 ],
                 [
                     'name' => 'payplug_sandbox',
-                    'label' => 'Test',
+                    'label' => $logged_translations['logged']['options']['test']['label'],
                     'value' => 1, //test
                     //"checked" => !PayplugWoocommerceHelper::check_mode()
                     'checked' => false,
@@ -211,22 +217,22 @@ class ApiRest
             'inactive_modal' => [
                 //"inactive" => $inactive,
                 'inactive' => false,
-                'title' => 'Inactive modal title',
-                'description' => 'Inactive modal description',
-                'password_label' => 'Inactive modal password label',
-                'cancel' => 'Inactive modal cancel',
-                'ok' => 'Inactive modal ok',
+                'title' => $logged_translations['logged']['inactiveModal']['title'],
+                'description' => $logged_translations['logged']['inactiveModal']['description'],
+                'password_label' => $logged_translations['logged']['inactiveModal']['passwordLabel'],
+                'cancel' => $logged_translations['logged']['inactiveModal']['cancel'],
+                'ok' => $logged_translations['logged']['inactiveModal']['ok'],
             ],
             'inactive_account' => [
                 'warning' => [
-                    'title' => 'Inactive account title',
-                    'description' => 'Inactive account warning description1' .
-                        'Inactive account warning description2' .
-                        'Inactive account warning description3',
+                    'title' => $logged_translations['logged']['inactiveAccount']['warning']['title'],
+                    'description' => $logged_translations['logged']['inactiveAccount']['warning']['description1'] .
+                        $logged_translations['logged']['inactiveAccount']['warning']['description2'] .
+                        $logged_translations['logged']['inactiveAccount']['warning']['description3'],
                 ],
                 'error' => [
-                    'title' => 'Inactive account error title',
-                    'description' => 'Inactive account error description',
+                    'title' => $logged_translations['logged']['inactiveAccount']['error']['title'],
+                    'description' => $logged_translations['logged']['inactiveAccount']['error']['description'],
                 ],
             ],
         ];
@@ -234,34 +240,37 @@ class ApiRest
 
     public function getLoginSection()
     {
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $login_translations = $translation->getLoginTranslations();
+
         return [
             'name' => 'generalLogin',
-            'title' => 'Login title',
+            'title' => $login_translations['login']['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => 'Live description',
-                    'not_registered' => 'Live not registered',
-                    'connect' => 'Live connect',
-                    'email_label' => 'Live email label',
-                    'email_placeholder' => 'Live email placeholder',
-                    'password_label' => 'Live password label',
-                    'password_placeholder' => 'Live password placeholder',
+                    'description' => $login_translations['login']['descriptions']['live']['description'],
+                    'not_registered' => $login_translations['login']['descriptions']['live']['notRegistered'],
+                    'connect' => $login_translations['login']['descriptions']['live']['connect'],
+                    'email_label' => $login_translations['login']['descriptions']['live']['emailLabel'],
+                    'email_placeholder' => $login_translations['login']['descriptions']['live']['emailPlaceholder'],
+                    'password_label' => $login_translations['login']['descriptions']['live']['passwordLabel'],
+                    'password_placeholder' => $login_translations['login']['descriptions']['live']['passwordPlaceholder'],
                     'link_forgot_password' => [
-                        'text' => 'Live link forgot  password text',
+                        'text' => $login_translations['login']['descriptions']['live']['forgotPassword']['text'],
                         'url' => 'https://www.payplug.com/portal/forgot_password',
                         'target' => '_blank',
                     ],
                 ],
                 'sandbox' => [
-                    'description' => 'Test description',
-                    'not_registered' => 'Test not registered',
-                    'connect' => 'Test connect',
-                    'email_label' => 'Test email label',
-                    'email_placeholder' => 'Test email placeholder',
-                    'password_label' => 'Test password label',
-                    'password_placeholder' => 'Test password placeholder',
+                    'description' => $login_translations['login']['descriptions']['test']['description'],
+                    'not_registered' => $login_translations['login']['descriptions']['test']['notRegistered'],
+                    'connect' => $login_translations['login']['descriptions']['test']['connect'],
+                    'email_label' => $login_translations['login']['descriptions']['test']['emailLabel'],
+                    'email_placeholder' => $login_translations['login']['descriptions']['test']['emailPlaceholder'],
+                    'password_label' => $login_translations['login']['descriptions']['test']['passwordLabel'],
+                    'password_placeholder' => $login_translations['login']['descriptions']['test']['passwordPlaceholder'],
                     'link_forgot_password' => [
-                        'text' => 'Test link forgot  password text',
+                        'text' => $login_translations['login']['descriptions']['test']['forgotPassword']['text'],
                         'url' => 'https://www.payplug.com/portal/forgot_password',
                         'target' => '_blank',
                     ],
@@ -272,15 +281,18 @@ class ApiRest
 
     public function getOneyPopupProduct($active = false)
     {
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $paylater_translations = $translation->getPaylaterTranslations();
+
         return [
             'name' => 'oney_product_animation',
             //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
             'image_url' => 'assets/images/product.jpg',
-            'title' => 'show oney popup product title',
+            'title' => $paylater_translations['paylater']['oneyPopupProduct']['title'],
             'descriptions' => [[
-                'description' => 'show oney popup product description',
+                'description' => $paylater_translations['paylater']['oneyPopupProduct']['description'],
                 'link_know_more' => [
-                    'text' => 'Find out more.',
+                    'text' => $paylater_translations['paylater']['oneyPopupProduct']['knowMore']['text'],
                     'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
                     'target' => '_blank',
                 ],
@@ -296,58 +308,61 @@ class ApiRest
         $min = !empty($options['oney_thresholds_min']) ? $options['oney_thresholds_min'] : 100;
         $product_page = !empty($options['oney_product_animation']) && $options['oney_product_animation'] === 'yes' ? true : false;
 
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $paylater_translations = $translation->getPaylaterTranslations();
+
         return [
             'name' => 'paymentMethodsBlock',
-            'title' => 'paylater title',
+            'title' => $paylater_translations['paylater']['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => 'Live description',
+                    'description' => $paylater_translations['paylater']['descriptions']['live']['description'],
                 ],
                 'sandbox' => [
-                    'description' => 'Test description',
+                    'description' => $paylater_translations['paylater']['descriptions']['test']['description'],
                 ],
             ],
             'options' => [
                 'name' => 'oney',
-                'title' => 'paylater option title',
+                'title' => $paylater_translations['paylater']['options']['title'],
                 'image' => 'assets/images/lg-oney.png',
                 'checked' => !empty($options) && $options['oney'] === 'yes',
                 'descriptions' => [
                     'live' => [
-                        'description' => 'paylater description live description',
+                        'description' => $paylater_translations['paylater']['options']['descriptions']['live']['description'],
                         'link_know_more' => [
-                            'text' => 'Find out more.',
+                            'text' => $paylater_translations['paylater']['options']['descriptions']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => 'paylater description test description',
+                        'description' => $paylater_translations['paylater']['options']['descriptions']['test']['description'],
                         'link_know_more' => [
-                            'text' => 'Find out more.',
+                            'text' => $paylater_translations['paylater']['options']['descriptions']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
                             'target' => '_blank',
                         ],
                     ],
                     'advanced' => [
                         '0' => '',
-                        'description' => 'paylater description advanced description',
+                        'description' => $paylater_translations['paylater']['options']['descriptions']['advanced']['description'],
                     ],
                 ],
                 'options' => [
                     [
                         'name' => 'payplug_oney_type',
                         'className' => '_paylaterLabel',
-                        'label' => 'paylater option 1 label',
-                        'subText' => 'paylater option 1 subText',
+                        'label' => $paylater_translations['paylater']['options']['option1']['label'],
+                        'subText' => $paylater_translations['paylater']['options']['option1']['subText'],
                         'value' => 'with_fees',
                         'checked' => !empty($options) && $options['oney_type'] === 'with_fees',
                     ],
                     [
                         'name' => 'payplug_oney_type',
                         'className' => '_paylaterLabel',
-                        'label' => 'paylater option 2 label',
-                        'subText' => 'paylater option 2 label',
+                        'label' => $paylater_translations['paylater']['options']['option2']['label'],
+                        'subText' => $paylater_translations['paylater']['options']['option2']['subText'],
                         'value' => 'without_fees',
                         'checked' => !empty($options) && $options['oney_type'] === 'without_fees',
                     ],
@@ -362,15 +377,18 @@ class ApiRest
 
     public function getPaymentMethodsSection()
     {
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $payment_methods_translations = $translation->getPaymentMethodsTranslations();
+
         return [
             'name' => 'paymentMethodsBlock',
-            'title' => 'payment methods title',
+            'title' => $payment_methods_translations['paymentMethods']['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => 'Live description',
+                    'description' => $payment_methods_translations['paymentMethods']['descriptions']['live']['description'],
                 ],
                 'sandbox' => [
-                    'description' => 'Test description',
+                    'description' => $payment_methods_translations['paymentMethods']['descriptions']['test']['description'],
                 ],
             ],
             'options' => [
@@ -378,16 +396,16 @@ class ApiRest
                     'type' => 'payment_option',
                     'sub_type' => 'input',
                     'name' => 'standard_payment_title',
-                    'title' => 'Title',
-                    'value' => 'Pay by credit card',
+                    'title' => $payment_methods_translations['paymentMethods']['standard']['title']['title'],
+                    'value' => $payment_methods_translations['paymentMethods']['standard']['title']['value'],
                     'descriptions' => [
                         'live' => [
-                            'description' => 'The payment solution title displayed to your customers during checkout',
-                            'placeholder' => 'Pay by credit card',
+                            'description' => $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['live']['description'],
+                            'placeholder' => $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['live']['placeholder'],
                         ],
                         'sandbox' => [
-                            'description' => 'The payment solution title displayed to your customers during checkout',
-                            'placeholder' => 'Pay by credit card',
+                            'description' => $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['test']['description'],
+                            'placeholder' => $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['test']['placeholder'],
                         ],
                     ],
                 ],
@@ -395,16 +413,16 @@ class ApiRest
                     'type' => 'payment_option',
                     'sub_type' => 'input',
                     'name' => 'standard_payment_description',
-                    'title' => 'Description',
-                    'value' => 'sedfghj',
+                    'title' => $payment_methods_translations['paymentMethods']['standard']['description']['title'],
+                    'value' => $payment_methods_translations['paymentMethods']['standard']['description']['value'],
                     'descriptions' => [
                         'live' => [
-                            'description' => 'The payment solution description displayed to your customers during checkout',
-                            'placeholder' => 'Description',
+                            'description' => $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['live']['description'],
+                            'placeholder' => $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['live']['placeholder'],
                         ],
                         'sandbox' => [
-                            'description' => 'The payment solution description displayed to your customers during checkout',
-                            'placeholder' => 'Description',
+                            'description' => $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['test']['description'],
+                            'placeholder' => $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['test']['placeholder'],
                         ],
                     ],
                 ],
@@ -412,22 +430,22 @@ class ApiRest
                     'type' => 'payment_option',
                     'sub_type' => 'IOptions',
                     'name' => 'embeded',
-                    'title' => 'Presentation of the payment page',
+                    'title' => $payment_methods_translations['paymentMethods']['embedded']['title'],
                     'descriptions' => [
                         'live' => [
-                            'description_redirect' => 'Your customers will be redirected to a customizable payment page hosted by PayPlug.',
-                            'description_popup' => 'Your customers will see a customizable payment pop-up window appear on the checkout page of your store.',
+                            'description_redirect' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['descriptionRedirect'],
+                            'description_popup' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['descriptionPopup'],
                             'link_know_more' => [
-                                'text' => 'Find out more.',
+                                'text' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['knowMore']['text'],
                                 'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
                                 'target' => '_blank',
                             ],
                         ],
                         'sandbox' => [
-                            'description_redirect' => 'Your customers will be redirected to a customizable payment page hosted by PayPlug.',
-                            'description_popup' => 'Your customers will see a customizable payment pop-up window appear on the checkout page of your store.',
+                            'description_redirect' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['descriptionRedirect'],
+                            'description_popup' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['descriptionPopup'],
                             'link_know_more' => [
-                                'text' => 'Find out more.',
+                                'text' => $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['knowMore']['text'],
                                 'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
                                 'target' => '_blank',
                             ],
@@ -437,13 +455,13 @@ class ApiRest
                         [
                             'name' => 'payplug_embedded',
                             'label' => 'Pop-up',
-                            'value' => 'popup',
+                            'value' => $payment_methods_translations['paymentMethods']['embedded']['popupValue'],
                             'checked' => true,
                         ],
                         [
                             'name' => 'payplug_embedded',
                             'label' => 'Redirected',
-                            'value' => 'redirect',
+                            'value' => $payment_methods_translations['paymentMethods']['embedded']['redirectValue'],
                             'checked' => false,
                         ],
                     ],
@@ -452,20 +470,20 @@ class ApiRest
                     'type' => 'payment_option',
                     'sub_type' => 'switch',
                     'name' => 'one_click',
-                    'title' => 'Activate one-click payment',
+                    'title' => $payment_methods_translations['paymentMethods']['oneClick']['title'],
                     'descriptions' => [
                         'live' => [
-                            'description' => 'Your customers will be able to register their card and make their next purchase in one click.',
+                            'description' => $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['live']['description'],
                             'link_know_more' => [
-                                'text' => 'Find out more.',
+                                'text' => $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['live']['knowMore']['text'],
                                 'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
                                 'target' => '_blank',
                             ],
                         ],
                         'sandbox' => [
-                            'description' => 'Your customers will be able to register their card and make their next purchase in one click.',
+                            'description' => $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['test']['description'],
                             'link_know_more' => [
-                                'text' => 'Find out more.',
+                                'text' => $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['test']['knowMore']['text'],
                                 'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
                                 'target' => '_blank',
                             ],
@@ -477,23 +495,23 @@ class ApiRest
             [
                 'type' => 'payment_method',
                 'name' => 'american_express',
-                'title' => 'AmEx Payment',
+                'title' => $payment_methods_translations['paymentMethods']['americanExpress']['title'],
                 'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/Amex_logo_color.svg',
                 'checked' => true,
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => 'Allow your customers to pay with their American Express cards.',
+                        'description' => $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['live']['description'],
                         'link_know_more' => [
-                            'text' => 'Find out more.',
+                            'text' => $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => 'Unavailable in test mode',
+                        'description' => $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['test']['description'],
                         'link_know_more' => [
-                            'text' => 'Find out more.',
+                            'text' => $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug',
                             'target' => '_blank',
                         ],
@@ -503,23 +521,23 @@ class ApiRest
             [
                 'type' => 'payment_method',
                 'name' => 'applepay',
-                'title' => 'Apple Pay payment',
+                'title' => $payment_methods_translations['paymentMethods']['applePay']['title'],
                 'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/applepay.svg',
                 'checked' => false,
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => 'Display the Apple Pay payment button on your store',
+                        'description' => $payment_methods_translations['paymentMethods']['applePay']['descriptions']['live']['description'],
                         'link_know_more' => [
-                            'text' => 'Find out more.',
+                            'text' => $payment_methods_translations['paymentMethods']['applePay']['descriptions']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/5149384347292',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => 'Unavailable in test mode',
+                        'description' => $payment_methods_translations['paymentMethods']['applePay']['descriptions']['test']['description'],
                         'link_know_more' => [
-                            'text' => 'Find out more.',
+                            'text' => $payment_methods_translations['paymentMethods']['applePay']['descriptions']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/5149384347292',
                             'target' => '_blank',
                         ],
@@ -529,23 +547,23 @@ class ApiRest
             [
                 'type' => 'payment_method',
                 'name' => 'bancontact',
-                'title' => 'Bancontact payment',
+                'title' => $payment_methods_translations['paymentMethods']['bancontact']['title'],
                 'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/bancontact.svg',
                 'checked' => false,
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => 'Allow your customers to pay with their Bancontact cards.',
+                        'description' => $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['live']['description'],
                         'link_know_more' => [
-                            'text' => 'Find out more.',
+                            'text' => $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/4408157435794',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => 'Unavailable in test mode',
+                        'description' => $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['test']['description'],
                         'link_know_more' => [
-                            'text' => 'Find out more.',
+                            'text' => $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/en-gb/articles/4408157435794',
                             'target' => '_blank',
                         ],
@@ -574,26 +592,29 @@ class ApiRest
         ];
     }
 
-    public function getStatusSection($options = [])
+    public function getRequirementsSection($options = [])
     {
         //$getRequirementsSection = new PayplugGatewayRequirements(new PayplugGateway());
         $checked = !empty($options['debug']) && $options['debug'] === 'yes' ? true : false;
 
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $requirements_translations = $translation->getRequirementsTranslations();
+
         return [
             //"error" => !$this->getRequirementsSection(),
             'error' => false,
-            'title' => 'status title',
+            'title' => $requirements_translations['requirements']['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => 'Live description',
-                    'errorMessage' => 'Live error message',
-                    'check' => 'Live check',
+                    'description' => $requirements_translations['requirements']['descriptions']['live']['description'],
+                    'errorMessage' => $requirements_translations['requirements']['descriptions']['live']['errorMessage'],
+                    'check' => $requirements_translations['requirements']['descriptions']['live']['check'],
                     //"check_success" => 'Live check success',
                 ],
                 'sandbox' => [
-                    'description' => 'Test description',
-                    'errorMessage' => 'Test error message',
-                    'check' => 'Test check',
+                    'description' => $requirements_translations['requirements']['descriptions']['test']['description'],
+                    'errorMessage' => $requirements_translations['requirements']['descriptions']['test']['errorMessage'],
+                    'check' => $requirements_translations['requirements']['descriptions']['test']['check'],
                     //"check_success" => 'Test check success',
                 ],
             ],
@@ -605,33 +626,33 @@ class ApiRest
                 $getRequirementsSection->account_requirement(),*/
                 [
                     'status' => true,
-                    'text' => 'PHP cURL extension must be enabled on your server.',
+                    'text' => $requirements_translations['requirements']['requirements']['curl']['text'],
                 ],
                 [
                     'status' => true,
-                    'text' => 'The PHP version on your server is valid.',
+                    'text' => $requirements_translations['requirements']['requirements']['php']['text'],
                 ],
                 [
                     'status' => true,
-                    'text' => 'OpenSSL is up to date.',
+                    'text' => $requirements_translations['requirements']['requirements']['openssl']['text'],
                 ],
                 [
                     'status' => true,
-                    'text' => 'Your shop currency has been set up with Euro.',
+                    'text' => $requirements_translations['requirements']['requirements']['currency']['text'],
                 ],
                 [
                     'status' => true,
-                    'text' => 'You must connect your PayPlug account.',
+                    'text' => $requirements_translations['requirements']['requirements']['account']['text'],
                 ],
             ],
             'debug' => [
                 'live' => [
-                    'title' => 'Live debug title',
-                    'description' => 'Live debug description',
+                    'title' => $requirements_translations['requirements']['debug']['live']['title'],
+                    'description' => $requirements_translations['requirements']['debug']['live']['description'],
                 ],
                 'sandbox' => [
-                    'title' => 'Test debug title',
-                    'description' => 'Test debug description',
+                    'title' => $requirements_translations['requirements']['debug']['test']['title'],
+                    'description' => $requirements_translations['requirements']['debug']['test']['description'],
                 ],
             ],
             'enable_debug_check' => $checked,
@@ -640,36 +661,39 @@ class ApiRest
 
     public function getThresholdsOptions($max, $min)
     {
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $paylater_translations = $translation->getPaylaterTranslations();
+
         return [
             'name' => 'thresholds',
             //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
             'image_url' => 'assets/images/thresholds.jpg',
-            'title' => 'thresholds option title',
+            'title' => $paylater_translations['paylater']['thresholds']['title'],
             'descriptions' => [
-                'description' => 'thresholds option desription',
+                'description' => $paylater_translations['paylater']['thresholds']['description'],
                 'min_amount' => [
                     'name' => 'oney_min_amounts',
                     'value' => $min,
                     'placeholder' => $min,
                 ],
-                'inter' => 'thresholds option and',
+                'inter' => $paylater_translations['paylater']['thresholds']['inter'],
                 'max_amount' => [
                     'name' => 'oney_max_amounts',
                     'value' => $max,
                     'placeholder' => $max,
                 ],
                 'error' => [
-                    'text' => 'thresholds option error text',
+                    'text' => $paylater_translations['paylater']['thresholds']['error']['text'],
                 ],
             ],
             'switch' => false,
         ];
     }
 
-    private function getRequirementsSection()
+    /*private function getRequirementsSection()
     {
         $getRequirementsSection = new PayplugGatewayRequirements(new PayplugGateway());
 
         return $getRequirementsSection->satisfy_requirements();
-    }
+    }*/
 }
