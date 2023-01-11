@@ -130,6 +130,9 @@ class PluginEntity
     private $tools;
 
     /** @var object */
+    private $translation;
+
+    /** @var object */
     private $translate;
 
     /** @var object */
@@ -491,6 +494,14 @@ class PluginEntity
     public function getTranslate()
     {
         return $this->translate;
+    }
+
+    /**
+     * @return object
+     */
+    public function getTranslation()
+    {
+        return $this->translation;
     }
 
     /**
@@ -1117,6 +1128,24 @@ class PluginEntity
         }
 
         $this->translate = $translate;
+
+        return $this;
+    }
+
+    /**
+     * @param object $translation
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setTranslation($translation)
+    {
+        if (!is_object($translation)) {
+            throw (new BadParameterException('Invalid argument, $translation must be a Translate'));
+        }
+
+        $this->translation = $translation;
 
         return $this;
     }
