@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS
+ * 2013 - 2023 PayPlug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    PayPlug SAS
- * @copyright 2013 - 2022 PayPlug SAS
+ * @copyright 2013 - 2023 PayPlug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -49,6 +49,7 @@ use PayPlug\src\application\adapter\ShopAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
 use PayPlug\src\models\classes\ApiRest;
+use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\src\models\entities\OneyEntity;
 use PayPlug\src\models\entities\OrderStateEntity;
@@ -122,6 +123,7 @@ class PluginInit extends BaseClass
 
     // Model classes
     private $api_rest;
+    private $translation;
 
     public function __construct($dependencies = null)
     {
@@ -172,6 +174,7 @@ class PluginInit extends BaseClass
             ->setShop($this->shop)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
+            ->setTranslation($this->translation)
             ->setValidate($this->validate)
         ;
 
@@ -320,5 +323,6 @@ class PluginInit extends BaseClass
     private function setClasses()
     {
         $this->api_rest = new ApiRest($this->dependencies);
+        $this->translation = new Translation($this->dependencies);
     }
 }
