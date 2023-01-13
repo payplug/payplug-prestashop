@@ -237,6 +237,21 @@ class PayPlugNotifications
             ];
         }
 
+        // Paid but one or multiple products out of stock
+        $this->order = $this->orderAdapter->get((int) $this->orderAdapter->getOrderByCartId($this->cart->id));
+        $order_details = $this->order->getOrderDetailList();
+        foreach ($order_details as $order_detail) {
+            if ($this->configAdapter->get('PS_STOCK_MANAGEMENT')
+                && ($order_detail['product_quantity_in_stock'] < 0)) {
+                $this->logger->addLog('NewOrderState: oos_paid');
+
+                return [
+                    'valid' => true,
+                    'status' => 'oos_paid',
+                ];
+            }
+        }
+
         $this->logger->addLog('NewOrderState: paid');
 
         return [
@@ -891,7 +906,7 @@ class PayPlugNotifications
     }
 
     /**
-     * @description Set $this->>cart in the DB from the resource id
+     * @description Set $this->cart in the DB from the resource id
      */
     private function setCartFromResource()
     {
@@ -1047,6 +1062,9 @@ class PayPlugNotifications
             ),
             'paid' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
+            ),
+            'oos_paid' => $this->configAdapter->get(
+                'PS_OS_OUTOFSTOCK_PAID'
             ),
             'error' => $this->configAdapter->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR') . $state_addons
