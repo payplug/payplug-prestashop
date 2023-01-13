@@ -28,6 +28,7 @@ use PayPlug\src\application\dependencies\PluginInit;
 use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\models\repositories\PaymentRepository;
 use PayPlug\src\utilities\helpers\FilesHelper;
+use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
@@ -311,8 +312,8 @@ class DependenciesClass
             'defaultValue' => 1,
             'setConf' => 1,
         ],
-        'show' => [
-            'name' => 'SHOW',
+        'enable' => [
+            'name' => 'ENABLE',
             'defaultValue' => 0,
             'setConf' => 1,
         ],
@@ -526,6 +527,7 @@ class DependenciesClass
     {
         $this->helpers = [
             'files' => new FilesHelper(),
+            'user' => new UserHelper(),
         ];
     }
 }

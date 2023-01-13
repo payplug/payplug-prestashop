@@ -3,6 +3,8 @@
 namespace PayPlug\tests\repositories;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\src\utilities\helpers\UserHelper;
+use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
 use PayPlug\src\utilities\validators\moduleValidator;
@@ -114,9 +116,18 @@ class RepositoryBase extends TestCase
                     'module' => \Mockery::mock(moduleValidator::class)->makePartial(),
                     'browser' => \Mockery::mock(browserValidator::class)->makePartial(),
                     'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
+                    'account' => \Mockery::mock(accountValidator::class)->makePartial(),
                 ],
             ])
         ;
+        $this->dependencies
+            ->shouldReceive(
+                [
+                    'getHelpers' => [
+                        'user' => \Mockery::mock(UserHelper::class)->makePartial(),
+                    ],
+                ]
+            );
         $this->dependencies
             ->shouldReceive('getConfigurationKey')
             ->andReturnUsing(function ($key) {

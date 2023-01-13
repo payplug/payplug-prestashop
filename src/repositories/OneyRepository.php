@@ -1525,9 +1525,16 @@ class OneyRepository extends BaseClass
      */
     public function isValidOneyEmail($email)
     {
-        $is_valid_email = $this->validators['payment']->isOneyEmail($email);
+        $is_valid_email = $this->validators['account']->isEmail($email);
         if (!$is_valid_email['result']) {
-            $code = isset($is_valid_email['code']) ? $is_valid_email['code'] : 'invalid';
+            return [
+                'result' => false,
+                'message' => $this->dependencies->l('Your email address is not a valid email', 'oneyrepository'),
+            ];
+        }
+        $is_oney_email = $this->validators['payment']->isOneyEmail($email);
+        if (!$is_oney_email['result']) {
+            $code = isset($is_oney_email['code']) ? $is_oney_email['code'] : 'invalid';
             switch ($code) {
                 case 'length-char':
                     $error = $this->dependencies->l('Your email address is too long and the + character is not valid', 'oneyrepository');
