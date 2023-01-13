@@ -65,12 +65,10 @@ class Translation
     public function getHeaderTranslations()
     {
         return [
-            'header' => [
-                'hidden' => $this->dependencies->l('payplug.getHeaderTranslations.headerHidden', 'translation'),
-                'visible' => $this->dependencies->l('payplug.getHeaderTranslations.headerVisible', 'translation'),
-                'title' => $this->dependencies->l('payplug.getHeaderTranslations.headerTitle', 'translation'),
-                'text' => $this->dependencies->l('payplug.getHeaderTranslations.headerText', 'translation'),
-            ],
+            'hidden' => $this->dependencies->l('payplug.getHeaderTranslations.headerHidden', 'headertranslation'),
+            'visible' => $this->dependencies->l('payplug.getHeaderTranslations.headerVisible', 'headertranslation'),
+            'title' => $this->dependencies->l('payplug.getHeaderTranslations.headerTitle', 'headertranslation'),
+            'text' => $this->dependencies->l('payplug.getHeaderTranslations.headerText', 'headertranslation'),
         ];
     }
 

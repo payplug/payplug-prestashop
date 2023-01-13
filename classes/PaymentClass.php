@@ -692,7 +692,7 @@ class PaymentClass
         ];
 
         $is_shown = $this->validators['module']->canBeShown(
-            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('enable'))
         );
 
         if (!$this->active

@@ -2,6 +2,8 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
+use PayPlug\src\utilities\validators\accountValidator;
+
 /**
  * @group unit
  * @group repository
@@ -18,6 +20,7 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
     {
         parent::setUp();
         $this->email = 'mock@payplug.com';
+        $this->validator = new AccountValidator();
     }
 
     public function testWithValidEmail()
