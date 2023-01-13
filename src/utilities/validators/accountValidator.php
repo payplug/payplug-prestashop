@@ -116,4 +116,32 @@ class accountValidator
             'message' => '',
         ];
     }
+
+    /**
+     * @description Check if a given email is valid
+     *
+     * @param $email
+     *
+     * @return array
+     */
+    public function isEmail($email)
+    {
+        if (!is_string($email) || !$email || empty($email)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $email must be a non empty string',
+            ];
+        }
+        if (!(bool) preg_match('/^\b[\w\.\+-]+@[\w\.-]+\.\w{2,4}\b$/', $email)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid email format given, $email given is not valid',
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => '',
+        ];
+    }
 }

@@ -290,7 +290,7 @@ class ConfigClass
      */
     public function disable()
     {
-        return $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 0);
+        return $this->config->updateValue($this->dependencies->getConfigurationKey('enable'), 0);
     }
 
     /**
@@ -375,7 +375,7 @@ class ConfigClass
     public function isAllowed()
     {
         $is_shown = $this->validators['module']->canBeShown(
-            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('enable'))
         );
         $is_allowed = $this->validators['module']->isAllowed(
             (bool) $this->module->isEnabled($this->dependencies->name),
@@ -455,7 +455,7 @@ class ConfigClass
         }
 
         if (!$is_payplug_configured) {
-            $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 0);
+            $this->config->updateValue($this->dependencies->getConfigurationKey('enable'), 0);
             $this->check_configuration['status']['check'] = 'check';
         }
 
@@ -556,7 +556,7 @@ class ConfigClass
         $configurationKeys = [
             $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
             $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
-            $this->dependencies->getConfigurationKey('show') => 'payplug_show',
+            $this->dependencies->getConfigurationKey('enable') => 'payplug_enable',
             $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded_mode',
             $this->dependencies->getConfigurationKey('inst') => 'payplug_inst',
             $this->dependencies->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
@@ -657,7 +657,7 @@ class ConfigClass
                         $this->config->updateValue($key, $value);
                 }
             }
-            if ($key == 'payplug_show' && $value) {
+            if ($key == 'payplug_enable' && $value) {
                 $this->module->getInstanceByName($this->dependencies->name)->enable();
             }
         }
@@ -685,11 +685,11 @@ class ConfigClass
         $this->checkConfiguration();
 
         $is_shown = $this->validators['module']->canBeShown(
-            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('enable'))
         );
 
         $this->configurations = [
-            'show' => $is_shown['result'],
+            'enable' => $is_shown['result'],
             'email' => $this->config->get($this->dependencies->getConfigurationKey('email')),
             'sandbox_mode' => $this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),
             'embedded_mode' => $this->config->get($this->dependencies->getConfigurationKey('embeddedMode')),
@@ -745,7 +745,7 @@ class ConfigClass
         } else {
             $verified = false;
         }
-        $is_active = (bool) $this->configurations['show'];
+        $is_active = (bool) $this->configurations['enable'];
 
         $this->dependencies->apiClass->getSiteUrl();
 
@@ -877,7 +877,7 @@ class ConfigClass
             'standard' => $this->configurations['standard'],
             'inst' => $this->configurations['inst'],
             'inst_min_amount' => $this->configurations['inst_min_amount'],
-            'show' => $this->configurations['show'],
+            'enable' => $this->configurations['enable'],
             'debug_mode' => $this->configurations['debug_mode'],
             'deferred' => $this->configurations['deferred'],
             'deferred_state' => $this->configurations['deferred_state'],
@@ -1268,7 +1268,7 @@ class ConfigClass
                     $this->dependencies->getConfigurationKey('email'),
                     $email
                 );
-                $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 1);
+                $this->config->updateValue($this->dependencies->getConfigurationKey('enable'), 1);
                 $this->assignContentVar();
                 $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
 
@@ -1356,7 +1356,7 @@ class ConfigClass
      */
     public function submitDisable()
     {
-        $this->config->updateValue($this->dependencies->getConfigurationKey('show'), false);
+        $this->config->updateValue($this->dependencies->getConfigurationKey('enable'), false);
 
         $this->assignContentVar();
         $content = $this->fetchTemplate('/views/templates/admin/admin.tpl');
@@ -1467,7 +1467,7 @@ class ConfigClass
     public function logout()
     {
         $this->install->setConfig();
-        $this->config->updateValue($this->dependencies->getConfigurationKey('show'), 0);
+        $this->config->updateValue($this->dependencies->getConfigurationKey('enable'), 0);
         $this->config->loadConfiguration();
     }
 
@@ -1531,11 +1531,11 @@ class ConfigClass
 
         // show module to the customer
         $switch['show'] = [
-            'name' => 'payplug_show',
+            'name' => 'payplug_enable',
             'label' => $this->dependencies->l('payplug.assignSwitchConfiguration.showPayplug', 'configclass'),
             'active' => $connected,
             'small' => true,
-            'checked' => $configurations['show'],
+            'checked' => $configurations['enable'],
         ];
 
         $switch['sandbox'] = [

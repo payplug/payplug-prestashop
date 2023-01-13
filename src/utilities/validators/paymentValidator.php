@@ -751,14 +751,6 @@ class paymentValidator
             ];
         }
 
-        if (!(bool) preg_match('/^\b[\w\.\+-]+@[\w\.-]+\.\w{2,4}\b$/', $email)) {
-            return [
-                'result' => false,
-                'code' => 'format',
-                'message' => 'Invalid email format given, $email given is not valid',
-            ];
-        }
-
         if (strlen($email) > 100 && strpos($email, '+')) {
             return [
                 'result' => false,

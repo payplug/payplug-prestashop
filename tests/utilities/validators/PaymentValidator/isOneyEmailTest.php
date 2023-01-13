@@ -29,13 +29,6 @@ class isOneyEmailTest extends TestCase
         yield [''];
     }
 
-    public function invalidEmailFormatDataProvider()
-    {
-        yield ['@test.com'];
-        yield ['email@test'];
-        yield ['emailtest.com'];
-    }
-
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -43,24 +36,13 @@ class isOneyEmailTest extends TestCase
      */
     public function testWhenGivenEmailWithInvalidStringFormat($email)
     {
-        $this->assertSame([
-            'result' => false,
-            'message' => 'Invalid argument given, $email must be a non empty string',
-        ], $this->validator->isOneyEmail($email));
-    }
-
-    /**
-     * @dataProvider invalidEmailFormatDataProvider
-     *
-     * @param mixed $email
-     */
-    public function testWhenGivenEmailWithInvalidEmailFormat($email)
-    {
-        $this->assertSame([
-            'result' => false,
-            'code' => 'format',
-            'message' => 'Invalid email format given, $email given is not valid',
-        ], $this->validator->isOneyEmail($email));
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Invalid argument given, $email must be a non empty string',
+            ],
+            $this->validator->isOneyEmail($email)
+        );
     }
 
     public function testWhenGivenEmailIsTooLongAndContainForbiddenChar()

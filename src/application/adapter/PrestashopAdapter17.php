@@ -281,11 +281,11 @@ class PrestashopAdapter17
 
         // show module to the customer
         $switch['show'] = [
-            'name' => 'payplug_show',
+            'name' => 'payplug_enable',
             'label' => $this->dependencies->l('payplug.assignSwitchConfiguration.showPayplug', 'prestashopadapter17'),
             'active' => $connected,
             'small' => true,
-            'checked' => $configurations['show'],
+            'checked' => $configurations['enable'],
         ];
 
         $switch['sandbox'] = [

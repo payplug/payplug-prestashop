@@ -226,7 +226,7 @@ class ConfigurationAction
         $configurationKeys = [
             $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
             $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
-            $this->dependencies->getConfigurationKey('show') => 'payplug_show',
+            $this->dependencies->getConfigurationKey('enable') => 'payplug_enable',
             $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded_mode',
             $this->dependencies->getConfigurationKey('inst') => 'payplug_inst',
             $this->dependencies->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
@@ -336,7 +336,7 @@ class ConfigurationAction
                 }
             }
 
-            if ('payplug_show' == $key && (bool) $value) {
+            if ('payplug_enable' == $key && (bool) $value) {
                 $module = $this->dependencies->getPlugin()->getModule();
                 $module->getInstanceByName($this->dependencies->name)->enable();
             }
