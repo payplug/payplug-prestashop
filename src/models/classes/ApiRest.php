@@ -705,6 +705,8 @@ class ApiRest
      *
      * @param mixed $current_configuration
      *
+     * @param mixed $current_configuration
+     *
      * @return array
      */
     public function getPaymentMethodsSection($current_configuration = [])
