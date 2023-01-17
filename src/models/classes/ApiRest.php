@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2023 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2023 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -32,13 +32,18 @@ class ApiRest
         $this->dependencies = $dependencies;
     }
 
+    /**
+     * @description build toto section for api usage
+     *
+     * @param string $action
+     */
     public function dispatch($action = '')
     {
         if (!is_string($action) || !$action) {
             $logger = $this->dependencies->getPlugin()->getLogger();
             $logger->addLog('ApiRest::dispatch: Invalid parameter given, $action must be a non empty string.');
 
-            return false;
+            exit(json_encode([]));
         }
 
         $configurationAction = $this->dependencies->getPlugin()->getConfigurationAction();
@@ -63,7 +68,7 @@ class ApiRest
                 $datas = json_decode(file_get_contents('php://input'), false);
                 $json = $configurationAction->saveAction($datas);
 
-            break;
+                break;
             case 'init':
             default:
                 $json = $configurationAction->renderConfiguration();
@@ -74,6 +79,11 @@ class ApiRest
         exit(json_encode($json));
     }
 
+    /**
+     * @description build toto section for api usage
+     *
+     * @return array
+     */
     public function getDataFields()
     {
         $config = $this->dependencies->getPlugin()->getConfiguration();
@@ -147,6 +157,11 @@ class ApiRest
         ];
     }
 
+    /**
+     * @description build footer section for api usage
+     *
+     * @return array
+     */
     public function getFooterSection()
     {
         $translation = $this->dependencies->getPlugin()
@@ -164,49 +179,80 @@ class ApiRest
             ],
             'link_help' => [
                 'text' => $translation['faq']['link'],
-                'url' => $this->dependencies->configClass->getFAQLinks($context->language->iso_code)['help'],
+                'url' => $this->dependencies
+                    ->getPlugin()
+                    ->getRoutes()
+                    ->getExternalUrl($context->language->iso_code)['help'],
                 'target' => '_blank',
             ],
         ];
     }
 
+    /**
+     * @description build logged section for api usage
+     *
+     * @return array
+     */
     public function getLoggedSection()
     {
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $logged_translations = $translation->getLoggedTranslations();
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getLoggedTranslations();
+
+        $context = $this->dependencies->getPlugin()
+            ->getContext()
+            ->get();
+        $iso_code = $context->language->iso_code;
+
+        $config = $this->dependencies->getPlugin()->getConfiguration();
+        $is_sandbox = (bool) $config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $inactive = (bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'));
 
         return [
-            'title' => $logged_translations['logged']['title'],
+            'title' => $translation['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => $logged_translations['logged']['descriptions']['live']['description'],
-                    'logout' => $logged_translations['logged']['descriptions']['live']['logout'],
-                    'mode' => $logged_translations['logged']['descriptions']['live']['mode'],
-                    'mode_description' => $logged_translations['logged']['descriptions']['live']['modeDescription'],
+                    'description' => $translation['description'],
+                    'logout' => $translation['user']['logout'],
+                    'mode' => $translation['mode']['title'],
+                    'mode_description' => $translation['mode']['description']['live'],
                     'link_learn_more' => [
-                        'text' => $logged_translations['logged']['descriptions']['live']['learnMore']['text'],
-                        'url' => 'Live learn more url',
+                        'text' => $translation['mode']['link']['live'],
+                        'url' => $this->dependencies
+                            ->getPlugin()
+                            ->getRoutes()
+                            ->getExternalUrl($iso_code)['sandbox'],
                         'target' => '_blank',
                     ],
                     'link_access_portal' => [
-                        'text' => $logged_translations['logged']['descriptions']['live']['accessPortal']['text'],
-                        'url' => 'https://www.payplug.com/portal',
+                        'text' => $translation['user']['link'],
+                        'url' => $this->dependencies
+                            ->getPlugin()
+                            ->getRoutes()
+                            ->getExternalUrl($iso_code)['portal'],
                         'target' => '_blank',
                     ],
                 ],
                 'sandbox' => [
-                    'description' => $logged_translations['logged']['descriptions']['test']['description'],
-                    'logout' => $logged_translations['logged']['descriptions']['test']['logout'],
-                    'mode' => $logged_translations['logged']['descriptions']['test']['mode'],
-                    'mode_description' => $logged_translations['logged']['descriptions']['test']['modeDescription'],
+                    'description' => $translation['description'],
+                    'logout' => $translation['user']['logout'],
+                    'mode' => $translation['mode']['title'],
+                    'mode_description' => $translation['mode']['description']['sandbox'],
                     'link_learn_more' => [
-                        'text' => $logged_translations['logged']['descriptions']['test']['learnMore']['text'],
-                        'url' => 'Test learn more url',
+                        'text' => $translation['mode']['link']['sandbox'],
+                        'url' => $this->dependencies
+                            ->getPlugin()
+                            ->getRoutes()
+                            ->getExternalUrl($iso_code)['sandbox'],
                         'target' => '_blank',
                     ],
                     'link_access_portal' => [
-                        'text' => $logged_translations['logged']['descriptions']['test']['accessPortal']['text'],
-                        'url' => 'https://www.payplug.com/portal',
+                        'text' => $translation['user']['link'],
+                        'url' => $this->dependencies
+                            ->getPlugin()
+                            ->getRoutes()
+                            ->getExternalUrl($iso_code)['portal'],
                         'target' => '_blank',
                     ],
                 ],
@@ -214,77 +260,85 @@ class ApiRest
             'options' => [
                 [
                     'name' => 'payplug_sandbox',
-                    'label' => $logged_translations['logged']['options']['live']['label'],
-                    'value' => 0, //live
-                    //"checked" => PayplugWoocommerceHelper::check_mode()
-                    'checked' => true,
+                    'label' => $translation['mode']['options']['sandbox'],
+                    'value' => 1, //live
+                    'checked' => $is_sandbox,
                 ],
                 [
                     'name' => 'payplug_sandbox',
-                    'label' => $logged_translations['logged']['options']['test']['label'],
-                    'value' => 1, //test
-                    //"checked" => !PayplugWoocommerceHelper::check_mode()
-                    'checked' => false,
+                    'label' => $translation['mode']['options']['live'],
+                    'value' => 0, //test
+                    'checked' => !$is_sandbox,
                 ],
             ],
             'inactive_modal' => [
-                //"inactive" => $inactive,
-                'inactive' => false,
-                'title' => $logged_translations['logged']['inactiveModal']['title'],
-                'description' => $logged_translations['logged']['inactiveModal']['description'],
-                'password_label' => $logged_translations['logged']['inactiveModal']['passwordLabel'],
-                'cancel' => $logged_translations['logged']['inactiveModal']['cancel'],
-                'ok' => $logged_translations['logged']['inactiveModal']['ok'],
+                'inactive' => !$inactive,
+                'title' => $translation['inactive']['modal']['title'],
+                'description' => $translation['inactive']['modal']['description'],
+                'password_label' => $translation['inactive']['modal']['password_label'],
+                'cancel' => $translation['inactive']['modal']['cancel'],
+                'ok' => $translation['inactive']['modal']['ok'],
             ],
             'inactive_account' => [
                 'warning' => [
-                    'title' => $logged_translations['logged']['inactiveAccount']['warning']['title'],
-                    'description' => $logged_translations['logged']['inactiveAccount']['warning']['description1'] .
-                        $logged_translations['logged']['inactiveAccount']['warning']['description2'] .
-                        $logged_translations['logged']['inactiveAccount']['warning']['description3'],
+                    'title' => $translation['inactive']['account']['warning']['title'],
+                    'description' => $translation['inactive']['account']['warning']['description'],
                 ],
                 'error' => [
-                    'title' => $logged_translations['logged']['inactiveAccount']['error']['title'],
-                    'description' => $logged_translations['logged']['inactiveAccount']['error']['description'],
+                    'title' => $translation['inactive']['account']['error']['title'],
+                    'description' => $translation['inactive']['account']['error']['description'],
                 ],
             ],
         ];
     }
 
+    /**
+     * @description build login section for api usage
+     *
+     * @return array
+     */
     public function getLoginSection()
     {
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $login_translations = $translation->getLoginTranslations();
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getLoginTranslations();
 
         return [
             'name' => 'generalLogin',
-            'title' => $login_translations['login']['title'],
+            'title' => $translation['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => $login_translations['login']['descriptions']['live']['description'],
-                    'not_registered' => $login_translations['login']['descriptions']['live']['notRegistered'],
-                    'connect' => $login_translations['login']['descriptions']['live']['connect'],
-                    'email_label' => $login_translations['login']['descriptions']['live']['emailLabel'],
-                    'email_placeholder' => $login_translations['login']['descriptions']['live']['emailPlaceholder'],
-                    'password_label' => $login_translations['login']['descriptions']['live']['passwordLabel'],
-                    'password_placeholder' => $login_translations['login']['descriptions']['live']['passwordPlaceholder'],
+                    'description' => $translation['description'],
+                    'not_registered' => $translation['register'],
+                    'connect' => $translation['connect'],
+                    'email_label' => $translation['email'],
+                    'email_placeholder' => $translation['email'],
+                    'password_label' => $translation['password'],
+                    'password_placeholder' => $translation['password'],
                     'link_forgot_password' => [
-                        'text' => $login_translations['login']['descriptions']['live']['forgotPassword']['text'],
-                        'url' => 'https://www.payplug.com/portal/forgot_password',
+                        'text' => $translation['forgot_password'],
+                        'url' => $this->dependencies
+                            ->getPlugin()
+                            ->getRoutes()
+                            ->getExternalUrl()['forgot_password'],
                         'target' => '_blank',
                     ],
                 ],
                 'sandbox' => [
-                    'description' => $login_translations['login']['descriptions']['test']['description'],
-                    'not_registered' => $login_translations['login']['descriptions']['test']['notRegistered'],
-                    'connect' => $login_translations['login']['descriptions']['test']['connect'],
-                    'email_label' => $login_translations['login']['descriptions']['test']['emailLabel'],
-                    'email_placeholder' => $login_translations['login']['descriptions']['test']['emailPlaceholder'],
-                    'password_label' => $login_translations['login']['descriptions']['test']['passwordLabel'],
-                    'password_placeholder' => $login_translations['login']['descriptions']['test']['passwordPlaceholder'],
+                    'description' => $translation['description'],
+                    'not_registered' => $translation['register'],
+                    'connect' => $translation['connect'],
+                    'email_label' => $translation['email'],
+                    'email_placeholder' => $translation['email'],
+                    'password_label' => $translation['password'],
+                    'password_placeholder' => $translation['password'],
                     'link_forgot_password' => [
-                        'text' => $login_translations['login']['descriptions']['test']['forgotPassword']['text'],
-                        'url' => 'https://www.payplug.com/portal/forgot_password',
+                        'text' => $translation['forgot_password'],
+                        'url' => $this->dependencies
+                            ->getPlugin()
+                            ->getRoutes()
+                            ->getExternalUrl()['forgot_password'],
                         'target' => '_blank',
                     ],
                 ],
@@ -292,6 +346,61 @@ class ApiRest
         ];
     }
 
+    /**
+     * @description build subscribe section for api usage
+     *
+     * @return array
+     */
+    public function getSubscribeSection()
+    {
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getSubscribeTranslations();
+
+        $register_link = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl()['signup'];
+        if ($this->dependencies->name == 'pspaylater') {
+            $register_link .= '/signup?sponsor=22101';
+        }
+
+        return [
+            'name' => 'generalSubscribe',
+            'title' => $translation['title'],
+            'descriptions' => [
+                'live' => [
+                    'description' => $translation['description'],
+                    'link_create_account' => [
+                        'text' => $translation['register'],
+                        'url' => $register_link,
+                        'target' => '_blank',
+                    ],
+                    'content_description' => $translation['text'],
+                    'already_have_account' => $translation['connect'],
+                ],
+                'sandbox' => [
+                    'description' => $translation['description'],
+                    'link_create_account' => [
+                        'text' => $translation['register'],
+                        'url' => $register_link,
+                        'target' => '_blank',
+                    ],
+                    'content_description' => $translation['text'],
+                    'already_have_account' => $translation['connect'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @description build oney popup section for api usage
+     *
+     * @param false $active
+     *
+     * @return array
+     */
     public function getOneyPopupProduct($active = false)
     {
         $translation = $this->dependencies->getPlugin()->getTranslation();
@@ -315,6 +424,13 @@ class ApiRest
         ];
     }
 
+    /**
+     * @description build paylater section for api usage
+     *
+     * @param array $options
+     *
+     * @return array
+     */
     public function getPaylaterSection($options = [])
     {
         $max = !empty($options['oney_thresholds_max']) ? $options['oney_thresholds_max'] : 3000;
@@ -388,6 +504,11 @@ class ApiRest
         ];
     }
 
+    /**
+     * @description build payment methods section for api usage
+     *
+     * @return array
+     */
     public function getPaymentMethodsSection()
     {
         $translation = $this->dependencies->getPlugin()->getTranslation();
@@ -586,6 +707,13 @@ class ApiRest
         ];
     }
 
+    /**
+     * @description build requirement section for api usage
+     *
+     * @param array $options
+     *
+     * @return array
+     */
     public function getRequirementsSection($options = [])
     {
         $checked = !empty($options['debug']) && $options['debug'] === 'yes' ? true : false;
@@ -652,7 +780,14 @@ class ApiRest
         ];
     }
 
-    public function getSettingsSection($logged)
+    /**
+     * @description get settings for api usage
+     *
+     * @param bool $logged
+     *
+     * @return array
+     */
+    public function getSettingsSection($logged = false)
     {
         return [
             'email' => 'blablabla@blabalabl.com',
@@ -671,7 +806,15 @@ class ApiRest
         ];
     }
 
-    public function getThresholdsOptions($max, $min)
+    /**
+     * @description build oney thresholds section for oney
+     *
+     * @param int $max
+     * @param int $min
+     *
+     * @return array
+     */
+    public function getThresholdsOptions($min = 0, $max = 0)
     {
         $translation = $this->dependencies->getPlugin()->getTranslation();
         $paylater_translations = $translation->getPaylaterTranslations();
