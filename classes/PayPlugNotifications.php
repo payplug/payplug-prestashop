@@ -242,7 +242,7 @@ class PayPlugNotifications
         $order_details = $this->order->getOrderDetailList();
         foreach ($order_details as $order_detail) {
             if ($this->configAdapter->get('PS_STOCK_MANAGEMENT')
-                && ($order_detail['product_quantity_in_stock'] < 0)) {
+                && ($order_detail['product_quantity_in_stock'] <= 0)) {
                 $this->logger->addLog('NewOrderState: oos_paid');
 
                 return [
