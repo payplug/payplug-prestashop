@@ -794,7 +794,10 @@ class ConfigClass
 
         $this->configurations['installments_panel_url'] = $installments_panel_url;
 
-        $this->configurations['faq_links'] = $this->getFAQLinks($this->context->language->iso_code);
+        $this->configurations['faq_links'] = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($this->context->language->iso_code);
         $amounts = $this->oney->getOneyPriceLimit(false);
         $customAmounts = $this->oney->getOneyPriceLimit(true);
         $oney_min_amounts = ($amounts['min'] / 100);
@@ -931,39 +934,6 @@ class ConfigClass
         $livepermissions = $this->getLivePermissions();
 
         return (bool) $this->validators['payment']->hasPermissions($livepermissions, 'onboardingOneyCompleted')['result'];
-    }
-
-    /**
-     * Get FAQ link for given iso lang
-     *
-     * @param $iso_code
-     *
-     * @return array
-     */
-    public function getFAQLinks($iso_code)
-    {
-        if ($iso_code == 'en') {
-            $iso_code = 'en-gb';
-        }
-
-        return [
-            'help' => 'https://support.payplug.com/hc/' . $iso_code . '/requests/new',
-            'activation' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021328991',
-            'deferred' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360010088420',
-            'install' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021389891',
-            'installments' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022447972',
-            'one_click' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022213892',
-            'oney' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360013071080',
-            'bancontact' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4408157435794',
-            'payment_page' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142312',
-            'integrated_payment_page' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021390191',
-            'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
-            'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
-            'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
-            'support' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
-            'applepay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/5149384347292',
-            'amex' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/5701208563996',
-        ];
     }
 
     /**

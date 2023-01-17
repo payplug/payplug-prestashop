@@ -107,9 +107,10 @@ class HookRepository extends BaseClass
 
         $id_order_state = $this->tools->tool('getValue', 'id_order_state');
         $current_order_state_type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $id_order_state);
-        $payplug_order_state_url = 'https://support.payplug.com/hc/'
-            . $this->context->getContext()->language->iso_code
-            . '/articles/4406805105298';
+        $payplug_order_state_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($this->context->language->iso_code)['order_state'];
         $this->context->getContext()->smarty->assign([
             'payplug_order_state_url' => $payplug_order_state_url,
             'current_order_state_type' => $current_order_state_type,
