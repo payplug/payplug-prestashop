@@ -80,35 +80,13 @@ class Translation
     public function getLoginTranslations()
     {
         return [
-            'login' => [
-                'title' => $this->dependencies->l('payplug.getLoginTranslations.LoginTitle', 'translation'),
-                'descriptions' => [
-                    'live' => [
-                        'description' => $this->dependencies->l('payplug.getLoginTranslations.LoginLiveDescription', 'translation'),
-                        'notRegistered' => $this->dependencies->l('payplug.getLoginTranslations.loginLiveNotRegistered', 'translation'),
-                        'connect' => $this->dependencies->l('payplug.getLoginTranslations.loginLiveConnect', 'translation'),
-                        'emailLabel' => $this->dependencies->l('payplug.getLoginTranslations.loginLiveEmailLabel', 'translation'),
-                        'emailPlaceholder' => $this->dependencies->l('payplug.getLoginTranslations.loginLiveEmailPlaceholder', 'translation'),
-                        'passwordLabel' => $this->dependencies->l('payplug.getLoginTranslations.loginLivePasswordLabel', 'translation'),
-                        'passwordPlaceholder' => $this->dependencies->l('payplug.getLoginTranslations.loginLivePasswordPlaceholder', 'translation'),
-                        'forgotPassword' => [
-                            'text' => $this->dependencies->l('payplug.getLoginTranslations.loginLiveForgotPasswordText', 'translation'),
-                        ],
-                    ],
-                    'test' => [
-                        'description' => $this->dependencies->l('payplug.getLoginTranslations.LoginTestDescription', 'translation'),
-                        'notRegistered' => $this->dependencies->l('payplug.getLoginTranslations.loginTestNotRegistered', 'translation'),
-                        'connect' => $this->dependencies->l('payplug.getLoginTranslations.loginTestConnect', 'translation'),
-                        'emailLabel' => $this->dependencies->l('payplug.getLoginTranslations.loginTestEmailLabel', 'translation'),
-                        'emailPlaceholder' => $this->dependencies->l('payplug.getLoginTranslations.loginTestEmailPlaceholder', 'translation'),
-                        'passwordLabel' => $this->dependencies->l('payplug.getLoginTranslations.loginTestPasswordLabel', 'translation'),
-                        'passwordPlaceholder' => $this->dependencies->l('payplug.getLoginTranslations.loginTestPasswordPlaceholder', 'translation'),
-                        'forgotPassword' => [
-                            'text' => $this->dependencies->l('payplug.getLoginTranslations.loginTestForgotPasswordText', 'translation'),
-                        ],
-                    ],
-                ],
-            ],
+            'title' => $this->dependencies->l('login.title', 'logintranslation'),
+            'description' => $this->dependencies->l('login.description', 'logintranslation'),
+            'email' => $this->dependencies->l('login.email', 'logintranslation'),
+            'password' => $this->dependencies->l('login.password', 'logintranslation'),
+            'register' => $this->dependencies->l('login.register', 'logintranslation'),
+            'connect' => $this->dependencies->l('login.connect', 'logintranslation'),
+            'forgot_password' => $this->dependencies->l('login.forgot_password', 'logintranslation'),
         ];
     }
 
@@ -118,59 +96,43 @@ class Translation
     public function getLoggedTranslations()
     {
         return [
-            'logged' => [
-                'title' => $this->dependencies->l('payplug.getLoggedTranslations.LoggedTitle', 'translation'),
-                'descriptions' => [
-                    'live' => [
-                        'description' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsLiveDescription', 'translation'),
-                        'logout' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsLiveLogout', 'translation'),
-                        'mode' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsLiveMode', 'translation'),
-                        'modeDescription' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsLiveModeDescription', 'translation'),
-                        'learnMore' => [
-                            'text' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsLiveLearnMoreText', 'translation'),
-                        ],
-                        'accessPortal' => [
-                            'text' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsLiveGoToPortal', 'translation'),
-                        ],
-                    ],
-                    'test' => [
-                        'description' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsTestDescription', 'translation'),
-                        'logout' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsTestLogout', 'translation'),
-                        'mode' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsTestMode', 'translation'),
-                        'modeDescription' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsTestModeDescription', 'translation'),
-                        'learnMore' => [
-                            'text' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsTestLearnMoreText', 'translation'),
-                        ],
-                        'accessPortal' => [
-                            'text' => $this->dependencies->l('payplug.getLoggedTranslations.loggedDescriptionsTestGoToPortal', 'translation'),
-                        ],
-                    ],
+            'title' => $this->dependencies->l('logged.title', 'loggedtranslation'),
+            'description' => $this->dependencies->l('logged.description', 'loggedtranslation'),
+            'user' => [
+                'link' => $this->dependencies->l('logged.user.link', 'loggedtranslation'),
+                'logout' => $this->dependencies->l('logged.user.logout', 'loggedtranslation'),
+            ],
+            'mode' => [
+                'title' => $this->dependencies->l('logged.mode.title', 'loggedtranslation'),
+                'description' => [
+                    'live' => $this->dependencies->l('logged.mode.description.live', 'loggedtranslation'),
+                    'sandbox' => $this->dependencies->l('logged.mode.description.sandbox', 'loggedtranslation'),
+                ],
+                'link' => [
+                    'live' => $this->dependencies->l('logged.mode.link.live', 'loggedtranslation'),
+                    'sandbox' => $this->dependencies->l('logged.mode.link.sandbox', 'loggedtranslation'),
                 ],
                 'options' => [
-                    'live' => [
-                        'label' => $this->dependencies->l('payplug.getLoggedTranslations.loggedOptionLiveLabel', 'translation'),
-                    ],
-                    'test' => [
-                        'label' => $this->dependencies->l('payplug.getLoggedTranslations.loggedOptionTestLabel', 'translation'),
-                    ],
+                    'live' => $this->dependencies->l('logged.mode.options.live', 'loggedtranslation'),
+                    'sandbox' => $this->dependencies->l('logged.mode.options.sandbox', 'loggedtranslation'),
                 ],
-                'inactiveModal' => [
-                    'title' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveModalTitle', 'translation'),
-                    'description' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveModalDescription', 'translation'),
-                    'passwordLabel' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveModalPasswordLabel', 'translation'),
-                    'cancel' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveModalCancel', 'translation'),
-                    'ok' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveModalOk', 'translation'),
+            ],
+            'inactive' => [
+                'modal' => [
+                    'title' => $this->dependencies->l('logged.inactive.modal.title', 'loggedtranslation'),
+                    'description' => $this->dependencies->l('logged.inactive.modal.description', 'loggedtranslation'),
+                    'password_label' => $this->dependencies->l('logged.inactive.modal.password_label', 'loggedtranslation'),
+                    'cancel' => $this->dependencies->l('logged.inactive.modal.cancel', 'loggedtranslation'),
+                    'ok' => $this->dependencies->l('logged.inactive.modal.ok', 'loggedtranslation'),
                 ],
-                'inactiveAccount' => [
+                'account' => [
                     'warning' => [
-                        'title' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveAccountWarningTitle', 'translation'),
-                        'description1' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveAccountWarningDescription1', 'translation'),
-                        'description2' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveAccountWarningDescription2', 'translation'),
-                        'description3' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveAccountWarningDescription3', 'translation'),
+                        'title' => $this->dependencies->l('logged.inactive.account.warning.title', 'loggedtranslation'),
+                        'description' => $this->dependencies->l('logged.inactive.account.warning.description', 'loggedtranslation'),
                     ],
                     'error' => [
-                        'title' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveAccountErrorTitle', 'translation'),
-                        'description' => $this->dependencies->l('payplug.getLoggedTranslations.loggedInactiveAccountErrorDescription', 'translation'),
+                        'title' => $this->dependencies->l('logged.inactive.account.error.title', 'loggedtranslation'),
+                        'description' => $this->dependencies->l('logged.inactive.account.error.description', 'loggedtranslation'),
                     ],
                 ],
             ],
@@ -183,11 +145,11 @@ class Translation
     public function getSubscribeTranslations()
     {
         return [
-            'subscribeTitle' => $this->dependencies->l('payplug.getSubscribeTranslations.SubscribeTitle', 'translation'),
-            'subscribeDescription' => $this->dependencies->l('payplug.getSubscribeTranslations.SubscribeDescription', 'translation'),
-            'subscribeCreateAccountDescription' => $this->dependencies->l('payplug.getSubscribeTranslations.SubscribeCreateAccountDescription', 'translation'),
-            'subscribeCreateAccount' => $this->dependencies->l('payplug.getSubscribeTranslations.SubscribeCreateAccount', 'translation'),
-            'subscribeShowLogin' => $this->dependencies->l('payplug.getSubscribeTranslations.SubscribeShowLogin', 'translation'),
+            'title' => $this->dependencies->l('subscribe.title', 'subscribetranslation'),
+            'description' => $this->dependencies->l('subscribe.description', 'subscribetranslation'),
+            'text' => $this->dependencies->l('subscribe.text', 'subscribetranslation'),
+            'register' => $this->dependencies->l('subscribe.register', 'subscribetranslation'),
+            'connect' => $this->dependencies->l('subscribe.connect', 'subscribetranslation'),
         ];
     }
 

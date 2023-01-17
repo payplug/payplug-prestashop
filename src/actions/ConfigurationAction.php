@@ -124,8 +124,15 @@ class ConfigurationAction
     public function logoutAction()
     {
         $this->dependencies->configClass->logout();
+        $api_rest = $this->dependencies->getPlugin()->getApiRest();
 
-        return $this->renderConfiguration();
+        return [
+            'success' => true,
+            'data' => [
+                'message' => 'Successfully logged out.',
+                'status' => $api_rest->getRequirementsSection(),
+            ],
+        ];
     }
 
     /**
@@ -139,29 +146,44 @@ class ConfigurationAction
         $config = $this->dependencies->getPlugin()->getConfiguration();
         $payplug_email = $config->get($this->dependencies->getConfigurationKey('email'));
 
-        $datas = [
-            'success' => true,
-            'data' => [
-                'header' => $api_rest->getHeaderSection(),
-                'status' => false,
-                'payment_methods' => $api_rest->getPaymentMethodsSection(),
-                'payment_paylater' => $api_rest->getPaylaterSection(),
-                'status' => $api_rest->getRequirementsSection(),
-                'footer' => $api_rest->getFooterSection(),
-            ],
-        ];
+        $header = $api_rest->getHeaderSection();
+        $footer = $api_rest->getFooterSection();
 
         if ((bool) $payplug_email) {
-            $datas['data']['payplug_wooc_settings'] = $api_rest->getDataFields($config);
-            $datas['data']['settings'] = $api_rest->getSettingsSection(true);
-            $datas['data']['login'] = $api_rest->getLoginSection();
-            $datas['data']['logged'] = $api_rest->getLoggedSection();
+            $payplug_wooc_settings = $api_rest->getDataFields($config);
+            unset($payplug_wooc_settings['payplug_live_key'],
+                $payplug_wooc_settings['payplug_test_key'],
+                $payplug_wooc_settings['payplug_password'],
+                $payplug_wooc_settings['payplug_merchant_id']);
+
+            $datas = [
+                'payplug_wooc_settings' => $payplug_wooc_settings,
+                'settings' => $api_rest->getSettingsSection(true),
+                'header' => $header,
+                'login' => $api_rest->getLoginSection(),
+                'logged' => $api_rest->getLoggedSection(),
+                'payment_methods' => $api_rest->getPaymentMethodsSection($payplug_wooc_settings),
+                'payment_paylater' => $api_rest->getPaylaterSection($payplug_wooc_settings),
+                'status' => $api_rest->getRequirementsSection($payplug_wooc_settings),
+                'footer' => $footer,
+            ];
         } else {
-            $datas['data']['settings'] = $api_rest->getSettingsSection(false);
-            $datas['data']['login'] = $api_rest->getLoginSection();
+            $datas = [
+                'settings' => $api_rest->getSettingsSection(),
+                'header' => $header,
+                'login' => $api_rest->getLoginSection(),
+                'subscribe' => $api_rest->getSubscribeSection(),
+                'payment_methods' => $api_rest->getPaymentMethodsSection(),
+                'payment_palate' => $api_rest->getPaylaterSection(),
+                'status' => $api_rest->getRequirementsSection(),
+                'footer' => $footer,
+            ];
         }
 
-        return $datas;
+        return [
+            'success' => true,
+            'data' => $datas,
+        ];
     }
 
     /**

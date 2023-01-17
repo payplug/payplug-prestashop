@@ -163,45 +163,31 @@ class AdminClass
             }
             if ($this->tools->tool('getValue', 'permissionsModal')) {
                 if ($this->tools->tool('getValue', 'type') == 'oneyPremium') {
-                    $link = 'https://portal.payplug.com/#/configuration/oney';
+                    $link = $this->dependencies
+                        ->getPlugin()
+                        ->getRoutes()
+                        ->getExternalUrl($this->context->language->iso_code)['oney_cgv'];
                 } elseif ($this->tools->tool('getValue', 'type') == 'bancontactPremium') {
-                    switch ($this->context->language->iso_code) {
-                        case 'fr':
-                            $link = 'https://support.payplug.com/hc/fr/requests/new?ticket_form_id=4583813991452';
-
-                            break;
-
-                        case 'it':
-                            $link = 'https://support.payplug.com/hc/it/requests/new?ticket_form_id=4583813991452';
-
-                            break;
-
-                        default:
-                            $link = 'https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=4583813991452';
-
-                            break;
-                    }
+                    $link = $this->dependencies
+                        ->getPlugin()
+                        ->getRoutes()
+                        ->getExternalUrl($this->context->language->iso_code)['help'];
+                    $link .= '?ticket_form_id=4583813991452';
                 } elseif ($this->tools->tool('getValue', 'type') == 'applepayPremium') {
-                    $link = 'mailto:support@payplug.com';
+                    $link = $this->dependencies
+                        ->getPlugin()
+                        ->getRoutes()
+                        ->getExternalUrl($this->context->language->iso_code)['mail'];
                 } elseif ($this->tools->tool('getValue', 'type') == 'amexPremium') {
-                    switch ($this->context->language->iso_code) {
-                        case 'fr':
-                            $link = 'https://support.payplug.com/hc/fr/requests/new';
-
-                            break;
-
-                        case 'it':
-                            $link = 'https://support.payplug.com/hc/it/requests/new';
-
-                            break;
-
-                        default:
-                            $link = 'https://support.payplug.com/hc/en-gb/requests/new';
-
-                            break;
-                    }
+                    $link = $this->dependencies
+                        ->getPlugin()
+                        ->getRoutes()
+                        ->getExternalUrl($this->context->language->iso_code)['help'];
                 } else {
-                    $link = 'https://www.payplug.com/contact';
+                    $link = $this->dependencies
+                        ->getPlugin()
+                        ->getRoutes()
+                        ->getExternalUrl($this->context->language->iso_code)['contact'];
                 }
                 $title = $this->dependencies->l('payplug.adminAjaxController.enableFeature', 'adminclass');
                 $this->assign->assign(

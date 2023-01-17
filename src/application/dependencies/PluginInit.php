@@ -66,6 +66,7 @@ use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\src\repositories\QueryRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
+use PayPlug\src\utilities\services\Routes;
 
 class PluginInit extends BaseClass
 {
@@ -125,6 +126,9 @@ class PluginInit extends BaseClass
     private $api_rest;
     private $translation;
 
+    // Utilities services
+    private $routes;
+
     public function __construct($dependencies = null)
     {
         $this->dependencies = $dependencies;
@@ -135,6 +139,7 @@ class PluginInit extends BaseClass
         $this->setAdapter();
         $this->setRepositories();
         $this->setClasses();
+        $this->setServices();
 
         $this->plugin
             ->setApiClass($this->apiClass)
@@ -171,6 +176,7 @@ class PluginInit extends BaseClass
             ->setOrderStateAdapter($this->order_state_adapter)
             ->setQuery($this->query)
             ->setSql($this->sql)
+            ->setRoutes($this->routes)
             ->setShop($this->shop)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
@@ -324,5 +330,10 @@ class PluginInit extends BaseClass
     {
         $this->api_rest = new ApiRest($this->dependencies);
         $this->translation = new Translation($this->dependencies);
+    }
+
+    private function setServices()
+    {
+        $this->routes = new Routes();
     }
 }

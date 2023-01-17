@@ -475,6 +475,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getRoutes()
+    {
+        return $this->routes;
+    }
+
+    /**
+     * @return object
+     */
     public function getShop()
     {
         return $this->shop;
@@ -1074,6 +1082,24 @@ class PluginEntity
         }
 
         $this->sql = $sql;
+
+        return $this;
+    }
+
+    /**
+     * @param object $routes
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setRoutes($routes)
+    {
+        if (!is_object($routes)) {
+            throw (new BadParameterException('Invalid argument, $routes must be a Services/Routes'));
+        }
+
+        $this->routes = $routes;
 
         return $this;
     }
