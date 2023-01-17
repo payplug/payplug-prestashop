@@ -63,17 +63,17 @@ class AdminPayplugController extends ModuleAdminController
         $this->dependencies->configClass->postProcess();
         $this->dependencies->configClass->assignContentVar();
 
-        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addJS($views_path . '/js/admin-v' . $this->dependencies->version . '.js');
-        $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
-        $this->context->controller->addCSS($views_path . '/css/admin-v' . $this->dependencies->version . '.css');
-        $this->context->controller->addJS($views_path . '/js/components-v' . $this->dependencies->version . '.js');
-
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
         ]);
 
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
+            $this->context->controller->addJS($views_path . '/js/admin-v' . $this->dependencies->version . '.js');
+            $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
+            $this->context->controller->addCSS($views_path . '/css/admin-v' . $this->dependencies->version . '.css');
+            $this->context->controller->addJS($views_path . '/js/components-v' . $this->dependencies->version . '.js');
+
             $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/admin.tpl');
 
             $this->context->smarty->assign([

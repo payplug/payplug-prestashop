@@ -800,9 +800,11 @@ class HookClass
         // check order state history
         $undefined_history_states = $this->dependencies->orderClass->getUndefinedOrderHistory($order->id);
         if (!empty($undefined_history_states)) {
-            $payplug_order_state_url = 'https://support.payplug.com/hc/'
-                . $this->context->language->iso_code
-                . '/articles/4406805105298';
+            $payplug_order_state_url = $this->dependencies
+                ->getPlugin()
+                ->getRoutes()
+                ->getExternalUrl($this->context->language->iso_code)['order_state'];
+
             $this->assign->assign([
                 'payplug_order_state_url' => $payplug_order_state_url,
                 'undefined_history_states' => $undefined_history_states,
