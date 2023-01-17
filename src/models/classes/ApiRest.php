@@ -128,6 +128,19 @@ class ApiRest
             (bool) $config->get($this->dependencies->getConfigurationKey('enable'))
         )['result'];
 
+        $psAccountConnected = $this->dependencies->configClass->checkPsAccount();
+        if ($logged && !$psAccountConnected) {
+            $this->dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->logoutAction();
+            $logged = false;
+        }
+
+        $enable = $this->validators['module']->canBeShown(
+            (bool) $config->get($this->dependencies->getConfigurationKey('enable'))
+        )['result'];
+
         return [
             'logged' => $logged,
             'email' => $config->get($this->dependencies->getConfigurationKey('email')),
