@@ -26,10 +26,13 @@ namespace PayPlug\src\models\classes;
 class ApiRest
 {
     private $dependencies;
+    private $validators;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->validators = $this->dependencies->getValidators();
+        $this->helpers = $this->dependencies->getHelpers();
     }
 
     /**
@@ -116,41 +119,62 @@ class ApiRest
         ];
     }
 
+    /**
+     * @description  build header section of the json file
+     *
+     * @return array
+     */
     public function getHeaderSection()
     {
-        $module_version = '3.12.0';
-        $disabled = false;
-        $enable = true;
+        $module_version = $this->dependencies->version;
+        $config = $this->dependencies->getPlugin()->getConfiguration();
+        $is_shown = $this->validators['module']->canBeShown(
+            (bool) $config->get($this->dependencies->getConfigurationKey('enable'))
+        );
 
         $translation = $this->dependencies->getPlugin()->getTranslation();
         $header_translations = $translation->getHeaderTranslations();
+        $userHelper = $this->helpers['user'];
+        $is_api_key = $this->validators['account']->isApiKey(
+            $config->get($this->dependencies->getConfigurationKey('testApiKey'))
+        );
+        $is_email = $this->validators['account']->isEmail(
+            $config->get($this->dependencies->getConfigurationKey('email'))
+        );
+        $logged = false;
+        if ($is_api_key['result'] && $is_email['result']) {
+            $logged = $userHelper->isLogged(
+                $is_email['result'],
+                $is_api_key['result']
+            )['result'];
+        }
 
         return [
-            'title' => $header_translations['header']['title'],
+            'title' => $header_translations['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => $header_translations['header']['text'],
+                    'description' => $header_translations['text'],
                     'plugin_version' => $module_version,
                 ],
                 'sandbox' => [
-                    'description' => $header_translations['header']['text'],
+                    'description' => $header_translations['text'],
                     'plugin_version' => $module_version,
                 ],
             ],
             'options' => [
                 'type' => 'select',
                 'name' => 'payplug_enable',
-                'disabled' => $disabled,
+                'disabled' => !$this->dependencies->configClass->checkPsAccount() || !$logged,
                 'options' => [
                     [
                         'value' => 1,
-                        'label' => $header_translations['header']['hidden'],
-                        'checked' => $enable === true ? true : false,
+                        'label' => $header_translations['visible'],
+                        'checked' => $is_shown['result'],
                     ],
                     [
                         'value' => 0,
-                        'label' => $header_translations['header']['visible'],
-                        'checked' => $enable === false ? true : false,
+                        'label' => $header_translations['hidden'],
+                        'checked' => !$is_shown['result'],
                     ],
                 ],
             ],

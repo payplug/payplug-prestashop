@@ -12,7 +12,7 @@ class Description {
     handleEvents() {
         const {container} = description.props;
         $(document)
-            .on('change', '.' + container + ' input[name=payplug_show]', this.triggerShow);
+            .on('change', '.' + container + ' input[name=payplug_enable]', this.triggerShow);
     }
 
     triggerShow(event) {
