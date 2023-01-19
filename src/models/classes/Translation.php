@@ -296,52 +296,68 @@ class Translation
     public function getPaylaterTranslations()
     {
         return [
-            'paylater' => [
-                'title' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterTitle', 'translation'),
-                'descriptions' => [
-                    'live' => [
-                        'description' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterLiveDescription', 'translation'),
-                    ],
-                    'test' => [
-                        'description' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterTestDescription', 'translation'),
-                    ],
+            'title' => $this->dependencies->l('paylater.title', 'paylatertranslation'),
+            'descriptions' => [
+                'live' => [
+                    'description' => $this->dependencies->l('paylater.descriptions.live.description', 'paylatertranslation'),
                 ],
-                'options' => [
-                    'title' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsTitle', 'translation'),
-                    'live' => [
-                        'description' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsLiveDescription', 'translation'),
-                        'knowMoreText' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsLiveKnowMoreText', 'translation'),
-                    ],
-                    'test' => [
-                        'description' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsTestDescription', 'translation'),
-                        'knowMoreText' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsTestKnowMoreText', 'translation'),
-                    ],
-                    'advanced' => [
-                        'description' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsAdvancedDescription', 'translation'),
-                    ],
-                    'option1' => [
-                        'label' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsOption1Label', 'translation'),
-                        'subtext' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsOption1Subtext', 'translation'),
-                    ],
-                    'option2' => [
-                        'label' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsOption2Label', 'translation'),
-                        'subtext' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterOptionsOption2Subtext', 'translation'),
-                    ],
+                'test' => [
+                    'description' => $this->dependencies->l('paylater.descriptions.test.description', 'paylatertranslation'),
                 ],
-                'oneyPopupProduct' => [
-                    'title' => $this->dependencies->l('payplug.getPaylaterTranslations.oneyPopupProductTitle', 'translation'),
-                    'description' => $this->dependencies->l('payplug.getPaylaterTranslations.oneyPopupProductDescription', 'translation'),
+            ],
+            'options' => [
+                'title' => $this->dependencies->l('paylater.options.title', 'paylatertranslation'),
+                'live' => [
+                    'description' => $this->dependencies->l('paylater.options.live.description', 'paylatertranslation'),
                     'knowMore' => [
-                        'text' => $this->dependencies->l('payplug.getPaylaterTranslations.oneyPopupProductKnowMoreText', 'translation'),
+                        'text' => $this->dependencies->l('paylater.options.live.knowMore.text', 'paylatertranslation'),
                     ],
                 ],
-                'thresholds' => [
-                    'title' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterThresholdsTitle', 'translation'),
-                    'description' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterThresholdsDescription', 'translation'),
-                    'inter' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterThresholdsInter', 'translation'),
-                    'error' => [
-                        'text' => $this->dependencies->l('payplug.getPaylaterTranslations.paylaterThresholdsTitle', 'translation'),
+                'test' => [
+                    'description' => $this->dependencies->l('paylater.options.test.description', 'paylatertranslation'),
+                    'knowMore' => [
+                        'text' => $this->dependencies->l('paylater.options.test.knowMore.text', 'paylatertranslation'),
                     ],
+                ],
+                'advanced' => [
+                    'description' => $this->dependencies->l('paylater.options.advanced.description', 'paylatertranslation'),
+                ],
+                'option1' => [
+                    'label' => $this->dependencies->l('paylater.options.option1.label', 'paylatertranslation'),
+                    'subtext' => $this->dependencies->l('paylater.options.option1.subtext', 'paylatertranslation'),
+                ],
+                'option2' => [
+                    'label' => $this->dependencies->l('paylater.options.option2.label', 'paylatertranslation'),
+                    'subtext' => $this->dependencies->l('paylater.options.option2.subtext', 'paylatertranslation'),
+                ],
+            ],
+            'oneySchedule' => [
+                'title' => $this->dependencies->l('oneySchedule.title', 'paylatertranslation'),
+                'description' => $this->dependencies->l('oneySchedule.description', 'paylatertranslation'),
+                'knowMore' => [
+                    'text' => $this->dependencies->l('oneySchedule.knowMore.text', 'paylatertranslation'),
+                ],
+            ],
+            'oneyPopupProduct' => [
+                'title' => $this->dependencies->l('oneyPopupProduct.title', 'paylatertranslation'),
+                'description' => $this->dependencies->l('oneyPopupProduct.description', 'paylatertranslation'),
+                'knowMore' => [
+                    'text' => $this->dependencies->l('oneyPopupProduct.knowMore.text', 'paylatertranslation'),
+                ],
+            ],
+            'oneyPopupCart' => [
+                'title' => $this->dependencies->l('oneyPopupCart.title', 'paylatertranslation'),
+                'description' => $this->dependencies->l('oneyPopupCart.description', 'paylatertranslation'),
+                'knowMore' => [
+                    'text' => $this->dependencies->l('oneyPopupCart.knowMore.text', 'paylatertranslation'),
+                ],
+            ],
+            'thresholds' => [
+                'title' => $this->dependencies->l('thresholds.title', 'paylatertranslation'),
+                'description' => $this->dependencies->l('thresholds.description', 'paylatertranslation'),
+                'inter' => $this->dependencies->l('thresholds.inter', 'paylatertranslation'),
+                'error' => [
+                    'text' => $this->dependencies->l('thresholds.error.text', 'paylatertranslation'),
                 ],
             ],
         ];
@@ -414,25 +430,24 @@ class Translation
     public function getModalTranslations()
     {
         return [
-            'modal' => [
-                'confirmation' => [
-                    'text' => $this->dependencies->l('payplug.getModalTranslations.modalConfirmationText', 'translation'),
-                    'submit' => $this->dependencies->l('payplug.getModalTranslations.modalConfirmationSubmit', 'translation'),
+            'confirmation' => [
+                'text' => $this->dependencies->l('payplug.getModalTranslations.modalConfirmationText', 'translation'),
+                'submit' => $this->dependencies->l('payplug.getModalTranslations.modalConfirmationSubmit', 'translation'),
+            ],
+            'error' => [
+                'submit' => $this->dependencies->l('payplug.getModalTranslations.modalErrorSubmit', 'translation'),
+            ],
+            'premium' => [
+                'feature' => [
+                    'title' => $this->dependencies->l('modal.premium.feature.title', 'modaltranslation'),
+                    'unavailable' => $this->dependencies->l('modal.premium.feature.unavailable', 'modaltranslation'),
+                    'activateOney' => $this->dependencies->l('modal.premium.feature.activateOney', 'modaltranslation'),
+                    'activateBancontact' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateBancontact', 'translation'),
+                    'activateApplePay' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateApplePay', 'translation'),
+                    'activateAmex' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateAmex', 'translation'),
+                    'activate' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivate', 'translation'),
                 ],
-                'error' => [
-                    'submit' => $this->dependencies->l('payplug.getModalTranslations.modalErrorSubmit', 'translation'),
-                ],
-                'premium' => [
-                    'feature' => [
-                        'unavailable' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureUnavailable', 'translation'),
-                        'activateOney' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateOney', 'translation'),
-                        'activateBancontact' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateBancontact', 'translation'),
-                        'activateApplePay' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateApplePay', 'translation'),
-                        'activateAmex' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateAmex', 'translation'),
-                        'activate' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivate', 'translation'),
-                    ],
-                    'PremiumOk' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumOk', 'translation'),
-                ],
+                'PremiumOk' => $this->dependencies->l('modal.premium.premiumOk', 'modaltranslation'),
             ],
         ];
     }
