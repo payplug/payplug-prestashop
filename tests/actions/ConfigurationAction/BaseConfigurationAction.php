@@ -76,7 +76,12 @@ class BaseConfigurationAction extends TestCase
         $this->dependencies
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
+                'getValidators' => [
+                    'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
+                ],
             ]);
+
+        $this->dependencies->name = 'payplug';
 
         $this->dependencies->name = 'payplug';
 

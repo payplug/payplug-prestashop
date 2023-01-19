@@ -536,7 +536,7 @@ class ConfigurationAction
                 }
             }
 
-            if ('payplug_enable' == $key && (bool) $value) {
+            if ('payplug_enable' == $config) {
                 $module = $this->dependencies->getPlugin()->getModule();
                 $module->getInstanceByName($this->dependencies->name)->enable();
             }
@@ -550,5 +550,48 @@ class ConfigurationAction
                 'close' => $translation['confirmation']['submit'],
             ],
         ];
+    }
+
+    public function checkPermissionAction($payment_method = null)
+    {
+        $validators = $this->dependencies->getValidators();
+        $permissions = $this->dependencies->apiClass->getAccountPermissions();
+
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $modal_translations = $translation->getModalTranslations();
+
+        switch ($payment_method) {
+            case 'oney':
+                $response = $validators['payment']->hasPermissions($permissions, 'can_use_oney');
+
+                if ($response['result'] === true) {
+                    $data = [];
+                } else {
+                    $data = [
+                        'title' => $modal_translations['premium']['feature']['title'],
+                        'msg' => $modal_translations['premium']['feature']['unavailable'] . ' ' . $modal_translations['premium']['feature']['activateOney'],
+                        'close' => $modal_translations['premium']['PremiumOk'],
+                    ];
+                }
+                $response = [
+                    'success' => $response['result'],
+                    'data' => $data,
+                ];
+
+                break;
+            default:
+                $response = [
+                    'success' => false,
+                    'data' => [
+                        'title' => $modal_translations['premium']['feature']['title'],
+                        'msg' => $modal_translations['premium']['feature']['unavailable'] . ' ' . $modal_translations['premium']['feature']['activateOney'],
+                        'close' => $modal_translations['premium']['PremiumOk'],
+                    ],
+                ];
+
+                break;
+        }
+
+        return $response;
     }
 }
