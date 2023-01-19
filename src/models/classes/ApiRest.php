@@ -65,6 +65,10 @@ class ApiRest
             case 'american_express_permissions':
             case 'oney_permissions':
             case 'applepay_permissions':
+                $payment_method = str_replace('_permissions', '', $action);
+                $json = $configurationAction->checkPermissionAction($payment_method);
+
+                break;
             case 'check_requirements':
             case 'refresh_keys':
             case 'save':
@@ -109,13 +113,15 @@ class ApiRest
             'bancontact' => 'no',
             'apple_pay' => 'no',
             'american_express' => 'yes',
-            'oney' => 'no',
-            'oney_type' => 'with_fees',
+            'oney' => $config->get($this->dependencies->getConfigurationKey('oney')),
+            'oney_type' => $config->get($this->dependencies->getConfigurationKey('oneyFees')),
             'oney_thresholds' => '',
-            'oney_thresholds_min' => 100,
-            'oney_thresholds_max' => 3000,
-            'oney_product_animation' => 'no',
-            'payplug_merchant_country' => 'FR',
+            'oney_thresholds_min' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMinAmounts')),
+            'oney_thresholds_max' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMaxAmounts')),
+            'oney_schedule' => $config->get($this->dependencies->getConfigurationKey('oneyOptimized')),
+            'oney_product_animation' => $config->get($this->dependencies->getConfigurationKey('oneyProductCta')),
+            'oney_cart_animation' => $config->get($this->dependencies->getConfigurationKey('oneyCartCta')),
+            'payplug_merchant_country' => $config->get($this->dependencies->getConfigurationKey('companyIso')),
         ];
     }
 
@@ -419,7 +425,42 @@ class ApiRest
     }
 
     /**
-     * @description build oney popup section for api usage
+     * @description build oney schedule section for api usage
+     *
+     * @param false $active
+     *
+     * @return array
+     */
+    public function getOneySchedule($active = false)
+    {
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $paylater_translations = $translation->getPaylaterTranslations();
+
+        if ($this->dependencies->name == 'payplug') {
+            $image = 'payplug-optimized.a4c0a282.svg';
+        } else {
+            $image = 'pspaylater-optimized.61e86ed9.svg';
+        }
+
+        return [
+            'name' => 'oney_schedule',
+            'image_url' => '/modules/' . $this->dependencies->name . '/dist/img/' . $image,
+            'title' => $paylater_translations['oneySchedule']['title'],
+            'descriptions' => [[
+                'description' => $paylater_translations['oneySchedule']['description'],
+                'link_know_more' => [
+                    'text' => $paylater_translations['oneySchedule']['knowMore']['text'],
+                    'url' => 'https://support.payplug.com/hc/fr/articles/360013071080#h_2595dd3d-a281-43ab-a51a-4986fecde5ee',
+                    'target' => '_blank',
+                ],
+            ]],
+            'switch' => true,
+            'checked' => $active,
+        ];
+    }
+
+    /**
+     * @description build oney product popup section for api usage
      *
      * @param false $active
      *
@@ -432,17 +473,29 @@ class ApiRest
 
         return [
             'name' => 'oney_product_animation',
-            //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
-            'image_url' => 'assets/images/product.jpg',
-            'title' => '', // $paylater_translations['paylater']['oneyPopupProduct']['title'],
-            'descriptions' => [[
-                'description' => '', // $paylater_translations['paylater']['oneyPopupProduct']['description'],
-                'link_know_more' => [
-                    'text' => '', // $paylater_translations['paylater']['oneyPopupProduct']['knowMore']['text'],
-                    'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
-                    'target' => '_blank',
-                ],
-            ]],
+            'image_url' => '/modules/' . $this->dependencies->name . '/dist/img/product.cac2b706.jpg',
+            'title' => $paylater_translations['oneyPopupProduct']['title'],
+            'switch' => true,
+            'checked' => $active,
+        ];
+    }
+
+    /**
+     * @description build oney cart popup section for api usage
+     *
+     * @param false $active
+     *
+     * @return array
+     */
+    public function getOneyPopupCart($active = false)
+    {
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $paylater_translations = $translation->getPaylaterTranslations();
+
+        return [
+            'name' => 'oney_cart_animation',
+            'image_url' => '/modules/' . $this->dependencies->name . '/dist/img/cart.e609c919.jpg',
+            'title' => $paylater_translations['oneyPopupCart']['title'],
             'switch' => true,
             'checked' => $active,
         ];
@@ -457,73 +510,105 @@ class ApiRest
      */
     public function getPaylaterSection($options = [])
     {
-        $max = !empty($options['oney_thresholds_max']) ? $options['oney_thresholds_max'] : 3000;
-        $min = !empty($options['oney_thresholds_min']) ? $options['oney_thresholds_min'] : 100;
-        $product_page = !empty($options['oney_product_animation']) && $options['oney_product_animation'] === 'yes' ? true : false;
+        $amountHelper = $this->helpers['amount'];
+
+        if (!empty($options['oney_thresholds_max'])) {
+            $max = $options['oney_thresholds_max'];
+            $max = explode(':', $max);
+            $max = $amountHelper->formatOneyAmount((int) $max[1])['result'];
+        } else {
+            $max = 300000;
+        }
+
+        if (!empty($options['oney_thresholds_min'])) {
+            $min = $options['oney_thresholds_min'];
+            $min = explode(':', $min);
+            $min = $amountHelper->formatOneyAmount((int) $min[1])['result'];
+        } else {
+            $min = 10000;
+        }
+
+        $product_page = !empty($options['oney_product_animation']) && $options['oney_product_animation'] ? true : false;
+        $cart_page = !empty($options['oney_cart_animation']) && $options['oney_cart_animation'] ? true : false;
+        $schedule = !empty($options['oney_schedule']) && $options['oney_schedule'] ? true : false;
+
+        $config = $this->dependencies->getPlugin()->getConfiguration();
+        if (($config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 'BE'
+                || $config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 'ES')
+            && $this->dependencies->name == 'pspaylater') {
+            $advanced_options = [
+                $this->getThresholdsOptions($min, $max),
+                $this->getOneySchedule($schedule),
+            ];
+        } else {
+            $advanced_options = [
+                $this->getThresholdsOptions($min, $max),
+                $this->getOneySchedule($schedule),
+                $this->getOneyPopupProduct($product_page),
+                $this->getOneyPopupCart($cart_page),
+            ];
+        }
 
         $translation = $this->dependencies->getPlugin()->getTranslation();
         $paylater_translations = $translation->getPaylaterTranslations();
 
         return [
             'name' => 'paymentMethodsBlock',
-            'title' => '', // $paylater_translations['paylater']['title'],
+            'title' => $paylater_translations['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => '', // $paylater_translations['paylater']['descriptions']['live']['description'],
+                    'description' => $paylater_translations['descriptions']['live']['description'],
                 ],
                 'sandbox' => [
-                    'description' => '', // $paylater_translations['paylater']['descriptions']['test']['description'],
+                    'description' => $paylater_translations['descriptions']['test']['description'],
                 ],
             ],
             'options' => [
                 'name' => 'oney',
-                'title' => '', // $paylater_translations['paylater']['options']['title'],
+                'title' => $paylater_translations['options']['title'],
                 'image' => 'assets/images/lg-oney.png',
-                'checked' => !empty($options) && $options['oney'] === 'yes',
+                'checked' => !empty($options) && $options['oney'],
                 'descriptions' => [
                     'live' => [
-                        'description' => '', // $paylater_translations['paylater']['options']['descriptions']['live']['description'],
+                        'description' => $paylater_translations['options']['live']['description'],
                         'link_know_more' => [
-                            'text' => '', // $paylater_translations['paylater']['options']['descriptions']['live']['knowMore']['text'],
+                            'text' => $paylater_translations['options']['live']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => '', // $paylater_translations['paylater']['options']['descriptions']['test']['description'],
+                        'description' => $paylater_translations['options']['test']['description'],
                         'link_know_more' => [
-                            'text' => '', // $paylater_translations['paylater']['options']['descriptions']['test']['knowMore']['text'],
+                            'text' => $paylater_translations['options']['test']['knowMore']['text'],
                             'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
                             'target' => '_blank',
                         ],
                     ],
                     'advanced' => [
                         '0' => '',
-                        'description' => '', // $paylater_translations['paylater']['options']['descriptions']['advanced']['description'],
+                        'description' => $paylater_translations['options']['advanced']['description'],
                     ],
                 ],
                 'options' => [
                     [
                         'name' => 'payplug_oney_type',
                         'className' => '_paylaterLabel',
-                        'label' => '', // $paylater_translations['paylater']['options']['option1']['label'],
-                        'subText' => '', // $paylater_translations['paylater']['options']['option1']['subText'],
+                        'label' => $paylater_translations['options']['option1']['label'],
+                        'subText' => $paylater_translations['options']['option1']['subtext'],
                         'value' => 'with_fees',
                         'checked' => !empty($options) && $options['oney_type'] === 'with_fees',
                     ],
                     [
                         'name' => 'payplug_oney_type',
                         'className' => '_paylaterLabel',
-                        'label' => '', // $paylater_translations['paylater']['options']['option2']['label'],
-                        'subText' => '', // $paylater_translations['paylater']['options']['option2']['subText'],
+                        'label' => $paylater_translations['options']['option2']['label'],
+                        'subText' => $paylater_translations['options']['option2']['subtext'],
                         'value' => 'without_fees',
                         'checked' => !empty($options) && $options['oney_type'] === 'without_fees',
                     ],
                 ],
-                'advanced_options' => [
-                    $this->getThresholdsOptions($max, $min),
-                    $this->getOneyPopupProduct($product_page),
-                ],
+                'advanced_options' => $advanced_options,
             ],
         ];
     }
@@ -843,26 +928,35 @@ class ApiRest
         $translation = $this->dependencies->getPlugin()->getTranslation();
         $paylater_translations = $translation->getPaylaterTranslations();
 
+        if ($this->dependencies->name == 'payplug') {
+            $image = 'thresholds.09a2ba52.jpg';
+        } else {
+            $image = 'pspaylater-thresholds.b1d1549c.svg';
+        }
+
         return [
             'name' => 'thresholds',
-            //"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
-            'image_url' => 'assets/images/thresholds.jpg',
-            'title' => '', // $paylater_translations['paylater']['thresholds']['title'],
+            'image_url' => '/modules/' . $this->dependencies->name . '/dist/img/' . $image,
+            'title' => $paylater_translations['thresholds']['title'],
             'descriptions' => [
-                'description' => '', // $paylater_translations['paylater']['thresholds']['description'],
+                'description' => $paylater_translations['thresholds']['description'],
                 'min_amount' => [
                     'name' => 'oney_min_amounts',
                     'value' => $min,
                     'placeholder' => $min,
+                    'min' => 100,
+                    'max' => 3000,
                 ],
-                'inter' => '', // $paylater_translations['paylater']['thresholds']['inter'],
+                'inter' => $paylater_translations['thresholds']['inter'],
                 'max_amount' => [
                     'name' => 'oney_max_amounts',
                     'value' => $max,
                     'placeholder' => $max,
+                    //'min' => 100,
+                    //'max' => 3000,
                 ],
                 'error' => [
-                    'text' => '', // $paylater_translations['paylater']['thresholds']['error']['text'],
+                    'text' => $paylater_translations['thresholds']['error']['text'],
                 ],
             ],
             'switch' => false,
