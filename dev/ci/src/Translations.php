@@ -186,8 +186,17 @@ class Translations
                 $string = $matches[2][$i];
                 $tags = str_replace('\'', '', $matches[3][$i]);
 
-                if ($tags) {
-                    $string = ['string' => $string, 'tags' => $tags];
+                if (isset($matches[6]) && $type_file == 'php') {
+                    $alias = str_replace('\'', '', $matches[6][$i]);
+                    if ($tags) {
+                        $string = ['string' => $string, 'tags' => $tags, 'alias' => $alias];
+                    } else {
+                        $string = ['string' => $string, 'alias' => $alias];
+                    }
+                } else {
+                    if ($tags) {
+                        $string = ['string' => $string, 'tags' => $tags];
+                    }
                 }
 
                 if ($quote === '"') {
@@ -256,18 +265,28 @@ class Translations
 
                 // Write each translation on its module file
                 $template_name = substr(basename($file['name']), 0, -4);
-
+                $alias = '';
                 foreach ($matches as $key) {
+                    $tags = '';
+
                     if (is_array($key)) {
-                        $tags = $key['tags'];
+                        if (isset($key['tags'])) {
+                            $tags = $key['tags'];
+                        }
+                        if (isset($key['alias'])) {
+                            $alias = $key['alias'];
+                        }
                         $key = $key['string'];
-                    } else {
-                        $tags = '';
                     }
 
                     $md5_key = md5($key);
+
                     $trans_key = '<{' . $this->moduleName . '}prestashop>';
-                    $trans_key .= strtolower($template_name) . '_' . $md5_key;
+                    if ($alias) {
+                        $trans_key .= strtolower($alias) . '_' . $md5_key;
+                    } else {
+                        $trans_key .= strtolower($template_name) . '_' . $md5_key;
+                    }
 
                     // to avoid duplicate entry
                     if (!in_array($trans_key, $array_check_duplicate)) {
