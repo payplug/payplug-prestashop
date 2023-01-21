@@ -90,6 +90,10 @@ class PaymentMethod {
             event.preventDefault();
             event.stopPropagation();
             paymentMethod.checkPremium($switch);
+        } else if (isSandBox && payment_method == 'paymentMethod_oney'){
+            event.preventDefault();
+            event.stopPropagation();
+            paymentMethod.checkPremium($switch);
         } else {
             paymentMethod.checkPaymentOptionInformation();
         }
@@ -246,10 +250,21 @@ class PaymentMethod {
                 if (typeof result != 'undefined') {
                     if (switchToggle) {
                         if (typeof result[paymentMethodName] != 'undefined' && !result[paymentMethodName]) {
-                            paymentMethod.handlePaymentMethod(paymentMethodName);
+                            const $sandbox = $('input[name=payplug_sandbox]:checked');
+                            if (parseInt($sandbox.val())) {
+                                if (result['is_oney_spain'] || result['is_oney_belgium']) {
+                                    paymentMethod.handlePaymentMethod(paymentMethodName);
+
+                                } else {
+                                    paymentMethod.checkPaymentOptionInformation();
+                                }
+                            } else {
+                                paymentMethod.handlePaymentMethod(paymentMethodName);
+                            }
                         } else if ('payplug_applepay' == paymentMethodName && !result['applepay_allowed_domains']) {
                             paymentMethod.handlePaymentMethod(paymentMethodName);
-                        } else {
+                        }
+                        else {
                             paymentMethod.checkPaymentOptionInformation();
                         }
                         $('.paymentMethod_switch input').removeAttr('disabled');
