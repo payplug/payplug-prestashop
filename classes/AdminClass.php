@@ -347,7 +347,14 @@ class AdminClass
                 $this->context->shop->domain,
                 $permissions['apple_pay_allowed_domains']
             )['result'];
-
+            $is_spain_allowed_country = $this->validators['payment']->isAllowedCountry(
+                $this->config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries')),
+                'ES'
+            )['result'];
+            $is_belgium_allowed_country = $this->validators['payment']->isAllowedCountry(
+                $this->config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries')),
+                'BE'
+            )['result'];
             $return = [
                     'payplug_sandbox' => $this->validators['payment']->hasPermissions($permissions, 'use_live_mode')['result'],
                     'payplug_one_click' => $this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result'],
@@ -358,6 +365,10 @@ class AdminClass
                     'payplug_inst' => $this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result'],
                     'payplug_deferred' => $this->validators['payment']->hasPermissions($permissions, 'can_create_deferred_payment')['result'],
                     'applepay_allowed_domains' => $applepay_allowed_domains,
+                    'is_oney_spain' => !$this->dependencies->configClass->isValidFeature('feature_spain_oney')
+                        && $is_spain_allowed_country,
+                    'is_oney_belgium' => !$this->dependencies->configClass->isValidFeature('feature_belgium_oney')
+                        && $is_belgium_allowed_country,
                 ];
 
             exit(json_encode($return));
