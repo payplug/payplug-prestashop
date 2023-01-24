@@ -459,7 +459,7 @@ class ApiClass
     {
         try {
             $this->setUserAgent();
-            $response = Authentication::getKeysByLogin($email, $password);
+            $response = Authentication::getKeysByLogin($email, base64_decode($password));
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
