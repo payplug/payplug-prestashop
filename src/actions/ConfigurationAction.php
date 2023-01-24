@@ -108,7 +108,7 @@ class ConfigurationAction
 
         $config = $this->dependencies->getPlugin()->getConfiguration();
         $config->updateValue($this->dependencies->getConfigurationKey('email'), $email);
-        $config->updateValue($this->dependencies->getConfigurationKey('show'), 1);
+        $config->updateValue($this->dependencies->getConfigurationKey('enable'), 1);
         if ((bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
             $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
         }
