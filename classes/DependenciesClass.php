@@ -26,6 +26,7 @@ namespace PayPlug\classes;
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
 use PayPlug\src\models\repositories\CountryRepository;
+use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\FilesHelper;
 use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
@@ -187,12 +188,12 @@ class DependenciesClass
         ],
         'oneyCustomMaxAmounts' => [
             'name' => 'ONEY_CUSTOM_MAX_AMOUNTS',
-            'defaultValue' => 'EUR:3000',
+            'defaultValue' => 'EUR:300000',
             'setConf' => 1,
         ],
         'oneyCustomMinAmounts' => [
             'name' => 'ONEY_CUSTOM_MIN_AMOUNTS',
-            'defaultValue' => 'EUR:100',
+            'defaultValue' => 'EUR:10000',
             'setConf' => 1,
         ],
         'oneyFees' => [
@@ -521,6 +522,7 @@ class DependenciesClass
     private function setHelpers()
     {
         $this->helpers = [
+            'amount' => new AmountHelper(),
             'files' => new FilesHelper(),
             'user' => new UserHelper(),
         ];

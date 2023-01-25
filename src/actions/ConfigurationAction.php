@@ -195,6 +195,7 @@ class ConfigurationAction
      */
     public function saveAction($datas = null)
     {
+        $validators = $this->dependencies->getValidators();
         $logger = $this->dependencies->getPlugin()->getLogger();
 
         if (!is_object($datas) || !$datas) {
@@ -232,15 +233,15 @@ class ConfigurationAction
             $this->dependencies->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
             $this->dependencies->getConfigurationKey('instMode') => 'payplug_inst_mode',
             $this->dependencies->getConfigurationKey('oneClick') => 'payplug_one_click',
-            $this->dependencies->getConfigurationKey('oney') => 'payplug_oney',
-            $this->dependencies->getConfigurationKey('oneyOptimized') => 'payplug_oney_optimized',
-            $this->dependencies->getConfigurationKey('oneyProductCta') => 'payplug_oney_product_cta',
-            $this->dependencies->getConfigurationKey('oneyCartCta') => 'payplug_oney_cart_cta',
-            $this->dependencies->getConfigurationKey('oneyFees') => 'payplug_oney_fees',
+            $this->dependencies->getConfigurationKey('oney') => 'enable_oney',
+            $this->dependencies->getConfigurationKey('oneyOptimized') => 'enable_oney_schedule',
+            $this->dependencies->getConfigurationKey('oneyProductCta') => 'enable_oney_product_animation',
+            $this->dependencies->getConfigurationKey('oneyCartCta') => 'enable_oney_cart_animation',
+            $this->dependencies->getConfigurationKey('oneyFees') => 'payplug_oney',
             $this->dependencies->getConfigurationKey('sandboxMode') => 'payplug_sandbox',
             $this->dependencies->getConfigurationKey('standard') => 'payplug_standard',
-            $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'payplug_oney_custom_max_amounts',
-            $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'payplug_oney_custom_min_amounts',
+            $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'oney_max_amounts',
+            $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'oney_min_amounts',
             $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact',
             $this->dependencies->getConfigurationKey('bancontactCountry') => 'payplug_bancontact_country',
             $this->dependencies->getConfigurationKey('applepay') => 'payplug_applepay',
@@ -291,13 +292,13 @@ class ConfigurationAction
                         }
 
                         break;
-                    case 'payplug_oney_custom_min_amounts':
-                    case 'payplug_oney_custom_max_amounts':
+                    case 'oney_min_amounts':
+                    case 'oney_max_amounts':
                         $oney = $this->dependencies->getPlugin()->getOney();
                         $limit_oney = $oney->getOneyPriceLimit(false);
                         $amount = $datas->{$config};
                         $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
-                        $is_valid_amount = $this->dependencies->getValidators['payment']->isAmount((int) $amount_to_cent, $limit_oney);
+                        $is_valid_amount = $validators['payment']->isAmount((int) $amount_to_cent, $limit_oney);
                         if ($is_valid_amount && !$configuration->updateValue($key, $oney->setCustomOneyLimit((int) $amount_to_cent))) {
                             return [
                                 'success' => false,
@@ -336,12 +337,55 @@ class ConfigurationAction
                 }
             }
 
-            if ('payplug_enable' == $key && (bool) $value) {
+            if ('payplug_enable' == $config) {
                 $module = $this->dependencies->getPlugin()->getModule();
                 $module->getInstanceByName($this->dependencies->name)->enable();
             }
         }
 
         return $this->renderConfiguration();
+    }
+
+    public function checkPermissionAction($payment_method = null)
+    {
+        $validators = $this->dependencies->getValidators();
+        $permissions = $this->dependencies->apiClass->getAccountPermissions();
+
+        $translation = $this->dependencies->getPlugin()->getTranslation();
+        $modal_translations = $translation->getModalTranslations();
+
+        switch ($payment_method) {
+            case 'oney':
+                $response = $validators['payment']->hasPermissions($permissions, 'can_use_oney');
+
+                if ($response['result'] === true) {
+                    $data = [];
+                } else {
+                    $data = [
+                        'title' => $modal_translations['premium']['feature']['title'],
+                        'msg' => $modal_translations['premium']['feature']['unavailable'] . ' ' . $modal_translations['premium']['feature']['activateOney'],
+                        'close' => $modal_translations['premium']['PremiumOk'],
+                    ];
+                }
+                $response = [
+                    'success' => $response['result'],
+                    'data' => $data,
+                ];
+
+                break;
+            default:
+                $response = [
+                    'success' => false,
+                    'data' => [
+                        'title' => $modal_translations['premium']['feature']['title'],
+                        'msg' => $modal_translations['premium']['feature']['unavailable'] . ' ' . $modal_translations['premium']['feature']['activateOney'],
+                        'close' => $modal_translations['premium']['PremiumOk'],
+                    ],
+                ];
+
+                break;
+        }
+
+        return $response;
     }
 }
