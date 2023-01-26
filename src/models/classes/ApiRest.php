@@ -128,19 +128,6 @@ class ApiRest
             (bool) $config->get($this->dependencies->getConfigurationKey('enable'))
         )['result'];
 
-        $psAccountConnected = $this->dependencies->configClass->checkPsAccount();
-        if ($logged && !$psAccountConnected) {
-            $this->dependencies
-                ->getPlugin()
-                ->getConfigurationAction()
-                ->logoutAction();
-            $logged = false;
-        }
-
-        $enable = $this->validators['module']->canBeShown(
-            (bool) $config->get($this->dependencies->getConfigurationKey('enable'))
-        )['result'];
-
         return [
             'logged' => $logged,
             'email' => $config->get($this->dependencies->getConfigurationKey('email')),
@@ -154,18 +141,18 @@ class ApiRest
             'inst_min_amount' => $config->get($this->dependencies->getConfigurationKey('instMinAmount')),
             'deferred' => $config->get($this->dependencies->getConfigurationKey('deferred')),
             'deferred_state' => $config->get($this->dependencies->getConfigurationKey('deferredState')),
-            'oney' => $config->get($this->dependencies->getConfigurationKey('oney')),
-            'oney_fees' => $config->get($this->dependencies->getConfigurationKey('oneyFees')),
-            'oney_schedule' => $config->get($this->dependencies->getConfigurationKey('oneyOptimized')),
-            'oney_product_animation' => $config->get($this->dependencies->getConfigurationKey('oneyProductCta')),
-            'oney_cart_animation' => $config->get($this->dependencies->getConfigurationKey('oneyCartCta')),
+            'oney' => (bool) $config->get($this->dependencies->getConfigurationKey('oney')),
+            'oney_fees' => (bool) $config->get($this->dependencies->getConfigurationKey('oneyFees')),
+            'oney_schedule' => (bool) $config->get($this->dependencies->getConfigurationKey('oneyOptimized')),
+            'oney_product_animation' => (bool) $config->get($this->dependencies->getConfigurationKey('oneyProductCta')),
+            'oney_cart_animation' => (bool) $config->get($this->dependencies->getConfigurationKey('oneyCartCta')),
             'oney_thresholds_min' => $config->get($this->dependencies->getConfigurationKey('oneyMinAmounts')),
             'oney_thresholds_max' => $config->get($this->dependencies->getConfigurationKey('oneyMaxAmounts')),
             'oney_custom_thresholds_min' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMinAmounts')),
             'oney_custom_thresholds_max' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMaxAmounts')),
-            'bancontact' => $config->get($this->dependencies->getConfigurationKey('bancontact')),
-            'bancontact_country' => $config->get($this->dependencies->getConfigurationKey('bancontactCountry')),
-            'applepay' => $config->get($this->dependencies->getConfigurationKey('applepay')),
+            'bancontact' => (bool) $config->get($this->dependencies->getConfigurationKey('bancontact')),
+            'bancontact_country' => (bool) $config->get($this->dependencies->getConfigurationKey('bancontactCountry')),
+            'applepay' => (bool) $config->get($this->dependencies->getConfigurationKey('applepay')),
         ];
     }
 
@@ -470,6 +457,9 @@ class ApiRest
     public function getOneySchedule($active = false)
     {
         if (!is_bool($active)) {
+            $logger = $this->dependencies->getPlugin()->getLogger();
+            $logger->addLog('ApiRest::getOneySchedule: Invalid parameter given, $active must be a boolean.');
+
             return [];
         }
 
@@ -495,7 +485,7 @@ class ApiRest
 
         return [
             'name' => 'oney_schedule',
-            'image_url' => $img_path . $this->dependencies->name . '-thresholds.jpg',
+            'image_url' => $img_path . $this->dependencies->name . '-optimized.jpg',
             'title' => $translation['oneySchedule']['title'],
             'descriptions' => [[
                 'description' => $translation['oneySchedule']['description'],
@@ -519,6 +509,13 @@ class ApiRest
      */
     public function getOneyPopupCart($active = false)
     {
+        if (!is_bool($active)) {
+            $logger = $this->dependencies->getPlugin()->getLogger();
+            $logger->addLog('ApiRest::getOneyPopupProduct: Invalid parameter given, $active must be a boolean.');
+
+            return [];
+        }
+
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslation()
@@ -547,6 +544,13 @@ class ApiRest
      */
     public function getOneyPopupProduct($active = false)
     {
+        if (!is_bool($active)) {
+            $logger = $this->dependencies->getPlugin()->getLogger();
+            $logger->addLog('ApiRest::getOneyPopupCart: Invalid parameter given, $active must be a boolean.');
+
+            return [];
+        }
+
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslation()
@@ -577,6 +581,9 @@ class ApiRest
     public function getPaylaterSection($current_configuration = [])
     {
         if (!is_array($current_configuration)) {
+            $logger = $this->dependencies->getPlugin()->getLogger();
+            $logger->addLog('ApiRest::getPaylaterSection: Invalid parameter given, $current_configuration must be an array.');
+
             return [];
         }
 
@@ -590,6 +597,7 @@ class ApiRest
             'oney_schedule' => false,
             'oney_fees' => true,
         ];
+
         foreach ($default_configuration as $k => $v) {
             if (!isset($current_configuration[$k])) {
                 $current_configuration[$k] = $v;
@@ -702,8 +710,6 @@ class ApiRest
     /**
      * @description build payment methods section for api usage
      * @todo: divide the get of the different payment method in relative class
-     *
-     * @param mixed $current_configuration
      *
      * @param mixed $current_configuration
      *
@@ -1279,6 +1285,9 @@ class ApiRest
     public function getThresholdsOptions($current_configuration = [])
     {
         if (!is_array($current_configuration)) {
+            $logger = $this->dependencies->getPlugin()->getLogger();
+            $logger->addLog('ApiRest::getThresholdsOptions: Invalid parameter given, $min must be an array.');
+
             return [];
         }
 
@@ -1313,20 +1322,14 @@ class ApiRest
             ->getTranslation()
             ->getPaylaterTranslations();
 
-        if ('payplug' == $this->dependencies->name) {
-            $image = 'thresholds.09a2ba52.jpg';
-        } else {
-            $image = 'pspaylater-thresholds.b1d1549c.svg';
-        }
-
         $img_path = $this->dependencies
             ->getPlugin()
             ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/img/';
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
 
         return [
             'name' => 'thresholds',
-            'image_url' => $img_path . $image,
+            'image_url' => $img_path . $this->dependencies->name . '-thresholds.jpg',
             'title' => $translation['thresholds']['title'],
             'descriptions' => [
                 'description' => $translation['thresholds']['description'],
