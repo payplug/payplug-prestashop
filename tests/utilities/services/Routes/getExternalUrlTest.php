@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group service
  * @group routes_service
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */

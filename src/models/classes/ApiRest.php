@@ -36,9 +36,11 @@ class ApiRest
     }
 
     /**
-     * @description build toto section for api usage
+     * @description Dispatch renders for a given action
      *
      * @param string $action
+     *
+     * @return array
      */
     public function dispatch($action = '')
     {
@@ -46,7 +48,7 @@ class ApiRest
             $logger = $this->dependencies->getPlugin()->getLogger();
             $logger->addLog('ApiRest::dispatch: Invalid parameter given, $action must be a non empty string.');
 
-            exit(json_encode([]));
+            return [];
         }
 
         $configurationAction = $this->dependencies->getPlugin()->getConfigurationAction();
@@ -61,6 +63,9 @@ class ApiRest
                 $json = $configurationAction->logoutAction();
 
                 break;
+            case 'deferred_permissions':
+            case 'installment_permissions':
+            case 'one_click_permissions':
             case 'bancontact_permissions':
             case 'american_express_permissions':
             case 'oney_permissions':
@@ -83,11 +88,11 @@ class ApiRest
                 break;
         }
 
-        exit(json_encode($json));
+        return $json;
     }
 
     /**
-     * @description build toto section for api usage
+     * @description Get current configuration from database
      *
      * @return array
      */
@@ -95,51 +100,6 @@ class ApiRest
     {
         $config = $this->dependencies->getPlugin()->getConfiguration();
 
-        return [
-            'rest_route' => '/payplug_api/login',
-            'action' => 'payplug_login',
-            'payplug_email' => $config->get($this->dependencies->getConfigurationKey('email')),
-            'payplug_password' => 'testplugin@21',
-            'enabled' => 'yes',
-            'title' => 'Pay by credit card',
-            'description' => 'sedfghj',
-            'email' => $config->get($this->dependencies->getConfigurationKey('email')),
-            'payplug_test_key' => 'sk_test_5viLdhhYB58UuSH0C49p0g',
-            'payplug_merchant_id' => '433983',
-            'mode' => 'yes',
-            'payment_method' => 'popup',
-            'debug' => 'no',
-            'oneclick' => 'no',
-            'bancontact' => 'no',
-            'apple_pay' => 'no',
-            'american_express' => 'yes',
-            'oney' => $config->get($this->dependencies->getConfigurationKey('oney')),
-            'oney_type' => $config->get($this->dependencies->getConfigurationKey('oneyFees')),
-            'oney_thresholds' => '',
-            'oney_thresholds_min' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMinAmounts')),
-            'oney_thresholds_max' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMaxAmounts')),
-            'oney_schedule' => $config->get($this->dependencies->getConfigurationKey('oneyOptimized')),
-            'oney_product_animation' => $config->get($this->dependencies->getConfigurationKey('oneyProductCta')),
-            'oney_cart_animation' => $config->get($this->dependencies->getConfigurationKey('oneyCartCta')),
-            'payplug_merchant_country' => $config->get($this->dependencies->getConfigurationKey('companyIso')),
-        ];
-    }
-
-    /**
-     * @description  build header section of the json file
-     *
-     * @return array
-     */
-    public function getHeaderSection()
-    {
-        $module_version = $this->dependencies->version;
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-        $is_shown = $this->validators['module']->canBeShown(
-            (bool) $config->get($this->dependencies->getConfigurationKey('enable'))
-        );
-
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $header_translations = $translation->getHeaderTranslations();
         $userHelper = $this->helpers['user'];
         $is_api_key = $this->validators['account']->isApiKey(
             $config->get($this->dependencies->getConfigurationKey('testApiKey'))
@@ -155,36 +115,88 @@ class ApiRest
             )['result'];
         }
 
+        $psAccountConnected = $this->dependencies->configClass->checkPsAccount();
+        if ($logged && !$psAccountConnected) {
+            $this->dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->logoutAction();
+            $logged = false;
+        }
+
+        $enable = $this->validators['module']->canBeShown(
+            (bool) $config->get($this->dependencies->getConfigurationKey('enable'))
+        )['result'];
+
         return [
-            'title' => $header_translations['title'],
-            'descriptions' => [
-                'live' => [
-                    'description' => $header_translations['text'],
-                    'plugin_version' => $module_version,
-                ],
-                'sandbox' => [
-                    'description' => $header_translations['text'],
-                    'plugin_version' => $module_version,
-                ],
-            ],
-            'options' => [
-                'type' => 'select',
-                'name' => 'payplug_enable',
-                'disabled' => !$this->dependencies->configClass->checkPsAccount() || !$logged,
-                'options' => [
-                    [
-                        'value' => 1,
-                        'label' => $header_translations['visible'],
-                        'checked' => $is_shown['result'],
-                    ],
-                    [
-                        'value' => 0,
-                        'label' => $header_translations['hidden'],
-                        'checked' => !$is_shown['result'],
-                    ],
-                ],
+            'logged' => $logged,
+            'email' => $config->get($this->dependencies->getConfigurationKey('email')),
+            'enable' => $enable,
+            'sandbox_mode' => $config->get($this->dependencies->getConfigurationKey('sandboxMode')),
+            'embedded_mode' => $config->get($this->dependencies->getConfigurationKey('embeddedMode')),
+            'standard' => $config->get($this->dependencies->getConfigurationKey('standard')),
+            'one_click' => $config->get($this->dependencies->getConfigurationKey('oneClick')),
+            'inst' => $config->get($this->dependencies->getConfigurationKey('inst')),
+            'inst_mode' => $config->get($this->dependencies->getConfigurationKey('instMode')),
+            'inst_min_amount' => $config->get($this->dependencies->getConfigurationKey('instMinAmount')),
+            'deferred' => $config->get($this->dependencies->getConfigurationKey('deferred')),
+            'deferred_state' => $config->get($this->dependencies->getConfigurationKey('deferredState')),
+            'oney' => $config->get($this->dependencies->getConfigurationKey('oney')),
+            'oney_fees' => $config->get($this->dependencies->getConfigurationKey('oneyFees')),
+            'oney_schedule' => $config->get($this->dependencies->getConfigurationKey('oneyOptimized')),
+            'oney_product_animation' => $config->get($this->dependencies->getConfigurationKey('oneyProductCta')),
+            'oney_cart_animation' => $config->get($this->dependencies->getConfigurationKey('oneyCartCta')),
+            'oney_thresholds_min' => $config->get($this->dependencies->getConfigurationKey('oneyMinAmounts')),
+            'oney_thresholds_max' => $config->get($this->dependencies->getConfigurationKey('oneyMaxAmounts')),
+            'oney_custom_thresholds_min' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMinAmounts')),
+            'oney_custom_thresholds_max' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMaxAmounts')),
+            'bancontact' => $config->get($this->dependencies->getConfigurationKey('bancontact')),
+            'bancontact_country' => $config->get($this->dependencies->getConfigurationKey('bancontactCountry')),
+            'applepay' => $config->get($this->dependencies->getConfigurationKey('applepay')),
+        ];
+    }
+
+    public function getDeferredState($deferred_state = 0)
+    {
+        if (!is_int($deferred_state)) {
+            return [];
+        }
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getPaymentMethodsTranslations();
+
+        $order_states = $this->dependencies
+            ->orderClass
+            ->getOrderStates();
+
+        $order_states_values = [
+            0 => [
+                'value' => 0,
+                'label' => $translation['deferred']['states']['default'],
+                'checked' => (int) $deferred_state ? false : true,
             ],
         ];
+        if ($order_states) {
+            foreach ($order_states as $order_state) {
+                $order_states_values[$order_state['id_order_state']] = [
+                    'value' => $order_state['id_order_state'],
+                    'label' => sprintf(
+                        $translation['deferred']['states']['state'],
+                        $order_state['name']
+                    ),
+                    'checked' => $order_state['id_order_state'] == $deferred_state ? true : false,
+                    'warning_msg' => sprintf(
+                        $translation['deferred']['states']['alert'],
+                        $order_state['name']
+                    ),
+                ];
+            }
+        }
+        ksort($order_states_values);
+
+        return $order_states_values;
     }
 
     /**
@@ -219,12 +231,68 @@ class ApiRest
     }
 
     /**
-     * @description build logged section for api usage
+     * @description  build header section of the json file
+     *
+     * @param mixed $current_configuration
      *
      * @return array
      */
-    public function getLoggedSection()
+    public function getHeaderSection($current_configuration = [])
     {
+        if (!is_array($current_configuration)) {
+            return [];
+        }
+
+        $translation = $this->dependencies->getPlugin()->getTranslation()->getHeaderTranslations();
+
+        $is_logged = isset($current_configuration['logged']) ? $current_configuration['logged'] : false;
+        $enable = isset($current_configuration['enable']) ? $current_configuration['enable'] : false;
+
+        return [
+            'title' => $translation['title'],
+            'descriptions' => [
+                'live' => [
+                    'description' => $translation['text'],
+                    'plugin_version' => $this->dependencies->version,
+                ],
+                'sandbox' => [
+                    'description' => $translation['text'],
+                    'plugin_version' => $this->dependencies->version,
+                ],
+            ],
+            'options' => [
+                'type' => 'select',
+                'name' => 'payplug_enable',
+                'disabled' => !$this->dependencies->configClass->checkPsAccount() || !$is_logged,
+                'options' => [
+                    [
+                        'value' => 1,
+                        'label' => $translation['visible'],
+                        'checked' => $enable,
+                    ],
+                    [
+                        'value' => 0,
+                        'label' => $translation['hidden'],
+                        'checked' => !$enable,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @description build logged section for api usage
+     *
+     * @param mixed $current_configuration
+     *
+     * @return array
+     */
+    public function getLoggedSection($current_configuration = [])
+    {
+        if (!is_array($current_configuration)) {
+            return [];
+        }
+
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslation()
@@ -235,8 +303,11 @@ class ApiRest
             ->get();
         $iso_code = $context->language->iso_code;
 
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-        $is_sandbox = (bool) $config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $config = $this->dependencies
+            ->getPlugin()
+            ->getConfiguration();
+
+        $is_sandbox = isset($current_configuration['sandbox_mode']) ? $current_configuration['sandbox_mode'] : true;
         $inactive = (bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'));
 
         return [
@@ -291,13 +362,13 @@ class ApiRest
                 [
                     'name' => 'payplug_sandbox',
                     'label' => $translation['mode']['options']['sandbox'],
-                    'value' => 1, //live
+                    'value' => 1,
                     'checked' => $is_sandbox,
                 ],
                 [
                     'name' => 'payplug_sandbox',
                     'label' => $translation['mode']['options']['live'],
-                    'value' => 0, //test
+                    'value' => 0,
                     'checked' => !$is_sandbox,
                 ],
             ],
@@ -377,54 +448,6 @@ class ApiRest
     }
 
     /**
-     * @description build subscribe section for api usage
-     *
-     * @return array
-     */
-    public function getSubscribeSection()
-    {
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getSubscribeTranslations();
-
-        $register_link = $this->dependencies
-            ->getPlugin()
-            ->getRoutes()
-            ->getExternalUrl()['signup'];
-        if ($this->dependencies->name == 'pspaylater') {
-            $register_link .= '/signup?sponsor=22101';
-        }
-
-        return [
-            'name' => 'generalSubscribe',
-            'title' => $translation['title'],
-            'descriptions' => [
-                'live' => [
-                    'description' => $translation['description'],
-                    'link_create_account' => [
-                        'text' => $translation['register'],
-                        'url' => $register_link,
-                        'target' => '_blank',
-                    ],
-                    'content_description' => $translation['text'],
-                    'already_have_account' => $translation['connect'],
-                ],
-                'sandbox' => [
-                    'description' => $translation['description'],
-                    'link_create_account' => [
-                        'text' => $translation['register'],
-                        'url' => $register_link,
-                        'target' => '_blank',
-                    ],
-                    'content_description' => $translation['text'],
-                    'already_have_account' => $translation['connect'],
-                ],
-            ],
-        ];
-    }
-
-    /**
      * @description build oney schedule section for api usage
      *
      * @param false $active
@@ -433,48 +456,42 @@ class ApiRest
      */
     public function getOneySchedule($active = false)
     {
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $paylater_translations = $translation->getPaylaterTranslations();
-
-        if ($this->dependencies->name == 'payplug') {
-            $image = 'payplug-optimized.a4c0a282.svg';
-        } else {
-            $image = 'pspaylater-optimized.61e86ed9.svg';
+        if (!is_bool($active)) {
+            return [];
         }
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getPaylaterTranslations();
+
+        $img_path = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
+
+        $iso_code = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get()->language->iso_code;
+
+        $external_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($iso_code);
 
         return [
             'name' => 'oney_schedule',
-            'image_url' => '/modules/' . $this->dependencies->name . '/dist/img/' . $image,
-            'title' => $paylater_translations['oneySchedule']['title'],
+            'image_url' => $img_path . $this->dependencies->name . '-thresholds.jpg',
+            'title' => $translation['oneySchedule']['title'],
             'descriptions' => [[
-                'description' => $paylater_translations['oneySchedule']['description'],
+                'description' => $translation['oneySchedule']['description'],
                 'link_know_more' => [
-                    'text' => $paylater_translations['oneySchedule']['knowMore']['text'],
-                    'url' => 'https://support.payplug.com/hc/fr/articles/360013071080#h_2595dd3d-a281-43ab-a51a-4986fecde5ee',
+                    'text' => $translation['link'],
+                    'url' => $external_url['oney'] . '#h_2595dd3d-a281-43ab-a51a-4986fecde5ee',
                     'target' => '_blank',
                 ],
             ]],
-            'switch' => true,
-            'checked' => $active,
-        ];
-    }
-
-    /**
-     * @description build oney product popup section for api usage
-     *
-     * @param false $active
-     *
-     * @return array
-     */
-    public function getOneyPopupProduct($active = false)
-    {
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $paylater_translations = $translation->getPaylaterTranslations();
-
-        return [
-            'name' => 'oney_product_animation',
-            'image_url' => '/modules/' . $this->dependencies->name . '/dist/img/product.cac2b706.jpg',
-            'title' => $paylater_translations['oneyPopupProduct']['title'],
             'switch' => true,
             'checked' => $active,
         ];
@@ -489,13 +506,48 @@ class ApiRest
      */
     public function getOneyPopupCart($active = false)
     {
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $paylater_translations = $translation->getPaylaterTranslations();
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getPaylaterTranslations();
+
+        $img_path = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
 
         return [
             'name' => 'oney_cart_animation',
-            'image_url' => '/modules/' . $this->dependencies->name . '/dist/img/cart.e609c919.jpg',
-            'title' => $paylater_translations['oneyPopupCart']['title'],
+            'image_url' => $img_path . $this->dependencies->name . '-cartOneyCta.jpg',
+            'title' => $translation['oneyPopupCart']['title'],
+            'switch' => true,
+            'checked' => $active,
+        ];
+    }
+
+    /**
+     * @description build oney product popup section for api usage
+     *
+     * @param false $active
+     *
+     * @return array
+     */
+    public function getOneyPopupProduct($active = false)
+    {
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getPaylaterTranslations();
+
+        $img_path = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
+
+        return [
+            'name' => 'oney_product_animation',
+            'image_url' => $img_path . $this->dependencies->name . '-productOneyCta.jpg',
+            'title' => $translation['oneyPopupProduct']['title'],
             'switch' => true,
             'checked' => $active,
         ];
@@ -505,107 +557,128 @@ class ApiRest
      * @description build paylater section for api usage
      *
      * @param array $options
+     * @param mixed $current_configuration
      *
      * @return array
      */
-    public function getPaylaterSection($options = [])
+    public function getPaylaterSection($current_configuration = [])
     {
-        $amountHelper = $this->helpers['amount'];
-
-        if (!empty($options['oney_thresholds_max'])) {
-            $max = $options['oney_thresholds_max'];
-            $max = explode(':', $max);
-            $max = $amountHelper->formatOneyAmount((int) $max[1])['result'];
-        } else {
-            $max = 300000;
+        if (!is_array($current_configuration)) {
+            return [];
         }
 
-        if (!empty($options['oney_thresholds_min'])) {
-            $min = $options['oney_thresholds_min'];
-            $min = explode(':', $min);
-            $min = $amountHelper->formatOneyAmount((int) $min[1])['result'];
-        } else {
-            $min = 10000;
+        // todo: get this default value from dependenciesClass (alike)
+        $default_configuration = [
+            'oney' => false,
+            'oney_custom_thresholds_min' => 'EUR:10000',
+            'oney_custom_thresholds_max' => 'EUR:300000',
+            'oney_product_animation' => true,
+            'oney_cart_animation' => true,
+            'oney_schedule' => false,
+            'oney_fees' => true,
+        ];
+        foreach ($default_configuration as $k => $v) {
+            if (!isset($current_configuration[$k])) {
+                $current_configuration[$k] = $v;
+            }
         }
 
-        $product_page = !empty($options['oney_product_animation']) && $options['oney_product_animation'] ? true : false;
-        $cart_page = !empty($options['oney_cart_animation']) && $options['oney_cart_animation'] ? true : false;
-        $schedule = !empty($options['oney_schedule']) && $options['oney_schedule'] ? true : false;
-
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-        if (($config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 'BE'
-                || $config->get($this->dependencies->getConfigurationKey('sandboxMode')) == 'ES')
-            && $this->dependencies->name == 'pspaylater') {
-            $advanced_options = [
-                $this->getThresholdsOptions($min, $max),
-                $this->getOneySchedule($schedule),
-            ];
-        } else {
-            $advanced_options = [
-                $this->getThresholdsOptions($min, $max),
-                $this->getOneySchedule($schedule),
-                $this->getOneyPopupProduct($product_page),
-                $this->getOneyPopupCart($cart_page),
-            ];
+        $advanced_options = [];
+        $thresholds = $this->getThresholdsOptions($current_configuration);
+        if ($thresholds) {
+            $advanced_options[] = $thresholds;
+        }
+        $schedules = $this->getOneySchedule((bool) $current_configuration['oney_schedule']);
+        if ($schedules) {
+            $advanced_options[] = $schedules;
         }
 
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $paylater_translations = $translation->getPaylaterTranslations();
+        $config = $this->dependencies
+            ->getPlugin()
+            ->getConfiguration();
+        $can_use_cta = !in_array(
+            $config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries')),
+            ['ES', 'BE']
+        );
+        if ($can_use_cta) {
+            $product = $this->getOneyPopupProduct((bool) $current_configuration['oney_product_animation']);
+            if ($product) {
+                $advanced_options[] = $product;
+            }
+            $cart = $this->getOneyPopupCart((bool) $current_configuration['oney_cart_animation']);
+            if ($cart) {
+                $advanced_options[] = $cart;
+            }
+        }
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getPaylaterTranslations();
+
+        $iso_code = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get()->language->iso_code;
+
+        $external_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($iso_code);
 
         return [
             'name' => 'paymentMethodsBlock',
-            'title' => $paylater_translations['title'],
+            'title' => $translation['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => $paylater_translations['descriptions']['live']['description'],
+                    'description' => $translation['description'],
                 ],
                 'sandbox' => [
-                    'description' => $paylater_translations['descriptions']['test']['description'],
+                    'description' => $translation['description'],
                 ],
             ],
             'options' => [
                 'name' => 'oney',
-                'title' => $paylater_translations['options']['title'],
+                'title' => $translation['options']['title'],
                 'image' => 'assets/images/lg-oney.png',
-                'checked' => !empty($options) && $options['oney'],
+                'checked' => $current_configuration['oney'],
                 'descriptions' => [
                     'live' => [
-                        'description' => $paylater_translations['options']['live']['description'],
+                        'description' => $translation['options']['description'],
                         'link_know_more' => [
-                            'text' => $paylater_translations['options']['live']['knowMore']['text'],
-                            'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                            'text' => $translation['link'],
+                            'url' => $external_url['oney'],
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => $paylater_translations['options']['test']['description'],
+                        'description' => $translation['options']['description'],
                         'link_know_more' => [
-                            'text' => $paylater_translations['options']['test']['knowMore']['text'],
-                            'url' => 'https://support.payplug.com/hc/fr/articles/4408142346002',
+                            'text' => $translation['link'],
+                            'url' => $external_url['oney'],
                             'target' => '_blank',
                         ],
                     ],
                     'advanced' => [
-                        '0' => '',
-                        'description' => $paylater_translations['options']['advanced']['description'],
+                        'description' => $translation['advanced'],
                     ],
                 ],
                 'options' => [
                     [
                         'name' => 'payplug_oney_type',
                         'className' => '_paylaterLabel',
-                        'label' => $paylater_translations['options']['option1']['label'],
-                        'subText' => $paylater_translations['options']['option1']['subtext'],
+                        'label' => $translation['options']['with_fees']['label'],
+                        'subText' => $translation['options']['with_fees']['subtext'],
                         'value' => 'with_fees',
-                        'checked' => !empty($options) && $options['oney_type'] === 'with_fees',
+                        'checked' => $current_configuration['oney_fees'],
                     ],
                     [
                         'name' => 'payplug_oney_type',
                         'className' => '_paylaterLabel',
-                        'label' => $paylater_translations['options']['option2']['label'],
-                        'subText' => $paylater_translations['options']['option2']['subtext'],
+                        'label' => $translation['options']['without_fees']['label'],
+                        'subText' => $translation['options']['without_fees']['subtext'],
                         'value' => 'without_fees',
-                        'checked' => !empty($options) && $options['oney_type'] === 'without_fees',
+                        'checked' => !$current_configuration['oney_fees'],
                     ],
                 ],
                 'advanced_options' => $advanced_options,
@@ -615,204 +688,426 @@ class ApiRest
 
     /**
      * @description build payment methods section for api usage
+     * @todo: divide the get of the different payment method in relative class
+     *
+     * @param mixed $current_configuration
      *
      * @return array
      */
-    public function getPaymentMethodsSection()
+    public function getPaymentMethodsSection($current_configuration = [])
     {
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $payment_methods_translations = $translation->getPaymentMethodsTranslations();
+        if (!is_array($current_configuration)) {
+            return [];
+        }
 
-        return [
-            'name' => 'paymentMethodsBlock',
-            'title' => '', // $payment_methods_translations['paymentMethods']['title'],
-            'descriptions' => [
-                'live' => [
-                    'description' => '', // $payment_methods_translations['paymentMethods']['descriptions']['live']['description'],
-                ],
-                'sandbox' => [
-                    'description' => '', // $payment_methods_translations['paymentMethods']['descriptions']['test']['description'],
-                ],
-            ],
-            'options' => [
-                [
-                    'type' => 'payment_option',
-                    'sub_type' => 'input',
-                    'name' => 'standard_payment_title',
-                    'title' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['title'],
-                    'value' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['value'],
-                    'descriptions' => [
-                        'live' => [
-                            'description' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['live']['description'],
-                            'placeholder' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['live']['placeholder'],
-                        ],
-                        'sandbox' => [
-                            'description' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['test']['description'],
-                            'placeholder' => '', // $payment_methods_translations['paymentMethods']['standard']['title']['descriptions']['test']['placeholder'],
-                        ],
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getPaymentMethodsTranslations();
+
+        $img_path = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/svg/payment/';
+
+        $iso_code = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get()->language->iso_code;
+
+        $external_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($iso_code);
+
+        // todo: get this default value from dependenciesClass (alike)
+        $default_configuration = [
+            'standard' => true,
+            'embedded_mode' => 'redirected',
+            'one_click' => false,
+            'inst' => false,
+            'inst_mode' => 3,
+            'inst_min_amount' => 150,
+            'deferred' => false,
+            'deferred_state' => 0,
+            'american_express' => false,
+            'bancontact' => false,
+            'bancontact_country' => false,
+            'applepay' => false,
+        ];
+        foreach ($default_configuration as $k => $v) {
+            if (!isset($current_configuration[$k])) {
+                $current_configuration[$k] = $v;
+            }
+        }
+
+        $payment_options = [];
+        if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
+            $advanced_settings = [];
+
+            $embedded_mode = [];
+            if ($this->dependencies->configClass->isValidFeature('feature_integrated')) {
+                $embedded_mode[] = [
+                    'name' => 'payplug_embedded',
+                    'label' => $translation['embedded']['options']['integrated'],
+                    'value' => 'integrated',
+                    'checked' => 'integrated' == $current_configuration['embedded_mode'],
+                ];
+            }
+            $embedded_mode[] = [
+                'name' => 'payplug_embedded',
+                'label' => $translation['embedded']['options']['popup'],
+                'value' => 'popup',
+                'checked' => 'popup' == $current_configuration['embedded_mode'],
+            ];
+            $embedded_mode[] = [
+                'name' => 'payplug_embedded',
+                'label' => $translation['embedded']['options']['redirect'],
+                'value' => 'redirected',
+                'checked' => 'redirected' == $current_configuration['embedded_mode'],
+            ];
+
+            if ($this->dependencies->configClass->isValidFeature('feature_installment')) {
+                $advanced_settings[] = [
+                    'name' => 'fractional',
+                    'title' => $translation['installment']['title'],
+                    'class' => '-installment',
+                    'enabled' => [
+                        'name' => 'payplug_inst',
+                        'checked' => $current_configuration['inst'],
                     ],
-                ],
-                [
-                    'type' => 'payment_option',
-                    'sub_type' => 'input',
-                    'name' => 'standard_payment_description',
-                    'title' => '', // $payment_methods_translations['paymentMethods']['standard']['description']['title'],
-                    'value' => '', // $payment_methods_translations['paymentMethods']['standard']['description']['value'],
                     'descriptions' => [
                         'live' => [
-                            'description' => '', // $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['live']['description'],
-                            'placeholder' => '', // $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['live']['placeholder'],
-                        ],
-                        'sandbox' => [
-                            'description' => '', // $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['test']['description'],
-                            'placeholder' => '', // $payment_methods_translations['paymentMethods']['standard']['descriptions']['descriptions']['test']['placeholder'],
-                        ],
-                    ],
-                ],
-                [
-                    'type' => 'payment_option',
-                    'sub_type' => 'IOptions',
-                    'name' => 'embeded',
-                    'title' => '', // $payment_methods_translations['paymentMethods']['embedded']['title'],
-                    'descriptions' => [
-                        'live' => [
-                            'description_redirect' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['descriptionRedirect'],
-                            'description_popup' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['descriptionPopup'],
-                            'link_know_more' => [
-                                'text' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['live']['knowMore']['text'],
-                                'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
-                                'target' => '_blank',
+                            'description_1' => $translation['installment']['descriptions']['description_1'],
+                            'text_from' => $translation['installment']['descriptions']['text_from'],
+                            'description_2' => $translation['installment']['descriptions']['description_2'],
+                            'links' => [
+                                [
+                                    'text' => $translation['installment']['descriptions']['controller_link'],
+                                    'url' => '#some_url',
+                                    'target' => '_blank',
+                                ],
+                                [
+                                    'text' => $translation['installment']['link'],
+                                    'url' => $external_url['installments'],
+                                    'target' => '_blank',
+                                ],
+                            ],
+                            'notes' => [
+                                'type' => '-warning',
+                                'description' => $translation['installment']['descriptions']['alert'],
                             ],
                         ],
                         'sandbox' => [
-                            'description_redirect' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['descriptionRedirect'],
-                            'description_popup' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['descriptionPopup'],
-                            'link_know_more' => [
-                                'text' => '', // $payment_methods_translations['paymentMethods']['embedded']['descriptions']['test']['knowMore']['text'],
-                                'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
-                                'target' => '_blank',
+                            'description_1' => $translation['installment']['descriptions']['description_1'],
+                            'text_from' => $translation['installment']['descriptions']['text_from'],
+                            'description_2' => $translation['installment']['descriptions']['description_2'],
+                            'links' => [
+                                [
+                                    'text' => $translation['installment']['descriptions']['controller_link'],
+                                    'url' => '#some_url',
+                                    'target' => '_blank',
+                                ],
+                                [
+                                    'text' => $translation['installment']['link'],
+                                    'url' => $external_url['installments'],
+                                    'target' => '_blank',
+                                ],
+                            ],
+                            'notes' => [
+                                'type' => '-warning',
+                                'description' => $translation['installment']['descriptions']['alert'],
                             ],
                         ],
                     ],
                     'options' => [
                         [
-                            'name' => 'payplug_embedded',
-                            'label' => 'Pop-up',
-                            'value' => '', // $payment_methods_translations['paymentMethods']['embedded']['popupValue'],
-                            'checked' => true,
+                            'name' => 'payplug_inst_mode',
+                            'type' => 'select',
+                            'disabled' => !$current_configuration['inst'],
+                            'options' => [
+                                [
+                                    'value' => 2,
+                                    'label' => $translation['installment']['select']['2_schedules'],
+                                    'checked' => 2 == (int) $current_configuration['inst_mode'],
+                                ],
+                                [
+                                    'value' => 3,
+                                    'label' => $translation['installment']['select']['3_schedules'],
+                                    'checked' => 3 == (int) $current_configuration['inst_mode'],
+                                ],
+                                [
+                                    'value' => 4,
+                                    'label' => $translation['installment']['select']['4_schedules'],
+                                    'checked' => 4 == (int) $current_configuration['inst_mode'],
+                                ],
+                            ],
                         ],
                         [
-                            'name' => 'payplug_embedded',
-                            'label' => 'Redirected',
-                            'value' => '', // $payment_methods_translations['paymentMethods']['embedded']['redirectValue'],
-                            'checked' => false,
+                            'type' => 'input',
+                            'name' => 'payplug_inst_min_amount',
+                            'disabled' => !$current_configuration['inst'],
+                            'value' => (int) $current_configuration['inst_min_amount'],
+                            'min' => 4,
+                            'step' => 1,
+                            'max' => 20000,
+                            'out_of_bound_msg' => $translation['installment']['error_limit'],
                         ],
                     ],
-                ],
-                [
-                    'type' => 'payment_option',
-                    'sub_type' => 'switch',
-                    'name' => 'one_click',
-                    'title' => '', // $payment_methods_translations['paymentMethods']['oneClick']['title'],
+                    'notes' => [
+                        'type' => '-warning',
+                        'description' => $translation['installment']['descriptions']['alert'],
+                    ],
+                ];
+            }
+
+            if ($this->dependencies->configClass->isValidFeature('feature_deferred')) {
+                $advanced_settings[] = [
+                    'name' => 'deferred',
+                    'title' => $translation['deferred']['title'],
+                    'class' => '-deferred',
+                    'enabled' => [
+                        'name' => 'payplug_deferred',
+                        'checked' => $current_configuration['deferred'],
+                    ],
                     'descriptions' => [
                         'live' => [
-                            'description' => '', // $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['live']['description'],
-                            'link_know_more' => [
-                                'text' => '', // $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['live']['knowMore']['text'],
-                                'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
-                                'target' => '_blank',
+                            'description_1' => $translation['deferred']['descriptions']['description_1'],
+                            'description_2' => $translation['deferred']['descriptions']['description_2'],
+                            'links' => [
+                                [
+                                    'text' => $translation['deferred']['link'],
+                                    'url' => $external_url['deferred'],
+                                    'target' => '_blank',
+                                ],
                             ],
                         ],
                         'sandbox' => [
-                            'description' => '', // $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['test']['description'],
-                            'link_know_more' => [
-                                'text' => '', // $payment_methods_translations['paymentMethods']['oneClick']['descriptions']['test']['knowMore']['text'],
-                                'url' => 'https://support.payplug.com/hc/en-gb/articles/4409698334098',
-                                'target' => '_blank',
+                            'description_1' => $translation['deferred']['descriptions']['description_1'],
+                            'description_2' => $translation['deferred']['descriptions']['description_2'],
+                            'links' => [
+                                [
+                                    'text' => $translation['deferred']['link'],
+                                    'url' => $external_url['deferred'],
+                                    'target' => '_blank',
+                                ],
                             ],
                         ],
                     ],
-                    'checked' => false,
+                    'options' => [
+                        'disabled' => !$current_configuration['deferred'],
+                        'name' => 'payplug_deferred_state',
+                        'type' => 'select',
+                        'options' => $this->getDeferredState((int) $current_configuration['deferred_state']),
+                    ],
+                ];
+            }
+
+            $payment_options[] = [
+                'type' => 'payment_method',
+                'name' => 'standard',
+                'title' => $translation['standard']['title'],
+                'image' => $img_path . 'standard.svg',
+                'checked' => $current_configuration['standard'],
+                'available_test_mode' => true,
+                'descriptions' => [
+                    'live' => [
+                        'description' => $translation['standard']['descriptions']['live'],
+                        'advanced_options' => $translation['standard']['advanced'],
+                    ],
+                    'sandbox' => [
+                        'description' => $translation['standard']['descriptions']['live'],
+                        'advanced_options' => $translation['standard']['advanced'],
+                    ],
                 ],
-            ],
-            [
+                'options' => [
+                    [
+                        'type' => 'payment_option',
+                        'sub_type' => 'IOptions',
+                        'name' => 'embeded',
+                        'title' => $translation['embedded']['title'],
+                        'descriptions' => [
+                            'live' => [
+                                'description_popup' => $translation['embedded']['descriptions']['popup'],
+                                'description_redirect' => $translation['embedded']['descriptions']['redirect'],
+                                'link_know_more' => [
+                                    'text' => $translation['embedded']['link'],
+                                    'url' => $external_url['embedded'],
+                                    'target' => '_blank',
+                                ],
+                            ],
+                            'sandbox' => [
+                                'description_popup' => $translation['embedded']['descriptions']['popup'],
+                                'description_redirect' => $translation['embedded']['descriptions']['redirect'],
+                                'link_know_more' => [
+                                    'text' => $translation['embedded']['link'],
+                                    'url' => $external_url['embedded'],
+                                    'target' => '_blank',
+                                ],
+                            ],
+                        ],
+                        'options' => $embedded_mode,
+                    ],
+                    [
+                        'type' => 'payment_option',
+                        'sub_type' => 'switch',
+                        'name' => 'one_click',
+                        'title' => $translation['one_click']['title'],
+                        'descriptions' => [
+                            'live' => [
+                                'description' => $translation['one_click']['descriptions']['live'],
+                                'link_know_more' => [
+                                    'text' => $translation['one_click']['link'],
+                                    'url' => $external_url['one_click'],
+                                    'target' => '_blank',
+                                ],
+                            ],
+                            'sandbox' => [
+                                'description' => $translation['one_click']['descriptions']['live'],
+                                'link_know_more' => [
+                                    'text' => $translation['one_click']['link'],
+                                    'url' => $external_url['one_click'],
+                                    'target' => '_blank',
+                                ],
+                            ],
+                        ],
+                        'checked' => $current_configuration['one_click'],
+                    ],
+                ],
+                'advanced_settings' => $advanced_settings ? [
+                    'title' => $translation['standard']['advanced'],
+                    'options' => $advanced_settings,
+                ] : [],
+            ];
+        }
+        if ($this->dependencies->configClass->isValidFeature('feature_amex')) {
+            $payment_options[] = [
                 'type' => 'payment_method',
                 'name' => 'american_express',
-                'title' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['title'],
-                'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/Amex_logo_color.svg',
-                'checked' => true,
+                'title' => $translation['amex']['title'],
+                'image' => $img_path . 'amex.svg',
+                'checked' => $current_configuration['american_express'],
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['live']['description'],
+                        'description' => $translation['amex']['descriptions']['live'],
                         'link_know_more' => [
-                            'text' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['live']['knowMore']['text'],
-                            'url' => 'https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug',
+                            'text' => $translation['amex']['link'],
+                            'url' => $external_url['amex'],
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['test']['description'],
+                        'description' => $translation['amex']['descriptions']['sandbox'],
                         'link_know_more' => [
-                            'text' => '', // $payment_methods_translations['paymentMethods']['americanExpress']['descriptions']['test']['knowMore']['text'],
-                            'url' => 'https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug',
+                            'text' => $translation['amex']['link'],
+                            'url' => $external_url['amex'],
                             'target' => '_blank',
                         ],
                     ],
                 ],
-            ],
-            [
+            ];
+        }
+        if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+            $payment_options[] = [
                 'type' => 'payment_method',
                 'name' => 'applepay',
-                'title' => '', // $payment_methods_translations['paymentMethods']['applePay']['title'],
-                'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/applepay.svg',
-                'checked' => false,
+                'title' => $translation['applepay']['title'],
+                'image' => $img_path . 'apple_pay.svg',
+                'checked' => $current_configuration['applepay'],
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => '', // $payment_methods_translations['paymentMethods']['applePay']['descriptions']['live']['description'],
+                        'description' => $translation['applepay']['descriptions']['live'],
                         'link_know_more' => [
-                            'text' => '', // $payment_methods_translations['paymentMethods']['applePay']['descriptions']['live']['knowMore']['text'],
-                            'url' => 'https://support.payplug.com/hc/en-gb/articles/5149384347292',
+                            'text' => $translation['applepay']['link'],
+                            'url' => $external_url['applepay'],
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => '', // $payment_methods_translations['paymentMethods']['applePay']['descriptions']['test']['description'],
+                        'description' => $translation['applepay']['descriptions']['sandbox'],
                         'link_know_more' => [
-                            'text' => '', // $payment_methods_translations['paymentMethods']['applePay']['descriptions']['test']['knowMore']['text'],
-                            'url' => 'https://support.payplug.com/hc/en-gb/articles/5149384347292',
+                            'text' => $translation['applepay']['link'],
+                            'url' => $external_url['applepay'],
                             'target' => '_blank',
                         ],
                     ],
                 ],
-            ],
-            [
+            ];
+        }
+        if ($this->dependencies->configClass->isValidFeature('feature_bancontact')) {
+            $payment_options[] = [
                 'type' => 'payment_method',
                 'name' => 'bancontact',
-                'title' => '', // $payment_methods_translations['paymentMethods']['bancontact']['title'],
-                'image' => 'http://localhost/wp-content/plugins/payplug-woocommerce/assets/images/bancontact.svg',
-                'checked' => false,
+                'title' => $translation['bancontact']['title'],
+                'image' => $img_path . 'bancontact.svg',
+                'checked' => $current_configuration['bancontact'],
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
-                        'description' => '', // $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['live']['description'],
+                        'description' => $translation['bancontact']['descriptions']['live'],
                         'link_know_more' => [
-                            'text' => '', // $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['live']['knowMore']['text'],
-                            'url' => 'https://support.payplug.com/hc/en-gb/articles/4408157435794',
+                            'text' => $translation['bancontact']['link'],
+                            'url' => $external_url['bancontact'],
                             'target' => '_blank',
                         ],
                     ],
                     'sandbox' => [
-                        'description' => '', // $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['test']['description'],
+                        'description' => $translation['bancontact']['descriptions']['sandbox'],
                         'link_know_more' => [
-                            'text' => '', // $payment_methods_translations['paymentMethods']['bancontact']['descriptions']['test']['knowMore']['text'],
-                            'url' => 'https://support.payplug.com/hc/en-gb/articles/4408157435794',
+                            'text' => $translation['bancontact']['link'],
+                            'url' => $external_url['bancontact'],
                             'target' => '_blank',
                         ],
                     ],
                 ],
+                'options' => [
+                    [
+                        'type' => 'payment_option',
+                        'sub_type' => 'switch',
+                        'name' => 'payplug_bancontact_country',
+                        'title' => $translation['bancontact']['user']['title'],
+                        'descriptions' => [
+                            'live' => [
+                                'description' => $translation['bancontact']['user']['description'],
+                                'link_know_more' => [
+                                    'text' => $translation['one_click']['link'],
+                                    'url' => $external_url['one_click'],
+                                    'target' => '_blank',
+                                ],
+                            ],
+                            'sandbox' => [
+                                'description' => $translation['bancontact']['user']['description'],
+                                'link_know_more' => [
+                                    'text' => $translation['one_click']['link'],
+                                    'url' => $external_url['one_click'],
+                                    'target' => '_blank',
+                                ],
+                            ],
+                        ],
+                        'checked' => $current_configuration['one_click'],
+                    ],
+                ],
+            ];
+        }
+
+        if (!$payment_options) {
+            return [];
+        }
+
+        return [
+            'name' => 'paymentMethodsBlock',
+            'title' => $translation['title'],
+            'descriptions' => [
+                'live' => [
+                    'description' => $translation['description'],
+                ],
+                'sandbox' => [
+                    'description' => $translation['description'],
+                ],
             ],
+            'options' => $payment_options,
         ];
     }
 
@@ -839,7 +1134,7 @@ class ApiRest
                     'description' => $requirements_translations['requirements']['descriptions']['live']['description'],
                     'errorMessage' => $requirements_translations['requirements']['descriptions']['live']['errorMessage'],
                     'check' => $requirements_translations['requirements']['descriptions']['live']['check'],
-                    //"check_success" => 'Live check success',
+                    //'check_success" => 'Live check success',
                 ],
                 'sandbox' => [
                     'description' => $requirements_translations['requirements']['descriptions']['test']['description'],
@@ -892,71 +1187,155 @@ class ApiRest
     /**
      * @description get settings for api usage
      *
-     * @param bool $logged
+     * @param array $current_configuration
      *
      * @return array
      */
-    public function getSettingsSection($logged = false)
+    public function getSettingsSection($current_configuration = [])
     {
+        if (!is_array($current_configuration)) {
+            return [];
+        }
+
+        $email = isset($current_configuration['email']) ? $current_configuration['email'] : '';
+        $is_logged = isset($current_configuration['logged']) ? $current_configuration['logged'] : false;
+
         return [
-            'email' => 'blablabla@blabalabl.com',
-            'WP' => [
-                'ajax_url' => 'http://localhost:9000/',
-                'nonce' => 'xxxxxxxxx',
-                'login_action' => 'payplug_login',
-                'logout_action' => 'payplug_logout',
-                'check_permission_action' => 'payplug_check_permission',
-                'check_requirements_action' => 'payplug_check_requirements',
-                'save_action' => 'payplug_save',
-                '_wpnonce' => '0b131d94c4',
+            'email' => $email,
+            'logged' => $is_logged,
+        ];
+    }
+
+    /**
+     * @description build subscribe section for api usage
+     *
+     * @return array
+     */
+    public function getSubscribeSection()
+    {
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getSubscribeTranslations();
+
+        $register_link = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl()['signup'];
+        if ($this->dependencies->name == 'pspaylater') {
+            $register_link .= '/signup?sponsor=22101';
+        }
+
+        return [
+            'name' => 'generalSubscribe',
+            'title' => $translation['title'],
+            'descriptions' => [
+                'live' => [
+                    'description' => $translation['description'],
+                    'link_create_account' => [
+                        'text' => $translation['register'],
+                        'url' => $register_link,
+                        'target' => '_blank',
+                    ],
+                    'content_description' => $translation['text'],
+                    'already_have_account' => $translation['connect'],
+                ],
+                'sandbox' => [
+                    'description' => $translation['description'],
+                    'link_create_account' => [
+                        'text' => $translation['register'],
+                        'url' => $register_link,
+                        'target' => '_blank',
+                    ],
+                    'content_description' => $translation['text'],
+                    'already_have_account' => $translation['connect'],
+                ],
             ],
-            'logged' => $logged,
-            'mode' => 0,
         ];
     }
 
     /**
      * @description build oney thresholds section for oney
      *
-     * @param int $max
-     * @param int $min
+     * @param array $current_configuration
      *
      * @return array
      */
-    public function getThresholdsOptions($min = 0, $max = 0)
+    public function getThresholdsOptions($current_configuration = [])
     {
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $paylater_translations = $translation->getPaylaterTranslations();
+        if (!is_array($current_configuration)) {
+            return [];
+        }
 
-        if ($this->dependencies->name == 'payplug') {
+        // todo: get this default value from dependenciesClass (alike)
+        $default_configuration = [
+            'oney_thresholds_min' => 'EUR:10000',
+            'oney_thresholds_max' => 'EUR:300000',
+            'oney_custom_thresholds_min' => 'EUR:10000',
+            'oney_custom_thresholds_max' => 'EUR:300000',
+        ];
+        foreach ($default_configuration as $k => $v) {
+            if (!isset($current_configuration[$k])) {
+                $current_configuration[$k] = $v;
+            }
+        }
+
+        // todo: Create an helper to handle the two following line of logic
+        $custom_min = explode(':', $current_configuration['oney_custom_thresholds_min']);
+        $custom_min = $this->helpers['amount']->formatOneyAmount((int) $custom_min[1])['result'];
+
+        $custom_max = explode(':', $current_configuration['oney_custom_thresholds_max']);
+        $custom_max = $this->helpers['amount']->formatOneyAmount((int) $custom_max[1])['result'];
+
+        $min = explode(':', $current_configuration['oney_thresholds_min']);
+        $min = $this->helpers['amount']->formatOneyAmount((int) $min[1])['result'];
+
+        $max = explode(':', $current_configuration['oney_thresholds_max']);
+        $max = $this->helpers['amount']->formatOneyAmount((int) $max[1])['result'];
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getPaylaterTranslations();
+
+        if ('payplug' == $this->dependencies->name) {
             $image = 'thresholds.09a2ba52.jpg';
         } else {
             $image = 'pspaylater-thresholds.b1d1549c.svg';
         }
 
+        $img_path = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/img/';
+
         return [
             'name' => 'thresholds',
-            'image_url' => '/modules/' . $this->dependencies->name . '/dist/img/' . $image,
-            'title' => $paylater_translations['thresholds']['title'],
+            'image_url' => $img_path . $image,
+            'title' => $translation['thresholds']['title'],
             'descriptions' => [
-                'description' => $paylater_translations['thresholds']['description'],
+                'description' => $translation['thresholds']['description'],
                 'min_amount' => [
                     'name' => 'oney_min_amounts',
-                    'value' => $min,
-                    'placeholder' => $min,
-                    'min' => 100,
-                    'max' => 3000,
+                    'value' => $custom_min,
+                    'placeholder' => $custom_min,
+                    'min' => $min,
+                    'max' => $max,
                 ],
-                'inter' => $paylater_translations['thresholds']['inter'],
+                'inter' => $translation['thresholds']['inter'],
                 'max_amount' => [
                     'name' => 'oney_max_amounts',
-                    'value' => $max,
-                    'placeholder' => $max,
-                    //'min' => 100,
-                    //'max' => 3000,
+                    'value' => $custom_max,
+                    'placeholder' => $custom_max,
+                    //'min' => $min,
+                    //'max' => $max,
                 ],
                 'error' => [
-                    'text' => $paylater_translations['thresholds']['error']['text'],
+                    'text' => sprintf(
+                        $translation['thresholds']['error']['text'],
+                        $min,
+                        $max
+                    ),
                 ],
             ],
             'switch' => false,
