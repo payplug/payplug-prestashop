@@ -536,7 +536,7 @@ class ConfigurationAction
                 }
             }
 
-            if ('payplug_enable' == $config) {
+            if ('payplug_enable' == $key && (bool) $value) {
                 $module = $this->dependencies->getPlugin()->getModule();
                 $module->getInstanceByName($this->dependencies->name)->enable();
             }
