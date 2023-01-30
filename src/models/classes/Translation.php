@@ -15,9 +15,9 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2023 PayPlug SAS
- *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    PayPlug SAS
+ * @copyright 2013 - 2023 PayPlug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
 
@@ -152,139 +152,100 @@ class Translation
     }
 
     /**
+     * @todo: Dispatch the different payment methods translation in their function
+     *
      * @return array
      */
     public function getPaymentMethodsTranslations()
     {
         return [
-            'paymentMethods' => [
-                'title' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodTitle', 'translation'),
+            'title' => $this->dependencies->l('paymentmethods.title', 'paymentmethodstranslation'),
+            'description' => $this->dependencies->l('paymentmethods.description', 'paymentmethodstranslation'),
+            'standard' => [
+                'title' => $this->dependencies->l('paymentmethods.standard.title', 'paymentmethodstranslation'),
                 'descriptions' => [
-                    'live' => [
-                        'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodLiveDescription', 'translation'),
-                    ],
-                    'test' => [
-                        'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodTestDescription', 'translation'),
-                    ],
+                    'live' => $this->dependencies->l('paymentmethods.standard.descriptions.live', 'paymentmethodstranslation'),
                 ],
-                'standard' => [
-                    'title' => [
-                        'title' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardTitleTitle', 'translation'),
-                        'value' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardTitleValue', 'translation'),
-                        'descriptions' => [
-                            'live' => [
-                                'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardTitleLiveDescription', 'translation'),
-                                'placeholder' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardTitleLivePlaceholder', 'translation'),
-                            ],
-                            'test' => [
-                                'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardTitleTestDescription', 'translation'),
-                                'placeholder' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardTitleTestPlaceholder', 'translation'),
-                            ],
-                        ],
-                    ],
-                    'description' => [
-                        'title' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardDescriptionTitle', 'translation'),
-                        'value' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardDescriptionValue', 'translation'),
-                        'descriptions' => [
-                            'live' => [
-                                'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardDescriptionLiveDescription', 'translation'),
-                                'placeholder' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardDescriptionLivePlaceholder', 'translation'),
-                            ],
-                            'test' => [
-                                'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardDescriptionTestDescription', 'translation'),
-                                'placeholder' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodStandardDescriptionTestPlaceholder', 'translation'),
-                            ],
-                        ],
-                    ],
+                'link' => $this->dependencies->l('paymentmethods.standard.link', 'paymentmethodstranslation'),
+                'advanced' => $this->dependencies->l('paymentmethods.standard.advanced', 'paymentmethodstranslation'),
+            ],
+            'embedded' => [
+                'title' => $this->dependencies->l('paymentmethods.embedded.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'popup' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup', 'paymentmethodstranslation'),
+                    'redirect' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect', 'paymentmethodstranslation'),
+                    'integrated' => $this->dependencies->l('paymentmethods.embedded.descriptions.integrated', 'paymentmethodstranslation'),
                 ],
-                'embedded' => [
-                    'title' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedTitle', 'translation'),
-                    'descriptions' => [
-                        'live' => [
-                            'descriptionRedirect' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedLiveDescriptionRedirect', 'translation'),
-                            'descriptionPopup' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedLiveDescriptionPopup', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedLiveKnowMoreText', 'translation'),
-                            ],
-                        ],
-                        'test' => [
-                            'descriptionRedirect' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedTestDescriptionRedirect', 'translation'),
-                            'descriptionPopup' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedTestDescriptionPopup', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedTestKnowMoreText', 'translation'),
-                            ],
-                        ],
-                    ],
-                    'popupValue' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedPopupValue', 'translation'),
-                    'redirectValue' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodEmbeddedRedirectValue', 'translation'),
+                'link' => $this->dependencies->l('paymentmethods.embedded.link', 'paymentmethodstranslation'),
+                'options' => [
+                    'integrated' => $this->dependencies->l('paymentmethods.embedded.options.integrated', 'paymentmethodstranslation'),
+                    'popup' => $this->dependencies->l('paymentmethods.embedded.options.popup', 'paymentmethodstranslation'),
+                    'redirect' => $this->dependencies->l('paymentmethods.embedded.options.redirect', 'paymentmethodstranslation'),
                 ],
-                'oneClick' => [
-                    'title' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodOneClickTitle', 'translation'),
-                    'descriptions' => [
-                        'live' => [
-                            'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodOneClickLiveDescription', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodOneClickLiveKnowMoreText', 'translation'),
-                            ],
-                        ],
-                        'test' => [
-                            'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodOneClickTestDescription', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodOneClickTestKnowMoreText', 'translation'),
-                            ],
-                        ],
-                    ],
+            ],
+            'one_click' => [
+                'title' => $this->dependencies->l('paymentmethods.one_click.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.one_click.descriptions.live', 'paymentmethodstranslation'),
                 ],
-                'americanExpress' => [
-                    'title' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodAmericanExpressTitle', 'translation'),
-                    'descriptions' => [
-                        'live' => [
-                            'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodAmericanExpressLiveDescription', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodAmericanExpressLiveKnowMoreText', 'translation'),
-                            ],
-                        ],
-                        'test' => [
-                            'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodAmericanExpressTestDescription', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodAmericanExpressTestKnowMoreText', 'translation'),
-                            ],
-                        ],
-                    ],
+                'link' => $this->dependencies->l('paymentmethods.one_click.link', 'paymentmethodstranslation'),
+            ],
+            'installment' => [
+                'title' => $this->dependencies->l('paymentmethods.installment.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'description_1' => $this->dependencies->l('paymentmethods.installment.descriptions.description_1', 'paymentmethodstranslation'),
+                    'text_from' => $this->dependencies->l('paymentmethods.installment.descriptions.text_from', 'paymentmethodstranslation'),
+                    'description_2' => $this->dependencies->l('paymentmethods.installment.descriptions.description_2', 'paymentmethodstranslation'),
+                    'controller_link' => $this->dependencies->l('paymentmethods.installment.descriptions.controller_link', 'paymentmethodstranslation'),
+                    'alert' => $this->dependencies->l('paymentmethods.installment.descriptions.alert', 'paymentmethodstranslation'),
                 ],
-                'applePay' => [
-                    'title' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodApplePayTitle', 'translation'),
-                    'descriptions' => [
-                        'live' => [
-                            'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodApplePayLiveDescription', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodApplePayLiveKnowMoreText', 'translation'),
-                            ],
-                        ],
-                        'test' => [
-                            'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodApplePayTestDescription', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodApplePayTestKnowMoreText', 'translation'),
-                            ],
-                        ],
-                    ],
+                'select' => [
+                    '2_schedules' => $this->dependencies->l('paymentmethods.installment.select.2_schedules', 'paymentmethodstranslation'),
+                    '3_schedules' => $this->dependencies->l('paymentmethods.installment.select.3_schedules', 'paymentmethodstranslation'),
+                    '4_schedules' => $this->dependencies->l('paymentmethods.installment.select.4_schedules', 'paymentmethodstranslation'),
                 ],
-                'bancontact' => [
-                    'title' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodBancontactTitle', 'translation'),
-                    'descriptions' => [
-                        'live' => [
-                            'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodBancontactLiveDescription', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodBancontactLiveKnowMoreText', 'translation'),
-                            ],
-                        ],
-                        'test' => [
-                            'description' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodBancontactTestDescription', 'translation'),
-                            'knowMore' => [
-                                'text' => $this->dependencies->l('payplug.getPaymentMethodsTranslations.paymentMethodBancontactTestKnowMoreText', 'translation'),
-                            ],
-                        ],
-                    ],
+                'link' => $this->dependencies->l('paymentmethods.installment.link', 'paymentmethodstranslation'),
+                'error_limit' => $this->dependencies->l('paymentmethods.installment.error_limit', 'paymentmethodstranslation'),
+            ],
+            'deferred' => [
+                'title' => $this->dependencies->l('paymentmethods.deferred.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'description_1' => $this->dependencies->l('paymentmethods.deferred.descriptions.description_1', 'paymentmethodstranslation'),
+                    'description_2' => $this->dependencies->l('paymentmethods.deferred.descriptions.description_2', 'paymentmethodstranslation'),
+                ],
+                'states' => [
+                    'default' => $this->dependencies->l('paymentmethods.deferred.states.default', 'paymentmethodstranslation'),
+                    'state' => $this->dependencies->l('paymentmethods.deferred.states.state', 'paymentmethodstranslation'),
+                    'alert' => $this->dependencies->l('paymentmethods.deferred.states.alert', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.deferred.link', 'paymentmethodstranslation'),
+            ],
+            'amex' => [
+                'title' => $this->dependencies->l('paymentmethods.amex.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.amex.descriptions.live', 'paymentmethodstranslation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.amex.descriptions.sandbox', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.amex.link', 'paymentmethodstranslation'),
+            ],
+            'applepay' => [
+                'title' => $this->dependencies->l('paymentmethods.applepay.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.applepay.descriptions.live', 'paymentmethodstranslation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.applepay.descriptions.sandbox', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.applepay.link', 'paymentmethodstranslation'),
+            ],
+            'bancontact' => [
+                'title' => $this->dependencies->l('paymentmethods.bancontact.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.bancontact.descriptions.live', 'paymentmethodstranslation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.bancontact.descriptions.sandbox', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.bancontact.link', 'paymentmethodstranslation'),
+                'user' => [
+                    'title' => $this->dependencies->l('paymentmethods.bancontact.user.title', 'paymentmethodstranslation'),
+                    'description' => $this->dependencies->l('paymentmethods.bancontact.user.description', 'paymentmethodstranslation'),
                 ],
             ],
         ];
@@ -297,38 +258,19 @@ class Translation
     {
         return [
             'title' => $this->dependencies->l('paylater.title', 'paylatertranslation'),
-            'descriptions' => [
-                'live' => [
-                    'description' => $this->dependencies->l('paylater.descriptions.live.description', 'paylatertranslation'),
-                ],
-                'test' => [
-                    'description' => $this->dependencies->l('paylater.descriptions.test.description', 'paylatertranslation'),
-                ],
-            ],
+            'description' => $this->dependencies->l('paylater.description', 'paylatertranslation'),
+            'advanced' => $this->dependencies->l('paylater.advanced', 'paylatertranslation'),
+            'link' => $this->dependencies->l('paylater.link', 'paylatertranslation'),
             'options' => [
                 'title' => $this->dependencies->l('paylater.options.title', 'paylatertranslation'),
-                'live' => [
-                    'description' => $this->dependencies->l('paylater.options.live.description', 'paylatertranslation'),
-                    'knowMore' => [
-                        'text' => $this->dependencies->l('paylater.options.live.knowMore.text', 'paylatertranslation'),
-                    ],
+                'description' => $this->dependencies->l('paylater.options.description', 'paylatertranslation'),
+                'with_fees' => [
+                    'label' => $this->dependencies->l('paylater.options.with_fees.label', 'paylatertranslation'),
+                    'subtext' => $this->dependencies->l('paylater.options.with_fees.subtext', 'paylatertranslation'),
                 ],
-                'test' => [
-                    'description' => $this->dependencies->l('paylater.options.test.description', 'paylatertranslation'),
-                    'knowMore' => [
-                        'text' => $this->dependencies->l('paylater.options.test.knowMore.text', 'paylatertranslation'),
-                    ],
-                ],
-                'advanced' => [
-                    'description' => $this->dependencies->l('paylater.options.advanced.description', 'paylatertranslation'),
-                ],
-                'option1' => [
-                    'label' => $this->dependencies->l('paylater.options.option1.label', 'paylatertranslation'),
-                    'subtext' => $this->dependencies->l('paylater.options.option1.subtext', 'paylatertranslation'),
-                ],
-                'option2' => [
-                    'label' => $this->dependencies->l('paylater.options.option2.label', 'paylatertranslation'),
-                    'subtext' => $this->dependencies->l('paylater.options.option2.subtext', 'paylatertranslation'),
+                'without_fees' => [
+                    'label' => $this->dependencies->l('paylater.options.without_fees.label', 'paylatertranslation'),
+                    'subtext' => $this->dependencies->l('paylater.options.without_fees.subtext', 'paylatertranslation'),
                 ],
             ],
             'oneySchedule' => [
@@ -340,17 +282,9 @@ class Translation
             ],
             'oneyPopupProduct' => [
                 'title' => $this->dependencies->l('oneyPopupProduct.title', 'paylatertranslation'),
-                'description' => $this->dependencies->l('oneyPopupProduct.description', 'paylatertranslation'),
-                'knowMore' => [
-                    'text' => $this->dependencies->l('oneyPopupProduct.knowMore.text', 'paylatertranslation'),
-                ],
             ],
             'oneyPopupCart' => [
                 'title' => $this->dependencies->l('oneyPopupCart.title', 'paylatertranslation'),
-                'description' => $this->dependencies->l('oneyPopupCart.description', 'paylatertranslation'),
-                'knowMore' => [
-                    'text' => $this->dependencies->l('oneyPopupCart.knowMore.text', 'paylatertranslation'),
-                ],
             ],
             'thresholds' => [
                 'title' => $this->dependencies->l('thresholds.title', 'paylatertranslation'),
@@ -431,23 +365,33 @@ class Translation
     {
         return [
             'confirmation' => [
-                'text' => $this->dependencies->l('payplug.getModalTranslations.modalConfirmationText', 'translation'),
-                'submit' => $this->dependencies->l('payplug.getModalTranslations.modalConfirmationSubmit', 'translation'),
+                'text' => $this->dependencies->l('modal.confirmation.text', 'modaltranslation'),
+                'submit' => $this->dependencies->l('modal.confirmation.submit', 'modaltranslation'),
             ],
             'error' => [
                 'submit' => $this->dependencies->l('payplug.getModalTranslations.modalErrorSubmit', 'translation'),
             ],
             'premium' => [
-                'feature' => [
-                    'title' => $this->dependencies->l('modal.premium.feature.title', 'modaltranslation'),
-                    'unavailable' => $this->dependencies->l('modal.premium.feature.unavailable', 'modaltranslation'),
-                    'activateOney' => $this->dependencies->l('modal.premium.feature.activateOney', 'modaltranslation'),
-                    'activateBancontact' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateBancontact', 'translation'),
-                    'activateApplePay' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateApplePay', 'translation'),
-                    'activateAmex' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivateAmex', 'translation'),
-                    'activate' => $this->dependencies->l('payplug.getModalTranslations.modalPremiumFeatureActivate', 'translation'),
+                'title' => $this->dependencies->l('modal.premium.title', 'modaltranslation'),
+                'description' => [
+                    'unavailable' => $this->dependencies->l('modal.premium.description.unavailable', 'modaltranslation'),
+                    'form' => $this->dependencies->l('modal.premium.description.form', 'modaltranslation'),
+                    'contact' => $this->dependencies->l('modal.premium.description.contact', 'modaltranslation'),
+                    'website' => $this->dependencies->l('modal.premium.description.default', 'modaltranslation'),
+                    'oney' => $this->dependencies->l('modal.premium.description.oney', 'modaltranslation'),
                 ],
-                'PremiumOk' => $this->dependencies->l('modal.premium.premiumOk', 'modaltranslation'),
+                'link' => [
+                    'form' => $this->dependencies->l('modal.premium.link.form', 'modaltranslation'),
+                    'contact' => $this->dependencies->l('modal.premium.link.contact', 'modaltranslation'),
+                    'website' => $this->dependencies->l('modal.premium.link.default', 'modaltranslation'),
+                    'oney' => $this->dependencies->l('modal.premium.link.oney', 'modaltranslation'),
+                ],
+                'feature' => [
+                    'bancontact' => $this->dependencies->l('modal.premium.feature.bancontact', 'modaltranslation'),
+                    'applepay' => $this->dependencies->l('modal.premium.feature.applepay', 'modaltranslation'),
+                    'american_express' => $this->dependencies->l('modal.premium.feature.american_express', 'modaltranslation'),
+                ],
+                'submit' => $this->dependencies->l('modal.premium.submit', 'modaltranslation'),
             ],
         ];
     }

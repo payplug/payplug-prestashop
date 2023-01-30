@@ -6,6 +6,7 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  * @group unit
  * @group action
  * @group configuration_action
+ * @group dev
  *
  * @runTestsInSeparateProcesses
  */
@@ -90,14 +91,17 @@ class loginActionTest extends BaseConfigurationAction
         $datas->payplug_email = 'payplug.login@payplug.com';
         $datas->payplug_password = '';
 
-        $adapter = \Mockery::mock();
-        $adapter->shouldReceive([
-            'isPlaintextPassword' => true,
-        ]);
-        $this->dependencies->configClass = \Mockery::mock();
-        $this->dependencies->configClass->shouldReceive([
-            'getAdapterPrestaClasse' => $adapter,
-        ]);
+        $account = \Mockery::mock('Account');
+        $account
+            ->shouldReceive([
+                'isPassword' => false,
+            ]);
+        $this->dependencies
+            ->shouldReceive([
+                'getValidators' => [
+                    'account' => $account,
+                ],
+            ]);
 
         $this->assertSame(
             [
@@ -117,14 +121,19 @@ class loginActionTest extends BaseConfigurationAction
         $datas->payplug_email = 'payplug.login@payplug.com';
         $datas->payplug_password = 'password';
 
-        $adapter = \Mockery::mock();
-        $adapter->shouldReceive([
-            'isPlaintextPassword' => false,
-        ]);
-        $this->dependencies->configClass = \Mockery::mock();
-        $this->dependencies->configClass->shouldReceive([
-            'getAdapterPrestaClasse' => $adapter,
-        ]);
+        $account = \Mockery::mock('Account');
+        $account
+            ->shouldReceive([
+                'isPassword' => [
+                    'result' => false,
+                ],
+            ]);
+        $this->dependencies
+            ->shouldReceive([
+                'getValidators' => [
+                    'account' => $account,
+                ],
+            ]);
 
         $this->assertSame(
             [
@@ -144,14 +153,19 @@ class loginActionTest extends BaseConfigurationAction
         $datas->payplug_email = 'payplug.login@payplug.com';
         $datas->payplug_password = 'password';
 
-        $adapter = \Mockery::mock();
-        $adapter->shouldReceive([
-            'isPlaintextPassword' => true,
-        ]);
-        $this->dependencies->configClass = \Mockery::mock();
-        $this->dependencies->configClass->shouldReceive([
-            'getAdapterPrestaClasse' => $adapter,
-        ]);
+        $account = \Mockery::mock('Account');
+        $account
+            ->shouldReceive([
+                'isPassword' => [
+                    'result' => true,
+                ],
+            ]);
+        $this->dependencies
+            ->shouldReceive([
+                'getValidators' => [
+                    'account' => $account,
+                ],
+            ]);
 
         $this->dependencies->apiClass = \Mockery::mock();
         $this->dependencies->apiClass->shouldReceive([
@@ -176,15 +190,19 @@ class loginActionTest extends BaseConfigurationAction
         $datas->payplug_email = 'payplug.login@payplug.com';
         $datas->payplug_password = 'password';
 
-        $adapter = \Mockery::mock();
-        $adapter->shouldReceive([
-            'isPlaintextPassword' => true,
-        ]);
-
-        $this->dependencies->configClass = \Mockery::mock();
-        $this->dependencies->configClass->shouldReceive([
-            'getAdapterPrestaClasse' => $adapter,
-        ]);
+        $account = \Mockery::mock('Account');
+        $account
+            ->shouldReceive([
+                'isPassword' => [
+                    'result' => true,
+                ],
+            ]);
+        $this->dependencies
+            ->shouldReceive([
+                'getValidators' => [
+                    'account' => $account,
+                ],
+            ]);
 
         $this->dependencies->apiClass = \Mockery::mock();
         $this->dependencies->apiClass->shouldReceive([

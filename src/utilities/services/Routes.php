@@ -63,7 +63,7 @@ class Routes
             'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
             'signup' => 'https://www.payplug.com/signup',
-            'support' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
+            'embedded' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
         ];
     }
 }
