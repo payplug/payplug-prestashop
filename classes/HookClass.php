@@ -843,7 +843,6 @@ class HookClass
     public function displayBackOfficeFooter()
     {
         if (\version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
-            $this->dependencies->configClass->assignContentVar();
             $this->assign->assign([
                 'js_def' => $this->media->getJsDef(),
             ]);

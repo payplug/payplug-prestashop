@@ -118,7 +118,6 @@ class MediaClass
                 'bancontact' => $args['bancontact'],
                 'bancontact_feature' => $this->dependencies->configClass->isValidFeature('feature_bancontact'),
                 'integrated_feature' => $this->dependencies->configClass->isValidFeature('feature_integrated'),
-                'display_mode_feature' => $this->dependencies->configClass->isValidFeature('feature_display_mode'),
                 'standard_feature' => $this->dependencies->configClass->isValidFeature('feature_standard'),
                 'installment_feature' => $this->dependencies->configClass->isValidFeature('feature_installment'),
                 'deferred_feature' => $this->dependencies->configClass->isValidFeature('feature_deferred'),

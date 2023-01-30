@@ -222,9 +222,9 @@ class ApiClass
         try {
             $response = Authentication::getPublishableKeys();
             $publishable_key = isset($response['httpResponse']['publishable_key'])
-                && $response['httpResponse']['publishable_key']
-                    ? $response['httpResponse']['publishable_key']
-                    : null;
+            && $response['httpResponse']['publishable_key']
+                ? $response['httpResponse']['publishable_key']
+                : null;
 
             if (!$publishable_key) {
                 $this->config->deleteByName(
@@ -459,7 +459,7 @@ class ApiClass
     {
         try {
             $this->setUserAgent();
-            $response = Authentication::getKeysByLogin($email, base64_decode($password));
+            $response = Authentication::getKeysByLogin($email, $password);
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
@@ -1226,7 +1226,7 @@ class ApiClass
             $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
             )
-        )) {
+            )) {
             $oney_methods = [];
             foreach ($json_answer['payment_methods'] as $key => $val) {
                 if ($this->tools->substr($key, 0, 5) == 'oney_') {

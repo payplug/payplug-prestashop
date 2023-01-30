@@ -30,7 +30,6 @@ use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\Dotenv\Dotenv;
 use Tab;
 use Tools;
-use Validate;
 
 class PrestashopAdapter17
 {
@@ -383,18 +382,5 @@ class PrestashopAdapter17
         $this->context->smarty->assign([
             'payplug_switch' => $switch,
         ]);
-    }
-
-    /**
-     * @description Check if string is Plaintext Password
-     *
-     * @param $plaintextPasswd
-     * @param int $size
-     *
-     * @return bool
-     */
-    public function isPlaintextPassword($plaintextPasswd, $size = 5)
-    {
-        return Validate::isPlaintextPassword($plaintextPasswd);
     }
 }

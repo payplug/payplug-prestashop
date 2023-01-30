@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @group unit
- * @group action
+ * @group helper
  * @group user_helper
  *
  * @runTestsInSeparateProcesses
