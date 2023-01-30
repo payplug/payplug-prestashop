@@ -29,6 +29,7 @@ class AdminPayplugController extends ModuleAdminController
     private $dependencies;
     private $api_rest;
     private $constant;
+    private $media;
     private $tools;
 
     public function __construct()
@@ -40,6 +41,7 @@ class AdminPayplugController extends ModuleAdminController
         $this->dependencies = new DependenciesClass();
         $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->tools = $this->dependencies->getPlugin()->getTools();
     }
 
@@ -53,34 +55,29 @@ class AdminPayplugController extends ModuleAdminController
         }
 
         if ($rest_route = $this->tools->tool('getValue', 'rest_route')) {
-            $this->api_rest->dispatch($rest_route);
+            $json = $this->api_rest->dispatch($rest_route);
+            exit(json_encode($json));
         }
-
-        if (Tools::getValue('_ajax')) {
-            $this->dependencies->adminClass->adminAjaxController();
-        }
-
-        $this->dependencies->configClass->postProcess();
-        $this->dependencies->configClass->assignContentVar();
 
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
         ]);
 
+        $this->media->addJsDef([
+            'payplug_admin_config' => [
+                'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
+                'img_path' => $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/',
+            ],
+        ]);
+
+        $template = 'admin_lib.tpl';
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
-            $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-            $this->context->controller->addJS($views_path . '/js/admin-v' . $this->dependencies->version . '.js');
-            $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
-            $this->context->controller->addCSS($views_path . '/css/admin-v' . $this->dependencies->version . '.css');
-            $this->context->controller->addJS($views_path . '/js/components-v' . $this->dependencies->version . '.js');
-
-            $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/admin.tpl');
-
+            $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/' . $template);
             $this->context->smarty->assign([
                 'content' => $this->content . $content,
             ]);
         } else {
-            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin_lib.tpl');
+            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/' . $template);
             parent::initContent();
         }
     }

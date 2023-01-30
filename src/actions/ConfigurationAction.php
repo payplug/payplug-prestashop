@@ -33,6 +33,120 @@ class ConfigurationAction
     }
 
     /**
+     * @param string $payment_method
+     *
+     * @return array
+     */
+    public function checkPermissionAction($payment_method = '')
+    {
+        if (!is_string($payment_method) || !$payment_method) {
+            return [
+                'success' => false,
+                'data' => [
+                    'msg' => 'An error occured while getting the permissions',
+                ],
+            ];
+        }
+
+        $allowed_methods = [
+            'one_click' => 'can_save_cards',
+            'installment' => 'can_create_installment_plan',
+            'deferred' => 'can_create_deferred_payment',
+            'oney' => 'can_use_oney',
+            'bancontact' => 'can_use_bancontact',
+            'applepay' => 'can_use_applepay',
+            'american_express' => 'can_use_amex',
+        ];
+
+        if (!$this->dependencies
+            ->getValidators()['payment']
+            ->hasPermissions($allowed_methods, $payment_method)['result']) {
+            return [
+                'success' => false,
+                'data' => [
+                    'msg' => 'We can\'t check the permissions of the given feature',
+                ],
+            ];
+        }
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getModalTranslations();
+
+        $context = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get();
+
+        $external_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($context->language->iso_code);
+
+        $permissions = $this->dependencies->apiClass->getAccountPermissions();
+        $has_permission = $this->dependencies
+            ->getValidators()['payment']
+            ->hasPermissions($permissions, $allowed_methods[$payment_method])['result'];
+        $message = $translation['premium']['description']['unavailable'];
+        switch ($payment_method) {
+            case 'american_express':
+            case 'bancontact':
+                $message .= sprintf(
+                    $translation['premium']['description']['form'],
+                    $translation['premium']['feature'][$payment_method]
+                );
+                $link = '<a href="' . $external_url['contact'] . '" target="_blank">' . $translation['premium']['link']['form'] . '</a>';
+                $message = str_replace('$link', $link, $message);
+
+                break;
+            case 'applepay':
+                $has_permission = $has_permission ? $this->dependencies
+                    ->getValidators()['payment']
+                    ->isApplepayAllowedDomain(
+                        $context->shop->domain,
+                        $permissions['apple_pay_allowed_domains']
+                    )['result'] : false;
+
+                $message .= sprintf(
+                    $translation['premium']['description']['contact'],
+                    $translation['premium']['feature'][$payment_method]
+                );
+                $link = '<a href="' . $external_url['mail'] . '" target="_blank">' . $translation['premium']['link']['contact'] . '</a>';
+                $message = str_replace('$link', $link, $message);
+
+                break;
+            case 'oney':
+                $message .= sprintf(
+                    $translation['premium']['description']['oney'],
+                    $translation['premium']['feature'][$payment_method]
+                );
+                $link = '<a href="' . $external_url['oney_cgv'] . '" target="_blank">' . $translation['premium']['link']['oney'] . '</a>';
+                $message = str_replace('$link', $link, $message);
+
+                break;
+            default:
+                $message .= ' ' . sprintf(
+                    $translation['premium']['description']['default'],
+                    $translation['premium']['feature'][$payment_method]
+                );
+                $link = '<a href="' . $external_url['contact'] . '" target="_blank">' . $translation['premium']['link']['default'] . '</a>';
+                $message = str_replace('$link', $link, $message);
+
+                break;
+        }
+
+        return [
+            'success' => $has_permission,
+            'data' => $has_permission ? [] : [
+                'title' => $translation['premium']['title'],
+                'msg' => $message,
+                'close' => $translation['premium']['submit'],
+            ],
+        ];
+    }
+
+    /**
      * @description Process the login of the merchant
      *
      * @param object $datas
@@ -80,9 +194,12 @@ class ConfigurationAction
             ];
         }
 
-        $password = $datas->payplug_password;
-        $isPlaintextPassword = $this->dependencies->configClass->getAdapterPrestaClasse()->isPlaintextPassword($password);
-        if (!$password || !$isPlaintextPassword) {
+        $password = base64_decode($datas->payplug_password);
+        $is_valid_password = $this->dependencies
+            ->getValidators()['account']
+            ->isPassword($password)['result'];
+
+        if (!$password || !$is_valid_password) {
             $logger->addLog('ConfigurationAction::loginAction: invalid password.');
 
             return [
@@ -143,28 +260,24 @@ class ConfigurationAction
     public function renderConfiguration()
     {
         $api_rest = $this->dependencies->getPlugin()->getApiRest();
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-        $payplug_email = $config->get($this->dependencies->getConfigurationKey('email'));
+        $current_configuration = $api_rest->getDataFields();
 
-        $header = $api_rest->getHeaderSection();
+        $setting = $api_rest->getSettingsSection($current_configuration);
+        $header = $api_rest->getHeaderSection($current_configuration);
         $footer = $api_rest->getFooterSection();
 
-        if ((bool) $payplug_email) {
-            $payplug_wooc_settings = $api_rest->getDataFields($config);
-            unset($payplug_wooc_settings['payplug_live_key'],
-                $payplug_wooc_settings['payplug_test_key'],
-                $payplug_wooc_settings['payplug_password'],
-                $payplug_wooc_settings['payplug_merchant_id']);
+        $is_logged = isset($current_configuration['logged']) ? $current_configuration['logged'] : false;
 
+        if ((bool) $is_logged) {
             $datas = [
-                'payplug_wooc_settings' => $payplug_wooc_settings,
-                'settings' => $api_rest->getSettingsSection(true),
+                'payplug_wooc_settings' => $current_configuration,
+                'settings' => $setting,
                 'header' => $header,
                 'login' => $api_rest->getLoginSection(),
-                'logged' => $api_rest->getLoggedSection(),
-                'payment_methods' => $api_rest->getPaymentMethodsSection($payplug_wooc_settings),
-                'payment_paylater' => $api_rest->getPaylaterSection($payplug_wooc_settings),
-                'status' => $api_rest->getRequirementsSection($payplug_wooc_settings),
+                'logged' => $api_rest->getLoggedSection($current_configuration),
+                'payment_methods' => $api_rest->getPaymentMethodsSection($current_configuration),
+                'payment_paylater' => $api_rest->getPaylaterSection($current_configuration),
+                'status' => $api_rest->getRequirementsSection($current_configuration),
                 'footer' => $footer,
             ];
         } else {
@@ -195,7 +308,11 @@ class ConfigurationAction
      */
     public function saveAction($datas = null)
     {
-        $validators = $this->dependencies->getValidators();
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getModalTranslations();
+
         $logger = $this->dependencies->getPlugin()->getLogger();
 
         if (!is_object($datas) || !$datas) {
@@ -225,35 +342,35 @@ class ConfigurationAction
         $configuration = $this->dependencies->getPlugin()->getConfiguration();
 
         $configurationKeys = [
-            $this->dependencies->getConfigurationKey('deferred') => 'payplug_deferred',
+            $this->dependencies->getConfigurationKey('deferred') => 'enable_payplug_deferred',
             $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
             $this->dependencies->getConfigurationKey('enable') => 'payplug_enable',
-            $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embedded_mode',
-            $this->dependencies->getConfigurationKey('inst') => 'payplug_inst',
+            $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embeded',
+            $this->dependencies->getConfigurationKey('inst') => 'enable_payplug_inst',
             $this->dependencies->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
             $this->dependencies->getConfigurationKey('instMode') => 'payplug_inst_mode',
-            $this->dependencies->getConfigurationKey('oneClick') => 'payplug_one_click',
+            $this->dependencies->getConfigurationKey('oneClick') => 'enable_one_click',
             $this->dependencies->getConfigurationKey('oney') => 'enable_oney',
             $this->dependencies->getConfigurationKey('oneyOptimized') => 'enable_oney_schedule',
             $this->dependencies->getConfigurationKey('oneyProductCta') => 'enable_oney_product_animation',
             $this->dependencies->getConfigurationKey('oneyCartCta') => 'enable_oney_cart_animation',
             $this->dependencies->getConfigurationKey('oneyFees') => 'payplug_oney',
             $this->dependencies->getConfigurationKey('sandboxMode') => 'payplug_sandbox',
-            $this->dependencies->getConfigurationKey('standard') => 'payplug_standard',
-            $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'oney_max_amounts',
+            $this->dependencies->getConfigurationKey('standard') => 'enable_standard',
             $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'oney_min_amounts',
-            $this->dependencies->getConfigurationKey('bancontact') => 'payplug_bancontact',
+            $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'oney_max_amounts',
+            $this->dependencies->getConfigurationKey('bancontact') => 'enable_bancontact',
             $this->dependencies->getConfigurationKey('bancontactCountry') => 'payplug_bancontact_country',
-            $this->dependencies->getConfigurationKey('applepay') => 'payplug_applepay',
-            $this->dependencies->getConfigurationKey('amex') => 'payplug_amex',
+            $this->dependencies->getConfigurationKey('applepay') => 'enable_applepay',
+            $this->dependencies->getConfigurationKey('amex') => 'enable_american_express',
         ];
 
         foreach ($configurationKeys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};
                 switch ($config) {
-                    case 'payplug_one_click':
-                        if ((bool) $datas->payplug_standard && !$configuration->updateValue($key, $value)) {
+                    case 'enable_one_click':
+                        if ((bool) $datas->enable_standard && !$configuration->updateValue($key, $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -264,11 +381,11 @@ class ConfigurationAction
                         }
 
                         break;
-                    case 'payplug_oney_optimized':
-                    case 'payplug_oney_product_cta':
-                    case 'payplug_oney_cart_cta':
-                    case 'payplug_oney_fees':
-                        if (((bool) $datas->payplug_oney || $this->dependencies->name == 'pspaylater') && !$configuration->updateValue($key, $value)) {
+                    case 'payplug_oney_type':
+                    case 'enable_oney_product_animation':
+                    case 'enable_oney_cart_animation':
+                    case 'enable_oney_schedule':
+                        if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) && !$configuration->updateValue($key, $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -281,7 +398,10 @@ class ConfigurationAction
                         break;
                     case 'payplug_inst_min_amount':
                     case 'payplug_inst_mode':
-                        if ((int) $datas->payplug_inst_min_amount >= 4 && (int) $datas->payplug_inst_mode < 5 && (int) $datas->payplug_inst_mode > 1 && !$configuration->updateValue($key, $value)) {
+                        if ((int) $datas->payplug_inst_min_amount >= 4
+                            && (int) $datas->payplug_inst_mode < 5
+                            && (int) $datas->payplug_inst_mode > 1
+                            && !$configuration->updateValue($key, $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -298,8 +418,11 @@ class ConfigurationAction
                         $limit_oney = $oney->getOneyPriceLimit(false);
                         $amount = $datas->{$config};
                         $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
-                        $is_valid_amount = $validators['payment']->isAmount((int) $amount_to_cent, $limit_oney);
-                        if ($is_valid_amount && !$configuration->updateValue($key, $oney->setCustomOneyLimit((int) $amount_to_cent))) {
+                        $is_valid_amount = $this->dependencies
+                            ->getValidators()['payment']
+                            ->isAmount((int) $amount_to_cent, $limit_oney);
+                        $formated_amount = $oney->setCustomOneyLimit((int) $amount_to_cent);
+                        if ($is_valid_amount && !$configuration->updateValue($key, $formated_amount)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -310,8 +433,7 @@ class ConfigurationAction
                         }
 
                         break;
-
-                    case 'payplug_bancontact':
+                    case 'enable_bancontact':
                     case 'payplug_bancontact_country':
                         if (!(bool) $datas->payplug_sandbox && !$configuration->updateValue($key, $value)) {
                             return [
@@ -337,55 +459,19 @@ class ConfigurationAction
                 }
             }
 
-            if ('payplug_enable' == $config) {
+            if ('payplug_enable' == $key && (bool) $value) {
                 $module = $this->dependencies->getPlugin()->getModule();
                 $module->getInstanceByName($this->dependencies->name)->enable();
             }
         }
 
-        return $this->renderConfiguration();
-    }
-
-    public function checkPermissionAction($payment_method = null)
-    {
-        $validators = $this->dependencies->getValidators();
-        $permissions = $this->dependencies->apiClass->getAccountPermissions();
-
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $modal_translations = $translation->getModalTranslations();
-
-        switch ($payment_method) {
-            case 'oney':
-                $response = $validators['payment']->hasPermissions($permissions, 'can_use_oney');
-
-                if ($response['result'] === true) {
-                    $data = [];
-                } else {
-                    $data = [
-                        'title' => $modal_translations['premium']['feature']['title'],
-                        'msg' => $modal_translations['premium']['feature']['unavailable'] . ' ' . $modal_translations['premium']['feature']['activateOney'],
-                        'close' => $modal_translations['premium']['PremiumOk'],
-                    ];
-                }
-                $response = [
-                    'success' => $response['result'],
-                    'data' => $data,
-                ];
-
-                break;
-            default:
-                $response = [
-                    'success' => false,
-                    'data' => [
-                        'title' => $modal_translations['premium']['feature']['title'],
-                        'msg' => $modal_translations['premium']['feature']['unavailable'] . ' ' . $modal_translations['premium']['feature']['activateOney'],
-                        'close' => $modal_translations['premium']['PremiumOk'],
-                    ],
-                ];
-
-                break;
-        }
-
-        return $response;
+        return [
+            'success' => true,
+            'data' => [
+                'title' => null,
+                'msg' => $translation['confirmation']['text'],
+                'close' => $translation['confirmation']['submit'],
+            ],
+        ];
     }
 }
