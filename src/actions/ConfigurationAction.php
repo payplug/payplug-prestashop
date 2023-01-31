@@ -287,7 +287,7 @@ class ConfigurationAction
                 'login' => $api_rest->getLoginSection(),
                 'subscribe' => $api_rest->getSubscribeSection(),
                 'payment_methods' => $api_rest->getPaymentMethodsSection(),
-                'payment_palate' => $api_rest->getPaylaterSection(),
+                'payment_paylater' => $api_rest->getPaylaterSection(),
                 'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
             ];
