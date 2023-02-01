@@ -182,7 +182,7 @@ class ApiClass
             if (!$publishable_key) {
                 $this->config->deleteByName($this->dependencies->getConfigurationKey('publishableKey'));
                 $this->config->deleteByName($this->dependencies->getConfigurationKey('publishableKeyTest'));
-                $this->config->updateValue($this->dependencies->getConfigurationKey('embeddedMode'), 'redirected');
+                $this->config->updateValue($this->dependencies->getConfigurationKey('embeddedMode'), 'redirect');
 
                 return [
                     'result' => false,
@@ -235,7 +235,7 @@ class ApiClass
                 );
                 $this->config->updateValue(
                     $this->dependencies->getConfigurationKey('embeddedMode'),
-                    'redirected'
+                    'redirect'
                 );
 
                 return [
