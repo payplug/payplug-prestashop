@@ -117,10 +117,7 @@ class ConfigurationAction
 
                 break;
             case 'oney':
-                $message .= sprintf(
-                    $translation['premium']['description']['oney'],
-                    $translation['premium']['feature'][$payment_method]
-                );
+                $message .= $translation['premium']['description']['oney'];
                 $link = '<a href="' . $external_url['oney_cgv'] . '" target="_blank">' . $translation['premium']['link']['oney'] . '</a>';
                 $message = str_replace('$link', $link, $message);
 
