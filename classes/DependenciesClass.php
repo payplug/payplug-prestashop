@@ -120,7 +120,7 @@ class DependenciesClass
         ],
         'embeddedMode' => [
             'name' => 'EMBEDDED_MODE',
-            'defaultValue' => 'redirected',
+            'defaultValue' => 'redirect',
             'setConf' => 1,
         ],
         'inst' => [

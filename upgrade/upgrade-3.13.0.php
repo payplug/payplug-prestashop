@@ -39,5 +39,13 @@ function upgrade_module_3_13_0()
         );
     $flag = $flag && Configuration::DeleteByName('PAYPLUG_SHOW');
 
+    $embedded_mode = Configuration::get('PAYPLUG_EMBEDDED_MODE');
+    if ('redirected' == $embedded_mode) {
+        $flag = $flag && Configuration::updateValue(
+                'PAYPLUG_EMBEDDED_MODE',
+                'redirect'
+            );
+    }
+
     return $flag;
 }

@@ -1533,7 +1533,7 @@ class PaymentClass
             'isDeferred' => $options['is_deferred'],
             'isEmbedded' => (string) $this->config->get(
                 $this->dependencies->getConfigurationKey('embeddedMode')
-            ) !== 'redirected',
+            ) !== 'redirect',
             'isIntegrated' => $options['is_integrated'],
             'isMobileDevice' => ($this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result']),
             'cart' => $cart,

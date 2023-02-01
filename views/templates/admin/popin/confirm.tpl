@@ -28,7 +28,7 @@
     {if $display_mode_feature && ($installment_feature || $standard_feature)}
         <li data-e2e-type="embedded" data-e2e-state="{if $embedded}on{else}off{/if}">
             {l s='admin.popin.confirm.paymentpage' mod='payplug'}
-            <strong>{if $embedded == 'integrated'}{l s='admin.popin.confirm.embedded' mod='payplug'}{elseif $embedded == 'popup'}{l s='admin.popin.confirm.popup' mod='payplug'}{elseif $embedded == 'redirected'}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
+            <strong>{if $embedded == 'integrated'}{l s='admin.popin.confirm.embedded' mod='payplug'}{elseif $embedded == 'popup'}{l s='admin.popin.confirm.popup' mod='payplug'}{elseif $embedded == 'redirect'}{l s='admin.popin.confirm.redirected' mod='payplug'}{/if}</strong>
         </li>
     {/if}
     {if $standard_feature}
