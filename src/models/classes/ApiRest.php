@@ -747,7 +747,7 @@ class ApiRest
         // todo: get this default value from dependenciesClass (alike)
         $default_configuration = [
             'standard' => true,
-            'embedded_mode' => 'redirected',
+            'embedded_mode' => 'redirect',
             'one_click' => false,
             'inst' => false,
             'inst_mode' => 3,
@@ -787,8 +787,8 @@ class ApiRest
             $embedded_mode[] = [
                 'name' => 'payplug_embedded',
                 'label' => $translation['embedded']['options']['redirect'],
-                'value' => 'redirected',
-                'checked' => 'redirected' == $current_configuration['embedded_mode'],
+                'value' => 'redirect',
+                'checked' => 'redirect' == $current_configuration['embedded_mode'],
             ];
 
             if ($this->dependencies->configClass->isValidFeature('feature_installment')) {
