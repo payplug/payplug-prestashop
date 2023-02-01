@@ -127,6 +127,8 @@ class Translation
                     'warning' => [
                         'title' => $this->dependencies->l('logged.inactive.account.warning.title', 'loggedtranslation'),
                         'description' => $this->dependencies->l('logged.inactive.account.warning.description', 'loggedtranslation'),
+                        'link' => $this->dependencies->l('logged.inactive.account.warning.link', 'loggedtranslation'),
+                        'trigger' => $this->dependencies->l('logged.inactive.account.warning.trigger', 'loggedtranslation'),
                     ],
                     'error' => [
                         'title' => $this->dependencies->l('logged.inactive.account.error.title', 'loggedtranslation'),
