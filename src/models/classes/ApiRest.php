@@ -26,6 +26,7 @@ namespace PayPlug\src\models\classes;
 class ApiRest
 {
     private $dependencies;
+    private $helpers;
     private $validators;
 
     public function __construct($dependencies)
@@ -652,6 +653,7 @@ class ApiRest
         $config = $this->dependencies
             ->getPlugin()
             ->getConfiguration();
+
         $can_use_cta = !in_array(
             $config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries')),
             ['ES', 'BE']
@@ -1362,16 +1364,20 @@ class ApiRest
 
         // todo: Create an helper to handle the two following line of logic
         $custom_min = explode(':', $current_configuration['oney_custom_min_amounts']);
-        $custom_min = $this->helpers['amount']->formatOneyAmount((int) $custom_min[1])['result'];
+        $custom_min = (int) $custom_min[1];
+        $custom_min = $this->helpers['amount']->formatOneyAmount($custom_min)['result'];
 
         $custom_max = explode(':', $current_configuration['oney_custom_max_amounts']);
-        $custom_max = $this->helpers['amount']->formatOneyAmount((int) $custom_max[1])['result'];
+        $custom_max = (int) $custom_max[1];
+        $custom_max = $this->helpers['amount']->formatOneyAmount($custom_max)['result'];
 
         $min = explode(':', $current_configuration['oney_min_amounts']);
-        $min = $this->helpers['amount']->formatOneyAmount((int) $min[1])['result'];
+        $min = (int) $min[1];
+        $min = $this->helpers['amount']->formatOneyAmount($min)['result'];
 
         $max = explode(':', $current_configuration['oney_max_amounts']);
-        $max = $this->helpers['amount']->formatOneyAmount((int) $max[1])['result'];
+        $max = (int) $max[1];
+        $max = $this->helpers['amount']->formatOneyAmount($max)['result'];
 
         $translation = $this->dependencies
             ->getPlugin()
@@ -1401,8 +1407,8 @@ class ApiRest
                     'name' => 'oney_max_amounts',
                     'value' => $custom_max,
                     'placeholder' => $custom_max,
-                    //'min' => $min,
-                    //'max' => $max,
+                    'min' => $min,
+                    'max' => $max,
                 ],
                 'error' => [
                     'text' => sprintf(
