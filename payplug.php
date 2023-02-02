@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -12,13 +12,13 @@
  *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * Do not edit or add to this file if you wish to upgrade Payplug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 // Check if prestashop Context
 if (!defined('_PS_VERSION_')) {
@@ -42,16 +42,16 @@ class Payplug extends PaymentModule
     public function __construct()
     {
         $this->name = 'payplug';
-        $this->author = 'PayPlug';
+        $this->author = 'Payplug';
         $this->bootstrap = true;
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->description = $this->l('payplug.construct.description');
-        $this->displayName = 'PayPlug';
+        $this->displayName = 'Payplug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '3.12.1';
+        $this->version = '3.13.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7'];
