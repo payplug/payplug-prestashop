@@ -474,6 +474,14 @@ $_MODULE['<{payplug}prestashop>subscribetranslation_3f58da54a81b5c268348af8ba07d
 $_MODULE['<{payplug}prestashop>subscribetranslation_7915be0d06568403359877496e6f9b25'] = 'General';
 $_MODULE['<{payplug}prestashop>subscribetranslation_ae9ef1ec842a2dd66e734e3cee742ab1'] = 'I already have a PayPlug account';
 $_MODULE['<{payplug}prestashop>subscribetranslation_d96313656bea2b4673ff166ef8933a5f'] = 'Create your account to use the module.';
+$_MODULE['<{payplug}prestashop>translation_02e883cf07cf2a3e6386a1765f38877b'] = 'OpenSSL 1.0.1 or later';
+$_MODULE['<{payplug}prestashop>translation_25b3b4ec77a36399a7a25ec060880c29'] = 'Control your environment to ensure that the module is in perfect working order';
+$_MODULE['<{payplug}prestashop>translation_64799c3d500ec8d5d754452d66ecca2b'] = 'The verification was successfully completed.';
+$_MODULE['<{payplug}prestashop>translation_6f5e0a3e6a49ae8095e77873ac3142e6'] = 'Status';
+$_MODULE['<{payplug}prestashop>translation_9c04a0bdb4ce63ef08c61db0fac8d0f2'] = 'Unfortunately at least one issue is preventing you from using PayPlug. Refresh the page or click \'Check\' once they are fixed';
+$_MODULE['<{payplug}prestashop>translation_a653b3271ca7f6c2371eb77b6f5dc8c2'] = 'PHP cURL extension must be enabled on your server';
+$_MODULE['<{payplug}prestashop>translation_ca06657b8f3f74842dd4c9241707f0fa'] = 'Your server must run PHP 5.6 or greater';
+$_MODULE['<{payplug}prestashop>translation_ee949139c7de143747d0be955f7a0f20'] = 'Check';
 $_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.';
 $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Empty payment data.';
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'An error occurred. Please retry in few seconds.';
