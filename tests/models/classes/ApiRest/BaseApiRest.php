@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class BaseApiRest extends TestCase
 {
+    public $amount_helper;
     public $classe;
     public $configuration;
     public $configuration_action;
@@ -75,11 +76,12 @@ class BaseApiRest extends TestCase
                 'getTranslation' => $this->translation,
             ]);
 
+        $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();
         $this->dependencies
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
                 'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
-                'getHelpers' => [],
+                'getHelpers' => ['amount' => $this->amount_helper],
             ]);
 
         $this->classe = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();
