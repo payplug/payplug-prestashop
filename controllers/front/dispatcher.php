@@ -58,16 +58,23 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
             $is_bancontact = (bool) ($method === 'bancontact');
             $is_applepay = (bool) ($method === 'applepay');
             $is_amex = (bool) ($method === 'amex');
+            $error_url = 'index.php?controller=order&step=3&has_error=1&modulename=' . $this->dependenciesClass->name;
 
             $cart = new Cart($id_cart);
             if (!Validate::isLoadedObject($cart)) {
                 return false;
             }
 
+            if (Order::getByCartId($id_cart)) {
+                $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
+                    $this->dependenciesClass->l('The transaction was not completed and your card was not charged.'),
+                ]);
+                $this->toolsAdapter->tool('redirect', $error_url);
+            }
+
             $options = $this->dependenciesClass->configClass->getAvailableOptions($cart);
 
             $embedded = $options['embedded'] != 'redirected';
-            $error_url = 'index.php?controller=order&step=3&has_error=1&modulename=' . $this->dependenciesClass->name;
 
             if ($options['oney'] && $is_oney) {
                 $payment = $this->dependenciesClass->paymentClass->preparePayment(['is_oney' => $oney_type]);
