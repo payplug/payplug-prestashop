@@ -37,14 +37,14 @@
     .borderRadius(.25em);
     .transition(left @dur);
     //.boxShadow(rgba(0,0,0,.15) 0 1px 4px 1px inset);
-    .border(darken(#colorMap[module], 5%));
+    .border(darken(#colorMap[primary], 5%));
     border-bottom-width: 2px;
     display: block;
     position: absolute;
     top: 0;
     left: 0;
     content: "";
-    background: #colorMap[module];
+    background: #colorMap[primary];
     width: 50%;
     height: 100%;
 
@@ -88,7 +88,7 @@
     height: 20px;
     margin: 0 8px 0 0;
     cursor: pointer;
-    background: #colorMap[module];
+    background: #colorMap[primary];
 
     label {
       display: none;
@@ -134,10 +134,10 @@
 
     input:checked + label {
       transition: background 300ms linear;
-      background: #colorMap[module];
+      background: #colorMap[primary];
       border-radius: 0.25em;
       border: 1px solid;
-      border-color: #colorMap[module];
+      border-color: #colorMap[primary];
     }
 
     &_label {
@@ -151,7 +151,7 @@
     &:before {
       background: none;
       .borderRadius(.25em);
-      .border(darken(#colorMap[module], 5%));
+      .border(darken(#colorMap[primary], 5%));
       width: calc(100% / 3);
       z-index: 1;
       border: none;

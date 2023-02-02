@@ -1,5 +1,5 @@
 {*
-* 2022 PayPlug
+* 2022 Payplug
 *
 * NOTICE OF LICENSE
 *
@@ -11,13 +11,13 @@
 *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * Do not edit or add to this file if you wish to upgrade Payplug module to newer
  * versions in the future.
 *
-*  @author PayPlug SAS
-*  @copyright 2023 PayPlug SAS
+*  @author Payplug SAS
+*  @copyright 2023 Payplug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
-*  International Registered Trademark & Property of PayPlug SAS
+*  International Registered Trademark & Property of Payplug SAS
 *}
 
 <div class="_advancedOption -{$advancedOptionName|escape:'htmlall':'UTF-8'}">

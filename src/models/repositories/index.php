@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2022 PayPlug SAS
+ * 2013 - 2022 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -12,7 +12,7 @@
  *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * Do not edit or add to this file if you wish to upgrade Payplug module to newer
  * versions in the future.
  *
  *  @author    PayPlug SAS
