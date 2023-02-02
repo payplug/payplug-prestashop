@@ -313,46 +313,43 @@ class Translation
     public function getRequirementsTranslations()
     {
         return [
+            'title' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsTitle', 'translation'),
+            'descriptions' => [
+                    'description' => $this->dependencies->l(
+                        'payplug.getRequirementsTranslations.requirementsDescription',
+                        'translation'
+                    ),
+                    'errorMessage' => $this->dependencies->l(
+                        'payplug.getRequirementsTranslations.requirementsDescriptionErrorMessage',
+                        'translation'
+                    ),
+                    'check' => $this->dependencies->l(
+                        'payplug.getRequirementsTranslations.requirementsDescriptionsCheck',
+                        'translation'
+                    ),
+                    'successMessage' => $this->dependencies->l(
+                        'payplug.getRequirementsTranslations.requirementsDescriptionsSuccessMessage',
+                        'translation'
+                    ),
+                ],
             'requirements' => [
-                'title' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsTitle', 'translation'),
-                'descriptions' => [
-                    'live' => [
-                        'description' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDescriptionsLiveDescription', 'translation'),
-                        'errorMessage' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDescriptionsLiveErrorMessage', 'translation'),
-                        'check' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDescriptionsLiveCheck', 'translation'),
-                    ],
-                    'test' => [
-                        'description' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDescriptionsTestDescription', 'translation'),
-                        'errorMessage' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDescriptionsTestErrorMessage', 'translation'),
-                        'check' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDescriptionsTestCheck', 'translation'),
-                    ],
+                'curl' => [
+                    'text' => $this->dependencies->l(
+                        'payplug.getRequirementsTranslations.requirementsCurlText',
+                        'translation'
+                    ),
                 ],
-                'requirements' => [
-                    'curl' => [
-                        'text' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsRequirementsCurlText', 'translation'),
-                    ],
-                    'php' => [
-                        'text' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsRequirementsPhpText', 'translation'),
-                    ],
-                    'openssl' => [
-                        'text' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsRequirementsOpensslText', 'translation'),
-                    ],
-                    'currency' => [
-                        'text' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsRequirementsCurrencyText', 'translation'),
-                    ],
-                    'account' => [
-                        'text' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsRequirementsAccountText', 'translation'),
-                    ],
+                'php' => [
+                    'text' => $this->dependencies->l(
+                        'payplug.getRequirementsTranslations.requirementsPhpText',
+                        'translation'
+                    ),
                 ],
-                'debug' => [
-                    'live' => [
-                        'title' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDebugLiveTitle', 'translation'),
-                        'description' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDebugLiveDescription', 'translation'),
-                    ],
-                    'test' => [
-                        'title' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDebugTestTitle', 'translation'),
-                        'description' => $this->dependencies->l('payplug.getRequirementsTranslations.requirementsDebugTestDescription', 'translation'),
-                    ],
+                'openssl' => [
+                    'text' => $this->dependencies->l(
+                        'payplug.getRequirementsTranslations.requirementsOpensslText',
+                        'translation'
+                    ),
                 ],
             ],
         ];

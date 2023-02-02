@@ -274,7 +274,7 @@ class ConfigurationAction
                 'logged' => $api_rest->getLoggedSection($current_configuration),
                 'payment_methods' => $api_rest->getPaymentMethodsSection($current_configuration),
                 'payment_paylater' => $api_rest->getPaylaterSection($current_configuration),
-                'status' => $api_rest->getRequirementsSection($current_configuration),
+                'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
             ];
         } else {

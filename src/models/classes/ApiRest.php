@@ -75,6 +75,12 @@ class ApiRest
 
                 break;
             case 'check_requirements':
+                $json = [
+                    'status' => $this->getRequirementsSection(),
+                ];
+
+               break;
+
             case 'refresh_keys':
             case 'save':
                 $datas = json_decode(file_get_contents('php://input'), false);
@@ -1138,73 +1144,77 @@ class ApiRest
     /**
      * @description build requirement section for api usage
      *
-     * @param array $options
-     *
      * @return array
      */
-    public function getRequirementsSection($options = [])
+    public function getRequirementsSection()
     {
-        $checked = !empty($options['debug']) && $options['debug'] === 'yes' ? true : false;
+        $translation = $this->dependencies->getPlugin()->getTranslation()->getRequirementsTranslations();
 
-        $translation = $this->dependencies->getPlugin()->getTranslation();
-        $requirements_translations = $translation->getRequirementsTranslations();
+        $requirements_reports = $this->dependencies->configClass->getReportRequirements();
+
+        $is_requirements_checked = $this->validators['module']->isAllRequirementsChecked(
+            $requirements_reports
+        );
+        $php_error = $curl_error = $openssl_error = false;
+        if (!$is_requirements_checked['result']) {
+            $error_code = $is_requirements_checked['code'];
+            switch ($error_code) {
+                case 'format':
+                    $php_error = true;
+                    $curl_error = true;
+                    $openssl_error = true;
+
+                    break;
+                case 'php_format':
+                case 'php_requirements':
+                    $php_error = true;
+
+                    break;
+                case 'openssl_format':
+                case 'openssl_requirements':
+                    $openssl_error = true;
+
+                    break;
+                case 'curl_format':
+                case 'curl_requirements':
+                    $curl_error = true;
+
+                    break;
+            }
+        }
 
         return [
-            //"error" => !$this->getRequirementsSection(),
-            'error' => false,
-            'title' => $requirements_translations['requirements']['title'],
+            'error' => !$is_requirements_checked['result'],
+            'title' => $translation['title'],
             'descriptions' => [
                 'live' => [
-                    'description' => $requirements_translations['requirements']['descriptions']['live']['description'],
-                    'errorMessage' => $requirements_translations['requirements']['descriptions']['live']['errorMessage'],
-                    'check' => $requirements_translations['requirements']['descriptions']['live']['check'],
-                    //'check_success" => 'Live check success',
+                    'description' => $translation['descriptions']['description'],
+                    'errorMessage' => $translation['descriptions']['errorMessage'],
+                    'check' => $translation['descriptions']['check'],
+                    'check_success' => $translation['descriptions']['successMessage'],
                 ],
                 'sandbox' => [
-                    'description' => $requirements_translations['requirements']['descriptions']['test']['description'],
-                    'errorMessage' => $requirements_translations['requirements']['descriptions']['test']['errorMessage'],
-                    'check' => $requirements_translations['requirements']['descriptions']['test']['check'],
-                    //"check_success" => 'Test check success',
+                    'description' => $translation['descriptions']['description'],
+                    'errorMessage' => $translation['descriptions']['errorMessage'],
+                    'check' => $translation['descriptions']['check'],
+                    'check_success' => $translation['descriptions']['successMessage'],
                 ],
             ],
             'requirements' => [
-                /*$getRequirementsSection->curl_requirement(),
-                $getRequirementsSection->php_requirement(),
-                $getRequirementsSection->openssl_requirement(),
-                $getRequirementsSection->currency_requirement(), //MISSING THIS MESSAGES
-                $getRequirementsSection->account_requirement(),*/
                 [
-                    'status' => true,
-                    'text' => $requirements_translations['requirements']['requirements']['curl']['text'],
+                    'status' => !$openssl_error && $requirements_reports['openssl']['installed'] && $requirements_reports['openssl']['up2date'],
+                    'text' => $translation['requirements']['openssl']['text'],
                 ],
                 [
-                    'status' => true,
-                    'text' => $requirements_translations['requirements']['requirements']['php']['text'],
+                    'status' => !$php_error ? $requirements_reports['php']['up2date'] : false,
+                    'text' => $translation['requirements']['php']['text'],
                 ],
                 [
-                    'status' => true,
-                    'text' => $requirements_translations['requirements']['requirements']['openssl']['text'],
-                ],
-                [
-                    'status' => true,
-                    'text' => $requirements_translations['requirements']['requirements']['currency']['text'],
-                ],
-                [
-                    'status' => true,
-                    'text' => $requirements_translations['requirements']['requirements']['account']['text'],
+                    'status' => !$curl_error ? $requirements_reports['curl']['installed'] : false,
+                    'text' => $translation['requirements']['curl']['text'],
                 ],
             ],
-            'debug' => [
-                'live' => [
-                    'title' => $requirements_translations['requirements']['debug']['live']['title'],
-                    'description' => $requirements_translations['requirements']['debug']['live']['description'],
-                ],
-                'sandbox' => [
-                    'title' => $requirements_translations['requirements']['debug']['test']['title'],
-                    'description' => $requirements_translations['requirements']['debug']['test']['description'],
-                ],
-            ],
-            'enable_debug_check' => $checked,
+            'enable_debug_check' => false, //TODO: to be deleted
         ];
     }
 
