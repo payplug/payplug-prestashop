@@ -474,6 +474,14 @@ $_MODULE['<{payplug}prestashop>subscribetranslation_3f58da54a81b5c268348af8ba07d
 $_MODULE['<{payplug}prestashop>subscribetranslation_7915be0d06568403359877496e6f9b25'] = 'Generale';
 $_MODULE['<{payplug}prestashop>subscribetranslation_ae9ef1ec842a2dd66e734e3cee742ab1'] = 'Ho già un account PayPlug';
 $_MODULE['<{payplug}prestashop>subscribetranslation_d96313656bea2b4673ff166ef8933a5f'] = 'Crea il tuo account per poter utilizzare il modulo.';
+$_MODULE['<{payplug}prestashop>translation_02e883cf07cf2a3e6386a1765f38877b'] = 'Il tuo server deve essere OpenSSL 1.0.1 o successivo';
+$_MODULE['<{payplug}prestashop>translation_25b3b4ec77a36399a7a25ec060880c29'] = 'Controlla il tuo ambiente per garantire il buon funzionamento del modulo.';
+$_MODULE['<{payplug}prestashop>translation_64799c3d500ec8d5d754452d66ecca2b'] = 'La verifica è stata effettuata con successo.';
+$_MODULE['<{payplug}prestashop>translation_6f5e0a3e6a49ae8095e77873ac3142e6'] = 'Stato';
+$_MODULE['<{payplug}prestashop>translation_9c04a0bdb4ce63ef08c61db0fac8d0f2'] = 'Potresti incontrare una difficoltà usando PayPlug. Aggiorna la pagina o clicca "Verifica" una volta corretti';
+$_MODULE['<{payplug}prestashop>translation_a653b3271ca7f6c2371eb77b6f5dc8c2'] = 'L\'estensione PHP cURL deve essere abilitata sul tuo server';
+$_MODULE['<{payplug}prestashop>translation_ca06657b8f3f74842dd4c9241707f0fa'] = 'Il tuo server deve essere su PHP 5.6 o maggiore';
+$_MODULE['<{payplug}prestashop>translation_ee949139c7de143747d0be955f7a0f20'] = 'Verifica';
 $_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'La simulazione del tuo piano di finanziamento non è per il momento disponibile. Queste informazioni ti saranno fornite al momento del pagamento.';
 $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Nessun campo è stato completato.';
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'Si è verificato un errore. Riprova tra un attimo.';

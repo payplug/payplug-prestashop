@@ -39,6 +39,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'format',
                 'message' => 'Invalid parameters given, $report must be an non empty array',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -65,6 +66,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'php_format',
                 'message' => 'Invalid argument given, $report[php] must be a non empty array',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -88,6 +90,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'php_format',
                 'message' => 'Missing array key: $report[php][up2date]',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -111,6 +114,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'php_requirements',
                 'message' => 'Wrong requirement: The minimum requirement for PHP is not respected',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -137,6 +141,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'curl_format',
                 'message' => 'Invalid argument given, $report[curl] must be a non empty array',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -160,6 +165,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'curl_format',
                 'message' => 'Missing array key: $report[curl][installed]',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -183,6 +189,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'curl_requirements',
                 'message' => 'Wrong requirement: The minimum requirement for Curl is not respected',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -208,6 +215,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'openssl_format',
                 'message' => 'Invalid argument given, $report[openssl] must be a non empty array',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -230,6 +238,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'openssl_format',
                 'message' => 'Missing array key: $report[openssl][installed] and/or $report[openssl][up2date]',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -253,6 +262,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'openssl_requirements',
                 'message' => 'Wrong requirement: The minimum requirement for OpenSSL is not respected',
             ],
             $this->validator->isAllRequirementsChecked($report)
@@ -276,6 +286,7 @@ class isAllRequirementsCheckedTest extends TestCase
         $this->assertSame(
             [
                 'result' => false,
+                'code' => 'openssl_requirements',
                 'message' => 'Wrong requirement: The minimum requirement for OpenSSL is not respected',
             ],
             $this->validator->isAllRequirementsChecked($report)

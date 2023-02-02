@@ -5,6 +5,7 @@ namespace PayPlug\tests\models\classes\ApiRest;
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\utilities\services\Routes;
+use PayPlug\src\utilities\validators\moduleValidator;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -72,7 +73,7 @@ class BaseApiRest extends TestCase
         $this->dependencies
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
-                'getValidators' => [],
+                'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
                 'getHelpers' => [],
             ]);
 
