@@ -3,6 +3,7 @@
 namespace PayPlug\tests\models\classes\ApiRest;
 
 use PayPlug\src\models\classes\ApiRest;
+use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\moduleValidator;
@@ -14,6 +15,7 @@ class BaseApiRest extends TestCase
     public $classe;
     public $configuration;
     public $configuration_action;
+    public $configuration_class;
     public $constant;
     public $dependencies;
     public $logger;
@@ -58,12 +60,15 @@ class BaseApiRest extends TestCase
             })
         ;
 
+        $this->configuration_class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
+
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
                 'getConfiguration' => $this->configuration,
                 'getConfigurationAction' => $this->configuration_action,
+                'getConfigurationClass' => $this->configuration_class,
                 'getConstant' => $this->constant,
                 'getLogger' => $this->logger,
                 'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),

@@ -79,7 +79,7 @@ class ApiRest
                     'status' => $this->getRequirementsSection(),
                 ];
 
-               break;
+                break;
 
             case 'refresh_keys':
             case 'save':
@@ -104,14 +104,16 @@ class ApiRest
      */
     public function getDataFields()
     {
-        $config = $this->dependencies->getPlugin()->getConfiguration();
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
 
         $userHelper = $this->helpers['user'];
         $is_api_key = $this->validators['account']->isApiKey(
-            $config->get($this->dependencies->getConfigurationKey('testApiKey'))
+            $configuration->getValue('test_api_key')
         );
         $is_email = $this->validators['account']->isEmail(
-            $config->get($this->dependencies->getConfigurationKey('email'))
+            $configuration->getValue('email')
         );
         $logged = false;
         if ($is_api_key['result'] && $is_email['result']) {
@@ -131,34 +133,35 @@ class ApiRest
         }
 
         $enable = $this->validators['module']->canBeShown(
-            (bool) $config->get($this->dependencies->getConfigurationKey('enable'))
+            (bool) $configuration->getValue('enable')
         )['result'];
 
         return [
             'logged' => $logged,
-            'email' => $config->get($this->dependencies->getConfigurationKey('email')),
+            'email' => $configuration->getValue('email'),
             'enable' => $enable,
-            'sandbox_mode' => $config->get($this->dependencies->getConfigurationKey('sandboxMode')),
-            'embedded_mode' => $config->get($this->dependencies->getConfigurationKey('embeddedMode')),
-            'standard' => $config->get($this->dependencies->getConfigurationKey('standard')),
-            'one_click' => $config->get($this->dependencies->getConfigurationKey('oneClick')),
-            'inst' => $config->get($this->dependencies->getConfigurationKey('inst')),
-            'inst_mode' => $config->get($this->dependencies->getConfigurationKey('instMode')),
-            'inst_min_amount' => $config->get($this->dependencies->getConfigurationKey('instMinAmount')),
-            'deferred' => $config->get($this->dependencies->getConfigurationKey('deferred')),
-            'deferred_state' => $config->get($this->dependencies->getConfigurationKey('deferredState')),
-            'oney' => (bool) $config->get($this->dependencies->getConfigurationKey('oney')),
-            'oney_fees' => (bool) $config->get($this->dependencies->getConfigurationKey('oneyFees')),
-            'oney_schedule' => (bool) $config->get($this->dependencies->getConfigurationKey('oneyOptimized')),
-            'oney_product_animation' => (bool) $config->get($this->dependencies->getConfigurationKey('oneyProductCta')),
-            'oney_cart_animation' => (bool) $config->get($this->dependencies->getConfigurationKey('oneyCartCta')),
-            'oney_thresholds_min' => $config->get($this->dependencies->getConfigurationKey('oneyMinAmounts')),
-            'oney_thresholds_max' => $config->get($this->dependencies->getConfigurationKey('oneyMaxAmounts')),
-            'oney_custom_thresholds_min' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMinAmounts')),
-            'oney_custom_thresholds_max' => $config->get($this->dependencies->getConfigurationKey('oneyCustomMaxAmounts')),
-            'bancontact' => (bool) $config->get($this->dependencies->getConfigurationKey('bancontact')),
-            'bancontact_country' => (bool) $config->get($this->dependencies->getConfigurationKey('bancontactCountry')),
-            'applepay' => (bool) $config->get($this->dependencies->getConfigurationKey('applepay')),
+            'sandbox_mode' => $configuration->getValue('sandbox_mode'),
+            'embedded_mode' => $configuration->getValue('embedded_mode'),
+            'standard' => $configuration->getValue('standard'),
+            'one_click' => $configuration->getValue('one_click'),
+            'inst' => $configuration->getValue('inst'),
+            'inst_mode' => $configuration->getValue('inst_mode'),
+            'inst_min_amount' => $configuration->getValue('inst_min_amount'),
+            'deferred' => $configuration->getValue('deferred'),
+            'deferred_state' => $configuration->getValue('deferred_state'),
+            'oney' => (bool) $configuration->getValue('oney'),
+            'oney_fees' => (bool) $configuration->getValue('oney_fees'),
+            'oney_schedule' => (bool) $configuration->getValue('oney_optimized'),
+            'oney_product_animation' => (bool) $configuration->getValue('oney_product_cta'),
+            'oney_cart_animation' => (bool) $configuration->getValue('oney_cart_cta'),
+            'oney_thresholds_min' => $configuration->getValue('oney_min_amounts'),
+            'oney_thresholds_max' => $configuration->getValue('oney_max_amounts'),
+            'oney_custom_thresholds_min' => $configuration->getValue('oney_custom_min_amounts'),
+            'oney_custom_thresholds_max' => $configuration->getValue('oney_custom_max_amounts'),
+            'bancontact' => (bool) $configuration->getValue('bancontact'),
+            'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
+            'applepay' => (bool) $configuration->getValue('applepay'),
+            'amex' => (bool) $configuration->getValue('amex'),
         ];
     }
 
@@ -249,10 +252,23 @@ class ApiRest
             return [];
         }
 
-        $translation = $this->dependencies->getPlugin()->getTranslation()->getHeaderTranslations();
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getHeaderTranslations();
 
-        $is_logged = isset($current_configuration['logged']) ? $current_configuration['logged'] : false;
-        $enable = isset($current_configuration['enable']) ? $current_configuration['enable'] : false;
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+        $default_configuration = [
+            'enable' => $configuration->getDefault('enable'),
+            'logged' => false,
+        ];
+        foreach ($default_configuration as $k => $v) {
+            if (!isset($current_configuration[$k])) {
+                $current_configuration[$k] = $v;
+            }
+        }
 
         return [
             'title' => $translation['title'],
@@ -269,17 +285,17 @@ class ApiRest
             'options' => [
                 'type' => 'select',
                 'name' => 'payplug_enable',
-                'disabled' => !$this->dependencies->configClass->checkPsAccount() || !$is_logged,
+                'disabled' => !$this->dependencies->configClass->checkPsAccount() || !$current_configuration['logged'],
                 'options' => [
                     [
                         'value' => 1,
                         'label' => $translation['visible'],
-                        'checked' => $enable,
+                        'checked' => $current_configuration['enable'],
                     ],
                     [
                         'value' => 0,
                         'label' => $translation['hidden'],
-                        'checked' => !$enable,
+                        'checked' => !$current_configuration['enable'],
                     ],
                 ],
             ],
@@ -313,12 +329,18 @@ class ApiRest
             ->getRoutes()
             ->getExternalUrl($iso_code);
 
-        $config = $this->dependencies
+        $configuration = $this->dependencies
             ->getPlugin()
-            ->getConfiguration();
-
-        $is_sandbox = isset($current_configuration['sandbox_mode']) ? $current_configuration['sandbox_mode'] : true;
-        $inactive = (bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'));
+            ->getConfigurationClass();
+        $inactive = (bool) $configuration->getValue('live_api_key');
+        $default_configuration = [
+            'sandbox_mode' => $configuration->getDefault('sandbox_mode'),
+        ];
+        foreach ($default_configuration as $k => $v) {
+            if (!isset($current_configuration[$k])) {
+                $current_configuration[$k] = $v;
+            }
+        }
 
         $inactive_description = $translation['inactive']['account']['warning']['description'];
         $link = '<a href="' . $external_url['sandbox'] . '" target="_blank">'
@@ -372,13 +394,13 @@ class ApiRest
                     'name' => 'payplug_sandbox',
                     'label' => $translation['mode']['options']['sandbox'],
                     'value' => 1,
-                    'checked' => $is_sandbox,
+                    'checked' => (bool) $current_configuration['sandbox_mode'],
                 ],
                 [
                     'name' => 'payplug_sandbox',
                     'label' => $translation['mode']['options']['live'],
                     'value' => 0,
-                    'checked' => !$is_sandbox,
+                    'checked' => !(bool) $current_configuration['sandbox_mode'],
                 ],
             ],
             'inactive_modal' => [
@@ -596,17 +618,20 @@ class ApiRest
             return [];
         }
 
-        // todo: get this default value from dependenciesClass (alike)
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
         $default_configuration = [
-            'oney' => false,
-            'oney_custom_thresholds_min' => 'EUR:10000',
-            'oney_custom_thresholds_max' => 'EUR:300000',
-            'oney_product_animation' => true,
-            'oney_cart_animation' => true,
-            'oney_schedule' => false,
-            'oney_fees' => true,
+            'oney' => $configuration->getDefault('oney'),
+            'oney_min_amounts' => $configuration->getDefault('oney_min_amounts'),
+            'oney_max_amounts' => $configuration->getDefault('oney_max_amounts'),
+            'oney_custom_min_amounts' => $configuration->getDefault('oney_custom_min_amounts'),
+            'oney_custom_max_amounts' => $configuration->getDefault('oney_custom_max_amounts'),
+            'oney_product_animation' => $configuration->getDefault('oney_product_animation'),
+            'oney_cart_animation' => $configuration->getDefault('oney_cart_animation'),
+            'oney_schedule' => $configuration->getDefault('oney_schedule'),
+            'oney_fees' => $configuration->getDefault('oney_fees'),
         ];
-
         foreach ($default_configuration as $k => $v) {
             if (!isset($current_configuration[$k])) {
                 $current_configuration[$k] = $v;
@@ -718,11 +743,11 @@ class ApiRest
 
     /**
      * @description build payment methods section for api usage
-     * @todo: divide the get of the different payment method in relative class
      *
      * @param mixed $current_configuration
      *
      * @return array
+     * @todo: divide the get of the different payment method in relative class
      */
     public function getPaymentMethodsSection($current_configuration = [])
     {
@@ -753,20 +778,22 @@ class ApiRest
             ->getRoutes()
             ->getExternalUrl($iso_code);
 
-        // todo: get this default value from dependenciesClass (alike)
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
         $default_configuration = [
-            'standard' => true,
-            'embedded_mode' => 'redirect',
-            'one_click' => false,
-            'inst' => false,
-            'inst_mode' => 3,
-            'inst_min_amount' => 150,
-            'deferred' => false,
-            'deferred_state' => 0,
-            'american_express' => false,
-            'bancontact' => false,
-            'bancontact_country' => false,
-            'applepay' => false,
+            'standard' => $configuration->getDefault('standard'),
+            'embedded_mode' => $configuration->getDefault('embedded_mode'),
+            'one_click' => $configuration->getDefault('one_click'),
+            'inst' => $configuration->getDefault('inst'),
+            'inst_mode' => $configuration->getDefault('inst_mode'),
+            'inst_min_amount' => $configuration->getDefault('inst_min_amount'),
+            'deferred' => $configuration->getDefault('deferred'),
+            'deferred_state' => $configuration->getDefault('deferred_state'),
+            'amex' => $configuration->getDefault('amex'),
+            'bancontact' => $configuration->getDefault('bancontact'),
+            'bancontact_country' => $configuration->getDefault('bancontact_country'),
+            'applepay' => $configuration->getDefault('applepay'),
         ];
         foreach ($default_configuration as $k => $v) {
             if (!isset($current_configuration[$k])) {
@@ -1019,7 +1046,7 @@ class ApiRest
                 'name' => 'american_express',
                 'title' => $translation['amex']['title'],
                 'image' => $img_path . 'amex.svg',
-                'checked' => $current_configuration['american_express'],
+                'checked' => $current_configuration['amex'],
                 'available_test_mode' => false,
                 'descriptions' => [
                     'live' => [
@@ -1234,12 +1261,22 @@ class ApiRest
             return [];
         }
 
-        $email = isset($current_configuration['email']) ? $current_configuration['email'] : '';
-        $is_logged = isset($current_configuration['logged']) ? $current_configuration['logged'] : false;
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $default_configuration = [
+            'email' => $configuration->getDefault('email'),
+            'logged' => false,
+            'sandbox_mode' => $configuration->getDefault('sandbox_mode'),
+        ];
+        foreach ($default_configuration as $k => $v) {
+            if (!isset($current_configuration[$k])) {
+                $current_configuration[$k] = $v;
+            }
+        }
 
         return [
-            'email' => $email,
-            'logged' => $is_logged,
+            'email' => $current_configuration['email'],
+            'logged' => $current_configuration['logged'],
+            'mode' => (bool) $current_configuration['sandbox_mode'] ? 1 : 0,
         ];
     }
 
@@ -1307,14 +1344,15 @@ class ApiRest
             return [];
         }
 
-        // todo: get this default value from dependenciesClass (alike)
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
         $default_configuration = [
-            'oney_thresholds_min' => 'EUR:10000',
-            'oney_thresholds_max' => 'EUR:300000',
-            'oney_custom_thresholds_min' => 'EUR:10000',
-            'oney_custom_thresholds_max' => 'EUR:300000',
+            'oney_min_amounts' => $configuration->getDefault('oney_min_amounts'),
+            'oney_max_amounts' => $configuration->getDefault('oney_max_amounts'),
+            'oney_custom_min_amounts' => $configuration->getDefault('oney_custom_min_amounts'),
+            'oney_custom_max_amounts' => $configuration->getDefault('oney_custom_max_amounts'),
         ];
-
         foreach ($default_configuration as $k => $v) {
             if (!isset($current_configuration[$k])) {
                 $current_configuration[$k] = $v;
@@ -1322,16 +1360,16 @@ class ApiRest
         }
 
         // todo: Create an helper to handle the two following line of logic
-        $custom_min = explode(':', $current_configuration['oney_custom_thresholds_min']);
+        $custom_min = explode(':', $current_configuration['oney_custom_min_amounts']);
         $custom_min = $this->helpers['amount']->formatOneyAmount((int) $custom_min[1])['result'];
 
-        $custom_max = explode(':', $current_configuration['oney_custom_thresholds_max']);
+        $custom_max = explode(':', $current_configuration['oney_custom_max_amounts']);
         $custom_max = $this->helpers['amount']->formatOneyAmount((int) $custom_max[1])['result'];
 
-        $min = explode(':', $current_configuration['oney_thresholds_min']);
+        $min = explode(':', $current_configuration['oney_min_amounts']);
         $min = $this->helpers['amount']->formatOneyAmount((int) $min[1])['result'];
 
-        $max = explode(':', $current_configuration['oney_thresholds_max']);
+        $max = explode(':', $current_configuration['oney_max_amounts']);
         $max = $this->helpers['amount']->formatOneyAmount((int) $max[1])['result'];
 
         $translation = $this->dependencies

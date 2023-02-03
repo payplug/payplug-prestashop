@@ -17,6 +17,18 @@ class getHeaderSectionTest extends BaseApiRest
     {
         parent::setUp();
 
+        $this->configuration_class
+            ->shouldReceive('getDefault')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    case 'enable':
+                        return 1;
+                    default:
+                        return $key;
+                }
+            })
+        ;
+
         $this->dependencies->version = 'x.xx.xx';
     }
 
