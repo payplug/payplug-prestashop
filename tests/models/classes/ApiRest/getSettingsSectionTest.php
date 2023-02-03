@@ -21,6 +21,21 @@ class getSettingsSectionTest extends BaseApiRest
         $context->shouldReceive([
             'get' => ContextMock::get(),
         ]);
+
+        $this->configuration_class
+            ->shouldReceive('getDefault')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    case 'email':
+                        return '';
+                    case 'sandbox_mode':
+                        return 1;
+                    default:
+                        return $key;
+                }
+            })
+        ;
+
         $this->plugin->shouldReceive([
             'getContext' => $context,
         ]);
@@ -56,12 +71,10 @@ class getSettingsSectionTest extends BaseApiRest
         $current_configuration = [
             'email' => '',
             'logged' => true,
+            'mode' => 1,
         ];
         $this->assertSame(
-            [
-                'email' => '',
-                'logged' => true,
-            ],
+            $current_configuration,
             $this->classe->getSettingsSection($current_configuration)
         );
     }
@@ -70,11 +83,13 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $current_configuration = [
             'logged' => true,
+            'mode' => 1,
         ];
         $this->assertSame(
             [
                 'email' => '',
                 'logged' => true,
+                'mode' => 1,
             ],
             $this->classe->getSettingsSection($current_configuration)
         );
@@ -85,12 +100,10 @@ class getSettingsSectionTest extends BaseApiRest
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
             'logged' => false,
+            'mode' => 1,
         ];
         $this->assertSame(
-            [
-                'email' => 'unit.test@payplug.com',
-                'logged' => false,
-            ],
+            $current_configuration,
             $this->classe->getSettingsSection($current_configuration)
         );
     }
@@ -99,11 +112,14 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
+            'mode' => 1,
         ];
+
         $this->assertSame(
             [
                 'email' => 'unit.test@payplug.com',
                 'logged' => false,
+                'mode' => 1,
             ],
             $this->classe->getSettingsSection($current_configuration)
         );
