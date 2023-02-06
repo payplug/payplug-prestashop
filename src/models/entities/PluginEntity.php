@@ -55,10 +55,10 @@ class PluginEntity
     private $carrier;
 
     /** @var object */
-    private $configClass;
+    private $configuration;
 
     /** @var object */
-    private $configuration;
+    private $configuration_class;
 
     /** @var object */
     private $constant;
@@ -308,6 +308,14 @@ class PluginEntity
     public function getConfigurationAction()
     {
         return $this->configurationAction;
+    }
+
+    /**
+     * @return object
+     */
+    public function getConfigurationClass()
+    {
+        return $this->configuration_class;
     }
 
     /**
@@ -708,6 +716,24 @@ class PluginEntity
         }
 
         $this->configurationAction = $configurationAction;
+
+        return $this;
+    }
+
+    /**
+     * @param object $configuration_class
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setConfigurationClass($configuration_class)
+    {
+        if (!is_object($configuration_class)) {
+            throw (new BadParameterException('Invalid argument, $configuration_class must be a setConfigurationClass'));
+        }
+
+        $this->configuration_class = $configuration_class;
 
         return $this;
     }

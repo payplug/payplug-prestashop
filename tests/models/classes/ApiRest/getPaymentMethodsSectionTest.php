@@ -24,7 +24,6 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->plugin->shouldReceive([
             'getContext' => $context,
         ]);
-
         $this->classe->shouldReceive([
             'getDeferredState' => [],
         ]);

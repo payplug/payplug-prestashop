@@ -24,6 +24,26 @@ class getLoggedSectionTest extends BaseApiRest
         $this->plugin->shouldReceive([
             'getContext' => $context,
         ]);
+
+        $this->configuration_class
+            ->shouldReceive('getValue')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    case 'live_api_key':
+                        return 'sk_live_azerty1234567';
+                }
+            })
+        ;
+
+        $this->configuration_class
+            ->shouldReceive('getDefault')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    case 'sandbox_mode':
+                        return 1;
+                }
+            })
+        ;
     }
 
     public function invalidArrayFormatDataProvider()
