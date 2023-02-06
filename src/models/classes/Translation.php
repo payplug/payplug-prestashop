@@ -127,6 +127,8 @@ class Translation
                     'warning' => [
                         'title' => $this->dependencies->l('logged.inactive.account.warning.title', 'loggedtranslation'),
                         'description' => $this->dependencies->l('logged.inactive.account.warning.description', 'loggedtranslation'),
+                        'link' => $this->dependencies->l('logged.inactive.account.warning.link', 'loggedtranslation'),
+                        'trigger' => $this->dependencies->l('logged.inactive.account.warning.trigger', 'loggedtranslation'),
                     ],
                     'error' => [
                         'title' => $this->dependencies->l('logged.inactive.account.error.title', 'loggedtranslation'),
@@ -374,7 +376,7 @@ class Translation
                     'unavailable' => $this->dependencies->l('modal.premium.description.unavailable', 'modaltranslation'),
                     'form' => $this->dependencies->l('modal.premium.description.form', 'modaltranslation'),
                     'contact' => $this->dependencies->l('modal.premium.description.contact', 'modaltranslation'),
-                    'website' => $this->dependencies->l('modal.premium.description.default', 'modaltranslation'),
+                    'default' => $this->dependencies->l('modal.premium.description.default', 'modaltranslation'),
                     'oney' => $this->dependencies->l('modal.premium.description.oney', 'modaltranslation'),
                 ],
                 'link' => [

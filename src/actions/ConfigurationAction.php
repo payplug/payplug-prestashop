@@ -123,10 +123,7 @@ class ConfigurationAction
 
                 break;
             default:
-                $message .= ' ' . sprintf(
-                    $translation['premium']['description']['default'],
-                    $translation['premium']['feature'][$payment_method]
-                );
+                $message .= $translation['premium']['description']['default'];
                 $link = '<a href="' . $external_url['contact'] . '" target="_blank">' . $translation['premium']['link']['default'] . '</a>';
                 $message = str_replace('$link', $link, $message);
 
