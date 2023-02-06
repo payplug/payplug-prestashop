@@ -308,6 +308,10 @@ class ApiRest
             ->getContext()
             ->get();
         $iso_code = $context->language->iso_code;
+        $external_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($iso_code);
 
         $config = $this->dependencies
             ->getPlugin()
@@ -315,6 +319,17 @@ class ApiRest
 
         $is_sandbox = isset($current_configuration['sandbox_mode']) ? $current_configuration['sandbox_mode'] : true;
         $inactive = (bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'));
+
+        $inactive_description = $translation['inactive']['account']['warning']['description'];
+        $link = '<a href="' . $external_url['sandbox'] . '" target="_blank">'
+            . $translation['inactive']['account']['warning']['link']
+            . '</a>';
+        $inactive_description = str_replace('$link', $link, $inactive_description);
+
+        $live_trigger = '<span id="inactiveModalClick">'
+            . $translation['inactive']['account']['warning']['trigger']
+            . '</span>';
+        $inactive_description = str_replace('$trigger', $live_trigger, $inactive_description);
 
         return [
             'title' => $translation['title'],
@@ -326,18 +341,12 @@ class ApiRest
                     'mode_description' => $translation['mode']['description']['live'],
                     'link_learn_more' => [
                         'text' => $translation['mode']['link']['live'],
-                        'url' => $this->dependencies
-                            ->getPlugin()
-                            ->getRoutes()
-                            ->getExternalUrl($iso_code)['sandbox'],
+                        'url' => $external_url['sandbox'],
                         'target' => '_blank',
                     ],
                     'link_access_portal' => [
                         'text' => $translation['user']['link'],
-                        'url' => $this->dependencies
-                            ->getPlugin()
-                            ->getRoutes()
-                            ->getExternalUrl($iso_code)['portal'],
+                        'url' => $external_url['portal'],
                         'target' => '_blank',
                     ],
                 ],
@@ -348,18 +357,12 @@ class ApiRest
                     'mode_description' => $translation['mode']['description']['sandbox'],
                     'link_learn_more' => [
                         'text' => $translation['mode']['link']['sandbox'],
-                        'url' => $this->dependencies
-                            ->getPlugin()
-                            ->getRoutes()
-                            ->getExternalUrl($iso_code)['sandbox'],
+                        'url' => $external_url['sandbox'],
                         'target' => '_blank',
                     ],
                     'link_access_portal' => [
                         'text' => $translation['user']['link'],
-                        'url' => $this->dependencies
-                            ->getPlugin()
-                            ->getRoutes()
-                            ->getExternalUrl($iso_code)['portal'],
+                        'url' => $external_url['portal'],
                         'target' => '_blank',
                     ],
                 ],
@@ -389,7 +392,7 @@ class ApiRest
             'inactive_account' => [
                 'warning' => [
                     'title' => $translation['inactive']['account']['warning']['title'],
-                    'description' => $translation['inactive']['account']['warning']['description'],
+                    'description' => $inactive_description,
                 ],
                 'error' => [
                     'title' => $translation['inactive']['account']['error']['title'],
