@@ -30,5 +30,5 @@ function upgrade_module_3_13_0()
     // Update PayPlug tab name to Payplug
     $sql = 'UPDATE `' . _DB_PREFIX_ . 'tab_lang` SET name = "Payplug" WHERE `name` = "PayPlug"';
 
-    return Db::getInstance()->executeS($sql);
+    return Db::getInstance()->execute($sql);
 }
