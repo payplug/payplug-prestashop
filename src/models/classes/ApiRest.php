@@ -63,7 +63,7 @@ class ApiRest
                 $json = $configurationAction->logoutAction();
 
                 break;
-            case 'deferred_permissions':
+            case 'deffered_permissions':
             case 'installment_permissions':
             case 'one_click_permissions':
             case 'bancontact_permissions':
