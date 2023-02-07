@@ -403,6 +403,7 @@ class ApiRest
                     'checked' => !(bool) $current_configuration['sandbox_mode'],
                 ],
             ],
+            'can_be_disabled' => true,
             'inactive_modal' => [
                 'inactive' => !$inactive,
                 'title' => $translation['inactive']['modal']['title'],
