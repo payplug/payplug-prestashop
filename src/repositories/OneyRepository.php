@@ -1370,12 +1370,18 @@ class OneyRepository extends BaseClass
     public function isValidOneyAddresses($id_shipping, $id_billing)
     {
         $shipping = $this->addressAdapter->get((int) $id_shipping);
-        $shipping_country = $this->countryAdapter->get((int) $shipping->id_country);
-
         $billing = $this->addressAdapter->get((int) $id_billing);
-        $billing_country = $this->countryAdapter->get((int) $billing->id_country);
+        $shipping_iso_code = $this
+            ->dependencies
+            ->configClass
+            ->getIsoCodeByCountryId((int) $shipping->id_country);
 
-        return $this->isValidOneyCountry($shipping_country->iso_code, $billing_country->iso_code);
+        $billing_iso_code = $this
+            ->dependencies
+            ->configClass
+            ->getIsoCodeByCountryId((int) $billing->id_country);
+
+        return $this->isValidOneyCountry($shipping_iso_code, $billing_iso_code);
     }
 
     /**
