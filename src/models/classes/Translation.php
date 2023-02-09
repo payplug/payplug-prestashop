@@ -382,7 +382,7 @@ class Translation
                 'link' => [
                     'form' => $this->dependencies->l('modal.premium.link.form', 'modaltranslation'),
                     'contact' => $this->dependencies->l('modal.premium.link.contact', 'modaltranslation'),
-                    'website' => $this->dependencies->l('modal.premium.link.default', 'modaltranslation'),
+                    'default' => $this->dependencies->l('modal.premium.link.default', 'modaltranslation'),
                     'oney' => $this->dependencies->l('modal.premium.link.oney', 'modaltranslation'),
                 ],
                 'feature' => [
