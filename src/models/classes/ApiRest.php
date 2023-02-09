@@ -166,6 +166,13 @@ class ApiRest
         ];
     }
 
+    /**
+     * @description Get available order state to use for the deferred payment
+     *
+     * @param int $deferred_state
+     *
+     * @return array
+     */
     public function getDeferredState($deferred_state = 0)
     {
         if (!is_int($deferred_state)) {
@@ -206,7 +213,7 @@ class ApiRest
         }
         ksort($order_states_values);
 
-        return $order_states_values;
+        return (array) $order_states_values;
     }
 
     /**
@@ -1129,7 +1136,7 @@ class ApiRest
                     [
                         'type' => 'payment_option',
                         'sub_type' => 'switch',
-                        'name' => 'payplug_bancontact_country',
+                        'name' => 'bancontact_country',
                         'title' => $translation['bancontact']['user']['title'],
                         'descriptions' => [
                             'live' => [
@@ -1149,7 +1156,7 @@ class ApiRest
                                 ],
                             ],
                         ],
-                        'checked' => $current_configuration['one_click'],
+                        'checked' => $current_configuration['bancontact_country'],
                     ],
                 ],
             ];
