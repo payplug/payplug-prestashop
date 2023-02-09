@@ -388,6 +388,7 @@ class Translation
                 'feature' => [
                     'bancontact' => $this->dependencies->l('modal.premium.feature.bancontact', 'modaltranslation'),
                     'applepay' => $this->dependencies->l('modal.premium.feature.applepay', 'modaltranslation'),
+                    'deffered' => $this->dependencies->l('modal.premium.feature.defferd', 'modaltranslation'),
                     'american_express' => $this->dependencies->l('modal.premium.feature.american_express', 'modaltranslation'),
                 ],
                 'submit' => $this->dependencies->l('modal.premium.submit', 'modaltranslation'),

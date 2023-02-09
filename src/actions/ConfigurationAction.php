@@ -51,7 +51,7 @@ class ConfigurationAction
         $allowed_methods = [
             'one_click' => 'can_save_cards',
             'installment' => 'can_create_installment_plan',
-            'deferred' => 'can_create_deferred_payment',
+            'deffered' => 'can_create_deferred_payment',
             'oney' => 'can_use_oney',
             'bancontact' => 'can_use_bancontact',
             'applepay' => 'can_use_applepay',
@@ -100,6 +100,12 @@ class ConfigurationAction
                 $message = str_replace('$link', $link, $message);
 
                 break;
+            case 'deffered':
+                $message .= $translation['premium']['description']['form'];
+                $link = '<a href="' . $external_url['contact'] . '" target="_blank">' . $translation['premium']['link']['form'] . '</a>';
+                $message = str_replace('$link', $link, $message);
+                break;
+
             case 'applepay':
                 $has_permission = $has_permission ? $this->dependencies
                     ->getValidators()['payment']
@@ -121,6 +127,12 @@ class ConfigurationAction
                 $link = '<a href="' . $external_url['oney_cgv'] . '" target="_blank">' . $translation['premium']['link']['oney'] . '</a>';
                 $message = str_replace('$link', $link, $message);
 
+                break;
+            case 'installment':
+            case 'one_click':
+                $message .= $translation['premium']['description']['default'];
+                $link = '<a href="' . $external_url['contact'] . '" target="_blank">' . $translation['premium']['link']['website'] . '</a>';
+                $message = str_replace('$link', $link, $message);
                 break;
             default:
                 $message .= $translation['premium']['description']['default'];
