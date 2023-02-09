@@ -326,7 +326,7 @@ $_MODULE['<{payplug}prestashop>paymentmethodstranslation_07519feab44afcfd802e5f3
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_075ccf19e72ab4184091aa508a05dfb8'] = 'I tuoi clienti vedranno comparire il modulo di pagamento direttamente nella pagina di checkout del tuo negozio.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_08c50aaff9924951dbafb422b7edf020'] = '3 rate';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_219a1209e3e3707678defb2c071ac0e2'] = 'Attenzione: questo tipo di pagamento non è garantito.<br/> In caso di mancato pagamento di una delle prossime rate, l\'importo sarà perso.';
-$_MODULE['<{payplug}prestashop>paymentmethodstranslation_26b9934cd522cdaaf424a847e53277df'] = 'Pagamento Apple Pay';
+$_MODULE['<{payplug}prestashop>paymentmethodstranslation_26b9934cd522cdaaf424a847e53277df'] = 'Visualizza il pulsante di pagamento Apple Pay sul tuo negozio';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_29853d941dd49648c3fb4c74671d7f60'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_3584b97d8694b528f167ac07d703e463'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_36cd08d50bdd5de9fd71a33b5473328b'] = 'Rediretta';
@@ -352,7 +352,7 @@ $_MODULE['<{payplug}prestashop>paymentmethodstranslation_851d87d830d61a220342b61
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_8598266b5aa25405f6ed58c08371f72a'] = 'Cattura manuale';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_85c9706cf5c49c33262d40df8b9414d8'] = 'Impostazioni avanzate';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_8c8fa812dfcd5148403ba3cf7fdd61c4'] = 'Differire il pagamento';
-$_MODULE['<{payplug}prestashop>paymentmethodstranslation_9378e903cc21ae05c134a3b1e0158603'] = 'Visualizza il pulsante di pagamento Apple Pay sul tuo negozio';
+$_MODULE['<{payplug}prestashop>paymentmethodstranslation_9378e903cc21ae05c134a3b1e0158603'] = 'Pagamento Apple Pay';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_9e182878140c5f46c5d78171d68d40bd'] = 'Apple Pay non è disponibile in modalità TEST. Per attivarlo è necessario mettere il modulo PayPlug in modalità LIVE.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_a5fd8aaa6aaa0ad2f5d0762addac9b91'] = 'Permetti ai tuoi clienti di pagare con la loro carta Bancontact.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_a6aaf01fc69e6cc97f0276bbd2658e68'] = 'Per saperne di più.';

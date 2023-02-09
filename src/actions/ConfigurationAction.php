@@ -354,7 +354,7 @@ class ConfigurationAction
             $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'oney_min_amounts',
             $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'oney_max_amounts',
             $this->dependencies->getConfigurationKey('bancontact') => 'enable_bancontact',
-            $this->dependencies->getConfigurationKey('bancontactCountry') => 'payplug_bancontact_country',
+            $this->dependencies->getConfigurationKey('bancontactCountry') => 'enable_bancontact_country',
             $this->dependencies->getConfigurationKey('applepay') => 'enable_applepay',
             $this->dependencies->getConfigurationKey('amex') => 'enable_american_express',
         ];
