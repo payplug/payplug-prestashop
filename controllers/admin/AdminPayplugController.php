@@ -43,6 +43,11 @@ class AdminPayplugController extends ModuleAdminController
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->tools = $this->dependencies->getPlugin()->getTools();
+
+        // If referer is from development server, trigger api rest renderer
+        if (strpos($_SERVER['HTTP_REFERER'], 'localhost') != null) {
+            $this->renderApiRest();
+        }
     }
 
     /**
@@ -54,10 +59,7 @@ class AdminPayplugController extends ModuleAdminController
             parent::initContent();
         }
 
-        if ($rest_route = $this->tools->tool('getValue', 'rest_route')) {
-            $json = $this->api_rest->dispatch($rest_route);
-            exit(json_encode($json));
-        }
+        $this->renderApiRest();
 
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
@@ -79,6 +81,17 @@ class AdminPayplugController extends ModuleAdminController
         } else {
             $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/' . $template);
             parent::initContent();
+        }
+    }
+
+    /**
+     * @description Render Api Rest Json
+     */
+    public function renderApiRest()
+    {
+        if ($rest_route = $this->tools->tool('getValue', 'rest_route')) {
+            $json = $this->api_rest->dispatch($rest_route);
+            exit(json_encode($json));
         }
     }
 }
