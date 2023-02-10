@@ -45,7 +45,7 @@ class AdminPayplugController extends ModuleAdminController
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
         // If referer is from development server, trigger api rest renderer
-        if (strpos($_SERVER['HTTP_REFERER'], 'localhost') != null) {
+        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'localhost') != null) {
             $this->renderApiRest();
         }
     }
