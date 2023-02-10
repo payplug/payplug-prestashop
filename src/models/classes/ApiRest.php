@@ -768,6 +768,11 @@ class ApiRest
             return [];
         }
 
+        $link = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get()->link;
+
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslation()
@@ -854,7 +859,7 @@ class ApiRest
                             'links' => [
                                 [
                                     'text' => $translation['installment']['descriptions']['controller_link'],
-                                    'url' => '#some_url',
+                                    'url' => $link->getAdminLink('AdminPayPlugInstallment'),
                                     'target' => '_blank',
                                 ],
                                 [
@@ -875,7 +880,7 @@ class ApiRest
                             'links' => [
                                 [
                                     'text' => $translation['installment']['descriptions']['controller_link'],
-                                    'url' => '#some_url',
+                                    'url' => $link->getAdminLink('AdminPayPlugInstallment'),
                                     'target' => '_blank',
                                 ],
                                 [

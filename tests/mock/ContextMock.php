@@ -11,6 +11,7 @@ class ContextMock
         $context->customer = CustomerMock::get();
         $context->currency = CurrencyMock::get();
         $context->language = LanguageMock::get();
+        $context->link = LinkMock::get();
 
         return $context;
     }
