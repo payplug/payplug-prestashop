@@ -14,6 +14,8 @@ use PayPlug\tests\mock\ContextMock;
  */
 class getPaymentMethodsSectionTest extends BaseApiRest
 {
+    //private $context;
+
     public function setUp()
     {
         parent::setUp();
@@ -27,6 +29,14 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->classe->shouldReceive([
             'getDeferredState' => [],
         ]);
+
+        $link = \Mockery::mock('Link');
+        $link
+            ->shouldReceive([
+                'getAdminLink' => 'AdminPayPlugInstallment',
+            ])
+        ;
+        $this->plugin->getContext()->get()->link = $link;
     }
 
     public function invalidArrayFormatDataProvider()
