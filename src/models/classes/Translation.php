@@ -199,7 +199,10 @@ class Translation
                     'text_from' => $this->dependencies->l('paymentmethods.installment.descriptions.text_from', 'paymentmethodstranslation'),
                     'description_2' => $this->dependencies->l('paymentmethods.installment.descriptions.description_2', 'paymentmethodstranslation'),
                     'controller_link' => $this->dependencies->l('paymentmethods.installment.descriptions.controller_link', 'paymentmethodstranslation'),
-                    'alert' => $this->dependencies->l('paymentmethods.installment.descriptions.alert', 'paymentmethodstranslation'),
+                    'alert' => [
+                        'start' => $this->dependencies->l('paymentmethods.installment.descriptions.alert.start', 'paymentmethodstranslation'),
+                        'end' => $this->dependencies->l('paymentmethods.installment.descriptions.alert.end', 'paymentmethodstranslation'),
+                    ],
                 ],
                 'select' => [
                     '2_schedules' => $this->dependencies->l('paymentmethods.installment.select.2_schedules', 'paymentmethodstranslation'),
