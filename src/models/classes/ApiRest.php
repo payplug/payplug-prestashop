@@ -870,7 +870,8 @@ class ApiRest
                             ],
                             'notes' => [
                                 'type' => '-warning',
-                                'description' => $translation['installment']['descriptions']['alert'],
+                                'description' => $translation['installment']['descriptions']['alert']['start']
+                                    . '<br />' . $translation['installment']['descriptions']['alert']['end'],
                             ],
                         ],
                         'sandbox' => [
