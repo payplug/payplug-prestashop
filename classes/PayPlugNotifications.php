@@ -880,7 +880,7 @@ class PayPlugNotifications
         // check current order state type to create if it's empty
         $type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $id_order_state);
         if ($type != $this->type) {
-            $this->plugin->getOrderState()->setType((int) $id_order_state, $this->type);
+            $this->dependencies->getPlugin()->getOrderState()->setType((int) $id_order_state, $this->type);
         }
 
         $this->exitProcess('The order state is not defined');
