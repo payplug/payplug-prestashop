@@ -30,6 +30,7 @@ use PayPlug\src\utilities\helpers\FilesHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
+use PayPlug\src\utilities\validators\lockValidator;
 use PayPlug\src\utilities\validators\loggerValidator;
 use PayPlug\src\utilities\validators\moduleValidator;
 use PayPlug\src\utilities\validators\orderValidator;
@@ -495,6 +496,7 @@ class DependenciesClass
             'account' => new accountValidator(),
             'browser' => new browserValidator(),
             'card' => new cardValidator(),
+            'lock' => new lockValidator(),
             'logger' => new loggerValidator(),
             'module' => new moduleValidator(),
             'order' => new orderValidator(),
