@@ -241,6 +241,7 @@ class ConfigurationAction
             'success' => true,
             'data' => [
                 'message' => 'Successfully logged out.',
+                'settings' => $api_rest->getSettingsSection(),
                 'status' => $api_rest->getRequirementsSection(),
             ],
         ];
