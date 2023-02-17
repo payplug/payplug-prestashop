@@ -35,16 +35,6 @@ class Translation
     /**
      * @return array
      */
-    public function getSettingsTranslations()
-    {
-        return [
-            'saveButton' => $this->dependencies->l('payplug.getSettingsTranslations.saveButton', 'translation'),
-        ];
-    }
-
-    /**
-     * @return array
-     */
     public function getFooterTranslations()
     {
         return [
@@ -370,9 +360,6 @@ class Translation
                 'text' => $this->dependencies->l('modal.confirmation.text', 'modaltranslation'),
                 'submit' => $this->dependencies->l('modal.confirmation.submit', 'modaltranslation'),
             ],
-            'error' => [
-                'submit' => $this->dependencies->l('payplug.getModalTranslations.modalErrorSubmit', 'translation'),
-            ],
             'premium' => [
                 'title' => $this->dependencies->l('modal.premium.title', 'modaltranslation'),
                 'description' => [
@@ -395,16 +382,6 @@ class Translation
                 ],
                 'submit' => $this->dependencies->l('modal.premium.submit', 'modaltranslation'),
             ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAlertTranslations()
-    {
-        return [
-            'orderState' => $this->dependencies->l('payplug.getAlertTranslations.orderState', 'translation'),
         ];
     }
 }
