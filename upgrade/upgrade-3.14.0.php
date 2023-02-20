@@ -24,12 +24,24 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_13_0()
+function upgrade_module_3_14_0()
 {
     $flag = true;
 
-    // Update PayPlug tab name to Payplug
-    $sql = 'UPDATE `' . _DB_PREFIX_ . 'tab_lang` SET name = "Payplug" WHERE `name` = "PayPlug"';
+    // Update PayPlug configuration variable `show` to `enable`
+    $flag = $flag && Configuration::updateValue(
+        'PAYPLUG_ENABLE',
+        Configuration::get('PAYPLUG_SHOW')
+    );
+    $flag = $flag && Configuration::DeleteByName('PAYPLUG_SHOW');
 
-    return $flag && Db::getInstance()->execute($sql);
+    $embedded_mode = Configuration::get('PAYPLUG_EMBEDDED_MODE');
+    if ('redirected' == $embedded_mode) {
+        $flag = $flag && Configuration::updateValue(
+            'PAYPLUG_EMBEDDED_MODE',
+            'redirect'
+        );
+    }
+
+    return $flag;
 }
