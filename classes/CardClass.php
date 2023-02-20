@@ -51,12 +51,7 @@ class CardClass
     public function uninstallCards()
     {
         if ($this->sql->checkExistingTable($this->dependencies->name . '_card', 1)) {
-            $cards = $this->query
-                ->select()
-                ->fields('*')
-                ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_card')
-                ->build()
-            ;
+            $cards = $this->dependencies->getRepositories()['card']->getAll();
 
             if ($cards) {
                 foreach ($cards as $card) {

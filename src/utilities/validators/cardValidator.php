@@ -33,7 +33,7 @@ class cardValidator
      *
      * @return array
      */
-    public function isExpired($month = 0, $year = 0)
+    public function isValidExpiration($month = 0, $year = 0)
     {
         if (!is_int($month) || !$month) {
             return [

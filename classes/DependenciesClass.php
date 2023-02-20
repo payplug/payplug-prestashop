@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\FilesHelper;
@@ -518,6 +519,7 @@ class DependenciesClass
         $prefix = $constant->get('_DB_PREFIX_');
         $this->repositories = [
             'country' => new CountryRepository($prefix),
+            'card' => new CardRepository($prefix, $this->name),
         ];
     }
 

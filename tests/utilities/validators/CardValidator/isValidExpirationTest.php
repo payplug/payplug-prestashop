@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-class isExpiredTest extends TestCase
+class isValidExpirationTest extends TestCase
 {
     protected $validator;
 
@@ -40,7 +40,7 @@ class isExpiredTest extends TestCase
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument, $month must be a non null integer',
-        ], $this->validator->isExpired($month, $year));
+        ], $this->validator->isValidExpiration($month, $year));
     }
 
     /**
@@ -54,7 +54,7 @@ class isExpiredTest extends TestCase
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument, $year must be a non null integer',
-        ], $this->validator->isExpired($month, $year));
+        ], $this->validator->isValidExpiration($month, $year));
     }
 
     public function testWhenMonthIsNotAValidDigit()
@@ -64,7 +64,7 @@ class isExpiredTest extends TestCase
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument format for $month given',
-        ], $this->validator->isExpired($month, $year));
+        ], $this->validator->isValidExpiration($month, $year));
     }
 
     public function testWhenYearIsNotAValidDigit()
@@ -74,7 +74,7 @@ class isExpiredTest extends TestCase
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument format for $year given',
-        ], $this->validator->isExpired($month, $year));
+        ], $this->validator->isValidExpiration($month, $year));
     }
 
     public function testWhenGivenDateIsInvalid()
@@ -84,7 +84,7 @@ class isExpiredTest extends TestCase
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid date given through $month and/or $year',
-        ], $this->validator->isExpired($month, $year));
+        ], $this->validator->isValidExpiration($month, $year));
     }
 
     public function testWhenGivenDateIsExpired()
@@ -94,7 +94,7 @@ class isExpiredTest extends TestCase
         $this->assertSame([
             'result' => false,
             'message' => 'This card is expired',
-        ], $this->validator->isExpired($month, $year));
+        ], $this->validator->isValidExpiration($month, $year));
     }
 
     public function testWhenGivenDateIsNotExpired()
@@ -104,6 +104,6 @@ class isExpiredTest extends TestCase
         $this->assertSame([
             'result' => true,
             'message' => '',
-        ], $this->validator->isExpired($month, $year));
+        ], $this->validator->isValidExpiration($month, $year));
     }
 }

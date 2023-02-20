@@ -56,15 +56,9 @@ final class GetByCustomerTest extends BaseCardRepository
 
     public function testWhenNoCardFoundForGivenCustomerId()
     {
-        $this->query
-            ->shouldReceive([
-                'select' => $this->query,
-                'fields' => $this->query,
-                'from' => $this->query,
-                'where' => $this->query,
-                'build' => false,
-            ])
-        ;
+        $this->repositories['card']->shouldReceive([
+            'getAllByCustomer' => [],
+        ]);
 
         $this->assertSame(
             [],
@@ -74,21 +68,15 @@ final class GetByCustomerTest extends BaseCardRepository
 
     public function testWhenCardsIsExpiredAndAllowed()
     {
-        $this->query
-            ->shouldReceive([
-                'select' => $this->query,
-                'fields' => $this->query,
-                'from' => $this->query,
-                'where' => $this->query,
-                'build' => $this->cards,
-            ])
-        ;
+        $this->repositories['card']->shouldReceive([
+            'getAllByCustomer' => $this->cards,
+        ]);
 
-        $this->repo
-            ->shouldReceive([
-                'isValidExpiration' => false,
-            ])
-        ;
+        $this->validators['card']->shouldReceive([
+            'isValidExpiration' => [
+                'result' => false,
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -109,21 +97,15 @@ final class GetByCustomerTest extends BaseCardRepository
 
     public function testWhenCardsIsExpiredAndDisallowed()
     {
-        $this->query
-            ->shouldReceive([
-                'select' => $this->query,
-                'fields' => $this->query,
-                'from' => $this->query,
-                'where' => $this->query,
-                'build' => $this->cards,
-            ])
-        ;
+        $this->repositories['card']->shouldReceive([
+            'getAllByCustomer' => $this->cards,
+        ]);
 
-        $this->repo
-            ->shouldReceive([
-                'isValidExpiration' => false,
-            ])
-        ;
+        $this->validators['card']->shouldReceive([
+            'isValidExpiration' => [
+                'result' => false,
+            ],
+        ]);
 
         $this->assertSame(
             [],
@@ -133,21 +115,15 @@ final class GetByCustomerTest extends BaseCardRepository
 
     public function testWhenCardsIsActive()
     {
-        $this->query
-            ->shouldReceive([
-                'select' => $this->query,
-                'fields' => $this->query,
-                'from' => $this->query,
-                'where' => $this->query,
-                'build' => $this->cards,
-            ])
-        ;
+        $this->repositories['card']->shouldReceive([
+            'getAllByCustomer' => $this->cards,
+        ]);
 
-        $this->repo
-            ->shouldReceive([
-                'isValidExpiration' => true,
-            ])
-        ;
+        $this->validators['card']->shouldReceive([
+            'isValidExpiration' => [
+                'result' => true,
+            ],
+        ]);
 
         $this->assertSame(
             [
