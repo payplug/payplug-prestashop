@@ -162,6 +162,7 @@ $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e5050831
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Numéro de carte invalide.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fe343fc63271ff9fc7c75ed541c1126b'] = 'Date d\'expiration invalide.';
 $_MODULE['<{payplug}prestashop>loggedtranslation_0341d376f7080493d3f52a58552bb4a3'] = 'mode TEST';
+$_MODULE['<{payplug}prestashop>loggedtranslation_27766cf749765856df5625363edc2d8b'] = 'Le mot de passe saisi n\'est pas valide';
 $_MODULE['<{payplug}prestashop>loggedtranslation_2b929a34d09ca6fee5628c53f02868de'] = 'Votre dossier est en cours de traitement.';
 $_MODULE['<{payplug}prestashop>loggedtranslation_32663ac476d0c7968f2d278d75097066'] = 'Mode';
 $_MODULE['<{payplug}prestashop>loggedtranslation_3b6e79974169a86c6c330e3afb2ff51d'] = 'Se déconnecter';
@@ -327,7 +328,6 @@ $_MODULE['<{payplug}prestashop>paymentmethodstranslation_0677841669a60464c933f29
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_07519feab44afcfd802e5f3b3be399d6'] = 'Vos clients seront redirigés vers une page de paiement personnalisable hébergée par Payplug.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_075ccf19e72ab4184091aa508a05dfb8'] = 'Vos clients verront apparaître le formulaire de paiement directement dans la page de checkout de votre boutique.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_08c50aaff9924951dbafb422b7edf020'] = '3 fois';
-$_MODULE['<{payplug}prestashop>paymentmethodstranslation_219a1209e3e3707678defb2c071ac0e2'] = 'Attention : ce type de paiement n\'est pas garanti. <br/>Si un défaut de paiement survient sur une des futures échéances alors ce montant sera perdu.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_239df1f28af2e0733c462455e9028f5d'] = 'Attention : ce type de paiement n\'est pas garanti.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_26b9934cd522cdaaf424a847e53277df'] = 'Afficher le bouton de paiement Apple Pay sur votre boutique.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_29853d941dd49648c3fb4c74671d7f60'] = 'En savoir plus.';
