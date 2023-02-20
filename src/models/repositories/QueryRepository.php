@@ -51,6 +51,8 @@ class QueryRepository
 
     private $adapter;
 
+    protected $module_name;
+
     private $data_type_text = [
         'char',
         'varchar',
