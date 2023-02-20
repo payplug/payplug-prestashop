@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-class hasLiveKeyTest extends TestCase
+class getIsoCodeByCountryTest extends TestCase
 {
     protected $accountValidator;
 

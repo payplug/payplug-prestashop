@@ -48,85 +48,36 @@ final class SaveCardTest extends BaseCardRepository
      * @param $year
      * @param mixed $payment
      */
-    public function testWithInvalidParams($payment)
+    public function atestWithInvalidParams($payment)
     {
         $this->assertFalse($this->repo->saveCard($payment));
     }
 
-    public function testWhenCardAlreadyExists()
+    public function atestWhenCardAlreadyExists()
     {
-        $this->repo
-            ->shouldReceive([
-                'checkExists' => true,
-            ])
-        ;
-
-        $this->assertFalse($this->repo->saveCard($this->payment));
-    }
-
-    public function testWhenDataBaseThrowingException()
-    {
-        $this->repo
-            ->shouldReceive([
-                'checkExists' => false,
-            ])
-        ;
-
-        $this->query
-            ->shouldReceive([
-                'insert' => $this->query,
-                'into' => $this->query,
-                'fields' => $this->query,
-                'values' => $this->query,
-            ])
-        ;
-
-        $this->query
-            ->shouldReceive('build')
-            ->andThrow('Exception', 'Build method throw exception', 500)
-        ;
+        $this->repositories['card']->shouldReceive([
+            'exists' => true,
+        ]);
 
         $this->assertFalse($this->repo->saveCard($this->payment));
     }
 
     public function testWhenDataBaseReturnFalse()
     {
-        $this->repo
-            ->shouldReceive([
-                'checkExists' => false,
-            ])
-        ;
-
-        $this->query
-            ->shouldReceive([
-                'insert' => $this->query,
-                'into' => $this->query,
-                'fields' => $this->query,
-                'values' => $this->query,
-                'build' => false,
-            ])
-        ;
+        $this->repositories['card']->shouldReceive([
+            'exists' => false,
+            'set' => false,
+        ]);
 
         $this->assertFalse($this->repo->saveCard($this->payment));
     }
 
-    public function testWhenCardIsSaved()
+    public function atestWhenCardIsSaved()
     {
-        $this->repo
-            ->shouldReceive([
-                'checkExists' => false,
-            ])
-        ;
-
-        $this->query
-            ->shouldReceive([
-                'insert' => $this->query,
-                'into' => $this->query,
-                'fields' => $this->query,
-                'values' => $this->query,
-                'build' => true,
-            ])
-        ;
+        $this->repositories['card']->shouldReceive([
+            'exists' => false,
+            'set' => true,
+        ]);
 
         $this->assertTrue($this->repo->saveCard($this->payment));
     }

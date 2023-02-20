@@ -47,6 +47,8 @@ class QueryRepository
 
     protected $prefix;
 
+    protected $module_name;
+
     private $data_type_text = [
         'char',
         'varchar',
@@ -76,9 +78,10 @@ class QueryRepository
 
     private $adapter;
 
-    public function __construct($prefix = '')
+    public function __construct($prefix = '', $module_name = '')
     {
         $this->setPrefix($prefix);
+        $this->setModuleName($module_name);
         $this->adapter = new QueryAdapter();
     }
 
@@ -624,5 +627,10 @@ class QueryRepository
     public function setPrefix($prefix = '')
     {
         $this->prefix = $prefix;
+    }
+
+    public function setModuleName($module_name = '')
+    {
+        $this->module_name = $module_name;
     }
 }

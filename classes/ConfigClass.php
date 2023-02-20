@@ -631,38 +631,32 @@ class ConfigClass
     public function gdprCardExport($id_customer)
     {
         if (!is_int($id_customer) || $id_customer === null) {
-            return false;
+            return [];
         }
 
-        $res_payplug_card = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_card')
-            ->where('id_customer = ' . (int) $id_customer)
-            ->build();
-
-        if (!$res_payplug_card) {
-            $cards = null;
-        } else {
-            $i = 1;
-            $cards = [];
-            foreach ($res_payplug_card as &$card) {
-                $card['expiry_date'] = date(
-                    'm / y',
-                    mktime(0, 0, 0, (int) $card['exp_month'], 1, (int) $card['exp_year'])
-                );
-                $cards[] = [
-                    '#' => $i,
-                    $this->dependencies->l('payplug.gdprCardExport.brand', 'configclass') => $card['brand'],
-                    $this->dependencies->l('payplug.gdprCardExport.country', 'configclass') => $card['country'],
-                    $this->dependencies->l('payplug.gdprCardExport.card', 'configclass') => '**** **** **** ' . $card['last4'],
-                    $this->dependencies->l('payplug.gdprCardExport.expiryDate', 'configclass') => $card['expiry_date'],
-                ];
-                ++$i;
-            }
+        $cards = $this->dependencies->getRepositories()['card']->getAllByCustomer($id_customer);
+        if (!$cards) {
+            return [];
         }
 
-        return $cards;
+        $i = 1;
+        $result = [];
+        foreach ($cards as &$card) {
+            $card['expiry_date'] = date(
+                'm / y',
+                mktime(0, 0, 0, (int) $card['exp_month'], 1, (int) $card['exp_year'])
+            );
+            $result[] = [
+                '#' => $i,
+                $this->dependencies->l('payplug.gdprCardExport.brand', 'configclass') => $card['brand'],
+                $this->dependencies->l('payplug.gdprCardExport.country', 'configclass') => $card['country'],
+                $this->dependencies->l('payplug.gdprCardExport.card', 'configclass') => '**** **** **** ' . $card['last4'],
+                $this->dependencies->l('payplug.gdprCardExport.expiryDate', 'configclass') => $card['expiry_date'],
+            ];
+            ++$i;
+        }
+
+        return $result;
     }
 
     /**
