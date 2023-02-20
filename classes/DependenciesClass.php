@@ -25,6 +25,7 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\models\repositories\PaymentRepository;
@@ -520,6 +521,7 @@ class DependenciesClass
         $logger = $this->getPlugin()->getLogger();
         $this->repositories = [
             'country' => new CountryRepository($prefix, $this->name, $logger),
+            'card' => new CardRepository($prefix, $this->name),
             'payment' => new PaymentRepository($prefix, $this->name, $logger),
         ];
     }

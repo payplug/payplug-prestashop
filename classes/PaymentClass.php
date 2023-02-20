@@ -1385,7 +1385,7 @@ class PaymentClass
             $payment_tab['initiator'] = 'PAYER';
             $payment_tab['payment_method'] = null;
             if ($options['id_card'] && $options['id_card'] != 'new_card') {
-                $card = $this->card->getCard((int) $options['id_card']);
+                $card = $this->dependencies->getRepositories()['card']->get((int) $options['id_card']);
                 if ($card['id_customer'] != $customer->id) {
                     return [
                         'result' => false,

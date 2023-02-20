@@ -3,6 +3,8 @@
 namespace PayPlug\tests\repositories;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\src\models\repositories\CardRepository;
+use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
@@ -59,6 +61,9 @@ class RepositoryBase extends TestCase
 //    protected $amountCurrencyClass_static;
     protected $configClass;
 
+    protected $validators;
+    protected $repositories;
+
     public function setUp()
     {
         $this->myLogPhp = MockHelper::createMockFactory('PayPlug\classes\MyLogPHP');
@@ -109,15 +114,21 @@ class RepositoryBase extends TestCase
                 return $string;
             })
         ;
+        $this->validators = [
+            'account' => \Mockery::mock(accountValidator::class)->makePartial(),
+            'card' => \Mockery::mock(cardValidator::class)->makePartial(),
+            'module' => \Mockery::mock(moduleValidator::class)->makePartial(),
+            'browser' => \Mockery::mock(browserValidator::class)->makePartial(),
+            'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
+        ];
+        $this->repositories = [
+            'card' => \Mockery::mock(CardRepository::class)->makePartial(),
+            'country' => \Mockery::mock(CountryRepository::class)->makePartial(),
+        ];
         $this->dependencies
             ->shouldReceive([
-                'getValidators' => [
-                    'card' => \Mockery::mock(cardValidator::class)->makePartial(),
-                    'module' => \Mockery::mock(moduleValidator::class)->makePartial(),
-                    'browser' => \Mockery::mock(browserValidator::class)->makePartial(),
-                    'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
-                    'account' => \Mockery::mock(accountValidator::class)->makePartial(),
-                ],
+                'getValidators' => $this->validators,
+                'getRepositories' => $this->repositories,
             ])
         ;
         $this->dependencies

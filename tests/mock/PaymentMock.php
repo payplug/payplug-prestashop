@@ -12,6 +12,7 @@ class PaymentMock
             'is_paid' => true,
             'paid_at' => 1614949567,
             'is_3ds' => false,
+            'is_live' => true,
             'card' => [
                 'last4' => '0001',
                 'country' => 'FR',
