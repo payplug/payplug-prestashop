@@ -56,6 +56,8 @@ class ConfigurationAction
             'bancontact' => 'can_use_bancontact',
             'applepay' => 'can_use_applepay',
             'american_express' => 'can_use_amex',
+            'use_live_mode' => 'use_live_mode',
+            'onboarding_oney_completed' => 'onboarding_oney_completed',
         ];
 
         if (!$this->dependencies
@@ -122,6 +124,7 @@ class ConfigurationAction
                 $message = str_replace('$link', $link, $message);
 
                 break;
+
             default:
                 $message .= $translation['premium']['description']['default'];
                 $link = '<a href="' . $external_url['contact'] . '" target="_blank">' . $translation['premium']['link']['default'] . '</a>';
@@ -138,6 +141,81 @@ class ConfigurationAction
                 'close' => $translation['premium']['submit'],
             ],
         ];
+    }
+
+    /**
+     * @description check merchant is onboarded
+     *
+     * @param $datas
+     *
+     * @return array
+     */
+    public function submitSandboxAction($datas)
+    {
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getLoggedTranslations();
+        $logger = $this->dependencies->getPlugin()->getLogger();
+        if (!is_object($datas) || !$datas) {
+            $logger->addLog('ConfigurationAction::submitSandboxAction: Invalid parameter given, $datas must be a non empty object.');
+
+            return [
+                'success' => false,
+                'data' => [
+                    // TODO  add translation
+                    'message' => 'An error has occurred',
+                ],
+            ];
+        }
+        $email = $datas->payplug_email;
+        $password = $datas->payplug_password;
+        $is_valid_password = $this->dependencies
+            ->getValidators()['account']
+            ->isPassword($password)['result'];
+
+        if (!$is_valid_password) {
+            $logger->addLog('ConfigurationAction::submitSandboxAction: invalid password.');
+
+            return [
+                'success' => false,
+                'data' => [
+                    'message' => $translation['inactive']['modal']['error'],
+                ],
+            ];
+        }
+
+        $password = base64_decode($datas->payplug_password);
+
+        if (!$this->dependencies->apiClass->login($email, $password)) {
+            $logger->addLog('ConfigurationAction::submitSandboxAction: invalid email and/or password.');
+
+            return [
+                'success' => false,
+                'data' => [
+                    //TODO add translation
+                    'message' => $translation['inactive']['modal']['error'],
+                ],
+            ];
+        }
+        $permissions = $this->dependencies->name == 'pspaylater' ? 'onboarding_oney_completed' : 'use_live_mode';
+        if (!$this->checkPermissionAction($permissions)['success']) {
+            return [
+                    'success' => false,
+                    'data' => [
+                        'still_inactive' => !$this->checkPermissionAction($permissions)['success'],
+                        'message' => '',
+                    ],
+                ];
+        }
+
+        return [
+                    'success' => true,
+                    'data' => [
+                        'still_inactive' => !$this->checkPermissionAction($permissions)['success'],
+                        'message' => '',
+                    ],
+                ];
     }
 
     /**

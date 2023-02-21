@@ -162,6 +162,7 @@ $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e5050831
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Invalid credit card number.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fe343fc63271ff9fc7c75ed541c1126b'] = 'Invalid expiry date.';
 $_MODULE['<{payplug}prestashop>loggedtranslation_0341d376f7080493d3f52a58552bb4a3'] = 'TEST mode';
+$_MODULE['<{payplug}prestashop>loggedtranslation_27766cf749765856df5625363edc2d8b'] = 'The password you entered is invalid';
 $_MODULE['<{payplug}prestashop>loggedtranslation_2b929a34d09ca6fee5628c53f02868de'] = 'Your application is being processed';
 $_MODULE['<{payplug}prestashop>loggedtranslation_32663ac476d0c7968f2d278d75097066'] = 'Mode';
 $_MODULE['<{payplug}prestashop>loggedtranslation_3b6e79974169a86c6c330e3afb2ff51d'] = 'Log out';
@@ -327,7 +328,6 @@ $_MODULE['<{payplug}prestashop>paymentmethodstranslation_0677841669a60464c933f29
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_07519feab44afcfd802e5f3b3be399d6'] = 'Your customers will be redirected to a customizable payment page hosted by Payplug.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_075ccf19e72ab4184091aa508a05dfb8'] = 'Your customers will see the payment form appear directly on the checkout page of your store.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_08c50aaff9924951dbafb422b7edf020'] = '3 instalments';
-$_MODULE['<{payplug}prestashop>paymentmethodstranslation_219a1209e3e3707678defb2c071ac0e2'] = 'Please note: this type of payment is not guaranteed.<br/> If a default affects one of the future instalments, this amount will be lost.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_239df1f28af2e0733c462455e9028f5d'] = 'Please note: this type of payment is not guaranteed.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_26b9934cd522cdaaf424a847e53277df'] = 'Display the Apple Pay payment button on your store.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_29853d941dd49648c3fb4c74671d7f60'] = 'Find out more.';

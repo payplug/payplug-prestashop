@@ -1221,7 +1221,7 @@ class ApiClass
             $can_use_amex = true;
         }
 
-        $onboardingOneyCompleted = false;
+        $onboarding_oney_completed = false;
         if (isset($json_answer['payment_methods']) && !empty(
             $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
@@ -1235,7 +1235,7 @@ class ApiClass
             }
             foreach ($oney_methods as $value) {
                 if ($value == 'true') {
-                    $onboardingOneyCompleted = true;
+                    $onboarding_oney_completed = true;
                 }
             }
         }
@@ -1250,7 +1250,7 @@ class ApiClass
             'can_use_bancontact' => $can_use_bancontact,
             'can_use_applepay' => $can_use_applepay,
             'can_use_amex' => $can_use_amex,
-            'onboardingOneyCompleted' => $onboardingOneyCompleted,
+            'onboarding_oney_completed' => $onboarding_oney_completed,
             'apple_pay_allowed_domains' => [],
         ];
 

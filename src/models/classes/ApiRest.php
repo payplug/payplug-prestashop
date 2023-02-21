@@ -83,6 +83,10 @@ class ApiRest
                 break;
 
             case 'refresh_keys':
+                $datas = json_decode(file_get_contents('php://input'), false);
+                $json = $configurationAction->submitSandboxAction($datas);
+
+                break;
             case 'save':
                 $datas = json_decode(file_get_contents('php://input'), false);
                 $json = $configurationAction->saveAction($datas);

@@ -112,6 +112,7 @@ class Translation
                     'password_label' => $this->dependencies->l('logged.inactive.modal.password_label', 'loggedtranslation'),
                     'cancel' => $this->dependencies->l('logged.inactive.modal.cancel', 'loggedtranslation'),
                     'ok' => $this->dependencies->l('logged.inactive.modal.ok', 'loggedtranslation'),
+                    'error' => $this->dependencies->l('logged.inactive.modal.error', 'loggedtranslation'),
                 ],
                 'account' => [
                     'warning' => [
