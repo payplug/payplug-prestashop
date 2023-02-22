@@ -151,9 +151,11 @@ class AmountCurrencyClass
             return (float) ($amount / 100);
         }
         $amount = (float) ($amount * 1000); // we use this trick to avoid rounding while converting to int
-            $amount = (float) ($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
+        $amount = (float) ($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
 
-            return (int) ($this->tools->tool('ps_round', $amount));
+        $amount = $this->tools->tool('ps_round', $amount);
+
+        return intval(strval($amount));
     }
 
     /**
