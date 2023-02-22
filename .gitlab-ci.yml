@@ -19,7 +19,9 @@ php cs fixer:
   image: composer:1.9
   stage: check php
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   script:
     - ./dev/ci/dist_files.sh -b payplug
     - composer install
@@ -32,7 +34,9 @@ check php version:
   image: php:8.0-alpine
   stage: check-php-version
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   script:
     - >
       RED='\033[0;31m';
@@ -48,7 +52,9 @@ coverage test:
   image: php:7.2.1
   stage: coverage and tests
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
     - pecl install xdebug-3.1.0
@@ -62,7 +68,9 @@ check module translations:
   image: composer:1.9
   stage: translations
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   script:
     - ./dev/ci/dist_files.sh -b payplug
     - composer install
@@ -84,7 +92,9 @@ assets:
   image: node:16
   stage: assets
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
     - npm --version
@@ -112,7 +122,9 @@ build zip release:
   image: composer:1.9
   stage: build
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
     - rm -rf ./vendor
@@ -135,7 +147,9 @@ asset-pspaylater:
   image: node:16
   stage: asset-pspaylater
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
     - npm --version
@@ -163,7 +177,9 @@ build-pspaylater:
   image: composer:1.9
   stage: build-pspaylater
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
     - ls -als ./vendor
