@@ -433,6 +433,10 @@ class ApiRest
                     'title' => $translation['inactive']['account']['error']['title'],
                     'description' => $translation['inactive']['account']['error']['description'],
                 ],
+                'success' => [
+                    'title' => $translation['inactive']['account']['success']['title'],
+                    'description' => $translation['inactive']['account']['success']['description'],
+                ],
             ],
         ];
     }

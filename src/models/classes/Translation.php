@@ -125,6 +125,10 @@ class Translation
                         'title' => $this->dependencies->l('logged.inactive.account.error.title', 'loggedtranslation'),
                         'description' => $this->dependencies->l('logged.inactive.account.error.description', 'loggedtranslation'),
                     ],
+                    'success' => [
+                        'title' => $this->dependencies->l('logged.inactive.account.success.title', 'loggedtranslation'),
+                        'description' => $this->dependencies->l('logged.inactive.account.success.description', 'loggedtranslation'),
+                    ],
                 ],
             ],
         ];
