@@ -61,6 +61,22 @@ class AdminPayplugController extends ModuleAdminController
 
         $this->renderApiRest();
 
+        if ($this->tools->tool('getValue', '_ajax')) {
+            if ($this->tools->tool('getValue', 'refund')) {
+                $this->dependencies->refundClass->refundPayment();
+            }
+            if ($this->tools->tool('getValue', 'capture')) {
+                $this->dependencies->paymentClass->capturePayment();
+            }
+            if ($this->tools->tool('getValue', 'confirmAbort')) {
+                $inst_id = $this->tools->tool('getValue', 'inst_id');
+                $this->dependencies->mediaClass->displayPopin('abort', ['inst_id' => $inst_id]);
+            }
+            if ($this->tools->tool('getValue', 'abort')) {
+                $this->dependencies->paymentClass->abortPayment();
+            }
+        }
+
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
         ]);

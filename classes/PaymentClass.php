@@ -571,7 +571,27 @@ class PaymentClass
         $pay_id = $this->tools->tool('getValue', 'pay_id');
         $id_order = $this->tools->tool('getValue', 'id_order');
 
-        $capture = $this->dependencies->apiClass->capturePayment($pay_id);
+        $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+        if (!$payment['result']) {
+            $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            if ($sandbox) {
+                $this->dependencies->apiClass->initializeApi(false);
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            } else {
+                $this->dependencies->apiClass->initializeApi(true);
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            }
+
+            if (!$payment['result']) {
+                exit(json_encode([
+                    'status' => 'error',
+                    'data' => $this->dependencies->l('payplug.capturePayment.cannotCapture', 'paymentclass'),
+                    'message' => $payment['message'],
+                ]));
+            }
+        }
+
+        $capture = $this->dependencies->apiClass->capturePayment($payment['resource']->id);
         if (!$capture['result']) {
             exit(json_encode([
                 'status' => 'error',
