@@ -162,6 +162,7 @@ $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e5050831
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Invalid credit card number.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fe343fc63271ff9fc7c75ed541c1126b'] = 'Invalid expiry date.';
 $_MODULE['<{payplug}prestashop>loggedtranslation_0341d376f7080493d3f52a58552bb4a3'] = 'TEST mode';
+$_MODULE['<{payplug}prestashop>loggedtranslation_07e60af823c32b756312f8ddbe07ca4a'] = 'Congratulations, your application has been accepted!';
 $_MODULE['<{payplug}prestashop>loggedtranslation_27766cf749765856df5625363edc2d8b'] = 'The password you entered is invalid';
 $_MODULE['<{payplug}prestashop>loggedtranslation_2b929a34d09ca6fee5628c53f02868de'] = 'Your application is being processed';
 $_MODULE['<{payplug}prestashop>loggedtranslation_32663ac476d0c7968f2d278d75097066'] = 'Mode';
@@ -178,6 +179,7 @@ $_MODULE['<{payplug}prestashop>loggedtranslation_80bca4436c5b5e2d9e56dda2c2245e7
 $_MODULE['<{payplug}prestashop>loggedtranslation_82352d8da2c659e4598892652d50fb75'] = 'Please enter your Payplug account password';
 $_MODULE['<{payplug}prestashop>loggedtranslation_8488221a790287726a027336cfe92eac'] = 'Congratulations, your account is connected!';
 $_MODULE['<{payplug}prestashop>loggedtranslation_893b01ee09a806952b057d426ff4f660'] = 'Ok';
+$_MODULE['<{payplug}prestashop>loggedtranslation_8948b2c39066e6ab61dceee29219b3e3'] = 'You can now use the LIVE mode and collect payments.';
 $_MODULE['<{payplug}prestashop>loggedtranslation_9b65aabf9f07dbda7577c42a0634f2de'] = 'General';
 $_MODULE['<{payplug}prestashop>loggedtranslation_a07d240ef2df8ef21b877e68bc25fd95'] = 'Live';
 $_MODULE['<{payplug}prestashop>loggedtranslation_c5d6d91359e770838fca28c5e1c3533e'] = 'Learn more';
