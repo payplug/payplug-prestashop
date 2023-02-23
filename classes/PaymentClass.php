@@ -2141,7 +2141,9 @@ class PaymentClass
         if (!$isApplePayCompatible['result']) {
             return $payment_options;
         }
-
+        $this->assign->assign([
+                                  'iso_lang' => $this->context->language->iso_code,
+                              ]);
         $payment_options['applepay'] = [
             'name' => 'applepay',
             'inputs' => [
@@ -2184,10 +2186,6 @@ class PaymentClass
             ),
             'moduleName' => $this->dependencies->name,
         ];
-
-        $this->assign->assign([
-            'iso_lang' => $this->context->language->iso_code,
-        ]);
 
         return $payment_options;
     }
