@@ -987,6 +987,18 @@ class ApiRest
                 ];
             }
 
+            $popup_description = $translation['embedded']['descriptions']['popup']['text'];
+            $popup_description_link = '<a href="' . $external_url['portal'] . '" target="_blank">'
+                . $translation['embedded']['descriptions']['popup']['link']
+                . '</a>';
+            $popup_description = str_replace('$popup_description_link', $popup_description_link, $popup_description);
+
+            $redirect_description = $translation['embedded']['descriptions']['redirect']['text'];
+            $redirect_description_link = '<a href="' . $external_url['portal'] . '" target="_blank">'
+                . $translation['embedded']['descriptions']['redirect']['link']
+                . '</a>';
+            $redirect_description = str_replace('$redirect_description_link', $redirect_description_link, $redirect_description);
+
             $payment_options[] = [
                 'type' => 'payment_method',
                 'name' => 'standard',
@@ -1012,8 +1024,8 @@ class ApiRest
                         'title' => $translation['embedded']['title'],
                         'descriptions' => [
                             'live' => [
-                                'description_popup' => $translation['embedded']['descriptions']['popup'],
-                                'description_redirect' => $translation['embedded']['descriptions']['redirect'],
+                                'description_popup' => $popup_description,
+                                'description_redirect' => $redirect_description,
                                 'link_know_more' => [
                                     'text' => $translation['embedded']['link'],
                                     'url' => $external_url['embedded'],
@@ -1021,8 +1033,8 @@ class ApiRest
                                 ],
                             ],
                             'sandbox' => [
-                                'description_popup' => $translation['embedded']['descriptions']['popup'],
-                                'description_redirect' => $translation['embedded']['descriptions']['redirect'],
+                                'description_popup' => $popup_description,
+                                'description_redirect' => $redirect_description,
                                 'link_know_more' => [
                                     'text' => $translation['embedded']['link'],
                                     'url' => $external_url['embedded'],
