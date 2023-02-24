@@ -782,6 +782,12 @@ class ApiClass
                 'code' => (int) $e->getCode(),
                 'message' => $e->getMessage(),
             ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int) $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
         }
 
         return $response;

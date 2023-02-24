@@ -41,7 +41,7 @@ var $document, $window, __moduleName__Module = {
             var {popup} = __moduleName__Module;
             var url = $('input:hidden[name=admin_ajax_url]').val();
             var inst_id = $('input:hidden[name=inst_id]').val();
-            var data = {_ajax: 1, popin: 1, type: 'abort', inst_id: inst_id};
+            var data = {_ajax: 1, confirmAbort: 1, inst_id: inst_id};
 
             $.ajax({
                 type: 'POST',
@@ -65,8 +65,8 @@ var $document, $window, __moduleName__Module = {
             var url = $('input:hidden[name=admin_ajax_url]').val();
             var inst_id = $('input:hidden[name=inst_id]').val();
             var id_order = $('input:hidden[name=id_order]').val();
-            var submit = 'submitPopin_abort';
-            var data = {_ajax: 1, submit: submit, inst_id: inst_id, id_order: id_order};
+            var submit = 'abort';
+            var data = {_ajax: 1, abort: 1, inst_id: inst_id, id_order: id_order};
 
             $.ajax({
                 type: 'POST',
