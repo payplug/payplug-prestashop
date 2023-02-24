@@ -321,7 +321,6 @@ key;default;tags;fr;en;gb;it;es;nl
 <{pspaylater}prestashop>paymentclass_f8519a87542797a26e116bd8fc3c4970;payplug.buildPaymentDetails.oneyX4WithFees;;"Oney 4x";"Oney 4x";"Oney 4x";"Oney 4x";"Oney 4x";"Oney 4x"
 <{pspaylater}prestashop>paymentmethodstranslation_02a885b68c8a3ec4fa17cad649a965d9;paymentmethods.standard.link;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_0677841669a60464c933f2938a905d3f;paymentmethods.bancontact.user.description;;;;;;;
-<{pspaylater}prestashop>paymentmethodstranslation_07519feab44afcfd802e5f3b3be399d6;paymentmethods.embedded.descriptions.redirect;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_075ccf19e72ab4184091aa508a05dfb8;paymentmethods.embedded.descriptions.integrated;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_08c50aaff9924951dbafb422b7edf020;paymentmethods.installment.select.3_schedules;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_219a1209e3e3707678defb2c071ac0e2;paymentmethods.installment.descriptions.alert;;;;;;;
@@ -352,12 +351,15 @@ key;default;tags;fr;en;gb;it;es;nl
 <{pspaylater}prestashop>paymentmethodstranslation_85c9706cf5c49c33262d40df8b9414d8;paymentmethods.standard.advanced;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_8c8fa812dfcd5148403ba3cf7fdd61c4;paymentmethods.deferred.title;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_9378e903cc21ae05c134a3b1e0158603;paymentmethods.applepay.title;;;;;;;
+<{pspaylater}prestashop>paymentmethodstranslation_9d86e634a77bcceb7ed25d28ce0424b6;paymentmethods.embedded.descriptions.redirect.link;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_9e182878140c5f46c5d78171d68d40bd;paymentmethods.applepay.descriptions.sandbox;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_a5fd8aaa6aaa0ad2f5d0762addac9b91;paymentmethods.bancontact.descriptions.live;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_a6aaf01fc69e6cc97f0276bbd2658e68;paymentmethods.bancontact.link;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_b0982d7be8e2668bcde5e550b917edcf;paymentmethods.installment.descriptions.description_1;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_b5282215d1ef0800cbc2f989aad4a67c;paymentmethods.deferred.states.state;;;;;;;
+<{pspaylater}prestashop>paymentmethodstranslation_bb5c6af01d365a1dbbc217475ade0d83;paymentmethods.embedded.descriptions.redirect.text;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_c41ba4e54bb5b1529fdf3583d0d228af;paymentmethods.one_click.descriptions.live;;;;;;;
+<{pspaylater}prestashop>paymentmethodstranslation_c451b5ca698d7f728f2150a8c6844e53;paymentmethods.embedded.descriptions.redirect.text;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_c45f141f9e09a8c4f3607d7eabccc81c;paymentmethods.amex.link;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_cc93f702d49b40211bc8d63fdf6814b0;paymentmethods.embedded.options.integrated;;;;;;;
 <{pspaylater}prestashop>paymentmethodstranslation_cef2811b3dd8ee6f6829ee6f98ca2960;paymentmethods.embedded.descriptions.popup;;;;;;;

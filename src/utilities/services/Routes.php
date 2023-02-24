@@ -47,7 +47,7 @@ class Routes
             'bancontact' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4408157435794',
             'contact' => 'https://www.payplug.com/contact',
             'deferred' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360010088420',
-            'forgot_password' => 'https://www.payplug.com/portal/forgot_password',
+            'forgot_password' => 'https://portal.payplug.com/forgot_password',
             'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
             'help' => 'https://support.payplug.com/hc/' . $iso_code . '/requests/new',
             'install' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021389891',
@@ -59,10 +59,10 @@ class Routes
             'oney_cgv' => 'https://portal.payplug.com/#/configuration/oney',
             'order_state' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4406805105298',
             'payment_page' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142312',
-            'portal' => 'https://www.payplug.com/portal',
+            'portal' => 'https://portal.payplug.com/',
             'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
-            'signup' => 'https://www.payplug.com/signup',
+            'signup' => 'https://portal.payplug.com/signup',
             'embedded' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
         ];
     }
