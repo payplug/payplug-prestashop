@@ -169,8 +169,14 @@ class Translation
             'embedded' => [
                 'title' => $this->dependencies->l('paymentmethods.embedded.title', 'paymentmethodstranslation'),
                 'descriptions' => [
-                    'popup' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup', 'paymentmethodstranslation'),
-                    'redirect' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect', 'paymentmethodstranslation'),
+                    'popup' => [
+                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup.text', 'paymentmethodstranslation'),
+                        'link' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup.link', 'paymentmethodstranslation'),
+                    ],
+                    'redirect' => [
+                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect.text', 'paymentmethodstranslation'),
+                        'link' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect.link', 'paymentmethodstranslation'),
+                    ],
                     'integrated' => $this->dependencies->l('paymentmethods.embedded.descriptions.integrated', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.embedded.link', 'paymentmethodstranslation'),
