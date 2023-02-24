@@ -896,11 +896,11 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: processUpdateOrder');
 
         $type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $this->order->current_state);
+        $this->type = $type ?: 'undefined';
 
         $this->logger->addLog('Current order state: ' . $this->order->current_state);
-        $this->logger->addLog('Type: ' . $type);
+        $this->logger->addLog('Type: ' . $this->type);
 
-        $this->type = $type ?: 'undefined';
         $method = 'processType' . $this->toolsAdapter->tool('ucfirst', $this->type);
         $this->{$method}();
     }
