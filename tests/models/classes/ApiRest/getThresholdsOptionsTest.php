@@ -87,11 +87,7 @@ class getThresholdsOptionsTest extends BaseApiRest
         );
         $this->assertSame(
             $all_amounts['oney_min_amounts'],
-            (int) $response['descriptions']['min_amount']['min'][1]
-        );
-        $this->assertSame(
-            $all_amounts['oney_max_amounts'],
-            (int) $response['descriptions']['min_amount']['max'][1]
+            (int) $response['descriptions']['min_amount']['default'][1]
         );
 
         // test oney_min_amounts
@@ -104,12 +100,8 @@ class getThresholdsOptionsTest extends BaseApiRest
             (int) $response['descriptions']['max_amount']['placeholder'][1]
         );
         $this->assertSame(
-            $all_amounts['oney_min_amounts'],
-            (int) $response['descriptions']['max_amount']['min'][1]
-        );
-        $this->assertSame(
             $all_amounts['oney_max_amounts'],
-            (int) $response['descriptions']['max_amount']['max'][1]
+            (int) $response['descriptions']['max_amount']['default'][1]
         );
     }
 }

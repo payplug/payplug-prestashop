@@ -123,11 +123,7 @@ class getPaylaterSectionTest extends BaseApiRest
         );
         $this->assertSame(
             $all_amounts['oney_min_amounts'],
-            (int) $thresholds_options['descriptions']['min_amount']['min'][1]
-        );
-        $this->assertSame(
-            $all_amounts['oney_max_amounts'],
-            (int) $thresholds_options['descriptions']['min_amount']['max'][1]
+            (int) $thresholds_options['descriptions']['min_amount']['default'][1]
         );
 
         // test oney_max_amounts
@@ -140,12 +136,8 @@ class getPaylaterSectionTest extends BaseApiRest
             (int) $thresholds_options['descriptions']['max_amount']['placeholder'][1]
         );
         $this->assertSame(
-            $all_amounts['oney_min_amounts'],
-            (int) $thresholds_options['descriptions']['max_amount']['min'][1]
-        );
-        $this->assertSame(
             $all_amounts['oney_max_amounts'],
-            (int) $thresholds_options['descriptions']['max_amount']['max'][1]
+            (int) $thresholds_options['descriptions']['max_amount']['default'][1]
         );
 
         // test fees options
