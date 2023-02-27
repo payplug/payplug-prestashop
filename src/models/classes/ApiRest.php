@@ -159,10 +159,10 @@ class ApiRest
             'oney_schedule' => (bool) $configuration->getValue('oney_optimized'),
             'oney_product_animation' => (bool) $configuration->getValue('oney_product_cta'),
             'oney_cart_animation' => (bool) $configuration->getValue('oney_cart_cta'),
-            'oney_thresholds_min' => $configuration->getValue('oney_min_amounts'),
-            'oney_thresholds_max' => $configuration->getValue('oney_max_amounts'),
-            'oney_custom_thresholds_min' => $configuration->getValue('oney_custom_min_amounts'),
-            'oney_custom_thresholds_max' => $configuration->getValue('oney_custom_max_amounts'),
+            'oney_min_amounts' => $configuration->getValue('oney_min_amounts'),
+            'oney_max_amounts' => $configuration->getValue('oney_max_amounts'),
+            'oney_custom_min_amounts' => $configuration->getValue('oney_custom_min_amounts'),
+            'oney_custom_max_amounts' => $configuration->getValue('oney_custom_max_amounts'),
             'bancontact' => (bool) $configuration->getValue('bancontact'),
             'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
             'applepay' => (bool) $configuration->getValue('applepay'),
@@ -1380,35 +1380,27 @@ class ApiRest
             return [];
         }
 
-        $configuration = $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass();
         $default_configuration = [
-            'oney_min_amounts' => $configuration->getDefault('oney_min_amounts'),
-            'oney_max_amounts' => $configuration->getDefault('oney_max_amounts'),
-            'oney_custom_min_amounts' => $configuration->getDefault('oney_custom_min_amounts'),
-            'oney_custom_max_amounts' => $configuration->getDefault('oney_custom_max_amounts'),
+            'oney_min_amounts' => $current_configuration['oney_min_amounts'],
+            'oney_max_amounts' => $current_configuration['oney_max_amounts'],
+            'oney_custom_min_amounts' => $current_configuration['oney_custom_min_amounts'],
+            'oney_custom_max_amounts' => $current_configuration['oney_custom_max_amounts'],
         ];
-        foreach ($default_configuration as $k => $v) {
-            if (!isset($current_configuration[$k])) {
-                $current_configuration[$k] = $v;
-            }
-        }
 
         // todo: Create an helper to handle the two following line of logic
-        $custom_min = explode(':', $current_configuration['oney_custom_min_amounts']);
+        $custom_min = explode(':', $default_configuration['oney_custom_min_amounts']);
         $custom_min = (int) $custom_min[1];
         $custom_min = $this->helpers['amount']->formatOneyAmount($custom_min)['result'];
 
-        $custom_max = explode(':', $current_configuration['oney_custom_max_amounts']);
+        $custom_max = explode(':', $default_configuration['oney_custom_max_amounts']);
         $custom_max = (int) $custom_max[1];
         $custom_max = $this->helpers['amount']->formatOneyAmount($custom_max)['result'];
 
-        $min = explode(':', $current_configuration['oney_min_amounts']);
+        $min = explode(':', $default_configuration['oney_min_amounts']);
         $min = (int) $min[1];
         $min = $this->helpers['amount']->formatOneyAmount($min)['result'];
 
-        $max = explode(':', $current_configuration['oney_max_amounts']);
+        $max = explode(':', $default_configuration['oney_max_amounts']);
         $max = (int) $max[1];
         $max = $this->helpers['amount']->formatOneyAmount($max)['result'];
 
@@ -1432,16 +1424,14 @@ class ApiRest
                     'name' => 'oney_min_amounts',
                     'value' => $custom_min,
                     'placeholder' => $custom_min,
-                    'min' => $min,
-                    'max' => $max,
+                    'default' => $min,
                 ],
                 'inter' => $translation['thresholds']['inter'],
                 'max_amount' => [
                     'name' => 'oney_max_amounts',
                     'value' => $custom_max,
                     'placeholder' => $custom_max,
-                    'min' => $min,
-                    'max' => $max,
+                    'default' => $max,
                 ],
                 'error' => [
                     'text' => sprintf(
