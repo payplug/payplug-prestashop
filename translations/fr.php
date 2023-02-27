@@ -346,7 +346,7 @@ $_MODULE['<{payplug}prestashop>paymentmethodstranslation_60bdd39bfa542f288dd1089
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_66b4d927572f8a7a2347fc69c6385e21'] = 'à partir de';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_69078e0028891d87307e4f88bd4f053c'] = 'Permettez à vos clients de payer avec leurs cartes American Express.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_6e8fa0eded1f41e892cc3773cd6d0426'] = '2 fois';
-$_MODULE['<{payplug}prestashop>paymentmethodstranslation_704fa7ba6fdca59d2236d6c5773fbc2c'] = 'En savoir plus.';
+$_MODULE['<{payplug}prestashop>paymentmethodstranslation_704fa7ba6fdca59d2236d6c5773fbc2c'] = ' En savoir plus.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_70b787ccbe9c4acf24f7643500b9ffe3'] = 'Présentation de la page de paiement';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_70e74fe806dc3b7c3ce144004fbf1e97'] = 'Vos clients verront apparaître $popup_description_link sur la page de checkout de votre boutique.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_73a58a6ef6b71328da3582e24a359b5f'] = 'Paiement AmEx';
