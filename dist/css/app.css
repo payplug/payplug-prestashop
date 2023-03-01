@@ -2752,6 +2752,7 @@ button.payplugLink:hover {
   padding: 8px 12px;
   background-color: inherit;
   cursor: pointer;
+  color: #212225;
 }
 .bootstrap .payplugUIInput input[type=text]::-moz-placeholder, .bootstrap .payplugUIInput input[type=email]::-moz-placeholder, .bootstrap .payplugUIInput input[type=password]::-moz-placeholder, .bootstrap .payplugUIInput input[type=number]::-moz-placeholder {
   color: rgba(33, 34, 37, 0.8);
