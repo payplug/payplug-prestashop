@@ -3865,7 +3865,6 @@ button.payplugLink:hover {
   }
 }
 .payplugConfiguration .paymentOption ._informations {
-  width: 100%;
   padding: 32px 0 0 60px;
 }
 .payplugConfiguration .paymentOption ._informations.-show {
