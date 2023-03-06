@@ -26,6 +26,7 @@ namespace PayPlug\classes;
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
 use PayPlug\src\models\repositories\CountryRepository;
+use PayPlug\src\models\repositories\PaymentRepository;
 use PayPlug\src\utilities\helpers\FilesHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
@@ -508,8 +509,10 @@ class DependenciesClass
     {
         $constant = $this->getPlugin()->getConstant();
         $prefix = $constant->get('_DB_PREFIX_');
+        $logger = $this->getPlugin()->getLogger();
         $this->repositories = [
-            'country' => new CountryRepository($prefix),
+            'country' => new CountryRepository($prefix, $this->name, $logger),
+            'payment' => new PaymentRepository($prefix, $this->name, $logger),
         ];
     }
 

@@ -164,27 +164,23 @@ class InstallmentClass
      *
      * @param int $id_cart
      *
-     * @return int OR bool
+     * @return string
      */
     public function getInstallmentByCart($id_cart)
     {
         if (!$id_cart || !is_int($id_cart)) {
-            return false;
-        }
-        $req_installment_cart = $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->where('payment_method = "installment"')
-            ->build('unique_value')
-        ;
-
-        if (!$req_installment_cart) {
-            return false;
+            return '';
         }
 
-        return $req_installment_cart;
+        $payment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $id_cart);
+
+        if (!$payment) {
+            return '';
+        }
+
+        return 'installment' == $payment['payment_method'] ? $payment['id_payment'] : '';
     }
 
     /**

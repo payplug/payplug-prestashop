@@ -27,6 +27,10 @@ use PayPlug\src\application\adapter\QueryAdapter;
 
 class QueryRepository
 {
+    protected $module_name;
+
+    protected $prefix;
+
     protected $query = [
         'type' => [],
         'fields' => [],
@@ -45,7 +49,7 @@ class QueryRepository
         'lastId' => [],
     ];
 
-    protected $prefix;
+    private $adapter;
 
     private $data_type_text = [
         'char',
@@ -74,12 +78,14 @@ class QueryRepository
         'varbinary',
     ];
 
-    private $adapter;
+    private $logger;
 
-    public function __construct($prefix = '')
+    public function __construct($prefix = '', $module_name = '', $logger = null)
     {
         $this->setPrefix($prefix);
+        $this->setModuleName($module_name);
         $this->adapter = new QueryAdapter();
+        $this->logger = $logger;
     }
 
     /**
@@ -465,21 +471,12 @@ class QueryRepository
                 $data_type = $this->getDataType($table_name[1], $column_name);
 
                 if (in_array($data_type[0]['DATA_TYPE'], $this->data_type_text)) {
-                    if ($data_type[0]['DATA_TYPE'] == 'varchar') {
-                        $data_type[0]['DATA_TYPE'] = 'char';
-                    }
                     $data = str_replace('\'', '', $column[1]);
                     $data = str_replace('"', '', $data);
-                    $where = $column[0] . $comparator . 'CAST(\'' . $data . '\' AS ' . $data_type[0]['DATA_TYPE'];
-                    if (in_array($data_type[0]['DATA_TYPE'], $this->data_type_length)) {
-                        $where .= '(' . $data_type[0]['data_type_length'] . ')';
-                    }
-                    $where .= ')';
+                    $where = $column[0] . $comparator . '"' . $this->escape($data) . '"';
                 } else {
-                    if ($data_type[0]['DATA_TYPE'] == 'tinyint') {
-                        $data_type[0]['DATA_TYPE'] = 'int';
-                    }
-                    $where = $column[0] . $comparator . 'CAST(' . trim($column[1]) . ' AS SIGNED ' . $data_type[0]['DATA_TYPE'] . ')';
+                    $data = trim($column[1]);
+                    $where = $column[0] . $comparator . '"' . (int) $data . '"';
                 }
             }
 
@@ -536,21 +533,12 @@ class QueryRepository
                 $data_type = $this->getDataType($table_name[1], $column_name);
 
                 if (in_array($data_type[0]['DATA_TYPE'], $this->data_type_text)) {
-                    if ($data_type[0]['DATA_TYPE'] == 'varchar') {
-                        $data_type[0]['DATA_TYPE'] = 'char';
-                    }
                     $data = str_replace('\'', '', $column[1]);
                     $data = str_replace('"', '', $data);
-                    $whereOr = $column[0] . $comparator . 'CAST(\'' . $data . '\' AS ' . $data_type[0]['DATA_TYPE'];
-                    if (in_array($data_type[0]['DATA_TYPE'], $this->data_type_length)) {
-                        $whereOr .= '(' . $data_type[0]['data_type_length'] . ')';
-                    }
-                    $whereOr .= ')';
+                    $whereOr = $column[0] . $comparator . '"' . $this->escape($data) . '"';
                 } else {
-                    if ($data_type[0]['DATA_TYPE'] == 'tinyint') {
-                        $data_type[0]['DATA_TYPE'] = 'int';
-                    }
-                    $whereOr = $column[0] . $comparator . 'CAST(' . trim($column[1]) . ' AS SIGNED ' . $data_type[0]['DATA_TYPE'] . ')';
+                    $data = trim($column[1]);
+                    $whereOr = $column[0] . $comparator . '"' . (int) $data . '"';
                 }
             }
 
@@ -589,8 +577,9 @@ class QueryRepository
         try {
             $result = $this->adapter->query($sql);
         } catch (\Exception $e) {
+            $this->logger->addLog('QueryRepository::build() - Exception thrown: ' . $e->getMessage());
+
             return false;
-            // @todo : AddLog
         }
 
         if (isset($param) && $param == 'unique_value' && isset($result[0])) {
@@ -624,5 +613,10 @@ class QueryRepository
     public function setPrefix($prefix = '')
     {
         $this->prefix = $prefix;
+    }
+
+    public function setModuleName($module_name = '')
+    {
+        $this->module_name = $module_name;
     }
 }
