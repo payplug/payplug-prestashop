@@ -110,7 +110,7 @@
                 {capture assign="generalLogin_link_password"}{l s='general.login.forgottenPassword' mod='payplug'}{/capture}
                 {include file='./../atoms/link/link.tpl'
                     linkData='payplugForgotPassword'
-                    linkHref=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal/forgot_password'
+                    linkHref=$portal_url|escape:'htmlall':'UTF-8'|cat:'/forgot_password'
                     linkClassName='_forgotPassword'
                     linkText=$generalLogin_link_password}
             </div>
@@ -152,7 +152,7 @@
             {capture assign="generalLogged_goToPortal"}{l s='general.logged.goToPortal' mod='payplug'}{/capture}
             {include file='./../atoms/buttonLink/buttonLink.tpl'
                 buttonLinkClassName='_userPortal'
-                buttonLinkHref=$site_url|escape:'htmlall':'UTF-8'|cat:'/portal'
+                buttonLinkHref=$portal_url|escape:'htmlall':'UTF-8'
                 buttonLinkName='logged_goToPortal'
                 buttonLinkText=$generalLogged_goToPortal
                 buttonLinkIcon='link'}

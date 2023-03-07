@@ -764,21 +764,25 @@ class PaymentClass
      * @description ONLY FOR VALIDATION
      * Retrieve payment stored
      *
-     * @param int $cart_id
+     * @param int $id_cart
      *
-     * @return bool|int
+     * @return string
      */
-    public function getPaymentByCart($cart_id)
+    public function getPaymentByCart($id_cart)
     {
-        $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('payment_method != "installment"')
-            ->where('id_cart = ' . (int) $cart_id)
-        ;
+        if (!$id_cart || !is_int($id_cart)) {
+            return '';
+        }
 
-        return $this->query->build('unique_value');
+        $payment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $id_cart);
+
+        if (!$payment) {
+            return '';
+        }
+
+        return 'installment' != $payment['payment_method'] ? $payment['id_payment'] : '';
     }
 
     /**
@@ -2141,7 +2145,9 @@ class PaymentClass
         if (!$isApplePayCompatible['result']) {
             return $payment_options;
         }
-
+        $this->assign->assign([
+                                  'iso_lang' => $this->context->language->iso_code,
+                              ]);
         $payment_options['applepay'] = [
             'name' => 'applepay',
             'inputs' => [
@@ -2184,10 +2190,6 @@ class PaymentClass
             ),
             'moduleName' => $this->dependencies->name,
         ];
-
-        $this->assign->assign([
-            'iso_lang' => $this->context->language->iso_code,
-        ]);
 
         return $payment_options;
     }

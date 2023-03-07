@@ -896,11 +896,11 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: processUpdateOrder');
 
         $type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $this->order->current_state);
+        $this->type = $type ?: 'undefined';
 
         $this->logger->addLog('Current order state: ' . $this->order->current_state);
-        $this->logger->addLog('Type: ' . $type);
+        $this->logger->addLog('Type: ' . $this->type);
 
-        $this->type = $type ?: 'undefined';
         $method = 'processType' . $this->toolsAdapter->tool('ucfirst', $this->type);
         $this->{$method}();
     }
@@ -912,14 +912,10 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: setCartFromResource');
         if ($this->is_installment) {
-            $id_cart = $this->query
-                ->select()
-                ->fields('id_cart')
-                ->from($this->constantAdapter->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-                ->where('`id_payment` = "' . pSQL($this->payment->installment_plan_id) . '"')
-                ->build('unique_value')
-            ;
-            if (!$id_cart) {
+            $payment = $this->dependencies
+                ->getRepositories()['payment']
+                ->getByIdPayment($this->payment->installment_plan_id);
+            if (!$payment['id_cart']) {
                 if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
                     $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
                     $this->exitProcess('Payment timeout for paymentID: ' . $this->payment->installment_plan_id, 200);
@@ -929,15 +925,10 @@ class PayPlugNotifications
                 $this->exitProcess($error_msg, 500);
             }
         } else {
-            $id_cart = $this->query
-                ->select()
-                ->fields('id_cart')
-                ->from($this->constantAdapter->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-                ->where('`id_payment` = "' . pSQL($this->resource->id) . '"')
-                ->build('unique_value')
-            ;
-
-            if (!$id_cart) {
+            $payment = $this->dependencies
+                ->getRepositories()['payment']
+                ->getByIdPayment($this->resource->id);
+            if (!$payment['id_cart']) {
                 if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
                     $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
                     $this->exitProcess('Payment timeout for payment ID: ' . $this->resource->id, 200);
@@ -948,9 +939,9 @@ class PayPlugNotifications
             }
         }
 
-        $this->cart = $this->cartAdapter->get((int) $id_cart);
+        $this->cart = $this->cartAdapter->get((int) $payment['id_cart']);
         if (!$this->validateAdapter->validate('isLoadedObject', $this->cart)) {
-            $this->logger->addLog('The cart cannot be loaded with id ' . $id_cart, 'error');
+            $this->logger->addLog('The cart cannot be loaded with id ' . $payment['id_cart'], 'error');
             $this->exitProcess('The cart cannot be loaded.', 500);
         }
     }

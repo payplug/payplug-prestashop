@@ -255,8 +255,6 @@ class ConfigClass
         $this->validate = $this->dependencies->getPlugin()->getValidate();
         $this->validators = $this->dependencies->getValidators();
 
-        $this->validators = $this->dependencies->getValidators();
-
         $this->setLoggers();
         $this->setConfigurationProperties();
 

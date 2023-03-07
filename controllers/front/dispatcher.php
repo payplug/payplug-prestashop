@@ -65,7 +65,12 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 return false;
             }
 
-            if (Order::getByCartId($id_cart)) {
+            if (version_compare(_PS_VERSION_, '1.7.1', '<')) {
+                $id_order = Order::getOrderByCartId($id_cart);
+            } else {
+                $id_order = Order::getByCartId($id_cart);
+            }
+            if ($id_order) {
                 $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
                     $this->dependenciesClass->l('The transaction was not completed and your card was not charged.'),
                 ]);

@@ -22,5 +22,5 @@
 <p>{l s='You need to activate your account before performing LIVE transactions.' mod='payplug'}</p>
 <div class="{$module_name|escape:'htmlall':'UTF-8'}Popup_footer">
     <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}Button -close">{l s='Cancel' mod='payplug'}</button>
-    <a class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" target="_blank" href="{$site_url|escape:'htmlall':'UTF-8'}/portal">{l s='Activate account' mod='payplug'}</a>
+    <a class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" target="_blank" href="{$portal_url|escape:'htmlall':'UTF-8'}">{l s='Activate account' mod='payplug'}</a>
 </div>
