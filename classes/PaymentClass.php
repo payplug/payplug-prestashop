@@ -2080,11 +2080,12 @@ class PaymentClass
 
             case 'invalid_amount_bottom':
             case 'invalid_amount_top':
+            $helpers = $this->dependencies->getHelpers();
                 $limits = $this->oney->getOneyPriceLimit(true);
                 $err_label = sprintf(
                     $this->dependencies->l('payplug.getPaymentOptions.invalidAmount', 'paymentclass'),
-                    $limits['min'],
-                    $limits['max']
+                    $helpers['amount']->formatOneyAmount($limits['min'])['result'],
+                    $helpers['amount']->formatOneyAmount($limits['max'])['result']
                 );
 
                 break;

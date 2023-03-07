@@ -93,15 +93,16 @@ class loginActionTest extends BaseConfigurationAction
         $account = \Mockery::mock('Account');
         $account
             ->shouldReceive([
-                'isPassword' => false,
-            ]);
+                                'isPassword' => [
+                                    'result' => false,
+                                ],
+                            ]);
         $this->dependencies
             ->shouldReceive([
                 'getValidators' => [
                     'account' => $account,
                 ],
             ]);
-
         $this->assertSame(
             [
                 'success' => false,

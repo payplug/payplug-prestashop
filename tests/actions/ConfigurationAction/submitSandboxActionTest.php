@@ -64,7 +64,7 @@ class submitSandboxActionTest extends BaseConfigurationAction
         $account = \Mockery::mock('Account');
         $account
             ->shouldReceive([
-                                'isPassword' => false,
+                                'isPassword' => ['result' => false],
                             ]);
         $this->dependencies
             ->shouldReceive([

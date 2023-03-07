@@ -44,6 +44,7 @@ class OneyRepository extends BaseClass
     private $validateAdapter;
     private $assign;
     private $validators;
+    private $helpers;
 
     public function __construct(
         $addressAdapter,
@@ -80,6 +81,7 @@ class OneyRepository extends BaseClass
         $this->oneyEntity = $oneyEntity;
         $this->log = $myLogPHP;
         $this->assign = $assign;
+        $this->helpers = $this->dependencies->getHelpers();
 
         $this->setOperations();
     }
@@ -203,8 +205,8 @@ class OneyRepository extends BaseClass
             'oneyWithFees' => (bool) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             ),
-            'oneyMinAmounts' => $this->toolsAdapter->tool('displayPrice', $limits['min']),
-            'oneyMaxAmounts' => $this->toolsAdapter->tool('displayPrice', $limits['max']),
+            'oneyMinAmounts' => $this->toolsAdapter->tool('displayPrice', $this->helpers['amount']->formatOneyAmount($limits['min'])['result']),
+            'oneyMaxAmounts' => $this->toolsAdapter->tool('displayPrice', $this->helpers['amount']->formatOneyAmount($limits['max'])['result']),
             'oneyUrl' => 'https://www.oney.' . $this->contextAdapter->getContext()->language->iso_code,
         ]);
     }
@@ -1397,8 +1399,8 @@ class OneyRepository extends BaseClass
         $is_valid_amount = $this->validators['payment']->isAmount(
             $this->dependencies->amountCurrencyClass->convertAmount($amount),
             [
-                'min' => $this->dependencies->amountCurrencyClass->convertAmount($limits['min']),
-                'max' => $this->dependencies->amountCurrencyClass->convertAmount($limits['max']),
+                'min' => $this->dependencies->amountCurrencyClass->convertAmount($this->helpers['amount']->formatOneyAmount($limits['min'])['result']),
+                'max' => $this->dependencies->amountCurrencyClass->convertAmount($this->helpers['amount']->formatOneyAmount($limits['max'])['result']),
             ]
         );
 
@@ -1407,8 +1409,8 @@ class OneyRepository extends BaseClass
                 'result' => false,
                 'error' => sprintf(
                     $this->dependencies->l('oney.isValidOneyAmount.unvalid', 'oneyrepository'),
-                    $limits['min'],
-                    $limits['max']
+                    $this->helpers['amount']->formatOneyAmount($limits['min'])['result'],
+                    $this->helpers['amount']->formatOneyAmount($limits['max'])['result']
                 ),
             ];
         }

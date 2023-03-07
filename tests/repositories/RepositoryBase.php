@@ -5,6 +5,7 @@ namespace PayPlug\tests\repositories;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
+use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
@@ -136,6 +137,7 @@ class RepositoryBase extends TestCase
                 [
                     'getHelpers' => [
                         'user' => \Mockery::mock(UserHelper::class)->makePartial(),
+                        'amount' => \Mockery::mock(AmountHelper::class)->makePartial(),
                     ],
                 ]
             );

@@ -42,6 +42,14 @@ function upgrade_module_3_14_0()
             'redirect'
         );
     }
+    // Update payplug configuration PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS and PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS
+    $flag = $flag && Configuration::updateValue(
+        'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS',
+        300000
+    );
 
-    return $flag;
+    return $flag && Configuration::updateValue(
+        'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS',
+        10000
+    );
 }
