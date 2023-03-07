@@ -3864,6 +3864,9 @@ button.payplugLink:hover {
     margin: 0 0 0 24px;
   }
 }
+.payplugConfiguration .paymentOption.-oney ._informations {
+  width: 100%;
+}
 .payplugConfiguration .paymentOption ._informations {
   padding: 32px 0 0 60px;
 }
