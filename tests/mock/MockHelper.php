@@ -67,6 +67,9 @@ class MockHelper extends Mockery
                     case 'ps_round':
                         return round($value, $params2);
 
+                    case 'file_get_contents':
+                        return file_get_contents('php://input');
+
                     default:
                         throw new Mockery\Exception('ERROR : Missing method "' . $action . '" in createToolsMock (MockHelper.php)');
 

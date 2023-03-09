@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */ require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
 use PayLaterModule\classes\DependenciesClass;

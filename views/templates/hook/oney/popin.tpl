@@ -1,5 +1,5 @@
 {*
-* 2022 PayPlug
+* 2023 Payplug
 *
 * NOTICE OF LICENSE
 *
@@ -14,10 +14,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
 *
-*  @author PayPlug SAS
-*  @copyright 2023 PayPlug SAS
+*  @author Payplug SAS
+*  @copyright 2023 Payplug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
-*  International Registered Trademark & Property of PayPlug SAS
+*  International Registered Trademark & Property of Payplug SAS
 *}
 <span class="{$module_name|escape:'htmlall':'UTF-8'}OneyPopin{if isset($payplug_oney_error) && $payplug_oney_error} -error{/if}{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($iso_code) && $iso_code == 'IT' } -isItalian{/if}">
     {if isset($payplug_oney_error) && $payplug_oney_error}

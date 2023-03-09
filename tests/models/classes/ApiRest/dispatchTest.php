@@ -55,6 +55,12 @@ class dispatchTest extends BaseApiRest
             ->shouldReceive([
                 'loginAction' => $response,
             ]);
+
+        $this->tools
+            ->shouldReceive([
+               'tool' => 'file_get_contents',
+            ]);
+
         $action = 'login';
         $this->assertSame(
             $response,
@@ -109,6 +115,12 @@ class dispatchTest extends BaseApiRest
             ->shouldReceive([
                 'saveAction' => $response,
             ]);
+
+        $this->tools
+            ->shouldReceive([
+               'tool' => 'file_get_contents',
+            ]);
+
         $action = 'save';
         $this->assertSame(
             $response,
