@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,18 +15,21 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\models\classes;
+
+use PayPlug\src\application\adapter\ToolsAdapter;
 
 class ApiRest
 {
     private $dependencies;
     private $helpers;
+    private $tools;
     private $validators;
 
     public function __construct($dependencies)
@@ -34,6 +37,7 @@ class ApiRest
         $this->dependencies = $dependencies;
         $this->validators = $this->dependencies->getValidators();
         $this->helpers = $this->dependencies->getHelpers();
+        $this->tools = ToolsAdapter::factory();
     }
 
     /**
@@ -56,7 +60,7 @@ class ApiRest
 
         switch ($action) {
             case 'login':
-                $datas = json_decode(file_get_contents('php://input'), false);
+                $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->loginAction($datas);
 
                 break;
@@ -83,12 +87,12 @@ class ApiRest
                 break;
 
             case 'refresh_keys':
-                $datas = json_decode(file_get_contents('php://input'), false);
+                $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->submitSandboxAction($datas);
 
                 break;
             case 'save':
-                $datas = json_decode(file_get_contents('php://input'), false);
+                $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->saveAction($datas);
 
                 break;

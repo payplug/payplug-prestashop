@@ -21,6 +21,7 @@ class BaseApiRest extends TestCase
     public $dependencies;
     public $logger;
     public $plugin;
+    public $tools;
 
     protected function setUp()
     {
@@ -83,6 +84,8 @@ class BaseApiRest extends TestCase
                 'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
                 'getHelpers' => ['amount' => $this->amount_helper],
             ]);
+
+        $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
 
         $this->classe = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();
     }
