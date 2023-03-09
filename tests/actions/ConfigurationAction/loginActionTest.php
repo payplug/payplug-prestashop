@@ -76,7 +76,7 @@ class loginActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'The email you entered is invalid.',
+                    'message' => 'login.error',
                 ],
             ],
             $this->action->loginAction($datas)
@@ -107,7 +107,7 @@ class loginActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'The password you entered is invalid.',
+                    'message' => 'login.error',
                 ],
             ],
             $this->action->loginAction($datas)
@@ -139,7 +139,7 @@ class loginActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'The password you entered is invalid.',
+                    'message' => 'login.error',
                 ],
             ],
             $this->action->loginAction($datas)
@@ -176,7 +176,7 @@ class loginActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'The email and/or password was not correct.',
+                    'message' => 'login.error',
                 ],
             ],
             $this->action->loginAction($datas)
