@@ -227,6 +227,10 @@ class ConfigurationAction
      */
     public function loginAction($datas = null)
     {
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslation()
+            ->getLoginTranslations();
         $logger = $this->dependencies->getPlugin()->getLogger();
 
         if (!is_object($datas) || !$datas) {
@@ -261,7 +265,7 @@ class ConfigurationAction
                 'success' => false,
                 'data' => [
                     // @todo: add translation
-                    'message' => 'The email you entered is invalid.',
+                    'message' => $translation['login_error'],
                 ],
             ];
         }
@@ -278,7 +282,7 @@ class ConfigurationAction
                 'success' => false,
                 'data' => [
                     // @todo: add translation
-                    'message' => 'The password you entered is invalid.',
+                    'message' => $translation['login_error'],
                 ],
             ];
         }
@@ -290,7 +294,7 @@ class ConfigurationAction
                 'success' => false,
                 'data' => [
                     // @todo: add translation
-                    'message' => 'The email and/or password was not correct.',
+                    'message' => $translation['login_error'],
                 ],
             ];
         }

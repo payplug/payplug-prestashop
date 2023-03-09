@@ -75,6 +75,7 @@ class Translation
             'register' => $this->dependencies->l('login.register', 'logintranslation'),
             'connect' => $this->dependencies->l('login.connect', 'logintranslation'),
             'forgot_password' => $this->dependencies->l('login.forgot_password', 'logintranslation'),
+            'login_error' => $this->dependencies->l('login.error', 'logintranslation'),
         ];
     }
 
