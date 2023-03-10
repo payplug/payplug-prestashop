@@ -88,6 +88,14 @@
     <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -api">
         {l s='hook.header.integratedPayment.api.genericError' tags=['<br>'] mod='payplug'}
     </div>
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_privacy_policy">
+        <img class="-lock" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/integrated/lock.svg"/>
+        <span>{$secure|escape:'htmlall':'UTF-8'}</span>
+        <img class="-logo" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/payplug.svg"/>
+        <br/>
+        <a href="{$privacyLink|escape:'htmlall':'UTF-8'}" target="_blank">{$privacy|escape:'htmlall':'UTF-8'}</a>
+    </div>
 </form>
 <script type="text/javascript">
     {literal}

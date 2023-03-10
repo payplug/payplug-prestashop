@@ -396,4 +396,15 @@ class Translation
             ],
         ];
     }
+
+    /**
+     * @return array
+     */
+    public function getFrontIntegratedPaymentTranslations()
+    {
+        return [
+            'privacy' => $this->dependencies->l('ip.privacy', 'iptranslation'),
+            'secure' => $this->dependencies->l('ip.secure', 'iptranslation'),
+        ];
+    }
 }

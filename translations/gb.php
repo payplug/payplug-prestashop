@@ -134,6 +134,8 @@ $_MODULE['<{payplug}prestashop>integrated_payment_76921e9f92347ff287c289e7b676bf
 $_MODULE['<{payplug}prestashop>integrated_payment_a79141e0766975b90eb9f7e50508313c'] = 'The debit will be made as soon as your order has been processed.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fc7f0a42d35826a2419198c3b430e50c'] = 'Invalid credit card number.';
 $_MODULE['<{payplug}prestashop>integrated_payment_fe343fc63271ff9fc7c75ed541c1126b'] = 'Invalid expiry date.';
+$_MODULE['<{payplug}prestashop>iptranslation_47a6c0ffb360f88d9c74a6e70155d108'] = 'Transaction secured by';
+$_MODULE['<{payplug}prestashop>iptranslation_ac0e34f417f30bb2cd8c505998b04e38'] = 'Privacy Policy';
 $_MODULE['<{payplug}prestashop>loggedtranslation_0341d376f7080493d3f52a58552bb4a3'] = 'TEST mode';
 $_MODULE['<{payplug}prestashop>loggedtranslation_07e60af823c32b756312f8ddbe07ca4a'] = 'Congratulations, your application has been accepted!';
 $_MODULE['<{payplug}prestashop>loggedtranslation_27766cf749765856df5625363edc2d8b'] = 'The password you entered is invalid';

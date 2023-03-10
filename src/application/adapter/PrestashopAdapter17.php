@@ -151,7 +151,7 @@ class PrestashopAdapter17
             $dotenv->load($dotenvFile);
             $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
         } else {
-            $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v0/index.js';
+            $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v1/index.js';
         }
         $integrated = [];
         $integrated['name'] = 'integrated';
@@ -167,6 +167,26 @@ class PrestashopAdapter17
         $integrated['callToActionText'] = $this->dependencies->l('specific17.setIntegratedPaymentOption.name', 'prestashopadapter17');
         $integrated['tpl'] = 'integrated_payment.tpl';
         $integrated['extra_classes'] = 'payplug integrated';
+
+        $translation = $this->dependencies->getPlugin()->getTranslation()->getFrontIntegratedPaymentTranslations();
+
+        switch ($this->context->language->iso_code) {
+            case 'fr':
+                $privacyLink = 'https://www.payplug.com/fr/politique-de-confidentialite/';
+
+                break;
+
+            case 'it':
+                $privacyLink = 'https://www.payplug.com/it/politica-di-confidenzialita/';
+
+                break;
+
+            default:
+                $privacyLink = 'https://www.payplug.com/privacy-policy/';
+
+                break;
+        }
+
         $this->context->smarty->assign([
             'integrated_payment_js_url' => $integrated_payment_js_url,
             'is_one_click_activated' => (bool) $this->config->get(
@@ -179,6 +199,9 @@ class PrestashopAdapter17
             'placeholderPan' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
             'placeholderExp' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
             'placeholderCvv' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopadapter17'),
+            'privacy' => $translation['privacy'],
+            'secure' => $translation['secure'],
+            'privacyLink' => $privacyLink,
         ]);
 
         $integrated['additionalInformation'] =
