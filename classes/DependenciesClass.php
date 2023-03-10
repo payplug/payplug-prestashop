@@ -299,16 +299,6 @@ class DependenciesClass
             'defaultValue' => null,
             'setConf' => 0,
         ],
-        'publishableKey' => [
-            'name' => 'PUBLISHABLE_KEY',
-            'defaultValue' => null,
-            'setConf' => 0,
-        ],
-        'publishableKeyTest' => [
-            'name' => 'PUBLISHABLE_KEY_TEST',
-            'defaultValue' => null,
-            'setConf' => 0,
-        ],
         'sandboxMode' => [
             'name' => 'SANDBOX_MODE',
             'defaultValue' => 1,

@@ -152,133 +152,6 @@ class ApiClass
     }
 
     /**
-     * @description set publishable keys from payplug/payplug-php
-     *
-     * @throws Payplug\Exception\ConfigurationNotSetException
-     * @throws ConfigurationException
-     */
-    public function setPublishableKeys()
-    {
-        if (!isset($this->current_api_key)) {
-            return [
-                'result' => false,
-            ];
-        }
-        $sandbox = $this->config->get(
-            $this->dependencies->getConfigurationKey('sandboxMode')
-        );
-        $flag = true;
-
-        $this->setSecretKey();
-
-        // Set the publishable for the given sandbox configuration
-        try {
-            $response = Authentication::getPublishableKeys();
-            $publishable_key = isset($response['httpResponse']['publishable_key'])
-            && $response['httpResponse']['publishable_key']
-                ? $response['httpResponse']['publishable_key']
-                : null;
-
-            if (!$publishable_key) {
-                $this->config->deleteByName($this->dependencies->getConfigurationKey('publishableKey'));
-                $this->config->deleteByName($this->dependencies->getConfigurationKey('publishableKeyTest'));
-                $this->config->updateValue($this->dependencies->getConfigurationKey('embeddedMode'), 'redirect');
-
-                return [
-                    'result' => false,
-                    'error' => [
-                        'name' => 'EMPTY_PUBLISHABLE_KEY',
-                        'message' => '',
-                    ],
-                ];
-            }
-
-            $flag = $flag
-                && $this->config->updateValue(
-                    $this->dependencies->getConfigurationKey('publishableKey') . ($sandbox ? '_TEST' : ''),
-                    $publishable_key
-                );
-        } catch (BadRequestException $e) {
-            return [
-                'result' => $flag,
-                'error' => [
-                    'name' => 'BAD_REQUEST_EXCEPTION',
-                    'message' => $e->getMessage(),
-                ],
-            ];
-        }
-
-        if ($sandbox) {
-            $this->setSecretKey($this->config->get(
-                $this->dependencies->getConfigurationKey('liveApiKey')
-            ));
-        } else {
-            $this->setSecretKey($this->config->get(
-                $this->dependencies->getConfigurationKey('testApiKey')
-            ));
-        }
-
-        // Set the publishable for the other sandbox configuration
-        try {
-            $response = Authentication::getPublishableKeys();
-            $publishable_key = isset($response['httpResponse']['publishable_key'])
-            && $response['httpResponse']['publishable_key']
-                ? $response['httpResponse']['publishable_key']
-                : null;
-
-            if (!$publishable_key) {
-                $this->config->deleteByName(
-                    $this->dependencies->getConfigurationKey('publishableKey')
-                );
-                $this->config->deleteByName(
-                    $this->dependencies->getConfigurationKey('publishableKeyTest')
-                );
-                $this->config->updateValue(
-                    $this->dependencies->getConfigurationKey('embeddedMode'),
-                    'redirect'
-                );
-
-                return [
-                    'result' => false,
-                    'error' => [
-                        'name' => 'EMPTY_PUBLISHABLE_KEY',
-                        'message' => '',
-                    ],
-                ];
-            }
-
-            $flag = $flag
-                && $this->config->updateValue(
-                    $this->dependencies->getConfigurationKey('publishableKey') . (!$sandbox ? '_TEST' : ''),
-                    $publishable_key
-                );
-        } catch (BadRequestException $e) {
-            return [
-                'result' => $flag,
-                'error' => [
-                    'name' => 'BAD_REQUEST_EXCEPTION',
-                    'message' => $e->getMessage(),
-                ],
-            ];
-        }
-
-        if (!$sandbox) {
-            $this->setSecretKey($this->config->get(
-                $this->dependencies->getConfigurationKey('liveApiKey')
-            ));
-        } else {
-            $this->setSecretKey($this->config->get(
-                $this->dependencies->getConfigurationKey('testApiKey')
-            ));
-        }
-
-        return [
-            'result' => $flag,
-            'error' => [],
-        ];
-    }
-
-    /**
      * @return string
      */
     public function getCurrentApiKey()
@@ -463,20 +336,10 @@ class ApiClass
             $json_answer = $response['httpResponse'];
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
-                if ($this->dependencies->configClass->isValidFeature('feature_integrated') && (version_compare(
-                    _PS_VERSION_,
-                    '1.7',
-                    '>='
-                ))) {
-                    if ($this->setPublishableKeys()) {
-                        return true;
-                    }
-                } else {
-                    return true;
-                }
-            } else {
-                return false;
+                return true;
             }
+
+            return false;
         } catch (BadRequestException $e) {
             json_encode([
                 'content' => null,

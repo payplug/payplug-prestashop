@@ -29,8 +29,6 @@ class Configuration
     // COMPANY_STATUS
     // DEBUG_MODE
     // OFFER
-    // PUBLISHABLE_KEY
-    // PUBLISHABLE_KEY_TEST
     private $configuration = [
         'allo_save_card' => [
             'type' => 'integer',

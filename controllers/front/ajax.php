@@ -406,37 +406,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'result' => true,
                     'message' => $message, // adapter error
                 ]));
-            } elseif ($tools->tool('getIsset', 'updatePublishableKey')) {
-                $publishable_keys = $this->dependencies->apiClass->setPublishableKeys();
-
-                if (!$publishable_keys['result']) {
-                    if (!empty($publishable_keys['error'])
-                        && 'EMPTY_PUBLISHABLE_KEY' == $publishable_keys['error']['name']) {
-                        $payment_options = [
-                            'is_deferred' => (bool) $this->configurationAdapter->get('PAYPLUG_DEFERRED'),
-                        ];
-                        $payment = $this->paymentClass->preparePayment($payment_options);
-                        if (!$payment['result']) {
-                            exit(json_encode([
-                                'result' => false,
-                            ]));
-                        }
-
-                        exit(json_encode([
-                            'result' => false,
-                            'redirectUrl' => $payment['return_url'],
-                        ]));
-                    }
-
-                    exit(json_encode($publishable_keys));
-                }
-
-                $sandbox = (bool) $this->configurationAdapter->get('PAYPLUG_SANDBOX_MODE');
-                $publishable_keys['key'] = (string) $this->configurationAdapter->get(
-                    'PAYPLUG_PUBLISHABLE_KEY' . ($sandbox ? '_TEST' : '')
-                );
-
-                exit(json_encode($publishable_keys));
             }
         }
     }

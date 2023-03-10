@@ -974,7 +974,7 @@ class HookClass
                 $dotenv->load($dotenvFile);
                 $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
             } else {
-                $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v1/index.js';
+                $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js';
             }
 
             if ($payment['result']) {
@@ -1035,9 +1035,6 @@ class HookClass
             $sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
             $this->media->addJsDef([
                 'integratedPaymentError' => $integratedPaymentError,
-                'payplug_publishable_key' => $this->config->get(
-                    $this->dependencies->getConfigurationKey('publishableKey') . ($sandbox ? '_TEST' : '')
-                ),
             ]);
         }
 
@@ -1056,6 +1053,9 @@ class HookClass
             [
                 $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
                 'PAYPLUG_DOMAIN' => $payplug_domain,
+                'is_sandbox_mode' => (bool) $this->config->get(
+                    $this->dependencies->getConfigurationKey('sandboxMode')
+                ),
             ]
         );
     }

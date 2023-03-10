@@ -159,7 +159,7 @@ var $document, $window, __moduleName__Module = {
                 }
 
                 try {
-                    var integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                    var integratedPayment = new Payplug.IntegratedPayment(is_sandbox_mode);
                 } catch (e) {
                     if (typeof e.name != 'undefined' && typeof e.message != 'undefined') {
                         addLogger(e.name + " : " + e.message);
@@ -291,42 +291,12 @@ var $document, $window, __moduleName__Module = {
                         if (!event.error.hasOwnProperty('message')) {
                             event.error.message = 'A generic error occured';
                         }
+                        $('.' + integrated.props.identifier + '_error.-api')
+                            .addClass('-show');
                         addLogger(event.error.name + " : " + event.error.message);
-                        // Error adapter on Invalid Key (try to replace the one in DB)
-                        if (event.error.name === 'AUTHENTICATION_INVALID') {
-                            // Ajax request to execute setPublishableKeys
-                            integrated.form.updatePublishableKey();
-                        } else {
-                            $('.' + integrated.props.identifier + '_error.-api')
-                                .addClass('-show');
-                        }
+                       integrated.form.resetIntPayment();
                     } else {
                         integrated.form.confirmIntPayment(event.token);
-                    }
-                });
-            },
-            updatePublishableKey: function () {
-                $.ajax({
-                    type: 'POST',
-                    url: window['__moduleName___ajax_url'],
-                    dataType: 'json',
-                    data: {
-                        _ajax: 1,
-                        updatePublishableKey: true
-                    },
-                    success: function (data) {
-                        if (data.result) {
-                            payplug_publishable_key = data.key;
-                            __moduleName__Module.integrated.form.resetIntPayment();
-                        } else {
-                            if (typeof data.redirectUrl != 'defined' && data.redirectUrl) {
-                                window.location.href = data.redirectUrl;
-                            } else {
-                                __moduleName__Module.popup.set(integratedPaymentError);
-                                __moduleName__Module.integrated.form.clearIntPayment();
-                                return false;
-                            }
-                        }
                     }
                 });
             },

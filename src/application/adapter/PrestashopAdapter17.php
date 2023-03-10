@@ -151,7 +151,7 @@ class PrestashopAdapter17
             $dotenv->load($dotenvFile);
             $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
         } else {
-            $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v1/index.js';
+            $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js';
         }
         $integrated = [];
         $integrated['name'] = 'integrated';
