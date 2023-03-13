@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\classes;
@@ -571,7 +571,27 @@ class PaymentClass
         $pay_id = $this->tools->tool('getValue', 'pay_id');
         $id_order = $this->tools->tool('getValue', 'id_order');
 
-        $capture = $this->dependencies->apiClass->capturePayment($pay_id);
+        $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+        if (!$payment['result']) {
+            $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            if ($sandbox) {
+                $this->dependencies->apiClass->initializeApi(false);
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            } else {
+                $this->dependencies->apiClass->initializeApi(true);
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            }
+
+            if (!$payment['result']) {
+                exit(json_encode([
+                    'status' => 'error',
+                    'data' => $this->dependencies->l('payplug.capturePayment.cannotCapture', 'paymentclass'),
+                    'message' => $payment['message'],
+                ]));
+            }
+        }
+
+        $capture = $this->dependencies->apiClass->capturePayment($payment['resource']->id);
         if (!$capture['result']) {
             exit(json_encode([
                 'status' => 'error',
@@ -692,7 +712,7 @@ class PaymentClass
         ];
 
         $is_shown = $this->validators['module']->canBeShown(
-            (bool) $this->config->get($this->dependencies->getConfigurationKey('show'))
+            (bool) $this->config->get($this->dependencies->getConfigurationKey('enable'))
         );
 
         if (!$this->active
@@ -819,42 +839,6 @@ class PaymentClass
 
         // if no error all good then return true
         return json_decode($payplug_errors, true);
-    }
-
-    /**
-     * @description Get available method to confire the module
-     *
-     * @return array
-     */
-    public function getPaymentMethods()
-    {
-        $paymentMethods = [];
-        $availablePaymentMethods = [
-            'standard',
-            'amex',
-            'applepay',
-            'bancontact',
-            'oney',
-        ];
-
-        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        foreach ($availablePaymentMethods as $availablePaymentMethod) {
-            $featureName = 'feature_' . $availablePaymentMethod;
-            if ($this->dependencies->configClass->isValidFeature($featureName)) {
-                $method = 'get' . $this->tools->tool('ucfirst', $availablePaymentMethod) . 'PaymentMethod';
-                // @todo: check if method exists
-                $paymentMethod = $this->{$method}($views_path);
-                if ($paymentMethod) {
-                    $paymentMethods[$availablePaymentMethod] = $paymentMethod;
-                }
-            }
-        }
-
-        $this->assign->assign([
-            'faq_links' => $this->dependencies->configClass->configurations['faq_links'],
-        ]);
-
-        return $paymentMethods;
     }
 
     /**
@@ -1421,7 +1405,7 @@ class PaymentClass
             $payment_tab['initiator'] = 'PAYER';
             $payment_tab['payment_method'] = null;
             if ($options['id_card'] && $options['id_card'] != 'new_card') {
-                $card = $this->card->getCard((int) $options['id_card']);
+                $card = $this->dependencies->getRepositories()['card']->get((int) $options['id_card']);
                 if ($card['id_customer'] != $customer->id) {
                     return [
                         'result' => false,
@@ -1569,7 +1553,7 @@ class PaymentClass
             'isDeferred' => $options['is_deferred'],
             'isEmbedded' => (string) $this->config->get(
                 $this->dependencies->getConfigurationKey('embeddedMode')
-            ) !== 'redirected',
+            ) !== 'redirect',
             'isIntegrated' => $options['is_integrated'],
             'isMobileDevice' => ($this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result']),
             'cart' => $cart,
@@ -1808,282 +1792,6 @@ class PaymentClass
         }
 
         return $user_browser;
-    }
-
-    private function getStandardPaymentMethod($views_path)
-    {
-        $advancedOptions = [];
-
-        // EmbeddedMode
-        $embeddedModeItems = [
-            [
-                'value' => 'integrated',
-                'dataName' => 'embeddedModeIntegrated',
-                'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.integrated', 'paymentclass'),
-            ],
-            [
-                'value' => 'popup',
-                'dataName' => 'embeddedModePopup',
-                'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.popup', 'paymentclass'),
-            ],
-            [
-                'value' => 'redirected',
-                'dataName' => 'embeddedModeRedirected',
-                'text' => $this->dependencies->l('payment.getPaymentMethod.embeddedMode.redirected', 'paymentclass'),
-            ],
-        ];
-        if (!$this->dependencies->configClass->isValidFeature('feature_integrated')) {
-            array_shift($embeddedModeItems);
-        }
-
-        // Installment
-        if ($this->dependencies->configClass->isValidFeature('feature_installment')) {
-            $this->assign->assign([
-                'installments_panel_url' => $this->dependencies->configClass->configurations['installments_panel_url'],
-                'inst_mode' => $this->dependencies->configClass->configurations['inst_mode'],
-                'inst_min_amount' => $this->dependencies->configClass->configurations['inst_min_amount'],
-            ]);
-            $advancedOptions['installment'] = [
-                'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('inst')),
-                'title' => $this->dependencies->l('paymentMethod.standard.installment.title', 'paymentclass'),
-                'checked' => $this->config->get($this->dependencies->getConfigurationKey('inst')),
-                'premium' => true,
-            ];
-        }
-
-        // Deferred State
-        if ($this->dependencies->configClass->isValidFeature('feature_deferred')) {
-            $order_states = $this->dependencies->orderClass->getOrderStates();
-            $deferred_state = $this->dependencies->configClass->configurations['deferred_state'];
-            $order_states_values = [
-                0 => [
-                    'key' => 0,
-                    'value' => $this->dependencies->l('payment.getPaymentMethod.deferred.capture.default', 'paymentclass'),
-                    'selected' => (int) $deferred_state ? false : true,
-                ],
-            ];
-            foreach ($order_states as $order_state) {
-                $order_states_values[$order_state['id_order_state']] = [
-                    'key' => $order_state['id_order_state'],
-                    'value' => sprintf(
-                        $this->dependencies->l('payment.getPaymentMethod.deferred.capture.state', 'paymentclass'),
-                        $order_state['name']
-                    ),
-                    'selected' => $order_state['id_order_state'] == $deferred_state ? true : false,
-                ];
-            }
-            ksort($order_states_values);
-            $this->assign->assign([
-                'order_states_values' => $order_states_values,
-            ]);
-            $advancedOptions['deferred'] = [
-                'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('deferred')),
-                'title' => $this->dependencies->l('paymentMethod.standard.deferred.title', 'paymentclass'),
-                'checked' => $this->config->get($this->dependencies->getConfigurationKey('deferred')),
-                'premium' => true,
-            ];
-        }
-
-        return [
-            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('standard')),
-            'title' => $this->dependencies->l('paymentMethod.standard.title', 'paymentclass'),
-            'image_url' => $views_path . 'img/svg/payment/standard.svg',
-            'description' => [
-                'live' => [
-                    'text' => $this->dependencies->l('paymentMethod.standard.description', 'paymentclass'),
-                ],
-            ],
-            'checked' => (bool) $this->config->get($this->dependencies->getConfigurationKey('standard')),
-            'useSandbox' => true,
-            'options' => [
-                [
-                    'title' => $this->dependencies->l('paymentMethod.standard.embedded.title', 'paymentclass'),
-                    'description' => $this->dependencies->l('paymentMethod.standard.embedded.description', 'paymentclass'),
-                    'link' => $this->dependencies->configClass->configurations['faq_links']['support'],
-                    'action' => [
-                        'type' => 'options',
-                        'params' => [
-                            'items' => $embeddedModeItems,
-                            'className' => '_sandboxRadioButton',
-                            'selected' => $this->config->get($this->dependencies->getConfigurationKey('embeddedMode')),
-                            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('embeddedMode')),
-                        ],
-                    ],
-                ],
-                [
-                    'title' => $this->dependencies->l('paymentMethod.standard.oneclick.title', 'paymentclass'),
-                    'description' => $this->dependencies->l('paymentMethod.standard.oneclick.description', 'paymentclass'),
-                    'link' => $this->dependencies->configClass->configurations['faq_links']['one_click'],
-                    'action' => [
-                        'type' => 'switch',
-                        'params' => [
-                            'enabledLabel' => 'On',
-                            'disabledLabel' => 'Off',
-                            'dataName' => 'oneClickSwitch',
-                            'checked' => $this->config->get($this->dependencies->getConfigurationKey('oneClick')),
-                            'className' => 'oneClickSwitch',
-                            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oneClick')),
-                        ],
-                    ],
-                ],
-            ],
-            'advancedOptions' => $advancedOptions,
-        ];
-    }
-
-    private function getApplepayPaymentMethod($views_path)
-    {
-        // If CMS version under 1.7 return empty has the method is not available
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            return [];
-        }
-
-        return [
-            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('applepay')),
-            'title' => $this->dependencies->l('paymentMethod.applepay.title', 'paymentclass'),
-            'image_url' => $views_path . 'img/svg/payment/applepay.svg',
-            'premium' => true,
-            'checked' => (bool) $this->config->get($this->dependencies->getConfigurationKey('applepay')),
-            'description' => [
-                'sandbox' => [
-                    'text' => $this->dependencies->l('paymentMethod.applepay.testDescription', 'paymentclass'),
-                ],
-                'live' => [
-                    'text' => $this->dependencies->l('paymentMethod.applepay.liveDescription', 'paymentclass'),
-                    'link' => $this->dependencies->configClass->configurations['faq_links']['applepay'],
-                ],
-            ],
-        ];
-    }
-
-    private function getAmexPaymentMethod($views_path)
-    {
-        return [
-            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('amex')),
-            'title' => $this->dependencies->l('paymentMethod.amex.title', 'paymentclass'),
-            'image_url' => $views_path . 'img/svg/payment/amex.svg',
-            'premium' => true,
-            'checked' => (bool) $this->config->get($this->dependencies->getConfigurationKey('amex')),
-            'description' => [
-                'sandbox' => [
-                    'text' => $this->dependencies->l('paymentMethod.amex.testDescription', 'paymentclass'),
-                ],
-                'live' => [
-                    'text' => $this->dependencies->l('paymentMethod.amex.liveDescription', 'paymentclass'),
-                    'link' => $this->dependencies->configClass->configurations['faq_links']['amex'],
-                ],
-            ],
-        ];
-    }
-
-    private function getBancontactPaymentMethod($views_path)
-    {
-        return [
-            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('bancontact')),
-            'title' => $this->dependencies->l('paymentMethod.bancontact.title', 'paymentclass'),
-            'image_url' => $views_path . 'img/svg/payment/bancontact.svg',
-            'description' => [
-                'sandbox' => [
-                    'text' => $this->dependencies->l('paymentMethod.bancontact.testDescription', 'paymentclass'),
-                ],
-                'live' => [
-                    'text' => $this->dependencies->l('paymentMethod.bancontact.liveDescription', 'paymentclass'),
-                    'link' => $this->dependencies->configClass->configurations['faq_links']['bancontact'],
-                ],
-            ],
-            'premium' => true,
-            'checked' => (bool) $this->config->get($this->dependencies->getConfigurationKey('bancontact')),
-            'options' => [
-                [
-                    'title' => $this->dependencies->l('paymentMethod.bancontactOption.title', 'paymentclass'),
-                    'description' => $this->dependencies->l('paymentMethod.bancontactOption.description', 'paymentclass'),
-                    'action' => [
-                        'type' => 'switch',
-                        'params' => [
-                            'enabledLabel' => 'On',
-                            'disabledLabel' => 'Off',
-                            'dataName' => 'bancontactCountrySwitch',
-                            'checked' => (bool) $this->config->get(
-                                $this->dependencies->getConfigurationKey('bancontactCountry')
-                            ),
-                            'className' => 'bancontactCountrySwitch',
-                            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('bancontactCountry')),
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    private function getOneyPaymentMethod($views_path)
-    {
-        $oneyFeesItems = [
-            [
-                'value' => '1',
-                'dataName' => 'oneyWithFees',
-                'text' => $this->dependencies->l('paymentMethod.oneyWithFees.title', 'paymentclass'),
-                'subText' => $this->dependencies->l('paymentMethod.oneyWithFees.subtitle', 'paymentclass'),
-                'className' => '_paylaterLabel',
-            ],
-            [
-                'value' => '0',
-                'dataName' => 'oneyWithoutFees',
-                'text' => $this->dependencies->l('paymentMethod.oneyWithoutFees.title', 'paymentclass'),
-                'subText' => $this->dependencies->l('paymentMethod.oneyWithoutFees.subtitle', 'paymentclass'),
-                'className' => '_paylaterLabel',
-            ],
-        ];
-
-        return [
-            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney')),
-            'title' => $this->dependencies->l('paymentMethod.oney.title', 'paymentclass'),
-            'premium' => true,
-            'description' => $this->dependencies->l('paymentMethod.oney.description', 'paymentclass'),
-            'link' => $this->dependencies->configClass->configurations['faq_links']['oney'],
-            'checked' => (bool) $this->config->get($this->dependencies->getConfigurationKey('oney')),
-            'options' => [
-                [
-                    'action' => [
-                        'type' => 'option',
-                        'params' => [
-                            'items' => $oneyFeesItems,
-                            'className' => '_paylaterOptions',
-                            'dataName' => 'oneyOptions',
-                            'selected' => $this->config->get($this->dependencies->getConfigurationKey('oney_fees')),
-                            'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_fees')),
-                        ],
-                    ],
-                ],
-            ],
-            'advancedOptions' => [
-                'thresholds' => [
-                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-thresholds.jpg',
-                    'title' => $this->dependencies->l('paymentMethod.oneyThresholdsOption.title', 'paymentclass'),
-                    'switch' => false,
-                ],
-                'optimised' => [
-                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-optimized.jpg',
-                    'title' => $this->dependencies->l('paymentMethod.oneyOptimisedOption.title', 'paymentclass'),
-                    'switch' => true,
-                    'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_optimized')),
-                    'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_optimized')),
-                ],
-                'product' => [
-                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-productOneyCta.jpg',
-                    'title' => $this->dependencies->l('paymentMethod.productOneyCta.title', 'paymentclass'),
-                    'switch' => true,
-                    'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_product_cta')),
-                    'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_product_cta')),
-                ],
-                'cart' => [
-                    'image_url' => $views_path . 'img/admin/screen/' . $this->dependencies->name . '-cartOneyCta.jpg',
-                    'title' => $this->dependencies->l('paymentMethod.productOneyCta.title', 'paymentclass'),
-                    'switch' => true,
-                    'name' => $this->tools->tool('strtolower', $this->dependencies->getConfigurationKey('oney_cart_cta')),
-                    'checked' => $this->config->get($this->dependencies->getConfigurationKey('oney_cart_cta')),
-                ],
-            ],
-        ];
     }
 
     private function getAmexPaymentOption($payment_options, $options = [])
@@ -2372,11 +2080,12 @@ class PaymentClass
 
             case 'invalid_amount_bottom':
             case 'invalid_amount_top':
+            $helpers = $this->dependencies->getHelpers();
                 $limits = $this->oney->getOneyPriceLimit(true);
                 $err_label = sprintf(
                     $this->dependencies->l('payplug.getPaymentOptions.invalidAmount', 'paymentclass'),
-                    $limits['min'],
-                    $limits['max']
+                    $helpers['amount']->formatOneyAmount($limits['min'])['result'],
+                    $helpers['amount']->formatOneyAmount($limits['max'])['result']
                 );
 
                 break;

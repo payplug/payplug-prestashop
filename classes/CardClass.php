@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 Payplug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2021 Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -51,12 +51,7 @@ class CardClass
     public function uninstallCards()
     {
         if ($this->sql->checkExistingTable($this->dependencies->name . '_card', 1)) {
-            $cards = $this->query
-                ->select()
-                ->fields('*')
-                ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_card')
-                ->build()
-            ;
+            $cards = $this->dependencies->getRepositories()['card']->getAll();
 
             if ($cards) {
                 foreach ($cards as $card) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,15 +15,16 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\application\dependencies;
 
 use PayPlug\classes\MyLogPHP;
+use PayPlug\src\actions\ConfigurationAction;
 use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
 use PayPlug\src\application\adapter\CarrierAdapter;
@@ -47,6 +48,9 @@ use PayPlug\src\application\adapter\ProductAdapter;
 use PayPlug\src\application\adapter\ShopAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
+use PayPlug\src\models\classes\ApiRest;
+use PayPlug\src\models\classes\Configuration;
+use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\src\models\entities\OneyEntity;
 use PayPlug\src\models\entities\OrderStateEntity;
@@ -63,12 +67,16 @@ use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\src\repositories\QueryRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
+use PayPlug\src\utilities\services\Routes;
 
 class PluginInit extends BaseClass
 {
     protected $dependencies;
 
-    // Entities
+    // Actions
+    private $configurationAction;
+
+    // EntitiesApiRest
     private $cacheEntity;
     private $oneyEntity;
     private $paymentEntity;
@@ -115,17 +123,29 @@ class PluginInit extends BaseClass
     private $tools;
     private $validate;
 
+    // Model classes
+    private $api_rest;
+    private $configuration_class;
+    private $translation;
+
+    // Utilities services
+    private $routes;
+
     public function __construct($dependencies = null)
     {
         $this->dependencies = $dependencies;
         $this->myLogPhp = new MyLogPHP();
 
+        $this->setActions();
         $this->setEntities();
         $this->setAdapter();
         $this->setRepositories();
+        $this->setClasses();
+        $this->setServices();
 
         $this->plugin
             ->setApiClass($this->apiClass)
+            ->setApiRest($this->api_rest)
             ->setApiVersion('2019-08-06')
             ->setAddress($this->address)
             ->setAssign($this->assign)
@@ -134,6 +154,8 @@ class PluginInit extends BaseClass
             ->setCarrier($this->carrier)
             ->setCart($this->cart)
             ->setConfiguration($this->configuration)
+            ->setConfigurationAction($this->configurationAction)
+            ->setConfigurationClass($this->configuration_class)
             ->setConstant($this->constant)
             ->setContext($this->context)
             ->setCountry($this->country)
@@ -157,13 +179,20 @@ class PluginInit extends BaseClass
             ->setOrderStateAdapter($this->order_state_adapter)
             ->setQuery($this->query)
             ->setSql($this->sql)
+            ->setRoutes($this->routes)
             ->setShop($this->shop)
             ->setTools($this->tools)
             ->setTranslate($this->translate)
+            ->setTranslation($this->translation)
             ->setValidate($this->validate)
         ;
 
         $this->setEntity($this->plugin);
+    }
+
+    private function setActions()
+    {
+        $this->configurationAction = new ConfigurationAction($this->dependencies);
     }
 
     private function setEntities()
@@ -298,5 +327,17 @@ class PluginInit extends BaseClass
         $this->shop = new ShopAdapter();
         $this->tools = new ToolsAdapter();
         $this->validate = new ValidateAdapter();
+    }
+
+    private function setClasses()
+    {
+        $this->api_rest = new ApiRest($this->dependencies);
+        $this->configuration_class = new Configuration($this->dependencies);
+        $this->translation = new Translation($this->dependencies);
+    }
+
+    private function setServices()
+    {
+        $this->routes = new Routes();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\classes;
@@ -217,10 +217,20 @@ class RefundClass
         $id_order = $this->tools->tool('getValue', 'id_order');
         $pay_id = $this->tools->tool('getValue', 'pay_id');
         $inst_id = $this->tools->tool('getValue', 'inst_id');
+        $pay_mode = $this->tools->tool('getValue', 'pay_mode');
+
+        $this->dependencies->apiClass->initializeApi($pay_mode == 'test');
 
         $amount_available = 0;
         if ($inst_id) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+            if (!$installment['result']) {
+                exit(json_encode([
+                    'status' => 'error',
+                    'data' => $this->dependencies->l('payplug.refundPayment.cannotRefund', 'refundclass'),
+                ]));
+            }
+
             foreach ($installment['resource']->schedule as $schedule) {
                 foreach ($schedule->payment_ids as $p_id) {
                     $payment = $this->dependencies->apiClass->retrievePayment($p_id);
@@ -231,6 +241,12 @@ class RefundClass
             }
         } else {
             $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+            if (!$payment['result']) {
+                exit(json_encode([
+                    'status' => 'error',
+                    'data' => $this->dependencies->l('payplug.refundPayment.cannotRefund', 'refundclass'),
+                ]));
+            }
             $amount_available = $payment['resource']->amount - $payment['resource']->amount_refunded;
         }
 
@@ -269,7 +285,6 @@ class RefundClass
             'ID Client' => (int) $this->tools->tool('getValue', 'id_customer'),
             'reason' => 'Refunded with Prestashop',
         ];
-        $pay_mode = $this->tools->tool('getValue', 'pay_mode');
         $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         if ($refund == 'error') {
             $this->logger->addLog('Cannot refund that amount.', 'notice');

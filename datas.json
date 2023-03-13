@@ -1,0 +1,71 @@
+{
+  "version" : "",
+  "name" : "",
+  "domains" : [
+    {
+      "url" : "www.mywebsite.com",
+      "default" : true
+    },
+    {
+      "url" : "www.mywebsite-2.com",
+      "default" : false
+    },
+    {
+      "url" : "www.mywebsite-3.com",
+      "default" : false
+    }
+  ],
+  "configuration" : {
+    "allow_save_card" : "",
+    "amex" :"",
+    "applepay" : "",
+    "bancontact" :"",
+    "bancontact_country" : "",
+    "company_id" :"",
+    "company_id_test" : "",
+    "company_iso" :"",
+    "company_status" : "",
+    "currencies" :"",
+    "debug_mode" : "",
+    "deferred" :"",
+    "deferred_state" : "",
+    "email" :"",
+    "embedded_mode" : "",
+    "inst" :"",
+    "inst_min_amount" : "",
+    "inst_mode" :"",
+    "keep_cards" : "",
+    "live_api_key" :"",
+    "max_amounts" : "",
+    "min_amounts" :"",
+    "offer" : "",
+    "oney" :"",
+    "oney_allowed_countries" : "",
+    "oney_cart_cta" :"",
+    "oney_custom_max_amounts" : "",
+    "oney_custom_min_amounts" :"",
+    "oney_fees" : "",
+    "oney_max_amounts" :"",
+    "oney_min_amounts" : "",
+    "oney_optimized" :"",
+    "oney_product_cta" : "",
+    "one_click" :"",
+    "sandbox_mode" : "",
+    "show" :"",
+    "standard" : "",
+    "test_api_key" :""
+  },
+  "modules" : [
+    {
+      "name" : "",
+      "version" : "",
+      "active" : ""
+    },
+    {
+      "name" : "",
+      "version" : "",
+      "active" : ""
+    },
+    ...
+  ]
+}

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */ require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
 use PayLaterModule\classes\DependenciesClass;
@@ -26,9 +26,11 @@ use PayLaterModule\classes\DependenciesClass;
 class AdminPsPayLaterController extends ModuleAdminController
 {
     public $module;
+
     private $constant;
     private $dependencies;
     private $logger;
+    private $media;
 
     public function __construct()
     {
@@ -39,6 +41,7 @@ class AdminPsPayLaterController extends ModuleAdminController
         $this->dependencies = new DependenciesClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
+        $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
     }
 
@@ -47,27 +50,22 @@ class AdminPsPayLaterController extends ModuleAdminController
      */
     public function initContent()
     {
-        if (Tools::getValue('_ajax')) {
-            $this->dependencies->adminClass->adminAjaxController();
-        }
         if ($this->module->name == 'pspaylater') {
             $this->setPsAccount();
         }
-
-        $this->dependencies->configClass->postProcess();
-        $this->dependencies->configClass->assignContentVar();
-
-        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addJS($views_path . '/js/admin-v' . $this->dependencies->version . '.js');
-        $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
-        $this->context->controller->addCSS($views_path . '/css/admin-v' . $this->dependencies->version . '.css');
-        $this->context->controller->addJS($views_path . '/js/components-v' . $this->dependencies->version . '.js');
 
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
         ]);
 
-        $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
+        $this->media->addJsDef([
+            'payplug_admin_config' => [
+                'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
+                'img_path' => $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/',
+            ],
+        ]);
+
+        $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin_lib.tpl');
 
         parent::initContent();
     }

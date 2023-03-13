@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\repositories;
@@ -107,9 +107,10 @@ class HookRepository extends BaseClass
 
         $id_order_state = $this->tools->tool('getValue', 'id_order_state');
         $current_order_state_type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $id_order_state);
-        $payplug_order_state_url = 'https://support.payplug.com/hc/'
-            . $this->context->getContext()->language->iso_code
-            . '/articles/4406805105298';
+        $payplug_order_state_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($this->context->language->iso_code)['order_state'];
         $this->context->getContext()->smarty->assign([
             'payplug_order_state_url' => $payplug_order_state_url,
             'current_order_state_type' => $current_order_state_type,

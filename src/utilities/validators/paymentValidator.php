@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\utilities\validators;
@@ -748,14 +748,6 @@ class paymentValidator
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $email must be a non empty string',
-            ];
-        }
-
-        if (!(bool) preg_match('/^\b[\w\.\+-]+@[\w\.-]+\.\w{2,4}\b$/', $email)) {
-            return [
-                'result' => false,
-                'code' => 'format',
-                'message' => 'Invalid email format given, $email given is not valid',
             ];
         }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\application\adapter;
@@ -362,18 +362,5 @@ class PrestashopAdapter16
         $this->context->cookie->write();
 
         return $this->context->link->getAdminLink('AdminOrders', true);
-    }
-
-    /**
-     * @description Check if string is Plaintext Password
-     *
-     * @param $plaintextPasswd
-     * @param int $size
-     *
-     * @return bool
-     */
-    public function isPlaintextPassword($plaintextPasswd, $size = 5)
-    {
-        return Tools::strlen($plaintextPasswd) >= $size && Tools::strlen($plaintextPasswd) <= 72;
     }
 }

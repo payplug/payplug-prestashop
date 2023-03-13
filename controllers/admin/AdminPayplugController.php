@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- *  @author    PayPlug SAS
- *  @copyright 2013 - 2023 PayPlug SAS
+ *  @author    Payplug SAS
+ *  @copyright 2013 - 2023 Payplug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
@@ -27,7 +27,10 @@ use PayPlug\classes\DependenciesClass;
 class AdminPayplugController extends ModuleAdminController
 {
     private $dependencies;
+    private $api_rest;
     private $constant;
+    private $media;
+    private $tools;
 
     public function __construct()
     {
@@ -36,7 +39,15 @@ class AdminPayplugController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->media = $this->dependencies->getPlugin()->getMedia();
+        $this->tools = $this->dependencies->getPlugin()->getTools();
+
+        // If referer is from development server, trigger api rest renderer
+        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'localhost') != null) {
+            $this->renderApiRest();
+        }
     }
 
     /**
@@ -48,32 +59,55 @@ class AdminPayplugController extends ModuleAdminController
             parent::initContent();
         }
 
-        if (Tools::getValue('_ajax')) {
-            $this->dependencies->adminClass->adminAjaxController();
+        $this->renderApiRest();
+
+        if ($this->tools->tool('getValue', '_ajax')) {
+            if ($this->tools->tool('getValue', 'refund')) {
+                $this->dependencies->refundClass->refundPayment();
+            }
+            if ($this->tools->tool('getValue', 'capture')) {
+                $this->dependencies->paymentClass->capturePayment();
+            }
+            if ($this->tools->tool('getValue', 'confirmAbort')) {
+                $inst_id = $this->tools->tool('getValue', 'inst_id');
+                $this->dependencies->mediaClass->displayPopin('abort', ['inst_id' => $inst_id]);
+            }
+            if ($this->tools->tool('getValue', 'abort')) {
+                $this->dependencies->paymentClass->abortPayment();
+            }
         }
-
-        $this->dependencies->configClass->postProcess();
-        $this->dependencies->configClass->assignContentVar();
-
-        $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addJS($views_path . '/js/admin-v' . $this->dependencies->version . '.js');
-        $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
-        $this->context->controller->addCSS($views_path . '/css/admin-v' . $this->dependencies->version . '.css');
-        $this->context->controller->addJS($views_path . '/js/components-v' . $this->dependencies->version . '.js');
 
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
         ]);
 
-        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
-            $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/admin.tpl');
+        $this->media->addJsDef([
+            'payplug_admin_config' => [
+                'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
+                'img_path' => $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/',
+            ],
+        ]);
 
+        $template = 'admin_lib.tpl';
+        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/' . $template);
             $this->context->smarty->assign([
                 'content' => $this->content . $content,
             ]);
         } else {
-            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
+            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/' . $template);
             parent::initContent();
+        }
+    }
+
+    /**
+     * @description Render Api Rest Json
+     */
+    public function renderApiRest()
+    {
+        if ($rest_route = $this->tools->tool('getValue', 'rest_route')) {
+            $json = $this->api_rest->dispatch($rest_route);
+            exit(json_encode($json));
         }
     }
 }

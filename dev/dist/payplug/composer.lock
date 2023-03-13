@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "53d4fff7b5853494ec1ebe783ce53bea",
+    "content-hash": "8bb4bff120c4930e3c01272a63f63f1e",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -266,12 +266,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Mbstring\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Mbstring\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -316,24 +316,24 @@
     "packages-dev": [
         {
             "name": "ccinn/composer-husky-plugin",
-            "version": "v0.1.0",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/whiteCcinn/composer-husky-plugin.git",
-                "reference": "51816a336d7af168ccb021d4dc12cb5d3ae1e67b"
+                "reference": "815623c34991991e998572abca8208c07295838c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/whiteCcinn/composer-husky-plugin/zipball/51816a336d7af168ccb021d4dc12cb5d3ae1e67b",
-                "reference": "51816a336d7af168ccb021d4dc12cb5d3ae1e67b",
+                "url": "https://api.github.com/repos/whiteCcinn/composer-husky-plugin/zipball/815623c34991991e998572abca8208c07295838c",
+                "reference": "815623c34991991e998572abca8208c07295838c",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.1",
+                "composer-plugin-api": "^1.1 || ^2.0",
                 "ext-json": "*"
             },
             "require-dev": {
-                "composer/composer": "^1.6.5 || ^1.7.0 || ^1.8.0"
+                "composer/composer": "^1.6.5 || ^1.7.0 || ^1.8.0 || ^2.0"
             },
             "type": "composer-plugin",
             "extra": {
@@ -359,7 +359,7 @@
                 "composer-plugin",
                 "husky-php"
             ],
-            "time": "2019-05-09T03:19:36+00:00"
+            "time": "2021-08-06T15:36:19+00:00"
         },
         {
             "name": "ccinn/husky-php",
@@ -1007,12 +1007,12 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "DeepCopy\\": "src/DeepCopy/"
-                },
                 "files": [
                     "src/DeepCopy/deep_copy.php"
-                ]
+                ],
+                "psr-4": {
+                    "DeepCopy\\": "src/DeepCopy/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1126,6 +1126,7 @@
             "keywords": [
                 "diff"
             ],
+            "abandoned": true,
             "time": "2020-10-14T08:39:05+00:00"
         },
         {
@@ -2490,6 +2491,7 @@
                     "type": "tidelift"
                 }
             ],
+            "abandoned": "symfony/error-handler",
             "time": "2020-10-24T10:57:07+00:00"
         },
         {
@@ -2776,12 +2778,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Ctype\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Ctype\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2850,12 +2852,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php70\\": ""
-                },
                 "files": [
                     "bootstrap.php"
                 ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php70\\": ""
+                },
                 "classmap": [
                     "Resources/stubs"
                 ]
@@ -2926,12 +2928,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php72\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php72\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -3207,6 +3209,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform-dev": [],

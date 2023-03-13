@@ -18,6 +18,10 @@ stages:
 php cs fixer:
   image: composer:1.9
   stage: check php
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   script:
     - ./dev/ci/dist_files.sh -b payplug
     - composer install
@@ -29,6 +33,10 @@ php cs fixer:
 check php version:
   image: php:8.0-alpine
   stage: check-php-version
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   script:
     - >
       RED='\033[0;31m';
@@ -43,6 +51,10 @@ check php version:
 coverage test:
   image: php:7.2.1
   stage: coverage and tests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
     - pecl install xdebug-3.1.0
@@ -55,16 +67,20 @@ coverage test:
 check module translations:
   image: composer:1.9
   stage: translations
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   script:
     - ./dev/ci/dist_files.sh -b payplug
     - composer install
     - >
-        RED='\033[0;31m';
-        ORANGE='\033[0;33m';
-        php dev/ci/generate-translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
-        if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING: MISSING TRANSLATION !! :O\n"; exit 126 ; fi;
-        if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR : MISSING MANDATORY TRANSLATION !!!\n"; exit 1;
-        elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
+      RED='\033[0;31m';
+      ORANGE='\033[0;33m';
+      exit_code=0; php dev/ci/generate-translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
+      if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING: MISSING TRANSLATION !! :O\n"; exit 126 ; fi;
+      if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR : MISSING MANDATORY TRANSLATION !!!\n"; exit 1;
+      elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
   allow_failure:
     exit_codes: 126
   artifacts:
@@ -75,6 +91,10 @@ check module translations:
 assets:
   image: node:16
   stage: assets
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
     - npm --version
@@ -101,6 +121,10 @@ assets:
 build zip release:
   image: composer:1.9
   stage: build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
     - rm -rf ./vendor
@@ -122,6 +146,10 @@ build zip release:
 asset-pspaylater:
   image: node:16
   stage: asset-pspaylater
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
     - npm --version
@@ -148,6 +176,10 @@ asset-pspaylater:
 build-pspaylater:
   image: composer:1.9
   stage: build-pspaylater
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
+      || $CI_COMMIT_REF_NAME == "qa"
+      || $CI_COMMIT_REF_NAME == "master"'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
     - ls -als ./vendor
@@ -175,7 +207,13 @@ run_test:
   stage: run_test
   needs:
     - build-pspaylater
+  rules:
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /smokes/'
+      when: always
+    - when: never
   script:
+    - echo $CI_MERGE_REQUEST_LABELS
+    - echo "The smoke test label is defined. The functional tests will be triggered"
     - curl -s
       -X POST
       -F token=$CI_JOB_TOKEN

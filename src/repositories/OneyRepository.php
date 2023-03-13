@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\repositories;
@@ -44,6 +44,7 @@ class OneyRepository extends BaseClass
     private $validateAdapter;
     private $assign;
     private $validators;
+    private $helpers;
 
     public function __construct(
         $addressAdapter,
@@ -80,6 +81,7 @@ class OneyRepository extends BaseClass
         $this->oneyEntity = $oneyEntity;
         $this->log = $myLogPHP;
         $this->assign = $assign;
+        $this->helpers = $this->dependencies->getHelpers();
 
         $this->setOperations();
     }
@@ -203,8 +205,8 @@ class OneyRepository extends BaseClass
             'oneyWithFees' => (bool) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
             ),
-            'oneyMinAmounts' => $this->toolsAdapter->tool('displayPrice', $limits['min']),
-            'oneyMaxAmounts' => $this->toolsAdapter->tool('displayPrice', $limits['max']),
+            'oneyMinAmounts' => $this->toolsAdapter->tool('displayPrice', $this->helpers['amount']->formatOneyAmount($limits['min'])['result']),
+            'oneyMaxAmounts' => $this->toolsAdapter->tool('displayPrice', $this->helpers['amount']->formatOneyAmount($limits['max'])['result']),
             'oneyUrl' => 'https://www.oney.' . $this->contextAdapter->getContext()->language->iso_code,
         ]);
     }
@@ -809,7 +811,7 @@ class OneyRepository extends BaseClass
     }
 
     /**
-     * @description   get custom oney ammount from BO form
+     * @description   get custom oney amount from BO form
      *
      * @param $custom_oney_amount
      *
@@ -827,7 +829,7 @@ class OneyRepository extends BaseClass
 
         $oneyAmount = [
             'currency' => $iso_code . ':',
-            'ammount' => $custom_oney_amount,
+            'amount' => $custom_oney_amount,
         ];
 
         return implode($oneyAmount);
@@ -1397,8 +1399,8 @@ class OneyRepository extends BaseClass
         $is_valid_amount = $this->validators['payment']->isAmount(
             $this->dependencies->amountCurrencyClass->convertAmount($amount),
             [
-                'min' => $this->dependencies->amountCurrencyClass->convertAmount($limits['min']),
-                'max' => $this->dependencies->amountCurrencyClass->convertAmount($limits['max']),
+                'min' => $this->dependencies->amountCurrencyClass->convertAmount($this->helpers['amount']->formatOneyAmount($limits['min'])['result']),
+                'max' => $this->dependencies->amountCurrencyClass->convertAmount($this->helpers['amount']->formatOneyAmount($limits['max'])['result']),
             ]
         );
 
@@ -1407,8 +1409,8 @@ class OneyRepository extends BaseClass
                 'result' => false,
                 'error' => sprintf(
                     $this->dependencies->l('oney.isValidOneyAmount.unvalid', 'oneyrepository'),
-                    $limits['min'],
-                    $limits['max']
+                    $this->helpers['amount']->formatOneyAmount($limits['min'])['result'],
+                    $this->helpers['amount']->formatOneyAmount($limits['max'])['result']
                 ),
             ];
         }
@@ -1525,9 +1527,16 @@ class OneyRepository extends BaseClass
      */
     public function isValidOneyEmail($email)
     {
-        $is_valid_email = $this->validators['payment']->isOneyEmail($email);
+        $is_valid_email = $this->validators['account']->isEmail($email);
         if (!$is_valid_email['result']) {
-            $code = isset($is_valid_email['code']) ? $is_valid_email['code'] : 'invalid';
+            return [
+                'result' => false,
+                'message' => $this->dependencies->l('Your email address is not a valid email', 'oneyrepository'),
+            ];
+        }
+        $is_oney_email = $this->validators['payment']->isOneyEmail($email);
+        if (!$is_oney_email['result']) {
+            $code = isset($is_oney_email['code']) ? $is_oney_email['code'] : 'invalid';
             switch ($code) {
                 case 'length-char':
                     $error = $this->dependencies->l('Your email address is too long and the + character is not valid', 'oneyrepository');

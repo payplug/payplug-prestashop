@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\classes;
@@ -182,7 +182,7 @@ class ApiClass
             if (!$publishable_key) {
                 $this->config->deleteByName($this->dependencies->getConfigurationKey('publishableKey'));
                 $this->config->deleteByName($this->dependencies->getConfigurationKey('publishableKeyTest'));
-                $this->config->updateValue($this->dependencies->getConfigurationKey('embeddedMode'), 'redirected');
+                $this->config->updateValue($this->dependencies->getConfigurationKey('embeddedMode'), 'redirect');
 
                 return [
                     'result' => false,
@@ -222,9 +222,9 @@ class ApiClass
         try {
             $response = Authentication::getPublishableKeys();
             $publishable_key = isset($response['httpResponse']['publishable_key'])
-                && $response['httpResponse']['publishable_key']
-                    ? $response['httpResponse']['publishable_key']
-                    : null;
+            && $response['httpResponse']['publishable_key']
+                ? $response['httpResponse']['publishable_key']
+                : null;
 
             if (!$publishable_key) {
                 $this->config->deleteByName(
@@ -235,7 +235,7 @@ class ApiClass
                 );
                 $this->config->updateValue(
                     $this->dependencies->getConfigurationKey('embeddedMode'),
-                    'redirected'
+                    'redirect'
                 );
 
                 return [
@@ -782,6 +782,12 @@ class ApiClass
                 'code' => (int) $e->getCode(),
                 'message' => $e->getMessage(),
             ];
+        } catch (Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int) $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
         }
 
         return $response;
@@ -1221,12 +1227,12 @@ class ApiClass
             $can_use_amex = true;
         }
 
-        $onboardingOneyCompleted = false;
+        $onboarding_oney_completed = false;
         if (isset($json_answer['payment_methods']) && !empty(
             $this->config->get(
                 $this->dependencies->getConfigurationKey('liveApiKey')
             )
-        )) {
+            )) {
             $oney_methods = [];
             foreach ($json_answer['payment_methods'] as $key => $val) {
                 if ($this->tools->substr($key, 0, 5) == 'oney_') {
@@ -1235,7 +1241,7 @@ class ApiClass
             }
             foreach ($oney_methods as $value) {
                 if ($value == 'true') {
-                    $onboardingOneyCompleted = true;
+                    $onboarding_oney_completed = true;
                 }
             }
         }
@@ -1250,7 +1256,7 @@ class ApiClass
             'can_use_bancontact' => $can_use_bancontact,
             'can_use_applepay' => $can_use_applepay,
             'can_use_amex' => $can_use_amex,
-            'onboardingOneyCompleted' => $onboardingOneyCompleted,
+            'onboarding_oney_completed' => $onboarding_oney_completed,
             'apple_pay_allowed_domains' => [],
         ];
 

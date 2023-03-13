@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\utilities\validators;
@@ -152,6 +152,7 @@ class moduleValidator
         if (!is_array($report) || empty($report)) {
             return [
                 'result' => false,
+                'code' => 'format',
                 'message' => 'Invalid parameters given, $report must be an non empty array',
             ];
         }
@@ -159,18 +160,21 @@ class moduleValidator
         if (!isset($report['php']) || !is_array($report['php']) || empty($report['php'])) {
             return [
                 'result' => false,
+                'code' => 'php_format',
                 'message' => 'Invalid argument given, $report[php] must be a non empty array',
             ];
         }
         if (!isset($report['php']['up2date'])) {
             return [
                 'result' => false,
+                'code' => 'php_format',
                 'message' => 'Missing array key: $report[php][up2date]',
             ];
         }
         if (!(bool) $report['php']['up2date']) {
             return [
                 'result' => false,
+                'code' => 'php_requirements',
                 'message' => 'Wrong requirement: The minimum requirement for PHP is not respected',
             ];
         }
@@ -178,18 +182,21 @@ class moduleValidator
         if (!isset($report['curl']) || !is_array($report['curl']) || empty($report['curl'])) {
             return [
                 'result' => false,
+                'code' => 'curl_format',
                 'message' => 'Invalid argument given, $report[curl] must be a non empty array',
             ];
         }
         if (!isset($report['curl']['installed'])) {
             return [
                 'result' => false,
+                'code' => 'curl_format',
                 'message' => 'Missing array key: $report[curl][installed]',
             ];
         }
         if (!(bool) $report['curl']['installed']) {
             return [
                 'result' => false,
+                'code' => 'curl_requirements',
                 'message' => 'Wrong requirement: The minimum requirement for Curl is not respected',
             ];
         }
@@ -197,18 +204,21 @@ class moduleValidator
         if (!isset($report['openssl']) || !is_array($report['openssl']) || empty($report['openssl'])) {
             return [
                 'result' => false,
+                'code' => 'openssl_format',
                 'message' => 'Invalid argument given, $report[openssl] must be a non empty array',
             ];
         }
         if (!isset($report['openssl']['installed']) || !isset($report['openssl']['up2date'])) {
             return [
                 'result' => false,
+                'code' => 'openssl_format',
                 'message' => 'Missing array key: $report[openssl][installed] and/or $report[openssl][up2date]',
             ];
         }
         if (!(bool) $report['openssl']['installed'] || !(bool) $report['openssl']['up2date']) {
             return [
                 'result' => false,
+                'code' => 'openssl_requirements',
                 'message' => 'Wrong requirement: The minimum requirement for OpenSSL is not respected',
             ];
         }

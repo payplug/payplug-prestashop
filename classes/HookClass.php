@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS.
+ * 2013 - 2023 Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\classes;
@@ -800,9 +800,11 @@ class HookClass
         // check order state history
         $undefined_history_states = $this->dependencies->orderClass->getUndefinedOrderHistory($order->id);
         if (!empty($undefined_history_states)) {
-            $payplug_order_state_url = 'https://support.payplug.com/hc/'
-                . $this->context->language->iso_code
-                . '/articles/4406805105298';
+            $payplug_order_state_url = $this->dependencies
+                ->getPlugin()
+                ->getRoutes()
+                ->getExternalUrl($this->context->language->iso_code)['order_state'];
+
             $this->assign->assign([
                 'payplug_order_state_url' => $payplug_order_state_url,
                 'undefined_history_states' => $undefined_history_states,
@@ -841,7 +843,6 @@ class HookClass
     public function displayBackOfficeFooter()
     {
         if (\version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
-            $this->dependencies->configClass->assignContentVar();
             $this->assign->assign([
                 'js_def' => $this->media->getJsDef(),
             ]);

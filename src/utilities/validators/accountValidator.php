@@ -116,4 +116,68 @@ class accountValidator
             'message' => '',
         ];
     }
+
+    /**
+     * @description Check if a given email is valid
+     *
+     * @param $email
+     *
+     * @return array
+     */
+    public function isEmail($email)
+    {
+        if (!is_string($email) || !$email) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $email must be a non empty string',
+            ];
+        }
+        if (!(bool) preg_match('/^\b[\w\.\+-]+@[\w\.-]+\.\w{2,4}\b$/', $email)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid email format given, $email given is not valid',
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => '',
+        ];
+    }
+
+    /**
+     * @description Check if a given password is valid
+     *
+     * @param $password
+     *
+     * @return array
+     */
+    public function isPassword($password)
+    {
+        if (!is_string($password) || !$password) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $password must be a non empty string',
+            ];
+        }
+
+        if (strlen($password) < 5) {
+            return [
+                'result' => false,
+                'message' => 'Invalid $password given, it is to short',
+            ];
+        }
+
+        if (strlen($password) > 72) {
+            return [
+                'result' => false,
+                'message' => 'Invalid $password given, it is to long',
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => '',
+        ];
+    }
 }

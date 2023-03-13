@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\models\entities;
@@ -32,6 +32,9 @@ class PluginEntity
 
     /** @var object */
     private $apiClass;
+
+    /** @var object */
+    private $api_rest;
 
     /** @var string */
     private $api_version;
@@ -52,10 +55,10 @@ class PluginEntity
     private $carrier;
 
     /** @var object */
-    private $configClass;
+    private $configuration;
 
     /** @var object */
-    private $configuration;
+    private $configuration_class;
 
     /** @var object */
     private $constant;
@@ -127,6 +130,9 @@ class PluginEntity
     private $tools;
 
     /** @var object */
+    private $translation;
+
+    /** @var object */
     private $translate;
 
     /** @var object */
@@ -138,18 +144,6 @@ class PluginEntity
     public function getApiClass()
     {
         return $this->apiClass;
-    }
-
-    /**
-     * @param object $apiClass
-     *
-     * @return PluginEntity
-     */
-    public function setApiClass($apiClass)
-    {
-        $this->apiClass = $apiClass;
-
-        return $this;
     }
 
     /**
@@ -245,6 +239,14 @@ class PluginEntity
     }
 
     /**
+     * @return object
+     */
+    public function getApiRest()
+    {
+        return $this->api_rest;
+    }
+
+    /**
      * @return string
      */
     public function getApiVersion()
@@ -298,6 +300,22 @@ class PluginEntity
     public function getConfiguration()
     {
         return $this->configuration;
+    }
+
+    /**
+     * @return object
+     */
+    public function getConfigurationAction()
+    {
+        return $this->configurationAction;
+    }
+
+    /**
+     * @return object
+     */
+    public function getConfigurationClass()
+    {
+        return $this->configuration_class;
     }
 
     /**
@@ -465,6 +483,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getRoutes()
+    {
+        return $this->routes;
+    }
+
+    /**
+     * @return object
+     */
     public function getShop()
     {
         return $this->shop;
@@ -489,6 +515,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getTranslation()
+    {
+        return $this->translation;
+    }
+
+    /**
+     * @return object
+     */
     public function getValidate()
     {
         return $this->validate;
@@ -508,6 +542,36 @@ class PluginEntity
         }
 
         $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * @param object $apiClass
+     *
+     * @return PluginEntity
+     */
+    public function setApiClass($apiClass)
+    {
+        $this->apiClass = $apiClass;
+
+        return $this;
+    }
+
+    /**
+     * @param object $api_rest
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setApiRest($api_rest)
+    {
+        if (!is_object($api_rest)) {
+            throw (new BadParameterException('Invalid argument, $api_rest must be ApiRest'));
+        }
+
+        $this->api_rest = $api_rest;
 
         return $this;
     }
@@ -630,10 +694,46 @@ class PluginEntity
     public function setConfiguration($configuration)
     {
         if (!is_object($configuration)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ConfigurationAdapter'));
+            throw (new BadParameterException('Invalid argument, $configuration must be a ConfigurationAdapter'));
         }
 
         $this->configuration = $configuration;
+
+        return $this;
+    }
+
+    /**
+     * @param object $configurationAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setConfigurationAction($configurationAction)
+    {
+        if (!is_object($configurationAction)) {
+            throw (new BadParameterException('Invalid argument, $configurationAction must be a ConfigurationAction'));
+        }
+
+        $this->configurationAction = $configurationAction;
+
+        return $this;
+    }
+
+    /**
+     * @param object $configuration_class
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setConfigurationClass($configuration_class)
+    {
+        if (!is_object($configuration_class)) {
+            throw (new BadParameterException('Invalid argument, $configuration_class must be a setConfigurationClass'));
+        }
+
+        $this->configuration_class = $configuration_class;
 
         return $this;
     }
@@ -1013,6 +1113,24 @@ class PluginEntity
     }
 
     /**
+     * @param object $routes
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setRoutes($routes)
+    {
+        if (!is_object($routes)) {
+            throw (new BadParameterException('Invalid argument, $routes must be a Services/Routes'));
+        }
+
+        $this->routes = $routes;
+
+        return $this;
+    }
+
+    /**
      * @param object $shop
      *
      * @throws BadParameterException
@@ -1062,6 +1180,24 @@ class PluginEntity
         }
 
         $this->translate = $translate;
+
+        return $this;
+    }
+
+    /**
+     * @param object $translation
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setTranslation($translation)
+    {
+        if (!is_object($translation)) {
+            throw (new BadParameterException('Invalid argument, $translation must be a Translate'));
+        }
+
+        $this->translation = $translation;
 
         return $this;
     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2021 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,19 +15,22 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2021 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\models\repositories\PaymentRepository;
+use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\FilesHelper;
+use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\cardValidator;
@@ -118,7 +121,7 @@ class DependenciesClass
         ],
         'embeddedMode' => [
             'name' => 'EMBEDDED_MODE',
-            'defaultValue' => 'redirected',
+            'defaultValue' => 'redirect',
             'setConf' => 1,
         ],
         'inst' => [
@@ -188,12 +191,12 @@ class DependenciesClass
         ],
         'oneyCustomMaxAmounts' => [
             'name' => 'ONEY_CUSTOM_MAX_AMOUNTS',
-            'defaultValue' => 'EUR:3000',
+            'defaultValue' => 'EUR:300000',
             'setConf' => 1,
         ],
         'oneyCustomMinAmounts' => [
             'name' => 'ONEY_CUSTOM_MIN_AMOUNTS',
-            'defaultValue' => 'EUR:100',
+            'defaultValue' => 'EUR:10000',
             'setConf' => 1,
         ],
         'oneyFees' => [
@@ -311,8 +314,8 @@ class DependenciesClass
             'defaultValue' => 1,
             'setConf' => 1,
         ],
-        'show' => [
-            'name' => 'SHOW',
+        'enable' => [
+            'name' => 'ENABLE',
             'defaultValue' => 0,
             'setConf' => 1,
         ],
@@ -337,6 +340,7 @@ class DependenciesClass
     public $version;
     public $refundClass;
 
+    private $classes;
     private $plugin;
     private $helpers;
     private $repositories;
@@ -491,6 +495,11 @@ class DependenciesClass
         return $this->helpers;
     }
 
+    public function getClasses()
+    {
+        return $this->classes;
+    }
+
     private function setvalidators()
     {
         $this->validators = [
@@ -512,6 +521,7 @@ class DependenciesClass
         $logger = $this->getPlugin()->getLogger();
         $this->repositories = [
             'country' => new CountryRepository($prefix, $this->name, $logger),
+            'card' => new CardRepository($prefix, $this->name),
             'payment' => new PaymentRepository($prefix, $this->name, $logger),
         ];
     }
@@ -519,7 +529,9 @@ class DependenciesClass
     private function setHelpers()
     {
         $this->helpers = [
+            'amount' => new AmountHelper(),
             'files' => new FilesHelper(),
+            'user' => new UserHelper(),
         ];
     }
 }

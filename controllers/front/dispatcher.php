@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 /**
@@ -79,7 +79,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             $options = $this->dependenciesClass->configClass->getAvailableOptions($cart);
 
-            $embedded = $options['embedded'] != 'redirected';
+            $embedded = $options['embedded'] != 'redirect';
 
             if ($options['oney'] && $is_oney) {
                 $payment = $this->dependenciesClass->paymentClass->preparePayment(['is_oney' => $oney_type]);

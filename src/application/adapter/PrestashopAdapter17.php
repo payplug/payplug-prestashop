@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - 2023 Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,10 +15,10 @@
  * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
- * @author    PayPlug SAS
- * @copyright 2013 - 2023 PayPlug SAS
+ * @author    Payplug SAS
+ * @copyright 2013 - 2023 Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *  International Registered Trademark & Property of PayPlug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
 
 namespace PayPlug\src\application\adapter;
@@ -30,7 +30,6 @@ use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\Dotenv\Dotenv;
 use Tab;
 use Tools;
-use Validate;
 
 class PrestashopAdapter17
 {
@@ -281,11 +280,11 @@ class PrestashopAdapter17
 
         // show module to the customer
         $switch['show'] = [
-            'name' => 'payplug_show',
+            'name' => 'payplug_enable',
             'label' => $this->dependencies->l('payplug.assignSwitchConfiguration.showPayplug', 'prestashopadapter17'),
             'active' => $connected,
             'small' => true,
-            'checked' => $configurations['show'],
+            'checked' => $configurations['enable'],
         ];
 
         $switch['sandbox'] = [
@@ -383,18 +382,5 @@ class PrestashopAdapter17
         $this->context->smarty->assign([
             'payplug_switch' => $switch,
         ]);
-    }
-
-    /**
-     * @description Check if string is Plaintext Password
-     *
-     * @param $plaintextPasswd
-     * @param int $size
-     *
-     * @return bool
-     */
-    public function isPlaintextPassword($plaintextPasswd, $size = 5)
-    {
-        return Validate::isPlaintextPassword($plaintextPasswd);
     }
 }
