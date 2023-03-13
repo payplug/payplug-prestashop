@@ -944,7 +944,11 @@ class HookClass
         $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
 
         // Is embeddedMode configured to show the lightbox..
-        $show_lightbox = 'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'));
+        $show_lightbox = 'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
+            || (
+                'integrated' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
+                && $this->tools->tool('getValue', 'inst')
+            );
         // ... or is the payment with one click
         $show_lightbox = $show_lightbox || 'new_card' != $id_card;
 
@@ -974,7 +978,10 @@ class HookClass
                 $dotenv->load($dotenvFile);
                 $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
             } else {
-                $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js';
+                $integrated_payment_js_url = $this->dependencies
+                    ->getPlugin()
+                    ->getRoutes()
+                    ->getSourceUrl()['integrated'];
             }
 
             if ($payment['result']) {
@@ -992,7 +999,10 @@ class HookClass
                             'isIntegratedPayment' => true,
                         ]);
                     } else {
-                        $api_url = $this->dependencies->apiClass->getApiUrl() . '/js/1/form.latest.js';
+                        $api_url = $this->dependencies
+                            ->getPlugin()
+                            ->getRoutes()
+                            ->getSourceUrl()['embedded'];
                     }
 
                     $this->assign->assign([

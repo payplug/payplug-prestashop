@@ -151,7 +151,10 @@ class PrestashopAdapter17
             $dotenv->load($dotenvFile);
             $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
         } else {
-            $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js';
+            $integrated_payment_js_url = $this->dependencies
+                ->getPlugin()
+                ->getRoutes()
+                ->getSourceUrl()['integrated'];
         }
         $integrated = [];
         $integrated['name'] = 'integrated';
@@ -161,7 +164,7 @@ class PrestashopAdapter17
             'value' => 'integrated',
         ];
 
-        $integrated['action'] = 'javascript:payplugModule.integrated.form.getIntPaymentId();';
+        $integrated['action'] = 'javascript:payplugModule.integrated.form.validate();';
         $integrated['logo'] = $payment_options['standard']['logo'];
         $integrated['moduleName'] = 'payplug';
         $integrated['callToActionText'] = $this->dependencies->l('specific17.setIntegratedPaymentOption.name', 'prestashopadapter17');

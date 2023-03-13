@@ -105,18 +105,19 @@
         var placeholderExp = '{/literal}{$placeholderExp|escape:'javascript':'UTF-8'}{literal}';
         var loadIntegrated = function() {
             if (typeof window['payplug_utilities'] != 'undefined') {
+                console.log('Loading script: {/literal}{$integrated_payment_js_url|escape:'javascript':'UTF-8'}{literal}');
                 window['payplug_utilities'].loadScript('{/literal}{$integrated_payment_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
-                    if(typeof window['payplug_module'] != 'undefined') {
-                        window['payplug_module'].integrated.init();
+                    if(typeof window['payplugModule'] != 'undefined') {
+                        window['payplugModule'].integrated.init();
                     } else {
-                        console.log('Type of payplugModule : ' + typeof window['payplug_module']);
+                        console.log('Type of payplugModule : ' + typeof window['payplugModule']);
                     }
                 });
             } else {
                 console.log('Type of payplug_utilities : ' + typeof window['payplug_utilities']);
             }
         }
-        if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplug_module'] != 'undefined') {
+        if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplugModule'] != 'undefined') {
             loadIntegrated();
         } else {
             window.addEventListener("load", loadIntegrated);

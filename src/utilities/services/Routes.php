@@ -23,8 +23,78 @@
 
 namespace PayPlug\src\utilities\services;
 
+use PayPlug\src\exceptions\BadParameterException;
+use Symfony\Component\Dotenv\Dotenv;
+
 class Routes
 {
+    /**
+     * @description Get the Api url
+     *
+     * @throws BadParameterException
+     *
+     * @return string
+     */
+    public function getApiUrl()
+    {
+        $dotenv = new Dotenv();
+        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            $dotenv->load($dotenvFile);
+            $api_url = $_ENV['API_BASE_URL'];
+        } else {
+            $api_url = 'https://api.payplug.com';
+        }
+
+        if (!is_string($api_url)
+            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
+            throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
+        }
+
+        return $api_url;
+    }
+
+    /**
+     * @description Get the Api url
+     *
+     * @throws BadParameterException
+     *
+     * @return string
+     */
+    public function getCDNUrl()
+    {
+        $dotenv = new Dotenv();
+        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            $dotenv->load($dotenvFile);
+            $cdn_url = $_ENV['CDN_BASE_URL'];
+        } else {
+            $cdn_url = 'https://cdn.payplug.com';
+        }
+
+        return $cdn_url;
+    }
+
+    /**
+     * @description get CDN url
+     *
+     * @return array
+     */
+    public function getSourceUrl()
+    {
+        return [
+            'embedded' => $this->getApiUrl() . '/js/1/form.latest.js',
+            'integrated' => $this->getCDNUrl() . '/js/integrated-payment/v1@1/index.js',
+        ];
+    }
+
+    /**
+     * @description Get external url
+     *
+     * @param string $iso_code
+     *
+     * @return array
+     */
     public function getExternalUrl($iso_code = '')
     {
         if (!is_string($iso_code)) {
