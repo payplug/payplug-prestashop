@@ -21,7 +21,8 @@ php cs fixer:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
       || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"'
+      || $CI_COMMIT_REF_NAME == "master"
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - ./dev/ci/dist_files.sh -b payplug
     - composer install
@@ -36,7 +37,8 @@ check php version:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
       || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"'
+      || $CI_COMMIT_REF_NAME == "master"
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - >
       RED='\033[0;31m';
@@ -54,7 +56,8 @@ coverage test:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
       || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"'
+      || $CI_COMMIT_REF_NAME == "master"
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
     - pecl install xdebug-3.1.0
@@ -70,7 +73,8 @@ check module translations:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
       || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"'
+      || $CI_COMMIT_REF_NAME == "master"
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - ./dev/ci/dist_files.sh -b payplug
     - composer install
@@ -94,7 +98,8 @@ assets:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
       || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"'
+      || $CI_COMMIT_REF_NAME == "master"
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
     - npm --version
@@ -124,7 +129,8 @@ build zip release:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
       || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"'
+      || $CI_COMMIT_REF_NAME == "master"
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
     - rm -rf ./vendor
@@ -149,7 +155,8 @@ asset-pspaylater:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
       || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"'
+      || $CI_COMMIT_REF_NAME == "master"
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
     - npm --version
@@ -179,7 +186,8 @@ build-pspaylater:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
       || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"'
+      || $CI_COMMIT_REF_NAME == "master"
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
     - ls -als ./vendor
@@ -208,7 +216,8 @@ run_test:
   needs:
     - build-pspaylater
   rules:
-    - if: '$CI_MERGE_REQUEST_LABELS =~ /smokes/'
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /smokes/
+      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
       when: always
     - when: never
   script:
