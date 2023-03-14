@@ -125,9 +125,6 @@ class PluginInit extends BaseClass
 
     // Model classes
     private $api_rest;
-
-    // Model classes
-    private $api_rest;
     private $configuration_class;
     private $translation;
 

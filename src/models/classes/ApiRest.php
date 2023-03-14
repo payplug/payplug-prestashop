@@ -68,13 +68,14 @@ class ApiRest
                 $json = $configurationAction->logoutAction();
 
                 break;
+            case 'american_express_permissions':
+            case 'applepay_permissions':
+            case 'bancontact_permissions':
             case 'deferred_permissions':
             case 'installment_permissions':
+            case 'integrated_permissions':
             case 'one_click_permissions':
-            case 'bancontact_permissions':
-            case 'american_express_permissions':
             case 'oney_permissions':
-            case 'applepay_permissions':
                 $payment_method = str_replace('_permissions', '', $action);
                 $json = $configurationAction->checkPermissionAction($payment_method);
 
@@ -1031,6 +1032,7 @@ class ApiRest
                             'live' => [
                                 'description_popup' => $popup_description,
                                 'description_redirect' => $redirect_description,
+                                'description_integrated' => $translation['embedded']['descriptions']['integrated']['text'],
                                 'link_know_more' => [
                                     'text' => $translation['embedded']['link'],
                                     'url' => $external_url['embedded'],
@@ -1040,6 +1042,7 @@ class ApiRest
                             'sandbox' => [
                                 'description_popup' => $popup_description,
                                 'description_redirect' => $redirect_description,
+                                'description_integrated' => $translation['embedded']['descriptions']['integrated']['text'],
                                 'link_know_more' => [
                                     'text' => $translation['embedded']['link'],
                                     'url' => $external_url['embedded'],

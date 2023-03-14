@@ -84,9 +84,6 @@ class PluginEntity
     /** @var object */
     private $install;
 
-//    /** @var object */
-//    private $installment;
-
     /** @var object */
     private $logger;
 
@@ -382,24 +379,6 @@ class PluginEntity
         return $this->install;
     }
 
-//    /**
-//     * @return object
-//     */
-//    public function getInstallment()
-//    {
-//        return $this->installment;
-//    }
-//
-//    /**
-//     * @param object $installment
-//     * @return PluginEntity
-//     */
-//    public function setInstallment($installment)
-//    {
-//        $this->installment = $installment;
-//        return $this;
-//    }
-
     /**
      * @return object
      */
@@ -577,36 +556,6 @@ class PluginEntity
     }
 
     /**
-     * @param object $apiClass
-     *
-     * @return PluginEntity
-     */
-    public function setApiClass($apiClass)
-    {
-        $this->apiClass = $apiClass;
-
-        return $this;
-    }
-
-    /**
-     * @param object $api_rest
-     *
-     * @throws BadParameterException
-     *
-     * @return self
-     */
-    public function setApiRest($api_rest)
-    {
-        if (!is_object($api_rest)) {
-            throw (new BadParameterException('Invalid argument, $api_rest must be ApiRest'));
-        }
-
-        $this->api_rest = $api_rest;
-
-        return $this;
-    }
-
-    /**
      * @param string $api_version
      *
      * @throws BadParameterException
@@ -728,24 +677,6 @@ class PluginEntity
         }
 
         $this->configuration = $configuration;
-
-        return $this;
-    }
-
-    /**
-     * @param object $configurationAction
-     *
-     * @throws BadParameterException
-     *
-     * @return self
-     */
-    public function setConfigurationAction($configurationAction)
-    {
-        if (!is_object($configurationAction)) {
-            throw (new BadParameterException('Invalid argument, $configurationAction must be a ConfigurationAction'));
-        }
-
-        $this->configurationAction = $configurationAction;
 
         return $this;
     }

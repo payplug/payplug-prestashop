@@ -1115,6 +1115,7 @@ class ApiClass
             'can_save_cards' => $json_answer['permissions']['can_save_cards'],
             'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
+            'can_use_integrated_payments' => $json_answer['permissions']['can_use_integrated_payments'],
             'can_use_oney' => $json_answer['permissions']['can_use_oney'],
             'can_use_bancontact' => $can_use_bancontact,
             'can_use_applepay' => $can_use_applepay,

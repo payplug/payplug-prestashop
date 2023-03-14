@@ -170,6 +170,9 @@ class Translation
             'embedded' => [
                 'title' => $this->dependencies->l('paymentmethods.embedded.title', 'paymentmethodstranslation'),
                 'descriptions' => [
+                    'integrated' => [
+                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.integrated.text', 'paymentmethodstranslation'),
+                    ],
                     'popup' => [
                         'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup.text', 'paymentmethodstranslation'),
                         'link' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup.link', 'paymentmethodstranslation'),
@@ -178,7 +181,6 @@ class Translation
                         'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect.text', 'paymentmethodstranslation'),
                         'link' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect.link', 'paymentmethodstranslation'),
                     ],
-                    'integrated' => $this->dependencies->l('paymentmethods.embedded.descriptions.integrated', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.embedded.link', 'paymentmethodstranslation'),
                 'options' => [
@@ -388,9 +390,10 @@ class Translation
                     'oney' => $this->dependencies->l('modal.premium.link.oney', 'modaltranslation'),
                 ],
                 'feature' => [
-                    'bancontact' => $this->dependencies->l('modal.premium.feature.bancontact', 'modaltranslation'),
-                    'applepay' => $this->dependencies->l('modal.premium.feature.applepay', 'modaltranslation'),
                     'american_express' => $this->dependencies->l('modal.premium.feature.american_express', 'modaltranslation'),
+                    'applepay' => $this->dependencies->l('modal.premium.feature.applepay', 'modaltranslation'),
+                    'bancontact' => $this->dependencies->l('modal.premium.feature.bancontact', 'modaltranslation'),
+                    'integrated' => $this->dependencies->l('modal.premium.feature.integrated', 'modaltranslation'),
                 ],
                 'submit' => $this->dependencies->l('modal.premium.submit', 'modaltranslation'),
             ],

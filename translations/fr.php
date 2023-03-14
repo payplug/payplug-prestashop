@@ -183,6 +183,7 @@ $_MODULE['<{payplug}prestashop>modaltranslation_77fe878dedd7eee3106a518699cb941e
 $_MODULE['<{payplug}prestashop>modaltranslation_7fa9f591dfea0601d8fe976db7b04e82'] = 'Activer une fonctionnalité';
 $_MODULE['<{payplug}prestashop>modaltranslation_91b5b36845d9b6aabe32e15fedaaa4fe'] = 'Pour activer %s, contactez $link.';
 $_MODULE['<{payplug}prestashop>modaltranslation_95e6d55a89d2261ca139dbd613698640'] = 'support@payplug.com';
+$_MODULE['<{payplug}prestashop>modaltranslation_962cafa689a699c9e1e89a8cf2dd1e56'] = 'le paiement intégré';
 $_MODULE['<{payplug}prestashop>modaltranslation_a16e391ae236117fdad2e249f961ea93'] = 'ce formulaire';
 $_MODULE['<{payplug}prestashop>modaltranslation_a88cdce377546e8fa0ddd689750633d1'] = 'Ok';
 $_MODULE['<{payplug}prestashop>modaltranslation_b80f2063287a3bd7898a632eb89d3e51'] = 'Apple Pay';
@@ -298,7 +299,6 @@ $_MODULE['<{payplug}prestashop>paymentclass_f59c945d932b249cb6f66ab244377e43'] =
 $_MODULE['<{payplug}prestashop>paymentclass_f8519a87542797a26e116bd8fc3c4970'] = 'Oney 4x';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_02a885b68c8a3ec4fa17cad649a965d9'] = 'En savoir plus.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_0677841669a60464c933f2938a905d3f'] = 'Vos clients résidents en Belgique seront les seuls à pouvoir commander et payer avec Bancontact sur votre boutique.';
-$_MODULE['<{payplug}prestashop>paymentmethodstranslation_075ccf19e72ab4184091aa508a05dfb8'] = 'Vos clients verront apparaître le formulaire de paiement directement dans la page de checkout de votre boutique.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_08c50aaff9924951dbafb422b7edf020'] = '3 fois';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_239df1f28af2e0733c462455e9028f5d'] = 'Attention : ce type de paiement n\'est pas garanti.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_26b9934cd522cdaaf424a847e53277df'] = 'Afficher le bouton de paiement Apple Pay sur votre boutique. ';
@@ -314,6 +314,7 @@ $_MODULE['<{payplug}prestashop>paymentmethodstranslation_54ab41d726c74b17e7846d0
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_5ac83c1ae14bc025a729c88e97104b9b'] = 'Si un défaut de paiement survient sur une des futures échéances alors ce montant sera perdu.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_5c1af6863c182c9527abfbacd965e425'] = 'Activer les paiements fractionnés non garantis';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_60bdd39bfa542f288dd10896123eeffc'] = 'Autoriser le paiement Bancontact pour vos clients belges uniquement';
+$_MODULE['<{payplug}prestashop>paymentmethodstranslation_6698d8bcb543246ca140bfb6308eb671'] = 'Vos clients verront apparaître le formulaire de paiement directement dans la page de checkout de votre boutique.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_66b4d927572f8a7a2347fc69c6385e21'] = 'à partir de';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_69078e0028891d87307e4f88bd4f053c'] = 'Permettez à vos clients de payer avec leurs cartes American Express. ';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_6e8fa0eded1f41e892cc3773cd6d0426'] = '2 fois';
