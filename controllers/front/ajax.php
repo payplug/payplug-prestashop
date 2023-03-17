@@ -105,18 +105,11 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $is_elligible = null;
                 if ($id_product = (int) $tools->tool('getValue', 'id_product')) {
                     $group = $tools->tool('getValue', 'group');
-                    // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
-                    if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
-                        $id_product_attribute = $group ?
-                            (int) Product::getIdProductAttributesByIdAttributes($id_product, $group) :
-                            0
-                        ;
-                    } else {
-                        $id_product_attribute = $group ?
+                    $id_product_attribute = $group ?
                             (int) $this->productAdapter->getIdProductAttributeByIdAttributes($id_product, $group) :
                             0
                         ;
-                    }
+
                     $quantity = (int) $tools->tool(
                         'getValue',
                         'qty',

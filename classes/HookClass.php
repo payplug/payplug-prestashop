@@ -1093,18 +1093,11 @@ class HookClass
             $id_product = (int) $this->tools->tool('getValue', 'id_product');
             $group = $this->tools->tool('getValue', 'group');
 
-            // Method getIdProductAttributesByIdAttributes deprecated in 1.7.3.1 version
-            if (\version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
-                $id_product_attribute = $group ? (int) $this->product->getIdProductAttributesByIdAttributes(
-                    $id_product,
-                    $group
-                ) : 0;
-            } else {
-                $id_product_attribute = $group ? (int) $this->product->getIdProductAttributeByIdAttributes(
-                    $id_product,
-                    $group
-                ) : 0;
-            }
+            $id_product_attribute = $group ? (int) $this->product->getIdProductAttributeByIdAttributes(
+                $id_product,
+                $group
+            ) : 0;
+
             $quantity = (int) $this->tools->tool(
                 'getValue',
                 'qty',
