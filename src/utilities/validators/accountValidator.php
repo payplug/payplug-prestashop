@@ -78,11 +78,10 @@ class accountValidator
             ];
         }
 
-        if (!(strpos($api_key, 'sk_live_') === 0
-            || strpos($api_key, 'pk_live_') === 0
-            || strpos($api_key, 'sk_test_') === 0
-            || strpos($api_key, 'pk_test_') === 0)
-            || strlen($api_key) != 30) {
+        if ((strpos($api_key, 'sk_live_') !== 0
+            && strpos($api_key, 'pk_live_') !== 0
+            && strpos($api_key, 'sk_test_') !== 0
+            && strpos($api_key, 'pk_test_') !== 0) || strlen($api_key) > 30) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $api_key is not allowed',

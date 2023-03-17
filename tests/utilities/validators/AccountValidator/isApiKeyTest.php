@@ -31,7 +31,7 @@ class isApiKeyTest extends TestCase
 
     public function invalidDataApiKeyDataProvider()
     {
-        yield ['sk_live_azertyuiopqsdfghjklmw', 'Invalid argument given, $api_key is not allowed']; // 29 char
+        yield ['sk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed']; // 32 char
         yield ['sk_liv_azertyuiopqsdfghjklmwxc', 'Invalid argument given, $api_key is not allowed']; // sk_liv invalid
         yield ['azerty_sk_live_uiopqsdfghjklmw', 'Invalid argument given, $api_key is not allowed']; // sk_live must be at the beginning
     }
