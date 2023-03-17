@@ -36,18 +36,18 @@ class ProductAdapter implements ProductInterface
     }
 
     /**
-     * @deprecated since 1.6.1.X Use getIdProductAttributeByIdAttributes() instead
+     * @description  get Id product by Attributes depending on the prestashop version
      *
      * @param mixed $idProduct
      * @param mixed $group
      */
-    public function getIdProductAttributesByIdAttributes($idProduct, $group)
-    {
-        return Product::getIdProductAttributesByIdAttributes($idProduct, $group);
-    }
-
     public function getIdProductAttributeByIdAttributes($idProduct, $group)
     {
+        if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
+            // @deprecated since 1.7.3.1 Use getIdProductAttributeByIdAttributes() instead
+            return Product::getIdProductAttributesByIdAttributes($idProduct, $group);
+        }
+
         return Product::getIdProductAttributeByIdAttributes($idProduct, $group);
     }
 
