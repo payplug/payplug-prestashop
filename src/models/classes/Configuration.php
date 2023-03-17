@@ -150,6 +150,12 @@ class Configuration
             'defaultValue' => 'EUR:1',
             'setConf' => 1,
         ],
+        'onboarding_states' => [
+            'type' => 'string',
+            'name' => 'ONBOARDING_STATES',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'one_click' => [
             'type' => 'integer',
             'name' => 'ONE_CLICK',

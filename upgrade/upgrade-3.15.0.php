@@ -28,7 +28,10 @@ function upgrade_module_3_15_0()
 {
     $flag = true;
 
-    $flag = $flag && Configuration::DeleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST');
+    // Delete publishable key usage, no longer needed for integrated payment
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY');
 
-    return $flag && Configuration::DeleteByName('PAYPLUG_PUBLISHABLE_KEY');
+    // Create new configuration variable for the merchant onboarding
+    return $flag && Configuration::updateValue('ONBOARDING_STATE', '{}');
 }

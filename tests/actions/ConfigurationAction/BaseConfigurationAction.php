@@ -80,8 +80,6 @@ class BaseConfigurationAction extends TestCase
 
         $this->dependencies->name = 'payplug';
 
-        $this->dependencies->name = 'payplug';
-
         $this->dependencies
             ->shouldReceive('l')
             ->andReturnUsing(function ($key) {

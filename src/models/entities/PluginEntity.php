@@ -97,6 +97,9 @@ class PluginEntity
     private $module;
 
     /** @var object */
+    private $onboardingAction;
+
+    /** @var object */
     private $oney;
 
     /** @var object */
@@ -401,6 +404,14 @@ class PluginEntity
     public function getLanguage()
     {
         return $this->language;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOnboardingAction()
+    {
+        return $this->onboardingAction;
     }
 
     /**
@@ -945,6 +956,24 @@ class PluginEntity
         }
 
         $this->module = $module;
+
+        return $this;
+    }
+
+    /**
+     * @param object $onboardingAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setOnboardingAction($onboardingAction)
+    {
+        if (!is_object($onboardingAction)) {
+            throw (new BadParameterException('Invalid argument, $onboardingAction must be a OnboardingAction'));
+        }
+
+        $this->onboardingAction = $onboardingAction;
 
         return $this;
     }
