@@ -6,7 +6,6 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group unit
  * @group classes
  * @group configuration_classes
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */

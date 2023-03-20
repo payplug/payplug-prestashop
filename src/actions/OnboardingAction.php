@@ -56,6 +56,34 @@ class OnboardingAction
 
     public function disableIntegratedAction()
     {
-        // todo: thrue ticket PRE-1769
+        $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
+        $onboarding_states = json_decode($configurationClass->getValue('onboarding_states'), true);
+
+        if (!is_array($onboarding_states)) {
+            // todo: add error log
+            return false;
+        }
+
+        // embedded_mode state does not exists, we don't need more action
+        if (!isset($onboarding_states['embedded_mode'])) {
+            return true;
+        }
+
+        $onboarding_state = $onboarding_states['embedded_mode'];
+        $embedded_mode = $configurationClass->getValue('embedded_mode');
+
+        // We clean onboarding states
+        unset($onboarding_states['embedded_mode']);
+        if (!$configurationClass->set('onboarding_states', $onboarding_states)) {
+            return false;
+        }
+
+        // If current embedded mode is different from integrated, we don't need more action
+        if ('integrated' != $embedded_mode) {
+            return true;
+        }
+
+        // Else we rollback to the previous configuration
+        return $configurationClass->set('embedded_mode', $onboarding_state);
     }
 }
