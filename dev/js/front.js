@@ -536,7 +536,7 @@ var $document, $window, __moduleName__Module = {
                 // valide integrated payment form
                 var integrated = __moduleName__Module.integrated;
 
-                $('.' + integrated.props.identifier + '_error.-fields').addClass('-show');
+                $('.' + integrated.props.identifier + '-fields').addClass('-show');
                 $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
 
                 // Check if field is empty
