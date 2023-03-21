@@ -6,6 +6,7 @@ namespace PayPlug\tests\actions\OnboardingAction;
  * @group unit
  * @group action
  * @group onboarding_action
+ * @group dev
  *
  * @runTestsInSeparateProcesses
  */
@@ -52,6 +53,11 @@ class disableIntegratedActionTest extends BaseOnboardingAction
             });
 
         $this->configurationClass
+            ->shouldReceive('getDefault')
+            ->with('onboarding_states')
+            ->andReturn('{}');
+
+        $this->configurationClass
             ->shouldReceive([
                 'set' => false,
             ]);
@@ -78,6 +84,11 @@ class disableIntegratedActionTest extends BaseOnboardingAction
             });
 
         $this->configurationClass
+            ->shouldReceive('getDefault')
+            ->with('onboarding_states')
+            ->andReturn('{}');
+
+        $this->configurationClass
             ->shouldReceive([
                 'set' => true,
             ]);
@@ -102,6 +113,11 @@ class disableIntegratedActionTest extends BaseOnboardingAction
                         break;
                 }
             });
+
+        $this->configurationClass
+            ->shouldReceive('getDefault')
+            ->with('onboarding_states')
+            ->andReturn('{}');
 
         $this->configurationClass
             ->shouldReceive('set')
@@ -136,6 +152,11 @@ class disableIntegratedActionTest extends BaseOnboardingAction
                         break;
                 }
             });
+
+        $this->configurationClass
+            ->shouldReceive('getDefault')
+            ->with('onboarding_states')
+            ->andReturn('{}');
 
         $this->configurationClass
             ->shouldReceive('set')

@@ -74,7 +74,10 @@ class OnboardingAction
 
         // We clean onboarding states
         unset($onboarding_states['embedded_mode']);
-        if (!$configurationClass->set('onboarding_states', $onboarding_states)) {
+        $onboarding_states_to_save = (empty($onboarding_states)
+            ? $configurationClass->getDefault('onboarding_states')
+            : json_encode($onboarding_states));
+        if (!$configurationClass->set('onboarding_states', $onboarding_states_to_save)) {
             return false;
         }
 
