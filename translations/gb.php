@@ -176,7 +176,7 @@ $_MODULE['<{payplug}prestashop>modaltranslation_1cd1375b14915e7018f57675ca1637b3
 $_MODULE['<{payplug}prestashop>modaltranslation_36773dc2077997e9f5a9b74a04022c27'] = 'To activate the Oney guaranteed split payment, go to $link.';
 $_MODULE['<{payplug}prestashop>modaltranslation_3c3facbdefab9989227a5f4e1b776459'] = 'AmEx';
 $_MODULE['<{payplug}prestashop>modaltranslation_490fbcb51f09a525cfff57845b548f61'] = 'For more information, please contact us via $link.';
-$_MODULE['<{payplug}prestashop>modaltranslation_6247bc8f1fa440af0b8e5b034680a04f'] = 'To activate Bancontact, please go to $link.';
+$_MODULE['<{payplug}prestashop>modaltranslation_6247bc8f1fa440af0b8e5b034680a04f'] = 'To activate %s, please go to $link.';
 $_MODULE['<{payplug}prestashop>modaltranslation_77fe878dedd7eee3106a518699cb941e'] = 'our website';
 $_MODULE['<{payplug}prestashop>modaltranslation_7fa9f591dfea0601d8fe976db7b04e82'] = 'Enable feature';
 $_MODULE['<{payplug}prestashop>modaltranslation_91b5b36845d9b6aabe32e15fedaaa4fe'] = 'To activate ApplePay, please contact $link.';
