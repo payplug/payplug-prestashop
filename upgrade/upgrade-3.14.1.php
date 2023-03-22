@@ -24,24 +24,18 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_14_0()
+function upgrade_module_3_14_1()
 {
     $flag = true;
 
-    // Update PayPlug configuration variable `show` to `enable`
+    // Update payplug configuration PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS and PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS
     $flag = $flag && Configuration::updateValue(
-        'PAYPLUG_ENABLE',
-        Configuration::get('PAYPLUG_SHOW')
+        'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS',
+        'EUR:300000'
     );
-    $flag = $flag && Configuration::DeleteByName('PAYPLUG_SHOW');
 
-    $embedded_mode = Configuration::get('PAYPLUG_EMBEDDED_MODE');
-    if ('redirected' == $embedded_mode) {
-        $flag = $flag && Configuration::updateValue(
-            'PAYPLUG_EMBEDDED_MODE',
-            'redirect'
-        );
-    }
-
-    return $flag;
+    return $flag && Configuration::updateValue(
+        'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS',
+        'EUR:10000'
+    );
 }
