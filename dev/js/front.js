@@ -522,7 +522,7 @@ var $document, $window, __moduleName__Module = {
 
                 // Listen to the validateForm Event
                 integratedPayment.onValidateForm(function ({isFormValid}) {
-                    if(isFormValid) {
+                    if (isFormValid) {
                         integrated.form.getPaymentId();
                     } else {
                         integrated.props.submited = false;
@@ -536,7 +536,7 @@ var $document, $window, __moduleName__Module = {
                 // valide integrated payment form
                 var integrated = __moduleName__Module.integrated;
 
-                $('.' + integrated.props.identifier + '-fields').addClass('-show');
+                // $('.' + integrated.props.identifier + '_error.-fields').addClass('-show');
                 $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
 
                 // Check if field is empty

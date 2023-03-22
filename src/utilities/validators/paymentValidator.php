@@ -25,7 +25,14 @@ namespace PayPlug\src\utilities\validators;
 
 class paymentValidator
 {
-    private $uncancellable_payment_method = ['oneclick', 'bancontact', 'apple_pay', 'oney', 'amex'];
+    private $uncancellable_payment_method = [
+        'amex',
+        'apple_pay',
+        'bancontact',
+        'integrated',
+        'oneclick',
+        'oney',
+    ];
 
     /**
      * @description Check if the payment is refundable
