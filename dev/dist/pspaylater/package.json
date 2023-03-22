@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "replace-in-file-webpack-plugin": "^1.0.6",
-    "webpack-remove-empty-scripts": "^0.8.0-alpha"
+    "webpack-remove-empty-scripts": "^1.0.0"
   },
   "main": "index.js"
 }
