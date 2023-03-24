@@ -181,7 +181,7 @@ $_MODULE['<{payplug}prestashop>modaltranslation_490fbcb51f09a525cfff57845b548f61
 $_MODULE['<{payplug}prestashop>modaltranslation_6247bc8f1fa440af0b8e5b034680a04f'] = 'Per attivare %s, utilizza $link.';
 $_MODULE['<{payplug}prestashop>modaltranslation_77fe878dedd7eee3106a518699cb941e'] = 'sito web';
 $_MODULE['<{payplug}prestashop>modaltranslation_7fa9f591dfea0601d8fe976db7b04e82'] = 'Attivare una funzionalità';
-$_MODULE['<{payplug}prestashop>modaltranslation_91b5b36845d9b6aabe32e15fedaaa4fe'] = 'Per attivare ApplePay, contatta $link.';
+$_MODULE['<{payplug}prestashop>modaltranslation_91b5b36845d9b6aabe32e15fedaaa4fe'] = 'Per attivare %s, contatta $link.';
 $_MODULE['<{payplug}prestashop>modaltranslation_95e6d55a89d2261ca139dbd613698640'] = 'support@payplug.com';
 $_MODULE['<{payplug}prestashop>modaltranslation_962cafa689a699c9e1e89a8cf2dd1e56'] = 'il pagamento integrato';
 $_MODULE['<{payplug}prestashop>modaltranslation_a16e391ae236117fdad2e249f961ea93'] = 'questo modulo';
