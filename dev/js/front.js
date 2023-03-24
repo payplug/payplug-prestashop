@@ -102,6 +102,12 @@ var $document, $window, __moduleName__Module = {
             integratedPayment: null,
             token: null,
             notValid: false,
+            fieldsInvalid: {
+                cardHolder: true,
+                pan: true,
+                cvv: true,
+                exp: true,
+            },
             fieldsEmpty: {
                 cardHolder: true,
                 pan: true,
@@ -198,36 +204,44 @@ var $document, $window, __moduleName__Module = {
                         if (!event.valid) {
                             field.error('cardHolder');
                             integrated.props.fieldsEmpty['cardHolder'] = 'FIELD_EMPTY' == event.error.name;
+                            integrated.props.fieldsInvalid['cardHolder'] = 'INVALID_CARDHOLDER' == event.error.name;
                         } else {
                             field.valid('cardHolder');
                             integrated.props.fieldsEmpty['cardHolder'] = false;
+                            integrated.props.fieldsInvalid['cardHolder'] = false;
                         }
                     });
                     form.pan.onChange(function (event) {
                         if (!event.valid) {
                             field.error('pan');
                             integrated.props.fieldsEmpty['pan'] = 'FIELD_EMPTY' == event.error.name;
+                            integrated.props.fieldsInvalid['pan'] = 'INVALID_CARD_NUMBER' == event.error.name;
                         } else {
                             field.valid('pan');
                             integrated.props.fieldsEmpty['pan'] = false;
+                            integrated.props.fieldsInvalid['pan'] = false;
                         }
                     });
                     form.cvv.onChange(function (event) {
                         if (!event.valid) {
                             field.error('cvv');
                             integrated.props.fieldsEmpty['cvv'] = 'FIELD_EMPTY' == event.error.name;
+                            integrated.props.fieldsInvalid['cvv'] = 'INVALID_CVV' == event.error.name;
                         } else {
                             field.valid('cvv');
                             integrated.props.fieldsEmpty['cvv'] = false;
+                            integrated.props.fieldsInvalid['cvv'] = false;
                         }
                     });
                     form.exp.onChange(function (event) {
                         if (!event.valid) {
                             field.error('exp');
                             integrated.props.fieldsEmpty['exp'] = 'FIELD_EMPTY' == event.error.name;
+                            integrated.props.fieldsInvalid['exp'] = 'INVALID_EXPIRATION_DATE' == event.error.name;
                         } else {
                             field.valid('exp');
                             integrated.props.fieldsEmpty['exp'] = false;
+                            integrated.props.fieldsInvalid['exp'] = false;
                         }
                     });
 
@@ -536,7 +550,6 @@ var $document, $window, __moduleName__Module = {
                 // valide integrated payment form
                 var integrated = __moduleName__Module.integrated;
 
-                // $('.' + integrated.props.identifier + '_error.-fields').addClass('-show');
                 $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
 
                 // Check if field is empty
@@ -546,6 +559,13 @@ var $document, $window, __moduleName__Module = {
                         $('.' + integrated.props.identifier + '_error.-' + key + ' span.emptyField').removeClass('-hide');
                         $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                    }
+                }
+
+                // Check if field is invalid
+                for (var key in integrated.props.fieldsInvalid) {
+                    if (integrated.props.fieldsInvalid[key]) {
+                        $('.' + integrated.props.identifier + '_error.-fields').addClass('-show');
                     }
                 }
             },
