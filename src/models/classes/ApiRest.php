@@ -834,7 +834,12 @@ class ApiRest
             $advanced_settings = [];
 
             $embedded_mode = [];
-            if ($this->dependencies->configClass->isValidFeature('feature_integrated')) {
+            $version = $this->dependencies
+                ->getPlugin()
+                ->getConstant()
+                ->get('_PS_VERSION_');
+            if (version_compare($version, '1.7', '>=')
+                && $this->dependencies->configClass->isValidFeature('feature_integrated')) {
                 $embedded_mode[] = [
                     'name' => 'payplug_embedded',
                     'label' => $translation['embedded']['options']['integrated'],
