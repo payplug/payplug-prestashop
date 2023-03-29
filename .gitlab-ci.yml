@@ -151,6 +151,7 @@ build zip release:
     - ./dev/ci/secure_directories.sh
     - git status
     - ./dev/ci/assets_revision.sh -b payplug
+    - ./dev/ci/update_year.sh
     - php ./dev/ci/import-translations.php
     - ./dev/ci/copy_translations.sh
   script:
@@ -215,6 +216,7 @@ build-pspaylater:
     - git status
     - rm -rf views/build && mv views/build-bnpl views/build
     - ./dev/ci/assets_revision.sh -b pspaylater
+    - ./dev/ci/update_year.sh
     - mkdir pspaylater
     - php ./dev/ci/import-translations.php
     - ./dev/ci/copy_translations.sh
