@@ -971,6 +971,7 @@ class HookClass
                 'id_card' => $id_card,
                 'is_installment' => (bool) $this->tools->tool('getValue', 'inst'),
                 'is_deferred' => (bool) $this->tools->tool('getValue', 'def'),
+                'is_amex' => (bool) $this->tools->tool('getValue', 'amex'),
             ];
 
             $payment = $this->dependencies->paymentClass->preparePayment($payment_options);
