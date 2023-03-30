@@ -130,6 +130,9 @@ class PluginEntity
     private $payment;
 
     /** @var object */
+    private $paymentAction;
+
+    /** @var object */
     private $orderClass;
 
     /** @var object */
@@ -473,6 +476,14 @@ class PluginEntity
     public function getPayment()
     {
         return $this->payment;
+    }
+
+    /**
+     * @return object
+     */
+    public function getPaymentAction()
+    {
+        return $this->paymentAction;
     }
 
     /**
@@ -1082,6 +1093,24 @@ class PluginEntity
     public function setPayment($payment)
     {
         $this->payment = $payment;
+
+        return $this;
+    }
+
+    /**
+     * @param object $paymentAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setPaymentAction($paymentAction)
+    {
+        if (!is_object($paymentAction)) {
+            throw (new BadParameterException('Invalid argument, $paymentAction must be a PaymentAction'));
+        }
+
+        $this->paymentAction = $paymentAction;
 
         return $this;
     }
