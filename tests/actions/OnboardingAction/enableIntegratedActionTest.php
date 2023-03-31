@@ -31,7 +31,10 @@ class enableIntegratedActionTest extends BaseOnboardingAction
         ]);
 
         $this->assertSame(
-            false,
+            [
+                'success' => false,
+                'message' => '$onboarding_states does not exist',
+            ],
             $this->action->enableIntegratedAction()
         );
     }
@@ -43,7 +46,10 @@ class enableIntegratedActionTest extends BaseOnboardingAction
         ]);
 
         $this->assertSame(
-            true,
+            [
+                'success' => true,
+                'message' => 'integrated payment is already forced',
+            ],
             $this->action->enableIntegratedAction()
         );
     }
@@ -77,7 +83,10 @@ class enableIntegratedActionTest extends BaseOnboardingAction
             });
 
         $this->assertSame(
-            false,
+            [
+                'success' => false,
+                'message' => 'Something wrong happened! We could not force the integrated payment',
+            ],
             $this->action->enableIntegratedAction()
         );
     }
@@ -107,7 +116,10 @@ class enableIntegratedActionTest extends BaseOnboardingAction
             });
 
         $this->assertSame(
-            false,
+            [
+                'success' => false,
+                'message' => 'Something wrong happened! We could not force the integrated payment',
+            ],
             $this->action->enableIntegratedAction()
         );
     }
@@ -137,7 +149,10 @@ class enableIntegratedActionTest extends BaseOnboardingAction
             });
 
         $this->assertSame(
-            true,
+            [
+                'success' => true,
+                'message' => 'Integareted payment has been successfully forced',
+            ],
             $this->action->enableIntegratedAction()
         );
     }

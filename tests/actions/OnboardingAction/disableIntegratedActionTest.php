@@ -32,7 +32,25 @@ class disableIntegratedActionTest extends BaseOnboardingAction
         ]);
 
         $this->assertSame(
-            false,
+            [
+                'success' => false,
+                'message' => '$onboarding_states does not exist',
+            ],
+            $this->action->disableIntegratedAction()
+        );
+    }
+
+    public function testWhenIntegratedPaymentisNotSet()
+    {
+        $this->configurationClass->shouldReceive([
+                                                     'getValue' => '{}',
+                                                 ]);
+
+        $this->assertSame(
+            [
+                'success' => true,
+                'message' => 'integrated payment has not been forced',
+            ],
             $this->action->disableIntegratedAction()
         );
     }
@@ -63,7 +81,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
             ]);
 
         $this->assertSame(
-            false,
+            [
+                'success' => false,
+                'message' => 'Something wrong happened! We could not force rollback the integrated payment',
+            ],
             $this->action->disableIntegratedAction()
         );
     }
@@ -94,7 +115,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
             ]);
 
         $this->assertSame(
-            true,
+            [
+                'success' => true,
+                'message' => 'embedded_mode is different from integrated',
+            ],
             $this->action->disableIntegratedAction()
         );
     }
@@ -133,7 +157,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
             });
 
         $this->assertSame(
-            false,
+            [
+                'success' => false,
+                'message' => 'Something went wrong! Integrated payment has not been rollback',
+            ],
             $this->action->disableIntegratedAction()
         );
     }
@@ -172,7 +199,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
             });
 
         $this->assertSame(
-            true,
+            [
+                'success' => true,
+                'message' => 'Integrated payment has been successfully rollback',
+            ],
             $this->action->disableIntegratedAction()
         );
     }
