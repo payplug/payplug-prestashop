@@ -33,7 +33,12 @@ class BaseOnboardingAction extends TestCase
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
             ]);
-
+        $this->dependencies
+            ->shouldReceive('getConfigurationKey')
+            ->andReturnUsing(function ($key) {
+                return $key;
+            })
+        ;
         $this->dependencies->name = 'payplug';
 
         $this->action = \Mockery::mock(OnboardingAction::class, [$this->dependencies])->makePartial();

@@ -305,6 +305,19 @@ class ConfigClass
         }
 
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
+        //check if we force integrated payment activation/rollback
+        if (isset($permissions['can_use_integrated_payments'])) {
+            $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
+            if ($permissions['can_use_integrated_payments']) {
+                if (!$onboardingAction->enableIntegratedAction()['success']) {
+                    $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
+                }
+            } else {
+                if (!$onboardingAction->disableIntegratedAction()['success']) {
+                    $this->logger->addLog($onboardingAction->disableIntegratedAction()['message'], 'error');
+                }
+            }
+        }
         $available_options = [
             'standard' => (bool) $this->config->get($this->dependencies->getConfigurationKey('standard')),
             'live' => !(bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),

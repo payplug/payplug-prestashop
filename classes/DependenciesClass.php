@@ -164,6 +164,12 @@ class DependenciesClass
             'defaultValue' => '',
             'setConf' => 1,
         ],
+        'onboarding_states' => [
+            'type' => 'string',
+            'name' => 'ONBOARDING_STATES',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'oneClick' => [
             'name' => 'ONE_CLICK',
             'defaultValue' => null,
