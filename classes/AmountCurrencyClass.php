@@ -31,6 +31,7 @@ class AmountCurrencyClass
     private $order;
     private $tools;
     private $validators;
+    private $validate;
 
     public function __construct($dependencies)
     {

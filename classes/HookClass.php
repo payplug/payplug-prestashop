@@ -30,14 +30,17 @@ class HookClass
     private $assign;
     private $cache;
     private $card;
+    private $cart;
     private $config;
     private $constant;
     private $context;
+    private $currency;
     private $dependencies;
     private $dispatcher;
     private $html;
     private $language;
     private $media;
+    private $module;
     private $oney;
     private $order;
     private $orderHistory;

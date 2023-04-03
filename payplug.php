@@ -33,6 +33,7 @@ class Payplug extends PaymentModule
 
     /** @var array */
     public $adminControllers;
+    public $module;
 
     /**
      * Constructor

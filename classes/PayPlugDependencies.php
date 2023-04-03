@@ -32,6 +32,9 @@ class PayPlugDependencies
     /** @var ApiClass */
     public $apiClass;
 
+    /** @var HookClass */
+    public $hookClass;
+
     /** @var OneyRepository */
     public $oney;
 

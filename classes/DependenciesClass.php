@@ -50,6 +50,7 @@ class DependenciesClass
     public $adminClass;
     public $amountCurrencyClass;
     public $apiClass;
+    public $applePayClass;
     public $cardClass;
     public $cartClass;
     public $configClass;
