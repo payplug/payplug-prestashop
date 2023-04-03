@@ -58,6 +58,9 @@ class PluginEntity
     private $configuration;
 
     /** @var object */
+    private $configurationAction;
+
+    /** @var object */
     private $configuration_class;
 
     /** @var object */
@@ -85,7 +88,13 @@ class PluginEntity
     private $install;
 
     /** @var object */
+    private $language;
+
+    /** @var object */
     private $logger;
+
+    /** @var object */
+    private $message;
 
     /** @var object */
     private $myLogPHP;
@@ -101,6 +110,12 @@ class PluginEntity
 
     /** @var object */
     private $oney;
+
+    /** @var object */
+    private $order;
+
+    /** @var object */
+    private $orderHistory;
 
     /** @var object */
     private $order_slip;
@@ -122,6 +137,12 @@ class PluginEntity
 
     /** @var object */
     private $query;
+
+    /** @var object */
+    private $routes;
+
+    /** @var object */
+    private $shop;
 
     /** @var object */
     private $sql;

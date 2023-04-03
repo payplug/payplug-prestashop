@@ -40,6 +40,8 @@ class OrderStateRepository extends BaseClass
     /** @var object */
     private $language;
 
+    private $log;
+
     /** @var object */
     private $order_state_adapter;
 

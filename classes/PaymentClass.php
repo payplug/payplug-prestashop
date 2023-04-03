@@ -38,6 +38,7 @@ class PaymentClass
     private $dependencies;
     private $language;
     private $logger;
+    private $module;
     private $oney;
     private $oney_allowed_iso_codes;
     private $order;

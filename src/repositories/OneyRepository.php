@@ -29,9 +29,11 @@ use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 
 class OneyRepository extends BaseClass
 {
+    public $oneyEntity;
     private $addressAdapter;
     private $cartAdapter;
     private $cache;
+    private $carrierAdapter;
     private $dependencies;
     private $log;
     private $logger;

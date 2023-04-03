@@ -27,6 +27,7 @@ use libphonenumberlight;
 
 class ConfigClass
 {
+    public $api_rest;
     public $amountCurrencyClass;
     public $configurations;
     public $email;
@@ -233,6 +234,7 @@ class ConfigClass
     private $oney;
     private $payment_status;
     private $query;
+    private $ssl_enable;
     private $tools;
     private $validate;
     private $validationErrors = [];

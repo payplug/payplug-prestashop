@@ -461,7 +461,7 @@ class ConfigurationAction
                         }
 
                         break;
-                    case 'payplug_oney_type':
+                    case 'payplug_oney':
                     case 'enable_oney_product_animation':
                     case 'enable_oney_cart_animation':
                     case 'enable_oney_schedule':

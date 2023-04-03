@@ -78,10 +78,17 @@ class accountValidator
             ];
         }
 
+        if (!(bool) preg_match('/^[a-zA-Z0-9_]*$/', $api_key)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $api_key contained invalid characters',
+            ];
+        }
+
         if ((strpos($api_key, 'sk_live_') !== 0
             && strpos($api_key, 'pk_live_') !== 0
             && strpos($api_key, 'sk_test_') !== 0
-            && strpos($api_key, 'pk_test_') !== 0) || strlen($api_key) > 30) {
+            && strpos($api_key, 'pk_test_') !== 0)) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $api_key is not allowed',

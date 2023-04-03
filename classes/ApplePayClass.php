@@ -27,6 +27,7 @@ class ApplePayClass
 {
     private $carrier;
     private $context;
+    private $currency;
     private $dependencies;
     private $logger;
 
