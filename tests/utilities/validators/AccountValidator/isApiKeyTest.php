@@ -6,7 +6,6 @@ use PayPlug\src\utilities\validators\accountValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group dev
  * @group unit
  * @group validator
  * @group account_validator

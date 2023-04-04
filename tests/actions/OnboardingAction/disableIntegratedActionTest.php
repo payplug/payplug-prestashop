@@ -6,7 +6,6 @@ namespace PayPlug\tests\actions\OnboardingAction;
  * @group unit
  * @group action
  * @group onboarding_action
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */

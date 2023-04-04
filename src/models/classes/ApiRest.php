@@ -748,7 +748,7 @@ class ApiRest
                         'label' => $translation['options']['with_fees']['label'],
                         'subText' => $translation['options']['with_fees']['subtext'],
                         'value' => 1,
-                         'checked' => $configuration->getValue('oney_fees'),
+                        'checked' => $configuration->getValue('oney_fees'),
                     ],
                     [
                         'name' => 'payplug_oney',
@@ -830,14 +830,15 @@ class ApiRest
         }
 
         $payment_options = [];
+        $version = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('_PS_VERSION_');
+
         if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
             $advanced_settings = [];
 
             $embedded_mode = [];
-            $version = $this->dependencies
-                ->getPlugin()
-                ->getConstant()
-                ->get('_PS_VERSION_');
             if (version_compare($version, '1.7', '>=')
                 && $this->dependencies->configClass->isValidFeature('feature_integrated')) {
                 $embedded_mode[] = [
@@ -1117,7 +1118,8 @@ class ApiRest
                 ],
             ];
         }
-        if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+        if (version_compare($version, '1.7', '>=')
+            && $this->dependencies->configClass->isValidFeature('feature_applepay')) {
             $payment_options[] = [
                 'type' => 'payment_method',
                 'name' => 'applepay',
