@@ -243,6 +243,7 @@ $_MODULE['<{payplug}prestashop>paylatertranslation_316179aac7a6faa0b80da221cb803
 $_MODULE['<{payplug}prestashop>paylatertranslation_43678681d9dd375783fc30a83e5eb35c'] = 'En savoir plus.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_54eea3870f268b54efa60fb34bd8cc60'] = 'Avec frais';
 $_MODULE['<{payplug}prestashop>paylatertranslation_5afb72d15ed393a1878809c19d359edc'] = 'Afficher le logo Oney sur la page produit';
+$_MODULE['<{payplug}prestashop>paylatertranslation_5e1d39b03353d89c6e3eda13ed989b50'] = 'Attention, le montant maximal renseigné est inférieur au montant minimal renseigné.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_5e92ff4b120d4704ee236a98e5b3b6b5'] = 'Sans frais';
 $_MODULE['<{payplug}prestashop>paylatertranslation_6bce1625877045961fb130db778b78f8'] = 'Paiements 3x 4x Oney';
 $_MODULE['<{payplug}prestashop>paylatertranslation_6c8df11847933a5204abdf768d31aba5'] = 'et';
@@ -257,6 +258,7 @@ $_MODULE['<{payplug}prestashop>paylatertranslation_d1f3d21700c2827d15aeb26e91d9e
 $_MODULE['<{payplug}prestashop>paylatertranslation_db9e1b05f134de8ab5d4bfd29b9d8a4a'] = 'En savoir plus.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_e02babd6337643c3b8d2268215b7eebf'] = 'Vos clients pourront voir le détail de leurs échéances en 3 ou 4 fois. ';
 $_MODULE['<{payplug}prestashop>paylatertranslation_ec0812e9aebf050a2add9aca5c0eac65'] = 'Les frais sont répartis entre vous et vos clients. ';
+$_MODULE['<{payplug}prestashop>paylatertranslation_ee404fbb3e48ee5a9dbb58957a1d284d'] = 'Attention, le montant minimal renseigné est supérieur au montant maximal renseigné.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_efcd0a3777c4ad7238f5476f6f9864c3'] = 'Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre (ou non) l\'ensemble des frais à votre charge. ';
 $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Payer en 3x ou 4x sans frais avec Oney';
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = ' ';

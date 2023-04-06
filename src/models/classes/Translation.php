@@ -300,7 +300,9 @@ class Translation
                 'description' => $this->dependencies->l('thresholds.description', 'paylatertranslation'),
                 'inter' => $this->dependencies->l('thresholds.inter', 'paylatertranslation'),
                 'error' => [
-                    'text' => $this->dependencies->l('thresholds.error.text', 'paylatertranslation'),
+                    'default' => $this->dependencies->l('thresholds.error.text', 'paylatertranslation'),
+                    'max' => $this->dependencies->l('thresholds.error.max.text', 'paylatertranslation'),
+                    'min' => $this->dependencies->l('thresholds.error.min.text', 'paylatertranslation'),
                 ],
             ],
         ];

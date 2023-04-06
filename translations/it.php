@@ -243,6 +243,7 @@ $_MODULE['<{payplug}prestashop>paylatertranslation_316179aac7a6faa0b80da221cb803
 $_MODULE['<{payplug}prestashop>paylatertranslation_43678681d9dd375783fc30a83e5eb35c'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_54eea3870f268b54efa60fb34bd8cc60'] = 'Con costi';
 $_MODULE['<{payplug}prestashop>paylatertranslation_5afb72d15ed393a1878809c19d359edc'] = 'Visualizza il logo Oney sulla pagina prodotto';
+$_MODULE['<{payplug}prestashop>paylatertranslation_5e1d39b03353d89c6e3eda13ed989b50'] = 'Attenzione, l\'importo massimo inserito è inferiore all\'importo minimo inserito.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_5e92ff4b120d4704ee236a98e5b3b6b5'] = 'Senza costi';
 $_MODULE['<{payplug}prestashop>paylatertranslation_6bce1625877045961fb130db778b78f8'] = 'Pagamenti rateali 3x 4x Oney';
 $_MODULE['<{payplug}prestashop>paylatertranslation_6c8df11847933a5204abdf768d31aba5'] = 'e';
@@ -257,6 +258,7 @@ $_MODULE['<{payplug}prestashop>paylatertranslation_d1f3d21700c2827d15aeb26e91d9e
 $_MODULE['<{payplug}prestashop>paylatertranslation_db9e1b05f134de8ab5d4bfd29b9d8a4a'] = 'Per saperne di più.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_e02babd6337643c3b8d2268215b7eebf'] = 'I tuoi clienti possono scegliere di pagare gli ordini in 3 o 4 rate. Scegli qui sotto se vuoi prendere a tuo carico tutti i costi (o meno). ';
 $_MODULE['<{payplug}prestashop>paylatertranslation_ec0812e9aebf050a2add9aca5c0eac65'] = 'Le spese sono ripartite tra te e i tuoi clienti.';
+$_MODULE['<{payplug}prestashop>paylatertranslation_ee404fbb3e48ee5a9dbb58957a1d284d'] = 'Attenzione, l\'importo minimo inserito è superiore all\'importo massimo inserito.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_efcd0a3777c4ad7238f5476f6f9864c3'] = 'I tuoi clienti possono scegliere di pagare gli ordini in 3 o 4 rate. Scegli qui sotto se vuoi prendere a tuo carico tutti i costi (o meno). ';
 $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Pagamento in 3x o 4x senza nessuna commissione con Oney';
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = 'Scopri di più';

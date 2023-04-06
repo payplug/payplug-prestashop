@@ -1450,7 +1450,17 @@ class ApiRest
                 ],
                 'error' => [
                     'text' => sprintf(
-                        $translation['thresholds']['error']['text'],
+                        $translation['thresholds']['error']['default'],
+                        $min,
+                        $max
+                    ),
+                    'maxtext' => sprintf(
+                        $translation['thresholds']['error']['max'],
+                        $min,
+                        $max
+                    ),
+                    'mintext' => sprintf(
+                        $translation['thresholds']['error']['min'],
                         $min,
                         $max
                     ),
