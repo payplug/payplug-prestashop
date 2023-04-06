@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS.
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -30,14 +30,17 @@ class HookClass
     private $assign;
     private $cache;
     private $card;
+    private $cart;
     private $config;
     private $constant;
     private $context;
+    private $currency;
     private $dependencies;
     private $dispatcher;
     private $html;
     private $language;
     private $media;
+    private $module;
     private $oney;
     private $order;
     private $orderHistory;
@@ -944,7 +947,11 @@ class HookClass
         $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
 
         // Is embeddedMode configured to show the lightbox..
-        $show_lightbox = 'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'));
+        $show_lightbox = 'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
+            || (
+                'integrated' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
+                && $this->tools->tool('getValue', 'inst')
+            );
         // ... or is the payment with one click
         $show_lightbox = $show_lightbox || 'new_card' != $id_card;
 
@@ -974,7 +981,10 @@ class HookClass
                 $dotenv->load($dotenvFile);
                 $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
             } else {
-                $integrated_payment_js_url = 'https://cdn.payplug.com/js/integrated-payment/v0/index.js';
+                $integrated_payment_js_url = $this->dependencies
+                    ->getPlugin()
+                    ->getRoutes()
+                    ->getSourceUrl()['integrated'];
             }
 
             if ($payment['result']) {
@@ -992,7 +1002,10 @@ class HookClass
                             'isIntegratedPayment' => true,
                         ]);
                     } else {
-                        $api_url = $this->dependencies->apiClass->getApiUrl() . '/js/1/form.latest.js';
+                        $api_url = $this->dependencies
+                            ->getPlugin()
+                            ->getRoutes()
+                            ->getSourceUrl()['embedded'];
                     }
 
                     $this->assign->assign([
@@ -1035,9 +1048,6 @@ class HookClass
             $sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
             $this->media->addJsDef([
                 'integratedPaymentError' => $integratedPaymentError,
-                'payplug_publishable_key' => $this->config->get(
-                    $this->dependencies->getConfigurationKey('publishableKey') . ($sandbox ? '_TEST' : '')
-                ),
             ]);
         }
 
@@ -1056,6 +1066,9 @@ class HookClass
             [
                 $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
                 'PAYPLUG_DOMAIN' => $payplug_domain,
+                'is_sandbox_mode' => (bool) $this->config->get(
+                    $this->dependencies->getConfigurationKey('sandboxMode')
+                ),
             ]
         );
     }

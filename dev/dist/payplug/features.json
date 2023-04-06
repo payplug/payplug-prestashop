@@ -5,6 +5,7 @@
         "feature_bancontact",
         "feature_deferred",
         "feature_installment",
+        "feature_integrated",
         "feature_oney",
         "feature_standard"
     ]

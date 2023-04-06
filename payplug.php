@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -33,6 +33,7 @@ class Payplug extends PaymentModule
 
     /** @var array */
     public $adminControllers;
+    public $module;
 
     /**
      * Constructor
@@ -51,7 +52,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '3.14.1';
+        $this->version = '3.15.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7'];

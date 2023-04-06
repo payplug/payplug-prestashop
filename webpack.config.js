@@ -1,5 +1,5 @@
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    Payplug SAS
- *  @copyright 2013 - 2023 Payplug SAS
+ *  @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */

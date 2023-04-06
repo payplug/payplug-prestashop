@@ -88,6 +88,14 @@
     <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -api">
         {l s='hook.header.integratedPayment.api.genericError' tags=['<br>'] mod='payplug'}
     </div>
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_privacy_policy">
+        <img class="-lock" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/integrated/lock.svg"/>
+        <span>{$secure|escape:'htmlall':'UTF-8'}</span>
+        <img class="-logo" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/payplug.svg"/>
+        <br/>
+        <a href="{$privacyLink|escape:'htmlall':'UTF-8'}" target="_blank">{$privacy|escape:'htmlall':'UTF-8'}</a>
+    </div>
 </form>
 <script type="text/javascript">
     {literal}
@@ -97,18 +105,19 @@
         var placeholderExp = '{/literal}{$placeholderExp|escape:'javascript':'UTF-8'}{literal}';
         var loadIntegrated = function() {
             if (typeof window['payplug_utilities'] != 'undefined') {
+                console.log('Loading script: {/literal}{$integrated_payment_js_url|escape:'javascript':'UTF-8'}{literal}');
                 window['payplug_utilities'].loadScript('{/literal}{$integrated_payment_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
-                    if(typeof window['payplug_module'] != 'undefined') {
-                        window['payplug_module'].integrated.init();
+                    if(typeof window['payplugModule'] != 'undefined') {
+                        window['payplugModule'].integrated.init();
                     } else {
-                        console.log('Type of payplugModule : ' + typeof window['payplug_module']);
+                        console.log('Type of payplugModule : ' + typeof window['payplugModule']);
                     }
                 });
             } else {
                 console.log('Type of payplug_utilities : ' + typeof window['payplug_utilities']);
             }
         }
-        if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplug_module'] != 'undefined') {
+        if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplugModule'] != 'undefined') {
             loadIntegrated();
         } else {
             window.addEventListener("load", loadIntegrated);

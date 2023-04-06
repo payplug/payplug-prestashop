@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -50,6 +50,7 @@ class DependenciesClass
     public $adminClass;
     public $amountCurrencyClass;
     public $apiClass;
+    public $applePayClass;
     public $cardClass;
     public $cartClass;
     public $configClass;
@@ -162,6 +163,12 @@ class DependenciesClass
         'offer' => [
             'name' => 'OFFER',
             'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'onboarding_states' => [
+            'type' => 'string',
+            'name' => 'ONBOARDING_STATES',
+            'defaultValue' => '{}',
             'setConf' => 1,
         ],
         'oneClick' => [
@@ -296,16 +303,6 @@ class DependenciesClass
         ],
         'orderStateRefundTest' => [
             'name' => 'ORDER_STATE_REFUND_TEST',
-            'defaultValue' => null,
-            'setConf' => 0,
-        ],
-        'publishableKey' => [
-            'name' => 'PUBLISHABLE_KEY',
-            'defaultValue' => null,
-            'setConf' => 0,
-        ],
-        'publishableKeyTest' => [
-            'name' => 'PUBLISHABLE_KEY_TEST',
             'defaultValue' => null,
             'setConf' => 0,
         ],

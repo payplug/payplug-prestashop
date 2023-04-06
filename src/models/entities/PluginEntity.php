@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -58,6 +58,9 @@ class PluginEntity
     private $configuration;
 
     /** @var object */
+    private $configurationAction;
+
+    /** @var object */
     private $configuration_class;
 
     /** @var object */
@@ -84,11 +87,14 @@ class PluginEntity
     /** @var object */
     private $install;
 
-//    /** @var object */
-//    private $installment;
+    /** @var object */
+    private $language;
 
     /** @var object */
     private $logger;
+
+    /** @var object */
+    private $message;
 
     /** @var object */
     private $myLogPHP;
@@ -100,7 +106,16 @@ class PluginEntity
     private $module;
 
     /** @var object */
+    private $onboardingAction;
+
+    /** @var object */
     private $oney;
+
+    /** @var object */
+    private $order;
+
+    /** @var object */
+    private $orderHistory;
 
     /** @var object */
     private $order_slip;
@@ -122,6 +137,12 @@ class PluginEntity
 
     /** @var object */
     private $query;
+
+    /** @var object */
+    private $routes;
+
+    /** @var object */
+    private $shop;
 
     /** @var object */
     private $sql;
@@ -382,24 +403,6 @@ class PluginEntity
         return $this->install;
     }
 
-//    /**
-//     * @return object
-//     */
-//    public function getInstallment()
-//    {
-//        return $this->installment;
-//    }
-//
-//    /**
-//     * @param object $installment
-//     * @return PluginEntity
-//     */
-//    public function setInstallment($installment)
-//    {
-//        $this->installment = $installment;
-//        return $this;
-//    }
-
     /**
      * @return object
      */
@@ -422,6 +425,14 @@ class PluginEntity
     public function getLanguage()
     {
         return $this->language;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOnboardingAction()
+    {
+        return $this->onboardingAction;
     }
 
     /**
@@ -966,6 +977,24 @@ class PluginEntity
         }
 
         $this->module = $module;
+
+        return $this;
+    }
+
+    /**
+     * @param object $onboardingAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setOnboardingAction($onboardingAction)
+    {
+        if (!is_object($onboardingAction)) {
+            throw (new BadParameterException('Invalid argument, $onboardingAction must be a OnboardingAction'));
+        }
+
+        $this->onboardingAction = $onboardingAction;
 
         return $this;
     }

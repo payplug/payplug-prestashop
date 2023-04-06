@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -27,6 +27,7 @@ use libphonenumberlight;
 
 class ConfigClass
 {
+    public $api_rest;
     public $amountCurrencyClass;
     public $configurations;
     public $email;
@@ -233,6 +234,7 @@ class ConfigClass
     private $oney;
     private $payment_status;
     private $query;
+    private $ssl_enable;
     private $tools;
     private $validate;
     private $validationErrors = [];
@@ -305,6 +307,19 @@ class ConfigClass
         }
 
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
+        //check if we force integrated payment activation/rollback
+        if (isset($permissions['can_use_integrated_payments'])) {
+            $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
+            if ($permissions['can_use_integrated_payments']) {
+                if (!$onboardingAction->enableIntegratedAction()['success']) {
+                    $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
+                }
+            } else {
+                if (!$onboardingAction->disableIntegratedAction()['success']) {
+                    $this->logger->addLog($onboardingAction->disableIntegratedAction()['message'], 'error');
+                }
+            }
+        }
         $available_options = [
             'standard' => (bool) $this->config->get($this->dependencies->getConfigurationKey('standard')),
             'live' => !(bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),

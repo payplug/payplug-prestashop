@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -29,8 +29,6 @@ class Configuration
     // COMPANY_STATUS
     // DEBUG_MODE
     // OFFER
-    // PUBLISHABLE_KEY
-    // PUBLISHABLE_KEY_TEST
     private $configuration = [
         'allo_save_card' => [
             'type' => 'integer',
@@ -150,6 +148,12 @@ class Configuration
             'type' => 'string',
             'name' => 'MIN_AMOUNTS',
             'defaultValue' => 'EUR:1',
+            'setConf' => 1,
+        ],
+        'onboarding_states' => [
+            'type' => 'string',
+            'name' => 'ONBOARDING_STATES',
+            'defaultValue' => '{}',
             'setConf' => 1,
         ],
         'one_click' => [

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -49,15 +49,16 @@ class ConfigurationAction
         }
 
         $allowed_methods = [
-            'one_click' => 'can_save_cards',
-            'installment' => 'can_create_installment_plan',
-            'deferred' => 'can_create_deferred_payment',
-            'oney' => 'can_use_oney',
-            'bancontact' => 'can_use_bancontact',
-            'applepay' => 'can_use_applepay',
             'american_express' => 'can_use_amex',
-            'use_live_mode' => 'use_live_mode',
+            'applepay' => 'can_use_applepay',
+            'bancontact' => 'can_use_bancontact',
+            'deferred' => 'can_create_deferred_payment',
+            'installment' => 'can_create_installment_plan',
+            'integrated' => 'can_use_integrated_payments',
             'onboarding_oney_completed' => 'onboarding_oney_completed',
+            'one_click' => 'can_save_cards',
+            'oney' => 'can_use_oney',
+            'use_live_mode' => 'use_live_mode',
         ];
 
         if (!$this->dependencies
@@ -90,6 +91,7 @@ class ConfigurationAction
         $has_permission = $this->dependencies
             ->getValidators()['payment']
             ->hasPermissions($permissions, $allowed_methods[$payment_method])['result'];
+
         $message = $translation['premium']['description']['unavailable'];
         switch ($payment_method) {
             case 'american_express':
@@ -109,7 +111,8 @@ class ConfigurationAction
                         $context->shop->domain,
                         $permissions['apple_pay_allowed_domains']
                     )['result'] : false;
-
+                    // no break
+            case 'integrated':
                 $message .= sprintf(
                     $translation['premium']['description']['contact'],
                     $translation['premium']['feature'][$payment_method]
@@ -458,7 +461,7 @@ class ConfigurationAction
                         }
 
                         break;
-                    case 'payplug_oney_type':
+                    case 'payplug_oney':
                     case 'enable_oney_product_animation':
                     case 'enable_oney_cart_animation':
                     case 'enable_oney_schedule':

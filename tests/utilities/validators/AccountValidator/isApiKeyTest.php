@@ -29,11 +29,21 @@ class isApiKeyTest extends TestCase
         yield ['', 'Invalid argument given, $api_key must be a non empty string'];
     }
 
+    public function invalidDataCharacterApiKeyDataProvider()
+    {
+        yield ['sk-live-azerty', 'Invalid argument given, $api_key contained invalid characters'];
+        yield ['sk/live/azerty', 'Invalid argument given, $api_key contained invalid characters'];
+        yield ['"sk_live_azerty"', 'Invalid argument given, $api_key contained invalid characters'];
+        yield ['<sk/live/azerty>', 'Invalid argument given, $api_key contained invalid characters'];
+    }
+
     public function invalidDataApiKeyDataProvider()
     {
-        yield ['sk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed']; // 32 char
-        yield ['sk_liv_azertyuiopqsdfghjklmwxc', 'Invalid argument given, $api_key is not allowed']; // sk_liv invalid
-        yield ['azerty_sk_live_uiopqsdfghjklmw', 'Invalid argument given, $api_key is not allowed']; // sk_live must be at the beginning
+        yield ['live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
+        yield ['azerty_sk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
+        yield ['azerty_pk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
+        yield ['azerty_sk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
+        yield ['azerty_pk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
     }
 
     public function validApiKeyDataProvider()
@@ -48,6 +58,23 @@ class isApiKeyTest extends TestCase
      * @param mixed $errorMsg
      */
     public function testWithInvalidTypeApiKeyDataProvider($apiKey, $errorMsg)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => $errorMsg,
+            ],
+            $this->accountValidator->isApiKey($apiKey)
+        );
+    }
+
+    /**
+     * @dataProvider invalidDataCharacterApiKeyDataProvider
+     *
+     * @param mixed $apiKey
+     * @param mixed $errorMsg
+     */
+    public function testWithForbiddenCharaterInApiKeyDataProvider($apiKey, $errorMsg)
     {
         $this->assertSame(
             [

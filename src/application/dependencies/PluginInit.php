@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -25,6 +25,7 @@ namespace PayPlug\src\application\dependencies;
 
 use PayPlug\classes\MyLogPHP;
 use PayPlug\src\actions\ConfigurationAction;
+use PayPlug\src\actions\OnboardingAction;
 use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
 use PayPlug\src\application\adapter\CarrierAdapter;
@@ -75,6 +76,7 @@ class PluginInit extends BaseClass
 
     // Actions
     private $configurationAction;
+    private $onboardingAction;
 
     // EntitiesApiRest
     private $cacheEntity;
@@ -155,6 +157,7 @@ class PluginInit extends BaseClass
             ->setCart($this->cart)
             ->setConfiguration($this->configuration)
             ->setConfigurationAction($this->configurationAction)
+            ->setOnboardingAction($this->onboardingAction)
             ->setConfigurationClass($this->configuration_class)
             ->setConstant($this->constant)
             ->setContext($this->context)
@@ -193,6 +196,7 @@ class PluginInit extends BaseClass
     private function setActions()
     {
         $this->configurationAction = new ConfigurationAction($this->dependencies);
+        $this->onboardingAction = new OnboardingAction($this->dependencies);
     }
 
     private function setEntities()

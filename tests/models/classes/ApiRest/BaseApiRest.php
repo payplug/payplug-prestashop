@@ -41,9 +41,13 @@ class BaseApiRest extends TestCase
         $this->constant
             ->shouldReceive('get')
             ->andReturnUsing(function ($key) {
-                return $key;
-            })
-        ;
+                switch ($key) {
+                    case '_PS_VERSION_':
+                        return '1.7.0.0';
+                    default:
+                        return $key;
+                }
+            });
 
         $this->configuration_action = \Mockery::mock('ConfigurationAction');
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
@@ -53,14 +57,12 @@ class BaseApiRest extends TestCase
             ->shouldReceive('l')
             ->andReturnUsing(function ($string, $name) {
                 return $string;
-            })
-        ;
+            });
         $this->dependencies
             ->shouldReceive('getConfigurationKey')
             ->andReturnUsing(function ($key) {
                 return $key;
-            })
-        ;
+            });
 
         $this->configuration_class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();

@@ -23,6 +23,7 @@ php cs fixer:
       || $CI_COMMIT_REF_NAME == "qa"
       || $CI_COMMIT_REF_NAME == "master"
       || $CI_COMMIT_REF_NAME == "support"
+      || $CI_COMMIT_REF_NAME == "develop"
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -40,6 +41,7 @@ check php version:
       || $CI_COMMIT_REF_NAME == "qa"
       || $CI_COMMIT_REF_NAME == "master"
       || $CI_COMMIT_REF_NAME == "support"
+      || $CI_COMMIT_REF_NAME == "develop"
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - >
@@ -60,6 +62,7 @@ coverage test:
       || $CI_COMMIT_REF_NAME == "qa"
       || $CI_COMMIT_REF_NAME == "master"
       || $CI_COMMIT_REF_NAME == "support"
+      || $CI_COMMIT_REF_NAME == "develop"
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
@@ -78,6 +81,7 @@ check module translations:
       || $CI_COMMIT_REF_NAME == "qa"
       || $CI_COMMIT_REF_NAME == "master"
       || $CI_COMMIT_REF_NAME == "support"
+      || $CI_COMMIT_REF_NAME == "develop"
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -104,6 +108,7 @@ assets:
       || $CI_COMMIT_REF_NAME == "qa"
       || $CI_COMMIT_REF_NAME == "master"
       || $CI_COMMIT_REF_NAME == "support"
+      || $CI_COMMIT_REF_NAME == "develop"
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -136,6 +141,7 @@ build zip release:
       || $CI_COMMIT_REF_NAME == "qa"
       || $CI_COMMIT_REF_NAME == "master"
       || $CI_COMMIT_REF_NAME == "support"
+      || $CI_COMMIT_REF_NAME == "develop"
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -145,6 +151,7 @@ build zip release:
     - ./dev/ci/secure_directories.sh
     - git status
     - ./dev/ci/assets_revision.sh -b payplug
+    - ./dev/ci/update_year.sh
     - php ./dev/ci/import-translations.php
     - ./dev/ci/copy_translations.sh
   script:
@@ -163,6 +170,7 @@ asset-pspaylater:
       || $CI_COMMIT_REF_NAME == "qa"
       || $CI_COMMIT_REF_NAME == "master"
       || $CI_COMMIT_REF_NAME == "support"
+      || $CI_COMMIT_REF_NAME == "develop"
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
@@ -195,6 +203,7 @@ build-pspaylater:
       || $CI_COMMIT_REF_NAME == "qa"
       || $CI_COMMIT_REF_NAME == "master"
       || $CI_COMMIT_REF_NAME == "support"
+      || $CI_COMMIT_REF_NAME == "develop"
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
@@ -207,6 +216,7 @@ build-pspaylater:
     - git status
     - rm -rf views/build && mv views/build-bnpl views/build
     - ./dev/ci/assets_revision.sh -b pspaylater
+    - ./dev/ci/update_year.sh
     - mkdir pspaylater
     - php ./dev/ci/import-translations.php
     - ./dev/ci/copy_translations.sh

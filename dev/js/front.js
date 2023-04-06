@@ -1,5 +1,5 @@
 /**
- * 2013 - 2023 PayPlug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -15,7 +15,7 @@
  * versions in the future.
  *
  *  @author    PayPlug SAS
- *  @copyright 2013 - 2023 PayPlug SAS
+ *  @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PayPlug SAS
  */
@@ -77,10 +77,10 @@ var $document, $window, __moduleName__Module = {
                         if ($required.length) {
                             $oneyType = data.errors[0].replace('oney_required_field_', '');
                             var paymentOption = $('input[value=' + $oneyType + ']')
-                                        .parent('form')
-                                        .find('button[type=submit]')
-                                        .attr('id')
-                                        .replace('pay-with-', '');
+                                .parent('form')
+                                .find('button[type=submit]')
+                                .attr('id')
+                                .replace('pay-with-', '');
 
 
                             $('#' + paymentOption).trigger('click');
@@ -102,11 +102,11 @@ var $document, $window, __moduleName__Module = {
             integratedPayment: null,
             token: null,
             notValid: false,
-            fieldsValid: {
-                cardHolder: false,
-                pan: false,
-                cvv: false,
-                exp: false,
+            fieldsInvalid: {
+                cardHolder: true,
+                pan: true,
+                cvv: true,
+                exp: true,
             },
             fieldsEmpty: {
                 cardHolder: true,
@@ -138,6 +138,258 @@ var $document, $window, __moduleName__Module = {
 
                 $document.on('click', '#' + payment_option_id, integrated.form.set);
             },
+            clear: function (clear) {
+                // confirm creation integrated paiement or show fail popup
+                var integrated = __moduleName__Module.integrated;
+                integrated.props.submited = false;
+
+                if (clear) {
+                    form.cardHolder.clear();
+                    form.pan.clear();
+                    form.cvv.clear();
+                    form.exp.clear();
+                    $('.' + integrated.props.identifier + '_container.-saveCard')
+                        .removeClass('-checked')
+                        .find('input')
+                        .prop('checked', false);
+                }
+
+                // unchecked tos
+                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+            },
+            confirm: function (token) {
+                __moduleName__Module.tools.loadSpinner();
+                // confirm creation integrated paiement or show fail popup
+                var integrated = __moduleName__Module.integrated;
+                if (integrated.props.query != null) {
+                    integrated.props.query.abort();
+                    integrated.props.query = null;
+                }
+
+                integrated.props.query = $.ajax({
+                    type: 'POST',
+                    url: window['__moduleName___ajax_url'],
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        confirmPayment: 1,
+                        cart_id: integrated.props.cart_id,
+                        pay_id: token,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR, textStatus, errorThrown);
+                        integrated.form.clear();
+                    },
+                    success: function (data) {
+                        __moduleName__Module.tools.removeSpinner();
+                        if (data.result) {
+                            window.location.href = data.return_url;
+                        } else {
+                            $('.' + integrated.props.identifier + '_error.-payment')
+                                .text(integratedPaymentError)
+                                .addClass('-show');
+                            integrated.form.clear(true);
+                            return false;
+                        }
+                    },
+                });
+            },
+            field: {
+                init: function () {
+                    var integrated = __moduleName__Module.integrated,
+                        field = integrated.form.field,
+                        form = integrated.props.form;
+
+                    form.cardHolder.onChange(function (event) {
+                        if (!event.valid) {
+                            field.error('cardHolder');
+                            integrated.props.fieldsEmpty['cardHolder'] = 'FIELD_EMPTY' == event.error.name;
+                            integrated.props.fieldsInvalid['cardHolder'] = 'INVALID_CARDHOLDER' == event.error.name;
+                        } else {
+                            field.valid('cardHolder');
+                            integrated.props.fieldsEmpty['cardHolder'] = false;
+                            integrated.props.fieldsInvalid['cardHolder'] = false;
+                        }
+                    });
+                    form.pan.onChange(function (event) {
+                        if (!event.valid) {
+                            field.error('pan');
+                            integrated.props.fieldsEmpty['pan'] = 'FIELD_EMPTY' == event.error.name;
+                            integrated.props.fieldsInvalid['pan'] = 'INVALID_CARD_NUMBER' == event.error.name;
+                        } else {
+                            field.valid('pan');
+                            integrated.props.fieldsEmpty['pan'] = false;
+                            integrated.props.fieldsInvalid['pan'] = false;
+                        }
+                    });
+                    form.cvv.onChange(function (event) {
+                        if (!event.valid) {
+                            field.error('cvv');
+                            integrated.props.fieldsEmpty['cvv'] = 'FIELD_EMPTY' == event.error.name;
+                            integrated.props.fieldsInvalid['cvv'] = 'INVALID_CVV' == event.error.name;
+                        } else {
+                            field.valid('cvv');
+                            integrated.props.fieldsEmpty['cvv'] = false;
+                            integrated.props.fieldsInvalid['cvv'] = false;
+                        }
+                    });
+                    form.exp.onChange(function (event) {
+                        if (!event.valid) {
+                            field.error('exp');
+                            integrated.props.fieldsEmpty['exp'] = 'FIELD_EMPTY' == event.error.name;
+                            integrated.props.fieldsInvalid['exp'] = 'INVALID_EXPIRATION_DATE' == event.error.name;
+                        } else {
+                            field.valid('exp');
+                            integrated.props.fieldsEmpty['exp'] = false;
+                            integrated.props.fieldsInvalid['exp'] = false;
+                        }
+                    });
+
+                    form.cardHolder.onFocus(function (event) {
+                        field.focus('cardHolder');
+                    });
+                    form.pan.onFocus(function () {
+                        field.focus('pan');
+                    });
+                    form.cvv.onFocus(function () {
+                        field.focus('cvv');
+                    });
+                    form.exp.onFocus(function () {
+                        field.focus('exp');
+                    });
+
+                    form.cardHolder.onBlur(function (event) {
+                        field.blur('cardHolder');
+                    });
+                    form.pan.onBlur(function () {
+                        field.blur('pan');
+                    });
+                    form.cvv.onBlur(function () {
+                        field.blur('cvv');
+                    });
+                    form.exp.onBlur(function () {
+                        field.blur('exp');
+                    });
+                },
+                error: function (type) {
+                    if (!type || typeof type == undefined) {
+                        return false;
+                    }
+                    var integrated = __moduleName__Module.integrated;
+                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').removeClass('-hide');
+                    $('.' + integrated.props.identifier + '_container.-' + type).addClass('-invalid');
+                },
+                blur: function (type) {
+                    if (!type || typeof type == undefined) {
+                        return false;
+                    }
+                    var integrated = __moduleName__Module.integrated;
+                    $('.' + integrated.props.identifier + '_container.-' + type).removeClass('-focus');
+                    if ($('.' + integrated.props.identifier + '_container.-' + type).is('.integrated_payment_error')) {
+                        integrated.form.field.error(type);
+                    }
+                },
+                focus: function (type) {
+                    if (!type || typeof type == undefined) {
+                        return false;
+                    }
+                    var integrated = __moduleName__Module.integrated;
+                    $('.' + integrated.props.identifier + '_container.-' + type).addClass('-focus').removeClass('-invalid');
+                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.emptyField').addClass('-hide');
+                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
+                    $('.' + integrated.props.identifier + '_error.-fields').removeClass('-show');
+                    $('.' + integrated.props.identifier + '_error.-api').removeClass('-show');
+                },
+                valid: function (type) {
+                    if (!type || typeof type == undefined) {
+                        return false;
+                    }
+                    var integrated = __moduleName__Module.integrated;
+                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
+                    $('.' + integrated.props.identifier + '_container.-' + type + ' span.invalidField').removeClass('-invalid');
+                },
+            },
+            getPaymentId: function (event) {
+                //create integrated payment id
+                var integrated = __moduleName__Module.integrated;
+                if (typeof event != 'undefined') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                if (integrated.props.submited) {
+                    return;
+                }
+                integrated.props.submited = true;
+
+                integratedPayment = integrated.props.integratedPayment;
+
+                token = integratedPayment.token;
+                if (integrated.props.query != null) {
+                    integrated.props.query.abort();
+                    integrated.props.query = null;
+                }
+
+                $('.' + integrated.props.identifier + '_error.-payment').removeClass('-show');
+                $('.' + integrated.props.identifier + '_error.-api').removeClass('-show');
+
+                integrated.props.query = $.ajax({
+                    type: 'POST',
+                    url: window['__moduleName___ajax_url'],
+                    dataType: 'json',
+                    data: {
+                        _ajax: 1,
+                        createIP: 1,
+                        token: token,
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        integrated.form.clear();
+                        console.log(jqXHR, textStatus, errorThrown);
+                    },
+                    success: function (result) {
+                        if (result && result.payment_id) {
+                            integrated.props.paymentId = result.payment_id;
+                            integrated.props.cart_id = result.cart_id;
+                            integrated.form.submit();
+                        } else {
+                            __moduleName__Module.popup.set(integratedPaymentError);
+                            integrated.form.clear();
+                            return false;
+                        }
+                    },
+                });
+            },
+            reset: function () {
+                // confirm creation integrated paiement or show fail popup
+                var integrated = __moduleName__Module.integrated,
+                    $form = $('.' + integrated.props.identifier),
+                    $cardHolder = $form.find('#cardholder'),
+                    $pan = $form.find('#pan'),
+                    $cvv = $form.find('#cvv'),
+                    $exp = $form.find('#exp');
+
+                integrated.form.clear();
+
+                $cardHolder.remove();
+                $pan.remove();
+                $cvv.remove();
+                $exp.remove();
+                $form.removeClass('-loaded');
+
+                // unchecked tos
+                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+
+                try {
+                    integrated.form.set();
+                } catch (e) {
+                    // @todo find a solution if an error block IP form display
+                    if (typeof e.name != 'undefined' && typeof e.message != 'undefined') {
+                        addLogger(e.name + " : " + e.message);
+                    } else {
+                        addLogger("UNKNOWN_ERROR: unable to generate IP form");
+                    }
+                }
+            },
             set: function () {
                 var integrated = __moduleName__Module.integrated;
 
@@ -159,7 +411,7 @@ var $document, $window, __moduleName__Module = {
                 }
 
                 try {
-                    var integratedPayment = new Payplug.IntegratedPayment(payplug_publishable_key);
+                    var integratedPayment = new Payplug.IntegratedPayment(is_sandbox_mode);
                 } catch (e) {
                     if (typeof e.name != 'undefined' && typeof e.message != 'undefined') {
                         addLogger(e.name + " : " + e.message);
@@ -262,28 +514,10 @@ var $document, $window, __moduleName__Module = {
                 // defined all event on form field
                 integrated.form.field.init();
 
-                $document.on('submit', 'form', function (event) {
-                    if (($(event.target).is('.' + integrated.props.identifier) || $(event.target).is('#payment-form'))
-                        && $('#' + payment_option_id).is(':checked')) {
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        if (integrated.props.submited) {
-                            return false;
-                        }
-
-                        integrated.props.submited = true;
-                        integrated.form.getIntPaymentId();
-
-                        return false;
-                    }
-                });
-
                 // Once an attempt has been made
                 integratedPayment.onCompleted(function (event) {
-
                     if (typeof event.error != 'undefined' && event.error != null) {
-                        integrated.form.clearIntPayment(true);
+                        integrated.form.clear(true);
 
                         if (!event.error.hasOwnProperty('name')) {
                             event.error.name = 'API_ERROR';
@@ -291,231 +525,51 @@ var $document, $window, __moduleName__Module = {
                         if (!event.error.hasOwnProperty('message')) {
                             event.error.message = 'A generic error occured';
                         }
+
                         addLogger(event.error.name + " : " + event.error.message);
-                        // Error adapter on Invalid Key (try to replace the one in DB)
-                        if (event.error.name === 'AUTHENTICATION_INVALID') {
-                            // Ajax request to execute setPublishableKeys
-                            integrated.form.updatePublishableKey();
-                        } else {
-                            $('.' + integrated.props.identifier + '_error.-api')
-                                .addClass('-show');
-                        }
+                        $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                        integrated.form.reset();
                     } else {
-                        integrated.form.confirmIntPayment(event.token);
+                        integrated.form.confirm(event.token);
                     }
                 });
-            },
-            updatePublishableKey: function () {
-                $.ajax({
-                    type: 'POST',
-                    url: window['__moduleName___ajax_url'],
-                    dataType: 'json',
-                    data: {
-                        _ajax: 1,
-                        updatePublishableKey: true
-                    },
-                    success: function (data) {
-                        if (data.result) {
-                            payplug_publishable_key = data.key;
-                            __moduleName__Module.integrated.form.resetIntPayment();
-                        } else {
-                            if (typeof data.redirectUrl != 'defined' && data.redirectUrl) {
-                                window.location.href = data.redirectUrl;
-                            } else {
-                                __moduleName__Module.popup.set(integratedPaymentError);
-                                __moduleName__Module.integrated.form.clearIntPayment();
-                                return false;
-                            }
-                        }
+
+                // Listen to the validateForm Event
+                integratedPayment.onValidateForm(function ({isFormValid}) {
+                    if (isFormValid) {
+                        integrated.form.getPaymentId();
+                    } else {
+                        integrated.props.submited = false;
+                        integrated.form.showError();
                     }
                 });
+
+                $document.on('submit', 'form', integrated.form.validate);
             },
-            field: {
-                init: function () {
-                    var integrated = __moduleName__Module.integrated,
-                        field = integrated.form.field,
-                        form = integrated.props.form;
-
-                    form.cardHolder.onChange(function (event) {
-                        if (!event.valid) {
-                            field.error('cardHolder');
-                        } else {
-                            field.valid('cardHolder');
-                        }
-                        integrated.props.fieldsEmpty['cardHolder'] = false;
-                    });
-                    form.pan.onChange(function (event) {
-                        if (!event.valid) {
-                            field.error('pan');
-                        } else {
-                            field.valid('pan');
-                        }
-                        integrated.props.fieldsEmpty['pan'] = false;
-                    });
-                    form.cvv.onChange(function (event) {
-                        if (!event.valid) {
-                            field.error('cvv');
-                        } else {
-                            field.valid('cvv');
-                        }
-                        integrated.props.fieldsEmpty['cvv'] = false;
-                    });
-                    form.exp.onChange(function (event) {
-                        if (!event.valid) {
-                            field.error('exp');
-                        } else {
-                            field.valid('exp');
-                        }
-                        integrated.props.fieldsEmpty['exp'] = false;
-                    });
-
-                    form.cardHolder.onFocus(function (event) {
-                        field.focus('cardHolder');
-                    });
-                    form.pan.onFocus(function () {
-                        field.focus('pan');
-                    });
-                    form.cvv.onFocus(function () {
-                        field.focus('cvv');
-                    });
-                    form.exp.onFocus(function () {
-                        field.focus('exp');
-                    });
-
-                    form.cardHolder.onBlur(function (event) {
-                        field.blur('cardHolder');
-                    });
-                    form.pan.onBlur(function () {
-                        field.blur('pan');
-                    });
-                    form.cvv.onBlur(function () {
-                        field.blur('cvv');
-                    });
-                    form.exp.onBlur(function () {
-                        field.blur('exp');
-                    });
-                },
-                error: function (type) {
-                    if (!type || typeof type == undefined) {
-                        return false;
-                    }
-                    var integrated = __moduleName__Module.integrated;
-                    integrated.props.fieldsValid[type] = false;
-                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').removeClass('-hide');
-                    $('.' + integrated.props.identifier + '_container.-' + type).addClass('-invalid');
-                },
-                blur: function (type) {
-                    if (!type || typeof type == undefined) {
-                        return false;
-                    }
-                    var integrated = __moduleName__Module.integrated;
-                    $('.' + integrated.props.identifier + '_container.-' + type).removeClass('-focus');
-                    if ($('.' + integrated.props.identifier + '_container.-' + type).is('.integrated_payment_error')) {
-                        integrated.form.field.error(type);
-                    }
-                },
-                focus: function (type) {
-                    if (!type || typeof type == undefined) {
-                        return false;
-                    }
-                    var integrated = __moduleName__Module.integrated;
-                    $('.' + integrated.props.identifier + '_container.-' + type).addClass('-focus').removeClass('-invalid');
-                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.emptyField').addClass('-hide');
-                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
-                    $('.' + integrated.props.identifier + '_error.-fields').removeClass('-show');
-                    $('.' + integrated.props.identifier + '_error.-api').removeClass('-show');
-                },
-                valid: function (type) {
-                    if (!type || typeof type == undefined) {
-                        return false;
-                    }
-                    var integrated = __moduleName__Module.integrated;
-                    integrated.props.fieldsValid[type] = true;
-                    $('.' + integrated.props.identifier + '_error.-' + type + ' span.invalidField').addClass('-hide');
-                    $('.' + integrated.props.identifier + '_container.-' + type + ' span.invalidField').removeClass('-invalid');
-                },
-            },
-            validateForm: function () {
+            showError: function () {
                 // valide integrated payment form
-                var integrated = __moduleName__Module.integrated,
-                    has_error = false;
+                var integrated = __moduleName__Module.integrated;
 
+                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+
+                // Check if field is empty
                 for (var key in integrated.props.fieldsEmpty) {
                     if (integrated.props.fieldsEmpty[key]) {
-                        has_error = true;
+                        $('.' + integrated.props.identifier + '_error.-' + key + ' span.invalidField').addClass('-hide');
                         $('.' + integrated.props.identifier + '_error.-' + key + ' span.emptyField').removeClass('-hide');
                         $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
                     }
                 }
 
-                for (var key in integrated.props.fieldsValid) {
-                    if (!integrated.props.fieldsValid[key] && !integrated.props.fieldsEmpty[key]) {
-                        has_error = true;
-                        $('.' + integrated.props.identifier + '_error.-' + key + ' span.invalidField').removeClass('-hide');
-                        $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
+                // Check if field is invalid
+                for (var key in integrated.props.fieldsInvalid) {
+                    if (integrated.props.fieldsInvalid[key]) {
                         $('.' + integrated.props.identifier + '_error.-fields').addClass('-show');
-                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
                     }
                 }
-
-                if (has_error === true) {
-                    return false;
-                }
-
-                return true;
             },
-            getIntPaymentId: function (event) {
-                //create integrated payment id
-                var integrated = __moduleName__Module.integrated;
-                if (typeof event != 'undefined') {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-
-                integratedPayment = integrated.props.integratedPayment;
-
-                token = integratedPayment.token;
-                if (integrated.props.query != null) {
-                    integrated.props.query.abort();
-                    integrated.props.query = null;
-                }
-
-                $('.' + integrated.props.identifier + '_error.-payment').removeClass('-show');
-                $('.' + integrated.props.identifier + '_error.-api').removeClass('-show');
-
-                if (!integrated.form.validateForm()) {
-                    integrated.props.submited = false;
-                    return;
-                }
-
-                integrated.props.query = $.ajax({
-                    type: 'POST',
-                    url: window['__moduleName___ajax_url'],
-                    dataType: 'json',
-                    data: {
-                        _ajax: 1,
-                        createIP: 1,
-                        token: token,
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        integrated.form.clearIntPayment();
-                        console.log(jqXHR, textStatus, errorThrown);
-                    },
-                    success: function (result) {
-                        if (result && result.payment_id) {
-                            integrated.props.paymentId = result.payment_id;
-                            integrated.props.cart_id = result.cart_id;
-                            integrated.form.submitIntPayment();
-                        } else {
-                            __moduleName__Module.popup.set(integratedPaymentError);
-                            integrated.form.clearIntPayment();
-                            return false;
-                        }
-                    },
-                });
-            },
-            submitIntPayment: function () {
+            submit: function () {
                 // create an integrated payment
 
                 var integrated = __moduleName__Module.integrated,
@@ -540,91 +594,21 @@ var $document, $window, __moduleName__Module = {
 
                 integratedPayment.pay(paymentId, integratedPaymentScheme, {save_card: integrated.props.save_card});
             },
-            confirmIntPayment: function (token) {
-                __moduleName__Module.tools.loadSpinner();
-                // confirm creation integrated paiement or show fail popup
-                var integrated = __moduleName__Module.integrated;
-                if (integrated.props.query != null) {
-                    integrated.props.query.abort();
-                    integrated.props.query = null;
+            validate: function (event) {
+                var isIntegrated = false;
+
+                if (typeof event != 'undefined') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    isIntegrated = $(event.target).find('input[name="method"][value="integrated"]');
+                } else {
+                    isIntegrated = true;
                 }
 
-                integrated.props.query = $.ajax({
-                    type: 'POST',
-                    url: window['__moduleName___ajax_url'],
-                    dataType: 'json',
-                    data: {
-                        _ajax: 1,
-                        confirmPayment: 1,
-                        cart_id: integrated.props.cart_id,
-                        pay_id: token,
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(jqXHR, textStatus, errorThrown);
-                        integrated.form.clearIntPayment();
-                    },
-                    success: function (data) {
-                        __moduleName__Module.tools.removeSpinner();
-                        if (data.result) {
-                            window.location.href = data.return_url;
-                        } else {
-                            $('.' + integrated.props.identifier + '_error.-payment')
-                                .text(integratedPaymentError)
-                                .addClass('-show');
-                            integrated.form.clearIntPayment(true);
-                            return false;
-                        }
-                    },
-                });
-            },
-            clearIntPayment: function (clear) {
-                // confirm creation integrated paiement or show fail popup
-                var integrated = __moduleName__Module.integrated;
-                integrated.props.submited = false;
-
-                if (clear) {
-                    form.cardHolder.clear();
-                    form.pan.clear();
-                    form.cvv.clear();
-                    form.exp.clear();
-                    $('.' + integrated.props.identifier + '_container.-saveCard')
-                        .removeClass('-checked')
-                        .find('input')
-                        .prop('checked', false);
-                }
-
-                // unchecked tos
-                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
-            },
-            resetIntPayment: function () {
-                // confirm creation integrated paiement or show fail popup
-                var integrated = __moduleName__Module.integrated,
-                    $form = $('.' + integrated.props.identifier),
-                    $cardHolder = $form.find('#cardholder'),
-                    $pan = $form.find('#pan'),
-                    $cvv = $form.find('#cvv'),
-                    $exp = $form.find('#exp');
-
-                integrated.form.clearIntPayment();
-
-                $cardHolder.remove();
-                $pan.remove();
-                $cvv.remove();
-                $exp.remove();
-                $form.removeClass('-loaded');
-
-                // unchecked tos
-                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
-
-                try {
-                    integrated.form.set();
-                } catch (e) {
-                    // @todo find a solution if an error block IP form display
-                    if (typeof e.name != 'undefined' && typeof e.message != 'undefined') {
-                        addLogger(e.name + " : " + e.message);
-                    } else {
-                        addLogger("UNKNOWN_ERROR: unable to generate IP form");
-                    }
+                if (isIntegrated) {
+                    var integrated = __moduleName__Module.integrated;
+                    integratedPayment = integrated.props.integratedPayment;
+                    integratedPayment.validateForm();
                 }
             }
         },

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2023 Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
  *
  * NOTICE OF LICENSE
  *
@@ -16,7 +16,7 @@
  * versions in the future.
  *
  * @author    Payplug SAS
- * @copyright 2013 - 2023 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -68,13 +68,14 @@ class ApiRest
                 $json = $configurationAction->logoutAction();
 
                 break;
+            case 'american_express_permissions':
+            case 'applepay_permissions':
+            case 'bancontact_permissions':
             case 'deferred_permissions':
             case 'installment_permissions':
+            case 'integrated_permissions':
             case 'one_click_permissions':
-            case 'bancontact_permissions':
-            case 'american_express_permissions':
             case 'oney_permissions':
-            case 'applepay_permissions':
                 $payment_method = str_replace('_permissions', '', $action);
                 $json = $configurationAction->checkPermissionAction($payment_method);
 
@@ -742,20 +743,20 @@ class ApiRest
                 ],
                 'options' => [
                     [
-                        'name' => 'payplug_oney_type',
+                        'name' => 'payplug_oney',
                         'className' => '_paylaterLabel',
                         'label' => $translation['options']['with_fees']['label'],
                         'subText' => $translation['options']['with_fees']['subtext'],
-                        'value' => 'with_fees',
-                        'checked' => $current_configuration['oney_fees'],
+                        'value' => 1,
+                        'checked' => $configuration->getValue('oney_fees'),
                     ],
                     [
-                        'name' => 'payplug_oney_type',
+                        'name' => 'payplug_oney',
                         'className' => '_paylaterLabel',
                         'label' => $translation['options']['without_fees']['label'],
                         'subText' => $translation['options']['without_fees']['subtext'],
-                        'value' => 'without_fees',
-                        'checked' => !$current_configuration['oney_fees'],
+                        'value' => 0,
+                        'checked' => !$configuration->getValue('oney_fees'),
                     ],
                 ],
                 'advanced_options' => $advanced_options,
@@ -829,11 +830,17 @@ class ApiRest
         }
 
         $payment_options = [];
+        $version = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('_PS_VERSION_');
+
         if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
             $advanced_settings = [];
 
             $embedded_mode = [];
-            if ($this->dependencies->configClass->isValidFeature('feature_integrated')) {
+            if (version_compare($version, '1.7', '>=')
+                && $this->dependencies->configClass->isValidFeature('feature_integrated')) {
                 $embedded_mode[] = [
                     'name' => 'payplug_embedded',
                     'label' => $translation['embedded']['options']['integrated'],
@@ -1031,6 +1038,7 @@ class ApiRest
                             'live' => [
                                 'description_popup' => $popup_description,
                                 'description_redirect' => $redirect_description,
+                                'description_integrated' => $translation['embedded']['descriptions']['integrated']['text'],
                                 'link_know_more' => [
                                     'text' => $translation['embedded']['link'],
                                     'url' => $external_url['embedded'],
@@ -1040,6 +1048,7 @@ class ApiRest
                             'sandbox' => [
                                 'description_popup' => $popup_description,
                                 'description_redirect' => $redirect_description,
+                                'description_integrated' => $translation['embedded']['descriptions']['integrated']['text'],
                                 'link_know_more' => [
                                     'text' => $translation['embedded']['link'],
                                     'url' => $external_url['embedded'],
@@ -1109,7 +1118,8 @@ class ApiRest
                 ],
             ];
         }
-        if ($this->dependencies->configClass->isValidFeature('feature_applepay')) {
+        if (version_compare($version, '1.7', '>=')
+            && $this->dependencies->configClass->isValidFeature('feature_applepay')) {
             $payment_options[] = [
                 'type' => 'payment_method',
                 'name' => 'applepay',
