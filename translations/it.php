@@ -314,13 +314,13 @@ $_MODULE['<{payplug}prestashop>paymentmethodstranslation_54ab41d726c74b17e7846d0
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_5ac83c1ae14bc025a729c88e97104b9b'] = 'In caso di mancato pagamento di una delle prossime rate, l\'importo sarà perso.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_5c1af6863c182c9527abfbacd965e425'] = 'Attiva i pagamenti rateali non garantiti';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_60bdd39bfa542f288dd10896123eeffc'] = 'Autorizza il pagamento con Bancontact solo per i clienti belgi';
-$_MODULE['<{payplug}prestashop>paymentmethodstranslation_6698d8bcb543246ca140bfb6308eb671'] = 'I tuoi clienti vedranno comparire il modulo di pagamento direttamente nella pagina di checkout del tuo negozio.';
+$_MODULE['<{payplug}prestashop>paymentmethodstranslation_6698d8bcb543246ca140bfb6308eb671'] = 'I tuoi clienti vedranno comparire il modulo di pagamento direttamente nella pagina di checkout del tuo negozio. ';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_66b4d927572f8a7a2347fc69c6385e21'] = 'a partire da';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_69078e0028891d87307e4f88bd4f053c'] = 'Permetti ai tuoi clienti di pagare con la loro carta American Express. ';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_6e8fa0eded1f41e892cc3773cd6d0426'] = '2 rate';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_704fa7ba6fdca59d2236d6c5773fbc2c'] = ' Per saperne di più.';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_70b787ccbe9c4acf24f7643500b9ffe3'] = 'Presentazione della pagina di pagamento';
-$_MODULE['<{payplug}prestashop>paymentmethodstranslation_70e74fe806dc3b7c3ce144004fbf1e97'] = 'I tuoi clienti vedranno comparire $popup_description_link nella pagina di checkout del tuo negozio.';
+$_MODULE['<{payplug}prestashop>paymentmethodstranslation_70e74fe806dc3b7c3ce144004fbf1e97'] = 'I tuoi clienti vedranno comparire $popup_description_link nella pagina di checkout del tuo negozio. ';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_73a58a6ef6b71328da3582e24a359b5f'] = 'Pagamento Amex';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_75b1d2f33bed74cc2bea48f596fc8b6c'] = 'Hai 7 giorni al massimo per catturare il pagamento (a partire dalla data di autorizzazione).';
 $_MODULE['<{payplug}prestashop>paymentmethodstranslation_765c005bddb5567173d85d3e8f59de25'] = '4 rate';
