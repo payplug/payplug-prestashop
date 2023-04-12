@@ -20,6 +20,7 @@
     "archive": {
         "exclude": [
             "!vendor/*",
+            "!upgrade/*",
             "!features.json",
             ".*",
             "!.htaccess",

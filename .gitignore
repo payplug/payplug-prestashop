@@ -10,6 +10,7 @@ composer.lock
 features.json
 package-lock.json
 package.json
+upgrade/
 vendor/
 views/css/*.css
 views/css/*.map

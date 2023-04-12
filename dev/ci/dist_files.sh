@@ -33,11 +33,18 @@ for file in $distFile
   done
 
 echo -n "Copy include.less "
-  if [ -d "$modules" ]; then
-    cp -v $path/include.less $PWD/${modules}/dev/css/less/include.less
-  else
-    cp -v $path/include.less $PWD/dev/css/less/include.less
-  fi
+if [ -d "$modules" ]; then
+  cp -v $path/include.less $PWD/${modules}/dev/css/less/include.less
+else
+  cp -v $path/include.less $PWD/dev/css/less/include.less
+fi
+
+echo -n "Copy upgrade files"
+if [ -d "$modules" ]; then
+  cp -vr $path/upgrade $PWD/${modules}/upgrade
+else
+  cp -vr $path/upgrade $PWD/upgrade
+fi
 
 
 echo "End script dist-files"

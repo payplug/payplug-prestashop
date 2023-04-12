@@ -24,6 +24,7 @@
         "exclude": [
             "!node_modules/prestashop_accounts_vue_components",
             "!vendor/*",
+            "!upgrade/*",
             "!features.json",
             ".*",
             "!.htaccess",
