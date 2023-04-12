@@ -308,7 +308,8 @@ class ConfigClass
 
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
         //check if we force integrated payment activation/rollback
-        if (isset($permissions['can_use_integrated_payments'])) {
+        if (isset($permissions['can_use_integrated_payments'])
+            && version_compare(_PS_VERSION_, '1.7', '>=')) {
             $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
             if ($permissions['can_use_integrated_payments']) {
                 if (!$onboardingAction->enableIntegratedAction()['success']) {
