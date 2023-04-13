@@ -35,5 +35,5 @@ function upgrade_module_3_15_0()
     $flag = $flag && Configuration::updateValue('PAYPLUG_ONEY_FEES', 1);
 
     // Create new configuration variable for the merchant onboarding
-    return $flag && Configuration::updateValue('ONBOARDING_STATE', '{}');
+    return $flag && Configuration::updateValue('PAYPLUG_ONBOARDING_STATES', '{}');
 }
