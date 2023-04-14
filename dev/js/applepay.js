@@ -20,34 +20,34 @@
  *  International Registered Trademark & Property of PayPlug SAS
  */
 var $document, $window, session = null;
-window[module_name+'ModuleApplePay'] = {
+window[module_name + 'ModuleApplePay'] = {
     init: function () {
-        $('apple-pay-button').click(function() {
+        $('apple-pay-button').click(function () {
             if (session != null) {
                 return;
             }
 
-            var data='';
+            var data = '';
             $.ajax({
                 method: "POST",
                 url: applePayPaymentRequestAjaxURL,
-                async: false
-            })
-                .success(function (datas) {
+                async: false,
+                success: function (datas) {
                     data = JSON.parse(datas);
-                })
-                .error(function () {
+                },
+                error: function () {
                     $('#apple-pay-button').css('pointer-events', 'auto');
                     session = null;
                     payplugModule.popup.set(payplug_transaction_error_message);
-                })
+                }
+            })
 
             // Define ApplePayPaymentRequest
             const request = data.applePayPaymentRequest;
 
             // Create ApplePaySession
             session = new ApplePaySession(3, request);
-            var paymentId= null;
+            var paymentId = null;
 
             $.ajax({
                 method: "POST",
@@ -58,9 +58,8 @@ window[module_name+'ModuleApplePay'] = {
                 },
                 beforeSend: function () {
                     $('#apple-pay-button').css('pointer-events', 'none');
-                }
-            })
-                .success(function (datas) {
+                },
+                success: function (datas) {
                     var datas = JSON.parse(datas);
                     if (!datas.result) {
                         console.log(datas.error_message);
@@ -112,27 +111,27 @@ window[module_name+'ModuleApplePay'] = {
                                 pay_id: paymentId,
                                 cart_id: id_cart,
                                 patchPayment: 1
-                            }
-                        })
-                            .success(function (datas) {
+                            },
+                            success: function (datas) {
                                 var datas = JSON.parse(datas);
 
                                 if (!datas.result) {
-                                    session.completePayment({ "status": ApplePaySession.STATUS_FAILURE });
+                                    session.completePayment({"status": ApplePaySession.STATUS_FAILURE});
                                     $('#apple-pay-button').css('pointer-events', 'auto');
                                     session = null;
                                     payplugModule.popup.set(payplug_transaction_error_message);
                                     return;
                                 }
 
-                                session.completePayment({ "status": ApplePaySession.STATUS_SUCCESS });
+                                session.completePayment({"status": ApplePaySession.STATUS_SUCCESS});
                                 window.location.replace(datas.return_url);
-                            })
-                            .error(function () {
+                            },
+                            error: function () {
                                 $('#apple-pay-button').css('pointer-events', 'auto');
                                 session = null;
                                 payplugModule.popup.set(payplug_transaction_error_message);
-                            })
+                            }
+                        })
                     };
 
                     session.oncancel = event => {
@@ -143,12 +142,13 @@ window[module_name+'ModuleApplePay'] = {
                     };
 
                     session.begin();
-                })
-                .error(function () {
+                },
+                error: function () {
                     $('#apple-pay-button').css('pointer-events', 'auto');
                     session = null;
                     payplugModule.popup.set(payplug_transaction_error_message);
-                })
+                }
+            })
         })
     }
 };
