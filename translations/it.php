@@ -85,6 +85,7 @@ $_MODULE['<{payplug}prestashop>footertranslation_2c2850bb9b02ea56c28521f7ad3f220
 $_MODULE['<{payplug}prestashop>footertranslation_8cf158b7878f57ad7e1c46a2db30bf6b'] = 'Aggiorna le impostazioni';
 $_MODULE['<{payplug}prestashop>footertranslation_c68934e63a815a5c50f07066cfd51778'] = 'Rendez-vous sul nostro ';
 $_MODULE['<{payplug}prestashop>footertranslation_d7887fb148867c83cc48656befe14145'] = 'centro assistenza';
+$_MODULE['<{payplug}prestashop>footertranslation_e91b7f76057e41c9c21099a944f17af4'] = 'https://support.payplug.com/hc/it/requests/new';
 $_MODULE['<{payplug}prestashop>headertranslation_1801a20831265219046a76afc5c45594'] = 'Modulo nascosto';
 $_MODULE['<{payplug}prestashop>headertranslation_3efc2c62296cd245937478788d70a045'] = 'Payplug è la soluzione di pagamento francese dedicata alle PMI. Fai decollare la tua performance grazie ai nostri strumenti orientati alla conversione, 100% chiavi in mano.';
 $_MODULE['<{payplug}prestashop>headertranslation_842a5156a43c41e75473ef0e67d42e3a'] = 'La soluzione di pagamento che aumenta le tue vendite.';

@@ -45,6 +45,7 @@ class Translation
                 'top' => $this->dependencies->l('footer.faq.top', 'footertranslation'),
                 'bottom' => $this->dependencies->l('footer.faq.bottom', 'footertranslation'),
                 'link' => $this->dependencies->l('footer.faq.link', 'footertranslation'),
+                'link_url' => $this->dependencies->l('footer.faq.link_url', 'footertranslation'),
             ],
         ];
     }

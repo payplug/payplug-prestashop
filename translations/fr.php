@@ -85,6 +85,7 @@ $_MODULE['<{payplug}prestashop>footertranslation_2c2850bb9b02ea56c28521f7ad3f220
 $_MODULE['<{payplug}prestashop>footertranslation_8cf158b7878f57ad7e1c46a2db30bf6b'] = 'Mettre à jour les paramètres';
 $_MODULE['<{payplug}prestashop>footertranslation_c68934e63a815a5c50f07066cfd51778'] = 'Rendez-vous sur notre ';
 $_MODULE['<{payplug}prestashop>footertranslation_d7887fb148867c83cc48656befe14145'] = 'centre d\'assistance';
+$_MODULE['<{payplug}prestashop>footertranslation_e91b7f76057e41c9c21099a944f17af4'] = 'https://support.payplug.com/hc/fr/requests/new';
 $_MODULE['<{payplug}prestashop>headertranslation_1801a20831265219046a76afc5c45594'] = 'Module masqué';
 $_MODULE['<{payplug}prestashop>headertranslation_3efc2c62296cd245937478788d70a045'] = 'Payplug, c\'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main.';
 $_MODULE['<{payplug}prestashop>headertranslation_842a5156a43c41e75473ef0e67d42e3a'] = 'La solution de paiement qui augmente vos ventes.';

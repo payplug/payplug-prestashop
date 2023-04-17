@@ -85,6 +85,7 @@ $_MODULE['<{payplug}prestashop>footertranslation_2c2850bb9b02ea56c28521f7ad3f220
 $_MODULE['<{payplug}prestashop>footertranslation_8cf158b7878f57ad7e1c46a2db30bf6b'] = 'Update settings';
 $_MODULE['<{payplug}prestashop>footertranslation_c68934e63a815a5c50f07066cfd51778'] = 'Please visit ';
 $_MODULE['<{payplug}prestashop>footertranslation_d7887fb148867c83cc48656befe14145'] = 'our helpdesk';
+$_MODULE['<{payplug}prestashop>footertranslation_e91b7f76057e41c9c21099a944f17af4'] = 'https://support.payplug.com/hc/en-gb/requests/new';
 $_MODULE['<{payplug}prestashop>headertranslation_1801a20831265219046a76afc5c45594'] = 'Hidden plugin';
 $_MODULE['<{payplug}prestashop>headertranslation_3efc2c62296cd245937478788d70a045'] = 'Payplug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools.';
 $_MODULE['<{payplug}prestashop>headertranslation_842a5156a43c41e75473ef0e67d42e3a'] = 'The payment solution that increases your sales.';

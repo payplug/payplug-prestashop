@@ -247,6 +247,7 @@ class ApiRest
             ],
             'link_help' => [
                 'text' => $translation['faq']['link'],
+                'url' => $translation['faq']['link_url'],
                 'url' => $this->dependencies
                     ->getPlugin()
                     ->getRoutes()
