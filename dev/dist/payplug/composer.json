@@ -19,6 +19,7 @@
     },
     "archive": {
         "exclude": [
+            "!dist/*",
             "!vendor/*",
             "!upgrade/*",
             "!features.json",
