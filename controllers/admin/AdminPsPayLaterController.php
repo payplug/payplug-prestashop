@@ -19,7 +19,7 @@
  * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
- */ require_once dirname(__FILE__) . '/../../vendor/autoload.php';
+ */
 
 use PayLaterModule\classes\DependenciesClass;
 
