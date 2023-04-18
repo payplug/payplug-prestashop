@@ -950,7 +950,7 @@ class HookClass
         $show_lightbox = 'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
             || (
                 'integrated' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
-                && $this->tools->tool('getValue', 'inst')
+                && ($this->tools->tool('getValue', 'inst') || $this->tools->tool('getValue', 'amex'))
             );
         // ... or is the payment with one click
         $show_lightbox = $show_lightbox || 'new_card' != $id_card;
