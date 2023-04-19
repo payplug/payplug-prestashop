@@ -27,10 +27,12 @@ class AdminPsPayLaterController extends ModuleAdminController
 {
     public $module;
 
+    private $api_rest;
     private $constant;
     private $dependencies;
     private $logger;
     private $media;
+    private $tools;
 
     public function __construct()
     {
@@ -39,10 +41,17 @@ class AdminPsPayLaterController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+        $this->tools = $this->dependencies->getPlugin()->getTools();
+
+        // If referer is from development server, trigger api rest renderer
+        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'localhost') != null) {
+            $this->renderApiRest();
+        }
     }
 
     /**
@@ -54,8 +63,12 @@ class AdminPsPayLaterController extends ModuleAdminController
             $this->setPsAccount();
         }
 
+        $this->renderApiRest();
+
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
+            'ps_account_isActivated' => $this->dependencies->configClass->isValidFeature('feature_ps_account'),
+            'pp_version' => $this->dependencies->version,
         ]);
 
         $this->media->addJsDef([
@@ -68,6 +81,17 @@ class AdminPsPayLaterController extends ModuleAdminController
         $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin_lib.tpl');
 
         parent::initContent();
+    }
+
+    /**
+     * @description Render Api Rest Json
+     */
+    public function renderApiRest()
+    {
+        if ($rest_route = $this->tools->tool('getValue', 'rest_route')) {
+            $json = $this->api_rest->dispatch($rest_route);
+            exit(json_encode($json));
+        }
     }
 
     public function setPsAccount()
