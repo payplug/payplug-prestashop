@@ -20,6 +20,17 @@
 *  International Registered Trademark & Property of Payplug SAS
 *}
 
+{if 'pspaylater' == $module_name}
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}_content">
+        {* Banner *}
+        {include file='./../api/molecules/banner.tpl'}
+
+        {if isset($ps_account_isActivated) && $ps_account_isActivated}
+            {include file='./panel/ps_account.tpl'}
+        {/if}
+    </div>
+{/if}
+
 <div id="payplug_admin"></div>
 
 <link href="{$lib_url|escape:'htmlall':'UTF-8'}css/app.css" rel="stylesheet" type="text/css">
