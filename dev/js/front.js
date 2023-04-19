@@ -595,18 +595,16 @@ var $document, $window, __moduleName__Module = {
                 integratedPayment.pay(paymentId, integratedPaymentScheme, {save_card: integrated.props.save_card});
             },
             validate: function (event) {
-                var isIntegrated = false;
+                var integrated = __moduleName__Module.integrated,
+                    payment_option_id = integrated.props.paymentOptionId,
+                    isIntegrated = payment_option_id == $('input[name="payment-option"]:checked').attr('id');
 
-                if (typeof event != 'undefined') {
+                if (typeof event != 'undefined' && isIntegrated) {
                     event.preventDefault();
                     event.stopPropagation();
-                    isIntegrated = $(event.target).find('input[name="method"][value="integrated"]');
-                } else {
-                    isIntegrated = true;
                 }
 
                 if (isIntegrated) {
-                    var integrated = __moduleName__Module.integrated;
                     integratedPayment = integrated.props.integratedPayment;
                     integratedPayment.validateForm();
                 }
