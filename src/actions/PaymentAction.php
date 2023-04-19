@@ -114,7 +114,7 @@ class PaymentAction
 
                 break;
             default:
-                if ('redirect' != $options['embedded']) {
+                if ('popup' == $options['embedded']) {
                     return [
                         'result' => true,
                         'return_url' => 'index.php?controller=order&step=3&embedded=1'
