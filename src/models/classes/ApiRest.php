@@ -1329,6 +1329,8 @@ class ApiRest
             'email' => $current_configuration['email'],
             'logged' => $current_configuration['logged'],
             'mode' => (bool) $current_configuration['sandbox_mode'] ? 1 : 0,
+            'psaccount' => $this->dependencies->configClass->checkPsAccount(),
+
         ];
     }
 
