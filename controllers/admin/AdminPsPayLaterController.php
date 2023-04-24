@@ -71,10 +71,11 @@ class AdminPsPayLaterController extends ModuleAdminController
             'pp_version' => $this->dependencies->version,
         ]);
 
+        $lib_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/';
         $this->media->addJsDef([
             'payplug_admin_config' => [
                 'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
-                'img_path' => $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/',
+                'img_path' => $lib_path,
             ],
         ]);
 
