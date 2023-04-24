@@ -33,6 +33,5 @@
 
 <div id="payplug_admin"></div>
 
-<link href="/modules/payplug/dist/css/app.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="/modules/payplug/dist/js/app-1.2.1.js"></script>
-<script type="text/javascript" src="/modules/payplug/dist/js/chunk-vendors-1.2.1.js"></script>
+<script type="text/javascript" src="/modules/{$module_name}/dist/js/app-1.2.1.js"></script>
+<script type="text/javascript" src="/modules/{$module_name}/dist/js/chunk-vendors-1.2.1.js"></script>

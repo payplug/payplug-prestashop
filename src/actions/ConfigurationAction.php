@@ -355,22 +355,30 @@ class ConfigurationAction
                 'header' => $header,
                 'login' => $api_rest->getLoginSection(),
                 'logged' => $api_rest->getLoggedSection($current_configuration),
-                'payment_methods' => $api_rest->getPaymentMethodsSection($current_configuration),
                 'payment_paylater' => $api_rest->getPaylaterSection($current_configuration),
                 'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
             ];
+
+            // Add payment_methods section if module is payplug
+            if ('payplug' == $this->dependencies->name) {
+                $datas['payment_methods'] = $api_rest->getPaymentMethodsSection($current_configuration);
+            }
         } else {
             $datas = [
                 'settings' => $api_rest->getSettingsSection(),
                 'header' => $header,
                 'login' => $api_rest->getLoginSection(),
                 'subscribe' => $api_rest->getSubscribeSection(),
-                'payment_methods' => $api_rest->getPaymentMethodsSection(),
                 'payment_paylater' => $api_rest->getPaylaterSection(),
                 'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
             ];
+
+            // Add payment_methods section if module is payplug
+            if ('payplug' == $this->dependencies->name) {
+                $datas['payment_methods'] = $api_rest->getPaymentMethodsSection();
+            }
         }
 
         return [
