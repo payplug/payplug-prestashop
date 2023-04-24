@@ -81,14 +81,16 @@ class AdminPayplugController extends ModuleAdminController
             'module_name' => $this->dependencies->name,
         ]);
 
+        $lib_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/';
         $this->media->addJsDef([
             'payplug_admin_config' => [
                 'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
-                'img_path' => $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/',
+                'img_path' => $lib_path,
             ],
         ]);
-
         $template = 'admin_lib.tpl';
+        $this->context->controller->addCSS($lib_path . '/css/app.css');
+
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
             $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/' . $template);
             $this->context->smarty->assign([
