@@ -26,7 +26,7 @@
 {/if}
 <div class="row">
     <div class="col-xs-12">
-        <apple-pay-button buttonstyle="black" type="pay" locale="{$iso_code}" id="apple-pay-button"></apple-pay-button>
+        <apple-pay-button buttonstyle="black" type="pay" locale="{$iso_code|escape:'htmlall':'UTF-8'}}" id="apple-pay-button"></apple-pay-button>
         <p class="{$module_name|escape:'htmlall':'UTF-8'}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
 </div>

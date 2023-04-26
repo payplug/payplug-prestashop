@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export folderList="src vendor log controllers"
+export folderList="src vendor log controllers dist"
 
 if [ -d "./vendor" ]; then
   echo "copying index.php recursively into vendor folders"
