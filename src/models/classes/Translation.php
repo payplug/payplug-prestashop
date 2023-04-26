@@ -45,6 +45,7 @@ class Translation
                 'top' => $this->dependencies->l('footer.faq.top', 'footertranslation'),
                 'bottom' => $this->dependencies->l('footer.faq.bottom', 'footertranslation'),
                 'link' => $this->dependencies->l('footer.faq.link', 'footertranslation'),
+                'link_url' => $this->dependencies->l('footer.faq.link_url', 'footertranslation'),
             ],
         ];
     }
@@ -300,7 +301,9 @@ class Translation
                 'description' => $this->dependencies->l('thresholds.description', 'paylatertranslation'),
                 'inter' => $this->dependencies->l('thresholds.inter', 'paylatertranslation'),
                 'error' => [
-                    'text' => $this->dependencies->l('thresholds.error.text', 'paylatertranslation'),
+                    'default' => $this->dependencies->l('thresholds.error.text', 'paylatertranslation'),
+                    'max' => $this->dependencies->l('thresholds.error.max.text', 'paylatertranslation'),
+                    'min' => $this->dependencies->l('thresholds.error.min.text', 'paylatertranslation'),
                 ],
             ],
         ];

@@ -15,15 +15,16 @@
     "require-dev": {
         "phpunit/phpunit": "5.*",
         "ccinn/composer-husky-plugin": "^0.2.0",
-        "ccinn/husky-php": "^0.1.0",
+        "ccinn/husky-php": "^0.4.0",
         "friendsofphp/php-cs-fixer": "^2.18",
         "squizlabs/php_codesniffer": "^3.5",
-        "mockery/mockery": "1.3.3"
+        "mockery/mockery": "1.5.1"
     },
     "archive": {
         "exclude": [
             "!node_modules/prestashop_accounts_vue_components",
             "!vendor/*",
+            "!upgrade/*",
             "!features.json",
             ".*",
             "!.htaccess",

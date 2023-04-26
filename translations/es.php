@@ -85,6 +85,7 @@ $_MODULE['<{payplug}prestashop>footertranslation_2c2850bb9b02ea56c28521f7ad3f220
 $_MODULE['<{payplug}prestashop>footertranslation_8cf158b7878f57ad7e1c46a2db30bf6b'] = 'Update settings';
 $_MODULE['<{payplug}prestashop>footertranslation_c68934e63a815a5c50f07066cfd51778'] = 'Please visit ';
 $_MODULE['<{payplug}prestashop>footertranslation_d7887fb148867c83cc48656befe14145'] = 'our helpdesk';
+$_MODULE['<{payplug}prestashop>footertranslation_e91b7f76057e41c9c21099a944f17af4'] = 'https://support.payplug.com/hc/en-gb/requests/new';
 $_MODULE['<{payplug}prestashop>headertranslation_1801a20831265219046a76afc5c45594'] = 'Hidden plugin';
 $_MODULE['<{payplug}prestashop>headertranslation_3efc2c62296cd245937478788d70a045'] = 'Payplug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools.';
 $_MODULE['<{payplug}prestashop>headertranslation_842a5156a43c41e75473ef0e67d42e3a'] = 'The payment solution that increases your sales.';
@@ -243,6 +244,7 @@ $_MODULE['<{payplug}prestashop>paylatertranslation_316179aac7a6faa0b80da221cb803
 $_MODULE['<{payplug}prestashop>paylatertranslation_43678681d9dd375783fc30a83e5eb35c'] = 'Find out more.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_54eea3870f268b54efa60fb34bd8cc60'] = 'With fees';
 $_MODULE['<{payplug}prestashop>paylatertranslation_5afb72d15ed393a1878809c19d359edc'] = 'Display the Oney logo on the product page';
+$_MODULE['<{payplug}prestashop>paylatertranslation_5e1d39b03353d89c6e3eda13ed989b50'] = 'Please note that the maximum amount entered is less than the minimum amount entered.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_5e92ff4b120d4704ee236a98e5b3b6b5'] = 'Without fees';
 $_MODULE['<{payplug}prestashop>paylatertranslation_6bce1625877045961fb130db778b78f8'] = '3x 4x Oney payments';
 $_MODULE['<{payplug}prestashop>paylatertranslation_6c8df11847933a5204abdf768d31aba5'] = 'and';
@@ -257,6 +259,7 @@ $_MODULE['<{payplug}prestashop>paylatertranslation_d1f3d21700c2827d15aeb26e91d9e
 $_MODULE['<{payplug}prestashop>paylatertranslation_db9e1b05f134de8ab5d4bfd29b9d8a4a'] = 'Find out more.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_e02babd6337643c3b8d2268215b7eebf'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose whether or not you want to pay all the fees. ';
 $_MODULE['<{payplug}prestashop>paylatertranslation_ec0812e9aebf050a2add9aca5c0eac65'] = 'The fees are split between you and your customers.';
+$_MODULE['<{payplug}prestashop>paylatertranslation_ee404fbb3e48ee5a9dbb58957a1d284d'] = 'Please note that the minimum amount entered is greater than the maximum amount entered.';
 $_MODULE['<{payplug}prestashop>paylatertranslation_efcd0a3777c4ad7238f5476f6f9864c3'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose below whether or not you want to pay all the fees. ';
 $_MODULE['<{payplug}prestashop>payment_8494ec9ddd46564fd79735b79097812b'] = 'Pay by card in 3x or 4x without fees with Oney';
 $_MODULE['<{payplug}prestashop>payment_a6ccfdf696e243550871da25431cb410'] = ' ';

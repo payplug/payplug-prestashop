@@ -26,6 +26,7 @@ namespace PayPlug\src\application\dependencies;
 use PayPlug\classes\MyLogPHP;
 use PayPlug\src\actions\ConfigurationAction;
 use PayPlug\src\actions\OnboardingAction;
+use PayPlug\src\actions\PaymentAction;
 use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
 use PayPlug\src\application\adapter\CarrierAdapter;
@@ -77,6 +78,7 @@ class PluginInit extends BaseClass
     // Actions
     private $configurationAction;
     private $onboardingAction;
+    private $paymentAction;
 
     // EntitiesApiRest
     private $cacheEntity;
@@ -173,6 +175,7 @@ class PluginInit extends BaseClass
             ->setMessage($this->message)
             ->setModule($this->module)
             ->setPayment($this->payment)
+            ->setPaymentAction($this->paymentAction)
             ->setProduct($this->product)
             ->setOney($this->oney)
             ->setOrder($this->order)
@@ -197,6 +200,7 @@ class PluginInit extends BaseClass
     {
         $this->configurationAction = new ConfigurationAction($this->dependencies);
         $this->onboardingAction = new OnboardingAction($this->dependencies);
+        $this->paymentAction = new PaymentAction($this->dependencies);
     }
 
     private function setEntities()
