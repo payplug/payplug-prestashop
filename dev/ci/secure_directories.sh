@@ -7,6 +7,11 @@ if [ -d "./vendor" ]; then
   find ./vendor -type d -exec cp -v index.php {} \;
 fi
 
+if [ -d "./dist" ]; then
+  echo "copying index.php recursively into dist folders"
+  find ./dist -type d -exec cp -v index.php {} \;
+fi
+
 for folder in $folderList
   do
     echo "copying htaccess recursively into folder "${folder}
