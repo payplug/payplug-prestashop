@@ -101,7 +101,7 @@ check module translations:
       - dev/dist/payplug/translations.csv
 
 assets:
-  image: node:16
+  image: node:20
   stage: assets
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
@@ -163,7 +163,7 @@ build zip release:
       - payplug_qa_$CI_COMMIT_REF_NAME.zip
 
 asset-pspaylater:
-  image: node:16
+  image: node:20
   stage: asset-pspaylater
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
