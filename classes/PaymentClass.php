@@ -814,11 +814,11 @@ class PaymentClass
     public function getPaymentDataCookie()
     {
         // get payplug data
-        $cookie_data = $this->context->cookie->__get('payplug_data');
+        $cookie_data = $this->context->cookie->__get($this->dependencies->name . '_data');
         $payplug_data = !empty($cookie_data) ? $cookie_data : false;
 
         // then flush to avoid repetition
-        $this->context->cookie->__set('payplug_data', '');
+        $this->context->cookie->__set($this->dependencies->name . '_data', '');
 
         // if no error all good then return true
         return json_decode($payplug_data, true);
@@ -1476,7 +1476,7 @@ class PaymentClass
                     $payment_data = $this->tools->tool('getValue', 'oney_form');
                 }
 
-                if ($payment_data) {
+                if ((bool) $payment_data) {
                     // hydrate with payment data
                     $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
 
@@ -1718,9 +1718,9 @@ class PaymentClass
 
         $value = json_encode($payplug_data);
 
-        $this->context->cookie->__set('payplug_data', $value);
+        $this->context->cookie->__set($this->dependencies->name . '_data', $value);
 
-        return (bool) $this->context->cookie->__get('payplug_data');
+        return (bool) $this->context->cookie->__get($this->dependencies->name . '_data');
     }
 
     /**
@@ -1736,6 +1736,11 @@ class PaymentClass
     {
         if (empty($payplug_errors)) {
             return false;
+        }
+
+        // Check if already setted
+        if ((bool) $this->context->cookie->__get($this->dependencies->name . 'Errors')) {
+            return true;
         }
 
         $value = json_encode($payplug_errors);
