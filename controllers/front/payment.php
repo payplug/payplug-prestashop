@@ -62,7 +62,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $error_url = $context->link->getPageLink($page, true, $context->language->id, [
             'has_error' => 1,
             'step' => 3,
-            'modulename' => 'payplug',
+            'modulename' => $this->dependencies->name,
         ]);
 
         // Invalid payment then return error
