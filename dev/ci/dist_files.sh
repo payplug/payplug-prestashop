@@ -34,14 +34,14 @@ for file in $distFile
 
 echo "Dist dir will be in: "$path
 echo "------------------"
-export distDir="upgrade dist"
+export distDir="upgrade views/css views/js views/img"
 for dir in $distDir
   do
     echo -n "Copy $dir "
     if [ -d "$modules" ]; then
-      cp -vr $path/${dir} $PWD/${modules}/${dir}
+      cp -vr $path/${dir}/. $PWD/${modules}/${dir}
     else
-      cp -vr $path/${dir} $PWD/${dir}
+      cp -vr $path/${dir}/. $PWD/${dir}
     fi
   done
 

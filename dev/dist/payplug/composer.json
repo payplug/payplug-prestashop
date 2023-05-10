@@ -37,6 +37,7 @@
             "views/build-bnpl",
             "!views/css/*.css",
             "!views/js/*.js",
+            "!views/img/*.svg",
             "views/templates/front/tools",
             "pspaylater.php",
             "test.php",

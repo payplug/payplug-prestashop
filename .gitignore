@@ -16,6 +16,8 @@ vendor/
 views/css/*.css
 views/css/*.map
 views/js/*.js
+views/img/*.svg
+views/img/admin/img/
 dev/ci/translations.csv
 dev/css/less/include.less
 dev/css/components/atoms/*.map
@@ -24,3 +26,6 @@ dev/css/*.css
 dev/css/*.map
 html/
 phpunit.log
+!dev/dist/*/views/
+!dev/dist/*/views/js/*.js
+!dev/dist/*/views/css/*.css

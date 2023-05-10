@@ -525,7 +525,7 @@ class ApiRest
         $img_path = $this->dependencies
             ->getPlugin()
             ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
 
         $iso_code = $this->dependencies
             ->getPlugin()
@@ -578,7 +578,7 @@ class ApiRest
         $img_path = $this->dependencies
             ->getPlugin()
             ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
 
         return [
             'name' => 'oney_cart_animation',
@@ -613,7 +613,7 @@ class ApiRest
         $img_path = $this->dependencies
             ->getPlugin()
             ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
 
         return [
             'name' => 'oney_product_animation',
@@ -1430,7 +1430,7 @@ class ApiRest
         $img_path = $this->dependencies
             ->getPlugin()
             ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
 
         return [
             'name' => 'thresholds',

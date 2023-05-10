@@ -22,11 +22,5 @@
 
 {* Block banner *}
 <div class="{$module_name|escape:'htmlall':'UTF-8'}_banner">
-    {if $iso == 'fr'}
-        <img class="_img" alt="banner-img" src="/modules/{$module_name|escape:'htmlall':'UTF-8'}/views/img/banner.png">
-    {elseif $iso == 'it'}
-        <img class="_img" alt="banner-img" src="/modules/{$module_name|escape:'htmlall':'UTF-8'}/views/img/banner.png">
-    {else}
-        <img class="_img" alt="banner-img" src="/modules/{$module_name|escape:'htmlall':'UTF-8'}/views/img/banner.png">
-    {/if}
+    <img class="_img" alt="banner-img" src="/modules/{$module_name|escape:'htmlall':'UTF-8'}/views/img/banner.png">
 </div>
