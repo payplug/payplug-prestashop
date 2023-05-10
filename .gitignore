@@ -10,12 +10,13 @@ composer.lock
 features.json
 package-lock.json
 package.json
-dist/
 upgrade/
 vendor/
 views/css/*.css
 views/css/*.map
 views/js/*.js
+views/img/*.svg
+views/img/admin/img/
 dev/ci/translations.csv
 dev/css/less/include.less
 dev/css/components/atoms/*.map
@@ -25,3 +26,6 @@ dev/css/*.map
 !dev/dist/*/upgrade/
 html/
 phpunit.log
+!dev/dist/*/views/
+!dev/dist/*/views/js/*.js
+!dev/dist/*/views/css/*.css

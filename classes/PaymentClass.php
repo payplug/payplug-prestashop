@@ -2086,7 +2086,7 @@ class PaymentClass
             ),
             'logo' => $this->dependencies->mediaClass->getMediaPath(
                 $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/logos_schemes_installment_'
+                . $this->dependencies->name . '/views/img/installment/logos_schemes_installment_'
                 . $this
                     ->config->get(
                         $this->dependencies->getConfigurationKey('instMode')
@@ -2278,7 +2278,7 @@ class PaymentClass
                 $logo = $card['brand'] != 'none' ? $this->dependencies->mediaClass->getMediaPath(
                     $this
                         ->constant
-                        ->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/views/img/' . $this
+                        ->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/views/img/standard/' . $this
                         ->tools
                         ->tool('strtolower', $card['brand']) . '.svg'
                 ) : '';
@@ -2362,7 +2362,7 @@ class PaymentClass
             ),
             'logo' => $this->dependencies->mediaClass->getMediaPath(
                 $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/logos_schemes_'
+                . $this->dependencies->name . '/views/img/standard/logos_schemes_'
                 . $this->dependencies->configClass->getImgLang() . '.svg'
             ),
             'callToActionText' => isset($cards) && $cards
