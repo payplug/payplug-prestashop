@@ -75,11 +75,11 @@ class PrestashopAdapter17
 
     public function displayPaymentOption($payment_options)
     {
-        if ($this->dependencies->configClass->isValidFeature('feature_integrated')
+        if ($this->dependencies->configClass->isValidFeature('feature_standard')
+            && $this->dependencies->configClass->isValidFeature('feature_integrated')
             && (string) $this->config->get(
                 $this->dependencies->getConfigurationKey('embeddedMode')
             ) == 'integrated'
-            && $this->dependencies->configClass->isValidFeature('feature_standard')
         ) {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }
