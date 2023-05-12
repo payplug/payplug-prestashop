@@ -33,19 +33,36 @@ class ConfigurationAction
     }
 
     /**
+     * @description check permission for a given payment method
+     *
      * @param string $payment_method
+     * @param bool   $sandbox_mode
      *
      * @return array
      */
-    public function checkPermissionAction($payment_method = '')
+    public function checkPermissionAction($payment_method = '', $sandbox_mode = null)
     {
-        if (!is_string($payment_method) || !$payment_method) {
+        // todo: add unit tests
+        if ((!is_string($payment_method) || !$payment_method)
+            || !is_bool($sandbox_mode)) {
             return [
                 'success' => false,
                 'data' => [
                     'msg' => 'An error occured while getting the permissions',
                 ],
             ];
+        }
+
+        $config = $this->dependencies->getPlugin()->getConfiguration();
+
+        if ($sandbox_mode) {
+            $permissions = $this->dependencies->apiClass->getAccountPermissions(
+                $config->get($this->dependencies->getConfigurationKey('testApiKey'))
+            );
+        } else {
+            $permissions = $this->dependencies->apiClass->getAccountPermissions(
+                $config->get($this->dependencies->getConfigurationKey('liveApiKey'))
+            );
         }
 
         $allowed_methods = [
@@ -87,7 +104,6 @@ class ConfigurationAction
             ->getRoutes()
             ->getExternalUrl($context->language->iso_code);
 
-        $permissions = $this->dependencies->apiClass->getAccountPermissions();
         $has_permission = $this->dependencies
             ->getValidators()['payment']
             ->hasPermissions($permissions, $allowed_methods[$payment_method])['result'];
@@ -166,7 +182,7 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // TODO  add translation
+                    // todo:  add translation
                     'message' => 'An error has occurred',
                 ],
             ];
@@ -196,29 +212,29 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    //TODO add translation
+                    // todo: add translation
                     'message' => $translation['inactive']['modal']['error'],
                 ],
             ];
         }
         $permissions = $this->dependencies->name == 'pspaylater' ? 'onboarding_oney_completed' : 'use_live_mode';
-        if (!$this->checkPermissionAction($permissions)['success']) {
+        if (!$this->checkPermissionAction($permissions, $datas->env)['success']) {
             return [
-                    'success' => false,
-                    'data' => [
-                        'still_inactive' => !$this->checkPermissionAction($permissions)['success'],
-                        'message' => '',
-                    ],
-                ];
+                'success' => false,
+                'data' => [
+                    'still_inactive' => !$this->checkPermissionAction($permissions, $datas->env)['success'],
+                    'message' => '',
+                ],
+            ];
         }
 
         return [
-                    'success' => true,
-                    'data' => [
-                        'still_inactive' => !$this->checkPermissionAction($permissions)['success'],
-                        'message' => '',
-                    ],
-                ];
+            'success' => true,
+            'data' => [
+                'still_inactive' => !$this->checkPermissionAction($permissions, $datas->env)['success'],
+                'message' => '',
+            ],
+        ];
     }
 
     /**
@@ -242,7 +258,7 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // @todo: add translation
+                    // todo: add translation
                     'message' => 'An error has occurred',
                 ],
             ];
@@ -254,7 +270,7 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // @todo: add translation
+                    // todo: add translation
                     'message' => 'An error has occurred',
                 ],
             ];
@@ -267,7 +283,7 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // @todo: add translation
+                    // todo: add translation
                     'message' => $translation['login_error'],
                 ],
             ];
@@ -284,7 +300,7 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // @todo: add translation
+                    // todo: add translation
                     'message' => $translation['login_error'],
                 ],
             ];
@@ -296,7 +312,7 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // @todo: add translation
+                    // todo: add translation
                     'message' => $translation['login_error'],
                 ],
             ];
@@ -401,7 +417,7 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // @todo: add translation
+                    // todo: add translation
                     'message' => 'An error has occurred',
                 ],
             ];
@@ -413,7 +429,7 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // @todo: add translation
+                    // todo: add translation
                     'message' => 'An error has occurred',
                 ],
             ];
@@ -454,7 +470,7 @@ class ConfigurationAction
                             return [
                                 'success' => false,
                                 'data' => [
-                                    // @todo: add translation
+                                    // todo: add translation
                                     'message' => 'An error has occurred while register ' . $config,
                                 ],
                             ];
@@ -469,7 +485,7 @@ class ConfigurationAction
                             return [
                                 'success' => false,
                                 'data' => [
-                                    // @todo: add translation
+                                    // todo: add translation
                                     'message' => 'An error has occurred while register ' . $config,
                                 ],
                             ];
@@ -485,7 +501,7 @@ class ConfigurationAction
                             return [
                                 'success' => false,
                                 'data' => [
-                                    // @todo: add translation
+                                    // todo: add translation
                                     'message' => 'An error has occurred while register ' . $config,
                                 ],
                             ];
@@ -506,7 +522,7 @@ class ConfigurationAction
                             return [
                                 'success' => false,
                                 'data' => [
-                                    // @todo: add translation
+                                    // todo: add translation
                                     'message' => 'An error has occurred while register ' . $config,
                                 ],
                             ];
@@ -519,7 +535,7 @@ class ConfigurationAction
                             return [
                                 'success' => false,
                                 'data' => [
-                                    // @todo: add translation
+                                    // todo: add translation
                                     'message' => 'An error has occurred while register ' . $config,
                                 ],
                             ];
@@ -531,7 +547,7 @@ class ConfigurationAction
                             return [
                                 'success' => false,
                                 'data' => [
-                                    // @todo: add translation
+                                    // todo: add translation
                                     'message' => 'An error has occurred while register ' . $config,
                                 ],
                             ];

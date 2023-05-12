@@ -133,6 +133,7 @@ class submitSandboxActionTest extends BaseConfigurationAction
         $datas->action = 'payplug_login';
         $datas->payplug_email = 'payplug.login@payplug.com';
         $datas->payplug_password = 'password';
+        $datas->env = true;
 
         $account = \Mockery::mock('Account');
         $account
@@ -180,6 +181,7 @@ class submitSandboxActionTest extends BaseConfigurationAction
         $datas->action = 'payplug_login';
         $datas->payplug_email = 'payplug.login@payplug.com';
         $datas->payplug_password = 'password';
+        $datas->env = true;
 
         $account = \Mockery::mock('Account');
         $account

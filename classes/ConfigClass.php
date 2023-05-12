@@ -311,7 +311,7 @@ class ConfigClass
         if (isset($permissions['can_use_integrated_payments'])
             && version_compare(_PS_VERSION_, '1.7', '>=')) {
             $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
-            if ($permissions['can_use_integrated_payments']) {
+            if ((bool) $permissions['can_use_integrated_payments']) {
                 if (!$onboardingAction->enableIntegratedAction()['success']) {
                     $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
                 }
@@ -374,6 +374,10 @@ class ConfigClass
             }
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_amex')['result'] || !$available_options['live']) {
                 $available_options['amex'] = false;
+            }
+            if (!$permissions['can_use_integrated_payments'] && $available_options['embedded'] == 'integrated') {
+                $this->config->updateValue($this->dependencies->getConfigurationKey('embeddedMode'), 'redirect');
+                $available_options['embedded'] = 'redirect';
             }
         }
 
