@@ -88,6 +88,10 @@ class AdminPayplugController extends ModuleAdminController
             ],
         ]);
 
+        $this->context->smarty->assign([
+            'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/dist/',
+        ]);
+
         $template = 'admin_lib.tpl';
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
             $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/' . $template);
