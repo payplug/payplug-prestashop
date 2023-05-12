@@ -21,5 +21,6 @@ dev/css/components/atoms/*.map
 dev/css/components/atoms/*.css
 dev/css/*.css
 dev/css/*.map
+!dev/dist/*/upgrade/
 html/
 phpunit.log
