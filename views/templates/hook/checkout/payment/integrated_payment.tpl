@@ -63,8 +63,7 @@
         <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
     </div>
 
-
-    {if isset($is_one_click_activated) && $is_one_click_activated }
+    {if isset($is_one_click_activated) && $is_one_click_activated && $customer.is_guest != '1'}
         <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -saveCard">
             <label>
                 <input type="checkbox" name="savecard">
