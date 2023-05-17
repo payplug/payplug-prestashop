@@ -540,30 +540,6 @@ class PaymentClass
     }
 
     /**
-     * @description Delete stored payment
-     * @unused
-     *
-     * @param int    $cart_id
-     * @param string $pay_id
-     *
-     * @return bool
-     */
-    public function deletePayment($cart_id, $pay_id = '')
-    {
-        $this->query
-            ->delete()
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $cart_id)
-        ;
-
-        if ($pay_id != '') {
-            $this->query->where('id_payment = "' . $this->query->escape($pay_id) . '"');
-        }
-
-        return $this->query->build();
-    }
-
-    /**
      * @description Capture the payment
      */
     public function capturePayment()
@@ -1028,60 +1004,6 @@ class PaymentClass
         }
 
         return false;
-    }
-
-    /**
-     * @description Check if a payment for the same id cart is pending
-     * @unused
-     *
-     * @param int $id_cart
-     *
-     * @return bool
-     */
-    public function isPaymentPending($id_cart)
-    {
-        $current_time = strtotime(date('Y-m-d H:i:s'));
-        $timeout_delay = 9;
-
-        $payment_cart = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->where('id_payment LIKE "pending"')
-            ->build()
-        ;
-
-        $payment_cart = reset($payment_cart);
-
-        if (!$payment_cart || (($current_time - strtotime($payment_cart['date_upd'])) >= $timeout_delay)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @description Get id_payment from a pending transaction for a given cart
-     *
-     * @param int $id_cart
-     *
-     * @return string id_payment OR bool
-     */
-    public function isTransactionPending($id_cart)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return false;
-        }
-
-        return $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->where('is_pending = 1')
-            ->build('unique_value')
-        ;
     }
 
     /**
@@ -1565,7 +1487,11 @@ class PaymentClass
 
         // Create payment if inexistent
         $force_payment_creation = $options['is_applepay'] || $options['is_oney'];
-        if (!$this->payment->checkPaymentTable($cart->id) || $force_payment_creation) {
+        $payment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $cart->id);
+
+        if (empty($payment) || $force_payment_creation) {
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
 
@@ -1661,7 +1587,9 @@ class PaymentClass
             && $this->payment->checkHash($this->paymentDetails)
             && $this->payment->isValidApiPayment($this->paymentDetails)) {
             // If timeout < 3 min and hash OK
-            $store_payment = $this->payment->checkPaymentTable($cart->id);
+            $store_payment = $this->dependencies
+                ->getRepositories()['payment']
+                ->getByCart((int) $cart->id);
             $this->paymentDetails['paymentId'] = $store_payment['id_payment'];
 
             $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);

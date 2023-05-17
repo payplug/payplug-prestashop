@@ -238,19 +238,18 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $payment_id = $tools->tool('getValue', 'pay_id');
                 $cart_id = $tools->tool('getValue', 'cart_id');
 
-                // Check payment correspondence
-                $query = $this->plugin->getQuery();
+                $payment = $this->dependencies
+                    ->getRepositories()['payment']
+                    ->getByCart((int) $cart_id);
 
-                // todo: request should not be here but to many different method are used to get the payment
-                // todo: extract this part with PaymentClass
-                $current_payment_id = $query
-                    ->select()
-                    ->fields('id_payment')
-                    ->from(_DB_PREFIX_ . $this->dependencies->name . '_payment')
-                    ->where('id_cart = ' . (int) $cart_id)
-                    ->build('unique_value')
-                ;
-                if ($payment_id != $current_payment_id) {
+                if (empty($payment)) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => 'No payment id for given cart id',
+                    ]));
+                }
+
+                if ($payment_id != $payment['id_payment']) {
                     exit(json_encode([
                         'result' => false,
                         'message' => 'No correspondance with given payment id',
@@ -325,15 +324,18 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 // Check payment id correspondance between the given one and the one from the DB
-                $query = $this->plugin->getQuery();
-                $current_payment_id = $query
-                    ->select()
-                    ->fields('id_payment')
-                    ->from(_DB_PREFIX_ . $this->dependencies->name . '_payment')
-                    ->where('id_cart = ' . (int) $context->cart->id)
-                    ->build('unique_value')
-                ;
-                if ($paymentId != $current_payment_id) {
+                $payment = $this->dependencies
+                    ->getRepositories()['payment']
+                    ->getByCart((int) $context->cart->id);
+
+                if (empty($payment)) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => 'No payment id for given cart id',
+                    ]));
+                }
+
+                if ($paymentId != $payment['id_payment']) {
                     exit(json_encode([
                         'result' => false,
                         'message' => 'No correspondance with given payment id',

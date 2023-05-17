@@ -97,6 +97,7 @@ class paymentValidator
 
     /**
      * @description Check if the payment creation went well
+     * todo: this method should check if there is an error in the payment resource nor in his creation (already sending a result)
      *
      * @param $payment
      *
@@ -593,38 +594,31 @@ class paymentValidator
     }
 
     /**
-     * @description Check if given payment is paid
+     * @description Check if given payment id is installment
      *
-     * @param null $payment
+     * @param string $payment_id
      *
      * @return array
      */
-    public function isPaid($payment = null)
+    public function isInstallment($payment_id = '')
     {
-        if (!is_object($payment) || !$payment) {
+        if (!is_string($payment_id) || !$payment_id) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument given, $payment must be a non empty object',
+                'message' => 'Invalid argument given, $payment_id must be a non empty string',
             ];
         }
 
-        if (!isset($payment->is_paid)) {
+        if (\strpos($payment_id, 'inst') === false) {
             return [
                 'result' => false,
-                'message' => 'Missing props, $payment does not contain is_paid props',
-            ];
-        }
-
-        if (!$payment->is_paid) {
-            return [
-                'result' => false,
-                'message' => 'Payment is not paid',
+                'message' => 'Given payment id is not from installment payment',
             ];
         }
 
         return [
             'result' => true,
-            'message' => '',
+            'message' => 'Given payment id is from installment payment',
         ];
     }
 
@@ -778,6 +772,42 @@ class paymentValidator
                 'result' => false,
                 'code' => 'length',
                 'message' => 'Invalid email lenght given, Oney email is limited to 100 char',
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => '',
+        ];
+    }
+
+    /**
+     * @description Check if given payment is paid
+     *
+     * @param null $payment
+     *
+     * @return array
+     */
+    public function isPaid($payment = null)
+    {
+        if (!is_object($payment) || !$payment) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $payment must be a non empty object',
+            ];
+        }
+
+        if (!isset($payment->is_paid)) {
+            return [
+                'result' => false,
+                'message' => 'Missing props, $payment does not contain is_paid props',
+            ];
+        }
+
+        if (!$payment->is_paid) {
+            return [
+                'result' => false,
+                'message' => 'Payment is not paid',
             ];
         }
 

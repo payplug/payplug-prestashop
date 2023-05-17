@@ -5,6 +5,7 @@ namespace PayPlug\tests\repositories;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
+use PayPlug\src\models\repositories\PaymentRepository;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
@@ -65,6 +66,9 @@ class RepositoryBase extends TestCase
     protected $validators;
     protected $repositories;
 
+    // model/classes
+    protected $configuration;
+
     public function setUp()
     {
         $this->myLogPhp = MockHelper::createMockFactory('PayPlug\classes\MyLogPHP');
@@ -76,6 +80,8 @@ class RepositoryBase extends TestCase
         $this->setAdapter();
         $this->setRepository();
         $this->setTemporariesClasses();
+
+        $this->configuration = MockHelper::createAssignMock('PayPlug\src\models\classes\Configuration');
     }
 
     private function setAdapter()
@@ -125,6 +131,7 @@ class RepositoryBase extends TestCase
         $this->repositories = [
             'card' => \Mockery::mock(CardRepository::class)->makePartial(),
             'country' => \Mockery::mock(CountryRepository::class)->makePartial(),
+            'payment' => \Mockery::mock(PaymentRepository::class)->makePartial(),
         ];
         $this->dependencies
             ->shouldReceive([

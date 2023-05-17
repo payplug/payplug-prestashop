@@ -32,6 +32,7 @@ class HookClass
     private $card;
     private $cart;
     private $config;
+    private $configuration;
     private $constant;
     private $context;
     private $currency;
@@ -62,6 +63,7 @@ class HookClass
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->currency = $this->dependencies->getPlugin()->getCurrency();
@@ -370,64 +372,35 @@ class HookClass
 
         $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
         $amount_refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
+        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
 
-        $inst_id = null;
-        $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCart((int) $order->id_cart);
-        $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $payment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $order->id_cart);
 
-        // Backward if order validated before
-        if (!$payment_id) {
-            $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCartBackward((int) $order->id_cart);
+        if (empty($payment)) {
+            return;
         }
 
-        if ($payment_id && \strpos($payment_id, 'inst') !== false) {
-            $inst_id = $payment_id;
-        }
-
-        if ($inst_id) {
+        $resource_id = $payment['id_payment'];
+        if ($this->validators['payment']->isInstallment((string) $resource_id)['result']) {
             $payment_list = [];
 
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    )
-                );
-            } else {
-                $this->dependencies->apiClass->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    )
-                );
-            }
-
-            // If no installment plan id, return false
-            if (!$inst_id || empty($inst_id)) {
-                return false;
-            }
-
             // Get the installment plan resource
-            $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
-
-            // If No installment plan resource, test the other live mode configuration
+            $installment = $this->dependencies->apiClass->retrieveInstallment($resource_id);
             if (!$installment['result']) {
                 if ($sandbox) {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    ));
-                    $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+                    $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
+                    $installment = $this->dependencies->apiClass->retrieveInstallment($resource_id);
                 } else {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    ));
-                    $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+                    $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
+                    $installment = $this->dependencies->apiClass->retrieveInstallment($resource_id);
                 }
             }
-
-            // If we still don't have a valid Installment plan resource, return false
             if (!$installment['result']) {
                 return false;
             }
+
             $installment = $installment['resource'];
 
             $pay_mode = $installment->is_live
@@ -520,7 +493,7 @@ class HookClass
             ));
             $inst_paid = $installment->is_fully_paid;
             $this->assign->assign([
-                'inst_id' => $inst_id,
+                'inst_id' => $resource_id,
                 'inst_status' => $inst_status,
                 'inst_status_code' => $inst_status_code,
                 'inst_aborted' => $inst_aborted,
@@ -531,55 +504,26 @@ class HookClass
             ]);
 
             $sandbox = ((int) $installment->is_live == 1 ? false : true);
-            $state_addons = ($sandbox ? '_TEST' : '');
-            $id_new_order_state = (int) $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
-            );
+            $state_addons = ($sandbox ? '_test' : '');
+            $id_new_order_state = (int) $this->configuration->getValue('order_state_refund' . $state_addons);
 
             $this->dependencies->installmentClass->updatePayplugInstallment($installment);
         } else {
-            $payment = $this->payment->checkPaymentTable((int) $order->id_cart);
-            $pay_id = isset($payment['id_payment']) ? $payment['id_payment'] : false;
-
-            if (!$this->validators['payment']->isPending($payment)['result']) {
-                $pay_id = $this->dependencies->orderClass->getPayplugOrderPayment($order->id);
-
-                if (!$pay_id) {
-                    $payments = $order->getOrderPaymentCollection();
-                    if (\count($payments->getResults()) > 1 || !$payments->getFirst()) {
-                        return false;
-                    }
-                    $pay_id = $payments->getFirst()->transaction_id;
-                }
-            }
-
-            // If no payment id, return false
-            if (!$pay_id || empty($pay_id)) {
-                return false;
-            }
-
             // Get the Payment resource
-            $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-
-            // If No Payment resource, test the other live mode configuration
+            $payment = $this->dependencies->apiClass->retrievePayment($resource_id);
             if (!$payment['result']) {
                 if ($sandbox) {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    ));
-                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                    $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
+                    $payment = $this->dependencies->apiClass->retrievePayment($resource_id);
                 } else {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    ));
-                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                    $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
+                    $payment = $this->dependencies->apiClass->retrievePayment($resource_id);
                 }
             }
-
-            // If we still don't have a valid Payment resource, return false
             if (!$payment['result']) {
                 return false;
             }
+
             $payment = $payment['resource'];
 
             // check if order is from oney payment
@@ -599,14 +543,10 @@ class HookClass
                 && $payment->payment_method['type'] == 'bancontact';
 
             // Update order state if is pending
-            $state_addons = $payment->is_live ? '' : '_TEST';
-            $paid_state = $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
-            );
-            $oney_state = $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG') . $state_addons
-            );
-            $cancelled_state = $this->config->get('PS_OS_CANCELED');
+            $state_addons = ($sandbox ? '_test' : '');
+            $paid_state = (int) $this->configuration->getValue('order_state_paid' . $state_addons);
+            $oney_state = (int) $this->configuration->getValue('order_state_oney_pg' . $state_addons);
+            $cancelled_state = (int) $this->configuration->getValue('order_state_cancelled' . $state_addons);
 
             if ($is_oney) {
                 // update order state from payment status
@@ -640,12 +580,8 @@ class HookClass
             $id_currency = (int) $this->currency->getIdByIsoCode($payment->currency);
             $state_addons = (!$payment->is_live ? '_TEST' : '');
 
-            $id_new_order_state = (int) $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
-            );
-            $id_pending_order_state = (int) $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
-            );
+            $id_new_order_state = (int) $this->configuration->getValue('order_state_refund' . $state_addons);
+            $id_pending_order_state = (int) $this->configuration->getValue('order_state_pending' . $state_addons);
 
             $current_state = (int) $order->getCurrentState();
             if (!$this->validators['payment']->isPaid($payment)['result']) {
@@ -737,7 +673,7 @@ class HookClass
             $show_menu_payment = true;
 
             $this->assign->assign([
-                'pay_id' => $pay_id,
+                'pay_id' => $resource_id,
                 'pay_status' => $pay_status,
                 'pay_amount' => $pay_amount,
                 'pay_date' => $pay_date,

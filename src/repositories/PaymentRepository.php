@@ -38,15 +38,17 @@ class PaymentRepository extends BaseClass
     private $query;
     private $constant;
     private $validators;
+    private $configuration;
 
     public function __construct(
         $cartAdapter,
         $confAdapter,
+        $configuration,
+        $constant,
         $dependencies,
         $logger,
         $paymentEntity,
-        $query,
-        $constant
+        $query
     ) {
         $this->dependencies = $dependencies;
         $this->cartAdapter = $cartAdapter;
@@ -55,6 +57,7 @@ class PaymentRepository extends BaseClass
         $this->paymentEntity = $paymentEntity;
         $this->query = $query;
         $this->constant = $constant;
+        $this->configuration = $configuration;
 
         $this->logger->setProcess('payment');
         $this->validators = $this->dependencies->getValidators();
@@ -135,11 +138,20 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
+        $paymentStored = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $paymentDetails['cartId']);
+
+        if (empty($paymentStored)) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[checkHash] No payment found for given cart id'
+            );
+        }
+
         $cartHash = $this->getHashedCart($paymentDetails);
         $is_cached_payment = $this->validators['payment']->isCachedPayment($paymentStored['cart_hash'], $cartHash);
-        if ($is_cached_payment['result'] == $cartHash
-            && $paymentStored['payment_method'] == $paymentDetails['paymentMethod']) {
+        if ($is_cached_payment['result']) {
             return [
                 'result' => true,
                 'paymentDetails' => $paymentDetails,
@@ -149,10 +161,7 @@ class PaymentRepository extends BaseClass
 
         // Create payment or installment
         $createPayment = $this->createPayment($paymentDetails);
-
-        if ($createPayment['result'] && $createPayment['paymentDetails']) {
-            $paymentDetails = $createPayment['paymentDetails'];
-        } elseif (!$createPayment['result']) {
+        if (!$createPayment['result']) {
             unset($paymentDetails['paymentTab']);
 
             return $this->returnPaymentError(
@@ -161,16 +170,20 @@ class PaymentRepository extends BaseClass
             );
         }
 
+        // Then update payment detail
+        $paymentDetails = $createPayment['paymentDetails'];
+
         // Update payment table
         $updatePaymentTable = $this->updatePaymentTable($paymentDetails);
-        if ($updatePaymentTable['result'] && $updatePaymentTable['paymentDetails']) {
-            $paymentDetails = $updatePaymentTable['paymentDetails'];
-        } elseif (!$updatePaymentTable['result']) {
+        if (!$updatePaymentTable['result']) {
             return $this->returnPaymentError(
                 ['name' => 'updatePaymentTable', 'value' => $updatePaymentTable],
                 $updatePaymentTable['response']
             );
         }
+
+        // Then update payment detail
+        $paymentDetails = $updatePaymentTable['paymentDetails'];
 
         return [
             'result' => true,
@@ -219,38 +232,6 @@ class PaymentRepository extends BaseClass
     }
 
     /**
-     * @description Check if existing payment / installment in payment table
-     *
-     * @param int $idCart
-     *
-     * @return array|bool
-     */
-    public function checkPaymentTable($idCart)
-    {
-        if (!$idCart || !is_int($idCart)) {
-            return $this->returnPaymentError(
-                ['name' => 'cart id', 'value' => $idCart],
-                '[checkPaymentTable] Problem with $idCart parameter'
-            );
-        }
-
-        $reqCheck = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $idCart)
-        ;
-
-        $resCheck = $reqCheck->build();
-
-        if (!$resCheck) {
-            return false;
-        }
-
-        return end($resCheck);
-    }
-
-    /**
      * @description Create payment / installment
      *
      * @param array $paymentDetails
@@ -259,10 +240,10 @@ class PaymentRepository extends BaseClass
      */
     public function createPayment($paymentDetails = [])
     {
-        if (!$paymentDetails || !is_array($paymentDetails)) {
+        if (!is_array($paymentDetails) || empty($paymentDetails)) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => 'No payment details'],
-                '[createPayment] Invalid $paymentDetails given'
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[createPayment] Invalid parameters given, $paymentDetails must be an non empty array'
             );
         }
 
@@ -271,38 +252,56 @@ class PaymentRepository extends BaseClass
             || empty($paymentDetails['paymentTab'])) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment] Invalid paymentTab given in $paymentDetails'
+                '[createPayment] Invalid parameters given, $paymentDetails[paymentTab] must be an non empty array'
             );
         }
 
-        if (!isset($paymentDetails['paymentMethod']) || !is_string($paymentDetails['paymentMethod'])) {
-            unset($paymentDetails['paymentTab']);
-
+        if (!isset($paymentDetails['paymentMethod'])
+            || !is_string($paymentDetails['paymentMethod'])
+            || !$paymentDetails['paymentMethod']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment] Invalid paymentMethod given in $paymentDetails'
+                '[createPayment] Invalid parameters given, $paymentDetails[paymentMethod] must be a non empty string'
             );
         }
 
-        if (!isset($paymentDetails['cartId']) || !is_int($paymentDetails['cartId'])) {
-            unset($paymentDetails['paymentTab']);
-
+        if (!isset($paymentDetails['cartId'])
+            || !is_int($paymentDetails['cartId'])
+            || !$paymentDetails['cartId']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment] Invalid cartId given in $paymentDetails'
+                '[createPayment] Invalid parameters given, $paymentDetails[cartId] must be a non null integer'
             );
         }
 
-        if ($paymentDetails['paymentMethod'] == 'standard' && !$this->confAdapter->get('PAYPLUG_STANDARD')) {
-            return $this->returnPaymentError(
-                ['name' => 'Configuration::get', 'value' => $this->confAdapter->get('PAYPLUG_STANDARD')],
-                '[createPayment] Try to create standard payment with PAYPLUG_STANDARD disabled'
-            );
+        // Check if configuration allow this payment method
+        $payment_methods = [
+            'amex' => 'amex',
+            'applepay' => 'apple_pay',
+            'bancontact' => 'bancontact',
+            'inst' => 'installment',
+            'one_click' => 'oneclick',
+            'oney' => 'oney',
+            'standard' => 'standard',
+        ];
+        foreach ($payment_methods as $config_key => $payment_method) {
+            if ($payment_method == $paymentDetails['paymentMethod'] && !$this->configuration->getValue($config_key)) {
+                return $this->returnPaymentError(
+                    [
+                        'name' => 'Configuration::get',
+                        'value' => $this->configuration->getValue($config_key),
+                    ],
+                    '[createPayment] Try to create payment with disabled feature'
+                );
+            }
         }
 
         // Before create a new payment, delete the previous one, if exists and it's not a oneclick payment
         // to avoid double order creation
-        if ($apiPayment = $this->checkPaymentTable($paymentDetails['cartId'])) {
+        $apiPayment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $paymentDetails['cartId']);
+        if (!empty($apiPayment)) {
             $is_cancellable = $this->validators['payment']->isCancellable($apiPayment['payment_method']);
             if ($is_cancellable['result']) {
                 $payment = $this->dependencies->apiClass->retrievePayment($apiPayment['id_payment']);
@@ -324,9 +323,7 @@ class PaymentRepository extends BaseClass
         if ($paymentDetails['paymentMethod'] !== 'installment') {
             $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
 
-            if ($this->validators['payment']->hasError($payment)['result']) {
-                unset($paymentDetails['paymentTab']);
-
+            if (!$payment['result']) {
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to create payment. Error: ' . $payment['message']
@@ -351,24 +348,13 @@ class PaymentRepository extends BaseClass
 
         if ($this->validators['payment']->isFailed($this->apiPayment)['result']) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $this->apiPayment],
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 (string) $this->apiPayment->failure->message
             );
         }
 
         // We can now hydrate our params
-        if (isset($this->apiPayment->id)) {
-            $paymentDetails['paymentId'] = $this->apiPayment->id;
-        }
-
-        if (!$paymentDetails['paymentId']) {
-            unset($paymentDetails['paymentTab']);
-
-            return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment ' . (string) $paymentDetails['paymentMethod'] . '] The payment id is null.'
-            );
-        }
+        $paymentDetails['paymentId'] = $this->apiPayment->id;
 
         if (isset($paymentDetails['paymentTab']['integration']) || $paymentDetails['paymentMethod'] == 'apple_pay') {
             $paymentDetails['paymentReturnUrl'] = $paymentDetails['paymentTab']['hosted_payment']['return_url'];
@@ -458,8 +444,7 @@ class PaymentRepository extends BaseClass
             ->set('authorized_at =      "' . $this->query->escape($paymentDetails['authorizedAt']) . '"')
             ->set('is_paid =            "' . $this->query->escape($paymentDetails['isPaid']) . '"')
             ->set('date_upd =           "' . $this->query->escape($paymentDate) . '"')
-            ->where('id_cart =          ' . (int) $paymentDetails['cartId'])
-        ;
+            ->where('id_cart =          ' . (int) $paymentDetails['cartId']);
 
         try {
             if (!$this->query->build()) {
@@ -489,18 +474,23 @@ class PaymentRepository extends BaseClass
      *
      * @throws Exception
      *
-     * @return array|bool
+     * @return bool
      */
     public function checkTimeoutPayment($idCart)
     {
         if (!$idCart || !is_int($idCart)) {
-            return $this->returnPaymentError(
-                ['name' => 'id cart', 'value' => $idCart],
-                '[checkTimeoutPayment] Problem with $idCart parameter'
-            );
+            // todo: add log
+            return false;
         }
 
-        $dateStored = $this->checkPaymentTable($idCart)['date_upd'];
+        $payment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $idCart);
+        if (empty($payment)) {
+            return true;
+        }
+
+        $dateStored = $payment['date_upd'];
         $is_timeout_cache = $this->validators['payment']->isTimeoutCachedPayment($dateStored);
 
         return $is_timeout_cache['result'];
@@ -513,48 +503,36 @@ class PaymentRepository extends BaseClass
      *
      * @return array
      */
-    public function getPaymentReturnUrl($paymentDetails)
+    public function getPaymentReturnUrl($paymentDetails = [])
     {
-        if (!$paymentDetails) {
+        if (!is_array($paymentDetails) || empty($paymentDetails)) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[getPaymentReturnUrl] $paymentDetails is null'
+                '[getPaymentReturnUrl] Invalid parameters given, $paymentDetails must be an non empty array'
             );
         }
 
-        $paymentStored = $this->checkPaymentTable($paymentDetails['cartId']);
-
+        $paymentStored = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $paymentDetails['cartId']);
         if (!$paymentStored) {
             return $this->returnPaymentError(
                 ['name' => 'paymentStored', 'value' => false],
-                '[getPaymentReturnUrl] $paymentStored is null or invalid'
+                '[getPaymentReturnUrl] No payment found for given cart id'
             );
         }
 
-        if (!$paymentDetails['paymentUrl']) {
-            $paymentDetails['paymentUrl'] = $paymentStored['payment_url'];
-        }
-
-        if (!$paymentDetails['paymentReturnUrl']) {
-            $paymentDetails['paymentReturnUrl'] = $paymentStored['payment_return_url'];
-        }
-
-        if (!$paymentDetails['authorizedAt']) {
-            $paymentDetails['authorizedAt'] = $paymentStored['authorized_at'];
-        }
-
-        if (!$paymentDetails['isPaid']) {
-            $paymentDetails['isPaid'] = $paymentStored['is_paid'];
-        }
-
-        if (!$paymentDetails['paymentUrl'] && !$paymentDetails['paymentReturnUrl']) {
-            $err = '[getPaymentReturnUrl] $paymentDetails[\'paymentUrl\'] ';
-            $err .= '&& $paymentDetails[\'paymentReturnUrl\'] are null';
-
-            return $this->returnPaymentError(
-                ['name' => 'paymentUrl', 'value' => false],
-                $err
-            );
+        $keys_to_check = [
+            'paymentUrl',
+            'paymentReturnUrl',
+            'authorizedAt',
+            'isPaid',
+        ];
+        foreach ($keys_to_check as $key) {
+            if (!isset($paymentDetails[$key]) || !$paymentDetails[$key]) {
+                $key_from_stored = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
+                $paymentDetails[$key] = $paymentStored[$key_from_stored];
+            }
         }
 
         switch ($paymentDetails['paymentMethod']) {
@@ -644,8 +622,7 @@ class PaymentRepository extends BaseClass
             ->select()
             ->fields('id_payment')
             ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $idCart)
-        ;
+            ->where('id_cart = ' . (int) $idCart);
 
         return $this->query->build('unique_value');
     }
@@ -688,7 +665,9 @@ class PaymentRepository extends BaseClass
             );
         }
         if ($paymentExist) {
-            $this->dependencies->paymentClass->deletePayment($paymentDetails['cartId']);
+            $this->dependencies
+                ->getRepositories()['payment']
+                ->remove((int) $paymentDetails['cartId']);
         }
         $this->query
             ->insert()
@@ -737,31 +716,41 @@ class PaymentRepository extends BaseClass
      */
     public function isValidApiPayment($paymentDetails)
     {
-        if (!$paymentDetails
-            || !is_array($paymentDetails)
-            || !isset($paymentDetails['cartId'])
-            || !$paymentDetails['cartId']
-            || !is_int($paymentDetails['cartId'])
-        ) {
+        if (!is_array($paymentDetails) || empty($paymentDetails)) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[isValidApiPayment] $paymentDetail or cartId is null, or $paymentDetail is not an array'
+                '[isValidApiPayment] Invalid parameters given, $paymentDetails must be an non empty array'
             );
         }
 
-        try {
-            $storedPayment = $this->checkPaymentTable($paymentDetails['cartId']);
-        } catch (Exception $e) {
+        if (!isset($paymentDetails['cartId']) || !is_int($paymentDetails['cartId']) || !$paymentDetails['cartId']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[isValidApiPayment] Error: ' . $e->getMessage()
+                '[isValidApiPayment] Invalid parameters given, $paymentDetail[cartId] must be a non-null integer'
             );
         }
 
-        if (!$storedPayment || !$storedPayment['payment_method'] || !$storedPayment['id_payment']) {
+        $storedPayment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $paymentDetails['cartId']);
+        if (empty($storedPayment)) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[isValidApiPayment] $storedPayment or payment_method or id_payment is null'
+                '[isValidApiPayment] No payment found for given cart id'
+            );
+        }
+
+        if (!isset($storedPayment['payment_method']) || !$storedPayment['payment_method']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[isValidApiPayment] Invalid stored payment getted, payment_method is not given'
+            );
+        }
+
+        if (!isset($storedPayment['id_payment']) || !$storedPayment['id_payment']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentDetails', 'value' => $paymentDetails],
+                '[isValidApiPayment] Invalid stored payment getted, id_payment is not given'
             );
         }
 
@@ -770,20 +759,13 @@ class PaymentRepository extends BaseClass
             if (!$installment['result']) {
                 return $this->returnPaymentError(
                     ['name' => 'storedPayment', 'value' => $storedPayment],
-                    '[isValidApiPayment] Cannot retrieve payment with id:' . $storedPayment['id_payment']
+                    '[isValidApiPayment] Cannot retrieve payment with id: ' . $storedPayment['id_payment']
                 );
             }
             $installment = $installment['resource'];
             $firstSchedule = $installment->schedule[0]->payment_ids;
             // Try to see if the first schedule was cancelled
             $storedPayment['id_payment'] = end($firstSchedule);
-        }
-
-        if (!$storedPayment['id_payment']) {
-            return $this->returnPaymentError(
-                ['name' => 'storedPayment', 'value' => $storedPayment],
-                '[isValidApiPayment] $storedPayment[\'id_payment\'] is null'
-            );
         }
 
         $retrievedPayment = $this->dependencies->apiClass->retrievePayment($storedPayment['id_payment']);

@@ -14,6 +14,7 @@ use PayPlug\tests\mock\CartMock;
  */
 final class CheckHashTest extends BasePaymentRepository
 {
+    private $hash;
     private $paymentDetails;
 
     public function setUp()
@@ -25,6 +26,7 @@ final class CheckHashTest extends BasePaymentRepository
         $cart->id_address_delivery = (string) $cart->id_address_delivery;
         $cart->id_address_invoice = (string) $cart->id_address_invoice;
 
+        $this->hash = '1234567890azertyuiop1234567890azertyuiop1234567890azertyuiop1234';
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
@@ -53,153 +55,156 @@ final class CheckHashTest extends BasePaymentRepository
         $this->repo
             ->shouldReceive([
                 'returnPaymentError' => $logMessage,
-            ])
-        ;
+            ]);
         $this->assertSame(
             $this->repo->checkHash($parameter),
             $logMessage
         );
     }
 
-    public function testWithSameHash()
+    public function testWhenNoPaymentFound()
     {
-        $tempPaymentDetails = [
-            'paymentTab' => mt_rand(),
-            'paymentId' => mt_rand(),
-            'paymentUrl' => 'url',
-            'paymentReturnUrl' => 'url',
-            'authorizedAt' => 'date',
-            'isPaid' => true,
-        ];
-
-        $this->paymentDetails = array_merge($this->paymentDetails, $tempPaymentDetails);
-
-        // same hash expected
-        $hash = hash('sha256', $this->paymentDetails['paymentMethod'] . json_encode($this->paymentDetails['cart']));
-
-        $this->query
-            ->shouldReceive([
-                'update' => $this->query,
-                'table' => $this->query,
-                'set' => $this->query,
-                'where' => $this->query,
-                'build' => true,
-            ])
-        ;
-
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'cart_hash' => $hash,
-                    'payment_method' => $this->paymentDetails['paymentMethod'],
-                ],
-                'createPayment' => [
-                    'result' => true,
-                    'paymentDetails' => $this->paymentDetails,
-                    'response' => '[createPayment] Payment successfully created',
-                ],
-                'getHashedCart' => 'b0a30e26e83b2a',
-            ])
-        ;
-
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [],
+        ]);
         $this->assertSame(
             [
-                'result' => true,
-                'paymentDetails' => $this->paymentDetails,
-                'response' => 'Payment created and updated successfully',
+                'result' => false,
+                'paymentDetails' => json_encode($this->paymentDetails),
+                'response' => '[checkHash] No payment found for given cart id',
             ],
             $this->repo->checkHash($this->paymentDetails)
         );
     }
 
-    public function testWithInvalidCreatePayment()
+    public function testWhenPaymentIsCached()
     {
-        $error_message = 'An error occurred in payment creation';
-
-        $expected_error = [
-            ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            $error_message,
-        ];
-
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'cart_hash' => 'different_hash',
-                    'payment_method' => $this->paymentDetails['paymentMethod'],
-                ],
-                'createPayment' => [
-                    'result' => false,
-                    'response' => $error_message,
-                ],
-                'returnPaymentError' => $expected_error,
-                'getHashedCart' => 'b0a30e26e83b2a',
-            ])
-        ;
-
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [
+                'id_cart' => 42,
+                'payment_method' => 'standard',
+                'cart_hash' => $this->hash,
+            ],
+        ]);
+        $this->repo->shouldReceive([
+            'getHashedCart' => $this->hash,
+        ]);
+        $this->validators['payment']->shouldReceive([
+            'isCachedPayment' => [
+                'result' => true,
+            ],
+        ]);
         $this->assertSame(
-            $expected_error,
+            [
+                'result' => true,
+                'paymentDetails' => $this->paymentDetails,
+                'response' => 'OK. Comparaison result: Same hash and same payment method.',
+            ],
             $this->repo->checkHash($this->paymentDetails)
         );
     }
 
-    public function testWithInvalidUpdatePayment()
+    public function testWhenPaymentIsNotCreated()
     {
-        $error_message = 'An error occurred in payment update';
-
-        $expected_error = [
-            ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            $error_message,
-        ];
-
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'cart_hash' => 'different_hash',
-                    'payment_method' => $this->paymentDetails['paymentMethod'],
-                ],
-                'createPayment' => [
-                    'result' => true,
-                    'paymentDetails' => $this->paymentDetails,
-                    'response' => '[createPayment] Payment successfully created',
-                ],
-                'updatePaymentTable' => [
-                    'result' => false,
-                    'response' => $error_message,
-                    'paymentDetails' => $this->paymentDetails,
-                ],
-                'returnPaymentError' => $expected_error,
-                'getHashedCart' => 'b0a30e26e83b2a',
-            ])
-        ;
-
+        $message = 'An error has occured';
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [
+                'id_cart' => 42,
+                'payment_method' => 'standard',
+                'cart_hash' => $this->hash,
+            ],
+        ]);
+        $this->validators['payment']->shouldReceive([
+            'isCachedPayment' => [
+                'result' => false,
+            ],
+        ]);
+        $this->repo->shouldReceive([
+            'getHashedCart' => $this->hash,
+            'createPayment' => [
+                'result' => false,
+                'response' => $message,
+            ],
+        ]);
         $this->assertSame(
-            $expected_error,
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($this->paymentDetails),
+                'response' => $message,
+            ],
             $this->repo->checkHash($this->paymentDetails)
         );
     }
 
-    public function testWithValidMethod()
+    public function testWhenPaymentIsNotUpdated()
     {
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'cart_hash' => 'different_hash',
-                    'payment_method' => $this->paymentDetails['paymentMethod'],
-                ],
-                'createPayment' => [
-                    'result' => true,
-                    'paymentDetails' => $this->paymentDetails,
-                    'response' => '[createPayment] Payment successfully created',
-                ],
-                'updatePaymentTable' => [
-                    'result' => true,
-                    'response' => 'Success message',
-                    'paymentDetails' => $this->paymentDetails,
-                ],
-                'getHashedCart' => 'b0a30e26e83b2a',
-            ])
-        ;
+        $message = 'An error has occured';
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [
+                'id_cart' => 42,
+                'payment_method' => 'standard',
+                'cart_hash' => $this->hash,
+            ],
+        ]);
+        $this->validators['payment']->shouldReceive([
+            'isCachedPayment' => [
+                'result' => false,
+            ],
+        ]);
+        $this->repo->shouldReceive([
+            'getHashedCart' => $this->hash,
+            'createPayment' => [
+                'result' => true,
+                'paymentDetails' => $this->paymentDetails,
+                'response' => '[createPayment] Payment successfully created',
+            ],
+            'updatePaymentTable' => [
+                'result' => false,
+                'response' => $message,
+                'paymentDetails' => $this->paymentDetails,
+            ],
+        ]);
+        $expected_payment_details = [
+            'result' => false,
+            'response' => $message,
+            'paymentDetails' => $this->paymentDetails,
+        ];
+        $this->assertSame(
+            [
+                'result' => false,
+                'updatePaymentTable' => json_encode($expected_payment_details),
+                'response' => 'An error has occured',
+            ],
+            $this->repo->checkHash($this->paymentDetails)
+        );
+    }
 
+    public function testWhenPaymentIsUpdated()
+    {
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [
+                'id_cart' => 42,
+                'payment_method' => 'standard',
+                'cart_hash' => $this->hash,
+            ],
+        ]);
+        $this->validators['payment']->shouldReceive([
+            'isCachedPayment' => [
+                'result' => false,
+            ],
+        ]);
+        $this->repo->shouldReceive([
+            'getHashedCart' => $this->hash,
+            'createPayment' => [
+                'result' => true,
+                'paymentDetails' => $this->paymentDetails,
+                'response' => '[createPayment] Payment successfully created',
+            ],
+            'updatePaymentTable' => [
+                'result' => true,
+                'paymentDetails' => $this->paymentDetails,
+            ],
+        ]);
         $this->assertSame(
             [
                 'result' => true,

@@ -391,7 +391,9 @@ class PayPlugValidation
             $this->logger->addLog('Order already exists: ' . $id_order);
             if ($this->type == 'payment') {
                 $this->logger->addLog('Deleting stored payment.');
-                $payment = $this->payment->checkPaymentTable((int) $cart_id);
+                $payment = $this->dependencies
+                    ->getRepositories()['payment']
+                    ->getByCart((int) $cart_id);
                 if ($this->validators['payment']->isPending($payment)['result']) {
                     $this->logger->addLog('Transaction is pending so stored payment will not be deleted.');
                 }

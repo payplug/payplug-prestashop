@@ -63,12 +63,12 @@ final class SaveCardTest extends BaseCardRepository
      * @param $year
      * @param mixed $payment
      */
-    public function atestWithInvalidParams($payment)
+    public function testWithInvalidParams($payment)
     {
         $this->assertFalse($this->repo->saveCard($payment));
     }
 
-    public function atestWhenCardAlreadyExists()
+    public function testWhenCardAlreadyExists()
     {
         $this->repositories['card']->shouldReceive([
             'exists' => true,
@@ -87,7 +87,7 @@ final class SaveCardTest extends BaseCardRepository
         $this->assertFalse($this->repo->saveCard($this->payment));
     }
 
-    public function atestWhenCardIsSaved()
+    public function testWhenCardIsSaved()
     {
         $this->repositories['card']->shouldReceive([
             'exists' => false,
