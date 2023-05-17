@@ -318,8 +318,6 @@ class PaymentRepository extends BaseClass
 
                     $this->logger->addLog('Payment aborted.');
                 }
-            } elseif ($apiPayment['payment_method'] == 'apple_pay') {
-                $this->dependencies->paymentClass->deletePayment($paymentDetails['cartId']);
             }
         }
 

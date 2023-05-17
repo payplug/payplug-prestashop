@@ -27,7 +27,6 @@ class paymentValidator
 {
     private $uncancellable_payment_method = [
         'amex',
-        'apple_pay',
         'bancontact',
         'integrated',
         'oneclick',

@@ -36,6 +36,7 @@ class FilesHelper
         if (isset($_SERVER['SERVER_NAME']) && (
             $_SERVER['SERVER_NAME'] == 'localhost'
                 || preg_match('/ngrok.io/i', $_SERVER['SERVER_NAME'])
+                || preg_match('/ngrok-free.app/i', $_SERVER['SERVER_NAME'])
         )
         ) {
             return;
