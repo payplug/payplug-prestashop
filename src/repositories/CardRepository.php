@@ -59,7 +59,7 @@ class CardRepository extends BaseClass
             $this->dependencies->getConfigurationKey('sandboxMode')
         );
         $idCompany = $this->configurationAdapter->get(
-            $this->dependencies->getConfigurationKey('companyId') . ($isSandbox ? '_TEST' : '')
+            $this->dependencies->getConfigurationKey('companyId')
         );
         $this->logger->setProcess('card');
 
@@ -135,7 +135,7 @@ class CardRepository extends BaseClass
             }
         }
 
-        $delete = $this->dependencies->getRepositories()['card']->delete((int) $id_payplug_card);
+        $delete = $this->dependencies->getRepositories()['card']->remove((int) $id_payplug_card);
 
         return (bool) $delete;
     }
@@ -333,22 +333,10 @@ class CardRepository extends BaseClass
             return false;
         }
 
-        $config = $this->configurationAdapter;
-
-        $brand = $payment->card->brand;
-        $allowed_brand = [
-            'mastercard',
-            'visa',
-        ];
-        if (!in_array($this->toolsAdapter->tool('strtolower', $brand), $allowed_brand)) {
-            $brand = 'none';
-        }
-
         $customer_id = isset($payment->metadata['ID Client']) ? $payment->metadata['ID Client'] : $payment->metadata['Client'];
 
-        $company_id = (int) $config->get(
-            $this->dependencies->getConfigurationKey('companyId') . ($payment->is_live ? '' : '_TEST')
-        );
+        $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
+        $company_id = (int) $configurationClass->getValue('company_id');
 
         $exists = $this->dependencies
             ->getRepositories()['card']
