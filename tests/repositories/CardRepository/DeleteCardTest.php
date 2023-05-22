@@ -81,7 +81,7 @@ final class DeleteCardTest extends BaseCardRepository
     {
         $this->repositories['card']->shouldReceive([
             'get' => $this->payplug_card,
-            'delete' => false,
+            'remove' => false,
         ]);
 
         $this->repo
@@ -100,7 +100,7 @@ final class DeleteCardTest extends BaseCardRepository
     {
         $this->repositories['card']->shouldReceive([
             'get' => $this->payplug_card,
-            'delete' => true,
+            'remove' => true,
         ]);
 
         $this->repo
@@ -124,7 +124,7 @@ final class DeleteCardTest extends BaseCardRepository
 
         $this->repositories['card']->shouldReceive([
             'get' => $card,
-            'delete' => true,
+            'remove' => true,
         ]);
 
         $this->assertTrue($this->repo->deleteCard(
