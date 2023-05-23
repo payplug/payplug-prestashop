@@ -30,6 +30,21 @@ final class SaveCardTest extends BaseCardRepository
             ->with('PAYPLUG_COMPANY_ID')
             ->andReturn(4242)
         ;
+
+        $this->dependencies->configClass
+            ->shouldReceive([
+                'getValue' => 1722,
+            ]);
+
+        $this->plugin = \Mockery::mock('Plugin');
+        $this->plugin
+            ->shouldReceive([
+                'getConfigurationClass' => $this->dependencies->configClass,
+            ]);
+        $this->dependencies
+            ->shouldReceive([
+                'getPlugin' => $this->plugin,
+            ]);
     }
 
     public function invalidDataProvider()

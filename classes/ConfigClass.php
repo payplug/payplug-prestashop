@@ -307,11 +307,13 @@ class ConfigClass
         }
 
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
+        $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
         //check if we force integrated payment activation/rollback
         if (isset($permissions['can_use_integrated_payments'])
+            && !(bool) $configurationClass->getValue('sandbox_mode')
             && version_compare(_PS_VERSION_, '1.7', '>=')) {
             $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
-            if ($permissions['can_use_integrated_payments']) {
+            if ((bool) $permissions['can_use_integrated_payments']) {
                 if (!$onboardingAction->enableIntegratedAction()['success']) {
                     $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
                 }
@@ -322,19 +324,19 @@ class ConfigClass
             }
         }
         $available_options = [
-            'standard' => (bool) $this->config->get($this->dependencies->getConfigurationKey('standard')),
-            'live' => !(bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode')),
-            'embedded' => (string) $this->config->get($this->dependencies->getConfigurationKey('embeddedMode')),
-            'one_click' => (bool) $this->config->get($this->dependencies->getConfigurationKey('oneClick')),
-            'installment' => (bool) $this->config->get($this->dependencies->getConfigurationKey('inst')),
-            'deferred' => (bool) $this->config->get($this->dependencies->getConfigurationKey('deferred')),
-            'oney' => (bool) $this->config->get($this->dependencies->getConfigurationKey('oney')),
-            'bancontact' => (bool) $this->config->get($this->dependencies->getConfigurationKey('bancontact')),
-            'applepay' => (bool) $this->config->get($this->dependencies->getConfigurationKey('applepay')),
-            'amex' => (bool) $this->config->get($this->dependencies->getConfigurationKey('amex')),
+            'standard' => (bool) $configurationClass->getValue('standard'),
+            'live' => !(bool) $configurationClass->getValue('sandbox_mode'),
+            'embedded' => (string) $configurationClass->getValue('embedded_mode'),
+            'one_click' => (bool) $configurationClass->getValue('one_click'),
+            'installment' => (bool) $configurationClass->getValue('inst'),
+            'deferred' => (bool) $configurationClass->getValue('deferred'),
+            'oney' => (bool) $configurationClass->getValue('oney'),
+            'bancontact' => (bool) $configurationClass->getValue('bancontact'),
+            'applepay' => (bool) $configurationClass->getValue('applepay'),
+            'amex' => (bool) $configurationClass->getValue('amex'),
         ];
 
-        if ($this->config->get($this->dependencies->getConfigurationKey('email')) === null
+        if ($configurationClass->getValue('email') === null
             || !$this->dependencies->amountCurrencyClass->checkCurrency($cart)
             || !$this->dependencies->amountCurrencyClass->checkAmount($cart)
         ) {
@@ -350,7 +352,7 @@ class ConfigClass
             $available_options['amex'] = false;
         } else {
             if (!$this->validators['payment']->hasPermissions($permissions, 'use_live_mode')['result']
-                || $this->config->get($this->dependencies->getConfigurationKey('liveApiKey')) === null
+                || $configurationClass->getValue('live_api_key') === null
             ) {
                 $available_options['live'] = false;
             }
@@ -374,6 +376,10 @@ class ConfigClass
             }
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_amex')['result'] || !$available_options['live']) {
                 $available_options['amex'] = false;
+            }
+            if (!$permissions['can_use_integrated_payments'] && $available_options['embedded'] == 'integrated') {
+                $configurationClass->set('embedded_mode', 'redirect');
+                $available_options['embedded'] = 'redirect';
             }
         }
 

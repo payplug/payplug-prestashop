@@ -188,25 +188,46 @@ class HookClass
     {
         $order = $this->order->get((int) $params['id_order']);
         $active = $this->module->isEnabled($this->dependencies->name);
+
+        $can_use_deferred = (bool) $this->config->get($this->dependencies->getConfigurationKey('deferred'));
+        $deferredState = $this->config->get($this->dependencies->getConfigurationKey('deferredState'));
+
         if (!$active
             || $order->payment != $this->module->getInstanceByName($this->dependencies->name)->displayName
-            || !$this->config->get($this->dependencies->getConfigurationKey('deferred'))
-            || !$this->config->get($this->dependencies->getConfigurationKey('deferredAuto'))
-            || $params['newOrderStatus']->id != $this->config->get(
-                $this->dependencies->getConfigurationKey('deferredState')
-            )
+            || !$can_use_deferred
+            || !(bool) $deferredState
+            || $params['newOrderStatus']->id != $deferredState
         ) {
             return;
         }
 
         $cart = $this->cart->get((int) $order->id_cart);
         $payment_method = $this->dependencies->paymentClass->getPaymentMethodByCart($cart);
+
         if ($payment_method['type'] == 'installment') {
-            $installment = new PPPaymentInstallment($payment_method['id'], $this->dependencies);
-            $payment = $installment->getFirstPayment();
-        } else {
-            $payment = new PPPayment($payment_method['id'], $this->dependencies);
+            return;
         }
+
+        $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
+        if (!$retrieve['result']) {
+            $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            if ($sandbox) {
+                $this->dependencies->apiClass->setSecretKey($this->config->get(
+                    $this->dependencies->getConfigurationKey('liveApiKey')
+                ));
+                $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
+            } else {
+                $this->dependencies->apiClass->setSecretKey($this->config->get(
+                    $this->dependencies->getConfigurationKey('testApiKey')
+                ));
+                $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
+            }
+        }
+
+        if (!$retrieve['result']) {
+            return;
+        }
+        $payment = $retrieve['resource'];
 
         $is_paid = $this->validators['payment']->isPaid($payment)['result'];
         $can_be_captured = $this->validators['payment']->isPayment($payment)['result']
@@ -216,7 +237,7 @@ class HookClass
             && !$this->validators['payment']->isExpired($payment)['result'];
 
         if ($can_be_captured) {
-            $capture = $this->dependencies->apiClass->capturePayment($payment->resource->id);
+            $capture = $this->dependencies->apiClass->capturePayment($payment->id);
             if ($capture['result']) {
                 $payment = $capture['resource'];
                 if ($payment->card->id !== null) {
