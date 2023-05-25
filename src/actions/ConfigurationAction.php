@@ -325,6 +325,9 @@ class ConfigurationAction
             $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
         }
 
+        // Update global configuration
+        $this->dependencies->apiClass->getAccountPermissions();
+
         return $this->renderConfiguration();
     }
 
