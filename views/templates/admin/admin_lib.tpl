@@ -33,6 +33,5 @@
 
 <div id="payplug_admin"></div>
 
-<link href="{$lib_url|escape:'htmlall':'UTF-8'}css/app.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-1.2.1.js"></script>
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-1.2.1.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-1.3.0.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-1.3.0.js"></script>
