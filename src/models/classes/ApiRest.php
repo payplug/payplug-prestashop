@@ -1352,7 +1352,7 @@ class ApiRest
             ->getRoutes()
             ->getExternalUrl()['signup'];
         if ($this->dependencies->name == 'pspaylater') {
-            $register_link .= '/signup?sponsor=22101';
+            $register_link .= '?sponsor=22101';
         }
 
         return [
