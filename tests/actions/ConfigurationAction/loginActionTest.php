@@ -207,6 +207,7 @@ class loginActionTest extends BaseConfigurationAction
         $this->dependencies->apiClass = \Mockery::mock();
         $this->dependencies->apiClass->shouldReceive([
             'login' => true,
+            'getAccountPermissions' => true,
         ]);
 
         $this->configuration->shouldReceive([
