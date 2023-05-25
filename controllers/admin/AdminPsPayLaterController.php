@@ -83,6 +83,8 @@ class AdminPsPayLaterController extends ModuleAdminController
             'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/dist/',
         ]);
 
+        $this->context->controller->addCSS($lib_path . '/css/app.css');
+
         $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin_lib.tpl');
 
         parent::initContent();
