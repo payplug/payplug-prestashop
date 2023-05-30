@@ -352,6 +352,7 @@ class ConfigurationAction
                 'message' => 'Successfully logged out.',
                 'settings' => $api_rest->getSettingsSection(),
                 'status' => $api_rest->getRequirementsSection(),
+                'subscribe' => $api_rest->getSubscribeSection(),
             ],
         ];
     }
