@@ -65,6 +65,12 @@ class AdminPsPayLaterController extends ModuleAdminController
 
         $this->renderApiRest();
 
+        if ($this->tools->tool('getValue', '_ajax')) {
+            if ($this->tools->tool('getValue', 'refund')) {
+                $this->dependencies->refundClass->refundPayment();
+            }
+        }
+
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
             'ps_account_isActivated' => $this->dependencies->configClass->isValidFeature('feature_ps_account'),
