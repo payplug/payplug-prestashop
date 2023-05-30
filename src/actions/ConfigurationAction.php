@@ -163,6 +163,47 @@ class ConfigurationAction
     }
 
     /**
+     * @description  check if the merchant has the permissions to activate Live mode
+     *
+     * @param $datas
+     *
+     * @return array
+     */
+    public function checkLivePermissionAction($datas)
+    {
+        $logger = $this->dependencies->getPlugin()->getLogger();
+        if (!is_object($datas) || !$datas) {
+            $logger->addLog('ConfigurationAction::checkLivePermissionAction: Invalid parameter given, $datas must be a non empty object.');
+
+            return [
+                'success' => false,
+                'data' => [
+                    // todo:  add translation
+                    'message' => 'An error has occurred',
+                ],
+            ];
+        }
+        $permissions = $this->dependencies->name == 'pspaylater' ? 'onboarding_oney_completed' : 'use_live_mode';
+        if (!$this->checkPermissionAction($permissions, (bool) $datas->env)['success']) {
+            return [
+                'success' => false,
+                'data' => [
+                    'still_inactive' => !$this->checkPermissionAction($permissions, $datas->env)['success'],
+                    'message' => '',
+                ],
+            ];
+        }
+
+        return [
+            'success' => true,
+            'data' => [
+                'still_inactive' => false,
+                'message' => '',
+            ],
+        ];
+    }
+
+    /**
      * @description check merchant is onboarded
      *
      * @param $datas
@@ -218,9 +259,10 @@ class ConfigurationAction
             ];
         }
         $permissions = $this->dependencies->name == 'pspaylater' ? 'onboarding_oney_completed' : 'use_live_mode';
-        if (!$this->checkPermissionAction($permissions, $datas->env)['success']) {
+
+        if (!$this->checkPermissionAction($permissions, (bool) $datas->env)['success']) {
             return [
-                'success' => false,
+                'success' => true,
                 'data' => [
                     'still_inactive' => !$this->checkPermissionAction($permissions, $datas->env)['success'],
                     'message' => '',

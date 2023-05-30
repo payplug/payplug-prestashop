@@ -90,7 +90,11 @@ class ApiRest
 
             case 'refresh_keys':
                 $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
-                $json = $configurationAction->submitSandboxAction($datas);
+                if (base64_decode($datas->payplug_password) != 'false') {
+                    $json = $configurationAction->submitSandboxAction($datas);
+                } else {
+                    $json = $configurationAction->checkLivePermissionAction($datas);
+                }
 
                 break;
             case 'save':
