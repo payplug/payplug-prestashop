@@ -321,12 +321,17 @@ class ConfigurationAction
         $config = $this->dependencies->getPlugin()->getConfiguration();
         $config->updateValue($this->dependencies->getConfigurationKey('email'), $email);
         $config->updateValue($this->dependencies->getConfigurationKey('enable'), 1);
-        if ((bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
-            $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
-        }
 
         // Update global configuration
-        $this->dependencies->apiClass->getAccountPermissions();
+        $permissions = $this->dependencies->apiClass->getAccountPermissions();
+        if ('pspaylater' == $this->dependencies->name) {
+            if ($permissions['onboarding_oney_completed']
+                && (bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
+                $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
+            }
+        } elseif ((bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
+            $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
+        }
 
         return $this->renderConfiguration();
     }
