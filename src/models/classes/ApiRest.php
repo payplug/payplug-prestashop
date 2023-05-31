@@ -351,7 +351,17 @@ class ApiRest
         $configuration = $this->dependencies
             ->getPlugin()
             ->getConfigurationClass();
-        $inactive = (bool) $configuration->getValue('live_api_key');
+
+        $live_api_key = $configuration->getValue('live_api_key');
+        $permissions = $this->dependencies->apiClass->getAccountPermissions(
+            $live_api_key
+        );
+        if ('pspaylater' == $this->dependencies->name) {
+            $active = $live_api_key && $permissions['onboarding_oney_completed'];
+        } else {
+            $active = is_null($live_api_key) ? false : $live_api_key;
+        }
+
         $default_configuration = [
             'sandbox_mode' => $configuration->getDefault('sandbox_mode'),
         ];
@@ -424,7 +434,7 @@ class ApiRest
             ],
             'can_be_disabled' => true,
             'inactive_modal' => [
-                'inactive' => !$inactive,
+                'inactive' => !$active,
                 'title' => $translation['inactive']['modal']['title'],
                 'description' => $translation['inactive']['modal']['description'],
                 'password_label' => $translation['inactive']['modal']['password_label'],
