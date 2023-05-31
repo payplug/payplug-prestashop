@@ -323,10 +323,13 @@ class ConfigurationAction
         $config->updateValue($this->dependencies->getConfigurationKey('enable'), 1);
 
         // Update global configuration
-        $permissions = $this->dependencies->apiClass->getAccountPermissions();
+        $permissions = $this->dependencies->apiClass->getAccountPermissions(
+            $config->get($this->dependencies->getConfigurationKey('liveApiKey'))
+        );
+
         if ('pspaylater' == $this->dependencies->name) {
-            if ($permissions['onboarding_oney_completed']
-                && (bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
+            if ((bool) $permissions['can_use_oney']
+                && (bool) $permissions['onboarding_oney_completed']) {
                 $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
             }
         } elseif ((bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
