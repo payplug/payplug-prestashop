@@ -26,16 +26,6 @@ class getLoggedSectionTest extends BaseApiRest
         ]);
 
         $this->configuration_class
-            ->shouldReceive('getValue')
-            ->andReturnUsing(function ($key) {
-                switch ($key) {
-                    case 'live_api_key':
-                        return 'sk_live_azerty1234567';
-                }
-            })
-        ;
-
-        $this->configuration_class
             ->shouldReceive('getDefault')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
@@ -55,6 +45,32 @@ class getLoggedSectionTest extends BaseApiRest
     }
 
     /**
+     * @description  generate Not onborded merchant datas
+     *
+     * @return \Generator
+     */
+    public function unOnboardedMerchantDataProvider()
+    {
+        yield ['payplug', null, true];
+        yield ['payplug', null, false];
+        yield ['pspaylater', 'sk_live_4fuIk4dSh7Kkyu3sP78', false];
+        yield ['pspaylater', null, false];
+        yield ['pspaylater', null, true];
+    }
+
+    /**
+     * @description  generate onborded merchant datas
+     *
+     * @return \Generator
+     */
+    public function OnboardedMerchantDataProvider()
+    {
+        yield ['payplug', 'sk_live_4fuIk4dSh7Kkyu3sP78', false];
+        yield ['payplug', 'sk_live_4fuIk4dSh7Kkyu3sP78', true];
+        yield ['pspaylater', 'sk_live_4fuIk4dSh7Kkyu3sP78', true];
+    }
+
+    /**
      * @dataProvider invalidArrayFormatDataProvider
      *
      * @param mixed $current_configuration
@@ -70,6 +86,11 @@ class getLoggedSectionTest extends BaseApiRest
     public function testWhenNoSandboxModeIsGiven()
     {
         $current_configuration = [];
+        $this->dependencies->apiClass->shouldReceive(
+            [
+                'getAccountPermissions' => ['onboarding_oney_completed' => true],
+            ]
+        );
         $response = $this->classe->getLoggedSection($current_configuration);
         $this->assertSame(
             [
@@ -95,6 +116,11 @@ class getLoggedSectionTest extends BaseApiRest
         $current_configuration = [
             'sandbox_mode' => true,
         ];
+        $this->dependencies->apiClass->shouldReceive(
+            [
+                'getAccountPermissions' => ['onboarding_oney_completed' => true],
+            ]
+        );
         $response = $this->classe->getLoggedSection($current_configuration);
         $this->assertSame(
             [
@@ -120,6 +146,11 @@ class getLoggedSectionTest extends BaseApiRest
         $current_configuration = [
             'sandbox_mode' => false,
         ];
+        $this->dependencies->apiClass->shouldReceive(
+            [
+                'getAccountPermissions' => ['onboarding_oney_completed' => true],
+            ]
+        );
         $response = $this->classe->getLoggedSection($current_configuration);
         $this->assertSame(
             [
@@ -137,6 +168,94 @@ class getLoggedSectionTest extends BaseApiRest
                 ],
             ],
             $response['options']
+        );
+    }
+
+    /**
+     * @dataProvider unOnboardedMerchantDataProvider
+     * @description test the cas of the merchant is not onboarded for both modules
+     *
+     * @param $module_name
+     * @param $live_api_key
+     * @param $onboarding_oney_completed
+     */
+    public function testWhenMerchantIsNotOnboarded($module_name, $live_api_key, $onboarding_oney_completed)
+    {
+        $current_configuration = [
+            'sandbox_mode' => false,
+        ];
+        $this->dependencies->name = $module_name;
+        $this->configuration_class
+            ->shouldReceive('getValue')
+            ->andReturnUsing(function ($key) use ($live_api_key) {
+                switch ($key) {
+                    case 'live_api_key':
+                        return $live_api_key;
+                }
+            })
+        ;
+
+        $this->dependencies->apiClass->shouldReceive(
+            [
+                'getAccountPermissions' => ['onboarding_oney_completed' => $onboarding_oney_completed],
+            ]
+        );
+        $response = $this->classe->getLoggedSection($current_configuration);
+        $this->assertSame(
+            [
+                'inactive' => true,
+                'title' => 'logged.inactive.modal.title',
+                'description' => 'logged.inactive.modal.description',
+                'password_label' => 'logged.inactive.modal.password_label',
+                'cancel' => 'logged.inactive.modal.cancel',
+                'ok' => 'logged.inactive.modal.ok',
+
+            ],
+            $response['inactive_modal']
+        );
+    }
+
+    /**
+     * @dataProvider OnboardedMerchantDataProvider
+     * @description test the cas of the merchant is onboarded for both modules
+     *
+     * @param $module_name
+     * @param $live_api_key
+     * @param $onboarding_oney_completed
+     */
+    public function testWhenMerchantIsOnboarded($module_name, $live_api_key, $onboarding_oney_completed)
+    {
+        $current_configuration = [
+            'sandbox_mode' => false,
+        ];
+        $this->dependencies->name = $module_name;
+        $this->configuration_class
+            ->shouldReceive('getValue')
+            ->andReturnUsing(function ($key) use ($live_api_key) {
+                switch ($key) {
+                    case 'live_api_key':
+                        return $live_api_key;
+                }
+            })
+        ;
+
+        $this->dependencies->apiClass->shouldReceive(
+            [
+                'getAccountPermissions' => ['onboarding_oney_completed' => $onboarding_oney_completed],
+            ]
+        );
+        $response = $this->classe->getLoggedSection($current_configuration);
+        $this->assertSame(
+            [
+                'inactive' => false,
+                'title' => 'logged.inactive.modal.title',
+                'description' => 'logged.inactive.modal.description',
+                'password_label' => 'logged.inactive.modal.password_label',
+                'cancel' => 'logged.inactive.modal.cancel',
+                'ok' => 'logged.inactive.modal.ok',
+
+            ],
+            $response['inactive_modal']
         );
     }
 }

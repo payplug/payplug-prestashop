@@ -947,7 +947,13 @@ class HookClass
         if (!$this->dependencies->configClass->isAllowed()) {
             return false;
         }
-
+        $this->media->addJsDef(
+            [
+                'is_sandbox_mode' => (bool) $this->config->get(
+                    $this->dependencies->getConfigurationKey('sandboxMode')
+                ),
+            ]
+        );
         $moduleName = $this->tools->tool('getValue', 'modulename');
 
         if ($this->tools->tool('getValue', 'has_error')

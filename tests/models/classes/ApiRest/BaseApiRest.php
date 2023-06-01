@@ -90,5 +90,6 @@ class BaseApiRest extends TestCase
         $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
 
         $this->classe = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();
+        $this->dependencies->apiClass = \Mockery::mock('alias:PayPlug\classes\ApiClass');
     }
 }

@@ -19,7 +19,7 @@
  * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
- */ require_once dirname(__FILE__) . '/../../vendor/autoload.php';
+ */
 
 use PayLaterModule\classes\DependenciesClass;
 
@@ -27,10 +27,12 @@ class AdminPsPayLaterController extends ModuleAdminController
 {
     public $module;
 
+    private $api_rest;
     private $constant;
     private $dependencies;
     private $logger;
     private $media;
+    private $tools;
 
     public function __construct()
     {
@@ -39,10 +41,17 @@ class AdminPsPayLaterController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+        $this->tools = $this->dependencies->getPlugin()->getTools();
+
+        // If referer is from development server, trigger api rest renderer
+        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'localhost') != null) {
+            $this->renderApiRest();
+        }
     }
 
     /**
@@ -54,14 +63,25 @@ class AdminPsPayLaterController extends ModuleAdminController
             $this->setPsAccount();
         }
 
+        $this->renderApiRest();
+
+        if ($this->tools->tool('getValue', '_ajax')) {
+            if ($this->tools->tool('getValue', 'refund')) {
+                $this->dependencies->refundClass->refundPayment();
+            }
+        }
+
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
+            'ps_account_isActivated' => $this->dependencies->configClass->isValidFeature('feature_ps_account'),
+            'pp_version' => $this->dependencies->version,
         ]);
 
+        $lib_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/';
         $this->media->addJsDef([
             'payplug_admin_config' => [
                 'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
-                'img_path' => $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/',
+                'img_path' => $lib_path,
             ],
         ]);
 
@@ -69,9 +89,22 @@ class AdminPsPayLaterController extends ModuleAdminController
             'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/dist/',
         ]);
 
+        $this->context->controller->addCSS($lib_path . '/css/app.css');
+
         $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin_lib.tpl');
 
         parent::initContent();
+    }
+
+    /**
+     * @description Render Api Rest Json
+     */
+    public function renderApiRest()
+    {
+        if ($rest_route = $this->tools->tool('getValue', 'rest_route')) {
+            $json = $this->api_rest->dispatch($rest_route);
+            exit(json_encode($json));
+        }
     }
 
     public function setPsAccount()

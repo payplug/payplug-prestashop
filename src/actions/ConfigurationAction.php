@@ -321,7 +321,18 @@ class ConfigurationAction
         $config = $this->dependencies->getPlugin()->getConfiguration();
         $config->updateValue($this->dependencies->getConfigurationKey('email'), $email);
         $config->updateValue($this->dependencies->getConfigurationKey('enable'), 1);
-        if ((bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
+
+        // Update global configuration
+        $permissions = $this->dependencies->apiClass->getAccountPermissions(
+            $config->get($this->dependencies->getConfigurationKey('liveApiKey'))
+        );
+
+        if ('pspaylater' == $this->dependencies->name) {
+            if ((bool) $permissions['can_use_oney']
+                && (bool) $permissions['onboarding_oney_completed']) {
+                $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
+            }
+        } elseif ((bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
             $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
         }
 
@@ -344,6 +355,7 @@ class ConfigurationAction
                 'message' => 'Successfully logged out.',
                 'settings' => $api_rest->getSettingsSection(),
                 'status' => $api_rest->getRequirementsSection(),
+                'subscribe' => $api_rest->getSubscribeSection(),
             ],
         ];
     }
@@ -371,22 +383,30 @@ class ConfigurationAction
                 'header' => $header,
                 'login' => $api_rest->getLoginSection(),
                 'logged' => $api_rest->getLoggedSection($current_configuration),
-                'payment_methods' => $api_rest->getPaymentMethodsSection($current_configuration),
                 'payment_paylater' => $api_rest->getPaylaterSection($current_configuration),
                 'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
             ];
+
+            // Add payment_methods section if module is payplug
+            if ('payplug' == $this->dependencies->name) {
+                $datas['payment_methods'] = $api_rest->getPaymentMethodsSection($current_configuration);
+            }
         } else {
             $datas = [
                 'settings' => $api_rest->getSettingsSection(),
                 'header' => $header,
                 'login' => $api_rest->getLoginSection(),
                 'subscribe' => $api_rest->getSubscribeSection(),
-                'payment_methods' => $api_rest->getPaymentMethodsSection(),
                 'payment_paylater' => $api_rest->getPaylaterSection(),
                 'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
             ];
+
+            // Add payment_methods section if module is payplug
+            if ('payplug' == $this->dependencies->name) {
+                $datas['payment_methods'] = $api_rest->getPaymentMethodsSection();
+            }
         }
 
         return [
