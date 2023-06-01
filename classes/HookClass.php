@@ -947,13 +947,27 @@ class HookClass
         if (!$this->dependencies->configClass->isAllowed()) {
             return false;
         }
+
+        $payplug_ajax_url = $this->context->link->getModuleLink($this->dependencies->name, 'ajax', [], true);
+        $dotenv = new Dotenv();
+        $dotenvFile = \dirname(\dirname(\dirname(__FILE__))) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            $dotenv->load($dotenvFile);
+            $payplug_domain = $_ENV['PAYPLUG_DOMAIN'];
+        } else {
+            $payplug_domain = 'https://secure.payplug.com';
+        }
+
         $this->media->addJsDef(
             [
+                $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
+                'PAYPLUG_DOMAIN' => $payplug_domain,
                 'is_sandbox_mode' => (bool) $this->config->get(
                     $this->dependencies->getConfigurationKey('sandboxMode')
                 ),
             ]
         );
+
         $moduleName = $this->tools->tool('getValue', 'modulename');
 
         if ($this->tools->tool('getValue', 'has_error')
@@ -1061,16 +1075,6 @@ class HookClass
             ]);
         }
 
-        $payplug_ajax_url = $this->context->link->getModuleLink($this->dependencies->name, 'ajax', [], true);
-        $dotenv = new Dotenv();
-        $dotenvFile = \dirname(\dirname(\dirname(__FILE__))) . '/payplugroutes/.env';
-        if (\file_exists($dotenvFile)) {
-            $dotenv->load($dotenvFile);
-            $payplug_domain = $_ENV['PAYPLUG_DOMAIN'];
-        } else {
-            $payplug_domain = 'https://secure.payplug.com';
-        }
-
         if ('integrated' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))) {
             $integratedPaymentError = $this->dependencies->l('hook.header.integratedPayment.error', 'hookclass');
             $sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
@@ -1089,16 +1093,6 @@ class HookClass
                 'applePayIdCart' => $this->context->cart->id,
             ]);
         }
-
-        $this->media->addJsDef(
-            [
-                $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
-                'PAYPLUG_DOMAIN' => $payplug_domain,
-                'is_sandbox_mode' => (bool) $this->config->get(
-                    $this->dependencies->getConfigurationKey('sandboxMode')
-                ),
-            ]
-        );
     }
 
     /**
