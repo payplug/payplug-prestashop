@@ -136,6 +136,9 @@ var $document, $window, __moduleName__Module = {
                 var integrated = __moduleName__Module.integrated,
                     payment_option_id = integrated.props.paymentOptionId;
 
+                if (typeof $document == 'undefined') {
+                    return false;
+                }
                 $document.on('click', '#' + payment_option_id, integrated.form.set);
             },
             clear: function (clear) {
