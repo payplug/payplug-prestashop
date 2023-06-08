@@ -1800,6 +1800,58 @@ class PaymentClass
         return $user_browser;
     }
 
+    /**
+     * @description update payment ressource
+     *
+     * @param $pay_id
+     * @param $order_id
+     */
+    public function updatePayment($pay_id, $order_id)
+    {
+        $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+
+        if (!$payment['result']) {
+            exit(json_encode([
+                                'data' => $this->dependencies->l('payplug.adminPayplugController.errorOccurred', 'adminpayplugcontroller'),
+                                'status' => 'error',
+                            ]));
+        }
+        $payment = $payment['resource'];
+
+        $state_addons = ($payment->is_live ? '' : '_TEST');
+        if ((int) $payment->is_paid == 1) {
+            $new_state = (int) $this->config->get(
+                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
+            );
+        } elseif ((int) $payment->is_paid == 0) {
+            if ($payment->is_live == 1) {
+                $new_state = (int) $this->dependencies->getPlugin()->getConfiguration()->get(
+                    $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR')
+                );
+            } else {
+                $new_state = $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR') . $state_addons;
+            }
+        }
+
+        $order = $this->order->get((int) $order_id);
+
+        if ($this->validate->validate('isLoadedObject', $order)) {
+            $current_state = (int) $order->getCurrentState();
+            if ($current_state != 0 && $current_state != $new_state) {
+                $history = $this->orderHistory->get();
+                $history->id_order = (int) $order->id;
+                $history->changeIdOrderState($new_state, (int) $order->id, true);
+                $history->addWithemail();
+                $this->logger->addLog('Change order state to ' . $new_state, 'notice');
+            }
+        }
+
+        exit(json_encode([
+                            'message' => $this->dependencies->l('payplug.adminPayplugController.orderUpdated', 'adminpayplugcontroller'),
+                            'reload' => true,
+                        ]));
+    }
+
     private function getAmexPaymentOption($payment_options, $options = [])
     {
         $payment_options['amex'] = [
