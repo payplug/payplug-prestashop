@@ -75,6 +75,12 @@ class AdminPayplugController extends ModuleAdminController
             if ($this->tools->tool('getValue', 'abort')) {
                 $this->dependencies->paymentClass->abortPayment();
             }
+
+            if ($this->tools->tool('getValue', 'update')) {
+                $pay_id = $this->tools->tool('getValue', 'pay_id');
+                $id_order = $this->tools->tool('getValue', 'id_order');
+                $this->dependencies->paymentClass->updatePayment($pay_id, $id_order);
+            }
         }
 
         $this->context->smarty->assign([

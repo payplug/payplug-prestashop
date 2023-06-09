@@ -892,6 +892,7 @@ class ApiRest
                                     'text' => $translation['installment']['descriptions']['controller_link'],
                                     'url' => $link->getAdminLink('AdminPayPlugInstallment'),
                                     'target' => '_blank',
+                                    'data_e2e' => 'data-panelInstallmentLink',
                                 ],
                                 [
                                     'text' => $translation['installment']['link'],
