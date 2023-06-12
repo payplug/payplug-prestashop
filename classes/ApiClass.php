@@ -52,6 +52,9 @@ class ApiClass
     /** var Configuration */
     public $config;
 
+    /** var ConfigurationClass */
+    public $configuration;
+
     /** var DependenciesClass */
     public $dependencies;
     /** @var object */
@@ -74,6 +77,7 @@ class ApiClass
     {
         $this->dependencies = $dependencies;
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
         $this->checkEnvironment();
@@ -1072,67 +1076,48 @@ class ApiClass
             }
         }
 
-        if (isset($json_answer['payment_methods']['bancontact']['enabled'])) {
-            $can_use_bancontact = $json_answer['payment_methods']['bancontact']['enabled'];
-        } else {
-            $can_use_bancontact = true;
-        }
-
-        if (isset($json_answer['payment_methods']['apple_pay']['enabled'])) {
-            $can_use_applepay = $json_answer['payment_methods']['apple_pay']['enabled'];
-        } else {
-            $can_use_applepay = true;
-        }
-
-        if (isset($json_answer['payment_methods']['american_express']['enabled'])) {
-            $can_use_amex = $json_answer['payment_methods']['american_express']['enabled'];
-        } else {
-            $can_use_amex = true;
-        }
-
-        $onboarding_oney_completed = false;
-        if (isset($json_answer['payment_methods']) && !empty(
-            $this->config->get(
-                $this->dependencies->getConfigurationKey('liveApiKey')
-            )
-            )) {
-            $oney_methods = [];
-            foreach ($json_answer['payment_methods'] as $key => $val) {
-                if ($this->tools->substr($key, 0, 5) == 'oney_') {
-                    $oney_methods[] = $val['enabled'];
-                }
-            }
-            foreach ($oney_methods as $value) {
-                if ($value == 'true') {
-                    $onboarding_oney_completed = true;
-                }
-            }
-        }
-
         $permissions = [
             'is_live' => $json_answer['is_live'],
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
             'can_save_cards' => $json_answer['permissions']['can_save_cards'],
+            'apple_pay_allowed_domains' => [],
+            'onboarding_oney_completed' => false,
+            'can_use_oney' => $json_answer['permissions']['can_use_oney'],
             'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_integrated_payments' => $json_answer['permissions']['can_use_integrated_payments'],
-            'can_use_oney' => $json_answer['permissions']['can_use_oney'],
-            'can_use_bancontact' => $can_use_bancontact,
-            'can_use_applepay' => $can_use_applepay,
-            'can_use_amex' => $can_use_amex,
-            'onboarding_oney_completed' => $onboarding_oney_completed,
-            'apple_pay_allowed_domains' => [],
         ];
 
-        // Do not allow Spain or Belgium on Payplug
-        if (($configuration['oney_allowed_countries'] === 'ES'
-                || $configuration['oney_allowed_countries'] === 'BE')
-            && $this->dependencies->name === 'payplug') {
-            $permissions['can_use_oney'] = false;
+        if (isset($json_answer['payment_methods'])) {
+            $payment_methods = $json_answer['payment_methods'];
+            foreach ($payment_methods as $payment_method_name => $payment_method) {
+                if (isset($payment_method['enabled'])) {
+                    $permissions['can_use_' . $payment_method_name] = $payment_method['enabled'];
+                } else {
+                    $permissions['can_use_' . $payment_method_name] = true;
+                }
+
+                if ('apple_pay' == $payment_method_name && isset($payment_method['allowed_domain_names'])) {
+                    $permissions['apple_pay_allowed_domains'] = $payment_method['allowed_domain_names'];
+                }
+            }
+
+            // Check oney onboarding
+            if ($this->configuration->getValue('live_api_key')) {
+                foreach ($permissions as $permission => $enabled) {
+                    if (strpos($permission, 'can_use_oney_') !== false) {
+                        if (!$permissions['onboarding_oney_completed']) {
+                            $permissions['onboarding_oney_completed'] = $enabled;
+                        }
+                    }
+                }
+            }
         }
 
-        if (isset($json_answer['payment_methods']['apple_pay']['allowed_domain_names'])) {
-            $permissions['apple_pay_allowed_domains'] = $json_answer['payment_methods']['apple_pay']['allowed_domain_names'];
+        // Do not allow Spain or Belgium on Payplug
+        if (in_array($configuration['oney_allowed_countries'], ['ES', 'BE'])
+            && 'payplug' == $this->dependencies->name) {
+            $permissions['can_use_oney'] = false;
         }
 
         // Get company country

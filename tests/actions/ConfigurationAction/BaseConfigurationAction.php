@@ -3,6 +3,7 @@
 namespace PayPlug\tests\actions\ConfigurationAction;
 
 use PayPlug\src\actions\ConfigurationAction;
+use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
@@ -11,6 +12,7 @@ class BaseConfigurationAction extends TestCase
 {
     public $action;
     public $configuration;
+    public $configuration_class;
     public $dependencies;
     public $logger;
     public $module;
@@ -64,10 +66,12 @@ class BaseConfigurationAction extends TestCase
 
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
 
+        $this->configuration_class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->plugin
             ->shouldReceive([
                 'getLogger' => $this->logger,
                 'getConfiguration' => $this->configuration,
+                'getConfigurationClass' => $this->configuration_class,
                 'getOney' => $this->oney,
                 'getTranslation' => $this->translation,
                 'getModule' => $this->module,

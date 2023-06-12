@@ -25,6 +25,12 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
+use PayPlug\src\models\classes\paymentMethod\GiropayPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\iDEALPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\MyBankPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\SatispayPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\SofortPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\StandardPaymentMethod;
 use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\models\repositories\PaymentRepository;
@@ -340,6 +346,7 @@ class DependenciesClass
     private $classes;
     private $plugin;
     private $helpers;
+    private $payment_method;
     private $repositories;
     private $validators;
 
@@ -362,6 +369,7 @@ class DependenciesClass
         $this->setHelpers();
         $this->setPlugin((new PluginInit($this))->getEntity());
         $this->setRepositories();
+        $this->setPaymentMethods();
 
         $this->apiClass = new ApiClass($this);
         $this->applePayClass = new ApplePayClass($this);
@@ -497,6 +505,11 @@ class DependenciesClass
         return $this->classes;
     }
 
+    public function getPaymentMethods()
+    {
+        return $this->payment_method;
+    }
+
     private function setvalidators()
     {
         $this->validators = [
@@ -529,6 +542,18 @@ class DependenciesClass
             'amount' => new AmountHelper(),
             'files' => new FilesHelper(),
             'user' => new UserHelper(),
+        ];
+    }
+
+    private function setPaymentMethods()
+    {
+        $this->payment_method = [
+            'standard' => new StandardPaymentMethod($this),
+            'satispay' => new SatispayPaymentMethod($this),
+            'sofort' => new SofortPaymentMethod($this),
+            'giropay' => new GiropayPaymentMethod($this),
+            'ideal' => new iDEALPaymentMethod($this),
+            'mybank' => new MyBankPaymentMethod($this),
         ];
     }
 }

@@ -4,6 +4,12 @@ namespace PayPlug\tests\models\classes\ApiRest;
 
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
+use PayPlug\src\models\classes\paymentMethod\GiropayPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\iDEALPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\MyBankPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\SatispayPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\SofortPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\StandardPaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\moduleValidator;
@@ -20,6 +26,7 @@ class BaseApiRest extends TestCase
     public $constant;
     public $dependencies;
     public $logger;
+    public $payment_methods;
     public $plugin;
     public $tools;
 
@@ -80,11 +87,27 @@ class BaseApiRest extends TestCase
             ]);
 
         $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();
+        $this->payment_methods = [
+            'amex' => \Mockery::mock('Amex'),
+            'applepay' => \Mockery::mock('Applepay'),
+            'bancontact' => \Mockery::mock('Bancontact'),
+            'deferred' => \Mockery::mock('Deferred'),
+            'giropay' => \Mockery::mock(GiropayPaymentMethod::class)->makePartial(),
+            'inst' => \Mockery::mock('Inst'),
+            'ideal' => \Mockery::mock(iDEALPaymentMethod::class)->makePartial(),
+            'mybank' => \Mockery::mock(MyBankPaymentMethod::class)->makePartial(),
+            'one_click' => \Mockery::mock('OneClick'),
+            'oney' => \Mockery::mock('Oney'),
+            'satispay' => \Mockery::mock(SatispayPaymentMethod::class)->makePartial(),
+            'sofort' => \Mockery::mock(SofortPaymentMethod::class)->makePartial(),
+            'standard' => \Mockery::mock(StandardPaymentMethod::class)->makePartial(),
+        ];
         $this->dependencies
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
                 'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
                 'getHelpers' => ['amount' => $this->amount_helper],
+                'getPaymentMethods' => $this->payment_methods,
             ]);
 
         $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');

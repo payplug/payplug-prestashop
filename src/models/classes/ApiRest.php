@@ -147,20 +147,22 @@ class ApiRest
             (bool) $configuration->getValue('enable')
         )['result'];
 
+        $payment_methods = json_decode($configuration->getValue('payment_methods'), true);
+
         return [
             'logged' => $logged,
             'email' => $configuration->getValue('email'),
             'enable' => $enable,
             'sandbox_mode' => (bool) $configuration->getValue('sandbox_mode'),
             'embedded_mode' => $configuration->getValue('embedded_mode'),
-            'standard' => (bool) $configuration->getValue('standard'),
-            'one_click' => (bool) $configuration->getValue('one_click'),
-            'inst' => (bool) $configuration->getValue('inst'),
+            'standard' => (bool) $payment_methods['standard'],
+            'one_click' => (bool) $payment_methods['one_click'],
+            'inst' => (bool) $payment_methods['inst'],
             'inst_mode' => $configuration->getValue('inst_mode'),
             'inst_min_amount' => $configuration->getValue('inst_min_amount'),
-            'deferred' => (bool) $configuration->getValue('deferred'),
+            'deferred' => (bool) $payment_methods['deferred'],
             'deferred_state' => $configuration->getValue('deferred_state'),
-            'oney' => (bool) $configuration->getValue('oney'),
+            'oney' => (bool) $payment_methods['oney'],
             'oney_fees' => (bool) $configuration->getValue('oney_fees'),
             'oney_schedule' => (bool) $configuration->getValue('oney_optimized'),
             'oney_product_animation' => (bool) $configuration->getValue('oney_product_cta'),
@@ -169,61 +171,16 @@ class ApiRest
             'oney_max_amounts' => $configuration->getValue('oney_max_amounts'),
             'oney_custom_min_amounts' => $configuration->getValue('oney_custom_min_amounts'),
             'oney_custom_max_amounts' => $configuration->getValue('oney_custom_max_amounts'),
-            'bancontact' => (bool) $configuration->getValue('bancontact'),
+            'bancontact' => (bool) $payment_methods['bancontact'],
             'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
-            'applepay' => (bool) $configuration->getValue('applepay'),
-            'amex' => (bool) $configuration->getValue('amex'),
+            'applepay' => (bool) $payment_methods['applepay'],
+            'amex' => (bool) $payment_methods['amex'],
+            'satispay' => (bool) $payment_methods['satispay'],
+            'sofort' => (bool) $payment_methods['sofort'],
+            'giropay' => (bool) $payment_methods['giropay'],
+            'ideal' => (bool) $payment_methods['ideal'],
+            'mybank' => (bool) $payment_methods['mybank'],
         ];
-    }
-
-    /**
-     * @description Get available order state to use for the deferred payment
-     *
-     * @param int $deferred_state
-     *
-     * @return array
-     */
-    public function getDeferredState($deferred_state = 0)
-    {
-        if (!is_int($deferred_state)) {
-            return [];
-        }
-
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getPaymentMethodsTranslations();
-
-        $order_states = $this->dependencies
-            ->orderClass
-            ->getOrderStates();
-
-        $order_states_values = [
-            0 => [
-                'value' => 0,
-                'label' => $translation['deferred']['states']['default'],
-                'checked' => (int) $deferred_state ? false : true,
-            ],
-        ];
-        if ($order_states) {
-            foreach ($order_states as $order_state) {
-                $order_states_values[$order_state['id_order_state']] = [
-                    'value' => $order_state['id_order_state'],
-                    'label' => sprintf(
-                        $translation['deferred']['states']['state'],
-                        $order_state['name']
-                    ),
-                    'checked' => $order_state['id_order_state'] == $deferred_state ? true : false,
-                    'warning_msg' => sprintf(
-                        $translation['deferred']['states']['alert'],
-                        $order_state['name']
-                    ),
-                ];
-            }
-        }
-        ksort($order_states_values);
-
-        return (array) $order_states_values;
     }
 
     /**
@@ -848,261 +805,9 @@ class ApiRest
             ->get('_PS_VERSION_');
 
         if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
-            $advanced_settings = [];
-
-            $embedded_mode = [];
-            if (version_compare($version, '1.7', '>=')
-                && $this->dependencies->configClass->isValidFeature('feature_integrated')) {
-                $embedded_mode[] = [
-                    'name' => 'payplug_embedded',
-                    'label' => $translation['embedded']['options']['integrated'],
-                    'value' => 'integrated',
-                    'checked' => 'integrated' == $current_configuration['embedded_mode'],
-                ];
-            }
-            $embedded_mode[] = [
-                'name' => 'payplug_embedded',
-                'label' => $translation['embedded']['options']['popup'],
-                'value' => 'popup',
-                'checked' => 'popup' == $current_configuration['embedded_mode'],
-            ];
-            $embedded_mode[] = [
-                'name' => 'payplug_embedded',
-                'label' => $translation['embedded']['options']['redirect'],
-                'value' => 'redirect',
-                'checked' => 'redirect' == $current_configuration['embedded_mode'],
-            ];
-
-            if ($this->dependencies->configClass->isValidFeature('feature_installment')) {
-                $advanced_settings[] = [
-                    'name' => 'fractional',
-                    'title' => $translation['installment']['title'],
-                    'class' => '-installment',
-                    'enabled' => [
-                        'name' => 'payplug_inst',
-                        'checked' => $current_configuration['inst'],
-                    ],
-                    'descriptions' => [
-                        'live' => [
-                            'description_1' => $translation['installment']['descriptions']['description_1'],
-                            'text_from' => $translation['installment']['descriptions']['text_from'],
-                            'description_2' => $translation['installment']['descriptions']['description_2'],
-                            'links' => [
-                                [
-                                    'text' => $translation['installment']['descriptions']['controller_link'],
-                                    'url' => $link->getAdminLink('AdminPayPlugInstallment'),
-                                    'target' => '_blank',
-                                    'data_e2e' => 'data-panelInstallmentLink',
-                                ],
-                                [
-                                    'text' => $translation['installment']['link'],
-                                    'url' => $external_url['installments'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'notes' => [
-                                'type' => '-warning',
-                                'description' => $translation['installment']['descriptions']['alert']['start']
-                                    . '<br />' . $translation['installment']['descriptions']['alert']['end'],
-                            ],
-                        ],
-                        'sandbox' => [
-                            'description_1' => $translation['installment']['descriptions']['description_1'],
-                            'text_from' => $translation['installment']['descriptions']['text_from'],
-                            'description_2' => $translation['installment']['descriptions']['description_2'],
-                            'links' => [
-                                [
-                                    'text' => $translation['installment']['descriptions']['controller_link'],
-                                    'url' => $link->getAdminLink('AdminPayPlugInstallment'),
-                                    'target' => '_blank',
-                                ],
-                                [
-                                    'text' => $translation['installment']['link'],
-                                    'url' => $external_url['installments'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'notes' => [
-                                'type' => '-warning',
-                                'description' => $translation['installment']['descriptions']['alert']['start']
-                                    . '<br />' . $translation['installment']['descriptions']['alert']['end'],
-                            ],
-                        ],
-                    ],
-                    'options' => [
-                        [
-                            'name' => 'payplug_inst_mode',
-                            'type' => 'select',
-                            'disabled' => !$current_configuration['inst'],
-                            'options' => [
-                                [
-                                    'value' => 2,
-                                    'label' => $translation['installment']['select']['2_schedules'],
-                                    'checked' => 2 == (int) $current_configuration['inst_mode'],
-                                ],
-                                [
-                                    'value' => 3,
-                                    'label' => $translation['installment']['select']['3_schedules'],
-                                    'checked' => 3 == (int) $current_configuration['inst_mode'],
-                                ],
-                                [
-                                    'value' => 4,
-                                    'label' => $translation['installment']['select']['4_schedules'],
-                                    'checked' => 4 == (int) $current_configuration['inst_mode'],
-                                ],
-                            ],
-                        ],
-                        [
-                            'type' => 'input',
-                            'name' => 'payplug_inst_min_amount',
-                            'disabled' => !$current_configuration['inst'],
-                            'value' => (int) $current_configuration['inst_min_amount'],
-                            'min' => 4,
-                            'step' => 1,
-                            'max' => 20000,
-                            'out_of_bound_msg' => $translation['installment']['error_limit'],
-                        ],
-                    ],
-                    'notes' => [
-                        'type' => '-warning',
-                        'description' => $translation['installment']['descriptions']['alert'],
-                    ],
-                ];
-            }
-
-            if ($this->dependencies->configClass->isValidFeature('feature_deferred')) {
-                $advanced_settings[] = [
-                    'name' => 'deferred',
-                    'title' => $translation['deferred']['title'],
-                    'class' => '-deferred',
-                    'enabled' => [
-                        'name' => 'payplug_deferred',
-                        'checked' => $current_configuration['deferred'],
-                    ],
-                    'descriptions' => [
-                        'live' => [
-                            'description_1' => $translation['deferred']['descriptions']['description_1'],
-                            'description_2' => $translation['deferred']['descriptions']['description_2'],
-                            'links' => [
-                                [
-                                    'text' => $translation['deferred']['link'],
-                                    'url' => $external_url['deferred'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                        'sandbox' => [
-                            'description_1' => $translation['deferred']['descriptions']['description_1'],
-                            'description_2' => $translation['deferred']['descriptions']['description_2'],
-                            'links' => [
-                                [
-                                    'text' => $translation['deferred']['link'],
-                                    'url' => $external_url['deferred'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                    ],
-                    'options' => [
-                        'disabled' => !$current_configuration['deferred'],
-                        'name' => 'payplug_deferred_state',
-                        'type' => 'select',
-                        'options' => $this->getDeferredState((int) $current_configuration['deferred_state']),
-                    ],
-                ];
-            }
-
-            $popup_description = $translation['embedded']['descriptions']['popup']['text'];
-            $popup_description_link = '<a href="' . $external_url['portal'] . '" target="_blank">'
-                . $translation['embedded']['descriptions']['popup']['link']
-                . '</a>';
-            $popup_description = str_replace('$popup_description_link', $popup_description_link, $popup_description);
-
-            $redirect_description = $translation['embedded']['descriptions']['redirect']['text'];
-            $redirect_description_link = '<a href="' . $external_url['portal'] . '" target="_blank">'
-                . $translation['embedded']['descriptions']['redirect']['link']
-                . '</a>';
-            $redirect_description = str_replace('$redirect_description_link', $redirect_description_link, $redirect_description);
-
-            $payment_options[] = [
-                'type' => 'payment_method',
-                'name' => 'standard',
-                'title' => $translation['standard']['title'],
-                'image' => $img_path . 'standard.svg',
-                'checked' => $current_configuration['standard'],
-                'available_test_mode' => true,
-                'descriptions' => [
-                    'live' => [
-                        'description' => $translation['standard']['descriptions']['live'],
-                        'advanced_options' => $translation['standard']['advanced'],
-                    ],
-                    'sandbox' => [
-                        'description' => $translation['standard']['descriptions']['live'],
-                        'advanced_options' => $translation['standard']['advanced'],
-                    ],
-                ],
-                'options' => [
-                    [
-                        'type' => 'payment_option',
-                        'sub_type' => 'IOptions',
-                        'name' => 'embeded',
-                        'title' => $translation['embedded']['title'],
-                        'descriptions' => [
-                            'live' => [
-                                'description_popup' => $popup_description,
-                                'description_redirect' => $redirect_description,
-                                'description_integrated' => $translation['embedded']['descriptions']['integrated']['text'],
-                                'link_know_more' => [
-                                    'text' => $translation['embedded']['link'],
-                                    'url' => $external_url['embedded'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'sandbox' => [
-                                'description_popup' => $popup_description,
-                                'description_redirect' => $redirect_description,
-                                'description_integrated' => $translation['embedded']['descriptions']['integrated']['text'],
-                                'link_know_more' => [
-                                    'text' => $translation['embedded']['link'],
-                                    'url' => $external_url['embedded'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                        'options' => $embedded_mode,
-                    ],
-                    [
-                        'type' => 'payment_option',
-                        'sub_type' => 'switch',
-                        'name' => 'one_click',
-                        'title' => $translation['one_click']['title'],
-                        'descriptions' => [
-                            'live' => [
-                                'description' => $translation['one_click']['descriptions']['live'],
-                                'link_know_more' => [
-                                    'text' => $translation['one_click']['link'],
-                                    'url' => $external_url['one_click'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'sandbox' => [
-                                'description' => $translation['one_click']['descriptions']['live'],
-                                'link_know_more' => [
-                                    'text' => $translation['one_click']['link'],
-                                    'url' => $external_url['one_click'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                        'checked' => $current_configuration['one_click'],
-                    ],
-                ],
-                'advanced_settings' => $advanced_settings ? [
-                    'title' => $translation['standard']['advanced'],
-                    'options' => $advanced_settings,
-                ] : [],
-            ];
+            $payment_options[] = $this->dependencies->getPaymentMethods()['standard']->getOption($current_configuration);
         }
+
         if ($this->dependencies->configClass->isValidFeature('feature_amex')) {
             $payment_options[] = [
                 'type' => 'payment_method',
@@ -1214,6 +919,31 @@ class ApiRest
                     ],
                 ],
             ];
+        }
+
+        // Satispay
+        if ($this->dependencies->configClass->isValidFeature('feature_satispay')) {
+            $payment_options[] = $this->dependencies->getPaymentMethods()['satispay']->getOption($current_configuration);
+        }
+
+        // Sofort
+        if ($this->dependencies->configClass->isValidFeature('feature_sofort')) {
+            $payment_options[] = $this->dependencies->getPaymentMethods()['sofort']->getOption($current_configuration);
+        }
+
+        // Giropay
+        if ($this->dependencies->configClass->isValidFeature('feature_giropay')) {
+            $payment_options[] = $this->dependencies->getPaymentMethods()['giropay']->getOption($current_configuration);
+        }
+
+        // iDEAL
+        if ($this->dependencies->configClass->isValidFeature('feature_ideal')) {
+            $payment_options[] = $this->dependencies->getPaymentMethods()['ideal']->getOption($current_configuration);
+        }
+
+        // MyBank
+        if ($this->dependencies->configClass->isValidFeature('feature_mybank')) {
+            $payment_options[] = $this->dependencies->getPaymentMethods()['mybank']->getOption($current_configuration);
         }
 
         if (!$payment_options) {

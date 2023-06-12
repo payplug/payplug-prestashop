@@ -318,6 +318,12 @@ class Configuration
             'defaultValue' => null,
             'setConf' => 0,
         ],
+        'payment_methods' => [
+            'type' => 'string',
+            'name' => 'PAYMENT_METHODS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'sandbox_mode' => [
             'type' => 'integer',
             'name' => 'SANDBOX_MODE',

@@ -258,6 +258,46 @@ class Translation
                     'description' => $this->dependencies->l('paymentmethods.bancontact.user.description', 'paymentmethodstranslation'),
                 ],
             ],
+            'satispay' => [
+                'title' => $this->dependencies->l('paymentmethods.satispay.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.satispay.descriptions.live', 'paymentmethodstranslation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.satispay.descriptions.sandbox', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.satispay.link', 'paymentmethodstranslation'),
+            ],
+            'sofort' => [
+                'title' => $this->dependencies->l('paymentmethods.sofort.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.sofort.descriptions.live', 'paymentmethodstranslation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.sofort.descriptions.sandbox', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.sofort.link', 'paymentmethodstranslation'),
+            ],
+            'giropay' => [
+                'title' => $this->dependencies->l('paymentmethods.giropay.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.giropay.descriptions.live', 'paymentmethodstranslation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.giropay.descriptions.sandbox', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.giropay.link', 'paymentmethodstranslation'),
+            ],
+            'ideal' => [
+                'title' => $this->dependencies->l('paymentmethods.ideal.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.ideal.descriptions.live', 'paymentmethodstranslation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.ideal.descriptions.sandbox', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.ideal.link', 'paymentmethodstranslation'),
+            ],
+            'mybank' => [
+                'title' => $this->dependencies->l('paymentmethods.mybank.title', 'paymentmethodstranslation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.mybank.descriptions.live', 'paymentmethodstranslation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.mybank.descriptions.sandbox', 'paymentmethodstranslation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.mybank.link', 'paymentmethodstranslation'),
+            ],
         ];
     }
 

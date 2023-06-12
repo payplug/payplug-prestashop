@@ -7,6 +7,10 @@
         "feature_installment",
         "feature_integrated",
         "feature_oney",
-        "feature_standard"
+        "feature_standard",
+        "feature_satispay",
+        "feature_sofort",
+        "feature_giropay",
+        "feature_mybank"
     ]
 }
