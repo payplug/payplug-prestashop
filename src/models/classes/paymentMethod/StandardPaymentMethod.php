@@ -33,9 +33,12 @@ class StandardPaymentMethod extends PaymentMethod
 
     public function getOption($current_configuration = [])
     {
+        $this->setParameters();
+
+        $option = parent::getOption($current_configuration);
+
         if (!is_array($current_configuration)) {
-            $logger = $this->dependencies->getPlugin()->getLogger();
-            $logger->addLog('ApiRest::getPaymentMethodsSection: Invalid parameter given, $current_configuration must be an array.');
+            $this->logger->addLog('StandardPaymentMethod::getOption: Invalid parameter given, $current_configuration must be an array.');
 
             return [];
         }
@@ -216,93 +219,72 @@ class StandardPaymentMethod extends PaymentMethod
             . '</a>';
         $redirect_description = str_replace('$redirect_description_link', $redirect_description_link, $redirect_description);
 
-        return [
-            'type' => 'payment_method',
-            'name' => 'standard',
-            'title' => $this->translation['standard']['title'],
-            'image' => $this->img_path . 'standard.svg',
-            'checked' => $current_configuration['standard'],
-            'available_test_mode' => true,
-            'descriptions' => [
-                'live' => [
-                    'description' => $this->translation['standard']['descriptions']['live'],
-                    'advanced_options' => $this->translation['standard']['advanced'],
-                ],
-                'sandbox' => [
-                    'description' => $this->translation['standard']['descriptions']['live'],
-                    'advanced_options' => $this->translation['standard']['advanced'],
-                ],
-            ],
-            'options' => [
-                [
-                    'type' => 'payment_option',
-                    'sub_type' => 'IOptions',
-                    'name' => 'embeded',
-                    'title' => $this->translation['embedded']['title'],
-                    'descriptions' => [
-                        'live' => [
-                            'description_popup' => $popup_description,
-                            'description_redirect' => $redirect_description,
-                            'description_integrated' => $this->translation['embedded']['descriptions']['integrated']['text'],
-                            'link_know_more' => [
-                                'text' => $this->translation['embedded']['link'],
-                                'url' => $this->external_url['embedded'],
-                                'target' => '_blank',
-                            ],
-                        ],
-                        'sandbox' => [
-                            'description_popup' => $popup_description,
-                            'description_redirect' => $redirect_description,
-                            'description_integrated' => $this->translation['embedded']['descriptions']['integrated']['text'],
-                            'link_know_more' => [
-                                'text' => $this->translation['embedded']['link'],
-                                'url' => $this->external_url['embedded'],
-                                'target' => '_blank',
-                            ],
+        $option['options'] = [
+            [
+                'type' => 'payment_option',
+                'sub_type' => 'IOptions',
+                'name' => 'embeded',
+                'title' => $this->translation['embedded']['title'],
+                'descriptions' => [
+                    'live' => [
+                        'description_popup' => $popup_description,
+                        'description_redirect' => $redirect_description,
+                        'description_integrated' => $this->translation['embedded']['descriptions']['integrated']['text'],
+                        'link_know_more' => [
+                            'text' => $this->translation['embedded']['link'],
+                            'url' => $this->external_url['embedded'],
+                            'target' => '_blank',
                         ],
                     ],
-                    'options' => $embedded_mode,
-                ],
-                [
-                    'type' => 'payment_option',
-                    'sub_type' => 'switch',
-                    'name' => 'one_click',
-                    'title' => $this->translation['one_click']['title'],
-                    'descriptions' => [
-                        'live' => [
-                            'description' => $this->translation['one_click']['descriptions']['live'],
-                            'link_know_more' => [
-                                'text' => $this->translation['one_click']['link'],
-                                'url' => $this->external_url['one_click'],
-                                'target' => '_blank',
-                            ],
-                        ],
-                        'sandbox' => [
-                            'description' => $this->translation['one_click']['descriptions']['live'],
-                            'link_know_more' => [
-                                'text' => $this->translation['one_click']['link'],
-                                'url' => $this->external_url['one_click'],
-                                'target' => '_blank',
-                            ],
+                    'sandbox' => [
+                        'description_popup' => $popup_description,
+                        'description_redirect' => $redirect_description,
+                        'description_integrated' => $this->translation['embedded']['descriptions']['integrated']['text'],
+                        'link_know_more' => [
+                            'text' => $this->translation['embedded']['link'],
+                            'url' => $this->external_url['embedded'],
+                            'target' => '_blank',
                         ],
                     ],
-                    'checked' => $current_configuration['one_click'],
                 ],
+                'options' => $embedded_mode,
             ],
-            'advanced_settings' => $advanced_settings ? [
-                'title' => $this->translation['standard']['advanced'],
-                'options' => $advanced_settings,
-            ] : [],
+            [
+                'type' => 'payment_option',
+                'sub_type' => 'switch',
+                'name' => 'one_click',
+                'title' => $this->translation['one_click']['title'],
+                'descriptions' => [
+                    'live' => [
+                        'description' => $this->translation['one_click']['descriptions']['live'],
+                        'link_know_more' => [
+                            'text' => $this->translation['one_click']['link'],
+                            'url' => $this->external_url['one_click'],
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'sandbox' => [
+                        'description' => $this->translation['one_click']['descriptions']['live'],
+                        'link_know_more' => [
+                            'text' => $this->translation['one_click']['link'],
+                            'url' => $this->external_url['one_click'],
+                            'target' => '_blank',
+                        ],
+                    ],
+                ],
+                'checked' => $current_configuration['one_click'],
+            ],
         ];
+        $option['advanced_settings'] = $advanced_settings ? [
+            'title' => $this->translation['standard']['advanced'],
+            'options' => $advanced_settings,
+        ] : [];
+        $option['descriptions']['live']['advanced_options'] = $this->translation['standard']['advanced'];
+        $option['descriptions']['sandbox']['advanced_options'] = $this->translation['standard']['advanced'];
+
+        return $option;
     }
 
-    /**
-     * @description Get available order state to use for the deferred payment
-     *
-     * @param int $deferred_state
-     *
-     * @return array
-     */
     public function getDeferredState($deferred_state = 0)
     {
         if (!is_int($deferred_state)) {
@@ -339,5 +321,14 @@ class StandardPaymentMethod extends PaymentMethod
         ksort($order_states_values);
 
         return (array) $order_states_values;
+    }
+
+    protected function getPaymentOption()
+    {
+        $payment_option = parent::getPaymentOption();
+        $payment_option['extra_classes'] = 'payplug default';
+        $payment_option['logo'] = $this->img_path . 'svg/checkout/standard/logos_schemes_' . $this->dependencies->configClass->getImgLang() . '.svg';
+
+        return $payment_option;
     }
 }

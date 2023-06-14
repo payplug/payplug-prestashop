@@ -23,11 +23,11 @@
 
 namespace PayPlug\src\models\classes\paymentMethod;
 
-class iDEALPaymentMethod extends PaymentMethod
+class AmexPaymentMethod extends PaymentMethod
 {
     public function __construct($dependencies)
     {
         parent::__construct($dependencies);
-        $this->name = 'ideal';
+        $this->name = 'amex';
     }
 }

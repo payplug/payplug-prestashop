@@ -167,6 +167,7 @@ class Translation
                 ],
                 'link' => $this->dependencies->l('paymentmethods.standard.link', 'paymentmethodstranslation'),
                 'advanced' => $this->dependencies->l('paymentmethods.standard.advanced', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.standard.call_to_action', 'paymentmethodstranslation'),
             ],
             'embedded' => [
                 'title' => $this->dependencies->l('paymentmethods.embedded.title', 'paymentmethodstranslation'),
@@ -196,6 +197,7 @@ class Translation
                     'live' => $this->dependencies->l('paymentmethods.one_click.descriptions.live', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.one_click.link', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.one_click.call_to_action', 'paymentmethodstranslation'),
             ],
             'installment' => [
                 'title' => $this->dependencies->l('paymentmethods.installment.title', 'paymentmethodstranslation'),
@@ -216,6 +218,7 @@ class Translation
                 ],
                 'link' => $this->dependencies->l('paymentmethods.installment.link', 'paymentmethodstranslation'),
                 'error_limit' => $this->dependencies->l('paymentmethods.installment.error_limit', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.installment.call_to_action', 'paymentmethodstranslation'),
             ],
             'deferred' => [
                 'title' => $this->dependencies->l('paymentmethods.deferred.title', 'paymentmethodstranslation'),
@@ -237,6 +240,7 @@ class Translation
                     'sandbox' => $this->dependencies->l('paymentmethods.amex.descriptions.sandbox', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.amex.link', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.amex.call_to_action', 'paymentmethodstranslation'),
             ],
             'applepay' => [
                 'title' => $this->dependencies->l('paymentmethods.applepay.title', 'paymentmethodstranslation'),
@@ -245,6 +249,7 @@ class Translation
                     'sandbox' => $this->dependencies->l('paymentmethods.applepay.descriptions.sandbox', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.applepay.link', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.applepay.call_to_action', 'paymentmethodstranslation'),
             ],
             'bancontact' => [
                 'title' => $this->dependencies->l('paymentmethods.bancontact.title', 'paymentmethodstranslation'),
@@ -257,6 +262,7 @@ class Translation
                     'title' => $this->dependencies->l('paymentmethods.bancontact.user.title', 'paymentmethodstranslation'),
                     'description' => $this->dependencies->l('paymentmethods.bancontact.user.description', 'paymentmethodstranslation'),
                 ],
+                'call_to_action' => $this->dependencies->l('paymentmethods.bancontact.call_to_action', 'paymentmethodstranslation'),
             ],
             'satispay' => [
                 'title' => $this->dependencies->l('paymentmethods.satispay.title', 'paymentmethodstranslation'),
@@ -265,6 +271,7 @@ class Translation
                     'sandbox' => $this->dependencies->l('paymentmethods.satispay.descriptions.sandbox', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.satispay.link', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.satispay.call_to_action', 'paymentmethodstranslation'),
             ],
             'sofort' => [
                 'title' => $this->dependencies->l('paymentmethods.sofort.title', 'paymentmethodstranslation'),
@@ -273,6 +280,7 @@ class Translation
                     'sandbox' => $this->dependencies->l('paymentmethods.sofort.descriptions.sandbox', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.sofort.link', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.sofort.call_to_action', 'paymentmethodstranslation'),
             ],
             'giropay' => [
                 'title' => $this->dependencies->l('paymentmethods.giropay.title', 'paymentmethodstranslation'),
@@ -281,6 +289,7 @@ class Translation
                     'sandbox' => $this->dependencies->l('paymentmethods.giropay.descriptions.sandbox', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.giropay.link', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.giropay.call_to_action', 'paymentmethodstranslation'),
             ],
             'ideal' => [
                 'title' => $this->dependencies->l('paymentmethods.ideal.title', 'paymentmethodstranslation'),
@@ -289,6 +298,7 @@ class Translation
                     'sandbox' => $this->dependencies->l('paymentmethods.ideal.descriptions.sandbox', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.ideal.link', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.ideal.call_to_action', 'paymentmethodstranslation'),
             ],
             'mybank' => [
                 'title' => $this->dependencies->l('paymentmethods.mybank.title', 'paymentmethodstranslation'),
@@ -297,6 +307,7 @@ class Translation
                     'sandbox' => $this->dependencies->l('paymentmethods.mybank.descriptions.sandbox', 'paymentmethodstranslation'),
                 ],
                 'link' => $this->dependencies->l('paymentmethods.mybank.link', 'paymentmethodstranslation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.mybank.call_to_action', 'paymentmethodstranslation'),
             ],
         ];
     }

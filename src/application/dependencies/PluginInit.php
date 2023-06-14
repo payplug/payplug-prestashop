@@ -52,6 +52,7 @@ use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
+use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\src\models\entities\OneyEntity;
@@ -130,6 +131,7 @@ class PluginInit extends BaseClass
     // Model classes
     private $api_rest;
     private $configuration_class;
+    private $payment_method;
     private $translation;
 
     // Utilities services
@@ -176,6 +178,7 @@ class PluginInit extends BaseClass
             ->setModule($this->module)
             ->setPayment($this->payment)
             ->setPaymentAction($this->paymentAction)
+            ->setPaymentMethod($this->payment_method)
             ->setProduct($this->product)
             ->setOney($this->oney)
             ->setOrder($this->order)
@@ -342,6 +345,7 @@ class PluginInit extends BaseClass
     {
         $this->api_rest = new ApiRest($this->dependencies);
         $this->configuration_class = new Configuration($this->dependencies);
+        $this->payment_method = new PaymentMethod($this->dependencies);
         $this->translation = new Translation($this->dependencies);
     }
 

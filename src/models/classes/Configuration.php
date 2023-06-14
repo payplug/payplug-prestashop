@@ -36,24 +36,6 @@ class Configuration
             'defaultValue' => 0,
             'setConf' => 1,
         ],
-        'applepay' => [
-            'type' => 'integer',
-            'name' => 'APPLEPAY',
-            'defaultValue' => null,
-            'setConf' => 1,
-        ],
-        'amex' => [
-            'type' => 'integer',
-            'name' => 'AMEX',
-            'defaultValue' => null,
-            'setConf' => 1,
-        ],
-        'bancontact' => [
-            'type' => 'integer',
-            'name' => 'BANCONTACT',
-            'defaultValue' => null,
-            'setConf' => 1,
-        ],
         'bancontact_country' => [
             'type' => 'integer',
             'name' => 'BANCONTACT_COUNTRY',
@@ -78,12 +60,6 @@ class Configuration
             'defaultValue' => 'EUR',
             'setConf' => 1,
         ],
-        'deferred' => [
-            'type' => 'integer',
-            'name' => 'DEFERRED',
-            'defaultValue' => 0,
-            'setConf' => 1,
-        ],
         'deferred_state' => [
             'type' => 'integer',
             'name' => 'DEFERRED_STATE',
@@ -106,12 +82,6 @@ class Configuration
             'type' => 'integer',
             'name' => 'ENABLE',
             'defaultValue' => 0,
-            'setConf' => 1,
-        ],
-        'inst' => [
-            'type' => 'integer',
-            'name' => 'INST',
-            'defaultValue' => null,
             'setConf' => 1,
         ],
         'inst_min_amount' => [
@@ -154,18 +124,6 @@ class Configuration
             'type' => 'string',
             'name' => 'ONBOARDING_STATES',
             'defaultValue' => '{}',
-            'setConf' => 1,
-        ],
-        'one_click' => [
-            'type' => 'integer',
-            'name' => 'ONE_CLICK',
-            'defaultValue' => null,
-            'setConf' => 1,
-        ],
-        'oney' => [
-            'type' => 'integer',
-            'name' => 'ONEY',
-            'defaultValue' => null,
             'setConf' => 1,
         ],
         'oney_allowed_countries' => [
@@ -321,18 +279,12 @@ class Configuration
         'payment_methods' => [
             'type' => 'string',
             'name' => 'PAYMENT_METHODS',
-            'defaultValue' => '{}',
+            'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"giropay":false,"inst":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"sofort":false,"standard":true}',
             'setConf' => 1,
         ],
         'sandbox_mode' => [
             'type' => 'integer',
             'name' => 'SANDBOX_MODE',
-            'defaultValue' => 1,
-            'setConf' => 1,
-        ],
-        'standard' => [
-            'type' => 'integer',
-            'name' => 'STANDARD',
             'defaultValue' => 1,
             'setConf' => 1,
         ],

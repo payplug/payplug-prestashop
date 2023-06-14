@@ -489,6 +489,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getPaymentMethod()
+    {
+        return $this->paymentMethod;
+    }
+
+    /**
+     * @return object
+     */
     public function getQuery()
     {
         return $this->query;
@@ -1111,6 +1119,24 @@ class PluginEntity
         }
 
         $this->paymentAction = $paymentAction;
+
+        return $this;
+    }
+
+    /**
+     * @param object $paymentMethod
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setPaymentMethod($paymentMethod)
+    {
+        if (!is_object($paymentMethod)) {
+            throw (new BadParameterException('Invalid argument, $paymentMethod must be a PaymentMethod'));
+        }
+
+        $this->paymentMethod = $paymentMethod;
 
         return $this;
     }

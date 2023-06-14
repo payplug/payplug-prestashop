@@ -781,8 +781,8 @@ class ApiRest
         $default_configuration = [
             'standard' => $configuration->getDefault('standard'),
             'embedded_mode' => $configuration->getDefault('embedded_mode'),
-            'one_click' => $configuration->getDefault('one_click'),
-            'inst' => $configuration->getDefault('inst'),
+            'oneclick' => $configuration->getDefault('oneclick'),
+            'installment' => $configuration->getDefault('installment'),
             'inst_mode' => $configuration->getDefault('inst_mode'),
             'inst_min_amount' => $configuration->getDefault('inst_min_amount'),
             'deferred' => $configuration->getDefault('deferred'),
@@ -804,8 +804,14 @@ class ApiRest
             ->getConstant()
             ->get('_PS_VERSION_');
 
+        $payment_method = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethod();
+
         if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
-            $payment_options[] = $this->dependencies->getPaymentMethods()['standard']->getOption($current_configuration);
+            $payment_options[] = $payment_method
+                ->getPaymentMethod('standard')
+                ->getOption($current_configuration);
         }
 
         if ($this->dependencies->configClass->isValidFeature('feature_amex')) {
@@ -923,27 +929,37 @@ class ApiRest
 
         // Satispay
         if ($this->dependencies->configClass->isValidFeature('feature_satispay')) {
-            $payment_options[] = $this->dependencies->getPaymentMethods()['satispay']->getOption($current_configuration);
+            $payment_options[] = $payment_method
+                ->getPaymentMethod('satispay')
+                ->getOption($current_configuration);
         }
 
         // Sofort
         if ($this->dependencies->configClass->isValidFeature('feature_sofort')) {
-            $payment_options[] = $this->dependencies->getPaymentMethods()['sofort']->getOption($current_configuration);
+            $payment_options[] = $payment_method
+                ->getPaymentMethod('sofort')
+                ->getOption($current_configuration);
         }
 
         // Giropay
         if ($this->dependencies->configClass->isValidFeature('feature_giropay')) {
-            $payment_options[] = $this->dependencies->getPaymentMethods()['giropay']->getOption($current_configuration);
+            $payment_options[] = $payment_method
+                ->getPaymentMethod('giropay')
+                ->getOption($current_configuration);
         }
 
         // iDEAL
         if ($this->dependencies->configClass->isValidFeature('feature_ideal')) {
-            $payment_options[] = $this->dependencies->getPaymentMethods()['ideal']->getOption($current_configuration);
+            $payment_options[] = $payment_method
+                ->getPaymentMethod('ideal')
+                ->getOption($current_configuration);
         }
 
         // MyBank
         if ($this->dependencies->configClass->isValidFeature('feature_mybank')) {
-            $payment_options[] = $this->dependencies->getPaymentMethods()['mybank']->getOption($current_configuration);
+            $payment_options[] = $payment_method
+                ->getPaymentMethod('mybank')
+                ->getOption($current_configuration);
         }
 
         if (!$payment_options) {

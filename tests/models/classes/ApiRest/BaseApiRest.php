@@ -5,8 +5,8 @@ namespace PayPlug\tests\models\classes\ApiRest;
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\paymentMethod\GiropayPaymentMethod;
-use PayPlug\src\models\classes\paymentMethod\iDEALPaymentMethod;
-use PayPlug\src\models\classes\paymentMethod\MyBankPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\IdealPaymentMethod;
+use PayPlug\src\models\classes\paymentMethod\MybankPaymentMethod;
 use PayPlug\src\models\classes\paymentMethod\SatispayPaymentMethod;
 use PayPlug\src\models\classes\paymentMethod\SofortPaymentMethod;
 use PayPlug\src\models\classes\paymentMethod\StandardPaymentMethod;
@@ -94,8 +94,8 @@ class BaseApiRest extends TestCase
             'deferred' => \Mockery::mock('Deferred'),
             'giropay' => \Mockery::mock(GiropayPaymentMethod::class)->makePartial(),
             'inst' => \Mockery::mock('Inst'),
-            'ideal' => \Mockery::mock(iDEALPaymentMethod::class)->makePartial(),
-            'mybank' => \Mockery::mock(MyBankPaymentMethod::class)->makePartial(),
+            'ideal' => \Mockery::mock(IdealPaymentMethod::class)->makePartial(),
+            'mybank' => \Mockery::mock(MybankPaymentMethod::class)->makePartial(),
             'one_click' => \Mockery::mock('OneClick'),
             'oney' => \Mockery::mock('Oney'),
             'satispay' => \Mockery::mock(SatispayPaymentMethod::class)->makePartial(),

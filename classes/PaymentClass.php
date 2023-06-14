@@ -850,39 +850,6 @@ class PaymentClass
     }
 
     /**
-     * @description Get the valid payment options from payplug configuration
-     *
-     * @param $cart
-     *
-     * @throws Exception
-     *
-     * @return array
-     */
-    public function getPaymentOptions()
-    {
-        $payment_options = [];
-        $options = $this->dependencies->configClass->getAvailableOptions($this->context->cart);
-        $available_payment_options = [
-            'standard',
-            'installment',
-            'oney',
-            'bancontact',
-            'applepay',
-            'amex',
-        ];
-
-        foreach ($available_payment_options as $available_payment_option) {
-            $allowed_feature = $this->dependencies->configClass->isValidFeature('feature_' . $available_payment_option);
-            if (isset($options[$available_payment_option]) && $options[$available_payment_option] && $allowed_feature) {
-                $method = 'get' . $this->tools->tool('ucfirst', $available_payment_option) . 'PaymentOption';
-                $payment_options = $this->{$method}($payment_options, $options);
-            }
-        }
-
-        return $payment_options;
-    }
-
-    /**
      * @description Get the status name for a given status id
      *
      * @param $id_status
