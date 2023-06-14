@@ -96,7 +96,7 @@ class AdminPayplugController extends ModuleAdminController
         ]);
 
         $this->context->smarty->assign([
-            'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/dist/',
+            'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/views/',
         ]);
 
         $this->context->controller->addCSS($lib_path . '/css/app.css');

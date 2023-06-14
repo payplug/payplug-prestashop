@@ -28,11 +28,12 @@ class BasePaymentRepository extends RepositoryBase
         $this->repo = \Mockery::mock(PaymentRepository::class, [
             $this->cart,
             $this->config,
+            $this->configuration,
+            $this->constant,
             $this->dependencies,
             $this->logger,
             $this->paymentEntity,
             $this->query,
-            $this->constant,
         ])->makePartial();
 
         $this->arrayCache = [];

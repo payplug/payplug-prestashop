@@ -5,66 +5,206 @@ namespace PayPlug\tests\repositories\PaymentRepository;
 use PayPlug\tests\mock\PaymentMock;
 
 /**
+ * @group unit
+ * @group repository
+ * @group payment
+ * @group payment_repository
+ *
  * @internal
  * @coversNothing
+ * @runTestsInSeparateProcesses
  */
 final class IsValidApiPaymentTest extends BasePaymentRepository
 {
-    /**
-     * Parameters to test method with empty $paiementDetails
-     *
-     * @return \Generator
-     */
-    public function invalidDataProvider()
+    private $paymentDetails;
+
+    public function setUp()
     {
-        yield [null, 'paymentDetails: null'];
-        yield [[(string) 'I am a string!'], 'paymentDetails: ["I am a string!"]'];
-        yield [['cartId' => null], 'paymentDetails: {"cartId":null}'];
-        yield [['cartId' => 'string'], 'paymentDetails: {"cartId":null}'];
+        parent::setUp();
+
+        $this->paymentDetails = [
+            'cartId' => 42,
+            'paymentMethod' => 'payment_method',
+        ];
+    }
+
+    public function invalidArrayFormatDataProvider()
+    {
+        yield [42];
+        yield [null];
+        yield [false];
+        yield ['lorem ipsum'];
+    }
+
+    public function invalidIntegerFormatDataProvider()
+    {
+        yield [null];
+        yield [['key' => 'value']];
+        yield [true];
+        yield ['lorem ipsum'];
     }
 
     /**
-     * Test methods with nulled $paiementDetails
+     * @dataProvider invalidArrayFormatDataProvider
      *
-     * @dataProvider invalidDataProvider
-     *
-     * @param array  $parameter
-     * @param string $logMessage
+     * @param string $paymentDetails
      */
-    public function testMethodWithInvalidData($parameter, $logMessage)
+    public function testWhenGivenPaymentDetailsIsNotAValidFormat($paymentDetails)
     {
-        $this->repo
-            ->shouldReceive([
-                'returnPaymentError' => $logMessage,
-            ])
-        ;
-
         $this->assertSame(
-            $this->repo->isValidApiPayment($parameter),
-            $logMessage
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($paymentDetails),
+                'response' => '[isValidApiPayment] Invalid parameters given, $paymentDetails must be an non empty array',
+            ],
+            $this->repo->isValidApiPayment($paymentDetails)
         );
     }
 
-    public function testMethodWithValidData()
+    /**
+     * @dataProvider invalidIntegerFormatDataProvider
+     *
+     * @param string $cartId
+     */
+    public function testWhenGivenPaymentDetailsCartIdIsNotAValidFormat($cartId)
     {
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'payment_method' => 'standard',
-                    'id_payment' => 1,
-                ],
-            ])
-        ;
         $paymentDetails = [
-            'cartId' => 1,
+            'cartId' => $cartId,
         ];
+        $this->assertSame(
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($paymentDetails),
+                'response' => '[isValidApiPayment] Invalid parameters given, $paymentDetail[cartId] must be a non-null integer',
+            ],
+            $this->repo->isValidApiPayment($paymentDetails)
+        );
+    }
 
-        $this->config
+    public function testWhenNoStoredPaymentIsFound()
+    {
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [],
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($this->paymentDetails),
+                'response' => '[isValidApiPayment] No payment found for given cart id',
+            ],
+            $this->repo->isValidApiPayment($this->paymentDetails)
+        );
+    }
+
+    public function testWhenPaymentMethodIsMissingInStoredPayment()
+    {
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [
+                'id_cart' => 42,
+                'id_payment' => 'pay_1234567890azerty',
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($this->paymentDetails),
+                'response' => '[isValidApiPayment] Invalid stored payment getted, payment_method is not given',
+            ],
+            $this->repo->isValidApiPayment($this->paymentDetails)
+        );
+    }
+
+    public function testWhenIdPaymentIsMissingInStoredPayment()
+    {
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [
+                'id_cart' => 42,
+                'payment_method' => 'standard',
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'paymentDetails' => json_encode($this->paymentDetails),
+                'response' => '[isValidApiPayment] Invalid stored payment getted, id_payment is not given',
+            ],
+            $this->repo->isValidApiPayment($this->paymentDetails)
+        );
+    }
+
+    public function testWhenInstallmentCantBeRetrieve()
+    {
+        $payment = [
+            'id_cart' => 42,
+            'id_payment' => 'pay_1234567890azerty',
+            'payment_method' => 'installment',
+        ];
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => $payment,
+        ]);
+
+        $this->dependencies->apiClass
             ->shouldReceive([
-                'get' => true,
-            ])
-        ;
+                'retrieveInstallment' => [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'An error occured',
+                ],
+            ]);
 
+        $this->assertSame(
+            [
+                'result' => false,
+                'storedPayment' => json_encode($payment),
+                'response' => '[isValidApiPayment] Cannot retrieve payment with id: ' . $payment['id_payment'],
+            ],
+            $this->repo->isValidApiPayment($this->paymentDetails)
+        );
+    }
+
+    public function testWhenPaymentCantBeRetrieve()
+    {
+        $payment = [
+            'id_cart' => 42,
+            'id_payment' => 'pay_1234567890azerty',
+            'payment_method' => 'standard',
+        ];
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => $payment,
+        ]);
+        $this->dependencies->apiClass
+            ->shouldReceive([
+                'retrievePayment' => [
+                    'code' => 500,
+                    'result' => false,
+                    'message' => 'An error occured',
+                ],
+            ]);
+        $this->repo->shouldReceive([
+            'createPayment' => [
+                'paymentDetails' => $this->paymentDetails,
+            ],
+            'updatePaymentTable' => true,
+        ]);
+        $this->assertSame(
+            true,
+            $this->repo->isValidApiPayment($this->paymentDetails)
+        );
+    }
+
+    public function testWhenPaymentIsRetrieve()
+    {
+        $payment = [
+            'id_cart' => 42,
+            'id_payment' => 'pay_1234567890azerty',
+            'payment_method' => 'standard',
+        ];
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => $payment,
+        ]);
         $this->dependencies->apiClass
             ->shouldReceive([
                 'retrievePayment' => [
@@ -72,33 +212,14 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
                     'result' => true,
                     'resource' => PaymentMock::getStandard(),
                 ],
-            ])
-        ;
-
+            ]);
         $this->assertSame(
-            $this->repo->isValidApiPayment($paymentDetails),
             [
                 'result' => true,
-                'paymentDetails' => $paymentDetails,
+                'paymentDetails' => $this->paymentDetails,
                 'response' => 'Valid API payment/installment',
-            ]
+            ],
+            $this->repo->isValidApiPayment($this->paymentDetails)
         );
-    }
-
-    public function testMethodWithThrowException()
-    {
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'payment_method' => 'standard',
-                    'id_payment' => 1,
-                ],
-            ])
-        ;
-
-        $this->paymentApi
-            ->shouldReceive(['retrieve' => mt_rand()])
-            ->andThrow('Payplug\Exception\HttpException', 'Bad request', 400)
-        ;
     }
 }

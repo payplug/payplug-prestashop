@@ -143,8 +143,8 @@ class PluginInit extends BaseClass
         $this->setActions();
         $this->setEntities();
         $this->setAdapter();
-        $this->setRepositories();
         $this->setClasses();
+        $this->setRepositories();
         $this->setServices();
 
         $this->plugin
@@ -286,11 +286,12 @@ class PluginInit extends BaseClass
         $this->payment = new PaymentRepository(
             $this->cart,
             $this->configuration,
+            $this->configuration_class,
+            $this->constant,
             $this->dependencies,
             $this->logger,
             $this->paymentEntity,
-            $this->query,
-            $this->constant
+            $this->query
         );
 
         $this->install = new InstallRepository(
