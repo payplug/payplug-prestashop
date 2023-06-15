@@ -30,4 +30,12 @@ class IdealPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'ideal';
     }
+
+    public function getOption($current_configuration = [])
+    {
+        $option = parent::getOption($current_configuration);
+        $option['available_test_mode'] = false;
+
+        return $option;
+    }
 }

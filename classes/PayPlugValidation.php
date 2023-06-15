@@ -44,6 +44,11 @@ class PayPlugValidation
     private $isDeferred;
     private $isOney;
     private $isBancontact;
+    private $isGiropay;
+    private $isIdeal;
+    private $isMybank;
+    private $isSatispay;
+    private $isSofort;
     private $isAmex;
     private $isApplepay;
     private $orderAdapter;
@@ -94,6 +99,11 @@ class PayPlugValidation
         $this->isDeferred = false;
         $this->isOney = false;
         $this->isBancontact = false;
+        $this->isGiropay = false;
+        $this->isIdeal = false;
+        $this->isMybank = false;
+        $this->isSatispay = false;
+        $this->isSofort = false;
         $this->isApplepay = false;
         $this->isAmex = false;
         $this->type = 'payment';
@@ -294,6 +304,31 @@ class PayPlugValidation
 
                         break;
 
+                    case 'giropay':
+                        $this->isGiropay = true;
+
+                        break;
+
+                    case 'ideal':
+                        $this->isIdeal = true;
+
+                        break;
+
+                    case 'mybank':
+                        $this->isMybank = true;
+
+                        break;
+
+                    case 'satispay':
+                        $this->isSatispay = true;
+
+                        break;
+
+                    case 'sofort':
+                        $this->isSofort = true;
+
+                        break;
+
                     case 'apple_pay':
                         $this->isApplepay = true;
 
@@ -307,6 +342,11 @@ class PayPlugValidation
                     default:
                         $this->isOney = false;
                         $this->isBancontact = false;
+                        $this->isGiropay = false;
+                        $this->isIdeal = false;
+                        $this->isMybank = false;
+                        $this->isSatispay = false;
+                        $this->isSofort = false;
                         $this->isApplepay = false;
                         $this->isAmex = false;
                 }
@@ -510,6 +550,16 @@ class PayPlugValidation
                 }
             } elseif ($this->isBancontact) {
                 $module_name = $this->dependencies->l('validation.createOrder.bancontact', 'payplugvalidation');
+            } elseif ($this->isGiropay) {
+                $module_name = $this->dependencies->l('validation.createOrder.giropay', 'payplugvalidation');
+            } elseif ($this->isIdeal) {
+                $module_name = $this->dependencies->l('validation.createOrder.ideal', 'payplugvalidation');
+            } elseif ($this->isMybank) {
+                $module_name = $this->dependencies->l('validation.createOrder.mybank', 'payplugvalidation');
+            } elseif ($this->isSatispay) {
+                $module_name = $this->dependencies->l('validation.createOrder.satispay', 'payplugvalidation');
+            } elseif ($this->isSofort) {
+                $module_name = $this->dependencies->l('validation.createOrder.sofort', 'payplugvalidation');
             } elseif ($this->isApplepay) {
                 $module_name = $this->dependencies->l('validation.createOrder.applepay', 'payplugvalidation');
             } elseif ($this->isAmex) {

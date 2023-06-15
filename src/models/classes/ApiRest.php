@@ -148,6 +148,7 @@ class ApiRest
         )['result'];
 
         $payment_methods = json_decode($configuration->getValue('payment_methods'), true);
+        $amounts = json_decode($configuration->getValue('amounts'), true);
 
         return [
             'logged' => $logged,
@@ -167,8 +168,8 @@ class ApiRest
             'oney_schedule' => (bool) $configuration->getValue('oney_optimized'),
             'oney_product_animation' => (bool) $configuration->getValue('oney_product_cta'),
             'oney_cart_animation' => (bool) $configuration->getValue('oney_cart_cta'),
-            'oney_min_amounts' => $configuration->getValue('oney_min_amounts'),
-            'oney_max_amounts' => $configuration->getValue('oney_max_amounts'),
+            'oney_min_amounts' => $amounts['oney']['min'],
+            'oney_max_amounts' => $amounts['oney']['max'],
             'oney_custom_min_amounts' => $configuration->getValue('oney_custom_min_amounts'),
             'oney_custom_max_amounts' => $configuration->getValue('oney_custom_max_amounts'),
             'bancontact' => (bool) $payment_methods['bancontact'],
@@ -485,6 +486,9 @@ class ApiRest
 
             return [];
         }
+
+        // todo : replace in appropriate OneyPaymentmethod
+        // 'amounts' => $configuration->getDefault('amounts'),
 
         return $this->dependencies
             ->getPlugin()

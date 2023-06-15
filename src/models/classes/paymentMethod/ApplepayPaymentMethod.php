@@ -31,6 +31,14 @@ class ApplepayPaymentMethod extends PaymentMethod
         $this->name = 'applepay';
     }
 
+    public function getOption($current_configuration = [])
+    {
+        $option = parent::getOption($current_configuration);
+        $option['available_test_mode'] = false;
+
+        return $option;
+    }
+
     protected function getPaymentOption($payment_options = [])
     {
         if (!is_array($payment_options)) {

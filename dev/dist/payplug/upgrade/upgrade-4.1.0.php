@@ -53,5 +53,26 @@ function upgrade_module_4_1_0()
     $flag = $flag && Configuration::deleteByName('PAYPLUG_ONE_CLICK');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_ONEY');
 
-    return $flag && Configuration::deleteByName('PAYPLUG_STANDARD');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_STANDARD');
+
+    $amounts = json_encode([
+            'default' => [
+                'min' => 'EUR:100',
+                'max' => 'EUR:2000000',
+            ],
+            'giropay' => [
+                'min' => 'EUR:100',
+                'max' => 'EUR:1000000',
+            ],
+            'sofort' => [
+                'min' => 'EUR:100',
+                'max' => 'EUR:500000',
+            ],
+            'oney' => [
+                'min' => 'EUR:10000',
+                'max' => 'EUR:300000',
+            ],
+        ]);
+
+    return $flag && Configuration::updateValue('AMOUNTS', json_encode($amounts));
 }

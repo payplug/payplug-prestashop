@@ -38,7 +38,7 @@ class getPaylaterSectionTest extends BaseApiRest
         yield [
             [
                 'oney' => true,
-                'oney_min_amounts' => 'EUR:1000',
+                'oney_min_amounts' => 'EUR:10000',
                 'oney_max_amounts' => 'EUR:300000',
                 'oney_custom_min_amounts' => 'EUR:10000',
                 'oney_custom_max_amounts' => 'EUR:300000',

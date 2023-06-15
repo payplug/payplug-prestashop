@@ -337,6 +337,28 @@ class PaymentMethod
             return [];
         }
 
+        $payplug_countries = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->getValue('countries');
+        $payplug_countries = json_decode($payplug_countries, true);
+
+        if (isset($payplug_countries[$this->name])) {
+            $shipping_address = $this->dependencies
+                ->getPlugin()
+                ->getAddress()
+                ->get((int) $this->context->cart->id_address_delivery);
+            $shipping_iso = $this->dependencies
+                ->configClass
+                ->getIsoCodeByCountryId((int) $shipping_address->id_country);
+
+            if (!$this->dependencies
+                ->getValidators()['payment']
+                ->isAllowedCountry(implode(',', $payplug_countries[$this->name]), $shipping_iso)['result']) {
+                return $payment_options;
+            }
+        }
+
         $payment_options[$this->name] = [
             'name' => $this->name,
             'inputs' => [

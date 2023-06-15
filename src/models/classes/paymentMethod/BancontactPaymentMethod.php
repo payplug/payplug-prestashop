@@ -40,6 +40,7 @@ class BancontactPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
         $option = parent::getOption($current_configuration);
+        $option['available_test_mode'] = false;
         $option['options'] = [
             [
                 'type' => 'payment_option',

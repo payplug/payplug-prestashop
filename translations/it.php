@@ -397,12 +397,17 @@ $_MODULE['<{payplug}prestashop>payplugnotifications_baad4f460ebbb7b6080ffce28c80
 $_MODULE['<{payplug}prestashop>payplugnotifications_bc8ccce668b84bedd79a3de5e4feea8b'] = 'Apple Pay';
 $_MODULE['<{payplug}prestashop>payplugnotifications_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
 $_MODULE['<{payplug}prestashop>payplugnotifications_f9932dff56316ff55d6280cfeb91846e'] = 'Oney 4x';
+$_MODULE['<{payplug}prestashop>payplugvalidation_2395201ab1d361b4f141e3e71298ee2a'] = 'Sofort';
+$_MODULE['<{payplug}prestashop>payplugvalidation_2a21263570fa5284d7d978db8684a485'] = 'Satispay';
 $_MODULE['<{payplug}prestashop>payplugvalidation_2a7fff1b4d732ad60c83c97651935fac'] = 'Apple Pay';
 $_MODULE['<{payplug}prestashop>payplugvalidation_37e5f7ac383cfd2bec46c08a29b13a39'] = 'Oney 3x senza spese';
+$_MODULE['<{payplug}prestashop>payplugvalidation_5af19f553f537554a3f457d3661eac0d'] = 'Giropay';
+$_MODULE['<{payplug}prestashop>payplugvalidation_5e21c0f8fcdc2de2eb8b8011ee7a0a61'] = 'MyBank';
 $_MODULE['<{payplug}prestashop>payplugvalidation_61349303d97520640a6bc5151919ff7f'] = 'Oney 4x senza spese';
 $_MODULE['<{payplug}prestashop>payplugvalidation_93de6a60bb878c218ccb1ce56a529a80'] = 'Amex';
 $_MODULE['<{payplug}prestashop>payplugvalidation_ce2d9931d650f844d0e49ba70cf68376'] = 'Oney 3x';
 $_MODULE['<{payplug}prestashop>payplugvalidation_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
+$_MODULE['<{payplug}prestashop>payplugvalidation_cf303562766f977c78e49a530d83a97e'] = 'Ideal';
 $_MODULE['<{payplug}prestashop>payplugvalidation_d14f16350ea2ddc76f6241cc131dcd82'] = 'Bancontact';
 $_MODULE['<{payplug}prestashop>payplugvalidation_f9932dff56316ff55d6280cfeb91846e'] = 'Oney 4x';
 $_MODULE['<{payplug}prestashop>php_version_096f5099565dd56d7c8d1c76bb8197a7'] = 'Fondi disponibili sul tuo conto bancario entro 2 o 5 giorni lavorativi';

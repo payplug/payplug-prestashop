@@ -36,6 +36,12 @@ class Configuration
             'defaultValue' => 0,
             'setConf' => 1,
         ],
+        'amounts' => [
+            'type' => 'string',
+            'name' => 'AMOUNTS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'bancontact_country' => [
             'type' => 'integer',
             'name' => 'BANCONTACT_COUNTRY',
@@ -45,13 +51,19 @@ class Configuration
         'company_id' => [
             'type' => 'integer',
             'name' => 'COMPANY_ID',
-            'defaultValue' => null,
+            'defaultValue' => 0,
             'setConf' => 1,
         ],
         'company_iso' => [
             'type' => 'string',
             'name' => 'COMPANY_ISO',
             'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'countries' => [
+            'type' => 'string',
+            'name' => 'COUNTRIES',
+            'defaultValue' => '{}',
             'setConf' => 1,
         ],
         'currencies' => [
@@ -108,18 +120,6 @@ class Configuration
             'defaultValue' => null,
             'setConf' => 1,
         ],
-        'max_amounts' => [
-            'type' => 'string',
-            'name' => 'MAX_AMOUNTS',
-            'defaultValue' => 'EUR:1000000',
-            'setConf' => 1,
-        ],
-        'min_amounts' => [
-            'type' => 'string',
-            'name' => 'MIN_AMOUNTS',
-            'defaultValue' => 'EUR:1',
-            'setConf' => 1,
-        ],
         'onboarding_states' => [
             'type' => 'string',
             'name' => 'ONBOARDING_STATES',
@@ -154,18 +154,6 @@ class Configuration
             'type' => 'integer',
             'name' => 'ONEY_FEES',
             'defaultValue' => 1,
-            'setConf' => 1,
-        ],
-        'oney_max_amounts' => [
-            'type' => 'string',
-            'name' => 'ONEY_MAX_AMOUNTS',
-            'defaultValue' => 'EUR:300000',
-            'setConf' => 1,
-        ],
-        'oney_min_amounts' => [
-            'type' => 'string',
-            'name' => 'ONEY_MIN_AMOUNTS',
-            'defaultValue' => 'EUR:10000',
             'setConf' => 1,
         ],
         'oney_optimized' => [
@@ -300,6 +288,34 @@ class Configuration
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+
+        $this->configuration['amounts']['defaultValue'] = json_encode([
+            'default' => [
+                'min' => 'EUR:100',
+                'max' => 'EUR:2000000',
+            ],
+            'giropay' => [
+                'min' => 'EUR:100',
+                'max' => 'EUR:1000000',
+            ],
+            'sofort' => [
+                'min' => 'EUR:100',
+                'max' => 'EUR:500000',
+            ],
+            'oney' => [
+                'min' => 'EUR:10000',
+                'max' => 'EUR:300000',
+            ],
+        ]);
+
+        $this->configuration['countries']['defaultValue'] = json_encode([
+            'default' => ['all'],
+            'giropay' => ['DE'],
+            'ideal' => ['NL'],
+            'mybank' => ['IT'],
+            'satispay' => ['AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PT', 'SI', 'SK'],
+            'sofort' => ['AT', 'BE', 'DE', 'ES', 'IT', 'NL'],
+        ]);
     }
 
     public function delete($key = '')
@@ -462,7 +478,7 @@ class Configuration
                 break;
             default:
             case 'string':
-                if (!is_string($value)) {
+                if (!is_string($value) && $value != null) {
                     return false;
                 }
 

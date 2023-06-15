@@ -30,6 +30,7 @@ class PaymentClass
     private $card;
     private $cart;
     private $config;
+    private $configuration;
     private $constant;
     private $context;
     private $country;
@@ -58,6 +59,7 @@ class PaymentClass
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
@@ -1004,6 +1006,11 @@ class PaymentClass
             'is_bancontact' => false,
             'is_applepay' => false,
             'is_amex' => false,
+            'is_giropay' => false,
+            'is_ideal' => false,
+            'is_mybank' => false,
+            'is_satispay' => false,
+            'is_sofort' => false,
         ];
 
         foreach ($default_options as $key => $value) {
@@ -1026,37 +1033,27 @@ class PaymentClass
         );
 
         // get the config
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'));
         $config = [
-            'one_click' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('oneClick')
-            ),
-            'installment' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('inst')
-            ),
+            'one_click' => (bool) $payment_methods->one_click,
+            'installment' => (bool) $payment_methods->inst,
             'company' => (int) $this->config->get(
                 $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
             ),
             'inst_mode' => (int) $this->config->get(
                 $this->dependencies->getConfigurationKey('instMode')
             ),
-            'deferred' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('deferred')
-            ),
-            'oney' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('oney')
-            ),
-            'standard' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('standard')
-            ),
-            'bancontact' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('bancontact')
-            ),
-            'applepay' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('applepay')
-            ),
-            'amex' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('amex')
-            ),
+            'deferred' => (bool) $payment_methods->deferred,
+            'oney' => (bool) $payment_methods->oney,
+            'standard' => (bool) $payment_methods->standard,
+            'bancontact' => (bool) $payment_methods->bancontact,
+            'applepay' => (bool) $payment_methods->applepay,
+            'amex' => (bool) $payment_methods->amex,
+            'giropay' => (bool) $payment_methods->giropay,
+            'ideal' => (bool) $payment_methods->ideal,
+            'mybank' => (bool) $payment_methods->mybank,
+            'satispay' => (bool) $payment_methods->satispay,
+            'sofort' => (bool) $payment_methods->sofort,
         ];
 
         $is_one_click = $options['id_card'] != 'new_card' && $config['one_click'];
@@ -1064,6 +1061,11 @@ class PaymentClass
         $options['is_bancontact'] = $options['is_bancontact'] && $config['bancontact'];
         $options['is_applepay'] = $options['is_applepay'] && $config['applepay'];
         $options['is_amex'] = $options['is_amex'] && $config['amex'];
+        $options['is_giropay'] = $options['is_giropay'] && $config['giropay'];
+        $options['is_ideal'] = $options['is_ideal'] && $config['ideal'];
+        $options['is_mybank'] = $options['is_mybank'] && $config['mybank'];
+        $options['is_satispay'] = $options['is_satispay'] && $config['satispay'];
+        $options['is_sofort'] = $options['is_sofort'] && $config['sofort'];
 
         // defined which is current payment method
         if ($is_one_click) {
@@ -1080,6 +1082,16 @@ class PaymentClass
             $payment_method = 'apple_pay';
         } elseif ($options['is_amex']) {
             $payment_method = 'amex';
+        } elseif ($options['is_giropay']) {
+            $payment_method = 'giropay';
+        } elseif ($options['is_ideal']) {
+            $payment_method = 'ideal';
+        } elseif ($options['is_mybank']) {
+            $payment_method = 'mybank';
+        } elseif ($options['is_satispay']) {
+            $payment_method = 'satispay';
+        } elseif ($options['is_sofort']) {
+            $payment_method = 'sofort';
         } else {
             $payment_method = 'standard';
         }
@@ -1409,6 +1421,31 @@ class PaymentClass
 
         if ($options['is_bancontact']) {
             $payment_tab['payment_method'] = 'bancontact';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_giropay']) {
+            $payment_tab['payment_method'] = 'giropay';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_ideal']) {
+            $payment_tab['payment_method'] = 'ideal';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_mybank']) {
+            $payment_tab['payment_method'] = 'mybank';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_satispay']) {
+            $payment_tab['payment_method'] = 'satispay';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_sofort']) {
+            $payment_tab['payment_method'] = 'sofort';
             unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
         }
 
@@ -1849,14 +1886,14 @@ class PaymentClass
         $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
 
         // canUseBancontact
-        if ((bool) $this->config->get(
-            $this->dependencies->getConfigurationKey('bancontactCountry')
-        ) && !($this->validators['payment']->isAllowedCountry(
+        if ((bool) $this->configuration->getValue('bancontact_country')
+        && !($this->validators['payment']->isAllowedCountry(
             'BE',
             $shipping_iso
         )['result']) && !($this->validators['payment']->isAllowedCountry('BE', $invoice_iso)['result'])) {
             return $payment_options;
         }
+
         $payment_options['bancontact'] = [
             'name' => 'bancontact',
             'tpl' => 'bancontact.tpl',
@@ -1902,6 +1939,336 @@ class PaymentClass
                     'name' => 'method',
                     'type' => 'hidden',
                     'value' => 'bancontact',
+                ],
+            ],
+        ];
+
+        return $payment_options;
+    }
+
+    private function getGiropayPaymentOption($payment_options)
+    {
+        $shipping_address = $this->address->get((int) $this->context->cart->id_address_delivery);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+        $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
+        $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
+
+        $payplug_countries = json_decode($this->configuration->configuration['countries']['defaultValue']);
+        $giropay_countries = implode(',', $payplug_countries->giropay);
+
+        if (!$this->validators['payment']->isAllowedCountry($giropay_countries, $invoice_iso)['result']) {
+            return $payment_options;
+        }
+
+        $payment_options['giropay'] = [
+            'name' => 'giropay',
+            'tpl' => 'giropay.tpl',
+            'logo' => $this->dependencies->mediaClass->getMediaPath(
+                $this->constant->get('_PS_MODULE_DIR_')
+                . $this->dependencies->name . '/views/img/giropay/giropay.svg'
+            ),
+            'callToActionText' => $this->dependencies->l(
+                'payplug.getPaymentOptions.payWithGiropay',
+                'paymentclass'
+            ),
+            'extra_classes' => 'giropay',
+            'action' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'dispatcher',
+                [],
+                true
+            ),
+            'payment_controller_url' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'payment',
+                ['type' => 'giropay'],
+                true
+            ),
+            'moduleName' => $this->dependencies->name,
+            'inputs' => [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int) $this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'giropay',
+                ],
+            ],
+        ];
+
+        return $payment_options;
+    }
+
+    private function getIdealPaymentOption($payment_options)
+    {
+        $shipping_address = $this->address->get((int) $this->context->cart->id_address_delivery);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+        $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
+        $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
+
+        $payplug_countries = json_decode($this->configuration->configuration['countries']['defaultValue']);
+        $ideal_countries = implode(',', $payplug_countries->ideal);
+
+        if (!$this->validators['payment']->isAllowedCountry($ideal_countries, $invoice_iso)['result']) {
+            return $payment_options;
+        }
+
+        $payment_options['ideal'] = [
+            'name' => 'ideal',
+            'tpl' => 'ideal.tpl',
+            'logo' => $this->dependencies->mediaClass->getMediaPath(
+                $this->constant->get('_PS_MODULE_DIR_')
+                . $this->dependencies->name . '/views/img/ideal/ideal.svg'
+            ),
+            'callToActionText' => $this->dependencies->l(
+                'payplug.getPaymentOptions.payWithIdeal',
+                'paymentclass'
+            ),
+            'extra_classes' => 'ideal',
+            'action' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'dispatcher',
+                [],
+                true
+            ),
+            'payment_controller_url' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'payment',
+                ['type' => 'ideal'],
+                true
+            ),
+            'moduleName' => $this->dependencies->name,
+            'inputs' => [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int) $this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'ideal',
+                ],
+            ],
+        ];
+
+        return $payment_options;
+    }
+
+    private function getMybankPaymentOption($payment_options)
+    {
+        $shipping_address = $this->address->get((int) $this->context->cart->id_address_delivery);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+        $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
+        $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
+
+        $payplug_countries = json_decode($this->configuration->configuration['countries']['defaultValue']);
+        $mybank_countries = implode(',', $payplug_countries->myBank);
+
+        if (!$this->validators['payment']->isAllowedCountry($mybank_countries, $invoice_iso)['result']) {
+            return $payment_options;
+        }
+
+        $payment_options['mybank'] = [
+            'name' => 'mybank',
+            'tpl' => 'mybank.tpl',
+            'logo' => $this->dependencies->mediaClass->getMediaPath(
+                $this->constant->get('_PS_MODULE_DIR_')
+                . $this->dependencies->name . '/views/img/mybank/mybank.svg'
+            ),
+            'callToActionText' => $this->dependencies->l(
+                'payplug.getPaymentOptions.payWithMybank',
+                'paymentclass'
+            ),
+            'extra_classes' => 'mybank',
+            'action' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'dispatcher',
+                [],
+                true
+            ),
+            'payment_controller_url' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'payment',
+                ['type' => 'mybank'],
+                true
+            ),
+            'moduleName' => $this->dependencies->name,
+            'inputs' => [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int) $this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'mybank',
+                ],
+            ],
+        ];
+
+        return $payment_options;
+    }
+
+    private function getSatispayPaymentOption($payment_options)
+    {
+        $shipping_address = $this->address->get((int) $this->context->cart->id_address_delivery);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+        $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
+        $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
+
+        $payplug_countries = json_decode($this->configuration->configuration['countries']['defaultValue']);
+        $satispay_countries = implode(',', $payplug_countries->satispay);
+
+        if (!$this->validators['payment']->isAllowedCountry($satispay_countries, $invoice_iso)['result']) {
+            return $payment_options;
+        }
+
+        $payment_options['satispay'] = [
+            'name' => 'satispay',
+            'tpl' => 'satispay.tpl',
+            'logo' => $this->dependencies->mediaClass->getMediaPath(
+                $this->constant->get('_PS_MODULE_DIR_')
+                . $this->dependencies->name . '/views/img/satispay/satispay.svg'
+            ),
+            'callToActionText' => $this->dependencies->l(
+                'payplug.getPaymentOptions.payWithSatispay',
+                'paymentclass'
+            ),
+            'extra_classes' => 'satispay',
+            'action' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'dispatcher',
+                [],
+                true
+            ),
+            'payment_controller_url' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'payment',
+                ['type' => 'satispay'],
+                true
+            ),
+            'moduleName' => $this->dependencies->name,
+            'inputs' => [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int) $this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'satispay',
+                ],
+            ],
+        ];
+
+        return $payment_options;
+    }
+
+    private function getSofortPaymentOption($payment_options)
+    {
+        $shipping_address = $this->address->get((int) $this->context->cart->id_address_delivery);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+        $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
+        $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
+
+        $payplug_countries = json_decode($this->configuration->configuration['countries']['defaultValue']);
+        $sofort_countries = implode(',', $payplug_countries->sofort);
+
+        if (!$this->validators['payment']->isAllowedCountry($sofort_countries, $invoice_iso)['result']) {
+            return $payment_options;
+        }
+
+        $payment_options['sofort'] = [
+            'name' => 'sofort',
+            'tpl' => 'sofort.tpl',
+            'logo' => $this->dependencies->mediaClass->getMediaPath(
+                $this->constant->get('_PS_MODULE_DIR_')
+                . $this->dependencies->name . '/views/img/sofort/sofort.svg'
+            ),
+            'callToActionText' => $this->dependencies->l(
+                'payplug.getPaymentOptions.payWithSofort',
+                'paymentclass'
+            ),
+            'extra_classes' => 'sofort',
+            'action' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'dispatcher',
+                [],
+                true
+            ),
+            'payment_controller_url' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'payment',
+                ['type' => 'sofort'],
+                true
+            ),
+            'moduleName' => $this->dependencies->name,
+            'inputs' => [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int) $this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => 'sofort',
                 ],
             ],
         ];
