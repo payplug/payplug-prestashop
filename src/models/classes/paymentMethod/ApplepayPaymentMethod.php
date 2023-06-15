@@ -30,4 +30,23 @@ class ApplepayPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'applepay';
     }
+
+    protected function getPaymentOption($payment_options = [])
+    {
+        if (!is_array($payment_options)) {
+            return [];
+        }
+
+        $payment_options = parent::getPaymentOption($payment_options);
+
+        $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
+        $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
+        if (!$isApplePayCompatible['result']) {
+            return [];
+        }
+
+        $payment_options[$this->name]['additionalInformation'] = $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
+
+        return $payment_options;
+    }
 }

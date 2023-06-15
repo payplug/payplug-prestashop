@@ -21,32 +21,37 @@
  *  International Registered Trademark & Property of Payplug SAS
  */
 
-namespace PayPlug\src\models\classes\paymentMethod;
+namespace PayPlug\src\utilities\services;
 
-class InstPaymentMethod extends PaymentMethod
+class Browser
 {
-    public function __construct($dependencies)
+    public function getName()
     {
-        parent::__construct($dependencies);
-        $this->name = 'installment';
-    }
+        $arr_browsers = ['Opera', 'Edg', 'Chrome', 'Safari', 'Firefox', 'MSIE', 'Trident'];
+        $agent = $_SERVER['HTTP_USER_AGENT'];
+        $user_browser = '';
 
-    protected function getPaymentOption($payment_options = [])
-    {
-        if (!is_array($payment_options)) {
-            return [];
+        foreach ($arr_browsers as $browser) {
+            if (strpos($agent, $browser) !== false) {
+                $user_browser = $browser;
+
+                break;
+            }
         }
 
-        $payment_options = parent::getPaymentOption($payment_options);
-        $configuration = $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass();
+        switch ($user_browser) {
+            case 'MSIE':
+            case 'Trident':
+                $user_browser = 'Internet Explorer';
 
-        $payment_options[$this->name]['callToActionText'] = sprintf(
-            $payment_options[$this->name]['callToActionText'],
-            $configuration->getValue('inst_mode')
-        );
+                break;
 
-        return $payment_options;
+            case 'Edg':
+                $user_browser = 'Microsoft Edge';
+
+                break;
+        }
+
+        return $user_browser;
     }
 }

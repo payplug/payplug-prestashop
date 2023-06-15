@@ -30,4 +30,72 @@ class BancontactPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'bancontact';
     }
+
+    /**
+     * @param array $current_configuration
+     *
+     * @return array
+     */
+    public function getOption($current_configuration = [])
+    {
+        $this->setParameters();
+        $option = parent::getOption($current_configuration);
+        $option['options'] = [
+            [
+                'type' => 'payment_option',
+                'sub_type' => 'switch',
+                'name' => 'bancontact_country',
+                'title' => $this->translation[$this->name]['user']['title'],
+                'descriptions' => [
+                    'live' => [
+                        'description' => $this->translation[$this->name]['user']['description'],
+                        'link_know_more' => [
+                            'text' => $this->translation[$this->name]['link'],
+                            'url' => $this->external_url[$this->name],
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'sandbox' => [
+                        'description' => $this->translation[$this->name]['user']['description'],
+                        'link_know_more' => [
+                            'text' => $this->translation[$this->name]['link'],
+                            'url' => $this->external_url[$this->name],
+                            'target' => '_blank',
+                        ],
+                    ],
+                ],
+                'checked' => $current_configuration['bancontact_country'],
+            ],
+        ];
+
+        return $option;
+    }
+
+    protected function getPaymentOption($payment_options = [])
+    {
+        if (!is_array($payment_options)) {
+            return [];
+        }
+
+        $payment_options = parent::getPaymentOption($payment_options);
+        $address = $this->dependencies->getPlugin()->getAddress();
+        $shipping_address = $address->get((int) $this->context->cart->id_address_delivery);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+        $invoice_address = $address->get((int) $this->context->cart->id_address_invoice);
+        $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
+
+        if (
+            (bool) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('bancontact_country')
+            && (
+                !($this->dependencies->getValidators()['payment']->isAllowedCountry('BE', $shipping_iso)['result'])
+                || $shipping_iso != $invoice_iso
+            )
+        ) {
+            unset($payment_options[$this->name]);
+
+            return $payment_options;
+        }
+
+        return $payment_options;
+    }
 }

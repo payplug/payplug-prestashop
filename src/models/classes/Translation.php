@@ -168,6 +168,7 @@ class Translation
                 'link' => $this->dependencies->l('paymentmethods.standard.link', 'paymentmethodstranslation'),
                 'advanced' => $this->dependencies->l('paymentmethods.standard.advanced', 'paymentmethodstranslation'),
                 'call_to_action' => $this->dependencies->l('paymentmethods.standard.call_to_action', 'paymentmethodstranslation'),
+                'has_saved_card' => $this->dependencies->l('paymentmethods.standard.has_saved_card', 'paymentmethodstranslation'),
             ],
             'embedded' => [
                 'title' => $this->dependencies->l('paymentmethods.embedded.title', 'paymentmethodstranslation'),

@@ -1665,36 +1665,6 @@ class PaymentClass
         return $this->dependencies->configClass->getIsoCodeByCountryId((int) $billing_address->id_country);
     }
 
-    public function getBrowser()
-    {
-        $arr_browsers = ['Opera', 'Edg', 'Chrome', 'Safari', 'Firefox', 'MSIE', 'Trident'];
-        $agent = $_SERVER['HTTP_USER_AGENT'];
-        $user_browser = '';
-
-        foreach ($arr_browsers as $browser) {
-            if (strpos($agent, $browser) !== false) {
-                $user_browser = $browser;
-
-                break;
-            }
-        }
-
-        switch ($user_browser) {
-            case 'MSIE':
-            case 'Trident':
-                $user_browser = 'Internet Explorer';
-
-                break;
-
-            case 'Edg':
-                $user_browser = 'Microsoft Edge';
-
-                break;
-        }
-
-        return $user_browser;
-    }
-
     /**
      * @description update payment ressource
      *
@@ -1747,6 +1717,12 @@ class PaymentClass
                         ]));
     }
 
+    /**
+     * @todo: remove this method after getting the call to action text
+     *
+     * @param mixed $payment_options
+     * @param mixed $options
+     */
     private function getAmexPaymentOption($payment_options, $options = [])
     {
         $payment_options['amex'] = [
@@ -1800,6 +1776,11 @@ class PaymentClass
         return $payment_options;
     }
 
+    /**
+     * @todo: remove this method after getting the call to action text
+     *
+     * @param mixed $payment_options
+     */
     private function getApplepayPaymentOption($payment_options)
     {
         $isApplePayCompatible = $this->validators['browser']->isApplePayCompatible($this->getBrowser());
@@ -1855,6 +1836,11 @@ class PaymentClass
         return $payment_options;
     }
 
+    /**
+     * @todo: remove this method after getting the call to action text
+     *
+     * @param mixed $payment_options
+     */
     private function getBancontactPaymentOption($payment_options)
     {
         $shipping_address = $this->address->get((int) $this->context->cart->id_address_delivery);
@@ -1923,6 +1909,12 @@ class PaymentClass
         return $payment_options;
     }
 
+    /**
+     * @todo: remove this method after getting the call to action text
+     *
+     * @param mixed $payment_options
+     * @param mixed $options
+     */
     private function getInstallmentPaymentOption($payment_options, $options = [])
     {
         $use_taxes = (bool) $this->config->get('PS_TAX');

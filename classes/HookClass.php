@@ -1148,7 +1148,7 @@ class HookClass
         $payment_options = $this->dependencies
             ->getPlugin()
             ->getPaymentMethod()
-            ->getPaymentOptions();
+            ->getPaymentOptionCollection();
 
         // Transforme tableau en TPL
         $paymentOptions = $this->dependencies->loadAdapterPresta()->displayPaymentOption(
@@ -1191,7 +1191,7 @@ class HookClass
         $payment_options = $this->dependencies
             ->getPlugin()
             ->getPaymentMethod()
-            ->getPaymentOptions();
+            ->getPaymentOptionCollection();
 
         // Transforme tableau en object
         return $this->dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);

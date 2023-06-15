@@ -31,6 +31,11 @@ class StandardPaymentMethod extends PaymentMethod
         $this->name = 'standard';
     }
 
+    /**
+     * @param array $current_configuration
+     *
+     * @return array
+     */
     public function getOption($current_configuration = [])
     {
         $this->setParameters();
@@ -285,6 +290,11 @@ class StandardPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    /**
+     * @param int $deferred_state
+     *
+     * @return array
+     */
     public function getDeferredState($deferred_state = 0)
     {
         if (!is_int($deferred_state)) {
@@ -323,12 +333,33 @@ class StandardPaymentMethod extends PaymentMethod
         return (array) $order_states_values;
     }
 
-    protected function getPaymentOption()
+    /**
+     * @param mixed $payment_options
+     *
+     * @return array
+     */
+    protected function getPaymentOption($payment_options = [])
     {
-        $payment_option = parent::getPaymentOption();
-        $payment_option['extra_classes'] = 'payplug default';
-        $payment_option['logo'] = $this->img_path . 'svg/checkout/standard/logos_schemes_' . $this->dependencies->configClass->getImgLang() . '.svg';
+        if (!is_array($payment_options)) {
+            return [];
+        }
 
-        return $payment_option;
+        $has_saved_card = false;
+        if (!empty($payment_options)) {
+            foreach ($payment_options as $key => $payment_option) {
+                if (!$has_saved_card && strpos($key, 'one_click') !== false) {
+                    $has_saved_card = true;
+                }
+            }
+        }
+
+        $payment_options = parent::getPaymentOption($payment_options);
+        $payment_options[$this->name]['callToActionText'] = $has_saved_card
+            ? $this->translation[$this->name]['has_saved_card']
+            : $payment_options[$this->name]['callToActionText'];
+        $payment_options[$this->name]['extra_classes'] = 'payplug default';
+        $payment_options[$this->name]['logo'] = $this->img_path . 'svg/checkout/standard/logos_schemes_' . $this->dependencies->configClass->getImgLang() . '.svg';
+
+        return $payment_options;
     }
 }

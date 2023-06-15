@@ -51,11 +51,21 @@ class PaymentMethod
         $this->dependencies = $dependencies;
     }
 
+    /**
+     * @param $key
+     *
+     * @return mixed
+     */
     public function get($key)
     {
         return $this->{$key};
     }
 
+    /**
+     * @param string $name
+     *
+     * @return array|mixed
+     */
     public function getPaymentMethod($name = '')
     {
         $this->setParameters();
@@ -76,24 +86,30 @@ class PaymentMethod
         return $payment_methods[$name];
     }
 
+    /**
+     * @return string[]
+     */
     public function getAvailablePaymentMethod()
     {
         return [
+            'one_click',
+            'standard',
+            'inst',
             'amex',
             'applepay',
             'bancontact',
-            'giropay',
-            'ideal',
-            'inst',
-            'mybank',
-            'one_click',
-            'oney',
             'satispay',
+            'mybank',
+            'giropay',
             'sofort',
-            'standard',
+            'ideal',
+            'oney',
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getAvailablePaymentMethodsObject()
     {
         $payment_methods = $this->getAvailablePaymentMethod();
@@ -111,6 +127,11 @@ class PaymentMethod
         return $payment_methods_obj;
     }
 
+    /**
+     * @param array $current_configuration
+     *
+     * @return array
+     */
     public function getOption($current_configuration = [])
     {
         $this->setParameters();
@@ -155,7 +176,37 @@ class PaymentMethod
         ];
     }
 
-    public function getPaymentOptions()
+    /**
+     * @param array $current_configuration
+     *
+     * @return array
+     */
+    public function getOptionCollection($current_configuration = [])
+    {
+        $this->setParameters();
+
+        $available_payment_methods = $this->getAvailablePaymentMethod();
+        $options = [];
+
+        foreach ($available_payment_methods as $payment_method) {
+            if ($this->dependencies->configClass->isValidFeature('feature_' . $payment_method)) {
+                $obj = $this->getPaymentMethod($payment_method);
+                if (is_object($obj)) {
+                    $option = $obj->getOption($current_configuration);
+                    if (!empty($option)) {
+                        $options[$payment_method] = $option;
+                    }
+                }
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPaymentOptionCollection()
     {
         $this->setParameters();
 
@@ -168,7 +219,7 @@ class PaymentMethod
             if (isset($options[$payment_method]) && $options[$payment_method] && $allowed_feature) {
                 $obj = $this->getPaymentMethod($payment_method);
                 if (is_object($obj)) {
-                    $payment_options[] = $obj->getPaymentOption();
+                    $payment_options = $obj->getPaymentOption($payment_options);
                 }
             }
         }
@@ -176,6 +227,14 @@ class PaymentMethod
         return $payment_options;
     }
 
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @throws BadParameterException
+     *
+     * @return $this
+     */
     public function set($key, $value)
     {
         if (is_null($value)) {
@@ -259,8 +318,17 @@ class PaymentMethod
             ->getPaymentMethodsTranslations();
     }
 
-    protected function getPaymentOption()
+    /**
+     * @param mixed $payment_options
+     *
+     * @return array
+     */
+    protected function getPaymentOption($payment_options = [])
     {
+        if (!is_array($payment_options)) {
+            return [];
+        }
+
         $this->setParameters();
 
         if (!isset($this->name) || !$this->name) {
@@ -269,7 +337,7 @@ class PaymentMethod
             return [];
         }
 
-        return [
+        $payment_options[$this->name] = [
             'name' => $this->name,
             'inputs' => [
                 'pc' => [
@@ -293,7 +361,6 @@ class PaymentMethod
                     'value' => $this->name,
                 ],
             ],
-            'tpl' => $this->name . '.tpl',
             'extra_classes' => $this->name,
             'payment_controller_url' => $this->context->link->getModuleLink(
                 $this->dependencies->name,
@@ -301,9 +368,13 @@ class PaymentMethod
                 ['type' => $this->name]
             ),
             'logo' => $this->img_path . 'svg/checkout/' . $this->name . '.svg',
-            'callToActionText' => $this->translation[$this->name]['call_to_action'],
+            'callToActionText' => isset($this->translation[$this->name]['call_to_action'])
+                ? $this->translation[$this->name]['call_to_action']
+                : '',
             'action' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
             'moduleName' => $this->dependencies->name,
         ];
+
+        return $payment_options;
     }
 }

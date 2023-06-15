@@ -70,6 +70,7 @@ use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\src\repositories\QueryRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
+use PayPlug\src\utilities\services\Browser;
 use PayPlug\src\utilities\services\Routes;
 
 class PluginInit extends BaseClass
@@ -135,6 +136,7 @@ class PluginInit extends BaseClass
     private $translation;
 
     // Utilities services
+    private $browser;
     private $routes;
 
     public function __construct($dependencies = null)
@@ -155,6 +157,7 @@ class PluginInit extends BaseClass
             ->setApiVersion('2019-08-06')
             ->setAddress($this->address)
             ->setAssign($this->assign)
+            ->setBrowser($this->browser)
             ->setCache($this->cache)
             ->setCard($this->card)
             ->setCarrier($this->carrier)
@@ -351,6 +354,7 @@ class PluginInit extends BaseClass
 
     private function setServices()
     {
+        $this->browser = new Browser();
         $this->routes = new Routes();
     }
 }
