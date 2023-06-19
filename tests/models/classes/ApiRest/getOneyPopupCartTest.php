@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\classes\ApiRest;
  * @group unit
  * @group classes
  * @group apirest_classes
- *
- * @runTestsInSeparateProcesses
  */
 class getOneyPopupCartTest extends BaseApiRest
 {

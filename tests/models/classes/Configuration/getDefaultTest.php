@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group unit
  * @group classes
  * @group configuration_classes
- *
- * @runTestsInSeparateProcesses
  */
 class getDefaultTest extends BaseConfiguration
 {

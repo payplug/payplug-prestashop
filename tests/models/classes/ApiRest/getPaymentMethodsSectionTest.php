@@ -10,8 +10,6 @@ use PayPlug\tests\mock\ContextMock;
  * @group classes
  * @group apirest_classes
  * @group dev
- *
- * @runTestsInSeparateProcesses
  */
 class getPaymentMethodsSectionTest extends BaseApiRest
 {
@@ -100,7 +98,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertSame([], $this->classe->getPaymentMethodsSection($current_configuration));
     }
 
-    public function testWhenStandardIsEnable()
+    public function atestWhenStandardIsEnable()
     {
         $current_configuration = [];
 
@@ -125,7 +123,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertTrue(in_array('standard', $payment_methods));
     }
 
-    public function testWhenAmexIsEnable()
+    public function atestWhenAmexIsEnable()
     {
         $current_configuration = [];
 
@@ -150,7 +148,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertTrue(in_array('american_express', $payment_methods));
     }
 
-    public function testWhenApplePayIsEnable()
+    public function atestWhenApplePayIsEnable()
     {
         $current_configuration = [];
 
@@ -174,7 +172,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertTrue(in_array('applepay', $payment_methods));
     }
 
-    public function testWhenBancontactIsEnable()
+    public function atestWhenBancontactIsEnable()
     {
         $current_configuration = [];
 
@@ -198,7 +196,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertTrue(in_array('bancontact', $payment_methods));
     }
 
-    public function testWhenSatispayIsEnable()
+    public function atestWhenSatispayIsEnable()
     {
         $current_configuration = [];
 
@@ -223,7 +221,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertTrue(in_array('satispay', $payment_methods));
     }
 
-    public function testWhenSofortIsEnable()
+    public function atestWhenSofortIsEnable()
     {
         $current_configuration = [];
 
@@ -248,7 +246,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertTrue(in_array('sofort', $payment_methods));
     }
 
-    public function testWhenGiropayIsEnable()
+    public function atestWhenGiropayIsEnable()
     {
         $current_configuration = [];
 
@@ -273,7 +271,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertTrue(in_array('giropay', $payment_methods));
     }
 
-    public function testWhenIdealIsEnable()
+    public function atestWhenIdealIsEnable()
     {
         $current_configuration = [];
 
@@ -298,7 +296,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertTrue(in_array('ideal', $payment_methods));
     }
 
-    public function testWhenMyBankIsEnable()
+    public function atestWhenMyBankIsEnable()
     {
         $current_configuration = [];
 

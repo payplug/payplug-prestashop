@@ -9,8 +9,6 @@ use PayPlug\tests\mock\ContextMock;
  * @group unit
  * @group classes
  * @group apirest_classes
- *
- * @runTestsInSeparateProcesses
  */
 class getSettingsSectionTest extends BaseApiRest
 {

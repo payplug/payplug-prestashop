@@ -7,8 +7,6 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  * @group action
  * @group configuration_action
  * @group configuration_action_save
- *
- * @runTestsInSeparateProcesses
  */
 class saveActionTest extends BaseConfigurationAction
 {

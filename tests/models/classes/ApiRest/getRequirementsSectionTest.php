@@ -8,8 +8,6 @@ use PayPlug\src\utilities\validators\moduleValidator;
  * @group unit
  * @group classes
  * @group apirest_classes
- *
- * @runTestsInSeparateProcesses
  */
 class getRequirementsSectionTest extends BaseApiRest
 {
