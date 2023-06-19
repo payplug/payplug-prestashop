@@ -29,35 +29,29 @@ function upgrade_module_4_1_0()
     $flag = true;
 
     $payment_methods = [
-        'standard' => Configuration::get('PAYPLUG_STANDARD'),
-        'one_click' => Configuration::get('PAYPLUG_ONE_CLICK'),
-        'inst' => Configuration::get('PAYPLUG_INST'),
-        'deferred' => Configuration::get('PAYPLUG_DEFERRED'),
-        'oney' => Configuration::get('PAYPLUG_ONEY'),
-        'bancontact' => Configuration::get('PAYPLUG_BANCONTACT'),
-        'applepay' => Configuration::get('PAYPLUG_APPLEPAY'),
-        'amex' => Configuration::get('PAYPLUG_AMEX'),
-        'satispay' => Configuration::get('PAYPLUG_SATISPAY'),
-        'sofort' => Configuration::get('PAYPLUG_SOFORT'),
-        'giropay' => Configuration::get('PAYPLUG_GIROPAY'),
-        'ideal' => Configuration::get('PAYPLUG_IDEAL'),
-        'mybank' => Configuration::get('PAYPLUG_MYBANK'),
+        'amex' => (bool) Configuration::get('PAYPLUG_AMEX'),
+        'applepay' => (bool) Configuration::get('PAYPLUG_APPLEPAY'),
+        'bancontact' => (bool) Configuration::get('PAYPLUG_BANCONTACT'),
+        'deferred' => (bool) Configuration::get('PAYPLUG_DEFERRED'),
+        'giropay' => false,
+        'ideal' => false,
+        'inst' => (bool) Configuration::get('PAYPLUG_INST'),
+        'mybank' => false,
+        'one_click' => (bool) Configuration::get('PAYPLUG_ONE_CLICK'),
+        'oney' => (bool) Configuration::get('PAYPLUG_ONEY'),
+        'satispay' => false,
+        'sofort' => false,
+        'standard' => (bool) Configuration::get('PAYPLUG_STANDARD'),
     ];
 
     $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
-
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_STANDARD');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_ONE_CLICK');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_INST');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_DEFERRED');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_ONEY');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_BANCONTACT');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_APPLEPAY');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_AMEX');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_SATISPAY');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_SOFORT');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_GIROPAY');
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_IDEAL');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_APPLEPAY');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_BANCONTACT');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_DEFERRED');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_INST');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_ONE_CLICK');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_ONEY');
 
-    return $flag && Configuration::deleteByName('PAYPLUG_MYBANK');
+    return $flag && Configuration::deleteByName('PAYPLUG_STANDARD');
 }

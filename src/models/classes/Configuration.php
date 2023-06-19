@@ -302,6 +302,22 @@ class Configuration
         $this->dependencies = $dependencies;
     }
 
+    public function delete($key = '')
+    {
+        if (!is_string($key) || !$key) {
+            return false;
+        }
+
+        if (!array_key_exists($key, $this->configuration)) {
+            return false;
+        }
+
+        return $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->deleteByName($this->getName($key));
+    }
+
     /**
      * @description get a given configuration
      *
@@ -340,6 +356,16 @@ class Configuration
         }
 
         return $this->configuration[$key]['defaultValue'];
+    }
+
+    /**
+     * @description get the configuration keys
+     *
+     * @return array[]
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
     }
 
     /**
@@ -399,9 +425,10 @@ class Configuration
             return false;
         }
 
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-
-        return $config->get($this->getName($key));
+        return $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->get($this->getName($key));
     }
 
     /**
@@ -442,8 +469,9 @@ class Configuration
                 break;
         }
 
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-
-        return $config->updateValue($this->getName($key), $value);
+        return $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->updateValue($this->getName($key), $value);
     }
 }
