@@ -6,6 +6,8 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  * @group unit
  * @group action
  * @group configuration_action
+ *
+ * @runTestsInSeparateProcesses
  */
 class submitSandboxActionTest extends BaseConfigurationAction
 {

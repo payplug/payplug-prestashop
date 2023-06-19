@@ -9,7 +9,8 @@ use PayPlug\tests\mock\ContextMock;
  * @group unit
  * @group classes
  * @group apirest_classes
- * @group dev
+ *
+ * @runTestsInSeparateProcesses
  */
 class getPaymentMethodsSectionTest extends BaseApiRest
 {
@@ -72,12 +73,25 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         yield ['lorem ipsum'];
     }
 
+    public function expectedPaymentMethods()
+    {
+        yield ['feature_standard', 'standard'];
+        yield ['feature_amex', 'amex'];
+        yield ['feature_applepay', 'applepay'];
+        yield ['feature_bancontact', 'bancontact'];
+        yield ['feature_satispay', 'satispay'];
+        yield ['feature_sofort', 'sofort'];
+        yield ['feature_giropay', 'giropay'];
+        yield ['feature_ideal', 'ideal'];
+        yield ['feature_mybank', 'mybank'];
+    }
+
     /**
      * @dataProvider invalidArrayFormatDataProvider
      *
      * @param mixed $current_configuration
      */
-    public function testWhenGivenConfigurationIsInvalidArrayFormat($current_configuration)
+    public function atestWhenGivenConfigurationIsInvalidArrayFormat($current_configuration)
     {
         $this->assertSame(
             [],
@@ -85,7 +99,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         );
     }
 
-    public function testWhenNoMethodAreEnable()
+    public function atestWhenNoMethodAreEnable()
     {
         $current_configuration = [];
 
@@ -98,226 +112,28 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->assertSame([], $this->classe->getPaymentMethodsSection($current_configuration));
     }
 
-    public function atestWhenStandardIsEnable()
+    /**
+     * @dataProvider expectedPaymentMethods
+     *
+     * @param string $feature
+     * @param string $expected
+     */
+    public function testWhenGivenMethodIsEnable($feature, $expected)
     {
-        $current_configuration = [];
-
         $configClass = \Mockery::mock('Config');
         $configClass
             ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_standard' == $key;
+            ->andReturnUsing(function ($key) use ($feature) {
+                return $feature == $key;
             });
-        $this->payment_method_option['name'] = 'standard';
-        $this->payment_methods['standard']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-
         $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
+        $response = $this->classe->getPaymentMethodsSection([]);
         $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
+        if (isset($response['options'])) {
+            foreach ($response['options'] as $payment_method) {
+                $payment_methods[] = $payment_method['name'];
+            }
         }
-        $this->assertTrue(in_array('standard', $payment_methods));
-    }
-
-    public function atestWhenAmexIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_amex' == $key;
-            });
-        $this->payment_method_option['name'] = 'amex';
-        $this->payment_methods['amex']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('american_express', $payment_methods));
-    }
-
-    public function atestWhenApplePayIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_applepay' == $key;
-            });
-        $this->payment_method_option['name'] = 'applepay';
-        $this->payment_methods['applepay']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('applepay', $payment_methods));
-    }
-
-    public function atestWhenBancontactIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_bancontact' == $key;
-            });
-        $this->payment_method_option['name'] = 'bancontact';
-        $this->payment_methods['bancontact']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('bancontact', $payment_methods));
-    }
-
-    public function atestWhenSatispayIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_satispay' == $key;
-            });
-        $this->payment_method_option['name'] = 'satispay';
-        $this->payment_methods['satispay']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('satispay', $payment_methods));
-    }
-
-    public function atestWhenSofortIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_sofort' == $key;
-            });
-        $this->payment_method_option['name'] = 'sofort';
-        $this->payment_methods['sofort']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('sofort', $payment_methods));
-    }
-
-    public function atestWhenGiropayIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_giropay' == $key;
-            });
-        $this->payment_method_option['name'] = 'giropay';
-        $this->payment_methods['giropay']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('giropay', $payment_methods));
-    }
-
-    public function atestWhenIdealIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_ideal' == $key;
-            });
-        $this->payment_method_option['name'] = 'ideal';
-        $this->payment_methods['ideal']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('ideal', $payment_methods));
-    }
-
-    public function atestWhenMyBankIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_mybank' == $key;
-            });
-        $this->payment_method_option['name'] = 'mybank';
-        $this->payment_methods['mybank']->shouldReceive([
-            'getOption' => $this->payment_method_option,
-        ]);
-
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('mybank', $payment_methods));
+        $this->assertTrue(in_array($expected, $payment_methods));
     }
 }

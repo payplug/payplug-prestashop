@@ -6,6 +6,8 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group unit
  * @group classes
  * @group configuration_classes
+ *
+ * @runTestsInSeparateProcesses
  */
 class getTypeTest extends BaseConfiguration
 {
@@ -36,7 +38,7 @@ class getTypeTest extends BaseConfiguration
 
     public function testWhenDefaultConfigurationIsReturned()
     {
-        $key = 'standard';
+        $key = 'enable';
         $this->assertSame(
             'integer',
             $this->classe->getType($key)

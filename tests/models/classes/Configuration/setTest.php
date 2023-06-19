@@ -6,6 +6,8 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group unit
  * @group classes
  * @group configuration_classes
+ *
+ * @runTestsInSeparateProcesses
  */
 class setTest extends BaseConfiguration
 {
@@ -69,7 +71,7 @@ class setTest extends BaseConfiguration
 
     public function testWhenConfigurationCanNotBeUpdated()
     {
-        $key = 'standard';
+        $key = 'enable';
         $value = 1;
         $this->configuration->shouldReceive([
             'updateValue' => false,
@@ -79,13 +81,13 @@ class setTest extends BaseConfiguration
 
     public function testWhenConfigurationIsUpdated()
     {
-        $key = 'standard';
+        $key = 'enable';
         $value = 1;
         $this->configuration->shouldReceive([
             'updateValue' => true,
         ]);
         $this->classe->shouldReceive([
-            'getName' => 'standard',
+            'getName' => 'enable',
         ]);
         $this->assertTrue($this->classe->set($key, $value));
     }

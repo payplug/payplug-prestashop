@@ -518,21 +518,22 @@ class ApiRest
         $configuration = $this->dependencies
             ->getPlugin()
             ->getConfigurationClass();
+
         $default_configuration = [
-            'standard' => $configuration->getDefault('standard'),
+            'bancontact_country' => $configuration->getDefault('bancontact_country'),
             'embedded_mode' => $configuration->getDefault('embedded_mode'),
-            'oneclick' => $configuration->getDefault('oneclick'),
-            'installment' => $configuration->getDefault('installment'),
             'inst_mode' => $configuration->getDefault('inst_mode'),
             'inst_min_amount' => $configuration->getDefault('inst_min_amount'),
-            'deferred' => $configuration->getDefault('deferred'),
             'deferred_state' => $configuration->getDefault('deferred_state'),
-            'amex' => $configuration->getDefault('amex'),
-            'bancontact' => $configuration->getDefault('bancontact'),
-            'bancontact_country' => $configuration->getDefault('bancontact_country'),
-            'applepay' => $configuration->getDefault('applepay'),
         ];
         foreach ($default_configuration as $k => $v) {
+            if (!isset($current_configuration[$k])) {
+                $current_configuration[$k] = $v;
+            }
+        }
+
+        $default_payment_method = json_decode($configuration->getDefault('payment_methods'), true);
+        foreach ($default_payment_method as $k => $v) {
             if (!isset($current_configuration[$k])) {
                 $current_configuration[$k] = $v;
             }

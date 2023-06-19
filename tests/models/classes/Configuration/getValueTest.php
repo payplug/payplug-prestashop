@@ -6,6 +6,8 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group unit
  * @group classes
  * @group configuration_classes
+ *
+ * @runTestsInSeparateProcesses
  */
 class getValueTest extends BaseConfiguration
 {
@@ -36,7 +38,7 @@ class getValueTest extends BaseConfiguration
 
     public function testWhenConfigurationCanNotBeReturn()
     {
-        $key = 'standard';
+        $key = 'enable';
         $this->configuration->shouldReceive([
             'get' => false,
         ]);
@@ -45,12 +47,12 @@ class getValueTest extends BaseConfiguration
 
     public function testWhenConfigurationIsReturn()
     {
-        $key = 'standard';
+        $key = 'enable';
         $this->configuration->shouldReceive([
             'get' => 1,
         ]);
         $this->classe->shouldReceive([
-            'getName' => 'standard',
+            'getName' => 'enable',
         ]);
         $this->assertSame(1, $this->classe->getValue($key));
     }

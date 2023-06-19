@@ -6,6 +6,8 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group unit
  * @group classes
  * @group configuration_classes
+ *
+ * @runTestsInSeparateProcesses
  */
 class getNameTest extends BaseConfiguration
 {
@@ -36,9 +38,9 @@ class getNameTest extends BaseConfiguration
 
     public function testWhenNameConfigurationIsReturned()
     {
-        $key = 'standard';
+        $key = 'enable';
         $this->assertSame(
-            'PAYPLUG_STANDARD',
+            'PAYPLUG_ENABLE',
             $this->classe->getName($key)
         );
     }
