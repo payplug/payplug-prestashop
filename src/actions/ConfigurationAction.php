@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -217,7 +217,7 @@ class ConfigurationAction
                 ],
             ];
         }
-        $permissions = $this->dependencies->name == 'pspaylater' ? 'onboarding_oney_completed' : 'use_live_mode';
+        $permissions = 'pspaylater' == $this->dependencies->name ? 'onboarding_oney_completed' : 'use_live_mode';
         if (!$this->checkPermissionAction($permissions, $datas->env)['success']) {
             return [
                 'success' => false,

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -45,13 +45,13 @@ class AdminPayplugController extends ModuleAdminController
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
         // If referer is from development server, trigger api rest renderer
-        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'localhost') != null) {
+        if (isset($_SERVER['HTTP_REFERER']) && null != strpos($_SERVER['HTTP_REFERER'], 'localhost')) {
             $this->renderApiRest();
         }
     }
 
     /**
-     * Initialize the content by adding Boostrap and loading the TPL
+     * Initialize the content by adding Boostrap and loading the TPL.
      */
     public function initContent()
     {

@@ -108,10 +108,10 @@ class MockHelper extends Mockery
         $validate
             ->shouldReceive('validate')
             ->andReturnUsing(function ($action, $object) {
-                if ($object === '' || is_null($object)) {
+                if ('' === $object || is_null($object)) {
                     return false;
                 }
-                if ($action == 'isLoadedObject' && !is_object($object)) {
+                if ('isLoadedObject' == $action && !is_object($object)) {
                     return false;
                 }
 

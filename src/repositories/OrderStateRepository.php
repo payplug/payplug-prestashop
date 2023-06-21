@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -202,7 +202,7 @@ class OrderStateRepository extends BaseClass
     }
 
     /**
-     * Find id_order_state by name
+     * Find id_order_state by name.
      *
      * @param array $name
      * @param bool  $test_mode

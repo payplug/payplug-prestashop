@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -161,7 +161,7 @@ class CardRepository extends BaseClass
         if (200 == $delete['code']) {
             $json_answer = $delete['resource']['httpResponse'];
 
-            if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
+            if (isset($json_answer['object']) && 'error' == $json_answer['object']) {
                 $message_log = 'Error occured while deleting the card' . $id_card . 'from the API [deleteCardFromAPI]';
                 $this->logger->addLog($message_log, 'error');
                 $this->logger->addLog('JSON answer: ' . json_encode($json_answer));
@@ -216,7 +216,7 @@ class CardRepository extends BaseClass
     }
 
     /**
-     * ## From classes/__PayPlugCard.php ##
+     * ## From classes/__PayPlugCard.php ##.
      *
      * @description Get collection of cards for a given customer
      *

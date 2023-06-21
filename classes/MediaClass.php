@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -146,7 +146,7 @@ class MediaClass
         }
 
         foreach ($medias as $media) {
-            if (strpos($media, 'css') === false) {
+            if (false === strpos($media, 'css')) {
                 $this->context->controller->addJS($media);
             } else {
                 $this->context->controller->addCSS($media);

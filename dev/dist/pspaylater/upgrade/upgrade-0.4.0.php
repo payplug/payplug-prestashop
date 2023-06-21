@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_0_4_0()
 {
     $flag = true;
-    if (Configuration::get('PSPAYLATER_ONEY_ALLOWED_COUNTRIES') != null
+    if (null != Configuration::get('PSPAYLATER_ONEY_ALLOWED_COUNTRIES')
         && in_array('BE', explode(',', Configuration::get('PSPAYLATER_ONEY_ALLOWED_COUNTRIES')))) {
         // set Oney advanced Options to 0 for belgian merchants of the pspaylater module.
         $flag = $flag && Configuration::updateValue('PSPAYLATER_ONEY_CART_CTA', 0)

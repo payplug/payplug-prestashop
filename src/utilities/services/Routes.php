@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -106,7 +106,7 @@ class Routes
             $iso_code = 'fr';
         }
 
-        if ($iso_code == 'en') {
+        if ('en' == $iso_code) {
             $iso_code = 'en-gb';
         }
 

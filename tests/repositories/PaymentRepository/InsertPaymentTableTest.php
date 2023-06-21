@@ -35,7 +35,7 @@ final class InsertPaymentTableTest extends BasePaymentRepository
     }
 
     /**
-     * Parameters to test method with empty $paiementDetails
+     * Parameters to test method with empty $paiementDetails.
      *
      * @return \Generator
      */
@@ -47,7 +47,7 @@ final class InsertPaymentTableTest extends BasePaymentRepository
     }
 
     /**
-     * Test methods with nulled $paiementDetails
+     * Test methods with nulled $paiementDetails.
      *
      * @dataProvider invalidDataProvider
      *

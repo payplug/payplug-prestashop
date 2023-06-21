@@ -75,7 +75,7 @@ class getPaylaterSectionTest extends BaseApiRest
     {
         $all_amounts = [];
         foreach ($current_configuration as $key => $configuration) {
-            if (strpos($key, '_amounts') !== false) {
+            if (false !== strpos($key, '_amounts')) {
                 $amount = explode(':', $configuration);
                 $all_amounts[$key] = (int) $amount[1];
 

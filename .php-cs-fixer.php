@@ -13,9 +13,9 @@ return (new PhpCsFixer\Config)
     ->setRules([
         '@PSR12' => true,
         '@PhpCsFixer' => true,
-        'phpdoc_summary' => false,
-        'yoda_style' => false,
-        'visibility_required' => false,
+        'phpdoc_summary' => true,
+        'yoda_style' => true,
+        'visibility_required' => true,
         'single_blank_line_before_namespace' => true,
         'no_blank_lines_after_phpdoc' => true,
         'single_space_after_construct' => true,

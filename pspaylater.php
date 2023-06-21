@@ -76,7 +76,7 @@ class PsPaylater extends PaymentModule
         }
 
         if ($this->payplug_dependencies->getDependency('configClass')->isValidFeature('feature_ps_account')
-            && $this->container === null) {
+            && null === $this->container) {
             $this->container = new \PrestaShop\ModuleLibServiceContainer\DependencyInjection\ServiceContainer(
                 $this->name,
                 $this->getLocalPath()
@@ -120,7 +120,7 @@ class PsPaylater extends PaymentModule
     }
 
     /**
-     * Load asset on the back office
+     * Load asset on the back office.
      */
     public function hookActionAdminControllerSetMedia()
     {

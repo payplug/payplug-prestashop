@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -32,7 +32,7 @@ use Payplug\Resource\Refund;
 
 /**
  * Class PayPlugNotifications
- * Use for treat notification from Payplug API
+ * Use for treat notification from Payplug API.
  */
 class PayPlugNotifications
 {
@@ -293,7 +293,7 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: processCreateOrder');
 
-        if (isset($this->resource->failure) && $this->resource->failure !== null) {
+        if (isset($this->resource->failure) && null !== $this->resource->failure) {
             $this->logger->addLog('The payment has failed.');
             $this->exitProcess('No treatment because payment has failed.');
         }
@@ -663,7 +663,7 @@ class PayPlugNotifications
                 $cart_lock = $this->payplugLock->createLockG2((int) $this->cart->id, 'ipn');
                 if (!$cart_lock) {
                     $checkReturn = $this->payplugLock->check((int) $this->cart->id);
-                    if ($checkReturn == 'stop ipn') {
+                    if ('stop ipn' == $checkReturn) {
                         $this->exitProcess('Lock cannot be created.', 500);
                     }
                 } else {
@@ -705,7 +705,7 @@ class PayPlugNotifications
                     $this->logger->addLog('[Save Card] $payment->save_card is not set', 'debug');
                 }
 
-                if (isset($this->payment->save_card) && $this->payment->save_card !== 1) {
+                if (isset($this->payment->save_card) && 1 !== $this->payment->save_card) {
                     $this->logger->addLog('[Save Card] $this->payment->save_card is set but not equal to 1', 'debug');
                 }
 
@@ -713,7 +713,7 @@ class PayPlugNotifications
                     $this->logger->addLog('[Save Card] $this->payment->card->id is not set', 'debug');
                 }
 
-                if (isset($this->payment->card->id) && $this->payment->card->id == '') {
+                if (isset($this->payment->card->id) && '' == $this->payment->card->id) {
                     $this->logger->addLog('[Save Card] $this->payment->card->id is set but empty', 'debug');
                 }
 
@@ -721,7 +721,7 @@ class PayPlugNotifications
                     $this->logger->addLog('[Save Card] $this->payment->hosted_payment is not set', 'debug');
                 }
 
-                if ((isset($this->payment->hosted_payment)) && $this->payment->hosted_payment == '') {
+                if ((isset($this->payment->hosted_payment)) && '' == $this->payment->hosted_payment) {
                     $this->logger->addLog('[Save Card] $this->payment->hosted_payment is set but empty', 'debug');
                 }
             } else {
@@ -916,7 +916,7 @@ class PayPlugNotifications
                 ->getRepositories()['payment']
                 ->getByIdPayment($this->payment->installment_plan_id);
             if (!$payment['id_cart']) {
-                if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
+                if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                     $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
                     $this->exitProcess('Payment timeout for paymentID: ' . $this->payment->installment_plan_id, 200);
                 }
@@ -929,7 +929,7 @@ class PayPlugNotifications
                 ->getRepositories()['payment']
                 ->getByIdPayment($this->resource->id);
             if (!$payment['id_cart']) {
-                if (isset($this->resource->failure->code) && $this->resource->failure->code == 'timeout') {
+                if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                     $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
                     $this->exitProcess('Payment timeout for payment ID: ' . $this->resource->id, 200);
                 }
@@ -1030,7 +1030,7 @@ class PayPlugNotifications
             $cart_lock = $this->payplugLock->createLockG2($this->cart->id, 'ipn');
             if (!$cart_lock) {
                 $checkReturn = $this->payplugLock->check($this->cart->id);
-                if ($checkReturn == 'stop ipn') {
+                if ('stop ipn' == $checkReturn) {
                     $this->exitProcess('Lock cannot be created.', 500);
                 }
             } else {
@@ -1118,19 +1118,19 @@ class PayPlugNotifications
 
         // Define if payment is bancontact resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_bancontact = $this->payment->payment_method['type'] == 'bancontact';
+            $this->is_bancontact = 'bancontact' == $this->payment->payment_method['type'];
         }
         $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
         // Define if payment is bancontact resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_bancontact = $this->payment->payment_method['type'] == 'bancontact';
+            $this->is_bancontact = 'bancontact' == $this->payment->payment_method['type'];
         }
         $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
         // Define if payment is bancontact resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_bancontact = $this->payment->payment_method['type'] == 'bancontact';
+            $this->is_bancontact = 'bancontact' == $this->payment->payment_method['type'];
         }
         $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
@@ -1144,13 +1144,13 @@ class PayPlugNotifications
 
         // Define if payment is applepay resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_applepay = $this->payment->payment_method['type'] == 'apple_pay';
+            $this->is_applepay = 'apple_pay' == $this->payment->payment_method['type'];
         }
         $this->logger->addLog('Notification: is_applepay: ' . ($this->is_applepay ? 'ok' : 'nok'));
 
         // Define if payment is amex resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_amex = $this->payment->payment_method['type'] == 'american_express';
+            $this->is_amex = 'american_express' == $this->payment->payment_method['type'];
         }
         $this->logger->addLog('Notification: is_amex ' . ($this->is_amex ? 'ok' : 'nok'));
     }

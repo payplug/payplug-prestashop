@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -133,7 +133,7 @@ class PrestashopAdapter16
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
                 if ((bool) $this->config->get('PAYPLUG_ONE_CLICK')
                     && !empty($payplug_cards)
-                    && ($payment_method == 'standard')) {
+                    && ('standard' == $payment_method)) {
                     continue;
                 }
                 /*
@@ -147,7 +147,7 @@ class PrestashopAdapter16
 
                 // Check if Oney is on error
                 $payment_option['oney_error'] = false;
-                if ($payment_method == 'oney'
+                if ('oney' == $payment_method
                         && (isset($payment_option['err_label']) && $payment_option['err_label'])) {
                     $payment_option['oney_error'] = '-disabled';
                     if ($oneyOptimized) {
@@ -155,7 +155,7 @@ class PrestashopAdapter16
                         $optimized_class = ' -optimized-16';
                     }
                 }
-                if ($payment_method == 'oney' && $oneyOptimized) {
+                if ('oney' == $payment_method && $oneyOptimized) {
                     $optimized_class = ' -optimized-16';
                     $oneyImageOptimized = '/views/img/oney/x3x4_with';
                     $oneyImagex3 = '/views/img/oney/x3_with';
@@ -172,14 +172,14 @@ class PrestashopAdapter16
                     if (strpos($payment_option['type'], 'without_fees')) {
                         $iso = Tools::strtoupper($this->context->getContext()->language->iso_code);
                         $merchant_company_iso = (string) $this->config->get('PAYPLUG_COMPANY_ISO');
-                        if ($iso != 'IT' && $iso != 'FR') {
+                        if ('IT' != $iso && 'FR' != $iso) {
                             $iso = $merchant_company_iso;
                         }
 
                         $oneyImage .= '_' . $iso;
                     }
 
-                    if ($error !== false) {
+                    if (false !== $error) {
                         $oneyImage .= '_alt.svg';
                         $payment_option['logo'] = Media::getMediaPath(
                             _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImageOptimized . $oneyImage
@@ -204,7 +204,7 @@ class PrestashopAdapter16
                     'extra_classes' => $payment_class . ' ' . $logo_class . ' ' . $extraClass .
                         ($error ? '_alt' : '') . ' ' . $optimized_class . ' ' . $extraClass,
                     'label' => $payment_option['callToActionText'],
-                    'logo_url' => $payment_method == 'one_click' ?
+                    'logo_url' => 'one_click' == $payment_method ?
                         $payment_options['standard']['logo'] :
                         $payment_option['logo'],
                     'payment_url' => $payment_option['payment_controller_url'],

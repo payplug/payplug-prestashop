@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -51,7 +51,7 @@ function upgrade_module_3_8_1()
     if (!empty($tabIds) && is_array($tabIds)) {
         foreach ($tabIds as $tabId) {
             $tab = new Tab($tabId['id_tab']);
-            if ($tab->class_name == 'AdminPayPlug') {
+            if ('AdminPayPlug' == $tab->class_name) {
                 $tab->class_name = 'AdminPayplug';
                 $flag = $flag && $tab->save();
             }

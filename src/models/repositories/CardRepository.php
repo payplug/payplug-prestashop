@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -196,10 +196,10 @@ class CardRepository extends QueryRepository
         if (!is_int($id_customer) || !$id_customer) {
             return [];
         }
-        if (!is_int($id_company) && $id_company !== null || $id_company === 0) {
+        if (!is_int($id_company) && null !== $id_company || 0 === $id_company) {
             return [];
         }
-        if (!is_bool($is_sandbox) && $is_sandbox !== null) {
+        if (!is_bool($is_sandbox) && null !== $is_sandbox) {
             return [];
         }
 
@@ -209,11 +209,11 @@ class CardRepository extends QueryRepository
             ->from($this->prefix . $this->module_name . '_card')
             ->where('`id_customer` = ' . (int) $id_customer);
 
-        if ($id_company !== null) {
+        if (null !== $id_company) {
             $this->where('`id_company` = ' . (int) $id_company);
         }
 
-        if ($is_sandbox !== null) {
+        if (null !== $is_sandbox) {
             $this->where('`is_sandbox` = ' . ((bool) $is_sandbox ? 1 : 0));
         }
 

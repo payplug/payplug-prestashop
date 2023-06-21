@@ -56,14 +56,14 @@ class Translations
         $arr_good_ext = ['.tpl', '.php'];
 
         foreach ($files as $key => $file) {
-            if ($file[0] === '.'
-                || $file === 'index.php'
+            if ('.' === $file[0]
+                || 'index.php' === $file
                 || in_array(substr($file, 0, strrpos($file, '.')), [])) {
                 unset($files[$key]);
-            } elseif ($type_clear === 'file'
+            } elseif ('file' === $type_clear
                 && !in_array(substr($file, strrpos($file, '.')), $arr_good_ext)) {
                 unset($files[$key]);
-            } elseif ($type_clear === 'directory'
+            } elseif ('directory' === $type_clear
                 && (!is_dir($path . $file) || in_array($file, $arr_exclude))) {
                 unset($files[$key]);
             }
@@ -81,8 +81,8 @@ class Translations
         $translation_dir = dirname(__FILE__) . '/../../../translations/';
         $translation_files = scandir($translation_dir, SCANDIR_SORT_NONE);
         foreach ($translation_files as $file) {
-            if ($file[0] === '.'
-                || $file === 'index.php'
+            if ('.' === $file[0]
+                || 'index.php' === $file
                 || in_array(substr($file, 0, strrpos($file, '.')), [])) {
                 continue;
             }
@@ -166,7 +166,7 @@ class Translations
     private function parseFile($content, $type_file = false)
     {
         // Parsing modules file
-        if ($type_file == 'php') {
+        if ('php' == $type_file) {
             $regex = '/->' . $this->method . '\(\s*(\')(.*[^\\\\])\'(\s*,\s*?\'(.+)\')?(\s*,\s*?(.+))?\s*\)/Ums';
         } else {
             // In tpl file look for something that should contain mod='module_name' according to the documentation
@@ -186,7 +186,7 @@ class Translations
                 $string = $matches[2][$i];
                 $tags = str_replace('\'', '', $matches[3][$i]);
 
-                if (isset($matches[6]) && $type_file == 'php') {
+                if (isset($matches[6]) && 'php' == $type_file) {
                     $alias = str_replace('\'', '', $matches[6][$i]);
                     if ($tags) {
                         $string = ['string' => $string, 'tags' => $tags, 'alias' => $alias];
@@ -199,7 +199,7 @@ class Translations
                     }
                 }
 
-                if ($quote === '"') {
+                if ('"' === $quote) {
                     // Escape single quotes because the core will do it when looking for the translation of this string
                     $string = str_replace('\'', '\\\'', $string);
                     // Unescape double quotes
@@ -253,12 +253,12 @@ class Translations
                 $content = file_get_contents($file_path);
 
                 // Module files can now be ignored by adding this string in a file
-                if (strpos($content, 'IGNORE_THIS_FILE_FOR_TRANSLATION') !== false) {
+                if (false !== strpos($content, 'IGNORE_THIS_FILE_FOR_TRANSLATION')) {
                     continue;
                 }
 
                 // Get file type
-                $type_file = substr($file['name'], -4) == '.tpl' ? 'tpl' : 'php';
+                $type_file = '.tpl' == substr($file['name'], -4) ? 'tpl' : 'php';
 
                 // Parse this content
                 $matches = $this->parseFile($content, $type_file);

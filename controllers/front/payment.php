@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -44,7 +44,7 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         $io = Tools::getValue('io', null);
         $is_oney = null;
         $with_fees = null;
-        if ((isset($type)) && ($type == 'oney')) {
+        if ((isset($type)) && ('oney' == $type)) {
             if (isset($io)) {
                 (bool) Configuration::get('PAYPLUG_ONEY_FEES') ? $with_fees = 'with_fees' : $with_fees = 'without_fees';
                 $is_oney = 'x' . $io . '_' . $with_fees;

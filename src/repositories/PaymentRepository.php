@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -320,7 +320,7 @@ class PaymentRepository extends BaseClass
             }
         }
 
-        if ($paymentDetails['paymentMethod'] !== 'installment') {
+        if ('installment' !== $paymentDetails['paymentMethod']) {
             $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
 
             if (!$payment['result']) {
@@ -356,7 +356,7 @@ class PaymentRepository extends BaseClass
         // We can now hydrate our params
         $paymentDetails['paymentId'] = $this->apiPayment->id;
 
-        if (isset($paymentDetails['paymentTab']['integration']) || $paymentDetails['paymentMethod'] == 'apple_pay') {
+        if (isset($paymentDetails['paymentTab']['integration']) || 'apple_pay' == $paymentDetails['paymentMethod']) {
             $paymentDetails['paymentReturnUrl'] = $paymentDetails['paymentTab']['hosted_payment']['return_url'];
         } elseif (isset($this->apiPayment->hosted_payment->return_url)) {
             $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->return_url;
@@ -371,8 +371,8 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        if (($paymentDetails['paymentMethod'] !== 'installment') && ($this->apiPayment->authorization !== null)) {
-            if ($this->apiPayment->authorization->authorized_at !== null) {
+        if (('installment' !== $paymentDetails['paymentMethod']) && (null !== $this->apiPayment->authorization)) {
+            if (null !== $this->apiPayment->authorization->authorized_at) {
                 $paymentDetails['authorizedAt'] = $this->apiPayment->authorization->authorized_at;
             }
         }
@@ -575,7 +575,7 @@ class PaymentRepository extends BaseClass
                     'result' => 'new_card',
                     'embedded' => $paymentDetails['isEmbedded']
                         && !$paymentDetails['isMobileDevice']
-                        && $paymentDetails['paymentMethod'] !== 'bancontact',
+                        && 'bancontact' !== $paymentDetails['paymentMethod'],
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];
@@ -681,7 +681,7 @@ class PaymentRepository extends BaseClass
             ->fields('is_paid')->values((int) $paymentDetails['isPaid'])
             ->fields('date_upd')->values($this->query->escape($paymentDate));
 
-        if ($paymentDetails['paymentUrl'] != '') {
+        if ('' != $paymentDetails['paymentUrl']) {
             $this->query->fields('payment_url')->values($this->query->escape($paymentDetails['paymentUrl']));
         }
 
@@ -754,7 +754,7 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        if ($storedPayment['payment_method'] == 'installment') {
+        if ('installment' == $storedPayment['payment_method']) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($storedPayment['id_payment']);
             if (!$installment['result']) {
                 return $this->returnPaymentError(

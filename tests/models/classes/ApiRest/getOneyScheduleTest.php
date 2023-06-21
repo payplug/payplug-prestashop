@@ -57,7 +57,7 @@ class getOneyScheduleTest extends BaseApiRest
 
         $assert_configurations = [];
         foreach ($response as $key => $schedule_configuration) {
-            if ($key == 'checked') {
+            if ('checked' == $key) {
                 $assert_configurations[] = (bool) $schedule_configuration;
             }
         }
@@ -74,7 +74,7 @@ class getOneyScheduleTest extends BaseApiRest
 
         $assert_configurations = [];
         foreach ($response as $key => $schedule_configuration) {
-            if ($key == 'checked') {
+            if ('checked' == $key) {
                 $assert_configurations[] = (bool) $schedule_configuration;
             }
         }

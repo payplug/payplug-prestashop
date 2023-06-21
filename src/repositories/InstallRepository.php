@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -311,7 +311,7 @@ class InstallRepository extends BaseClass
     {
         foreach (array_keys($this->dependencies->configurationKeys) as $key) {
             if ($this->dependencies->getConfigurationKeyOption($key, 'setConf')) {
-                if ($key == 'oney' && $this->dependencies->name == 'pspaylater') {
+                if ('oney' == $key && 'pspaylater' == $this->dependencies->name) {
                     $this->config->updateValue(
                         $this->dependencies->getConfigurationKey($key),
                         1
