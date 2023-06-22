@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -40,7 +40,7 @@ class SQLtableRepository
     }
 
     /**
-     * Install SQL tables used by module
+     * Install SQL tables used by module.
      *
      * @return bool
      */
@@ -258,7 +258,7 @@ class SQLtableRepository
     }
 
     /**
-     * Remove SQL tables used by module
+     * Remove SQL tables used by module.
      *
      * @param $keep_cards
      *
@@ -297,7 +297,7 @@ class SQLtableRepository
     }
 
     /**
-     * Check if existing table
+     * Check if existing table.
      *
      * @param string   $table
      * @param bool|int $canUsePayplugLogger

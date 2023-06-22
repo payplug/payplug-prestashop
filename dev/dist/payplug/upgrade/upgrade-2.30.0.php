@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -40,7 +40,7 @@ function upgrade_module_2_30_0($object)
         $lock_exists = false;
         if ($res_describe) {
             foreach ($res_describe as $field) {
-                if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                if ('id_cart' == $field['Field'] && 'UNI' == $field['Key']) {
                     $lock_exists = true;
                 }
             }
@@ -66,7 +66,7 @@ function upgrade_module_2_30_0($object)
                 $res_describe = Db::getInstance()->executeS($req_describe);
                 if ($res_describe) {
                     foreach ($res_describe as $field) {
-                        if ($field['Field'] == 'id_cart' && $field['Key'] == 'UNI') {
+                        if ('id_cart' == $field['Field'] && 'UNI' == $field['Key']) {
                             $flag = $flag && true;
                         }
                     }

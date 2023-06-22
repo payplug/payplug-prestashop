@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -336,7 +336,7 @@ class ConfigClass
             'amex' => (bool) $configurationClass->getValue('amex'),
         ];
 
-        if ($configurationClass->getValue('email') === null
+        if (null === $configurationClass->getValue('email')
             || !$this->dependencies->amountCurrencyClass->checkCurrency($cart)
             || !$this->dependencies->amountCurrencyClass->checkAmount($cart)
         ) {
@@ -352,7 +352,7 @@ class ConfigClass
             $available_options['amex'] = false;
         } else {
             if (!$this->validators['payment']->hasPermissions($permissions, 'use_live_mode')['result']
-                || $configurationClass->getValue('live_api_key') === null
+                || null === $configurationClass->getValue('live_api_key')
             ) {
                 $available_options['live'] = false;
             }
@@ -377,7 +377,7 @@ class ConfigClass
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_amex')['result'] || !$available_options['live']) {
                 $available_options['amex'] = false;
             }
-            if (!$permissions['can_use_integrated_payments'] && $available_options['embedded'] == 'integrated') {
+            if (!$permissions['can_use_integrated_payments'] && 'integrated' == $available_options['embedded']) {
                 $configurationClass->set('embedded_mode', 'redirect');
                 $available_options['embedded'] = 'redirect';
             }
@@ -425,7 +425,7 @@ class ConfigClass
      */
     public function checkPsAccount()
     {
-        if ($this->dependencies->name == 'pspaylater') {
+        if ('pspaylater' == $this->dependencies->name) {
             $module = $this->module->getInstanceByName($this->dependencies->name);
             $check_ps_account = $this->validators['module']->isAccountLinkedToPsAccount($module);
 
@@ -436,7 +436,7 @@ class ConfigClass
     }
 
     /**
-     * Get iso code from language code
+     * Get iso code from language code.
      *
      * @param $language
      *
@@ -463,7 +463,7 @@ class ConfigClass
     }
 
     /**
-     * Get live permissions
+     * Get live permissions.
      *
      * @return array
      */
@@ -476,7 +476,7 @@ class ConfigClass
     }
 
     /**
-     * Check if current device used is mobile
+     * Check if current device used is mobile.
      *
      * @return bool
      */
@@ -516,7 +516,7 @@ class ConfigClass
     }
 
     /**
-     * Check if given phone number is valid mobile phone number
+     * Check if given phone number is valid mobile phone number.
      *
      * @param string $phone_number
      * @param string $iso_code
@@ -549,7 +549,7 @@ class ConfigClass
     }
 
     /**
-     * Return international formatted phone number (norm E.164)
+     * Return international formatted phone number (norm E.164).
      *
      * @param $phone_number
      * @param $country
@@ -593,7 +593,7 @@ class ConfigClass
     }
 
     /**
-     * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm
+     * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm.
      *
      * @param int $country_id
      *
@@ -621,7 +621,7 @@ class ConfigClass
 
     /**
      * Get all country iso-code of ISO 3166-1 alpha-2 norm
-     * Source: DB PayPlug
+     * Source: DB PayPlug.
      *
      * @return null|array
      */
@@ -650,7 +650,7 @@ class ConfigClass
      */
     public function gdprCardExport($id_customer)
     {
-        if (!is_int($id_customer) || $id_customer === null) {
+        if (!is_int($id_customer) || null === $id_customer) {
             return [];
         }
 
@@ -750,7 +750,7 @@ class ConfigClass
     {
         if ($this->context->smarty->tpl_vars) {
             foreach (array_keys($this->context->smarty->tpl_vars) as $key) {
-                if (strpos($key, 'feature_') !== false && !$this->isValidFeature($key)) {
+                if (false !== strpos($key, 'feature_') && !$this->isValidFeature($key)) {
                     unset($this->context->smarty->tpl_vars[$key]);
                 }
             }
@@ -777,7 +777,7 @@ class ConfigClass
     }
 
     /**
-     * Create log files to be used everywhere in PayPlug module
+     * Create log files to be used everywhere in PayPlug module.
      */
     private function setLoggers()
     {
@@ -788,7 +788,7 @@ class ConfigClass
     }
 
     /**
-     * Set very adapter properties
+     * Set very adapter properties.
      */
     private function setConfigurationProperties()
     {

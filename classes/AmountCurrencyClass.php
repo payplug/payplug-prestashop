@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -45,7 +45,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Check if amount is correct
+     * Check if amount is correct.
      *
      * @param object $cart
      *
@@ -73,7 +73,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Check if amount is correct
+     * Check if amount is correct.
      *
      * @param int    $amount
      * @param object $order
@@ -88,10 +88,10 @@ class AmountCurrencyClass
 
         $order_amount = $order->total_paid;
 
-        if ($amount != 0) {
+        if (0 != $amount) {
             return abs($order_amount - $amount) / $amount < 0.00001;
         }
-        if ($order_amount != 0) {
+        if (0 != $order_amount) {
             return abs($amount - $order_amount) / $order_amount < 0.00001;
         }
 
@@ -99,7 +99,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Check amount to refund
+     * Check amount to refund.
      *
      * @param int $amount
      *
@@ -111,7 +111,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * check if currency is allowed
+     * check if currency is allowed.
      *
      * @param object $cart
      *
@@ -135,7 +135,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Format amount float to int or int to float
+     * Format amount float to int or int to float.
      *
      * @param $amount
      * @param bool $to_cents
@@ -160,7 +160,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Get amounts with the right currency
+     * Get amounts with the right currency.
      *
      * @param string $iso_code
      *
@@ -193,7 +193,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Get supported currencies
+     * Get supported currencies.
      *
      * @return array
      */

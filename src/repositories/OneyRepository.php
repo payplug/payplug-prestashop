@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -105,7 +105,7 @@ class OneyRepository extends BaseClass
 
     /**
      * ONLY PS 1.6
-     * Assign Oney var
+     * Assign Oney var.
      *
      * @param $cart Cart
      *
@@ -198,10 +198,10 @@ class OneyRepository extends BaseClass
     public function assignLegalNotice()
     {
         $limits = $this->getOneyPriceLimit();
-        $learnMoreLink = $this->configurationAdapter->get(
+        $learnMoreLink = 'IT' == $this->configurationAdapter->get(
             $this->dependencies->getConfigurationKey('companyIso')
-        ) == 'IT'
-        && $this->toolsAdapter->tool('strtolower', $this->contextAdapter->getContext()->language->iso_code) == 'it';
+        )
+        && 'it' == $this->toolsAdapter->tool('strtolower', $this->contextAdapter->getContext()->language->iso_code);
         $this->assign->assign([
             'learnMoreLink' => (bool) $learnMoreLink,
             'oneyWithFees' => (bool) $this->configurationAdapter->get(
@@ -250,7 +250,7 @@ class OneyRepository extends BaseClass
                     break;
 
                 case 'mobile_phone_number':
-                    $id_address = $type == 'shipping' ?
+                    $id_address = 'shipping' == $type ?
                         $this->contextAdapter->getContext()->cart->id_address_delivery :
                         $this->contextAdapter->getContext()->cart->id_address_invoice;
                     $address = $this->addressAdapter->get((int) $id_address);
@@ -268,7 +268,7 @@ class OneyRepository extends BaseClass
 
                 case 'first_name':
                     if (!$validate->validate('isName', $data)) {
-                        $text = $type == 'shipping' ?
+                        $text = 'shipping' == $type ?
                             $this->dependencies->l('Please enter your shipping firstname.', 'oneyrepository') :
                             $this->dependencies->l('Please enter your billing firstname.', 'oneyrepository');
                         $errors[] = $text;
@@ -278,7 +278,7 @@ class OneyRepository extends BaseClass
 
                 case 'last_name':
                     if (!$validate->validate('isName', $data)) {
-                        $text = $type == 'shipping' ?
+                        $text = 'shipping' == $type ?
                             $this->dependencies->l('Please enter your shipping lastname.', 'oneyrepository') :
                             $this->dependencies->l('Please enter your billing lastname.', 'oneyrepository');
                         $errors[] = $text;
@@ -288,7 +288,7 @@ class OneyRepository extends BaseClass
 
                 case 'address1':
                     if (!$validate->validate('isAddress', $data)) {
-                        $text = $type == 'shipping' ?
+                        $text = 'shipping' == $type ?
                             $this->dependencies->l('Please enter your shipping address.', 'oneyrepository') :
                             $this->dependencies->l('Please enter your billing address.', 'oneyrepository');
                         $errors[] = $text;
@@ -298,7 +298,7 @@ class OneyRepository extends BaseClass
 
                 case 'postcode':
                     if (!$validate->validate('isPostCode', $data)) {
-                        $text = $type == 'shipping' ?
+                        $text = 'shipping' == $type ?
                             $this->dependencies->l('Please enter your shipping postcode.', 'oneyrepository') :
                             $this->dependencies->l('Please enter your billing postcode.', 'oneyrepository');
                         $errors[] = $text;
@@ -308,7 +308,7 @@ class OneyRepository extends BaseClass
 
                 case 'city':
                     if (!$validate->validate('isCityName', $data)) {
-                        $text = $type == 'shipping' ?
+                        $text = 'shipping' == $type ?
                             $this->dependencies->l('Please enter your shipping city.', 'oneyrepository') :
                             $this->dependencies->l('Please enter your billing city.', 'oneyrepository');
                         $errors[] = $text;
@@ -381,7 +381,7 @@ class OneyRepository extends BaseClass
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
-        $withFirstSchedule = $this->contextAdapter->getContext()->language->iso_code == 'it';
+        $withFirstSchedule = 'it' == $this->contextAdapter->getContext()->language->iso_code;
         $vars = [
             'use_fees' => (bool) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('oneyFees')
@@ -447,15 +447,15 @@ class OneyRepository extends BaseClass
             $merchant_company_iso = (string) $this->configurationAdapter->get(
                 $this->dependencies->getConfigurationKey('companyIso')
             );
-            if ($use_fees === false) {
-                if ($iso != 'IT' && $iso != 'FR') {
+            if (false === $use_fees) {
+                if ('IT' != $iso && 'FR' != $iso) {
                     $iso = $merchant_company_iso;
                 }
 
                 $oneyImage .= '_' . $iso;
             }
 
-            if ($is_elligible['result'] !== true) {
+            if (true !== $is_elligible['result']) {
                 $oneyImage .= '_alt';
             }
 
@@ -481,7 +481,7 @@ class OneyRepository extends BaseClass
 
     /**
      * ONLY PS 1.6
-     * Display Oney required fields template
+     * Display Oney required fields template.
      *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
@@ -730,7 +730,7 @@ class OneyRepository extends BaseClass
         );
 
         foreach (array_keys($oney_simulations['simulations']) as $key) {
-            $with_fees = (bool) strpos($key, 'with_fees') !== false;
+            $with_fees = false !== (bool) strpos($key, 'with_fees');
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 unset($oney_simulations['simulations'][$key]);
             }
@@ -782,7 +782,7 @@ class OneyRepository extends BaseClass
                 : $this->dependencies->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
         );
 
-        $withFirstSchedule = $this->contextAdapter->getContext()->language->iso_code == 'it';
+        $withFirstSchedule = 'it' == $this->contextAdapter->getContext()->language->iso_code;
 
         $this->assign->assign([
             'payplug_oney_required_field' => $cart ? $this->displayOneyRequiredFields() : false,
@@ -874,7 +874,7 @@ class OneyRepository extends BaseClass
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
 
-        if ($custom == true) {
+        if (true == $custom) {
             $oney_min_amounts = explode(
                 ',',
                 $tools->tool('strtoupper', $config->get(
@@ -1153,7 +1153,7 @@ class OneyRepository extends BaseClass
         }
 
         $simulations = $simulations['resource'];
-        if (isset($simulations['object']) && $simulations['object'] == 'error') {
+        if (isset($simulations['object']) && 'error' == $simulations['object']) {
             return [
                 'result' => false,
                 'error' => $simulations['message'],

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -42,7 +42,7 @@ class AdminClass
      */
     public function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
-        if ($controller_name == 'AdminModules') {
+        if ('AdminModules' == $controller_name) {
             switch ($this->dependencies->name) {
                 case 'pspaylater':
                     $admin_ajax_url = $this->context->link->getAdminLink('AdminPsPayLater');
@@ -54,7 +54,7 @@ class AdminClass
 
                     break;
             }
-        } elseif ($controller_name == 'AdminOrders') {
+        } elseif ('AdminOrders' == $controller_name) {
             $admin_ajax_url = $this->context->link->getAdminLink($controller_name) . '&id_order=' . $id_order
                 . '&vieworder';
         }

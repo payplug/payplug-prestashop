@@ -1,6 +1,6 @@
 <?php
 /**
- * MyLogPHP 1.2.6
+ * MyLogPHP 1.2.6.
  *
  * NOTICE OF LICENSE
  *
@@ -35,7 +35,7 @@ class MyLogPHP
     private $HEADERS;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $logfilename path and name of the file log
      * @param string $separator   character used for separate the field values
@@ -132,7 +132,7 @@ class MyLogPHP
                 fwrite($fd, $headers);
             }
             $debugBacktrace = debug_backtrace();
-            if ($line_n === null) {
+            if (null === $line_n) {
                 $line = $debugBacktrace[1]['line'];
             } else {
                 $line = $line_n;

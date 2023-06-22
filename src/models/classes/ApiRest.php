@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -1362,7 +1362,7 @@ class ApiRest
             ->getPlugin()
             ->getRoutes()
             ->getExternalUrl()['signup'];
-        if ($this->dependencies->name == 'pspaylater') {
+        if ('pspaylater' == $this->dependencies->name) {
             $register_link .= '?sponsor=22101';
         }
 

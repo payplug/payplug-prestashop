@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -45,7 +45,7 @@ class paymentValidator
      */
     public function canBeRefund($pay_id, $data, $truly_refundable_amount = false, $total_amount = false)
     {
-        if ($pay_id == null) {
+        if (null == $pay_id) {
             if (!is_numeric($total_amount)) {
                 return [
                     'result' => false,
@@ -609,7 +609,7 @@ class paymentValidator
             ];
         }
 
-        if (\strpos($payment_id, 'inst') === false) {
+        if (false === \strpos($payment_id, 'inst')) {
             return [
                 'result' => false,
                 'message' => 'Given payment id is not from installment payment',

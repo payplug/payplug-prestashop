@@ -55,7 +55,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
-            if ($requirement['text'] == 'payplug.getRequirementsTranslations.requirementsCurlText') {
+            if ('payplug.getRequirementsTranslations.requirementsCurlText' == $requirement['text']) {
                 $this->assertSame(false, $requirement['status']);
             }
         }
@@ -95,7 +95,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
-            if ($requirement['text'] == 'payplug.getRequirementsTranslations.requirementsCurlText') {
+            if ('payplug.getRequirementsTranslations.requirementsCurlText' == $requirement['text']) {
                 $this->assertSame(true, $requirement['status']);
             }
         }
@@ -135,7 +135,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
-            if ($requirement['text'] == 'payplug.getRequirementsTranslations.requirementsPhpText') {
+            if ('payplug.getRequirementsTranslations.requirementsPhpText' == $requirement['text']) {
                 $this->assertSame(false, $requirement['status']);
             }
         }
@@ -175,7 +175,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
-            if ($requirement['text'] == 'payplug.getRequirementsTranslations.requirementsPhpText') {
+            if ('payplug.getRequirementsTranslations.requirementsPhpText' == $requirement['text']) {
                 $this->assertSame(true, $requirement['status']);
             }
         }
@@ -215,7 +215,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
-            if ($requirement['text'] == 'payplug.getRequirementsTranslations.requirementsOpensslText') {
+            if ('payplug.getRequirementsTranslations.requirementsOpensslText' == $requirement['text']) {
                 $this->assertSame(false, $requirement['status']);
             }
         }
@@ -255,7 +255,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
-            if ($requirement['text'] == 'payplug.getRequirementsTranslations.requirementsOpensslText') {
+            if ('payplug.getRequirementsTranslations.requirementsOpensslText' == $requirement['text']) {
                 $this->assertSame(true, $requirement['status']);
             }
         }

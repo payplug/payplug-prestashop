@@ -34,7 +34,7 @@ if ($fp) {
         foreach ($available_languages as $lang) {
             $line[] = stripcslashes($trans[$lang]);
 
-            if (!$trans[$lang] && strpos($key, 'pspaylater') == false && $moduleName != 'pspaylater') {
+            if (!$trans[$lang] && false == strpos($key, 'pspaylater') && 'pspaylater' != $moduleName) {
                 $missing_translations[$lang][$key] = $trans['default'];
             }
         }
@@ -64,7 +64,7 @@ if (isset($argv) && !empty($argv)) {
         $restricted_branches = ['qa', 'hotfix', 'master', 'release'];
         foreach ($restricted_branches as $branch) {
             $pos = strpos($target_branch, $branch);
-            if ($pos !== false && !$pos && !$need_return) {
+            if (false !== $pos && !$pos && !$need_return) {
                 $need_return = true;
             }
         }

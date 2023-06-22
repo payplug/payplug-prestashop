@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -69,7 +69,7 @@ class OrderClass
      */
     public function getOrderStates($id_lang = null)
     {
-        if ($id_lang === null) {
+        if (null === $id_lang) {
             $id_lang = $this->context->language->id;
         }
 

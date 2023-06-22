@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -126,8 +126,8 @@ class PayPlugValidation
                 $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation'),
             ]);
             $this->toolsAdapter->tool('redirect', $redirect_url_error);
-        } elseif (!($ps = $this->toolsAdapter->tool('getValue', 'ps')) || $ps != 1) {
-            if ($ps == 2) {
+        } elseif (!($ps = $this->toolsAdapter->tool('getValue', 'ps')) || 1 != $ps) {
+            if (2 == $ps) {
                 $this->logger->addLog('Order has been cancelled on PayPlug page');
                 $this->toolsAdapter->tool('redirect', $cancel_url);
             }
@@ -314,7 +314,7 @@ class PayPlugValidation
 
             $is_authorized = false;
 
-            if (($payment->authorization !== null) && isset($payment->authorization->authorized_amount)) {
+            if ((null !== $payment->authorization) && isset($payment->authorization->authorized_amount)) {
                 $is_authorized = true;
                 if (!$this->isOney) {
                     $this->isDeferred = true;
@@ -323,8 +323,8 @@ class PayPlugValidation
 
             $amount = $payment->amount;
 
-            if (((isset($payment->save_card) && (int) $payment->save_card == 1))
-                || ((isset($payment->card->id) && $payment->card->id != ''))
+            if (((isset($payment->save_card) && 1 == (int) $payment->save_card))
+                || ((isset($payment->card->id) && '' != $payment->card->id))
             ) {
                 $this->logger->addLog('[Save Card] Saving card...');
                 $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
@@ -336,7 +336,7 @@ class PayPlugValidation
                         $this->logger->addLog('[Save Card] $payment->save_card is not set', 'debug');
                     }
 
-                    if (isset($payment->save_card) && $payment->save_card !== 1) {
+                    if (isset($payment->save_card) && 1 !== $payment->save_card) {
                         $this->logger->addLog('[Save Card] $payment->save_card is set but not equal to 1', 'debug');
                     }
 
@@ -344,7 +344,7 @@ class PayPlugValidation
                         $this->logger->addLog('[Save Card] $payment->card->id is not set', 'debug');
                     }
 
-                    if (isset($payment->card->id) && $payment->card->id == '') {
+                    if (isset($payment->card->id) && '' == $payment->card->id) {
                         $this->logger->addLog('[Save Card] $payment->card->id is set but empty', 'debug');
                     }
 
@@ -352,7 +352,7 @@ class PayPlugValidation
                         $this->logger->addLog('[Save Card] $payment->hosted_payment is not set', 'debug');
                     }
 
-                    if ((isset($payment->hosted_payment)) && $payment->hosted_payment == '') {
+                    if ((isset($payment->hosted_payment)) && '' == $payment->hosted_payment) {
                         $this->logger->addLog('[Save Card] $payment->hosted_payment is set but empty', 'debug');
                     }
                 } else {
@@ -389,7 +389,7 @@ class PayPlugValidation
 
         if ($id_order) {
             $this->logger->addLog('Order already exists: ' . $id_order);
-            if ($this->type == 'payment') {
+            if ('payment' == $this->type) {
                 $this->logger->addLog('Deleting stored payment.');
                 $payment = $this->dependencies
                     ->getRepositories()['payment']
@@ -401,7 +401,7 @@ class PayPlugValidation
         } else {
             $this->logger->addLog('Order doesn\'t exists yet.');
 
-            if ($this->type == 'payment') {
+            if ('payment' == $this->type) {
                 $state_addons = ($payment->is_live ? '' : '_TEST');
             } else {
                 $state_addons = ($installment->is_live ? '' : '_TEST');
@@ -427,7 +427,7 @@ class PayPlugValidation
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG' . $state_addons)
             );
 
-            if ($this->type == 'installment') {
+            if ('installment' == $this->type) {
                 $installment = new PPPaymentInstallment($inst_id, $this->dependencies);
                 $first_payment = $installment->getFirstPayment();
                 if ($this->validators['payment']->isDeferred($first_payment->resource)['result']) {
@@ -456,9 +456,9 @@ class PayPlugValidation
             $this->logger->addLog('Order state will be : ' . $order_state);
 
             $transaction_id = null;
-            if ($this->type == 'payment') {
+            if ('payment' == $this->type) {
                 $transaction_id = $payment->id;
-            } elseif ($this->type == 'installment') {
+            } elseif ('installment' == $this->type) {
                 $transaction_id = $inst_id;
             }
             $extra_vars = [
@@ -583,7 +583,7 @@ class PayPlugValidation
             $this->logger->addLog('Order validated');
 
             // Add payplug orderPayment / Installment
-            if ($this->type == 'payment') {
+            if ('payment' == $this->type) {
                 $data = [];
                 $data['metadata'] = $payment->metadata;
                 $data['metadata']['Order'] = $id_order;

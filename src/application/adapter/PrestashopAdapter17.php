@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -58,7 +58,7 @@ class PrestashopAdapter17
         $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
         $this->context->controller->addJS($views_path . '/js/front-v' . $this->dependencies->version . '.js');
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')
-            && (bool) $this->config->get($this->dependencies->getConfigurationKey('applepay')) === true) {
+            && true === (bool) $this->config->get($this->dependencies->getConfigurationKey('applepay'))) {
             Media::addJsDef(
                 [
                     $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
@@ -77,9 +77,9 @@ class PrestashopAdapter17
     {
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
             && $this->dependencies->configClass->isValidFeature('feature_integrated')
-            && (string) $this->config->get(
+            && 'integrated' == (string) $this->config->get(
                 $this->dependencies->getConfigurationKey('embeddedMode')
-            ) == 'integrated'
+            )
         ) {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }
@@ -105,7 +105,7 @@ class PrestashopAdapter17
             }
 
             // load oney schedule on e page loading
-            if ($payment_method == 'oney' && $payment_option['is_optimized']) {
+            if ('oney' == $payment_method && $payment_option['is_optimized']) {
                 try {
                     $payment_schedule = $this->oney->getOneyPaymentOptionsList(
                         $payment_option['amount'],

@@ -5,12 +5,12 @@ namespace PayPlug\tests\mock;
 /**
  * Il s'agit de la variable $paymentDetails créée dans payplug.php
  * qui servira à tout le processus de création de paiement dans PaymentRepository
- * Class PaymentDetailsMock
+ * Class PaymentDetailsMock.
  */
 class PaymentDetailsMock
 {
     /**
-     * $paymentDetails d'un paiement standard
+     * $paymentDetails d'un paiement standard.
      *
      * @return array
      */
@@ -26,7 +26,7 @@ class PaymentDetailsMock
     }
 
     /**
-     * $paymentDetails d'un paiement fractionné 3x
+     * $paymentDetails d'un paiement fractionné 3x.
      *
      * @return array
      */

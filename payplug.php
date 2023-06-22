@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -36,7 +36,7 @@ class Payplug extends PaymentModule
     public $module;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @throws Exception
      */
@@ -134,7 +134,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Load asset on the back office
+     * Load asset on the back office.
      */
     public function hookActionAdminControllerSetMedia()
     {
@@ -482,7 +482,7 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * Run update module
+     * Run update module.
      */
     public function runUpgradeModule()
     {

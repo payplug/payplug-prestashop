@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -89,7 +89,7 @@ class QueryRepository
     }
 
     /**
-     * Converts object to string
+     * Converts object to string.
      *
      * @return string
      */
@@ -170,7 +170,7 @@ class QueryRepository
 
     public function values($values)
     {
-        if (!empty($values) || $values == 0) {
+        if (!empty($values) || 0 == $values) {
             $this->query['values'][] = '\'' . $values . '\'';
         }
 
@@ -350,7 +350,7 @@ class QueryRepository
 
     public function build($param = false)
     {
-        if ($this->query['type'] == 'SELECT') {
+        if ('SELECT' == $this->query['type']) {
             $sql = 'SELECT ' . ((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*') . "\n";
             if (!$this->query['from']) {
                 $this->query = null;
@@ -360,14 +360,14 @@ class QueryRepository
             }
 
             $sql .= 'FROM ' . implode(', ', $this->query['from']) . "\n";
-        } elseif ($this->query['type'] == 'INSERT') {
+        } elseif ('INSERT' == $this->query['type']) {
             $sql = 'INSERT INTO ' . implode(",\n", $this->query['into']) . "\n";
             $sql .= '(' . implode(",\n", $this->query['fields']) . ')' . "\n";
 
             if ($this->query['values']) {
                 $sql .= 'VALUES (' . "\n" . implode(",\n", $this->query['values']) . ')' . "\n";
             }
-        } elseif ($this->query['type'] == 'UPDATE') {
+        } elseif ('UPDATE' == $this->query['type']) {
             $sql = 'UPDATE ' . ((($this->query['table'])) ?
                     implode(",\n", $this->query['table']) :
                     implode(",\n", $this->query['into'])) . "\n";
@@ -375,11 +375,11 @@ class QueryRepository
             if ($this->query['set'] && (!empty($this->query['set']))) {
                 $sql .= 'SET ' . implode(',' . "\n", $this->query['set']) . "\n";
             }
-        } elseif ($this->query['type'] == 'TRUNCATE') {
+        } elseif ('TRUNCATE' == $this->query['type']) {
             $sql = 'TRUNCATE TABLE ' . ((($this->query['table'])) ?
                     implode(",\n", $this->query['table']) :
                     implode(",\n", $this->query['into'])) . "\n";
-        } elseif ($this->query['type'] == 'DELETE') {
+        } elseif ('DELETE' == $this->query['type']) {
             if (!$this->query['from']) {
                 throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
             }
@@ -387,7 +387,7 @@ class QueryRepository
             $sql = 'DELETE FROM ' . ((isset($this->query['table']) && (!empty($this->query['table']))) ?
                     implode(",\n", $this->query['table']) :
                     implode(",\n", $this->query['from'])) . "\n";
-        } elseif ($this->query['type'] == 'CREATE') {
+        } elseif ('CREATE' == $this->query['type']) {
             if (!$this->query['table']) {
                 throw new PrestaShopException('Can\'t create table because ->table() is not set or empty');
             }
@@ -405,13 +405,13 @@ class QueryRepository
             if (isset($this->query['engine']) && (!empty($this->query['engine']))) {
                 $sql .= "\n" . 'ENGINE = ' . implode($this->query['engine']);
             }
-        } elseif ($this->query['type'] == 'DROP') {
+        } elseif ('DROP' == $this->query['type']) {
             if (!$this->query['table']) {
                 throw new PrestaShopException('Table name not set in QueryRepository. Cannot drop it.');
             }
 
             $sql = 'DROP TABLE IF EXISTS ' . implode($this->query['table']) . "\n";
-        } elseif ($this->query['type'] == 'SHOW TABLES LIKE') {
+        } elseif ('SHOW TABLES LIKE' == $this->query['type']) {
             if (!$this->query['table']) {
                 throw new PrestaShopException('Table name not set in QueryRepository. Cannot check if exists.');
             }
@@ -438,9 +438,9 @@ class QueryRepository
                     $comparator = ' LIKE ';
                 }
 
-                if ($this->query['type'] == 'SELECT' || $this->query['type'] == 'DELETE') {
+                if ('SELECT' == $this->query['type'] || 'DELETE' == $this->query['type']) {
                     $table = $this->query['from'][0];
-                } elseif ($this->query['type'] == 'INSERT') {
+                } elseif ('INSERT' == $this->query['type']) {
                     $table = $this->query['into'][0];
                 } else {
                     $table = $this->query['table'][0];
@@ -500,9 +500,9 @@ class QueryRepository
                     $comparator = ' LIKE ';
                 }
 
-                if ($this->query['type'] == 'SELECT') {
+                if ('SELECT' == $this->query['type']) {
                     $table = $this->query['from'][0];
-                } elseif ($this->query['type'] == 'INSERT') {
+                } elseif ('INSERT' == $this->query['type']) {
                     $table = $this->query['into'][0];
                 } else {
                     $table = $this->query['table'][0];
@@ -568,7 +568,7 @@ class QueryRepository
             $sql .= 'LIMIT ' . ($limit['offset'] ? $limit['offset'] . ', ' : '') . $limit['limit'];
         }
 
-        if (isset($param) && $param == 'debug') {
+        if (isset($param) && 'debug' == $param) {
             var_dump($sql);
 
             exit;
@@ -582,11 +582,11 @@ class QueryRepository
             return false;
         }
 
-        if (isset($param) && $param == 'unique_value' && isset($result[0])) {
+        if (isset($param) && 'unique_value' == $param && isset($result[0])) {
             $result = reset($result[0]);
         }
 
-        if (isset($param) && $param == 'unique_row' && isset($result[0])) {
+        if (isset($param) && 'unique_row' == $param && isset($result[0])) {
             $result = $result[0];
         }
 

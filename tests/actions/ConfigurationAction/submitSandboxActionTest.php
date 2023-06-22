@@ -125,7 +125,7 @@ class submitSandboxActionTest extends BaseConfigurationAction
     }
 
     /**
-     * description test submitSandboxAction when merchant is onboarded
+     * description test submitSandboxAction when merchant is onboarded.
      */
     public function testWhenUserIsOnboarded()
     {
@@ -173,7 +173,7 @@ class submitSandboxActionTest extends BaseConfigurationAction
     }
 
     /**
-     * description test submitSandboxAction when merchant is not onboarded
+     * description test submitSandboxAction when merchant is not onboarded.
      */
     public function testWhenUserIsNotOnboarded()
     {

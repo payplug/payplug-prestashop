@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -87,7 +87,7 @@ class ApiClass
     public function checkEnvironment()
     {
         if (isset($_SERVER['SERVER_NAME'])
-            && $_SERVER['SERVER_NAME'] == 'localhost'
+            && 'localhost' == $_SERVER['SERVER_NAME']
             || preg_match(
                 '/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io|ngrok-free.app)/i',
                 $_SERVER['SERVER_NAME']
@@ -115,7 +115,7 @@ class ApiClass
      */
     public function getAccountPermissions($api_key = null)
     {
-        if ($api_key == null) {
+        if (null == $api_key) {
             $api_key = $this->setAPIKey();
         }
 
@@ -156,9 +156,9 @@ class ApiClass
      */
     public function getCurrentApiKey()
     {
-        if ((int) $this->config->get(
+        if (1 === (int) $this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
-        ) === 1) {
+        )) {
             return $this->config->get(
                 $this->dependencies->getConfigurationKey('testApiKey')
             );
@@ -218,7 +218,7 @@ class ApiClass
      */
     public function setSecretKey($token = false)
     {
-        if (!$token && $this->getCurrentApiKey() != null) {
+        if (!$token && null != $this->getCurrentApiKey()) {
             $token = $this->getCurrentApiKey();
         }
 
@@ -247,7 +247,7 @@ class ApiClass
      */
     public function initializeApi($sandbox = null)
     {
-        if ($sandbox === null && $this->current_api_key) {
+        if (null === $sandbox && $this->current_api_key) {
             $payplug_key = $this->current_api_key;
         } else {
             $configuration_key = ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY';
@@ -269,7 +269,7 @@ class ApiClass
         $parses = explode(';', $str);
         $response = null;
         foreach ($parses as $parse) {
-            if (strpos($parse, 'HTTP Response') !== false) {
+            if (false !== strpos($parse, 'HTTP Response')) {
                 $parse = str_replace('HTTP Response:', '', $parse);
                 $parse = trim($parse);
                 $response = json_decode($parse, true);
@@ -982,7 +982,7 @@ class ApiClass
      */
     private function treatAccountResponse($json_answer, $is_sandbox = true)
     {
-        if ((isset($json_answer['object']) && $json_answer['object'] == 'error')
+        if ((isset($json_answer['object']) && 'error' == $json_answer['object'])
             || empty($json_answer)
         ) {
             return false;
@@ -1098,12 +1098,12 @@ class ApiClass
             )) {
             $oney_methods = [];
             foreach ($json_answer['payment_methods'] as $key => $val) {
-                if ($this->tools->substr($key, 0, 5) == 'oney_') {
+                if ('oney_' == $this->tools->substr($key, 0, 5)) {
                     $oney_methods[] = $val['enabled'];
                 }
             }
             foreach ($oney_methods as $value) {
-                if ($value == 'true') {
+                if ('true' == $value) {
                     $onboarding_oney_completed = true;
                 }
             }
@@ -1125,9 +1125,9 @@ class ApiClass
         ];
 
         // Do not allow Spain or Belgium on Payplug
-        if (($configuration['oney_allowed_countries'] === 'ES'
-                || $configuration['oney_allowed_countries'] === 'BE')
-            && $this->dependencies->name === 'payplug') {
+        if (('ES' === $configuration['oney_allowed_countries']
+                || 'BE' === $configuration['oney_allowed_countries'])
+            && 'payplug' === $this->dependencies->name) {
             $permissions['can_use_oney'] = false;
         }
 
@@ -1185,7 +1185,7 @@ class ApiClass
      */
     private function setApiKeysbyJsonResponse($json_answer)
     {
-        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
+        if (isset($json_answer['object']) && 'error' == $json_answer['object']) {
             return false;
         }
 
@@ -1251,7 +1251,7 @@ class ApiClass
      */
     private function setUserAgent()
     {
-        if ($this->current_api_key != null) {
+        if (null != $this->current_api_key) {
             HttpClient::setDefaultUserAgentProduct(
                 $this->dependencies->name . '-Prestashop',
                 $this->dependencies->version,

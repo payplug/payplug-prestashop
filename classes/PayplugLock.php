@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -48,7 +48,7 @@ class PayplugLock
     }
 
     /**
-     * Check
+     * Check.
      *
      * @param int   $id_cart
      * @param int   $loop_time
@@ -69,7 +69,7 @@ class PayplugLock
             $creation_date = new DateTime($lock_exists['date_add']);
             $end_of_life = $creation_date->add($lifetime);
             $time = new DateTime('now');
-            while (($this->existsLockG2($id_cart) !== false) && ($time < $last_check)) {
+            while ((false !== $this->existsLockG2($id_cart)) && ($time < $last_check)) {
                 if (function_exists('usleep')) {
                     usleep($loop_time * 1000000);
                 } else {
@@ -78,7 +78,7 @@ class PayplugLock
 
                 // If lock take too much time, end the process
                 if ($time > $end_of_life) {
-                    if ($process == 'validation') {
+                    if ('validation' == $process) {
                         $this->deleteLockG2($id_cart);
                     } else {
                         return 'stop ipn';
@@ -163,7 +163,7 @@ class PayplugLock
     }
 
     /**
-     * Sleep time
+     * Sleep time.
      *
      * @param int $seconds
      */
