@@ -533,9 +533,7 @@ class HookClass
                 'oney_x3_without_fees',
                 'oney_x4_without_fees',
             ];
-
             $is_oney = isset($payment->payment_method, $payment->payment_method['type'])
-
                 && \in_array($payment->payment_method['type'], $oney_payment_method);
 
             $is_bancontact = isset($payment->payment_method, $payment->payment_method['type'])
@@ -736,6 +734,13 @@ class HookClass
             'display_single_payment' => $display_single_payment,
             'display_refund' => $display_refund,
             'refund_delay_oney' => $refund_delay_oney,
+            'refund_disable' => in_array($payment->payment_method['type'], [
+                    'giropay',
+                    'ideal',
+                    'mybank',
+                    'satispay',
+                    'sofort',
+                ]),
             'show_menu_payment' => $show_menu_payment,
             'show_menu_refunded' => $show_menu_refunded,
             'show_menu_update' => $show_menu_update,
