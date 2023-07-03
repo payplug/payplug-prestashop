@@ -1,41 +1,18 @@
 <?php
 
-namespace PayPlug\tests\models\classes\ApiRest;
-
-use PayPlug\tests\mock\ContextMock;
+namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
 /**
  * @group unit
  * @group classes
- * @group apirest_classes
+ * @group payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */
-class getOneyScheduleTest extends BaseApiRest
+class getProductCallToActionTest extends BaseOneyPaymentMethod
 {
-    public function setUp()
-    {
-        parent::setUp();
-        $context = \Mockery::mock('Context');
-        $context->shouldReceive([
-            'get' => ContextMock::get(),
-        ]);
-        $this->plugin->shouldReceive([
-            'getContext' => $context,
-        ]);
-    }
-
-    public function invalidDataProvider()
-    {
-        yield [42];
-        yield [['key' => 'value']];
-        yield [null];
-        yield [''];
-    }
-
     /**
-     * @description  test with invalid parameters
-     * @dataProvider invalidDataProvider
+     * @dataProvider invalidBoolFormatDataProvider
      *
      * @param mixed $active
      */
@@ -43,17 +20,14 @@ class getOneyScheduleTest extends BaseApiRest
     {
         $this->assertSame(
             [],
-            $this->classe->getOneySchedule($active)
+            $this->classe->getProductCallToAction($active)
         );
     }
 
-    /**
-     * @description  test with switch set to true
-     */
     public function testWhenEnabled()
     {
         $configuration = true;
-        $response = $this->classe->getOneySchedule($configuration);
+        $response = $this->classe->getProductCallToAction($configuration);
 
         $assert_configurations = [];
         foreach ($response as $key => $schedule_configuration) {
@@ -64,13 +38,10 @@ class getOneyScheduleTest extends BaseApiRest
         $this->assertTrue(in_array(true, $assert_configurations));
     }
 
-    /**
-     * @description  test with switch set to false
-     */
     public function testWhenDisabled()
     {
         $configuration = false;
-        $response = $this->classe->getOneySchedule($configuration);
+        $response = $this->classe->getProductCallToAction($configuration);
 
         $assert_configurations = [];
         foreach ($response as $key => $schedule_configuration) {

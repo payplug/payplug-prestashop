@@ -501,6 +501,175 @@ class paymentValidator
     }
 
     /**
+     * @description Check if the amount is between min and max for the given payment method
+     *
+     * @param $amount
+     * @param $payment_method
+     * @param $payment_methods_amount
+     *
+     * @return array
+     */
+    public function isEligibleByAmount($amount, $payment_method, $payment_methods_amount)
+    {
+        if (!is_int($amount)) {
+            return [
+                'result' => false,
+                'message' => '$amount must be a int type',
+            ];
+        }
+
+        if (!is_string($payment_method)) {
+            return [
+                'result' => false,
+                'message' => '$payment_method must be a string type',
+            ];
+        }
+
+        if (!is_string($payment_methods_amount)) {
+            return [
+                'result' => false,
+                'message' => '$payment_methods_amount must be a string type',
+            ];
+        }
+
+        $payment_methods_amount = json_decode($payment_methods_amount);
+
+        switch ($payment_method) {
+            case 'giropay':
+                $payment = 'giropay';
+
+                break;
+
+            case 'ideal':
+                $payment = 'ideal';
+
+                break;
+
+            case 'mybank':
+                $payment = 'mybank';
+
+                break;
+
+            case 'oney':
+                $payment = 'oney';
+
+                break;
+
+            case 'satispay':
+                $payment = 'satispay';
+
+                break;
+
+            case 'sofort':
+                $payment = 'sofort';
+
+                break;
+
+            default:
+                $payment = 'default';
+
+                break;
+        }
+
+        if ($amount < (int) str_replace('EUR:', '', $payment_methods_amount->{$payment}->min)
+            || $amount > (int) str_replace('EUR:', '', $payment_methods_amount->{$payment}->max)) {
+            return [
+                'result' => false,
+                'message' => $amount . ' is not eligible for ' . $payment_method,
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => $amount . ' is eligible for ' . $payment_method,
+        ];
+    }
+
+    /**
+     * @description Check if the amount is between min and max for the given payment method
+     *
+     * @param $country
+     * @param $payment_method
+     * @param $payment_methods_countries
+     *
+     * @return array
+     */
+    public function isEligibleByCountry($country, $payment_method, $payment_methods_countries)
+    {
+        if (!is_string($country)) {
+            return [
+                'result' => false,
+                'message' => '$country must be a string type',
+            ];
+        }
+
+        if (!is_string($payment_method)) {
+            return [
+                'result' => false,
+                'message' => '$payment_method must be a string type',
+            ];
+        }
+
+        if (!is_string($payment_methods_countries)) {
+            return [
+                'result' => false,
+                'message' => '$payment_methods_countries must be a string type',
+            ];
+        }
+
+        $payment_methods_countries = json_decode($payment_methods_countries);
+
+        switch ($payment_method) {
+            case 'giropay':
+                $payment = 'giropay';
+
+                break;
+
+            case 'ideal':
+                $payment = 'ideal';
+
+                break;
+
+            case 'mybank':
+                $payment = 'mybank';
+
+                break;
+
+            case 'oney':
+                $payment = 'oney';
+
+                break;
+
+            case 'satispay':
+                $payment = 'satispay';
+
+                break;
+
+            case 'sofort':
+                $payment = 'sofort';
+
+                break;
+
+            default:
+                $payment = 'default';
+
+                break;
+        }
+
+        if (!in_array($country, $payment_methods_countries->{$payment})) {
+            return [
+                'result' => false,
+                'message' => $country . ' is not eligible for ' . $payment_method,
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => $country . ' is eligible for ' . $payment_method,
+        ];
+    }
+
+    /**
      * @description Check if payment is expired
      *
      * @param object $payment

@@ -11,15 +11,6 @@ namespace PayPlug\tests\models\classes\Configuration;
  */
 class getNameTest extends BaseConfiguration
 {
-    public function invalidStringFormatDataProvider()
-    {
-        yield [42];
-        yield [['key' => 'value']];
-        yield [false];
-        yield [''];
-        yield [null];
-    }
-
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -38,9 +29,9 @@ class getNameTest extends BaseConfiguration
 
     public function testWhenNameConfigurationIsReturned()
     {
-        $key = 'standard';
+        $key = 'enable';
         $this->assertSame(
-            'PAYPLUG_STANDARD',
+            'PAYPLUG_ENABLE',
             $this->classe->getName($key)
         );
     }

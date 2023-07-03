@@ -25,20 +25,12 @@ class getPaylaterSectionTest extends BaseApiRest
         ]);
     }
 
-    public function invalidDataProvider()
-    {
-        yield [42];
-        yield [true];
-        yield [null];
-        yield [''];
-    }
-
     public function validDataProvider()
     {
         yield [
             [
                 'oney' => true,
-                'oney_min_amounts' => 'EUR:1000',
+                'oney_min_amounts' => 'EUR:10000',
                 'oney_max_amounts' => 'EUR:300000',
                 'oney_custom_min_amounts' => 'EUR:10000',
                 'oney_custom_max_amounts' => 'EUR:300000',
@@ -52,7 +44,7 @@ class getPaylaterSectionTest extends BaseApiRest
 
     /**
      * @description  test with invalid parameters
-     * @dataProvider invalidDataProvider
+     * @dataProvider invalidArrayFormatDataProvider
      *
      * @param mixed $current_configuration
      */

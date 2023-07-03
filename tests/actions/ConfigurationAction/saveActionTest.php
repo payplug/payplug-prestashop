@@ -6,6 +6,7 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  * @group unit
  * @group action
  * @group configuration_action
+ * @group configuration_action_save
  *
  * @runTestsInSeparateProcesses
  */

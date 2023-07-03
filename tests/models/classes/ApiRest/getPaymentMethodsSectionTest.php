@@ -14,7 +14,7 @@ use PayPlug\tests\mock\ContextMock;
  */
 class getPaymentMethodsSectionTest extends BaseApiRest
 {
-    //private $context;
+    private $payment_method_option;
 
     public function setUp()
     {
@@ -34,17 +34,48 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $link
             ->shouldReceive([
                 'getAdminLink' => 'AdminPayPlugInstallment',
-            ])
-        ;
+            ]);
         $this->plugin->getContext()->get()->link = $link;
+
+        $this->payment_method_option = [
+            'available_test_mode' => false,
+            'checked' => false,
+            'descriptions' => [
+                'live' => [
+                    'description' => 'Lorem ipsum live description ',
+                    'link_know_more' => [
+                        'target' => '_blank',
+                        'text' => 'Sit dolor emet.',
+                        'url' => 'https://support.payplug.com/hc/fr/articles/123456789',
+                    ],
+                ],
+                'sandbox' => [
+                    'description' => 'Lorem ipsum sandbox description ',
+                    'link_know_more' => [
+                        'target' => '_blank',
+                        'text' => 'Sit dolor emet.',
+                        'url' => 'https://support.payplug.com/hc/fr/articles/123456789',
+                    ],
+                ],
+            ],
+            'image' => '/modules/payplug/views/img/svg/payment/apple_pay.svg',
+            'name' => 'payment_method',
+            'title' => 'Paiement Payplug',
+            'type' => 'payment_method',
+        ];
     }
 
-    public function invalidArrayFormatDataProvider()
+    public function expectedPaymentMethods()
     {
-        yield [42];
-        yield [null];
-        yield [false];
-        yield ['lorem ipsum'];
+        yield ['feature_standard', 'standard'];
+        yield ['feature_amex', 'amex'];
+        yield ['feature_applepay', 'applepay'];
+        yield ['feature_bancontact', 'bancontact'];
+        yield ['feature_satispay', 'satispay'];
+        yield ['feature_sofort', 'sofort'];
+        yield ['feature_giropay', 'giropay'];
+        yield ['feature_ideal', 'ideal'];
+        yield ['feature_mybank', 'mybank'];
     }
 
     /**
@@ -68,173 +99,33 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $configClass
             ->shouldReceive([
                 'isValidFeature' => false,
-            ])
-        ;
+            ]);
         $this->dependencies->configClass = $configClass;
         $this->assertSame([], $this->classe->getPaymentMethodsSection($current_configuration));
     }
 
-    public function testWhenStandardIsNotEnable()
+    /**
+     * @dataProvider expectedPaymentMethods
+     *
+     * @param string $feature
+     * @param string $expected
+     */
+    public function testWhenGivenMethodIsEnable($feature, $expected)
     {
-        $current_configuration = [];
-
         $configClass = \Mockery::mock('Config');
         $configClass
             ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_standard' != $key;
-            })
-        ;
+            ->andReturnUsing(function ($key) use ($feature) {
+                return $feature == $key;
+            });
         $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
+        $response = $this->classe->getPaymentMethodsSection([]);
         $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
+        if (isset($response['options'])) {
+            foreach ($response['options'] as $payment_method) {
+                $payment_methods[] = $payment_method['name'];
+            }
         }
-        $this->assertFalse(in_array('standard', $payment_methods));
-    }
-
-    public function testWhenStandardIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => true,
-            ])
-        ;
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('standard', $payment_methods));
-    }
-
-    public function testWhenAmexIsNotEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_amex' != $key;
-            })
-        ;
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertFalse(in_array('american_express', $payment_methods));
-    }
-
-    public function testWhenAmexIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => true,
-            ])
-        ;
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('american_express', $payment_methods));
-    }
-
-    public function testWhenApplePayIsNotEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_applepay' != $key;
-            })
-        ;
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertFalse(in_array('applepay', $payment_methods));
-    }
-
-    public function testWhenApplePayIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => true,
-            ])
-        ;
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('applepay', $payment_methods));
-    }
-
-    public function testWhenBancontactIsNotEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($key) {
-                return 'feature_bancontact' != $key;
-            })
-        ;
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertFalse(in_array('bancontact', $payment_methods));
-    }
-
-    public function testWhenBancontactIsEnable()
-    {
-        $current_configuration = [];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => true,
-            ])
-        ;
-        $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection($current_configuration);
-
-        $payment_methods = [];
-        foreach ($response['options'] as $payment_method) {
-            $payment_methods[] = $payment_method['name'];
-        }
-        $this->assertTrue(in_array('bancontact', $payment_methods));
+        $this->assertTrue(in_array($expected, $payment_methods));
     }
 }

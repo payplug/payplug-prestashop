@@ -3,11 +3,14 @@
 namespace PayPlug\tests\models\classes\Configuration;
 
 use PayPlug\src\models\classes\Configuration;
+use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
 class BaseConfiguration extends TestCase
 {
+    use FormatDataProvider;
+
     public $configuration;
     public $dependencies;
     public $classe;

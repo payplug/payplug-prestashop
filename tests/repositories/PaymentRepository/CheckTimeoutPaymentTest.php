@@ -9,7 +9,6 @@ use PayPlug\tests\mock\CartMock;
  * @group repository
  * @group payment
  * @group payment_repository
- * @group debug
  *
  * @runTestsInSeparateProcesses
  */

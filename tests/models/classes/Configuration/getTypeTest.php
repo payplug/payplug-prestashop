@@ -11,15 +11,6 @@ namespace PayPlug\tests\models\classes\Configuration;
  */
 class getTypeTest extends BaseConfiguration
 {
-    public function invalidStringFormatDataProvider()
-    {
-        yield [42];
-        yield [['key' => 'value']];
-        yield [false];
-        yield [''];
-        yield [null];
-    }
-
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -38,7 +29,7 @@ class getTypeTest extends BaseConfiguration
 
     public function testWhenDefaultConfigurationIsReturned()
     {
-        $key = 'standard';
+        $key = 'enable';
         $this->assertSame(
             'integer',
             $this->classe->getType($key)
