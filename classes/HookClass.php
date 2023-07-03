@@ -1109,7 +1109,7 @@ class HookClass
      *
      * @throws Exception
      *
-     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
+     * @deprecated This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
      *
      * @return string
      */
@@ -1145,7 +1145,10 @@ class HookClass
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
-        $payment_options = $this->dependencies->paymentClass->getPaymentOptions();
+        $payment_options = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethod()
+            ->getPaymentOptionCollection();
 
         // Transforme tableau en TPL
         $paymentOptions = $this->dependencies->loadAdapterPresta()->displayPaymentOption(
@@ -1185,8 +1188,10 @@ class HookClass
         ]);
 
         // Données sous forme de tableau (pour 1.6 et 1.7)
-
-        $payment_options = $this->dependencies->paymentClass->getPaymentOptions();
+        $payment_options = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethod()
+            ->getPaymentOptionCollection();
 
         // Transforme tableau en object
         return $this->dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);

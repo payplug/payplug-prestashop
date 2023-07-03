@@ -324,17 +324,16 @@ class ConfigClass
             }
         }
         $available_options = [
-            'standard' => (bool) $configurationClass->getValue('standard'),
             'live' => !(bool) $configurationClass->getValue('sandbox_mode'),
             'embedded' => (string) $configurationClass->getValue('embedded_mode'),
-            'one_click' => (bool) $configurationClass->getValue('one_click'),
-            'installment' => (bool) $configurationClass->getValue('inst'),
-            'deferred' => (bool) $configurationClass->getValue('deferred'),
-            'oney' => (bool) $configurationClass->getValue('oney'),
-            'bancontact' => (bool) $configurationClass->getValue('bancontact'),
-            'applepay' => (bool) $configurationClass->getValue('applepay'),
-            'amex' => (bool) $configurationClass->getValue('amex'),
         ];
+
+        $payment_methods = json_decode($configurationClass->getValue('payment_methods'), true);
+        if ($payment_methods) {
+            foreach ($payment_methods as $payment_method => $enabled) {
+                $available_options[$payment_method] = (bool) $enabled;
+            }
+        }
 
         if (null === $configurationClass->getValue('email')
             || !$this->dependencies->amountCurrencyClass->checkCurrency($cart)

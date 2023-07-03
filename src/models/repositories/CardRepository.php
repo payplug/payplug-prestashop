@@ -185,21 +185,21 @@ class CardRepository extends QueryRepository
     /**
      * @description Get all registered cards for a given customer
      *
-     * @param int   $id_customer
-     * @param int   $id_company
-     * @param false $is_sandbox
+     * @param int  $id_customer
+     * @param int  $id_company
+     * @param bool $is_sandbox
      *
      * @return array
      */
-    public function getAllByCustomer($id_customer = 0, $id_company = null, $is_sandbox = null)
+    public function getAllByCustomer($id_customer = 0, $id_company = 0, $is_sandbox = false)
     {
         if (!is_int($id_customer) || !$id_customer) {
             return [];
         }
-        if (!is_int($id_company) && null !== $id_company || 0 === $id_company) {
+        if (!is_int($id_company) || !$id_company) {
             return [];
         }
-        if (!is_bool($is_sandbox) && null !== $is_sandbox) {
+        if (!is_bool($is_sandbox)) {
             return [];
         }
 

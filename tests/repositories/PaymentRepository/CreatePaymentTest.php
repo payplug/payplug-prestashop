@@ -152,15 +152,15 @@ final class CreatePaymentTest extends BasePaymentRepository
 
     public function testWhenTryingToCreatePaymentWithOptionDisabled()
     {
-        $config = '0';
+        $config = '{"standard":false}';
         $this->configuration->shouldReceive('getValue')
-            ->with('standard')
+            ->with('payment_methods')
             ->andReturn($config);
         $this->assertSame(
             [
                 'result' => false,
                 'Configuration::get' => json_encode($config),
-                'response' => '[createPayment] Try to create payment with disabled feature',
+                'response' => '[createPayment] Try to create payment with disabled feature standard',
             ],
             $this->repo->createPayment($this->paymentDetails)
         );
@@ -169,8 +169,8 @@ final class CreatePaymentTest extends BasePaymentRepository
     public function testWhenExistingCancellablePaymentCantBeAborted()
     {
         $this->configuration->shouldReceive('getValue')
-            ->with('standard')
-            ->andReturn(1);
+            ->with('payment_methods')
+            ->andReturn('{"standard":true}');
         $payment = [
             'id_cart' => 42,
             'id_payment' => 'pay_1234567890azerty',
@@ -211,8 +211,8 @@ final class CreatePaymentTest extends BasePaymentRepository
     public function testWhenPaymentCanNotBeCreated()
     {
         $this->configuration->shouldReceive('getValue')
-            ->with('standard')
-            ->andReturn(1);
+            ->with('payment_methods')
+            ->andReturn('{"standard":true}');
         $this->repositories['payment']->shouldReceive([
             'getByCart' => [],
         ]);
@@ -238,8 +238,8 @@ final class CreatePaymentTest extends BasePaymentRepository
     public function testWhenPaymentIsCreatedWithFailure()
     {
         $this->configuration->shouldReceive('getValue')
-            ->with('standard')
-            ->andReturn(1);
+            ->with('payment_methods')
+            ->andReturn('{"standard":true}');
         $this->repositories['payment']->shouldReceive([
             'getByCart' => [],
         ]);
@@ -275,8 +275,8 @@ final class CreatePaymentTest extends BasePaymentRepository
     public function testWhenPaymentIsCreatedWithoutFailure()
     {
         $this->configuration->shouldReceive('getValue')
-            ->with('standard')
-            ->andReturn(1);
+            ->with('payment_methods')
+            ->andReturn('{"standard":true}');
         $this->repositories['payment']->shouldReceive([
             'getByCart' => [],
         ]);

@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\repositories\CardRepository;
 
 use PayPlug\src\models\repositories\CardRepository;
-use PHPUnit\Framework\TestCase;
+use PayPlug\tests\models\repositories\BaseRepository;
 
 /**
  * @group unit
@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-class getAllTest extends TestCase
+class getAllTest extends BaseRepository
 {
     protected function setUp()
     {

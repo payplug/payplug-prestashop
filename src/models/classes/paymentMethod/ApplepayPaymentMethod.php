@@ -1,0 +1,74 @@
+<?php
+/**
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of Payplug SAS
+ */
+
+namespace PayPlug\src\models\classes\paymentMethod;
+
+class ApplepayPaymentMethod extends PaymentMethod
+{
+    public function __construct($dependencies)
+    {
+        parent::__construct($dependencies);
+        $this->name = 'applepay';
+    }
+
+    /**
+     * @description Get option for given configuration
+     *
+     * @param array $current_configuration
+     *
+     * @return array
+     */
+    public function getOption($current_configuration = [])
+    {
+        $option = parent::getOption($current_configuration);
+        $option['available_test_mode'] = false;
+
+        return $option;
+    }
+
+    /**
+     * @description Get payment option
+     *
+     * @param array $payment_options
+     *
+     * @return array
+     */
+    protected function getPaymentOption($payment_options = [])
+    {
+        if (!is_array($payment_options)) {
+            return [];
+        }
+
+        $payment_options = parent::getPaymentOption($payment_options);
+
+        $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
+        $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
+        if (!$isApplePayCompatible['result']) {
+            return [];
+        }
+
+        $payment_options[$this->name]['additionalInformation'] = $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
+
+        return $payment_options;
+    }
+}

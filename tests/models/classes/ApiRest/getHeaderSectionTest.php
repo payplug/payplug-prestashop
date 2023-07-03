@@ -32,14 +32,6 @@ class getHeaderSectionTest extends BaseApiRest
         $this->dependencies->version = 'x.xx.xx';
     }
 
-    public function invalidArrayFormatDataProvider()
-    {
-        yield [42];
-        yield [null];
-        yield [false];
-        yield ['lorem ipsum'];
-    }
-
     /**
      * @dataProvider invalidArrayFormatDataProvider
      *

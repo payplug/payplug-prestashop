@@ -279,19 +279,25 @@ class PaymentRepository extends BaseClass
             'amex' => 'amex',
             'applepay' => 'apple_pay',
             'bancontact' => 'bancontact',
+            'giropay' => 'giropay',
+            'ideal' => 'ideal',
             'inst' => 'installment',
+            'mybank' => 'mybank',
             'one_click' => 'oneclick',
             'oney' => 'oney',
+            'satispay' => 'satispay',
+            'sofort' => 'sofort',
             'standard' => 'standard',
         ];
+        $database_payment_methods = json_decode($this->configuration->getValue('payment_methods'));
         foreach ($payment_methods as $config_key => $payment_method) {
-            if ($payment_method == $paymentDetails['paymentMethod'] && !$this->configuration->getValue($config_key)) {
+            if ($payment_method == $paymentDetails['paymentMethod'] && !$database_payment_methods->{$config_key}) {
                 return $this->returnPaymentError(
                     [
                         'name' => 'Configuration::get',
-                        'value' => $this->configuration->getValue($config_key),
+                        'value' => $this->configuration->getValue('payment_methods'),
                     ],
-                    '[createPayment] Try to create payment with disabled feature'
+                    '[createPayment] Try to create payment with disabled feature ' . $payment_method
                 );
             }
         }
@@ -565,8 +571,13 @@ class PaymentRepository extends BaseClass
             case 'amex':
             case 'apple_pay':
             case 'bancontact':
+            case 'giropay':
+            case 'ideal':
             case 'installment':
             case 'integrated':
+            case 'mybank':
+            case 'satispay':
+            case 'sofort':
             case 'standard':
                 $returnUrl = $paymentDetails['paymentUrl']
                     ? $paymentDetails['paymentUrl']
@@ -575,7 +586,14 @@ class PaymentRepository extends BaseClass
                     'result' => 'new_card',
                     'embedded' => $paymentDetails['isEmbedded']
                         && !$paymentDetails['isMobileDevice']
-                        && 'bancontact' !== $paymentDetails['paymentMethod'],
+                        && !in_array($paymentDetails['paymentMethod'], [
+                            'bancontact',
+                            'giropay',
+                            'ideal',
+                            'mybank',
+                            'satispay',
+                            'sofort',
+                        ]),
                     'redirect' => $paymentDetails['isMobileDevice'],
                     'return_url' => $returnUrl,
                 ];

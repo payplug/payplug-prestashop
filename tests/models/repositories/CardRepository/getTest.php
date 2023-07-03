@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\repositories\CardRepository;
 
 use PayPlug\src\models\repositories\CardRepository;
-use PHPUnit\Framework\TestCase;
+use PayPlug\tests\models\repositories\BaseRepository;
 
 /**
  * @group unit
@@ -12,19 +12,11 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-class getTest extends TestCase
+class getTest extends BaseRepository
 {
     protected function setUp()
     {
         $this->repository = \Mockery::mock(CardRepository::class)->makePartial();
-    }
-
-    public function invalidIntegerFormatDataProvider()
-    {
-        yield [0];
-        yield [['key' => 'value']];
-        yield [true];
-        yield ['lorem ipsum'];
     }
 
     /**

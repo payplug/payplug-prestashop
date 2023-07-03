@@ -45,14 +45,6 @@ class getSettingsSectionTest extends BaseApiRest
         ]);
     }
 
-    public function invalidArrayFormatDataProvider()
-    {
-        yield [42];
-        yield [null];
-        yield [false];
-        yield ['lorem ipsum'];
-    }
-
     /**
      * @dataProvider invalidArrayFormatDataProvider
      *

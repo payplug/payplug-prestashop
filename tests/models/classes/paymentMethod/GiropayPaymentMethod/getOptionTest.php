@@ -1,0 +1,18 @@
+<?php
+
+namespace PayPlug\tests\models\classes\paymentMethod\GiropayPaymentMethod;
+
+/**
+ * @group unit
+ * @group classes
+ * @group payment_method_classes
+ *
+ * @runTestsInSeparateProcesses
+ */
+class getOptionTest extends BaseGiropayPaymentMethod
+{
+    public function testWhenGivenOptionIsNotAvailableWithSandboxMode()
+    {
+        $this->assertFalse($this->classe->getOption([])['available_test_mode']);
+    }
+}

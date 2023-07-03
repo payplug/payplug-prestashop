@@ -3,7 +3,8 @@ config*.xml
 php-cs-fixer-v2.phar
 .php_cs.cache
 .DS_Store
-.idea
+.idea/
+.well-know/
 node_modules/
 composer.json
 composer.lock

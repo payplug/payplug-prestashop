@@ -1,26 +1,16 @@
 <?php
 
-namespace PayPlug\tests\models\classes\ApiRest;
-
-use PayPlug\src\models\classes\ApiRest;
+namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
 
 /**
  * @group unit
  * @group classes
- * @group apirest_classes
+ * @group payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */
-class getDeferredStateTest extends BaseApiRest
+class getDeferredStateTest extends BaseStandardPaymentMethod
 {
-    public function invalidIntegerFormatDataProvider()
-    {
-        yield [null];
-        yield [['key' => 'value']];
-        yield [true];
-        yield ['lorem ipsum'];
-    }
-
     /**
      * @dataProvider invalidIntegerFormatDataProvider
      *

@@ -13,15 +13,6 @@ use PayPlug\src\models\classes\ApiRest;
  */
 class dispatchTest extends BaseApiRest
 {
-    public function invalidStringFormatDataProvider()
-    {
-        yield [42];
-        yield [['key' => 'value']];
-        yield [false];
-        yield [''];
-        yield [null];
-    }
-
     /**
      * @dataProvider invalidStringFormatDataProvider
      *

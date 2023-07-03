@@ -4,7 +4,7 @@ namespace PayPlug\tests\models\repositories\CardRepository;
 
 use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\tests\mock\PaymentMock;
-use PHPUnit\Framework\TestCase;
+use PayPlug\tests\models\repositories\BaseRepository;
 
 /**
  * @group unit
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-class setTest extends TestCase
+class setTest extends BaseRepository
 {
     protected function setUp()
     {
@@ -23,31 +23,6 @@ class setTest extends TestCase
         $this->repository
             ->shouldReceive('escape')
             ->andReturnUsing(function ($key) { return $key; });
-    }
-
-    public function invalidObjectFormatDataProvider()
-    {
-        yield ['lorem Ipsum'];
-        yield [true];
-        yield [42];
-        yield [['key' => 'value']];
-        yield [null];
-    }
-
-    public function invalidIntegerFormatDataProvider()
-    {
-        yield [0];
-        yield [['key' => 'value']];
-        yield [true];
-        yield ['lorem ipsum'];
-    }
-
-    public function invalidBoolFormatDataProvider()
-    {
-        yield ['lorem Ipsum'];
-        yield [42];
-        yield [['key' => 'value']];
-        yield [null];
     }
 
     /**

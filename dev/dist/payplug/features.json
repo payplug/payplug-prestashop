@@ -4,9 +4,15 @@
         "feature_applepay",
         "feature_bancontact",
         "feature_deferred",
+        "feature_giropay",
+        "feature_ideal",
         "feature_installment",
         "feature_integrated",
+        "feature_mybank",
+        "feature_one_click",
         "feature_oney",
+        "feature_satispay",
+        "feature_sofort",
         "feature_standard"
     ]
 }

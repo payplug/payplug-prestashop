@@ -52,6 +52,7 @@ use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
+use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\src\models\entities\OneyEntity;
@@ -69,6 +70,7 @@ use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\src\repositories\QueryRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
+use PayPlug\src\utilities\services\Browser;
 use PayPlug\src\utilities\services\Routes;
 
 class PluginInit extends BaseClass
@@ -130,9 +132,11 @@ class PluginInit extends BaseClass
     // Model classes
     private $api_rest;
     private $configuration_class;
+    private $payment_method;
     private $translation;
 
     // Utilities services
+    private $browser;
     private $routes;
 
     public function __construct($dependencies = null)
@@ -153,6 +157,7 @@ class PluginInit extends BaseClass
             ->setApiVersion('2019-08-06')
             ->setAddress($this->address)
             ->setAssign($this->assign)
+            ->setBrowser($this->browser)
             ->setCache($this->cache)
             ->setCard($this->card)
             ->setCarrier($this->carrier)
@@ -176,6 +181,7 @@ class PluginInit extends BaseClass
             ->setModule($this->module)
             ->setPayment($this->payment)
             ->setPaymentAction($this->paymentAction)
+            ->setPaymentMethod($this->payment_method)
             ->setProduct($this->product)
             ->setOney($this->oney)
             ->setOrder($this->order)
@@ -342,11 +348,13 @@ class PluginInit extends BaseClass
     {
         $this->api_rest = new ApiRest($this->dependencies);
         $this->configuration_class = new Configuration($this->dependencies);
+        $this->payment_method = new PaymentMethod($this->dependencies);
         $this->translation = new Translation($this->dependencies);
     }
 
     private function setServices()
     {
+        $this->browser = new Browser();
         $this->routes = new Routes();
     }
 }

@@ -1,32 +1,18 @@
 <?php
 
-namespace PayPlug\tests\models\classes\ApiRest;
+namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
 /**
  * @group unit
  * @group classes
- * @group apirest_classes
+ * @group payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */
-class getOneyPopupCartTest extends BaseApiRest
+class getCartCallToActionTest extends BaseOneyPaymentMethod
 {
-    public function setUp()
-    {
-        parent::setUp();
-    }
-
-    public function invalidDataProvider()
-    {
-        yield [42];
-        yield [['key' => 'value']];
-        yield [null];
-        yield [''];
-    }
-
     /**
-     * @description  test with invalid parameters
-     * @dataProvider invalidDataProvider
+     * @dataProvider invalidBoolFormatDataProvider
      *
      * @param mixed $active
      */
@@ -34,17 +20,14 @@ class getOneyPopupCartTest extends BaseApiRest
     {
         $this->assertSame(
             [],
-            $this->classe->getOneyPopupCart($active)
+            $this->classe->getCartCallToAction($active)
         );
     }
 
-    /**
-     * @description  test with switch set to true
-     */
     public function testWhenEnabled()
     {
         $configuration = true;
-        $response = $this->classe->getOneyPopupCart($configuration);
+        $response = $this->classe->getCartCallToAction($configuration);
 
         $assert_configurations = [];
         foreach ($response as $key => $schedule_configuration) {
@@ -55,13 +38,10 @@ class getOneyPopupCartTest extends BaseApiRest
         $this->assertTrue(in_array(true, $assert_configurations));
     }
 
-    /**
-     * @description  test with switch set to false
-     */
     public function testWhenDisabled()
     {
         $configuration = false;
-        $response = $this->classe->getOneyPopupCart($configuration);
+        $response = $this->classe->getCartCallToAction($configuration);
 
         $assert_configurations = [];
         foreach ($response as $key => $schedule_configuration) {
