@@ -157,7 +157,7 @@ class PaymentMethod
                     ] : [],
                 ],
                 'sandbox' => [
-                    'description' => $this->translation[$this->name]['descriptions']['live'],
+                    'description' => isset($this->translation[$this->name]['descriptions']['sandbox']) ? $this->translation[$this->name]['descriptions']['sandbox'] : $this->translation[$this->name]['descriptions']['live'],
                     'link_know_more' => isset($this->external_url[$this->name]) ? [
                         'text' => $this->translation[$this->name]['link'],
                         'url' => $this->external_url[$this->name],
