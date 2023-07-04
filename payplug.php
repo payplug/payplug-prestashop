@@ -52,7 +52,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '4.0.0';
+        $this->version = '4.1.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
