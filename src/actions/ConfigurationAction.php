@@ -70,11 +70,16 @@ class ConfigurationAction
             'applepay' => 'can_use_applepay',
             'bancontact' => 'can_use_bancontact',
             'deferred' => 'can_create_deferred_payment',
+            'giropay' => 'can_use_giropay',
+            'ideal' => 'can_use_ideal',
             'installment' => 'can_create_installment_plan',
             'integrated' => 'can_use_integrated_payments',
+            'mybank' => 'can_use_mybank',
             'onboarding_oney_completed' => 'onboarding_oney_completed',
             'one_click' => 'can_save_cards',
             'oney' => 'can_use_oney',
+            'satispay' => 'can_use_satispay',
+            'sofort' => 'can_use_sofort',
             'use_live_mode' => 'use_live_mode',
         ];
 
@@ -112,6 +117,11 @@ class ConfigurationAction
         switch ($payment_method) {
             case 'american_express':
             case 'bancontact':
+            case 'giropay':
+            case 'ideal':
+            case 'mybank':
+            case 'satispay':
+            case 'sofort':
                 $message .= sprintf(
                     $translation['premium']['description']['form'],
                     $translation['premium']['feature'][$payment_method]
