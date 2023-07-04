@@ -181,9 +181,13 @@ $_MODULE['<{payplug}prestashop>modaltranslation_1cd1375b14915e7018f57675ca1637b3
 $_MODULE['<{payplug}prestashop>modaltranslation_36773dc2077997e9f5a9b74a04022c27'] = 'To activate the Oney guaranteed split payment, go to $link.';
 $_MODULE['<{payplug}prestashop>modaltranslation_3c3facbdefab9989227a5f4e1b776459'] = 'Amex';
 $_MODULE['<{payplug}prestashop>modaltranslation_490fbcb51f09a525cfff57845b548f61'] = 'For more information, please contact us via $link.';
+$_MODULE['<{payplug}prestashop>modaltranslation_5e76ab11855b6c8321599b5f8e8d3479'] = 'Satispay';
 $_MODULE['<{payplug}prestashop>modaltranslation_6247bc8f1fa440af0b8e5b034680a04f'] = 'To activate %s, please go to $link.';
+$_MODULE['<{payplug}prestashop>modaltranslation_77a05f40d66e70b66d857c8bcaf6c7d4'] = 'Giropay';
 $_MODULE['<{payplug}prestashop>modaltranslation_77fe878dedd7eee3106a518699cb941e'] = 'our website';
 $_MODULE['<{payplug}prestashop>modaltranslation_7fa9f591dfea0601d8fe976db7b04e82'] = 'Enable feature';
+$_MODULE['<{payplug}prestashop>modaltranslation_8dc786116b6051f0a2478fe4d84dab58'] = 'iDEAL';
+$_MODULE['<{payplug}prestashop>modaltranslation_909fad7d994d68534f0ba70306fd0bc9'] = 'MyBank';
 $_MODULE['<{payplug}prestashop>modaltranslation_91b5b36845d9b6aabe32e15fedaaa4fe'] = 'To activate %s, please contact $link.';
 $_MODULE['<{payplug}prestashop>modaltranslation_95e6d55a89d2261ca139dbd613698640'] = 'support@payplug.com';
 $_MODULE['<{payplug}prestashop>modaltranslation_962cafa689a699c9e1e89a8cf2dd1e56'] = 'the integrated payment';
@@ -192,6 +196,7 @@ $_MODULE['<{payplug}prestashop>modaltranslation_a88cdce377546e8fa0ddd689750633d1
 $_MODULE['<{payplug}prestashop>modaltranslation_b80f2063287a3bd7898a632eb89d3e51'] = 'Apple Pay';
 $_MODULE['<{payplug}prestashop>modaltranslation_c1a5bd91b871ea530fa79f316cafaed5'] = 'Ok';
 $_MODULE['<{payplug}prestashop>modaltranslation_e74545a087d834f417fe2d576af43ab8'] = 'Bancontact';
+$_MODULE['<{payplug}prestashop>modaltranslation_ec0d5374081890cc3235421045aee625'] = 'Sofort';
 $_MODULE['<{payplug}prestashop>modaltranslation_f32144d64f47cb22470cc41f396c85a9'] = 'your Payplug portal';
 $_MODULE['<{payplug}prestashop>my_account_5950a70a3ccf0d0cd27b69fd21b19872'] = 'Saved cards';
 $_MODULE['<{payplug}prestashop>one_click_25e8f2fd2871c8423bbe4e254066cd98'] = 'Please wait...';

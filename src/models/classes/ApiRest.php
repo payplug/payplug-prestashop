@@ -76,6 +76,11 @@ class ApiRest
             case 'integrated_permissions':
             case 'one_click_permissions':
             case 'oney_permissions':
+            case 'satispay_permissions':
+            case 'mybank_permissions':
+            case 'sofort_permissions':
+            case 'giropay_permissions':
+            case 'ideal_permissions':
                 $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
                 $payment_method = str_replace('_permissions', '', $action);
                 $json = $configurationAction->checkPermissionAction($payment_method, (bool) $datas->env);
