@@ -54,9 +54,13 @@
 
     <div class="form-group">
         {assign var='submitRefundButton' value=$module_name|cat:'SubmitRefund'}
-        {include file='./button.tpl' button_disable=$refund_delay_oney e2e_action='refund' submitName=$submitRefundButton submitValue={l s='Refund' mod='payplug'}}
+        {include file='./button.tpl' button_disable=$refund_delay_oney || $refund_disable e2e_action='refund' submitName=$submitRefundButton submitValue={l s='Refund' mod='payplug'}}
         {if $refund_delay_oney}
             <div class="{$module_name|escape:'htmlall':'UTF-8'}Order_delay">{l s='The refund will be possible 48h after the last payment or refund transaction.' mod='payplug'}</div>
+        {/if}
+        {if $refund_disable}
+            {assign "contact_link" "<a href='mailto:support@payplug.com' target='_blank'>"}
+            <div class="{$module_name|escape:'htmlall':'UTF-8'}Order_delay">{l s='admin.order.refund.disabled' tags=[$contact_link]  mod='payplug'}</div>
         {/if}
     </div>
 </form>

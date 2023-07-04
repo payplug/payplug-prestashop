@@ -42,10 +42,15 @@ class PayPlugNotifications
     public $flag;
     public $is_amex = false;
     public $is_applepay = false;
-    public $is_oney = false;
-    public $is_installment = false;
-    public $is_deferred = false;
     public $is_bancontact = false;
+    public $is_deferred = false;
+    public $is_giropay = false;
+    public $is_ideal = false;
+    public $is_installment = false;
+    public $is_mybank = false;
+    public $is_oney = false;
+    public $is_satispay = false;
+    public $is_sofort = false;
     public $key;
     public $lock_key;
     public $logger;
@@ -422,6 +427,16 @@ class PayPlugNotifications
             $module_name = $this->dependencies->l('notification.createOrder.applepay', 'payplugnotifications');
         } elseif ($this->is_amex) {
             $module_name = $this->dependencies->l('notification.createOrder.amex', 'payplugnotifications');
+        } elseif ($this->is_giropay) {
+            $module_name = $this->dependencies->l('notification.createOrder.giropay', 'payplugvalidation');
+        } elseif ($this->is_ideal) {
+            $module_name = $this->dependencies->l('notification.createOrder.ideal', 'payplugvalidation');
+        } elseif ($this->is_mybank) {
+            $module_name = $this->dependencies->l('notification.createOrder.mybank', 'payplugvalidation');
+        } elseif ($this->is_satispay) {
+            $module_name = $this->dependencies->l('notification.createOrder.satispay', 'payplugvalidation');
+        } elseif ($this->is_sofort) {
+            $module_name = $this->dependencies->l('notification.createOrder.sofort', 'payplugvalidation');
         }
 
         // Create Order
@@ -1153,6 +1168,36 @@ class PayPlugNotifications
             $this->is_amex = 'american_express' == $this->payment->payment_method['type'];
         }
         $this->logger->addLog('Notification: is_amex ' . ($this->is_amex ? 'ok' : 'nok'));
+
+        // Define if payment is giropay resource
+        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
+            $this->is_giropay = 'giropay' == $this->payment->payment_method['type'];
+        }
+        $this->logger->addLog('Notification: is_giropay ' . ($this->is_giropay ? 'ok' : 'nok'));
+
+        // Define if payment is ideal resource
+        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
+            $this->is_ideal = 'ideal' == $this->payment->payment_method['type'];
+        }
+        $this->logger->addLog('Notification: is_ideal ' . ($this->is_ideal ? 'ok' : 'nok'));
+
+        // Define if payment is mybank resource
+        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
+            $this->is_mybank = 'mybank' == $this->payment->payment_method['type'];
+        }
+        $this->logger->addLog('Notification: is_mybank ' . ($this->is_mybank ? 'ok' : 'nok'));
+
+        // Define if payment is satispay resource
+        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
+            $this->is_satispay = 'satispay' == $this->payment->payment_method['type'];
+        }
+        $this->logger->addLog('Notification: is_satispay ' . ($this->is_satispay ? 'ok' : 'nok'));
+
+        // Define if payment is sofort resource
+        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
+            $this->is_sofort = 'sofort' == $this->payment->payment_method['type'];
+        }
+        $this->logger->addLog('Notification: is_sofort ' . ($this->is_sofort ? 'ok' : 'nok'));
     }
 
     /**
