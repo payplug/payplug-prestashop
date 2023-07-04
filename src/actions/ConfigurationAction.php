@@ -481,6 +481,44 @@ class ConfigurationAction
             'bancontact_country' => 'enable_bancontact_country',
         ];
 
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+
+        $get_account = $this->dependencies->apiClass->getAccount($configuration->getValue('live_api_key'), false, false);
+        $amounts = [
+            'default' => [
+                'min' => 'EUR:100',
+                'max' => 'EUR:2000000',
+            ],
+        ];
+        $countries = [];
+        foreach ($get_account['payment_methods'] as $key => $payment_method) {
+            if (array_key_exists('min_amounts', $payment_method)) {
+                $amounts[$key]['min'] = 'EUR:' . $payment_method['min_amounts']['EUR'];
+            }
+            if (array_key_exists('max_amounts', $payment_method)) {
+                $amounts[$key]['max'] = 'EUR:' . $payment_method['max_amounts']['EUR'];
+            }
+            if (array_key_exists('allowed_countries', $payment_method)) {
+                $countries[$key] = $payment_method['allowed_countries'];
+            }
+        }
+
+        $configuration_get_account = [
+            'amounts' => json_encode($amounts),
+            'countries' => json_encode($countries),
+        ];
+        foreach ($configuration_get_account as $key => $config) {
+            if (!$configuration->set($key, $config)) {
+                return [
+                    'success' => false,
+                    'data' => [
+                        // todo: add translation
+                        'message' => 'An error has occurred while register ' . $key,
+                    ],
+                ];
+            }
+        }
+
         foreach ($configuration_keys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};

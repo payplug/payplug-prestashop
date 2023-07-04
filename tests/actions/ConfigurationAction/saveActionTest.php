@@ -12,6 +12,8 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  */
 class saveActionTest extends BaseConfigurationAction
 {
+    public $configurationClass;
+
     public function invalidObjectFormatDataProvider()
     {
         yield [42];
@@ -77,11 +79,42 @@ class saveActionTest extends BaseConfigurationAction
             'updateValue' => false,
         ]);
 
+        $configClass = \Mockery::mock('Config');
+        $configClass
+            ->shouldReceive([
+                'isValidFeature' => true,
+            ])
+        ;
+        $this->dependencies->apiClass = \Mockery::mock();
+        $this->dependencies->apiClass->shouldReceive([
+            'getAccount' => [
+                'payment_methods' => [
+                    'sofort' => [
+                        'enabled' => 1,
+                        'allowed_countries' => [
+                            '0' => 'AT',
+                            '1' => 'BE',
+                            '2' => 'DE',
+                            '3' => 'ES',
+                            '4' => 'IT',
+                            '5' => 'NL',
+                        ],
+                        'min_amounts' => [
+                            'EUR' => 100,
+                        ],
+                        'max_amounts' => [
+                            'EUR' => 2000000,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
         $this->assertSame(
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'An error has occurred while register enable_standard',
+                    'message' => 'An error has occurred while register amounts',
                 ],
             ],
             $this->action->saveAction($datas)
@@ -96,6 +129,37 @@ class saveActionTest extends BaseConfigurationAction
 
         $this->configuration->shouldReceive([
             'updateValue' => true,
+        ]);
+
+        $configClass = \Mockery::mock('Config');
+        $configClass
+            ->shouldReceive([
+                'isValidFeature' => true,
+            ])
+        ;
+        $this->dependencies->apiClass = \Mockery::mock();
+        $this->dependencies->apiClass->shouldReceive([
+            'getAccount' => [
+                'payment_methods' => [
+                    'sofort' => [
+                        'enabled' => 1,
+                        'allowed_countries' => [
+                            '0' => 'AT',
+                            '1' => 'BE',
+                            '2' => 'DE',
+                            '3' => 'ES',
+                            '4' => 'IT',
+                            '5' => 'NL',
+                        ],
+                        'min_amounts' => [
+                            'EUR' => 100,
+                        ],
+                        'max_amounts' => [
+                            'EUR' => 2000000,
+                        ],
+                    ],
+                ],
+            ],
         ]);
 
         $this->action->shouldReceive([

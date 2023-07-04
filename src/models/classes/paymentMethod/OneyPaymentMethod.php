@@ -54,8 +54,8 @@ class OneyPaymentMethod extends PaymentMethod
         $payment_methods = json_decode($this->configuration->getDefault('payment_methods'), true);
         $default_configuration = [
             'oney' => (bool) $payment_methods['oney'],
-            'oney_min_amounts' => $amounts['oney']['min'],
-            'oney_max_amounts' => $amounts['oney']['max'],
+            'oney_min_amounts' => $amounts['oney_x3_with_fees']['min'],
+            'oney_max_amounts' => $amounts['oney_x3_with_fees']['max'],
             'oney_custom_min_amounts' => $this->configuration->getDefault('oney_custom_min_amounts'),
             'oney_custom_max_amounts' => $this->configuration->getDefault('oney_custom_max_amounts'),
             'oney_product_animation' => $this->configuration->getDefault('oney_product_animation'),

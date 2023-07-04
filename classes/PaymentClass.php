@@ -1353,6 +1353,31 @@ class PaymentClass
             unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
         }
 
+        if ($options['is_giropay']) {
+            $payment_tab['payment_method'] = 'giropay';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_ideal']) {
+            $payment_tab['payment_method'] = 'ideal';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_mybank']) {
+            $payment_tab['payment_method'] = 'mybank';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_satispay']) {
+            $payment_tab['payment_method'] = 'satispay';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_sofort']) {
+            $payment_tab['payment_method'] = 'sofort';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
         if ($options['is_applepay']) {
             $payment_tab['payment_method'] = 'apple_pay';
             $payment_tab['payment_context'] = [

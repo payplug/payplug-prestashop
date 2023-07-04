@@ -29,8 +29,8 @@ class Configuration
     // COMPANY_STATUS
     // DEBUG_MODE
     // OFFER
-    private $configuration = [
-        'allo_save_card' => [
+    public $configuration = [
+        'allow_save_card' => [
             'type' => 'integer',
             'name' => 'ALLOW_SAVE_CARD',
             'defaultValue' => 0,
@@ -39,7 +39,7 @@ class Configuration
         'amounts' => [
             'type' => 'string',
             'name' => 'AMOUNTS',
-            'defaultValue' => '{}',
+            'defaultValue' => '{"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:100","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:2000000"},"ideal":{"min":"EUR:100","max":"EUR:2000000"},"mybank":{"min":"EUR:100","max":"EUR:2000000"},"satispay":{"min":"EUR:100","max":"EUR:2000000"},"sofort":{"min":"EUR:100","max":"EUR:2000000"}}',
             'setConf' => 1,
         ],
         'bancontact_country' => [
@@ -63,7 +63,7 @@ class Configuration
         'countries' => [
             'type' => 'string',
             'name' => 'COUNTRIES',
-            'defaultValue' => '{}',
+            'defaultValue' => '{"oney_x3_with_fees":["YT","BL","PF","GP","RE","MF","MQ","GF","FR","NC"],"oney_x4_with_fees":["YT","BL","PF","GP","RE","MF","MQ","GF","FR","NC"],"oney_x3_without_fees":["YT","BL","PF","GP","RE","MF","MQ","GF","FR","NC"],"oney_x4_without_fees":["YT","BL","PF","GP","RE","MF","MQ","GF","FR","NC"],"bancontact":["ALL"],"giropay":["DE"],"ideal":["NL"],"mybank":["IT"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"],"sofort":["AT","BE","DE","ES","IT","NL"]}',
             'setConf' => 1,
         ],
         'currencies' => [
@@ -288,34 +288,6 @@ class Configuration
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-
-        $this->configuration['amounts']['defaultValue'] = json_encode([
-            'default' => [
-                'min' => 'EUR:100',
-                'max' => 'EUR:2000000',
-            ],
-            'giropay' => [
-                'min' => 'EUR:100',
-                'max' => 'EUR:1000000',
-            ],
-            'sofort' => [
-                'min' => 'EUR:100',
-                'max' => 'EUR:500000',
-            ],
-            'oney' => [
-                'min' => 'EUR:10000',
-                'max' => 'EUR:300000',
-            ],
-        ]);
-
-        $this->configuration['countries']['defaultValue'] = json_encode([
-            'default' => ['all'],
-            'giropay' => ['DE'],
-            'ideal' => ['NL'],
-            'mybank' => ['IT'],
-            'satispay' => ['AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PT', 'SI', 'SK'],
-            'sofort' => ['AT', 'BE', 'DE', 'ES', 'IT', 'NL'],
-        ]);
     }
 
     public function delete($key = '')

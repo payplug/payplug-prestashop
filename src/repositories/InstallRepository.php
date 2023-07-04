@@ -24,6 +24,7 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\application\dependencies\BaseClass;
+use PayPlug\src\models\classes\Configuration;
 
 class InstallRepository extends BaseClass
 {
