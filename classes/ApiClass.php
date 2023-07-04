@@ -130,13 +130,14 @@ class ApiClass
      * @description Get account permission from Payplug API
      *
      * @param $api_key
-     * @param bool $sandbox
+     * @param bool  $sandbox
+     * @param mixed $treat_account
      *
      * @throws ConfigurationException
      *
      * @return array|false
      */
-    public function getAccount($api_key, $sandbox = true)
+    public function getAccount($api_key, $sandbox = true, $treat_account = true)
     {
         $this->setSecretKey($api_key);
 
@@ -147,6 +148,10 @@ class ApiClass
         }
 
         $json_answer = $response['httpResponse'];
+
+        if (!$treat_account) {
+            return $json_answer;
+        }
 
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;

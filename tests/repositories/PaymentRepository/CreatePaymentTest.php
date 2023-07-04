@@ -156,6 +156,10 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn($config);
+        $this->configuration->shouldReceive('getValue')
+            ->with('payment_methods')
+            ->andReturn('{"amex":false,"applepay":false,"bancontact":true,"deferred":false,"giropay":false,"inst":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"sofort":false,"standard":false}');
+
         $this->assertSame(
             [
                 'result' => false,

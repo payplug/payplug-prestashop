@@ -323,6 +323,7 @@ class ConfigClass
                 }
             }
         }
+
         $available_options = [
             'live' => !(bool) $configurationClass->getValue('sandbox_mode'),
             'embedded' => (string) $configurationClass->getValue('embedded_mode'),
