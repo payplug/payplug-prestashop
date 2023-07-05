@@ -19,6 +19,9 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of Payplug SAS
 *}
+{*<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>*}
+
 {if isset($oney_required_fields) && $oney_required_fields}
     <form class="{$module_name|escape:'htmlall':'UTF-8'}OneyRequired"{if isset($oney_type) && $oney_type} data-oney_type="{$oney_type|escape:'htmlall':'UTF-8'}"{/if}>
         {if isset($is_popin_tpl) && $is_popin_tpl}
@@ -41,7 +44,7 @@
                             <p>{$field.text|escape:'htmlall':'UTF-8'}</p>
                             {foreach $field.input as $input}
                                 <div class="{$module_name|escape:'htmlall':'UTF-8'}OneyRequired_field -{$input.name|escape:'htmlall':'UTF-8'}">
-                                    <input data-type="{$input.name|escape:'htmlall':'UTF-8'}" class="{$module_name|escape:'htmlall':'UTF-8'}OneyRequired_input{if $name==$input.name} -tocheck -error{/if}" type="{$input.type|escape:'htmlall':'UTF-8'}" name="{$fieldset_type|escape:'htmlall':'UTF-8'}-{$input.name|escape:'htmlall':'UTF-8'}" placeholder="{$input.value|escape:'htmlall':'UTF-8'}" />
+                                    <input data-type="{$input.name|escape:'htmlall':'UTF-8'}" class="{$module_name|escape:'htmlall':'UTF-8'}OneyRequired_input{if $name==$input.name} -tocheck -error{/if}" type="{$input.type|escape:'htmlall':'UTF-8'}" name="{$fieldset_type|escape:'htmlall':'UTF-8'}-{$input.name|escape:'htmlall':'UTF-8'}" placeholder="{$input.value|escape:'htmlall':'UTF-8'}" id="phone" />
                                 </div>
                             {/foreach}
                         </div>
@@ -61,3 +64,11 @@
         <button type="button" class="{$module_name|escape:'htmlall':'UTF-8'}OneyRequired_close">{l s='Cancel' mod='payplug'}</button>
     </form>
 {/if}
+
+{*<script>
+  inputPhoneNumber = document.getElementById("phone");
+  window.intlTelInput(inputPhoneNumber, {
+      utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+      separateDialCode: true
+  });
+</script>*}
