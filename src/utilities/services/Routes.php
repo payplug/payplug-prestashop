@@ -139,6 +139,9 @@ class Routes
             'satispay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089121532700',
             'signup' => 'https://portal.payplug.com/signup',
             'sofort' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089091941660',
+            'tel_js' => 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js',
+            'tel_css' => 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css',
+            'tel_js_util' => 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js',
         ];
     }
 }

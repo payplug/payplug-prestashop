@@ -1120,7 +1120,10 @@ var $document, $window, __moduleName__Module = {
             popup.hydrate(content);
             popup.open();
 
-
+            const input = document.querySelector("#phone");
+            window.intlTelInput(input, {
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+            });
         },
         setDeleteCardPopup: function (content) {
             var popup = __moduleName__Module.popup,

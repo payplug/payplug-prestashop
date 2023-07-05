@@ -57,6 +57,30 @@ class PrestashopAdapter17
         $this->context->controller->addCSS($views_path . '/css/front-v' . $this->dependencies->version . '.css');
         $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
         $this->context->controller->addJS($views_path . '/js/front-v' . $this->dependencies->version . '.js');
+        $this->context->controller->registerJavascript(
+            'module-payplug-intelphone-js',
+            $this->dependencies
+                ->getPlugin()
+                ->getRoutes()
+                ->getExternalUrl()['tel_js'],
+            [
+                'priority' => 200,
+                'attribute' => 'async',
+                'server' => 'remote',
+            ]
+        );
+        $this->context->controller->registerStylesheet(
+            'module-payplug-intelphone-css',
+            $this->dependencies
+                ->getPlugin()
+                ->getRoutes()
+                ->getExternalUrl()['tel_css'],
+            [
+                'priority' => 200,
+                'attribute' => 'async',
+                'server' => 'remote',
+            ]
+        );
         $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')
             && (bool) $payment_methods['applepay']) {

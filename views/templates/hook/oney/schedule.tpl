@@ -19,7 +19,6 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of Payplug SAS
 *}
-
 <div class="{$module_name|escape:'htmlall':'UTF-8'}OneySchedule{if isset($use_fees) && !$use_fees} -withoutFees{/if}">
     {if $oney_payment_option}
         <ul>

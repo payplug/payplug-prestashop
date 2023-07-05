@@ -912,7 +912,6 @@ class OneyRepository extends BaseClass
 
                 switch ($key) {
                     case 'email':
-                    case 'mobile_phone_number':
                         $shipping_fields[$key] = [
                             'text' => $message,
                             'input' => [
@@ -920,6 +919,21 @@ class OneyRepository extends BaseClass
                                     'name' => $key,
                                     'value' => $data,
                                     'type' => 'text',
+                                ],
+                            ],
+                        ];
+
+                        break;
+
+                    case 'mobile_phone_number':
+                        $shipping_fields[$key] = [
+                            'text' => $message,
+                            'input' => [
+                                [
+                                    'name' => $key,
+                                    'value' => $data,
+                                    'type' => 'tel',
+                                    'id' => 'phone',
                                 ],
                             ],
                         ];
