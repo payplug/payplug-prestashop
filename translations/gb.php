@@ -17,6 +17,7 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_b718adec73e04ce
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca9744094b101499e7f7ce'] = 'Installment ID';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Customer';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Installment payment #';
+$_MODULE['<{payplug}prestashop>ajax_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Capture';
 $_MODULE['<{payplug}prestashop>cardrepository_02a956470929d9e5b24b9ec5cc4a7bf9'] = 'Card successfully deleted.';

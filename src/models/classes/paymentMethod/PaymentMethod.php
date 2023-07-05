@@ -112,6 +112,34 @@ class PaymentMethod
     }
 
     /**
+     * @description Get payment option availability
+     *
+     * @return array
+     */
+    public function getPaymentOptionsAvailability()
+    {
+        $this->setParameters();
+
+        $available_payment_methods = $this->getAvailablePaymentMethod();
+        if (empty($available_payment_methods)) {
+            return [];
+        }
+
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
+        if (empty($payment_methods)) {
+            return [];
+        }
+
+        $options = [];
+        foreach ($available_payment_methods as $available_payment_method) {
+            $options[$available_payment_method] = isset($payment_methods[$available_payment_method])
+                && (bool) $payment_methods[$available_payment_method];
+        }
+
+        return $options;
+    }
+
+    /**
      * @description Get option for given configuration
      *
      * @param array $current_configuration
@@ -236,17 +264,18 @@ class PaymentMethod
     {
         $this->setParameters();
 
-        $options = $this->dependencies->configClass->getAvailableOptions($this->context->cart);
-        $available_payment_methods = $this->getAvailablePaymentMethod();
+        $options = $this->getPaymentOptionsAvailability();
+        if (empty($options)) {
+            return [];
+        }
+
         $payment_options = [];
-        if ($available_payment_methods) {
-            foreach ($available_payment_methods as $payment_method) {
-                $allowed_feature = $this->dependencies->configClass->isValidFeature('feature_' . $payment_method);
-                if (isset($options[$payment_method]) && $options[$payment_method] && $allowed_feature) {
-                    $obj = $this->getPaymentMethod($payment_method);
-                    if (is_object($obj)) {
-                        $payment_options = $obj->getPaymentOption($payment_options);
-                    }
+        foreach ($options as $payment_method => $enabled) {
+            $allowed_feature = $this->dependencies->configClass->isValidFeature('feature_' . $payment_method);
+            if ($enabled && $allowed_feature) {
+                $obj = $this->getPaymentMethod($payment_method);
+                if (is_object($obj)) {
+                    $payment_options = $obj->getPaymentOption($payment_options);
                 }
             }
         }
@@ -281,40 +310,78 @@ class PaymentMethod
     }
 
     /**
+     * @description Reset the permission from current permission
+     *
+     * @param array $permissions
+     */
+    public function resetPaymentMethodFromPermission($permissions = [])
+    {
+        $this->setParameters();
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
+
+        foreach ($payment_methods as $payment_method => $active) {
+            if ($active
+                && isset($permissions[$payment_method])
+                && !$permissions[$payment_method]
+            ) {
+                $payment_methods[$payment_method] = false;
+            }
+        }
+
+        $this->configuration->set('payment_methods', json_encode($payment_methods));
+    }
+
+    /**
      * @description Set parameters for usage
      */
     protected function setParameters()
     {
-        $this->configuration = $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass();
-        $this->context = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get();
-        $this->iso_code = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get()->language->iso_code;
-        $this->external_url = $this->dependencies
-            ->getPlugin()
-            ->getRoutes()
-            ->getExternalUrl($this->iso_code);
-        $this->img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/';
-        $this->link = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get()->link;
-        $this->logger = $this->dependencies
-            ->getPlugin()
-            ->getLogger();
-        $this->translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getPaymentMethodsTranslations();
+        if (!$this->configuration) {
+            $this->configuration = $this->dependencies
+                ->getPlugin()
+                ->getConfigurationClass();
+        }
+        if (!$this->context) {
+            $this->context = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get();
+        }
+        if (!$this->iso_code) {
+            $this->iso_code = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get()->language->iso_code;
+        }
+        if (!$this->external_url) {
+            $this->external_url = $this->dependencies
+                ->getPlugin()
+                ->getRoutes()
+                ->getExternalUrl($this->iso_code);
+        }
+        if (!$this->img_path) {
+            $this->img_path = $this->dependencies
+                ->getPlugin()
+                ->getConstant()
+                ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/';
+        }
+        if (!$this->link) {
+            $this->link = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get()->link;
+        }
+        if (!$this->logger) {
+            $this->logger = $this->dependencies
+                ->getPlugin()
+                ->getLogger();
+        }
+        if (!$this->translation) {
+            $this->translation = $this->dependencies
+                ->getPlugin()
+                ->getTranslation()
+                ->getPaymentMethodsTranslations();
+        }
     }
 
     /**

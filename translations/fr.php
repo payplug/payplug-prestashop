@@ -17,6 +17,7 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_b718adec73e04ce
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca9744094b101499e7f7ce'] = 'ID paiement fractionné';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Client';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Numéro d\'échéance';
+$_MODULE['<{payplug}prestashop>ajax_cef5ffe1ea30cca7818c988c27467aed'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Déclencher';
 $_MODULE['<{payplug}prestashop>cardrepository_02a956470929d9e5b24b9ec5cc4a7bf9'] = 'Carte supprimée avec succès.';

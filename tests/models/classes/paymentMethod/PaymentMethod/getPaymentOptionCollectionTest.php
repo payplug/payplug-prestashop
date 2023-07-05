@@ -8,11 +8,25 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
 class getPaymentOptionCollectionTest extends BasePaymentMethod
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    default:
+                        return $this->configuration->getDefault($key);
+                }
+            });
+    }
+
     public function testWhenNoAvailablePaymentMethodFound()
     {
         $configClass = \Mockery::mock('Config');
@@ -33,10 +47,11 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
+            'getPaymentOptionsAvailability' => [],
         ]);
         $configClass->shouldReceive([
-            'getAvailableOptions' => [],
             'isValidFeature' => true,
+            'getImgLang' => 'fr',
         ]);
         $this->dependencies->configClass = $configClass;
         $this->assertSame([], $this->classe->getPaymentOptionCollection());

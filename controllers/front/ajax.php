@@ -20,6 +20,7 @@
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
+
 /**
  * @description
  * Treat ajax call
@@ -106,9 +107,8 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 if ($id_product = (int) $tools->tool('getValue', 'id_product')) {
                     $group = $tools->tool('getValue', 'group');
                     $id_product_attribute = $group ?
-                            (int) $this->productAdapter->getIdProductAttributeByIdAttributes($id_product, $group) :
-                            0
-                        ;
+                        (int) $this->productAdapter->getIdProductAttributeByIdAttributes($id_product, $group) :
+                        0;
 
                     $quantity = (int) $tools->tool(
                         'getValue',
@@ -141,8 +141,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $group = $tools->tool('getValue', 'group');
                     $id_product_attribute = $group ?
                         (int) $this->productAdapter->getIdProductAttributeByIdAttributes($id_product, $group) :
-                        0
-                    ;
+                        0;
                     // Some integration will not use qty data but quantity_wanted
                     $quantity = (int) $tools->tool('getValue', 'qty');
                     $quantity = $quantity ? $quantity : (int) $tools->tool('getValue', 'quantity_wanted', 1);
@@ -220,18 +219,34 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $token = $tools->tool('getValue', 'token');
                 if (false == $token) {
                     exit(
-                        json_encode(
-                            [
-                                'result' => true,
-                                'message' => $token,
-                            ]
-                        )
+                    json_encode(
+                        [
+                            'result' => true,
+                            'message' => $token,
+                        ]
+                    )
                     );
                 }
                 $payment = $this->paymentClass->preparePayment([
                     'is_integrated' => 1,
                     'is_deferred' => (bool) $this->configurationAdapter->get('PAYPLUG_DEFERRED'),
                 ]);
+                $payment['force_reload'] = false;
+
+                if (!$payment['result']) {
+                    $payment_details = json_decode($payment['paymentDetails'], true);
+                    if (isset($payment_details['error_code']) && 403 == (int) $payment_details['error_code']) {
+                        $this->paymentClass->setPaymentErrorsCookie([
+                            $this->dependencies->l('The transaction was not completed and your card was not charged.', 'ajax'),
+                        ]);
+                        $payment['force_reload'] = true;
+                        $payment['return_url'] = $context->link->getPageLink('order', true, $context->language->id, [
+                            'step' => '3',
+                            'has_error' => '1',
+                            'modulename' => $this->dependencies->name,
+                        ]);
+                    }
+                }
 
                 exit(json_encode($payment));
             } elseif ($tools->tool('getIsset', 'confirmPayment')) {

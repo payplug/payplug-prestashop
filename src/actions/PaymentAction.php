@@ -66,21 +66,7 @@ class PaymentAction
         $toolsAdapter = $this->dependencies->getPlugin()->getTools();
 
         $cart = $cartAdapter->get((int) $toolsAdapter->tool('getValue', 'id_cart'));
-        $options = $this->dependencies->configClass->getAvailableOptions($cart);
-
-        if (!isset($options[$method])) {
-            return [
-                'result' => false,
-                'message' => 'Given $method not found from getAvailableOptions',
-            ];
-        }
-
-        if (!$options[$method]) {
-            return [
-                'result' => false,
-                'message' => 'Given $method is not available',
-            ];
-        }
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
 
         switch ($method) {
             case 'applepay':
@@ -99,38 +85,13 @@ class PaymentAction
 
                 break;
             case 'bancontact':
-                $payment_options = [
-                    'is_bancontact' => true,
-                ];
-
-                break;
             case 'giropay':
-                $payment_options = [
-                    'is_giropay' => true,
-                ];
-
-                break;
             case 'ideal':
-                $payment_options = [
-                    'is_ideal' => true,
-                ];
-
-                break;
             case 'mybank':
-                $payment_options = [
-                    'is_mybank' => true,
-                ];
-
-                break;
             case 'satispay':
-                $payment_options = [
-                    'is_satispay' => true,
-                ];
-
-                break;
             case 'sofort':
                 $payment_options = [
-                    'is_sofort' => true,
+                    'is_' . $method => true,
                 ];
 
                 break;
@@ -139,7 +100,7 @@ class PaymentAction
                     'result' => true,
                     'return_url' => 'index.php?controller=order&step=3&embedded=1'
                         . '&pc=' . $toolsAdapter->tool('getValue', 'pc')
-                        . '&def=' . (int) $options['deferred']
+                        . '&def=' . (int) $payment_methods['deferred']
                         . '&modulename=' . $this->dependencies->name,
                 ];
             case 'oney':
@@ -149,20 +110,21 @@ class PaymentAction
 
                 break;
             default:
-                if ('redirect' != $options['embedded']) {
+                $embedded = (string) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('embedded_mode');
+                if ('redirect' != $embedded) {
                     return [
                         'result' => true,
                         'return_url' => 'index.php?controller=order&step=3&embedded=1'
                             . ('installment' == $method ? '&inst=1' : '')
                             . ('amex' == $method ? '&amex=1' : '')
-                            . ('amex' != $method && $options['deferred'] ? '&def=1' : '')
+                            . ('amex' != $method && $payment_methods['deferred'] ? '&def=1' : '')
                             . '&modulename=' . $this->dependencies->name,
                     ];
                 }
                 $payment_options = [
                     'is_installment' => 'installment' == $method,
                     'is_amex' => 'amex' == $method,
-                    'is_deferred' => 'amex' != $method && $options['deferred'],
+                    'is_deferred' => 'amex' != $method && $payment_methods['deferred'],
                 ];
 
                 break;
