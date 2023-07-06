@@ -307,6 +307,12 @@ class ConfigClass
         }
 
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
+
+        // in case if API is not available or not returning permissions
+        if (empty($permissions)) {
+            return $available_options = [];
+        }
+
         $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
         //check if we force integrated payment activation/rollback
         if (isset($permissions['can_use_integrated_payments'])
@@ -359,10 +365,16 @@ class ConfigClass
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result']) {
                 $available_options['one_click'] = false;
             }
-            if (!$this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result']) {
+            if (!$this->validators['payment']->hasPermissions(
+                $permissions,
+                'can_create_installment_plan'
+            )['result']) {
                 $available_options['installment'] = false;
             }
-            if (!$this->validators['payment']->hasPermissions($permissions, 'can_create_deferred_payment')['result']) {
+            if (!$this->validators['payment']->hasPermissions(
+                $permissions,
+                'can_create_deferred_payment'
+            )['result']) {
                 $available_options['deferred'] = false;
             }
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_oney')['result']) {
@@ -371,10 +383,16 @@ class ConfigClass
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_bancontact')['result']) {
                 $available_options['bancontact'] = false;
             }
-            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_applepay')['result'] || !$available_options['live']) {
+            if (!$this->validators['payment']->hasPermissions(
+                $permissions,
+                'can_use_applepay'
+            )['result'] || !$available_options['live']) {
                 $available_options['applepay'] = false;
             }
-            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_amex')['result'] || !$available_options['live']) {
+            if (!$this->validators['payment']->hasPermissions(
+                $permissions,
+                'can_use_amex'
+            )['result'] || !$available_options['live']) {
                 $available_options['amex'] = false;
             }
             if (!$permissions['can_use_integrated_payments'] && 'integrated' == $available_options['embedded']) {
