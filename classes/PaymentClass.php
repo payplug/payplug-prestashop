@@ -1623,7 +1623,7 @@ class PaymentClass
 
         if (!$payment['result']) {
             exit(json_encode([
-                                'data' => $this->dependencies->l('payplug.adminPayplugController.errorOccurred', 'adminpayplugcontroller'),
+                                'data' => $this->dependencies->l('payplug.adminPayplugController.errorOccurred', 'paymentclass'),
                                 'status' => 'error',
                             ]));
         }
@@ -1658,7 +1658,7 @@ class PaymentClass
         }
 
         exit(json_encode([
-                            'message' => $this->dependencies->l('payplug.adminPayplugController.orderUpdated', 'adminpayplugcontroller'),
+                            'message' => $this->dependencies->l('payplug.adminPayplugController.orderUpdated', 'paymentclass'),
                             'reload' => true,
                         ]));
     }

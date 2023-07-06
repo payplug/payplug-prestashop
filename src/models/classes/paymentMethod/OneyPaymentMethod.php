@@ -217,8 +217,8 @@ class OneyPaymentMethod extends PaymentMethod
 
             $oneyLogo = $oney_payment . (!$use_fees ? '_side_' . $iso : '') . ($error ? '_alt' : '') . '.svg';
             $text = $use_fees
-                ? $this->dependencies->l('payplug.getPaymentOptions.payWithOney', 'paymentclass')
-                : $this->dependencies->l('payplug.getPaymentOptions.payWithOneyWithout', 'paymentclass');
+                ? $this->dependencies->l('payplug.getPaymentOptions.payWithOney', 'oneypaymentmethod')
+                : $this->dependencies->l('payplug.getPaymentOptions.payWithOneyWithout', 'oneypaymentmethod');
 
             $oneyLabel = $error ? $err_label : sprintf($text, $split);
 
@@ -448,35 +448,35 @@ class OneyPaymentMethod extends PaymentMethod
     protected function getErrorLabel($error = '')
     {
         if (!is_string($error) || !$error) {
-            return $this->dependencies->l('payplug.getPaymentOptions.errorOccurred', 'paymentclass');
+            return $this->dependencies->l('payplug.getPaymentOptions.errorOccurred', 'oneypaymentmethod');
         }
 
         switch ($error) {
             case 'invalid_addresses':
                 $err_label =
-                    $this->dependencies->l('payplug.getPaymentOptions.invalidAddresses', 'paymentclass');
+                    $this->dependencies->l('payplug.getPaymentOptions.invalidAddresses', 'oneypaymentmethod');
 
                 break;
             case 'invalid_amount_bottom':
             case 'invalid_amount_top':
                 $limits = $this->dependencies->getPlugin()->getOney()->getOneyPriceLimit(true);
                 $err_label = sprintf(
-                    $this->dependencies->l('payplug.getPaymentOptions.invalidAmount', 'paymentclass'),
+                    $this->dependencies->l('payplug.getPaymentOptions.invalidAmount', 'oneypaymentmethod'),
                     $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
                     $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result']
                 );
 
                 break;
             case 'invalid_carrier':
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidCarrier', 'paymentclass');
+                $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidCarrier', 'oneypaymentmethod');
 
                 break;
             case 'invalid_cart':
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidCart', 'paymentclass');
+                $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidCart', 'oneypaymentmethod');
 
                 break;
             default:
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.errorOccurred', 'paymentclass');
+                $err_label = $this->dependencies->l('payplug.getPaymentOptions.errorOccurred', 'oneypaymentmethod');
 
                 break;
         }

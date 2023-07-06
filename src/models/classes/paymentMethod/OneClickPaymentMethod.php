@@ -104,7 +104,7 @@ class OneClickPaymentMethod extends PaymentMethod
      */
     protected function getCardBrand($card = [])
     {
-        $default = $this->dependencies->l('payplug.getPaymentOptions.card', 'paymentclass');
+        $default = $this->dependencies->l('payplug.getPaymentOptions.card', 'oneclickpaymentmethod');
 
         if (!is_array($card) || empty($card)) {
             return $default;
