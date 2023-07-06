@@ -143,7 +143,7 @@ class ApiClass
 
         try {
             $response = Authentication::getAccount();
-        } catch (ConfigurationException $e) {
+        } catch (Exception $e) {
             return false;
         }
 
