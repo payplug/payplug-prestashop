@@ -428,15 +428,15 @@ class PayPlugNotifications
         } elseif ($this->is_amex) {
             $module_name = $this->dependencies->l('notification.createOrder.amex', 'payplugnotifications');
         } elseif ($this->is_giropay) {
-            $module_name = $this->dependencies->l('notification.createOrder.giropay', 'payplugvalidation');
+            $module_name = $this->dependencies->l('notification.createOrder.giropay', 'payplugnotifications');
         } elseif ($this->is_ideal) {
-            $module_name = $this->dependencies->l('notification.createOrder.ideal', 'payplugvalidation');
+            $module_name = $this->dependencies->l('notification.createOrder.ideal', 'payplugnotifications');
         } elseif ($this->is_mybank) {
-            $module_name = $this->dependencies->l('notification.createOrder.mybank', 'payplugvalidation');
+            $module_name = $this->dependencies->l('notification.createOrder.mybank', 'payplugnotifications');
         } elseif ($this->is_satispay) {
-            $module_name = $this->dependencies->l('notification.createOrder.satispay', 'payplugvalidation');
+            $module_name = $this->dependencies->l('notification.createOrder.satispay', 'payplugnotifications');
         } elseif ($this->is_sofort) {
-            $module_name = $this->dependencies->l('notification.createOrder.sofort', 'payplugvalidation');
+            $module_name = $this->dependencies->l('notification.createOrder.sofort', 'payplugnotifications');
         }
 
         // Create Order
