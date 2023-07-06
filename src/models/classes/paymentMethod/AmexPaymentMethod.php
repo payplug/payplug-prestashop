@@ -42,6 +42,7 @@ class AmexPaymentMethod extends PaymentMethod
     {
         $option = parent::getOption($current_configuration);
         $option['available_test_mode'] = false;
+        $option['name'] = 'american_express';
 
         return $option;
     }
