@@ -66,7 +66,7 @@ class ConfigurationAction
         }
 
         $allowed_methods = [
-            'american_express' => 'can_use_amex',
+            'american_express' => 'can_use_american_express',
             'applepay' => 'can_use_applepay',
             'bancontact' => 'can_use_bancontact',
             'deferred' => 'can_create_deferred_payment',
