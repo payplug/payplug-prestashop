@@ -391,7 +391,7 @@ class ConfigClass
             }
             if (!$this->validators['payment']->hasPermissions(
                 $permissions,
-                'can_use_amex'
+                'can_use_american_express'
             )['result'] || !$available_options['live']) {
                 $available_options['amex'] = false;
             }
