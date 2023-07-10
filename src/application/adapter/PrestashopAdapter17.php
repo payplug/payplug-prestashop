@@ -145,8 +145,11 @@ class PrestashopAdapter17
      */
     public function setIntegratedPaymentOption($payment_options)
     {
+        if (empty($payment_options)) {
+            return [];
+        }
         $dotenv = new Dotenv();
-        $dotenvFile = dirname(__FILE__, 4) . '/payplugroutes/.env';
+        $dotenvFile = dirname(__FILE__, 5) . '/payplugroutes/.env';
         if (file_exists($dotenvFile)) {
             $dotenv->load($dotenvFile);
             $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
