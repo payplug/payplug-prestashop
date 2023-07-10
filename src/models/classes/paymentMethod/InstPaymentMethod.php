@@ -45,6 +45,12 @@ class InstPaymentMethod extends PaymentMethod
         }
 
         $payment_options = parent::getPaymentOption($payment_options);
+
+        $payment_options[$this->name]['logo'] = $this->img_path
+            . 'svg/checkout/installment/logos_schemes_installment_'
+            . $this->configuration->getValue('inst_mode') . '_'
+            . $this->dependencies->configClass->getImgLang() . '.png';
+
         $payment_options[$this->name]['callToActionText'] = sprintf(
             $payment_options[$this->name]['callToActionText'],
             $this->configuration->getValue('inst_mode')
