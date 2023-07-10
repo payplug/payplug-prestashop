@@ -725,6 +725,19 @@ class HookClass
 
         $views_path = __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/';
         $display_single_payment = $show_menu_payment;
+
+        $refund_disable = false;
+        if (isset($payment->payment_method, $payment->payment_method['type'])
+            && in_array($payment->payment_method['type'], [
+                'giropay',
+                'ideal',
+                'mybank',
+                'satispay',
+                'sofort',
+            ])) {
+            $refund_disable = true;
+        }
+
         $this->assign->assign([
             'logo_url' => [
                 'payplug' => $views_path . 'img/payplug.svg',
@@ -734,13 +747,7 @@ class HookClass
             'display_single_payment' => $display_single_payment,
             'display_refund' => $display_refund,
             'refund_delay_oney' => $refund_delay_oney,
-            'refund_disable' => in_array($payment->payment_method['type'], [
-                    'giropay',
-                    'ideal',
-                    'mybank',
-                    'satispay',
-                    'sofort',
-                ]),
+            'refund_disable' => $refund_disable,
             'show_menu_payment' => $show_menu_payment,
             'show_menu_refunded' => $show_menu_refunded,
             'show_menu_update' => $show_menu_update,
