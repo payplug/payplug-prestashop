@@ -490,6 +490,9 @@ class Payplug extends PaymentModule
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
             $helpers = $this->module->getHelpers();
             $helpers['files']::clean();
+
+            // Call getAccount method to update countries and amounts configurations from merchant account
+            $this->module->apiClass->getAccountPermissions();
         }
 
         return parent::runUpgradeModule();
@@ -525,11 +528,9 @@ class Payplug extends PaymentModule
             'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
             'actionAdminPerformanceControllerAfter',
-            //'actionCarrierUpdate',
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
             'actionExportGDPRData',
-            //'actionObjectCarrierAddAfter',
             'actionOrderStatusUpdate',
             'actionObjectOrderStateAddAfter',
             'actionObjectOrderStateUpdateAfter',
@@ -544,11 +545,9 @@ class Payplug extends PaymentModule
             'displayProductPriceBlock',
             'displayAdminStatusesForm',
             'header',
-            //'moduleRoutes',
             'payment',
             'paymentReturn',
             'paymentOptions',
-            //'registerGDPRConsent',
         ];
     }
 

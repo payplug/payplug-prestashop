@@ -932,21 +932,15 @@ class PaymentClass
             ];
         }
 
-        $is_sandbox = (int) $this->config->get(
-            $this->dependencies->getConfigurationKey('sandboxMode')
-        );
+        $is_sandbox = (int) $this->configuration->getValue('sandbox_mode');
 
         // get the config
         $payment_methods = json_decode($this->configuration->getValue('payment_methods'));
         $config = [
             'one_click' => (bool) $payment_methods->one_click,
-            'installment' => (bool) $payment_methods->inst,
-            'company' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
-            ),
-            'inst_mode' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('instMode')
-            ),
+            'installment' => (bool) $payment_methods->installment,
+            'company' => (int) $this->configuration->getValue('company_id' . ($is_sandbox ? '_test' : '')),
+            'inst_mode' => (int) $this->configuration->getValue('inst_mode'),
             'deferred' => (bool) $payment_methods->deferred,
             'oney' => (bool) $payment_methods->oney,
             'standard' => (bool) $payment_methods->standard,
@@ -1004,9 +998,7 @@ class PaymentClass
 
         // Currency
         $currency = $this->currency->get((int) $cart->id_currency);
-        $supported_currencies = explode(';', $this->config->get(
-            $this->dependencies->getConfigurationKey('currencies')
-        ));
+        $supported_currencies = explode(';', $this->configuration->getValue('currencies'));
         $currency_iso_code = $currency->iso_code;
 
         // if unvalid iso code, return false

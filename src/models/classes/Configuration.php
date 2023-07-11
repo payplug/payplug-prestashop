@@ -39,7 +39,7 @@ class Configuration
         'amounts' => [
             'type' => 'string',
             'name' => 'AMOUNTS',
-            'defaultValue' => '{"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:100","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:2000000"},"ideal":{"min":"EUR:100","max":"EUR:2000000"},"mybank":{"min":"EUR:100","max":"EUR:2000000"},"satispay":{"min":"EUR:100","max":"EUR:2000000"},"sofort":{"min":"EUR:100","max":"EUR:2000000"}}',
+            'defaultValue' => '{}',
             'setConf' => 1,
         ],
         'bancontact_country' => [
@@ -54,6 +54,12 @@ class Configuration
             'defaultValue' => 0,
             'setConf' => 1,
         ],
+        'company_id_test' => [
+            'type' => 'integer',
+            'name' => 'COMPANY_ID_TEST',
+            'defaultValue' => 0,
+            'setConf' => 1,
+        ],
         'company_iso' => [
             'type' => 'string',
             'name' => 'COMPANY_ISO',
@@ -63,7 +69,7 @@ class Configuration
         'countries' => [
             'type' => 'string',
             'name' => 'COUNTRIES',
-            'defaultValue' => '{"oney_x3_with_fees":["YT","BL","PF","GP","RE","MF","MQ","GF","FR","NC"],"oney_x4_with_fees":["YT","BL","PF","GP","RE","MF","MQ","GF","FR","NC"],"oney_x3_without_fees":["YT","BL","PF","GP","RE","MF","MQ","GF","FR","NC"],"oney_x4_without_fees":["YT","BL","PF","GP","RE","MF","MQ","GF","FR","NC"],"bancontact":["ALL"],"giropay":["DE"],"ideal":["NL"],"mybank":["IT"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"],"sofort":["AT","BE","DE","ES","IT","NL"]}',
+            'defaultValue' => '{}',
             'setConf' => 1,
         ],
         'currencies' => [
@@ -267,7 +273,7 @@ class Configuration
         'payment_methods' => [
             'type' => 'string',
             'name' => 'PAYMENT_METHODS',
-            'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"giropay":false,"inst":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"sofort":false,"standard":true}',
+            'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"giropay":false,"installment":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"sofort":false,"standard":true}',
             'setConf' => 1,
         ],
         'sandbox_mode' => [

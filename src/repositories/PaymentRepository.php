@@ -281,7 +281,7 @@ class PaymentRepository extends BaseClass
             'bancontact' => 'bancontact',
             'giropay' => 'giropay',
             'ideal' => 'ideal',
-            'inst' => 'installment',
+            'installment' => 'installment',
             'mybank' => 'mybank',
             'one_click' => 'oneclick',
             'oney' => 'oney',

@@ -395,7 +395,7 @@ class PrestashopAdapter17
         $switch['installment'] = [
             'name' => 'payplug_inst',
             'active' => $connected,
-            'checked' => $configurations['inst'],
+            'checked' => $configurations['installment'],
             'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
         ];

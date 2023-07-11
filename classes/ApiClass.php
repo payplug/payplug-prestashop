@@ -997,86 +997,52 @@ class ApiClass
             return false;
         }
 
-        $id = $json_answer['id'];
-
         $configuration = [
-            'currencies' => $this->config->get(
-                $this->dependencies->getConfigurationKey('currencies')
-            ),
-            'min_amounts' => $this->config->get(
-                $this->dependencies->getConfigurationKey('minAmounts')
-            ),
-            'max_amounts' => $this->config->get(
-                $this->dependencies->getConfigurationKey('maxAmounts')
-            ),
-            'oney_allowed_countries' => $this->config->get(
-                $this->dependencies->getConfigurationKey('oneyAllowedCountries')
-            ),
-            'oney_max_amounts' => $this->config->get(
-                $this->dependencies->getConfigurationKey('oneyMaxAmounts')
-            ),
-            'oney_min_amounts' => $this->config->get(
-                $this->dependencies->getConfigurationKey('oneyMinAmounts')
-            ),
+            'amounts' => json_decode($this->configuration->getValue('amounts'), true),
+            'company_id' => isset($json_answer['id']) ? $json_answer['id'] : $this->configuration->getValue('company_id'),
+            'company_iso' => isset($json_answer['country']) ? $json_answer['country'] : $this->configuration->getValue('company_iso'),
+            'countries' => json_decode($this->configuration->getValue('countries'), true),
+            'currencies' => $this->configuration->getValue('currencies'),
+            'oney_allowed_countries' => $this->configuration->getValue('oney_allowed_countries'),
         ];
 
         if (isset($json_answer['configuration'])) {
-            if (isset($json_answer['configuration']['currencies'])
-                && !empty($json_answer['configuration']['currencies'])) {
-                $configuration['currencies'] = [];
-                foreach ($json_answer['configuration']['currencies'] as $value) {
-                    $configuration['currencies'][] = $value;
-                }
-            }
-
-            if (isset($json_answer['configuration']['min_amounts'])
-                && !empty($json_answer['configuration']['min_amounts'])) {
-                $configuration['min_amounts'] = '';
+            // Check payplug default amounts
+            if (isset($json_answer['configuration']['min_amounts']) && !empty($json_answer['configuration']['min_amounts'])) {
+                $configuration['amounts']['default']['min'] = '';
                 foreach ($json_answer['configuration']['min_amounts'] as $key => $value) {
-                    $configuration['min_amounts'] .= $key . ':' . $value . ';';
+                    $configuration['amounts']['default']['min'] .= $key . ':' . $value . ';';
                 }
-                $configuration['min_amounts'] = $this->tools->substr($configuration['min_amounts'], 0, -1);
+                $configuration['amounts']['default']['min'] = $this->tools->substr($configuration['amounts']['default']['min'], 0, -1);
             }
 
             if (isset($json_answer['configuration']['max_amounts'])
                 && !empty($json_answer['configuration']['max_amounts'])) {
-                $configuration['max_amounts'] = '';
+                $configuration['amounts']['default']['max'] = '';
                 foreach ($json_answer['configuration']['max_amounts'] as $key => $value) {
-                    $configuration['max_amounts'] .= $key . ':' . $value . ';';
+                    $configuration['amounts']['default']['max'] .= $key . ':' . $value . ';';
                 }
-                $configuration['max_amounts'] = $this->tools->substr($configuration['max_amounts'], 0, -1);
+                $configuration['amounts']['default']['max'] = $this->tools->substr($configuration['amounts']['default']['max'], 0, -1);
             }
 
-            if (isset($json_answer['configuration']['oney'])) {
-                if (isset($json_answer['configuration']['oney']['allowed_countries'])
-                    && !empty($json_answer['configuration']['oney']['allowed_countries'])
-                    && sizeof($json_answer['configuration']['oney']['allowed_countries'])
-                ) {
+            // Check Currency
+            if (isset($json_answer['configuration']['currencies'])
+                && !empty($json_answer['configuration']['currencies'])) {
+                $configuration['currencies'] = [];
+                foreach ($json_answer['configuration']['currencies'] as $key => $value) {
+                    $configuration['currencies'][] = $value;
+                }
+            }
+
+            // Check oney allowed countries
+            if (isset($json_answer['configuration']['oney'], $json_answer['configuration']['oney']['allowed_countries'])) {
+                $allowed_countries = $json_answer['configuration']['oney']['allowed_countries'];
+                if (!empty($allowed_countries)) {
                     $allowed = '';
                     foreach ($json_answer['configuration']['oney']['allowed_countries'] as $country) {
                         $allowed .= $country . ',';
                     }
                     $configuration['oney_allowed_countries'] = $this->tools->substr($allowed, 0, -1);
-                }
-
-                if (isset($json_answer['configuration']['oney']['min_amounts'])
-                    && !empty($json_answer['configuration']['oney']['min_amounts'])
-                ) {
-                    $configuration['oney_min_amounts'] = '';
-                    foreach ($json_answer['configuration']['oney']['min_amounts'] as $key => $value) {
-                        $configuration['oney_min_amounts'] .= $key . ':' . $value . ';';
-                    }
-                    $configuration['oney_min_amounts'] = $this->tools->substr($configuration['oney_min_amounts'], 0, -1);
-                }
-
-                if (isset($json_answer['configuration']['oney']['max_amounts'])
-                    && !empty($json_answer['configuration']['oney']['max_amounts'])
-                ) {
-                    $configuration['oney_max_amounts'] = '';
-                    foreach ($json_answer['configuration']['oney']['max_amounts'] as $key => $value) {
-                        $configuration['oney_max_amounts'] .= $key . ':' . $value . ';';
-                    }
-                    $configuration['oney_max_amounts'] = $this->tools->substr($configuration['oney_max_amounts'], 0, -1);
                 }
             }
         }
@@ -1096,14 +1062,32 @@ class ApiClass
         if (isset($json_answer['payment_methods'])) {
             $payment_methods = $json_answer['payment_methods'];
             foreach ($payment_methods as $payment_method_name => $payment_method) {
+                // Check the permissions..
                 if (isset($payment_method['enabled'])) {
                     $permissions['can_use_' . $payment_method_name] = $payment_method['enabled'];
                 } else {
                     $permissions['can_use_' . $payment_method_name] = true;
                 }
 
+                // then check the apple domain to use..
                 if ('apple_pay' == $payment_method_name && isset($payment_method['allowed_domain_names'])) {
                     $permissions['apple_pay_allowed_domains'] = $payment_method['allowed_domain_names'];
+                }
+
+                // then check the amount related to the feature..
+                if (array_key_exists('min_amounts', $payment_method)) {
+                    $configuration['amounts'][$payment_method_name]['min'] = 'EUR:' . $payment_method['min_amounts']['EUR'];
+                }
+                if (array_key_exists('max_amounts', $payment_method)) {
+                    $configuration['amounts'][$payment_method_name]['max'] = 'EUR:' . $payment_method['max_amounts']['EUR'];
+                }
+
+                // then check the country restriction related to the feature
+                if (array_key_exists('allowed_countries', $payment_method)) {
+                    $allowed_countries = $payment_method['allowed_countries'];
+                    if (!empty($allowed_countries) && !in_array('ALL', $allowed_countries)) {
+                        $configuration['countries'][$payment_method_name] = $payment_method['allowed_countries'];
+                    }
                 }
             }
 
@@ -1125,41 +1109,15 @@ class ApiClass
             $permissions['can_use_oney'] = false;
         }
 
-        // Get company country
-        $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : false;
+        // Update globale configuration from account response
 
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : ''),
-            $id
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('companyIso'),
-            $company_iso
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('currencies'),
-            implode(';', $configuration['currencies'])
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('minAmounts'),
-            $configuration['min_amounts']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('maxAmounts'),
-            $configuration['max_amounts']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('oneyAllowedCountries'),
-            $configuration['oney_allowed_countries']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('oneyMaxAmounts'),
-            $configuration['oney_max_amounts']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('oneyMinAmounts'),
-            $configuration['oney_min_amounts']
-        );
+        // Format amount, country and currency before update
+        $configuration['amounts'] = json_encode($configuration['amounts']);
+        $configuration['countries'] = json_encode($configuration['countries']);
+        $configuration['currencies'] = implode(';', $configuration['currencies']);
+        foreach ($configuration as $key => $value) {
+            $this->configuration->set($key, $value);
+        }
 
         return $permissions;
     }

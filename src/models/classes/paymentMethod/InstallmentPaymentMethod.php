@@ -23,12 +23,25 @@
 
 namespace PayPlug\src\models\classes\paymentMethod;
 
-class InstPaymentMethod extends PaymentMethod
+class InstallmentPaymentMethod extends PaymentMethod
 {
     public function __construct($dependencies)
     {
         parent::__construct($dependencies);
         $this->name = 'installment';
+    }
+
+    /**
+     * @description Get option for given configuration
+     * For this payment method we always return empty array since this payment feature is contain in standard payment option
+     *
+     * @param array $current_configuration
+     *
+     * @return array
+     */
+    public function getOption($current_configuration = [])
+    {
+        return [];
     }
 
     /**
