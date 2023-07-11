@@ -76,7 +76,7 @@ class PaymentMethod
         return [
             'one_click',
             'standard',
-            'inst',
+            'installment',
             'amex',
             'applepay',
             'bancontact',
@@ -137,6 +137,7 @@ class PaymentMethod
         // If no configuration given, get the default one
         if (!isset($current_configuration[$this->name])) {
             $default_payment_method = json_decode($this->configuration->getDefault('payment_methods'), true);
+
             $current_configuration[$this->name] = $default_payment_method[$this->name];
         }
 

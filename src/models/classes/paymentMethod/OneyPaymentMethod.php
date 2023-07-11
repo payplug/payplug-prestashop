@@ -54,10 +54,10 @@ class OneyPaymentMethod extends PaymentMethod
         $payment_methods = json_decode($this->configuration->getDefault('payment_methods'), true);
         $default_configuration = [
             'oney' => (bool) $payment_methods['oney'],
-            'oney_min_amounts' => $amounts['oney_x3_with_fees']['min'],
-            'oney_max_amounts' => $amounts['oney_x3_with_fees']['max'],
-            'oney_custom_min_amounts' => $this->configuration->getDefault('oney_custom_min_amounts'),
-            'oney_custom_max_amounts' => $this->configuration->getDefault('oney_custom_max_amounts'),
+            'oney_min_amounts' => isset($amounts['oney_x3_with_fees']) ? $amounts['oney_x3_with_fees']['min'] : '',
+            'oney_max_amounts' => isset($amounts['oney_x3_with_fees']) ? $amounts['oney_x3_with_fees']['max'] : '',
+            'oney_custom_min_amounts' => isset($amounts['oney_x3_with_fees']) ? $amounts['oney_x3_with_fees']['min'] : '',
+            'oney_custom_max_amounts' => isset($amounts['oney_x3_with_fees']) ? $amounts['oney_x3_with_fees']['max'] : '',
             'oney_product_animation' => $this->configuration->getDefault('oney_product_animation'),
             'oney_cart_animation' => $this->configuration->getDefault('oney_cart_animation'),
             'oney_schedule' => $this->configuration->getDefault('oney_schedule'),
@@ -184,7 +184,6 @@ class OneyPaymentMethod extends PaymentMethod
         $err_label = $this->getErrorLabel($error);
 
         $optimized = $this->configuration->getValue('oney_optimized') && !$error;
-        $oney_template = $optimized ? 'oney.tpl' : 'unified.tpl';
 
         $use_fees = (bool) $this->configuration->getValue('oney_fees');
         $delivery_address = $this->dependencies
@@ -390,10 +389,17 @@ class OneyPaymentMethod extends PaymentMethod
 
         $thresholds = [];
         foreach ($default_configuration as $key => $config) {
+            $amount_key = str_replace('oney_', '', str_replace('_amounts', '', $key));
+
+            if (!$config) {
+                $thresholds[$amount_key] = 0;
+
+                continue;
+            }
+
             $amount = explode(':', $config);
             $amount = (int) $amount[1];
             $amount = $this->dependencies->getHelpers()['amount']->formatOneyAmount($amount)['result'];
-            $amount_key = str_replace('oney_', '', str_replace('_amounts', '', $key));
             $thresholds[$amount_key] = $amount;
         }
 

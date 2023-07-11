@@ -81,7 +81,7 @@ class StandardPaymentMethod extends PaymentMethod
                 'class' => '-installment',
                 'enabled' => [
                     'name' => 'payplug_inst',
-                    'checked' => $current_configuration['inst'],
+                    'checked' => $current_configuration['installment'],
                 ],
                 'descriptions' => [
                     'live' => [
@@ -135,7 +135,7 @@ class StandardPaymentMethod extends PaymentMethod
                     [
                         'name' => 'payplug_inst_mode',
                         'type' => 'select',
-                        'disabled' => !$current_configuration['inst'],
+                        'disabled' => !$current_configuration['installment'],
                         'options' => [
                             [
                                 'value' => 2,
@@ -157,7 +157,7 @@ class StandardPaymentMethod extends PaymentMethod
                     [
                         'type' => 'input',
                         'name' => 'payplug_inst_min_amount',
-                        'disabled' => !$current_configuration['inst'],
+                        'disabled' => !$current_configuration['installment'],
                         'value' => (int) $current_configuration['inst_min_amount'],
                         'min' => 4,
                         'step' => 1,

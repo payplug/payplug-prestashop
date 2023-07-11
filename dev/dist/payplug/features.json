@@ -6,7 +6,7 @@
         "feature_deferred",
         "feature_giropay",
         "feature_ideal",
-        "feature_inst",
+        "feature_installment",
         "feature_integrated",
         "feature_mybank",
         "feature_one_click",

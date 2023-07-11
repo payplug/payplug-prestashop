@@ -57,8 +57,6 @@ class getPaylaterSectionTest extends BaseApiRest
     }
 
     /**
-     * @description
-     *
      * @dataProvider validDataProvider
      *
      * @param mixed $current_configuration
@@ -70,11 +68,8 @@ class getPaylaterSectionTest extends BaseApiRest
             if (false !== strpos($key, '_amounts')) {
                 $amount = explode(':', $configuration);
                 $all_amounts[$key] = (int) $amount[1];
-
                 $this->amount_helper
-                    ->shouldReceive(
-                        'formatOneyAmount'
-                    )
+                    ->shouldReceive('formatOneyAmount')
                     ->once()
                     ->with($amount[1])
                     ->andReturn(['result' => [
