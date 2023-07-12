@@ -49,15 +49,15 @@ class Configuration
             'setConf' => 1,
         ],
         'company_id' => [
-            'type' => 'integer',
+            'type' => 'string',
             'name' => 'COMPANY_ID',
-            'defaultValue' => 0,
+            'defaultValue' => null,
             'setConf' => 1,
         ],
         'company_id_test' => [
-            'type' => 'integer',
+            'type' => 'string',
             'name' => 'COMPANY_ID_TEST',
-            'defaultValue' => 0,
+            'defaultValue' => null,
             'setConf' => 1,
         ],
         'company_iso' => [
