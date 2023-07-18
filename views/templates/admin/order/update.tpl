@@ -27,5 +27,5 @@
     <input class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" type="submit" name="{$module_name|escape:'htmlall':'UTF-8'}SubmitUpdate" value="{l s='Update' mod='payplug'}" >
     <p class="hide pperror"></p>
     <p class="hide ppsuccess"></p>
-    <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
+    <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/gif/spinner.gif" />
 </form>

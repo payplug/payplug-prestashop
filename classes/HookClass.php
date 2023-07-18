@@ -1173,7 +1173,7 @@ class HookClass
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => $this->tools->tool('getHttpHost', true) .
-                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/img/admin/spinner.gif',
+                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/img/gif/spinner.gif',
             'front_ajax_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ajax', [], true),
             'api_url' => $this->dependencies->apiClass->getApiUrl(),
             'price2display' => $price2display,

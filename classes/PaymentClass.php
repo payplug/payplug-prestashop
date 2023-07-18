@@ -239,7 +239,7 @@ class PaymentClass
         $this->assign->assign([
             'spinner_url' => $this->tools->tool('getHttpHost', true)
                 . $this->constant->get(__PS_BASE_URI__)
-                . 'modules/' . $this->dependencies->name . '/views/img/admin/spinner.gif',
+                . 'modules/' . $this->dependencies->name . '/views/img/gif/spinner.gif',
             'payment_url' => $payment_url,
             'payment_controller_url' => $payment_controller_url,
             'installment_controller_url' => $installment_controller_url,

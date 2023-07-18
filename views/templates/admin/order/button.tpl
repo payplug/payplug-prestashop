@@ -29,5 +29,5 @@
 {if !isset($button_disable) || !$button_disable}
     <p class="hide ppaction pperror"></p>
     <p class="hide ppaction ppsuccess"></p>
-    <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif" />
+    <img class="loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/gif/spinner.gif" />
 {/if}
