@@ -67,7 +67,7 @@ class ConfigurationAction
 
         $allowed_methods = [
             'american_express' => 'can_use_american_express',
-            'applepay' => 'can_use_applepay',
+            'applepay' => 'can_use_apple_pay',
             'bancontact' => 'can_use_bancontact',
             'deferred' => 'can_create_deferred_payment',
             'giropay' => 'can_use_giropay',
@@ -137,6 +137,7 @@ class ConfigurationAction
                         $context->shop->domain,
                         $permissions['apple_pay_allowed_domains']
                     )['result'] : false;
+
                     // no break
             case 'integrated':
                 $message .= sprintf(
