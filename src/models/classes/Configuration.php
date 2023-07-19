@@ -132,6 +132,12 @@ class Configuration
             'defaultValue' => '{}',
             'setConf' => 1,
         ],
+        'oney' => [
+            'type' => 'integer',
+            'name' => 'ONEY',
+            'defaultValue' => 0,
+            'setConf' => 1,
+        ],
         'oney_allowed_countries' => [
             'type' => 'string',
             'name' => 'ONEY_ALLOWED_COUNTRIES',

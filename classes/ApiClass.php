@@ -1003,6 +1003,7 @@ class ApiClass
             'company_iso' => isset($json_answer['country']) ? $json_answer['country'] : $this->configuration->getValue('company_iso'),
             'countries' => json_decode($this->configuration->getValue('countries'), true),
             'currencies' => $this->configuration->getValue('currencies'),
+            'oney' => isset($json_answer['permissions']['can_use_oney']) ? (int) $json_answer['permissions']['can_use_oney'] : $this->configuration->getValue('oney'),
             'oney_allowed_countries' => $this->configuration->getValue('oney_allowed_countries'),
         ];
 
