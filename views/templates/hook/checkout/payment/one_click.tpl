@@ -59,7 +59,7 @@
                     <div class="{$module_name|escape:'htmlall':'UTF-8'}OneClick_submit">
                         <p class="{$module_name|escape:'htmlall':'UTF-8'}OneClick_message">
                             {l s='Please wait...' mod='payplug'}
-                            <img class="{$module_name|escape:'htmlall':'UTF-8'}OneClick_loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/admin/spinner.gif"/>
+                            <img class="{$module_name|escape:'htmlall':'UTF-8'}OneClick_loader" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/gif/spinner.gif"/>
                         </p>
                         <button class="{$module_name|escape:'htmlall':'UTF-8'}Button -green -payment" type="submit" name="SubmitPayplugOneClick">{l s='Pay' mod='payplug'} {displayPrice price=$price2display}</button>
                     </div>
