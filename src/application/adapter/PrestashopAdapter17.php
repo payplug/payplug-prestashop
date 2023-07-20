@@ -77,6 +77,7 @@ class PrestashopAdapter17
     {
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
             && $this->dependencies->configClass->isValidFeature('feature_integrated')
+            && array_key_exists('standard', $payment_options)
             && 'integrated' == (string) $this->config->get(
                 $this->dependencies->getConfigurationKey('embeddedMode')
             )
