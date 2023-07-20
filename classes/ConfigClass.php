@@ -385,7 +385,7 @@ class ConfigClass
             }
             if (!$this->validators['payment']->hasPermissions(
                 $permissions,
-                'can_use_applepay'
+                'can_use_apple_pay'
             )['result'] || !$available_options['live']) {
                 $available_options['applepay'] = false;
             }
