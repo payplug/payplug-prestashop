@@ -315,20 +315,21 @@ class ConfigClass
 
         $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
         //check if we force integrated payment activation/rollback
-        if (isset($permissions['can_use_integrated_payments'])
-            && !(bool) $configurationClass->getValue('sandbox_mode')
-            && version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
-            if ((bool) $permissions['can_use_integrated_payments']) {
-                if (!$onboardingAction->enableIntegratedAction()['success']) {
-                    $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
-                }
-            } else {
-                if (!$onboardingAction->disableIntegratedAction()['success']) {
-                    $this->logger->addLog($onboardingAction->disableIntegratedAction()['message'], 'error');
-                }
-            }
-        }
+        //TODO: Clean this code and delete forcing IP onboarding usages
+//        if (isset($permissions['can_use_integrated_payments'])
+//            && !(bool) $configurationClass->getValue('sandbox_mode')
+//            && version_compare(_PS_VERSION_, '1.7', '>=')) {
+//            $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
+//            if ((bool) $permissions['can_use_integrated_payments']) {
+//                if (!$onboardingAction->enableIntegratedAction()['success']) {
+//                    $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
+//                }
+//            } else {
+//                if (!$onboardingAction->disableIntegratedAction()['success']) {
+//                    $this->logger->addLog($onboardingAction->disableIntegratedAction()['message'], 'error');
+//                }
+//            }
+//        }
 
         $available_options = [
             'live' => !(bool) $configurationClass->getValue('sandbox_mode'),
