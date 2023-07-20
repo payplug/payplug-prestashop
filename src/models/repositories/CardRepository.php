@@ -128,7 +128,7 @@ class CardRepository extends QueryRepository
             ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
             ->build('unique_row');
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 
     /**
