@@ -64,7 +64,9 @@ class ApplepayPaymentMethod extends PaymentMethod
         $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
         $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
         if (!$isApplePayCompatible['result']) {
-            return [];
+            unset($payment_options[$this->name]);
+
+            return $payment_options;
         }
 
         $payment_options[$this->name]['additionalInformation'] = $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
