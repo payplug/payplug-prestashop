@@ -158,15 +158,10 @@ class PaymentClass
      */
     public function assignPaymentOptions($cart)
     {
-        $standard = $this->config->get(
-            $this->dependencies->getConfigurationKey('standard')
-        );
-        $one_click = $standard && $this->config->get(
-            $this->dependencies->getConfigurationKey('oneClick')
-        );
-        $installment = $this->config->get(
-            $this->dependencies->getConfigurationKey('inst')
-        );
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $standard = (bool) $payment_methods['standard'];
+        $one_click = $standard && (bool) $payment_methods['one_click'];
+        $installment = (bool) $payment_methods['inst'];
         $installment_mode = $this->config->get(
             $this->dependencies->getConfigurationKey('instMode')
         );
@@ -935,23 +930,23 @@ class PaymentClass
         $is_sandbox = (int) $this->configuration->getValue('sandbox_mode');
 
         // get the config
-        $payment_methods = json_decode($this->configuration->getValue('payment_methods'));
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
         $config = [
-            'one_click' => (bool) $payment_methods->one_click,
-            'installment' => (bool) $payment_methods->installment,
+            'one_click' => (bool) $payment_methods['one_click'],
+            'installment' => (bool) $payment_methods['installment'],
             'company' => (int) $this->configuration->getValue('company_id' . ($is_sandbox ? '_test' : '')),
             'inst_mode' => (int) $this->configuration->getValue('inst_mode'),
-            'deferred' => (bool) $payment_methods->deferred,
-            'oney' => (bool) $payment_methods->oney,
-            'standard' => (bool) $payment_methods->standard,
-            'bancontact' => (bool) $payment_methods->bancontact,
-            'applepay' => (bool) $payment_methods->applepay,
-            'amex' => (bool) $payment_methods->amex,
-            'giropay' => (bool) $payment_methods->giropay,
-            'ideal' => (bool) $payment_methods->ideal,
-            'mybank' => (bool) $payment_methods->mybank,
-            'satispay' => (bool) $payment_methods->satispay,
-            'sofort' => (bool) $payment_methods->sofort,
+            'deferred' => (bool) $payment_methods['deferred'],
+            'oney' => (bool) $payment_methods['oney'],
+            'standard' => (bool) $payment_methods['standard'],
+            'bancontact' => (bool) $payment_methods['bancontact'],
+            'applepay' => (bool) $payment_methods['applepay'],
+            'amex' => (bool) $payment_methods['amex'],
+            'giropay' => (bool) $payment_methods['giropay'],
+            'ideal' => (bool) $payment_methods['ideal'],
+            'mybank' => (bool) $payment_methods['mybank'],
+            'satispay' => (bool) $payment_methods['satispay'],
+            'sofort' => (bool) $payment_methods['sofort'],
         ];
 
         $is_one_click = 'new_card' != $options['id_card'] && $config['one_click'];

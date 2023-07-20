@@ -44,7 +44,6 @@ function upgrade_module_4_1_0()
         'standard' => (bool) Configuration::get('PAYPLUG_STANDARD'),
     ];
 
-    $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
     $flag = $flag && Configuration::deleteByName('PAYPLUG_AMEX');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_APPLEPAY');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_BANCONTACT');
@@ -53,7 +52,12 @@ function upgrade_module_4_1_0()
     $flag = $flag && Configuration::deleteByName('PAYPLUG_ONE_CLICK');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_ONEY');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_STANDARD');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_MAX_AMOUNTS');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_MIN_AMOUNTS');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_ONEY_MAX_AMOUNTS');
+    $flag = $flag && Configuration::deleteByName('PAYPLUG_ONEY_MIN_AMOUNTS');
 
+    $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
     $flag = $flag && Configuration::updateValue('PAYPLUG_AMOUNTS', '{}');
 
     return $flag && Configuration::updateValue('PAYPLUG_COUNTRIES', '{}');

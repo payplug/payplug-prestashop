@@ -93,11 +93,10 @@ class OneyRepository extends BaseClass
      */
     public function assignOneyJSVar()
     {
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
         $js_var = [
             'loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
-            'can_use_oney' => $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('oney')
-            ),
+            'can_use_oney' => (bool) $payment_methods['oney'],
         ];
 
         return \Media::addJsDef($js_var);
@@ -115,9 +114,8 @@ class OneyRepository extends BaseClass
      */
     public function assignOneyPaymentOptions($cart)
     {
-        if (!$this->configurationAdapter->get(
-            $this->dependencies->getConfigurationKey('oney')
-        )) {
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        if (!(bool) $payment_methods['oney']) {
             return false;
         }
 
@@ -338,13 +336,7 @@ class OneyRepository extends BaseClass
         $config = $this->configurationAdapter;
 
         return $config->deleteByName(
-            $this->dependencies->getConfigurationKey('oney')
-        ) && $config->deleteByName(
             $this->dependencies->getConfigurationKey('oneyAllowedCountries')
-        ) && $config->deleteByName(
-            $this->dependencies->getConfigurationKey('oneyMaxAmounts')
-        ) && $config->deleteByName(
-            $this->dependencies->getConfigurationKey('oneyMinAmounts')
         );
     }
 
@@ -873,8 +865,9 @@ class OneyRepository extends BaseClass
         }
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
+        $amounts = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('amounts'), true);
 
-        if (true == $custom) {
+        if ((bool) $custom) {
             $oney_min_amounts = explode(
                 ',',
                 $tools->tool('strtoupper', $config->get(
@@ -884,9 +877,7 @@ class OneyRepository extends BaseClass
         } else {
             $oney_min_amounts = explode(
                 ',',
-                $tools->tool('strtoupper', $config->get(
-                    $this->dependencies->getConfigurationKey('oneyMinAmounts')
-                ))
+                $tools->tool('strtoupper', $amounts['oney_x3_with_fees']['min'])
             );
         }
         foreach ($oney_min_amounts as $min_amount) {
@@ -1269,9 +1260,8 @@ class OneyRepository extends BaseClass
 
         // we use the Oney limit to get allowed currencies
         $currencies = [];
-        foreach (explode(';', $this->configurationAdapter->get(
-            $this->dependencies->getConfigurationKey('oneyMinAmounts')
-        )) as $amount_cur) {
+        $amounts = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('amounts'), true);
+        foreach (explode(';', $amounts['oney_x3_with_fees']['min']) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $currencies[] = $this->toolsAdapter->tool('strtoupper', $cur[1]);
@@ -1355,8 +1345,10 @@ class OneyRepository extends BaseClass
      */
     public function isOneyAllowed()
     {
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+
         return $this->dependencies->configClass->isAllowed()
-            && $this->configurationAdapter->get($this->dependencies->getConfigurationKey('oney'))
+            && (bool) $payment_methods['oney']
             && $this->isOneyAllowedCurrency($this->contextAdapter->getContext()->currency);
     }
 

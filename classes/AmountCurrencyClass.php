@@ -170,12 +170,9 @@ class AmountCurrencyClass
     {
         $min_amounts = [];
         $max_amounts = [];
-        $min = $this->config->get(
-            $this->dependencies->getConfigurationKey('minAmounts')
-        );
-        $max = $this->config->get(
-            $this->dependencies->getConfigurationKey('maxAmounts')
-        );
+        $amounts = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('amounts'), true);
+        $min = $amounts['default']['min'];
+        $max = $amounts['default']['max'];
         foreach (explode(';', $this->tools->tool('strtoupper', $min)) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
@@ -200,9 +197,8 @@ class AmountCurrencyClass
     private function getSupportedCurrencies()
     {
         $currencies = [];
-        foreach (explode(';', $this->config->get(
-            $this->dependencies->getConfigurationKey('minAmounts')
-        )) as $amount_cur) {
+        $amounts = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('amounts'), true);
+        foreach (explode(';', $amounts['default']['min']) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $currencies[] = $this->tools->tool('strtoupper', $cur[1]);

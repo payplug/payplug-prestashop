@@ -335,8 +335,7 @@ class CardRepository extends BaseClass
 
         $customer_id = isset($payment->metadata['ID Client']) ? $payment->metadata['ID Client'] : $payment->metadata['Client'];
 
-        $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
-        $company_id = (int) $configurationClass->getValue('company_id');
+        $company_id = (int) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('company_id');
 
         $exists = $this->dependencies
             ->getRepositories()['card']
