@@ -519,22 +519,24 @@ class ConfigurationAction
                         break;
                     case 'oney_min_amounts':
                     case 'oney_max_amounts':
-                        $oney = $this->dependencies->getPlugin()->getOney();
-                        $limit_oney = $oney->getOneyPriceLimit(false);
-                        $amount = $datas->{$config};
-                        $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
-                        $is_valid_amount = $this->dependencies
-                            ->getValidators()['payment']
-                            ->isAmount((int) $amount_to_cent, $limit_oney);
-                        $formated_amount = $oney->setCustomOneyLimit((int) $amount_to_cent);
-                        if ($is_valid_amount && !$configuration->set($key, (string) $formated_amount)) {
-                            return [
-                                'success' => false,
-                                'data' => [
-                                    // todo: add translation
-                                    'message' => 'An error has occurred while register ' . $config,
-                                ],
-                            ];
+                        if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name)) {
+                            $oney = $this->dependencies->getPlugin()->getOney();
+                            $limit_oney = $oney->getOneyPriceLimit(false);
+                            $amount = $datas->{$config};
+                            $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+                            $is_valid_amount = $this->dependencies
+                                ->getValidators()['payment']
+                                ->isAmount((int) $amount_to_cent, $limit_oney);
+                            $formated_amount = $oney->setCustomOneyLimit((int) $amount_to_cent);
+                            if ($is_valid_amount && !$configuration->set($key, (string) $formated_amount)) {
+                                return [
+                                    'success' => false,
+                                    'data' => [
+                                        // todo: add translation
+                                        'message' => 'An error has occurred while register ' . $config,
+                                    ],
+                                ];
+                            }
                         }
 
                         break;
