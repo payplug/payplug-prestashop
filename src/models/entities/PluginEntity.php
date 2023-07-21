@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -41,6 +41,9 @@ class PluginEntity
 
     /** @var object */
     private $assign;
+
+    /** @var object */
+    private $browser;
 
     /** @var object */
     private $cache;
@@ -289,6 +292,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getBrowser()
+    {
+        return $this->browser;
+    }
+
+    /**
+     * @return object
+     */
     public function getCache()
     {
         return $this->cache;
@@ -489,6 +500,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getPaymentMethod()
+    {
+        return $this->paymentMethod;
+    }
+
+    /**
+     * @return object
+     */
     public function getQuery()
     {
         return $this->query;
@@ -630,6 +649,24 @@ class PluginEntity
         }
 
         $this->assign = $assign;
+
+        return $this;
+    }
+
+    /**
+     * @param object $browser
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setBrowser($browser)
+    {
+        if (!is_object($browser)) {
+            throw (new BadParameterException('Invalid argument, $browser must be a Services/Browser'));
+        }
+
+        $this->browser = $browser;
 
         return $this;
     }
@@ -1111,6 +1148,24 @@ class PluginEntity
         }
 
         $this->paymentAction = $paymentAction;
+
+        return $this;
+    }
+
+    /**
+     * @param object $paymentMethod
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setPaymentMethod($paymentMethod)
+    {
+        if (!is_object($paymentMethod)) {
+            throw (new BadParameterException('Invalid argument, $paymentMethod must be a PaymentMethod'));
+        }
+
+        $this->paymentMethod = $paymentMethod;
 
         return $this;
     }

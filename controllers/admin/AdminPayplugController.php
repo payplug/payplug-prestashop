@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -45,13 +45,13 @@ class AdminPayplugController extends ModuleAdminController
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
         // If referer is from development server, trigger api rest renderer
-        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'localhost') != null) {
+        if (isset($_SERVER['HTTP_REFERER']) && null != strpos($_SERVER['HTTP_REFERER'], 'localhost')) {
             $this->renderApiRest();
         }
     }
 
     /**
-     * Initialize the content by adding Boostrap and loading the TPL
+     * Initialize the content by adding Boostrap and loading the TPL.
      */
     public function initContent()
     {
@@ -87,7 +87,7 @@ class AdminPayplugController extends ModuleAdminController
             'module_name' => $this->dependencies->name,
         ]);
 
-        $lib_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/dist/';
+        $lib_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         $this->media->addJsDef([
             'payplug_admin_config' => [
                 'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
@@ -96,19 +96,18 @@ class AdminPayplugController extends ModuleAdminController
         ]);
 
         $this->context->smarty->assign([
-            'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/dist/',
+            'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/views/',
         ]);
 
-        $template = 'admin_lib.tpl';
         $this->context->controller->addCSS($lib_path . '/css/app.css');
 
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
-            $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/' . $template);
+            $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/admin.tpl');
             $this->context->smarty->assign([
                 'content' => $this->content . $content,
             ]);
         } else {
-            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/' . $template);
+            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
             parent::initContent();
         }
     }

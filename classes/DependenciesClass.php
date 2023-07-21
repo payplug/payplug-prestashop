@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -422,7 +422,7 @@ class DependenciesClass
     }
 
     /**
-     * Get configuration key name for adapter module
+     * Get configuration key name for adapter module.
      *
      * @param string $key
      *
@@ -438,7 +438,7 @@ class DependenciesClass
     }
 
     /**
-     * Get configuration key option for adapter module
+     * Get configuration key option for adapter module.
      *
      * @param string $key
      * @param string $option
@@ -451,7 +451,7 @@ class DependenciesClass
     }
 
     /**
-     * Concatenate adapter module name to configuration key
+     * Concatenate adapter module name to configuration key.
      *
      * @param string $string
      *

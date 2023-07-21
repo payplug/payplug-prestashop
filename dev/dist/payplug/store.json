@@ -804,7 +804,7 @@
         "advanced_options": [
           {
             "name": "thresholds",
-            "image_url": "/modules/payplug/views/img/admin/screen/payplug-thresholds.jpg",
+            "image_url": "/modules/payplug/views/img/oney/payplug-thresholds.jpg",
             "title": "Personnalisez votre offre de paiement fractionne",
             "descriptions": {
               "description": "Proposer le paiement fractionne garanti pour des montants entre",
@@ -829,7 +829,7 @@
           },
           {
             "name": "oney_schedule",
-            "image_url": "/modules/payplug/views/img/admin/screen/payplug-optimized.jpg",
+            "image_url": "/modules/payplug/views/img/oney/payplug-optimized.jpg",
             "title": "Afficher les echeanciers sur le checkout",
             "descriptions": [
               {
@@ -846,14 +846,14 @@
           },
           {
             "name": "oney_product_animation",
-            "image_url": "/modules/payplug/views/img/admin/screen/payplug-productOneyCta.jpg",
+            "image_url": "/modules/payplug/views/img/oney/payplug-productOneyCta.jpg",
             "title": "Afficher le logo Oney sur la page produit",
             "switch": true,
             "checked": true
           },
           {
             "name": "oney_cart_animation",
-            "image_url": "/modules/payplug/views/img/admin/screen/payplug-cartOneyCta.jpg",
+            "image_url": "/modules/payplug/views/img/oney/payplug-cartOneyCta.jpg",
             "title": "Afficher le logo Oney sur la page panier",
             "switch": true,
             "checked": true

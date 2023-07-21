@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -69,7 +69,7 @@ class InstallmentClass
                     $payment = $payment['resource'];
                     $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($payment);
                 } else {
-                    if ((int) $installment->is_active == 1) {
+                    if (1 == (int) $installment->is_active) {
                         $status = 6; //ongoing
                     } else {
                         $status = 7; //cancelled

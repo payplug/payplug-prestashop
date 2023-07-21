@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -85,10 +85,10 @@ class accountValidator
             ];
         }
 
-        if ((strpos($api_key, 'sk_live_') !== 0
-            && strpos($api_key, 'pk_live_') !== 0
-            && strpos($api_key, 'sk_test_') !== 0
-            && strpos($api_key, 'pk_test_') !== 0)) {
+        if ((0 !== strpos($api_key, 'sk_live_')
+            && 0 !== strpos($api_key, 'pk_live_')
+            && 0 !== strpos($api_key, 'sk_test_')
+            && 0 !== strpos($api_key, 'pk_test_'))) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $api_key is not allowed',
@@ -138,7 +138,7 @@ class accountValidator
                 'message' => 'Invalid argument given, $email must be a non empty string',
             ];
         }
-        if (!(bool) preg_match('/^\b[\w\.\+-]+@[\w\.-]+\.\w{2,4}\b$/', $email)) {
+        if (!(bool) preg_match('/^\b[\w\.\+-]+@[\w\.-]+\.\w{2,}\b$/', $email)) {
             return [
                 'result' => false,
                 'message' => 'Invalid email format given, $email given is not valid',

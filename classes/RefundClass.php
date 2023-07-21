@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -52,7 +52,7 @@ class RefundClass
 
     /**
      * Generate refund form
-     * Done
+     * Done.
      *
      * @param int $amount_refunded_payplug
      * @param int $amount_available
@@ -93,7 +93,7 @@ class RefundClass
         if (isset($order_slips) && !empty($order_slips) && sizeof($order_slips)) {
             foreach ($order_slips as $order_slip) {
                 $amount_refunded_presta += $order_slip['amount'];
-                if (!$flag_shipping_refunded && $order_slip['shipping_cost'] == 1) {
+                if (!$flag_shipping_refunded && 1 == $order_slip['shipping_cost']) {
                     $amount_refunded_presta += $order_slip['shipping_cost_amount'];
                     $flag_shipping_refunded = true;
                 }
@@ -118,10 +118,10 @@ class RefundClass
     {
         $this->logger->setProcess('refund');
 
-        $sandbox = $this->tools->tool('strtoupper', $pay_mode) == 'TEST';
+        $sandbox = 'TEST' == $this->tools->tool('strtoupper', $pay_mode);
         $this->dependencies->apiClass->initializeApi($sandbox);
         $response = [];
-        if ($pay_id == null) {
+        if (null == $pay_id) {
             if ($inst_id) {
                 $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
                 if (!$installment['result']) {
@@ -219,7 +219,7 @@ class RefundClass
         $inst_id = $this->tools->tool('getValue', 'inst_id');
         $pay_mode = $this->tools->tool('getValue', 'pay_mode');
 
-        $this->dependencies->apiClass->initializeApi($pay_mode == 'test');
+        $this->dependencies->apiClass->initializeApi('test' == $pay_mode);
 
         $amount_available = 0;
         if ($inst_id) {
@@ -286,7 +286,7 @@ class RefundClass
             'reason' => 'Refunded with Prestashop',
         ];
         $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
-        if ($refund == 'error') {
+        if ('error' == $refund) {
             $this->logger->addLog('Cannot refund that amount.', 'notice');
             $this->logger->addLog(
                 '$pay_id : ' . $pay_id .
@@ -343,7 +343,7 @@ class RefundClass
             if ((int) $this->tools->tool('getValue', 'id_state') || !$amount_available) {
                 $new_state = (int) $this->tools->tool('getValue', 'id_state');
                 if (!$new_state) {
-                    if ($installment->is_live == 1) {
+                    if (1 == $installment->is_live) {
                         $new_state = (int) $this->config->get(
                             $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
                         );
@@ -364,7 +364,7 @@ class RefundClass
 
                     $current_state = (int) $this->dependencies->orderClass->getCurrentOrderState($order->id);
                     $this->logger->addLog('Current order state: ' . $current_state, 'notice');
-                    if ($current_state != 0 && $current_state != $new_state) {
+                    if (0 != $current_state && $current_state != $new_state) {
                         $history = $this->orderHistory->get();
                         $history->id_order = (int) $order->id;
                         $history->changeIdOrderState($new_state, (int) $order->id, true);
@@ -392,7 +392,7 @@ class RefundClass
             $new_state = (int) $this->tools->tool('getValue', 'id_state');
 
             if ($payment->is_refunded) {
-                if ($payment->is_live == 1) {
+                if (1 == $payment->is_live) {
                     $new_state = (int) $this->config->get(
                         $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
                     );
@@ -415,7 +415,7 @@ class RefundClass
 
                     $current_state = (int) $this->dependencies->orderClass->getCurrentOrderState($order->id);
                     $this->logger->addLog('Current order state: ' . $current_state, 'notice');
-                    if ($current_state != 0 && $current_state != $new_state) {
+                    if (0 != $current_state && $current_state != $new_state) {
                         $history = $this->orderHistory->get();
                         $history->id_order = (int) $order->id;
                         $history->changeIdOrderState($new_state, (int) $order->id, true);

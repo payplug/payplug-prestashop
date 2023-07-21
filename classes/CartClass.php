@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -97,51 +97,5 @@ class CartClass
         }
 
         return $this->dependencies->payplugLock->deleteLockG2($id_cart);
-    }
-
-    /**
-     * @description Get cart installment
-     *
-     * @param int $id_cart
-     *
-     * @return int
-     */
-    public function getPayplugInstallmentCart($id_cart = 0)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return 0;
-        }
-
-        return $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->build('unique_value')
-        ;
-    }
-
-    /**
-     * @description get cart installment backward
-     *
-     * @param int $id_cart
-     *
-     * @return mixed
-     *
-     * @deprecated use for installment from Payplug 3.1.3 or further
-     */
-    public function getPayplugInstallmentCartBackward($id_cart = 0)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return 0;
-        }
-
-        return $this->query
-            ->select()
-            ->fields('id_installment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment_cart')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->build('unique_value')
-        ;
     }
 }

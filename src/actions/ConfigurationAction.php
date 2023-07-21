@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -66,15 +66,20 @@ class ConfigurationAction
         }
 
         $allowed_methods = [
-            'american_express' => 'can_use_amex',
-            'applepay' => 'can_use_applepay',
+            'american_express' => 'can_use_american_express',
+            'applepay' => 'can_use_apple_pay',
             'bancontact' => 'can_use_bancontact',
             'deferred' => 'can_create_deferred_payment',
+            'giropay' => 'can_use_giropay',
+            'ideal' => 'can_use_ideal',
             'installment' => 'can_create_installment_plan',
             'integrated' => 'can_use_integrated_payments',
+            'mybank' => 'can_use_mybank',
             'onboarding_oney_completed' => 'onboarding_oney_completed',
             'one_click' => 'can_save_cards',
             'oney' => 'can_use_oney',
+            'satispay' => 'can_use_satispay',
+            'sofort' => 'can_use_sofort',
             'use_live_mode' => 'use_live_mode',
         ];
 
@@ -112,6 +117,11 @@ class ConfigurationAction
         switch ($payment_method) {
             case 'american_express':
             case 'bancontact':
+            case 'giropay':
+            case 'ideal':
+            case 'mybank':
+            case 'satispay':
+            case 'sofort':
                 $message .= sprintf(
                     $translation['premium']['description']['form'],
                     $translation['premium']['feature'][$payment_method]
@@ -127,6 +137,7 @@ class ConfigurationAction
                         $context->shop->domain,
                         $permissions['apple_pay_allowed_domains']
                     )['result'] : false;
+
                     // no break
             case 'integrated':
                 $message .= sprintf(
@@ -217,7 +228,7 @@ class ConfigurationAction
                 ],
             ];
         }
-        $permissions = $this->dependencies->name == 'pspaylater' ? 'onboarding_oney_completed' : 'use_live_mode';
+        $permissions = 'pspaylater' == $this->dependencies->name ? 'onboarding_oney_completed' : 'use_live_mode';
         if (!$this->checkPermissionAction($permissions, $datas->env)['success']) {
             return [
                 'success' => false,
@@ -454,54 +465,32 @@ class ConfigurationAction
                 ],
             ];
         }
-
-        $configuration = $this->dependencies->getPlugin()->getConfiguration();
-
-        $configurationKeys = [
-            $this->dependencies->getConfigurationKey('deferred') => 'enable_payplug_deferred',
-            $this->dependencies->getConfigurationKey('deferredState') => 'payplug_deferred_state',
-            $this->dependencies->getConfigurationKey('enable') => 'payplug_enable',
-            $this->dependencies->getConfigurationKey('embeddedMode') => 'payplug_embeded',
-            $this->dependencies->getConfigurationKey('inst') => 'enable_payplug_inst',
-            $this->dependencies->getConfigurationKey('instMinAmount') => 'payplug_inst_min_amount',
-            $this->dependencies->getConfigurationKey('instMode') => 'payplug_inst_mode',
-            $this->dependencies->getConfigurationKey('oneClick') => 'enable_one_click',
-            $this->dependencies->getConfigurationKey('oney') => 'enable_oney',
-            $this->dependencies->getConfigurationKey('oneyOptimized') => 'enable_oney_schedule',
-            $this->dependencies->getConfigurationKey('oneyProductCta') => 'enable_oney_product_animation',
-            $this->dependencies->getConfigurationKey('oneyCartCta') => 'enable_oney_cart_animation',
-            $this->dependencies->getConfigurationKey('oneyFees') => 'payplug_oney',
-            $this->dependencies->getConfigurationKey('sandboxMode') => 'payplug_sandbox',
-            $this->dependencies->getConfigurationKey('standard') => 'enable_standard',
-            $this->dependencies->getConfigurationKey('oneyCustomMinAmounts') => 'oney_min_amounts',
-            $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts') => 'oney_max_amounts',
-            $this->dependencies->getConfigurationKey('bancontact') => 'enable_bancontact',
-            $this->dependencies->getConfigurationKey('bancontactCountry') => 'enable_bancontact_country',
-            $this->dependencies->getConfigurationKey('applepay') => 'enable_applepay',
-            $this->dependencies->getConfigurationKey('amex') => 'enable_american_express',
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $configuration_keys = [
+            'deferred_state' => 'payplug_deferred_state',
+            'enable' => 'payplug_enable',
+            'embedded_mode' => 'payplug_embeded',
+            'inst_min_amount' => 'payplug_inst_min_amount',
+            'inst_mode' => 'payplug_inst_mode',
+            'oney_optimized' => 'enable_oney_schedule',
+            'oney_product_cta' => 'enable_oney_product_animation',
+            'oney_cart_cta' => 'enable_oney_cart_animation',
+            'oney_fees' => 'payplug_oney',
+            'sandbox_mode' => 'payplug_sandbox',
+            'oney_custom_min_amounts' => 'oney_min_amounts',
+            'oney_custom_max_amounts' => 'oney_max_amounts',
+            'bancontact_country' => 'enable_bancontact_country',
         ];
 
-        foreach ($configurationKeys as $key => $config) {
+        foreach ($configuration_keys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};
                 switch ($config) {
-                    case 'enable_one_click':
-                        if ((bool) $datas->enable_standard && !$configuration->updateValue($key, $value)) {
-                            return [
-                                'success' => false,
-                                'data' => [
-                                    // todo: add translation
-                                    'message' => 'An error has occurred while register ' . $config,
-                                ],
-                            ];
-                        }
-
-                        break;
                     case 'payplug_oney':
                     case 'enable_oney_product_animation':
                     case 'enable_oney_cart_animation':
                     case 'enable_oney_schedule':
-                        if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) && !$configuration->updateValue($key, $value)) {
+                        if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) && !$configuration->set($key, (int) $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -517,7 +506,7 @@ class ConfigurationAction
                         if ((int) $datas->payplug_inst_min_amount >= 4
                             && (int) $datas->payplug_inst_mode < 5
                             && (int) $datas->payplug_inst_mode > 1
-                            && !$configuration->updateValue($key, $value)) {
+                            && !$configuration->set($key, (int) $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -530,28 +519,29 @@ class ConfigurationAction
                         break;
                     case 'oney_min_amounts':
                     case 'oney_max_amounts':
-                        $oney = $this->dependencies->getPlugin()->getOney();
-                        $limit_oney = $oney->getOneyPriceLimit(false);
-                        $amount = $datas->{$config};
-                        $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
-                        $is_valid_amount = $this->dependencies
-                            ->getValidators()['payment']
-                            ->isAmount((int) $amount_to_cent, $limit_oney);
-                        $formated_amount = $oney->setCustomOneyLimit((int) $amount_to_cent);
-                        if ($is_valid_amount && !$configuration->updateValue($key, $formated_amount)) {
-                            return [
-                                'success' => false,
-                                'data' => [
-                                    // todo: add translation
-                                    'message' => 'An error has occurred while register ' . $config,
-                                ],
-                            ];
+                        if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name)) {
+                            $oney = $this->dependencies->getPlugin()->getOney();
+                            $limit_oney = $oney->getOneyPriceLimit(false);
+                            $amount = $datas->{$config};
+                            $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+                            $is_valid_amount = $this->dependencies
+                                ->getValidators()['payment']
+                                ->isAmount((int) $amount_to_cent, $limit_oney);
+                            $formated_amount = $oney->setCustomOneyLimit((int) $amount_to_cent);
+                            if ($is_valid_amount && !$configuration->set($key, (string) $formated_amount)) {
+                                return [
+                                    'success' => false,
+                                    'data' => [
+                                        // todo: add translation
+                                        'message' => 'An error has occurred while register ' . $config,
+                                    ],
+                                ];
+                            }
                         }
 
                         break;
-                    case 'enable_bancontact':
                     case 'payplug_bancontact_country':
-                        if (!(bool) $datas->payplug_sandbox && !$configuration->updateValue($key, $value)) {
+                        if ((bool) $datas->enable_bancontact && !$configuration->set($key, (int) $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -563,7 +553,18 @@ class ConfigurationAction
 
                         break;
                     default:
-                        if (!$configuration->updateValue($key, $value)) {
+                        switch ($configuration->getType($key)) {
+                            case 'integer':
+                                $value = (int) $value;
+
+                                break;
+                            default:
+                            case 'string':
+                                $value = (string) $value;
+
+                                break;
+                        }
+                        if (!$configuration->set($key, $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -579,6 +580,35 @@ class ConfigurationAction
                 $module = $this->dependencies->getPlugin()->getModule();
                 $module->getInstanceByName($this->dependencies->name)->enable();
             }
+        }
+
+        $payment_methods = [];
+        $payment_method_keys = [
+            'amex' => 'enable_american_express',
+            'applepay' => 'enable_applepay',
+            'bancontact' => 'enable_bancontact',
+            'deferred' => 'enable_payplug_deferred',
+            'giropay' => 'enable_giropay',
+            'installment' => 'enable_payplug_inst',
+            'ideal' => 'enable_ideal',
+            'mybank' => 'enable_mybank',
+            'one_click' => 'enable_one_click',
+            'oney' => 'enable_oney',
+            'satispay' => 'enable_satispay',
+            'sofort' => 'enable_sofort',
+            'standard' => 'enable_standard',
+        ];
+        foreach ($payment_method_keys as $key => $config) {
+            $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;
+        }
+        if (!$configuration->set('payment_methods', json_encode($payment_methods))) {
+            return [
+                'success' => false,
+                'data' => [
+                    // todo: add translation
+                    'message' => 'An error has occurred while register ' . $config,
+                ],
+            ];
         }
 
         return [

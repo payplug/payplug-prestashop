@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -45,7 +45,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Check if amount is correct
+     * Check if amount is correct.
      *
      * @param object $cart
      *
@@ -73,7 +73,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Check if amount is correct
+     * Check if amount is correct.
      *
      * @param int    $amount
      * @param object $order
@@ -88,10 +88,10 @@ class AmountCurrencyClass
 
         $order_amount = $order->total_paid;
 
-        if ($amount != 0) {
+        if (0 != $amount) {
             return abs($order_amount - $amount) / $amount < 0.00001;
         }
-        if ($order_amount != 0) {
+        if (0 != $order_amount) {
             return abs($amount - $order_amount) / $order_amount < 0.00001;
         }
 
@@ -99,7 +99,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Check amount to refund
+     * Check amount to refund.
      *
      * @param int $amount
      *
@@ -111,7 +111,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * check if currency is allowed
+     * check if currency is allowed.
      *
      * @param object $cart
      *
@@ -135,7 +135,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Format amount float to int or int to float
+     * Format amount float to int or int to float.
      *
      * @param $amount
      * @param bool $to_cents
@@ -160,7 +160,7 @@ class AmountCurrencyClass
     }
 
     /**
-     * Get amounts with the right currency
+     * Get amounts with the right currency.
      *
      * @param string $iso_code
      *
@@ -170,12 +170,9 @@ class AmountCurrencyClass
     {
         $min_amounts = [];
         $max_amounts = [];
-        $min = $this->config->get(
-            $this->dependencies->getConfigurationKey('minAmounts')
-        );
-        $max = $this->config->get(
-            $this->dependencies->getConfigurationKey('maxAmounts')
-        );
+        $amounts = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('amounts'), true);
+        $min = $amounts['default']['min'];
+        $max = $amounts['default']['max'];
         foreach (explode(';', $this->tools->tool('strtoupper', $min)) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
@@ -193,16 +190,15 @@ class AmountCurrencyClass
     }
 
     /**
-     * Get supported currencies
+     * Get supported currencies.
      *
      * @return array
      */
     private function getSupportedCurrencies()
     {
         $currencies = [];
-        foreach (explode(';', $this->config->get(
-            $this->dependencies->getConfigurationKey('minAmounts')
-        )) as $amount_cur) {
+        $amounts = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('amounts'), true);
+        foreach (explode(';', $amounts['default']['min']) as $amount_cur) {
             $cur = [];
             preg_match('/^([A-Z]{3}):([0-9]*)$/', $amount_cur, $cur);
             $currencies[] = $this->tools->tool('strtoupper', $cur[1]);

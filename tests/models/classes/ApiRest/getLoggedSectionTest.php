@@ -36,14 +36,6 @@ class getLoggedSectionTest extends BaseApiRest
         ;
     }
 
-    public function invalidArrayFormatDataProvider()
-    {
-        yield [42];
-        yield [null];
-        yield [false];
-        yield ['lorem ipsum'];
-    }
-
     /**
      * @description  generate Not onborded merchant datas
      *

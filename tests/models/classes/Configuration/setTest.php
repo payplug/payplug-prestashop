@@ -11,15 +11,6 @@ namespace PayPlug\tests\models\classes\Configuration;
  */
 class setTest extends BaseConfiguration
 {
-    public function invalidStringFormatDataProvider()
-    {
-        yield [42];
-        yield [['key' => 'value']];
-        yield [false];
-        yield [''];
-        yield [null];
-    }
-
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -71,7 +62,7 @@ class setTest extends BaseConfiguration
 
     public function testWhenConfigurationCanNotBeUpdated()
     {
-        $key = 'standard';
+        $key = 'enable';
         $value = 1;
         $this->configuration->shouldReceive([
             'updateValue' => false,
@@ -81,13 +72,13 @@ class setTest extends BaseConfiguration
 
     public function testWhenConfigurationIsUpdated()
     {
-        $key = 'standard';
+        $key = 'enable';
         $value = 1;
         $this->configuration->shouldReceive([
             'updateValue' => true,
         ]);
         $this->classe->shouldReceive([
-            'getName' => 'standard',
+            'getName' => 'enable',
         ]);
         $this->assertTrue($this->classe->set($key, $value));
     }

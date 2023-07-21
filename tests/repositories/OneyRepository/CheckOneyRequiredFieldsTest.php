@@ -30,7 +30,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 
         $this->dependencies->shouldReceive('isValidMobilePhoneNumber')
             ->andReturnUsing(function ($phone_number) {
-                return !is_null($phone_number) && $phone_number !== '';
+                return !is_null($phone_number) && '' !== $phone_number;
             })
         ;
 

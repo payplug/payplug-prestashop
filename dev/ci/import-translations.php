@@ -60,7 +60,7 @@ if (!empty($translations)) {
             if (in_array($lang, $available_languages) && $value) {
                 $value = str_replace('’', "'", $value);
                 $t = addcslashes($value, "'");
-                if ($t && $t != '') {
+                if ($t && '' != $t) {
                     $row = '$_MODULE[\'' . $translation_key . '\'] = \'' . $t . '\';' . PHP_EOL;
                     fwrite($files[$lang], $row);
                 }

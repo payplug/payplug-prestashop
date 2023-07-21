@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\repositories\CountryRepository;
 
 use PayPlug\src\models\repositories\CountryRepository;
-use PHPUnit\Framework\TestCase;
+use PayPlug\tests\models\repositories\BaseRepository;
 
 /**
  * @group unit
@@ -12,21 +12,13 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-class getIsoCodeByCountryTest extends TestCase
+class getIsoCodeByCountryTest extends BaseRepository
 {
     protected $accountValidator;
 
     protected function setUp()
     {
         $this->repository = \Mockery::mock(CountryRepository::class)->makePartial();
-    }
-
-    public function invalidIntegerFormatDataProvider()
-    {
-        yield [0];
-        yield [['key' => 'value']];
-        yield [true];
-        yield ['lorem ipsum'];
     }
 
     /**

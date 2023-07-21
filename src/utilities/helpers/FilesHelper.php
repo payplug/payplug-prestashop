@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -34,7 +34,7 @@ class FilesHelper
     {
         // If we are on local environment then don't run the cleaning
         if (isset($_SERVER['SERVER_NAME']) && (
-            $_SERVER['SERVER_NAME'] == 'localhost'
+            'localhost' == $_SERVER['SERVER_NAME']
                 || preg_match('/ngrok.io/i', $_SERVER['SERVER_NAME'])
                 || preg_match('/ngrok-free.app/i', $_SERVER['SERVER_NAME'])
         )
@@ -149,9 +149,9 @@ class FilesHelper
         foreach ($files as $key => $file) {
             if (in_array($file, ['.', '..'])) {
                 unset($files[$key]);
-            } elseif ($type_clear === 'file' && is_dir($path . $file)) {
+            } elseif ('file' === $type_clear && is_dir($path . $file)) {
                 unset($files[$key]);
-            } elseif ($type_clear === 'directory'
+            } elseif ('directory' === $type_clear
                 && (!is_dir($path . $file) || in_array($file, $arr_exclude))) {
                 unset($files[$key]);
             }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -128,7 +128,7 @@ class CardRepository extends QueryRepository
             ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
             ->build('unique_row');
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 
     /**
@@ -185,21 +185,21 @@ class CardRepository extends QueryRepository
     /**
      * @description Get all registered cards for a given customer
      *
-     * @param int   $id_customer
-     * @param int   $id_company
-     * @param false $is_sandbox
+     * @param int  $id_customer
+     * @param int  $id_company
+     * @param bool $is_sandbox
      *
      * @return array
      */
-    public function getAllByCustomer($id_customer = 0, $id_company = null, $is_sandbox = null)
+    public function getAllByCustomer($id_customer = 0, $id_company = 0, $is_sandbox = false)
     {
         if (!is_int($id_customer) || !$id_customer) {
             return [];
         }
-        if (!is_int($id_company) && $id_company !== null || $id_company === 0) {
+        if (!is_int($id_company) || !$id_company) {
             return [];
         }
-        if (!is_bool($is_sandbox) && $is_sandbox !== null) {
+        if (!is_bool($is_sandbox)) {
             return [];
         }
 
@@ -209,11 +209,11 @@ class CardRepository extends QueryRepository
             ->from($this->prefix . $this->module_name . '_card')
             ->where('`id_customer` = ' . (int) $id_customer);
 
-        if ($id_company !== null) {
+        if (null !== $id_company) {
             $this->where('`id_company` = ' . (int) $id_company);
         }
 
-        if ($is_sandbox !== null) {
+        if (null !== $is_sandbox) {
             $this->where('`is_sandbox` = ' . ((bool) $is_sandbox ? 1 : 0));
         }
 

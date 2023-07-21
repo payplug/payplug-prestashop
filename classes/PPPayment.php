@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -69,7 +69,7 @@ class PPPayment
 
     public function isDeferred()
     {
-        return $this->resource->authorization !== null;
+        return null !== $this->resource->authorization;
     }
 
     public function refresh()

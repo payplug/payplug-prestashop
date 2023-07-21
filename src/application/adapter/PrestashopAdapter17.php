@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -57,8 +57,9 @@ class PrestashopAdapter17
         $this->context->controller->addCSS($views_path . '/css/front-v' . $this->dependencies->version . '.css');
         $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
         $this->context->controller->addJS($views_path . '/js/front-v' . $this->dependencies->version . '.js');
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')
-            && (bool) $this->config->get($this->dependencies->getConfigurationKey('applepay')) === true) {
+            && (bool) $payment_methods['applepay']) {
             Media::addJsDef(
                 [
                     $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
@@ -77,9 +78,10 @@ class PrestashopAdapter17
     {
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
             && $this->dependencies->configClass->isValidFeature('feature_integrated')
-            && (string) $this->config->get(
+            && array_key_exists('standard', $payment_options)
+            && 'integrated' == (string) $this->config->get(
                 $this->dependencies->getConfigurationKey('embeddedMode')
-            ) == 'integrated'
+            )
         ) {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }
@@ -105,7 +107,7 @@ class PrestashopAdapter17
             }
 
             // load oney schedule on e page loading
-            if ($payment_method == 'oney' && $payment_option['is_optimized']) {
+            if ('oney' == $payment_method && $payment_option['is_optimized']) {
                 try {
                     $payment_schedule = $this->oney->getOneyPaymentOptionsList(
                         $payment_option['amount'],
@@ -145,8 +147,11 @@ class PrestashopAdapter17
      */
     public function setIntegratedPaymentOption($payment_options)
     {
+        if (empty($payment_options)) {
+            return [];
+        }
         $dotenv = new Dotenv();
-        $dotenvFile = dirname(__FILE__, 4) . '/payplugroutes/.env';
+        $dotenvFile = dirname(__FILE__, 5) . '/payplugroutes/.env';
         if (file_exists($dotenvFile)) {
             $dotenv->load($dotenvFile);
             $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
@@ -163,7 +168,6 @@ class PrestashopAdapter17
             'type' => 'hidden',
             'value' => 'integrated',
         ];
-
         $integrated['action'] = 'javascript:payplugModule.integrated.form.validate();';
         $integrated['logo'] = $payment_options['standard']['logo'];
         $integrated['moduleName'] = 'payplug';
@@ -172,32 +176,27 @@ class PrestashopAdapter17
         $integrated['extra_classes'] = 'payplug integrated';
 
         $translation = $this->dependencies->getPlugin()->getTranslation()->getFrontIntegratedPaymentTranslations();
-
         switch ($this->context->language->iso_code) {
             case 'fr':
                 $privacyLink = 'https://www.payplug.com/fr/politique-de-confidentialite/';
 
                 break;
-
             case 'it':
                 $privacyLink = 'https://www.payplug.com/it/politica-di-confidenzialita/';
 
                 break;
-
             default:
                 $privacyLink = 'https://www.payplug.com/privacy-policy/';
 
                 break;
         }
 
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+
         $this->context->smarty->assign([
             'integrated_payment_js_url' => $integrated_payment_js_url,
-            'is_one_click_activated' => (bool) $this->config->get(
-                $this->dependencies->getConfigurationKey('oneClick')
-            ),
-            'is_deferred_activated' => (bool) $this->config->get(
-                $this->dependencies->getConfigurationKey('deferred')
-            ),
+            'is_one_click_activated' => (bool) $payment_methods['one_click'],
+            'is_deferred_activated' => (bool) $payment_methods['deferred'],
             'placeholderCardholder' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
             'placeholderPan' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
             'placeholderExp' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
@@ -392,7 +391,7 @@ class PrestashopAdapter17
         $switch['installment'] = [
             'name' => 'payplug_inst',
             'active' => $connected,
-            'checked' => $configurations['inst'],
+            'checked' => $configurations['installment'],
             'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
             'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
         ];

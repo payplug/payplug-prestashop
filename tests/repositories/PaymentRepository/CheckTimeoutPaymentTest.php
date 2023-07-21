@@ -32,76 +32,78 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
         ];
     }
 
-    /**
-     * Parameters to test method with empty $paiementDetails
-     *
-     * @return \Generator
-     */
-    public function checkTimeoutPaymentParameters()
+    public function invalidIntegerFormatDataProvider()
     {
-        // Test if (!$idCart)
-        yield [null, 'id cart: null'];
-
-        // Test if (!is_int($idCart))
-        yield [
-            (string) 'I am a string!',
-            'id cart: "I am a string!"',
-        ];
+        yield [null];
+        yield [['key' => 'value']];
+        yield [true];
+        yield ['lorem ipsum'];
     }
 
     /**
-     * Test methods with nulled $paiementDetails
+     * @dataProvider invalidIntegerFormatDataProvider
      *
-     * @dataProvider checkTimeoutPaymentParameters
-     *
-     * @param array  $parameter
-     * @param string $logMessage
-     *
-     * @throws \Exception
+     * @param string $idCart
      */
-    public function testMethodWithEmptyParams($parameter, $logMessage)
+    public function testWhenGivenPaymentDetailsCartIdIsNotAValidFormat($idCart)
     {
-        $this->repo
-            ->shouldReceive([
-                'returnPaymentError' => $logMessage,
-            ])
-        ;
-
-        $this->assertSame(
-            $this->repo->checkTimeoutPayment($parameter),
-            $logMessage
+        $this->assertFalse(
+            $this->repo->checkTimeoutPayment($idCart)
         );
     }
 
-    public function testWithTimeoutLessThan3min()
+    public function testWhenNoPaymentFound()
     {
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'date_upd' => (new \DateTime('-2 min'))->format('Y-m-d H:i:s'),
-                ],
-            ])
-        ;
-
-        $this->assertSame(
-            true,
-            $this->repo->checkTimeoutPayment($this->paymentDetails['cartId'])
+        $idCart = 42;
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [],
+        ]);
+        $this->assertTrue(
+            $this->repo->checkTimeoutPayment($idCart)
         );
     }
 
-    public function testWithTimoutMoreThan3min()
+    public function testWhenPaymentIsNotTimeout()
     {
-        $this->repo
-            ->shouldReceive([
-                'checkPaymentTable' => [
-                    'date_upd' => date('Y-m-d H:i:s', strtotime('-5 minutes')),
+        $idCart = 42;
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [
+                'id_payment' => 'pay_12345678azertyu',
+                'date_upd' => '2023-01-01 00:00:00',
+            ],
+        ]);
+        $this->validators['payment']->shouldReceive(
+            [
+                'isTimeoutCachedPayment' => [
+                    'result' => false,
+                    'message' => '',
                 ],
-            ])
-        ;
+            ]
+        );
+        $this->assertFalse(
+            $this->repo->checkTimeoutPayment($idCart)
+        );
+    }
 
-        $this->assertSame(
-            false,
-            $this->repo->checkTimeoutPayment($this->paymentDetails['cartId'])
+    public function testWhenPaymentIsTimeout()
+    {
+        $idCart = 42;
+        $this->repositories['payment']->shouldReceive([
+            'getByCart' => [
+                'id_payment' => 'pay_12345678azertyu',
+                'date_upd' => '2023-01-01 00:00:00',
+            ],
+        ]);
+        $this->validators['payment']->shouldReceive(
+            [
+                'isTimeoutCachedPayment' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]
+        );
+        $this->assertTrue(
+            $this->repo->checkTimeoutPayment($idCart)
         );
     }
 }

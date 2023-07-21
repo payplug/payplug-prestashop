@@ -24,6 +24,7 @@ var allow_debug = true, debug = function (str) {
         console.log(str);
     }
 };
+let ipCDNCountdown = 0;
 var $document, $window, __moduleName__Module = {
     init: function () {
         this.card.init();
@@ -395,6 +396,18 @@ var $document, $window, __moduleName__Module = {
             },
             set: function () {
                 var integrated = __moduleName__Module.integrated;
+
+                if (typeof Payplug == 'undefined') {
+                    if (ipCDNCountdown < 10) {
+                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                        console.log('Waiting for Integrated payment form to load');
+                        ipCDNCountdown++;
+                        setTimeout(function(){
+                            integrated.form.set();
+                        }, 1000);
+                    }
+                    return;
+                }
 
                 integrated.props.api = Payplug;
 

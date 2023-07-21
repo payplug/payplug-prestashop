@@ -60,7 +60,7 @@ class isLoggedTest extends TestCase
     }
 
     /**
-     * test return with invalid Email
+     * test return with invalid Email.
      */
     public function testIsNotLoggedWithInvalidEmail()
     {
@@ -74,7 +74,7 @@ class isLoggedTest extends TestCase
     }
 
     /**
-     * description test return with invalid Apikey
+     * description test return with invalid Apikey.
      */
     public function testIsNotLoggedWithInvalidApiKey()
     {

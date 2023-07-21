@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -29,29 +29,17 @@ class Configuration
     // COMPANY_STATUS
     // DEBUG_MODE
     // OFFER
-    private $configuration = [
-        'allo_save_card' => [
+    public $configuration = [
+        'allow_save_card' => [
             'type' => 'integer',
             'name' => 'ALLOW_SAVE_CARD',
             'defaultValue' => 0,
             'setConf' => 1,
         ],
-        'applepay' => [
-            'type' => 'integer',
-            'name' => 'APPLEPAY',
-            'defaultValue' => null,
-            'setConf' => 1,
-        ],
-        'amex' => [
-            'type' => 'integer',
-            'name' => 'AMEX',
-            'defaultValue' => null,
-            'setConf' => 1,
-        ],
-        'bancontact' => [
-            'type' => 'integer',
-            'name' => 'BANCONTACT',
-            'defaultValue' => null,
+        'amounts' => [
+            'type' => 'string',
+            'name' => 'AMOUNTS',
+            'defaultValue' => '{}',
             'setConf' => 1,
         ],
         'bancontact_country' => [
@@ -61,8 +49,14 @@ class Configuration
             'setConf' => 1,
         ],
         'company_id' => [
-            'type' => 'integer',
+            'type' => 'string',
             'name' => 'COMPANY_ID',
+            'defaultValue' => null,
+            'setConf' => 1,
+        ],
+        'company_id_test' => [
+            'type' => 'string',
+            'name' => 'COMPANY_ID_TEST',
             'defaultValue' => null,
             'setConf' => 1,
         ],
@@ -72,16 +66,16 @@ class Configuration
             'defaultValue' => '',
             'setConf' => 1,
         ],
+        'countries' => [
+            'type' => 'string',
+            'name' => 'COUNTRIES',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'currencies' => [
             'type' => 'string',
             'name' => 'CURRENCIES',
             'defaultValue' => 'EUR',
-            'setConf' => 1,
-        ],
-        'deferred' => [
-            'type' => 'integer',
-            'name' => 'DEFERRED',
-            'defaultValue' => 0,
             'setConf' => 1,
         ],
         'deferred_state' => [
@@ -108,12 +102,6 @@ class Configuration
             'defaultValue' => 0,
             'setConf' => 1,
         ],
-        'inst' => [
-            'type' => 'integer',
-            'name' => 'INST',
-            'defaultValue' => null,
-            'setConf' => 1,
-        ],
         'inst_min_amount' => [
             'type' => 'integer',
             'name' => 'INST_MIN_AMOUNT',
@@ -138,34 +126,10 @@ class Configuration
             'defaultValue' => null,
             'setConf' => 1,
         ],
-        'max_amounts' => [
-            'type' => 'string',
-            'name' => 'MAX_AMOUNTS',
-            'defaultValue' => 'EUR:1000000',
-            'setConf' => 1,
-        ],
-        'min_amounts' => [
-            'type' => 'string',
-            'name' => 'MIN_AMOUNTS',
-            'defaultValue' => 'EUR:1',
-            'setConf' => 1,
-        ],
         'onboarding_states' => [
             'type' => 'string',
             'name' => 'ONBOARDING_STATES',
             'defaultValue' => '{}',
-            'setConf' => 1,
-        ],
-        'one_click' => [
-            'type' => 'integer',
-            'name' => 'ONE_CLICK',
-            'defaultValue' => null,
-            'setConf' => 1,
-        ],
-        'oney' => [
-            'type' => 'integer',
-            'name' => 'ONEY',
-            'defaultValue' => null,
             'setConf' => 1,
         ],
         'oney_allowed_countries' => [
@@ -196,18 +160,6 @@ class Configuration
             'type' => 'integer',
             'name' => 'ONEY_FEES',
             'defaultValue' => 1,
-            'setConf' => 1,
-        ],
-        'oney_max_amounts' => [
-            'type' => 'string',
-            'name' => 'ONEY_MAX_AMOUNTS',
-            'defaultValue' => 'EUR:300000',
-            'setConf' => 1,
-        ],
-        'oney_min_amounts' => [
-            'type' => 'string',
-            'name' => 'ONEY_MIN_AMOUNTS',
-            'defaultValue' => 'EUR:10000',
             'setConf' => 1,
         ],
         'oney_optimized' => [
@@ -318,15 +270,15 @@ class Configuration
             'defaultValue' => null,
             'setConf' => 0,
         ],
+        'payment_methods' => [
+            'type' => 'string',
+            'name' => 'PAYMENT_METHODS',
+            'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"giropay":false,"installment":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"sofort":false,"standard":true}',
+            'setConf' => 1,
+        ],
         'sandbox_mode' => [
             'type' => 'integer',
             'name' => 'SANDBOX_MODE',
-            'defaultValue' => 1,
-            'setConf' => 1,
-        ],
-        'standard' => [
-            'type' => 'integer',
-            'name' => 'STANDARD',
             'defaultValue' => 1,
             'setConf' => 1,
         ],
@@ -342,6 +294,22 @@ class Configuration
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+    }
+
+    public function delete($key = '')
+    {
+        if (!is_string($key) || !$key) {
+            return false;
+        }
+
+        if (!array_key_exists($key, $this->configuration)) {
+            return false;
+        }
+
+        return $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->deleteByName($this->getName($key));
     }
 
     /**
@@ -382,6 +350,16 @@ class Configuration
         }
 
         return $this->configuration[$key]['defaultValue'];
+    }
+
+    /**
+     * @description get the configuration keys
+     *
+     * @return array[]
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
     }
 
     /**
@@ -441,9 +419,10 @@ class Configuration
             return false;
         }
 
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-
-        return $config->get($this->getName($key));
+        return $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->get($this->getName($key));
     }
 
     /**
@@ -477,15 +456,16 @@ class Configuration
                 break;
             default:
             case 'string':
-                if (!is_string($value)) {
+                if (!is_string($value) && null != $value) {
                     return false;
                 }
 
                 break;
         }
 
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-
-        return $config->updateValue($this->getName($key), $value);
+        return $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->updateValue($this->getName($key), $value);
     }
 }

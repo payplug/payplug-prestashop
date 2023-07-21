@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -30,6 +30,7 @@ class PaymentClass
     private $card;
     private $cart;
     private $config;
+    private $configuration;
     private $constant;
     private $context;
     private $country;
@@ -58,6 +59,7 @@ class PaymentClass
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
@@ -123,7 +125,7 @@ class PaymentClass
 
         $installment = $installment['resource'];
 
-        if ($installment->is_live == 1) {
+        if (1 == $installment->is_live) {
             $new_state = (int) $this->config->get('PS_OS_CANCELED');
         } else {
             $new_state = (int) $this->config->get('PS_OS_CANCELED');
@@ -133,7 +135,7 @@ class PaymentClass
 
         if ($this->validate->validate('isLoadedObject', $order)) {
             $current_state = (int) $order->getCurrentState();
-            if ($current_state != 0 && $current_state !== $new_state) {
+            if (0 != $current_state && $current_state !== $new_state) {
                 $order_history = $this->orderHistory->get();
                 $order_history->id_order = (int) $order->id;
                 $order_history->changeIdOrderState($new_state, (int) $order->id, true);
@@ -156,15 +158,10 @@ class PaymentClass
      */
     public function assignPaymentOptions($cart)
     {
-        $standard = $this->config->get(
-            $this->dependencies->getConfigurationKey('standard')
-        );
-        $one_click = $standard && $this->config->get(
-            $this->dependencies->getConfigurationKey('oneClick')
-        );
-        $installment = $this->config->get(
-            $this->dependencies->getConfigurationKey('inst')
-        );
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $standard = (bool) $payment_methods['standard'];
+        $one_click = $standard && (bool) $payment_methods['one_click'];
+        $installment = (bool) $payment_methods['inst'];
         $installment_mode = $this->config->get(
             $this->dependencies->getConfigurationKey('instMode')
         );
@@ -205,7 +202,7 @@ class PaymentClass
             'api_url' => $this->dependencies->apiClass->getApiUrl(),
         ]);
 
-        if (!empty($payplug_cards) && $one_click == 1) {
+        if (!empty($payplug_cards) && 1 == $one_click) {
             $this->assign->assign([
                 'payplug_cards' => $payplug_cards,
                 'payplug_one_click' => 1,
@@ -237,7 +234,7 @@ class PaymentClass
         $this->assign->assign([
             'spinner_url' => $this->tools->tool('getHttpHost', true)
                 . $this->constant->get(__PS_BASE_URI__)
-                . 'modules/' . $this->dependencies->name . '/views/img/admin/spinner.gif',
+                . 'modules/' . $this->dependencies->name . '/views/img/gif/spinner.gif',
             'payment_url' => $payment_url,
             'payment_controller_url' => $payment_controller_url,
             'installment_controller_url' => $installment_controller_url,
@@ -378,7 +375,7 @@ class PaymentClass
         if ($card_details
             && isset($card_details['brand'])
             && !empty($card_details['brand'])
-            && ($card_details['brand'] !== 'none')) {
+            && ('none' !== $card_details['brand'])) {
             $card_brand = $this
                 ->dependencies
                 ->l('payplug.adminAjaxController.card', 'paymentclass') . ' ' . $card_details['brand'];
@@ -388,7 +385,7 @@ class PaymentClass
         $card_country = null;
         if ($card_details
             && isset($card_details['country'])
-            && ($card_details['country'] !== 'none')) {
+            && ('none' !== $card_details['country'])) {
             $card_country = $card_details['country'];
             $card_brand .= ' (' . $card_details['country'] . ')';
         }
@@ -424,7 +421,7 @@ class PaymentClass
         ];
 
         //Deferred payment does'nt display 3DS option before capture so we have to consider it null
-        if ($payment->is_3ds !== null) {
+        if (null !== $payment->is_3ds) {
             $payment_details['tds'] = ($payment->is_3ds)
                 ? $this->dependencies->l('payplug.buildPaymentDetails.yes', 'paymentclass')
                 : $this->dependencies->l('payplug.buildPaymentDetails.no', 'paymentclass');
@@ -490,7 +487,7 @@ class PaymentClass
                             && !$this->validators['payment']->isExpired($payment)['result'];
         $payment_details['can_be_captured'] = $can_be_captured;
 
-        if ($payment->authorization !== null && !$is_oney) {
+        if (null !== $payment->authorization && !$is_oney) {
             $payment_details['authorization'] = true;
             if ($is_paid) {
                 $payment_details['date'] = date('d/m/Y', $payment->paid_at);
@@ -515,7 +512,7 @@ class PaymentClass
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
-                    && $payment->authorization->authorized_at != null
+                    && null != $payment->authorization->authorized_at
                 ) {
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                 }
@@ -537,30 +534,6 @@ class PaymentClass
         }
 
         return $payment_details;
-    }
-
-    /**
-     * @description Delete stored payment
-     * @unused
-     *
-     * @param int    $cart_id
-     * @param string $pay_id
-     *
-     * @return bool
-     */
-    public function deletePayment($cart_id, $pay_id = '')
-    {
-        $this->query
-            ->delete()
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $cart_id)
-        ;
-
-        if ($pay_id != '') {
-            $this->query->where('id_payment = "' . $this->query->escape($pay_id) . '"');
-        }
-
-        return $this->query->build();
     }
 
     /**
@@ -603,7 +576,7 @@ class PaymentClass
 
         $payment = $capture['resource'];
 
-        if ($payment->card->id !== null) {
+        if (null !== $payment->card->id) {
             $this->logger->addLog('Save the payment card', 'notice');
             $this->card->saveCard($payment);
         }
@@ -626,7 +599,7 @@ class PaymentClass
 
             $current_state = (int) $order->getCurrentState();
             $this->logger->addLog('Current order state: ' . $current_state, 'notice');
-            if ($current_state != 0 && $current_state != $new_state) {
+            if (0 != $current_state && $current_state != $new_state) {
                 $order_history = $this->orderHistory->get();
                 $order_history->id_order = (int) $order->id;
                 $this->logger->addLog('New order state: ' . $new_state, 'notice');
@@ -666,7 +639,7 @@ class PaymentClass
         $with_msg_button = false;
 
         foreach ($errors as $error) {
-            if (strpos($error, 'oney_required_field') !== false) {
+            if (false !== strpos($error, 'oney_required_field')) {
                 $this->assign->assign(['is_popin_tpl' => true]);
                 $fields = $this->oney->getOneyRequiredFields();
                 $this->assign->assign([
@@ -696,64 +669,6 @@ class PaymentClass
     }
 
     /**
-     * @description Get allowed payment options for customer
-     * @unused
-     *
-     * @param $cart
-     *
-     * @return array
-     */
-    public function getAllowedPaymentOptions($cart)
-    {
-        $options = [
-            'standard' => false,
-            'oneclick' => false,
-            'installment' => false,
-            'oney' => false,
-        ];
-
-        $is_shown = $this->validators['module']->canBeShown(
-            (bool) $this->config->get($this->dependencies->getConfigurationKey('enable'))
-        );
-
-        if (!$this->active
-            || !$is_shown['result']
-            || !$this->dependencies->amountCurrencyClass->checkCurrency($cart)
-            || !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
-            return $options;
-        }
-
-        // check if installment allowed
-        $installment = $this->config->get(
-            $this->dependencies->getConfigurationKey('inst')
-        );
-        $installment_min_amount = $this->config->get(
-            $this->dependencies->getConfigurationKey('instMinAmount')
-        );
-        $order_total = $cart->getOrderTotal(true);
-        $installment = $installment && $order_total >= $installment_min_amount;
-
-        // check if one click allowed
-        $one_click = $this->config->get(
-            $this->dependencies->getConfigurationKey('oneClick')
-        );
-        $payplug_cards = $this->card->getByCustomer((int) $cart->id_customer, true);
-        $one_click = (bool) ($one_click && !empty($payplug_cards));
-
-        // check if oney is allowed
-        $oney = $this->config->get(
-            $this->dependencies->getConfigurationKey('oney')
-        );
-
-        return [
-            'standard' => true,
-            'oneclick' => $one_click,
-            'installment' => $installment,
-            'oney' => $oney,
-        ];
-    }
-
-    /**
      * @description Get the payment method for a given payment card
      * @unused
      *
@@ -763,16 +678,16 @@ class PaymentClass
      */
     public function getCurrentPaymentMethod($card = null)
     {
-        $card = $card != null ? $card : $this->tools->tool('getValue', 'pc', null);
+        $card = null != $card ? $card : $this->tools->tool('getValue', 'pc', null);
 
         // check if is Installment
-        if ($this->tools->tool('getValue', 'io') || $this->tools->tool('getValue', 'type') == 'oney') {
+        if ($this->tools->tool('getValue', 'io') || 'oney' == $this->tools->tool('getValue', 'type')) {
             $payment_method = 'PayPlugPaymentOney';
-        } elseif ($this->tools->tool('getValue', 'i') || $this->tools->tool('getValue', 'type') == 'installment') {
+        } elseif ($this->tools->tool('getValue', 'i') || 'installment' == $this->tools->tool('getValue', 'type')) {
             $payment_method = 'PayPlugPaymentInstallment';
-        } elseif (($card != null && $card != 'new_card') || $this->tools->tool('getValue', 'type') == 'oneclick') {
+        } elseif ((null != $card && 'new_card' != $card) || 'oneclick' == $this->tools->tool('getValue', 'type')) {
             $payment_method = 'PayPlugPaymentOneClick';
-        } elseif ($this->tools->tool('getValue', 'type') == 'standard') {
+        } elseif ('standard' == $this->tools->tool('getValue', 'type')) {
             $payment_method = 'PayPlugPaymentStandard';
         } else {
             $payment_method = 'PayPlugPaymentStandard';
@@ -874,39 +789,6 @@ class PaymentClass
     }
 
     /**
-     * @description Get the valid payment options from payplug configuration
-     *
-     * @param $cart
-     *
-     * @throws Exception
-     *
-     * @return array
-     */
-    public function getPaymentOptions()
-    {
-        $payment_options = [];
-        $options = $this->dependencies->configClass->getAvailableOptions($this->context->cart);
-        $available_payment_options = [
-            'standard',
-            'installment',
-            'oney',
-            'bancontact',
-            'applepay',
-            'amex',
-        ];
-
-        foreach ($available_payment_options as $available_payment_option) {
-            $allowed_feature = $this->dependencies->configClass->isValidFeature('feature_' . $available_payment_option);
-            if (isset($options[$available_payment_option]) && $options[$available_payment_option] && $allowed_feature) {
-                $method = 'get' . $this->tools->tool('ucfirst', $available_payment_option) . 'PaymentOption';
-                $payment_options = $this->{$method}($payment_options, $options);
-            }
-        }
-
-        return $payment_options;
-    }
-
-    /**
      * @description Get the status name for a given status id
      *
      * @param $id_status
@@ -950,7 +832,7 @@ class PaymentClass
             $payment = $payment['resource'];
         }
 
-        if ($payment->installment_plan_id !== null) {
+        if (null !== $payment->installment_plan_id) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($payment->installment_plan_id);
             if (!$installment['result']) {
                 return false;
@@ -962,126 +844,34 @@ class PaymentClass
         }
 
         $pay_status = 1; //not paid
-        if ((int) $payment->is_paid == 1) {
+        if (1 == (int) $payment->is_paid) {
             $pay_status = 2; //paid
         } elseif (isset($payment->payment_method, $payment->payment_method['is_pending'])
-            && (int) $payment->payment_method['is_pending'] == 1
+            && 1 == (int) $payment->payment_method['is_pending']
         ) {
             $pay_status = 10; //oney pending
-        } elseif ($this->validators['payment']->isFailed($payment)['result'] && $pay_status != 9) {
-            if ($payment->failure->code == 'aborted') {
+        } elseif ($this->validators['payment']->isFailed($payment)['result'] && 9 != $pay_status) {
+            if ('aborted' == $payment->failure->code) {
                 $pay_status = 7; //cancelled
-            } elseif ($payment->failure->code == 'timeout') {
+            } elseif ('timeout' == $payment->failure->code) {
                 $pay_status = 11; //abandoned
             } else {
                 $pay_status = 3; //failed
             }
-        } elseif ($payment->authorization !== null && ($payment->authorization->expires_at - time()) > 0) {
+        } elseif (null !== $payment->authorization && ($payment->authorization->expires_at - time()) > 0) {
             $pay_status = 8; //authorized
-        } elseif ($payment->authorization !== null && ($payment->authorization->expires_at - time()) <= 0) {
+        } elseif (null !== $payment->authorization && ($payment->authorization->expires_at - time()) <= 0) {
             $pay_status = 9; //authorization expired
-        } elseif ($payment->installment_plan_id !== null && (int) $installment->is_active == 1) {
+        } elseif (null !== $payment->installment_plan_id && 1 == (int) $installment->is_active) {
             $pay_status = 6; //ongoing
         }
-        if ((int) $payment->is_refunded == 1) {
+        if (1 == (int) $payment->is_refunded) {
             $pay_status = 5; //refunded
         } elseif ((int) $payment->amount_refunded > 0) {
             $pay_status = 4; //partially refunded
         }
 
         return $pay_status;
-    }
-
-    /**
-     * @description Check if payment method is valid for given id
-     * @unused
-     *
-     * @param string $payment_id
-     * @param string $type       default payment
-     *
-     * @return bool
-     */
-    public function isPaidPaymentMethod($payment_id, $type = 'payment')
-    {
-        switch ($type) {
-            case 'installment':
-                $installment = $this->dependencies->apiClass->retrieveInstallment($payment_id);
-                if ($installment['result'] && $installment['resource']->is_active) {
-                    $schedules = $installment['resource']->schedule;
-                    foreach ($schedules as $schedule) {
-                        foreach ($schedule->payment_ids as $pay_id) {
-                            $inst_payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-                            if ($inst_payment['result'] && $inst_payment['resource']->is_paid) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-
-                break;
-
-            case 'payment':
-            default:
-                $payment = $this->dependencies->apiClass->retrievePayment($payment_id);
-
-                return $payment['result'] && $payment['resource']->is_paid;
-        }
-
-        return false;
-    }
-
-    /**
-     * @description Check if a payment for the same id cart is pending
-     * @unused
-     *
-     * @param int $id_cart
-     *
-     * @return bool
-     */
-    public function isPaymentPending($id_cart)
-    {
-        $current_time = strtotime(date('Y-m-d H:i:s'));
-        $timeout_delay = 9;
-
-        $payment_cart = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->where('id_payment LIKE "pending"')
-            ->build()
-        ;
-
-        $payment_cart = reset($payment_cart);
-
-        if (!$payment_cart || (($current_time - strtotime($payment_cart['date_upd'])) >= $timeout_delay)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @description Get id_payment from a pending transaction for a given cart
-     *
-     * @param int $id_cart
-     *
-     * @return string id_payment OR bool
-     */
-    public function isTransactionPending($id_cart)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return false;
-        }
-
-        return $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->where('is_pending = 1')
-            ->build('unique_value')
-        ;
     }
 
     /**
@@ -1115,6 +905,11 @@ class PaymentClass
             'is_bancontact' => false,
             'is_applepay' => false,
             'is_amex' => false,
+            'is_giropay' => false,
+            'is_ideal' => false,
+            'is_mybank' => false,
+            'is_satispay' => false,
+            'is_sofort' => false,
         ];
 
         foreach ($default_options as $key => $value) {
@@ -1132,49 +927,38 @@ class PaymentClass
             ];
         }
 
-        $is_sandbox = (int) $this->config->get(
-            $this->dependencies->getConfigurationKey('sandboxMode')
-        );
+        $is_sandbox = (int) $this->configuration->getValue('sandbox_mode');
 
         // get the config
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
         $config = [
-            'one_click' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('oneClick')
-            ),
-            'installment' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('inst')
-            ),
-            'company' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : '')
-            ),
-            'inst_mode' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('instMode')
-            ),
-            'deferred' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('deferred')
-            ),
-            'oney' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('oney')
-            ),
-            'standard' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('standard')
-            ),
-            'bancontact' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('bancontact')
-            ),
-            'applepay' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('applepay')
-            ),
-            'amex' => (int) $this->config->get(
-                $this->dependencies->getConfigurationKey('amex')
-            ),
+            'one_click' => (bool) $payment_methods['one_click'],
+            'installment' => (bool) $payment_methods['installment'],
+            'company' => (int) $this->configuration->getValue('company_id' . ($is_sandbox ? '_test' : '')),
+            'inst_mode' => (int) $this->configuration->getValue('inst_mode'),
+            'deferred' => (bool) $payment_methods['deferred'],
+            'oney' => (bool) $payment_methods['oney'],
+            'standard' => (bool) $payment_methods['standard'],
+            'bancontact' => (bool) $payment_methods['bancontact'],
+            'applepay' => (bool) $payment_methods['applepay'],
+            'amex' => (bool) $payment_methods['amex'],
+            'giropay' => (bool) $payment_methods['giropay'],
+            'ideal' => (bool) $payment_methods['ideal'],
+            'mybank' => (bool) $payment_methods['mybank'],
+            'satispay' => (bool) $payment_methods['satispay'],
+            'sofort' => (bool) $payment_methods['sofort'],
         ];
 
-        $is_one_click = $options['id_card'] != 'new_card' && $config['one_click'];
+        $is_one_click = 'new_card' != $options['id_card'] && $config['one_click'];
         $options['is_installment'] = $options['is_installment'] && $config['installment'];
         $options['is_bancontact'] = $options['is_bancontact'] && $config['bancontact'];
         $options['is_applepay'] = $options['is_applepay'] && $config['applepay'];
         $options['is_amex'] = $options['is_amex'] && $config['amex'];
+        $options['is_giropay'] = $options['is_giropay'] && $config['giropay'];
+        $options['is_ideal'] = $options['is_ideal'] && $config['ideal'];
+        $options['is_mybank'] = $options['is_mybank'] && $config['mybank'];
+        $options['is_satispay'] = $options['is_satispay'] && $config['satispay'];
+        $options['is_sofort'] = $options['is_sofort'] && $config['sofort'];
 
         // defined which is current payment method
         if ($is_one_click) {
@@ -1191,6 +975,16 @@ class PaymentClass
             $payment_method = 'apple_pay';
         } elseif ($options['is_amex']) {
             $payment_method = 'amex';
+        } elseif ($options['is_giropay']) {
+            $payment_method = 'giropay';
+        } elseif ($options['is_ideal']) {
+            $payment_method = 'ideal';
+        } elseif ($options['is_mybank']) {
+            $payment_method = 'mybank';
+        } elseif ($options['is_satispay']) {
+            $payment_method = 'satispay';
+        } elseif ($options['is_sofort']) {
+            $payment_method = 'sofort';
         } else {
             $payment_method = 'standard';
         }
@@ -1199,9 +993,7 @@ class PaymentClass
 
         // Currency
         $currency = $this->currency->get((int) $cart->id_currency);
-        $supported_currencies = explode(';', $this->config->get(
-            $this->dependencies->getConfigurationKey('currencies')
-        ));
+        $supported_currencies = explode(';', $this->configuration->getValue('currencies'));
         $currency_iso_code = $currency->iso_code;
 
         // if unvalid iso code, return false
@@ -1359,8 +1151,8 @@ class PaymentClass
         //save card
         $allow_save_card =
             $config['one_click']
-            && $this->cart->isGuestCartByCartId($cart->id) != 1
-            && $options['id_card'] == 'new_card';
+            && 1 != $this->cart->isGuestCartByCartId($cart->id)
+            && 'new_card' == $options['id_card'];
 
         $payment_tab = [
             'currency' => $currency_iso_code,
@@ -1391,7 +1183,7 @@ class PaymentClass
             // then add schedule
             $schedule = [];
             for ($i = 0; $i < $config['inst_mode']; ++$i) {
-                if ($i == 0) {
+                if (0 == $i) {
                     $schedule[$i]['date'] = 'TODAY';
                     $int_part = (int) ($amount / $config['inst_mode']);
                     $schedule[$i]['amount'] = (int) ($int_part + ($amount - ($int_part * $config['inst_mode'])));
@@ -1405,7 +1197,7 @@ class PaymentClass
         } elseif ($is_one_click) {
             $payment_tab['initiator'] = 'PAYER';
             $payment_tab['payment_method'] = null;
-            if ($options['id_card'] && $options['id_card'] != 'new_card') {
+            if ($options['id_card'] && 'new_card' != $options['id_card']) {
                 $card = $this->dependencies->getRepositories()['card']->get((int) $options['id_card']);
                 if ($card['id_customer'] != $customer->id) {
                     return [
@@ -1523,6 +1315,56 @@ class PaymentClass
             unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
         }
 
+        if ($options['is_giropay']) {
+            $payment_tab['payment_method'] = 'giropay';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_ideal']) {
+            $payment_tab['payment_method'] = 'ideal';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_mybank']) {
+            $payment_tab['payment_method'] = 'mybank';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_satispay']) {
+            $payment_tab['payment_method'] = 'satispay';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_sofort']) {
+            $payment_tab['payment_method'] = 'sofort';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_giropay']) {
+            $payment_tab['payment_method'] = 'giropay';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_ideal']) {
+            $payment_tab['payment_method'] = 'ideal';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_mybank']) {
+            $payment_tab['payment_method'] = 'mybank';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_satispay']) {
+            $payment_tab['payment_method'] = 'satispay';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
+        if ($options['is_sofort']) {
+            $payment_tab['payment_method'] = 'sofort';
+            unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+        }
+
         if ($options['is_applepay']) {
             $payment_tab['payment_method'] = 'apple_pay';
             $payment_tab['payment_context'] = [
@@ -1552,9 +1394,9 @@ class PaymentClass
             'authorizedAt' => null,
             'isPaid' => null,
             'isDeferred' => $options['is_deferred'],
-            'isEmbedded' => (string) $this->config->get(
+            'isEmbedded' => 'redirect' !== (string) $this->config->get(
                 $this->dependencies->getConfigurationKey('embeddedMode')
-            ) !== 'redirect',
+            ),
             'isIntegrated' => $options['is_integrated'],
             'isMobileDevice' => ($this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result']),
             'cart' => $cart,
@@ -1565,7 +1407,11 @@ class PaymentClass
 
         // Create payment if inexistent
         $force_payment_creation = $options['is_applepay'] || $options['is_oney'];
-        if (!$this->payment->checkPaymentTable($cart->id) || $force_payment_creation) {
+        $payment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $cart->id);
+
+        if (empty($payment) || $force_payment_creation) {
             // Create payment or installment
             $createPayment = $this->payment->createPayment($this->paymentDetails);
 
@@ -1661,7 +1507,9 @@ class PaymentClass
             && $this->payment->checkHash($this->paymentDetails)
             && $this->payment->isValidApiPayment($this->paymentDetails)) {
             // If timeout < 3 min and hash OK
-            $store_payment = $this->payment->checkPaymentTable($cart->id);
+            $store_payment = $this->dependencies
+                ->getRepositories()['payment']
+                ->getByCart((int) $cart->id);
             $this->paymentDetails['paymentId'] = $store_payment['id_payment'];
 
             $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
@@ -1750,56 +1598,6 @@ class PaymentClass
         return (bool) $this->context->cookie->__get($this->dependencies->name . 'Errors');
     }
 
-    public function getShippingAddress($address, $cart)
-    {
-        return $address->get((int) $cart->id_address_delivery);
-    }
-
-    public function getBillingAddress($address, $cart)
-    {
-        return $address->get((int) $cart->id_address_invoice);
-    }
-
-    public function getShippingIso($shipping_address)
-    {
-        return $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
-    }
-
-    public function getBillingIso($billing_address)
-    {
-        return $this->dependencies->configClass->getIsoCodeByCountryId((int) $billing_address->id_country);
-    }
-
-    public function getBrowser()
-    {
-        $arr_browsers = ['Opera', 'Edg', 'Chrome', 'Safari', 'Firefox', 'MSIE', 'Trident'];
-        $agent = $_SERVER['HTTP_USER_AGENT'];
-        $user_browser = '';
-
-        foreach ($arr_browsers as $browser) {
-            if (strpos($agent, $browser) !== false) {
-                $user_browser = $browser;
-
-                break;
-            }
-        }
-
-        switch ($user_browser) {
-            case 'MSIE':
-            case 'Trident':
-                $user_browser = 'Internet Explorer';
-
-                break;
-
-            case 'Edg':
-                $user_browser = 'Microsoft Edge';
-
-                break;
-        }
-
-        return $user_browser;
-    }
-
     /**
      * @description update payment ressource
      *
@@ -1812,19 +1610,19 @@ class PaymentClass
 
         if (!$payment['result']) {
             exit(json_encode([
-                                'data' => $this->dependencies->l('payplug.adminPayplugController.errorOccurred', 'adminpayplugcontroller'),
+                                'data' => $this->dependencies->l('payplug.adminPayplugController.errorOccurred', 'paymentclass'),
                                 'status' => 'error',
                             ]));
         }
         $payment = $payment['resource'];
 
         $state_addons = ($payment->is_live ? '' : '_TEST');
-        if ((int) $payment->is_paid == 1) {
+        if (1 == (int) $payment->is_paid) {
             $new_state = (int) $this->config->get(
                 $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
             );
-        } elseif ((int) $payment->is_paid == 0) {
-            if ($payment->is_live == 1) {
+        } elseif (0 == (int) $payment->is_paid) {
+            if (1 == $payment->is_live) {
                 $new_state = (int) $this->dependencies->getPlugin()->getConfiguration()->get(
                     $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR')
                 );
@@ -1837,7 +1635,7 @@ class PaymentClass
 
         if ($this->validate->validate('isLoadedObject', $order)) {
             $current_state = (int) $order->getCurrentState();
-            if ($current_state != 0 && $current_state != $new_state) {
+            if (0 != $current_state && $current_state != $new_state) {
                 $history = $this->orderHistory->get();
                 $history->id_order = (int) $order->id;
                 $history->changeIdOrderState($new_state, (int) $order->id, true);
@@ -1847,537 +1645,9 @@ class PaymentClass
         }
 
         exit(json_encode([
-                            'message' => $this->dependencies->l('payplug.adminPayplugController.orderUpdated', 'adminpayplugcontroller'),
+                            'message' => $this->dependencies->l('payplug.adminPayplugController.orderUpdated', 'paymentclass'),
                             'reload' => true,
                         ]));
-    }
-
-    private function getAmexPaymentOption($payment_options, $options = [])
-    {
-        $payment_options['amex'] = [
-            'name' => 'amex',
-            'inputs' => [
-                'pc' => [
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ],
-                'pay' => [
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ],
-                'id_cart' => [
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int) $this->context->cart->id,
-                ],
-                'method' => [
-                    'name' => 'method',
-                    'type' => 'hidden',
-                    'value' => 'amex',
-                ],
-            ],
-            'tpl' => 'amex.tpl',
-            'extra_classes' => 'amex',
-            'payment_controller_url' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'payment',
-                ['type' => 'amex']
-            ),
-            'logo' => $this->dependencies->mediaClass->getMediaPath(
-                $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/svg/payment/amex.svg'
-            ),
-            'callToActionText' => $this->dependencies->l(
-                'payplug.getPaymentOptions.payWithAmex',
-                'paymentclass'
-            ),
-            'action' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'dispatcher',
-                [],
-                true
-            ),
-            'moduleName' => $this->dependencies->name,
-        ];
-
-        return $payment_options;
-    }
-
-    private function getApplepayPaymentOption($payment_options)
-    {
-        $isApplePayCompatible = $this->validators['browser']->isApplePayCompatible($this->getBrowser());
-        if (!$isApplePayCompatible['result']) {
-            return $payment_options;
-        }
-        $this->assign->assign([
-                                  'iso_lang' => $this->context->language->iso_code,
-                              ]);
-        $payment_options['applepay'] = [
-            'name' => 'applepay',
-            'inputs' => [
-                'pc' => [
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ],
-                'pay' => [
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ],
-                'id_cart' => [
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int) $this->context->cart->id,
-                ],
-                'method' => [
-                    'name' => 'method',
-                    'type' => 'hidden',
-                    'value' => 'applepay',
-                ],
-            ],
-            'tpl' => 'applepay.tpl',
-            'additionalInformation' => $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl'),
-            'callToActionText' => $this->dependencies->l(
-                'payplug.getPaymentOptions.payWithApplePay',
-                'paymentclass'
-            ),
-            'extra_classes' => 'payplug default',
-            'payment_controller_url' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'payment',
-                ['type' => 'applepay']
-            ),
-            'logo' => $this->dependencies->mediaClass->getMediaPath(
-                $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/svg/payment/apple_pay.svg'
-            ),
-            'moduleName' => $this->dependencies->name,
-        ];
-
-        return $payment_options;
-    }
-
-    private function getBancontactPaymentOption($payment_options)
-    {
-        $shipping_address = $this->address->get((int) $this->context->cart->id_address_delivery);
-        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
-        $invoice_address = $this->address->get((int) $this->context->cart->id_address_invoice);
-        $invoice_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $invoice_address->id_country);
-
-        // canUseBancontact
-        if ((bool) $this->config->get(
-            $this->dependencies->getConfigurationKey('bancontactCountry')
-        ) && !($this->validators['payment']->isAllowedCountry(
-            'BE',
-            $shipping_iso
-        )['result']) && !($this->validators['payment']->isAllowedCountry('BE', $invoice_iso)['result'])) {
-            return $payment_options;
-        }
-        $payment_options['bancontact'] = [
-            'name' => 'bancontact',
-            'tpl' => 'bancontact.tpl',
-            'logo' => $this->dependencies->mediaClass->getMediaPath(
-                $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/bancontact/bancontact.svg'
-            ),
-            'callToActionText' => $this->dependencies->l(
-                'payplug.getPaymentOptions.payWithBancontact',
-                'paymentclass'
-            ),
-            'extra_classes' => 'bancontact',
-            'action' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'dispatcher',
-                [],
-                true
-            ),
-            'payment_controller_url' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'payment',
-                ['type' => 'bancontact'],
-                true
-            ),
-            'moduleName' => $this->dependencies->name,
-            'inputs' => [
-                'pc' => [
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ],
-                'pay' => [
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ],
-                'id_cart' => [
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int) $this->context->cart->id,
-                ],
-                'method' => [
-                    'name' => 'method',
-                    'type' => 'hidden',
-                    'value' => 'bancontact',
-                ],
-            ],
-        ];
-
-        return $payment_options;
-    }
-
-    private function getInstallmentPaymentOption($payment_options, $options = [])
-    {
-        $use_taxes = (bool) $this->config->get('PS_TAX');
-        $cart_amount = (float) $this->context->cart->getOrderTotal($use_taxes);
-        $min_amount = (float) $this->config->get($this->dependencies->getConfigurationKey('instMinAmount'));
-        $amount_limit = $this->dependencies->amountCurrencyClass->getAmountsByCurrency(
-            $this->context->currency->iso_code
-        );
-
-        $is_valid_amount = $this->validators['payment']->isAmount(
-            $this->dependencies->amountCurrencyClass->convertAmount($cart_amount),
-            [
-                'min' => $this->dependencies->amountCurrencyClass->convertAmount($min_amount),
-                'max' => $amount_limit['max_amount'],
-            ]
-        );
-
-        if (!$is_valid_amount['result']) {
-            return $payment_options;
-        }
-
-        $installment_mode = $this->config->get(
-            $this->dependencies->getConfigurationKey('instMode')
-        );
-
-        $payment_options['installment'] = [
-            'name' => 'installment',
-            'inputs' => [
-                'pc' => [
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ],
-                'pay' => [
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ],
-                'id_cart' => [
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int) $this->context->cart->id,
-                ],
-                'method' => [
-                    'name' => 'method',
-                    'type' => 'hidden',
-                    'value' => 'installment',
-                ],
-            ],
-            'tpl' => 'installment.tpl',
-            'payment_controller_url' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'payment',
-                ['type' => 'installment', 'i' => 1],
-                true
-            ),
-            'logo' => $this->dependencies->mediaClass->getMediaPath(
-                $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/logos_schemes_installment_'
-                . $this
-                    ->config->get(
-                        $this->dependencies->getConfigurationKey('instMode')
-                    ) . '_' . $this
-                    ->dependencies->configClass->getImgLang() . '.png'
-            ),
-            'callToActionText' => sprintf(
-                $this->dependencies->l('payplug.getPaymentOptions.payByCardInstallment', 'paymentclass'),
-                $this->config->get(
-                    $this->dependencies->getConfigurationKey('instMode')
-                )
-            ),
-            'action' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'dispatcher',
-                ['def' => isset($options['deferred']) ? (int) $options['deferred'] : 0],
-                true
-            ),
-            'moduleName' => $this->dependencies->name,
-        ];
-
-        $this->assign->assign([
-            'installment_controller_url' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'payment',
-                ['i' => 1],
-                true
-            ),
-            'installment_mode' => $installment_mode,
-        ]);
-
-        return $payment_options;
-    }
-
-    private function getOneyPaymentOption($payment_options)
-    {
-        $use_taxes = (bool) $this->config->get('PS_TAX');
-        $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
-
-        $is_elligible = $this->oney->isOneyElligible($this->context->cart, $cart_amount, true);
-        $error = $is_elligible['result'] ? false : $is_elligible['error_type'];
-
-        switch ($error) {
-            case 'invalid_addresses':
-                $err_label =
-                    $this->dependencies->l('payplug.getPaymentOptions.invalidAddresses', 'paymentclass');
-
-                break;
-
-            case 'invalid_amount_bottom':
-            case 'invalid_amount_top':
-            $helpers = $this->dependencies->getHelpers();
-                $limits = $this->oney->getOneyPriceLimit(true);
-                $err_label = sprintf(
-                    $this->dependencies->l('payplug.getPaymentOptions.invalidAmount', 'paymentclass'),
-                    $helpers['amount']->formatOneyAmount($limits['min'])['result'],
-                    $helpers['amount']->formatOneyAmount($limits['max'])['result']
-                );
-
-                break;
-
-            case 'invalid_carrier':
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidCarrier', 'paymentclass');
-
-                break;
-
-            case 'invalid_cart':
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidCart', 'paymentclass');
-
-                break;
-
-            default:
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.errorOccurred', 'paymentclass');
-
-                break;
-        }
-
-        $optimized = $this->config->get($this->dependencies->getConfigurationKey('oneyOptimized')) && !$error;
-        $oney_template = $optimized ? 'oney.tpl' : 'unified.tpl';
-
-        $use_fees = (bool) $this->config->get($this->dependencies->getConfigurationKey('oneyFees'));
-        $delivery_address = $this->address->get($this->context->cart->id_address_delivery);
-        $iso = $this->tools->tool('strtoupper', $this->context->language->iso_code);
-        if (!in_array($iso, $this->oney_allowed_iso_codes)) {
-            $iso = $this->config->get($this->dependencies->getConfigurationKey('companyIso'));
-        }
-
-        $available_oney_payments = $this->oney->oneyEntity->getOperations();
-        foreach ($available_oney_payments as $oney_payment) {
-            $with_fees = (bool) strpos($oney_payment, 'with_fees') !== false;
-            if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
-                continue;
-            }
-
-            $payment_key = 'oney_' . $oney_payment;
-            $type = explode('_', $oney_payment);
-            $split = (int) str_replace('x', '', $type[0]);
-
-            $oneyLogo = $oney_payment . (!$use_fees ? '_side_' . $iso : '') . ($error ? '_alt' : '') . '.svg';
-            $text = $use_fees
-                ? $this->dependencies->l('payplug.getPaymentOptions.payWithOney', 'paymentclass')
-                : $this->dependencies->l('payplug.getPaymentOptions.payWithOneyWithout', 'paymentclass');
-
-            $oneyLabel = $error ? $err_label : sprintf($text, $split);
-
-            if ($optimized) {
-                $adapter = $this->dependencies->loadAdapterPresta();
-                if ($adapter
-                    && (method_exists($adapter, 'getPaymentOption'))) {
-                    $oneyData = $adapter->getPaymentOption();
-                    $oneyLogo = $oneyData['oneyLogo'];
-                    $oneyLabel = $oneyData['oneyCallToActionText'];
-                }
-            }
-
-            $payment_options[$payment_key] = [
-                'name' => 'oney',
-                'is_optimized' => $optimized,
-                'type' => $oney_payment,
-                'amount' => $cart_amount,
-                'iso_code' => $this
-                    ->dependencies
-                    ->configClass
-                    ->getIsoCodeByCountryId((int) $delivery_address->id_country),
-                'inputs' => [
-                    'pc' => [
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ],
-                    'pay' => [
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ],
-                    'id_cart' => [
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => (int) $this->context->cart->id,
-                    ],
-                    'method' => [
-                        'name' => 'method',
-                        'type' => 'hidden',
-                        'value' => 'oney',
-                    ],
-                    'oney_type' => [
-                        'name' => $this->dependencies->name . 'Oney_type',
-                        'type' => 'hidden',
-                        'value' => $oney_payment,
-                    ],
-                ],
-                'tpl' => $oney_template,
-                'extra_classes' => sprintf('oney%sx', $split),
-                'payment_controller_url' => $this->context->link->getModuleLink(
-                    $this->dependencies->name,
-                    'payment',
-                    ['type' => 'oney', 'io' => sprintf('%s', $split)],
-                    true
-                ),
-                'logo' => $this->dependencies->mediaClass->getMediaPath(
-                    $this->constant->get('_PS_MODULE_DIR_')
-                    . $this->dependencies->name . '/views/img/oney/' . $oneyLogo
-                ),
-                'callToActionText' => $oneyLabel,
-                'action' => $this->context->link->getModuleLink(
-                    $this->dependencies->name,
-                    'dispatcher',
-                    [],
-                    true
-                ),
-                'moduleName' => $this->dependencies->name,
-                'err_label' => $err_label,
-            ];
-        }
-
-        return $payment_options;
-    }
-
-    private function getStandardPaymentOption($payment_options, $options = [])
-    {
-        //One Click Payment
-        if (isset($options['one_click']) && $options['one_click']) {
-            $cards = $this->card->getByCustomer((int) $this->context->customer->id, true);
-            foreach ($cards as $card) {
-                $brand = ($card['brand'] != 'none')
-                    ? $this->tools->tool('ucfirst', $card['brand'])
-                    : $this->dependencies->l('payplug.getPaymentOptions.card', 'paymentclass');
-                $payment_key = 'one_click_' . $card['id_payplug_card'];
-                $logo = $card['brand'] != 'none' ? $this->dependencies->mediaClass->getMediaPath(
-                    $this
-                        ->constant
-                        ->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/views/img/' . $this
-                        ->tools
-                        ->tool('strtolower', $card['brand']) . '.svg'
-                ) : '';
-
-                $payment_options[$payment_key] = [
-                    'name' => 'one_click',
-                    'inputs' => [
-                        'pc' => [
-                            'name' => 'pc',
-                            'type' => 'hidden',
-                            'value' => (int) $card['id_payplug_card'],
-                        ],
-                        'pay' => [
-                            'name' => 'pay',
-                            'type' => 'hidden',
-                            'value' => '1',
-                        ],
-                        'id_cart' => [
-                            'name' => 'id_cart',
-                            'type' => 'hidden',
-                            'value' => (int) $this->context->cart->id,
-                        ],
-                        'method' => [
-                            'name' => 'method',
-                            'type' => 'hidden',
-                            'value' => 'one_click',
-                        ],
-                    ],
-                    'tpl' => 'one_click.tpl',
-                    'payment_controller_url' => $this->context->link->getModuleLink(
-                        $this->dependencies->name,
-                        'payment',
-                        [],
-                        true
-                    ),
-                    'logo' => $logo,
-                    'callToActionText' => $brand . ' **** **** **** ' . $card['last4'],
-                    'expiry_date_card' => $this->dependencies->l('payplug.getPaymentOptions.expiryDate', 'paymentclass') . ': ' . $card['expiry_date'],
-                    'action' => $this->context->link->getModuleLink(
-                        $this->dependencies->name,
-                        'dispatcher',
-                        ['def' => isset($options['deferred']) ? (int) $options['deferred'] : 0],
-                        true
-                    ),
-                    'moduleName' => $this->dependencies->name,
-                ];
-            }
-        }
-
-        // Standard Payment or new card from one-click
-        $payment_options['standard'] = [
-            'name' => 'standard',
-            'inputs' => [
-                'pc' => [
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ],
-                'pay' => [
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ],
-                'id_cart' => [
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int) $this->context->cart->id,
-                ],
-                'method' => [
-                    'name' => 'method',
-                    'type' => 'hidden',
-                    'value' => 'standard',
-                ],
-            ],
-            'tpl' => 'standard.tpl',
-            'extra_classes' => 'payplug default',
-            'payment_controller_url' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'payment',
-                ['type' => 'standard']
-            ),
-            'logo' => $this->dependencies->mediaClass->getMediaPath(
-                $this->constant->get('_PS_MODULE_DIR_')
-                . $this->dependencies->name . '/views/img/logos_schemes_'
-                . $this->dependencies->configClass->getImgLang() . '.svg'
-            ),
-            'callToActionText' => isset($cards) && $cards
-                ? $this->dependencies->l('payplug.getPaymentOptions.payDifferentCard', 'paymentclass')
-                : $this->dependencies->l('payplug.getPaymentOptions.payCreditCard', 'paymentclass'),
-            'action' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'dispatcher',
-                ['def' => isset($options['deferred']) ? (int) $options['deferred'] : 0],
-                true
-            ),
-            'moduleName' => $this->dependencies->name,
-        ];
-
-        return $payment_options;
     }
 
     /**
@@ -2402,7 +1672,7 @@ class PaymentClass
             $type = $keys[0];
             $field_name = $keys[1];
 
-            if (strpos($field_name, 'phone') != false) {
+            if (false != strpos($field_name, 'phone')) {
                 switch ($type) {
                     case 'billing':
                         $id_country = $this->country->getByIso($payment_tab['billing']['country']);
@@ -2422,10 +1692,10 @@ class PaymentClass
                 }
             }
 
-            if ($field_name == 'email') {
+            if ('email' == $field_name) {
                 $payment_tab['billing']['email'] = $field;
                 $payment_tab['shipping']['email'] = $field;
-            } elseif ($type == 'same') {
+            } elseif ('same' == $type) {
                 $payment_tab['billing'][$field_name] = $field;
                 $payment_tab['shipping'][$field_name] = $field;
             } else {

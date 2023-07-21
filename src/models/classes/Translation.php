@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -39,13 +39,13 @@ class Translation
     {
         return [
             'button' => [
-                'text' => $this->dependencies->l('footer.button.text', 'footertranslation'),
+                'text' => $this->dependencies->l('footer.button.text', 'translation'),
             ],
             'faq' => [
-                'top' => $this->dependencies->l('footer.faq.top', 'footertranslation'),
-                'bottom' => $this->dependencies->l('footer.faq.bottom', 'footertranslation'),
-                'link' => $this->dependencies->l('footer.faq.link', 'footertranslation'),
-                'link_url' => $this->dependencies->l('footer.faq.link_url', 'footertranslation'),
+                'top' => $this->dependencies->l('footer.faq.top', 'translation'),
+                'bottom' => $this->dependencies->l('footer.faq.bottom', 'translation'),
+                'link' => $this->dependencies->l('footer.faq.link', 'translation'),
+                'link_url' => $this->dependencies->l('footer.faq.link_url', 'translation'),
             ],
         ];
     }
@@ -56,10 +56,10 @@ class Translation
     public function getHeaderTranslations()
     {
         return [
-            'hidden' => $this->dependencies->l('payplug.getHeaderTranslations.headerHidden', 'headertranslation'),
-            'visible' => $this->dependencies->l('payplug.getHeaderTranslations.headerVisible', 'headertranslation'),
-            'title' => $this->dependencies->l('payplug.getHeaderTranslations.headerTitle', 'headertranslation'),
-            'text' => $this->dependencies->l('payplug.getHeaderTranslations.headerText', 'headertranslation'),
+            'hidden' => $this->dependencies->l('payplug.getHeaderTranslations.headerHidden', 'translation'),
+            'visible' => $this->dependencies->l('payplug.getHeaderTranslations.headerVisible', 'translation'),
+            'title' => $this->dependencies->l('payplug.getHeaderTranslations.headerTitle', 'translation'),
+            'text' => $this->dependencies->l('payplug.getHeaderTranslations.headerText', 'translation'),
         ];
     }
 
@@ -69,14 +69,14 @@ class Translation
     public function getLoginTranslations()
     {
         return [
-            'title' => $this->dependencies->l('login.title', 'logintranslation'),
-            'description' => $this->dependencies->l('login.description', 'logintranslation'),
-            'email' => $this->dependencies->l('login.email', 'logintranslation'),
-            'password' => $this->dependencies->l('login.password', 'logintranslation'),
-            'register' => $this->dependencies->l('login.register', 'logintranslation'),
-            'connect' => $this->dependencies->l('login.connect', 'logintranslation'),
-            'forgot_password' => $this->dependencies->l('login.forgot_password', 'logintranslation'),
-            'login_error' => $this->dependencies->l('login.error', 'logintranslation'),
+            'title' => $this->dependencies->l('login.title', 'translation'),
+            'description' => $this->dependencies->l('login.description', 'translation'),
+            'email' => $this->dependencies->l('login.email', 'translation'),
+            'password' => $this->dependencies->l('login.password', 'translation'),
+            'register' => $this->dependencies->l('login.register', 'translation'),
+            'connect' => $this->dependencies->l('login.connect', 'translation'),
+            'forgot_password' => $this->dependencies->l('login.forgot_password', 'translation'),
+            'login_error' => $this->dependencies->l('login.error', 'translation'),
         ];
     }
 
@@ -86,50 +86,50 @@ class Translation
     public function getLoggedTranslations()
     {
         return [
-            'title' => $this->dependencies->l('logged.title', 'loggedtranslation'),
-            'description' => $this->dependencies->l('logged.description', 'loggedtranslation'),
+            'title' => $this->dependencies->l('logged.title', 'translation'),
+            'description' => $this->dependencies->l('logged.description', 'translation'),
             'user' => [
-                'link' => $this->dependencies->l('logged.user.link', 'loggedtranslation'),
-                'logout' => $this->dependencies->l('logged.user.logout', 'loggedtranslation'),
+                'link' => $this->dependencies->l('logged.user.link', 'translation'),
+                'logout' => $this->dependencies->l('logged.user.logout', 'translation'),
             ],
             'mode' => [
-                'title' => $this->dependencies->l('logged.mode.title', 'loggedtranslation'),
+                'title' => $this->dependencies->l('logged.mode.title', 'translation'),
                 'description' => [
-                    'live' => $this->dependencies->l('logged.mode.description.live', 'loggedtranslation'),
-                    'sandbox' => $this->dependencies->l('logged.mode.description.sandbox', 'loggedtranslation'),
+                    'live' => $this->dependencies->l('logged.mode.description.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('logged.mode.description.sandbox', 'translation'),
                 ],
                 'link' => [
-                    'live' => $this->dependencies->l('logged.mode.link.live', 'loggedtranslation'),
-                    'sandbox' => $this->dependencies->l('logged.mode.link.sandbox', 'loggedtranslation'),
+                    'live' => $this->dependencies->l('logged.mode.link.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('logged.mode.link.sandbox', 'translation'),
                 ],
                 'options' => [
-                    'live' => $this->dependencies->l('logged.mode.options.live', 'loggedtranslation'),
-                    'sandbox' => $this->dependencies->l('logged.mode.options.sandbox', 'loggedtranslation'),
+                    'live' => $this->dependencies->l('logged.mode.options.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('logged.mode.options.sandbox', 'translation'),
                 ],
             ],
             'inactive' => [
                 'modal' => [
-                    'title' => $this->dependencies->l('logged.inactive.modal.title', 'loggedtranslation'),
-                    'description' => $this->dependencies->l('logged.inactive.modal.description', 'loggedtranslation'),
-                    'password_label' => $this->dependencies->l('logged.inactive.modal.password_label', 'loggedtranslation'),
-                    'cancel' => $this->dependencies->l('logged.inactive.modal.cancel', 'loggedtranslation'),
-                    'ok' => $this->dependencies->l('logged.inactive.modal.ok', 'loggedtranslation'),
-                    'error' => $this->dependencies->l('logged.inactive.modal.error', 'loggedtranslation'),
+                    'title' => $this->dependencies->l('logged.inactive.modal.title', 'translation'),
+                    'description' => $this->dependencies->l('logged.inactive.modal.description', 'translation'),
+                    'password_label' => $this->dependencies->l('logged.inactive.modal.password_label', 'translation'),
+                    'cancel' => $this->dependencies->l('logged.inactive.modal.cancel', 'translation'),
+                    'ok' => $this->dependencies->l('logged.inactive.modal.ok', 'translation'),
+                    'error' => $this->dependencies->l('logged.inactive.modal.error', 'translation'),
                 ],
                 'account' => [
                     'warning' => [
-                        'title' => $this->dependencies->l('logged.inactive.account.warning.title', 'loggedtranslation'),
-                        'description' => $this->dependencies->l('logged.inactive.account.warning.description', 'loggedtranslation'),
-                        'link' => $this->dependencies->l('logged.inactive.account.warning.link', 'loggedtranslation'),
-                        'trigger' => $this->dependencies->l('logged.inactive.account.warning.trigger', 'loggedtranslation'),
+                        'title' => $this->dependencies->l('logged.inactive.account.warning.title', 'translation'),
+                        'description' => $this->dependencies->l('logged.inactive.account.warning.description', 'translation'),
+                        'link' => $this->dependencies->l('logged.inactive.account.warning.link', 'translation'),
+                        'trigger' => $this->dependencies->l('logged.inactive.account.warning.trigger', 'translation'),
                     ],
                     'error' => [
-                        'title' => $this->dependencies->l('logged.inactive.account.error.title', 'loggedtranslation'),
-                        'description' => $this->dependencies->l('logged.inactive.account.error.description', 'loggedtranslation'),
+                        'title' => $this->dependencies->l('logged.inactive.account.error.title', 'translation'),
+                        'description' => $this->dependencies->l('logged.inactive.account.error.description', 'translation'),
                     ],
                     'success' => [
-                        'title' => $this->dependencies->l('logged.inactive.account.success.title', 'loggedtranslation'),
-                        'description' => $this->dependencies->l('logged.inactive.account.success.description', 'loggedtranslation'),
+                        'title' => $this->dependencies->l('logged.inactive.account.success.title', 'translation'),
+                        'description' => $this->dependencies->l('logged.inactive.account.success.description', 'translation'),
                     ],
                 ],
             ],
@@ -142,11 +142,11 @@ class Translation
     public function getSubscribeTranslations()
     {
         return [
-            'title' => $this->dependencies->l('subscribe.title', 'subscribetranslation'),
-            'description' => $this->dependencies->l('subscribe.description', 'subscribetranslation'),
-            'text' => $this->dependencies->l('subscribe.text', 'subscribetranslation'),
-            'register' => $this->dependencies->l('subscribe.register', 'subscribetranslation'),
-            'connect' => $this->dependencies->l('subscribe.connect', 'subscribetranslation'),
+            'title' => $this->dependencies->l('subscribe.title', 'translation'),
+            'description' => $this->dependencies->l('subscribe.description', 'translation'),
+            'text' => $this->dependencies->l('subscribe.text', 'translation'),
+            'register' => $this->dependencies->l('subscribe.register', 'translation'),
+            'connect' => $this->dependencies->l('subscribe.connect', 'translation'),
         ];
     }
 
@@ -158,105 +158,157 @@ class Translation
     public function getPaymentMethodsTranslations()
     {
         return [
-            'title' => $this->dependencies->l('paymentmethods.title', 'paymentmethodstranslation'),
-            'description' => $this->dependencies->l('paymentmethods.description', 'paymentmethodstranslation'),
+            'title' => $this->dependencies->l('paymentmethods.title', 'translation'),
+            'description' => $this->dependencies->l('paymentmethods.description', 'translation'),
             'standard' => [
-                'title' => $this->dependencies->l('paymentmethods.standard.title', 'paymentmethodstranslation'),
+                'title' => $this->dependencies->l('paymentmethods.standard.title', 'translation'),
                 'descriptions' => [
-                    'live' => $this->dependencies->l('paymentmethods.standard.descriptions.live', 'paymentmethodstranslation'),
+                    'live' => $this->dependencies->l('paymentmethods.standard.descriptions.live', 'translation'),
                 ],
-                'link' => $this->dependencies->l('paymentmethods.standard.link', 'paymentmethodstranslation'),
-                'advanced' => $this->dependencies->l('paymentmethods.standard.advanced', 'paymentmethodstranslation'),
+                'link' => $this->dependencies->l('paymentmethods.standard.link', 'translation'),
+                'advanced' => $this->dependencies->l('paymentmethods.standard.advanced', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.standard.call_to_action', 'translation'),
+                'has_saved_card' => $this->dependencies->l('paymentmethods.standard.has_saved_card', 'translation'),
             ],
             'embedded' => [
-                'title' => $this->dependencies->l('paymentmethods.embedded.title', 'paymentmethodstranslation'),
+                'title' => $this->dependencies->l('paymentmethods.embedded.title', 'translation'),
                 'descriptions' => [
                     'integrated' => [
-                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.integrated.text', 'paymentmethodstranslation'),
+                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.integrated.text', 'translation'),
                     ],
                     'popup' => [
-                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup.text', 'paymentmethodstranslation'),
-                        'link' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup.link', 'paymentmethodstranslation'),
+                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup.text', 'translation'),
+                        'link' => $this->dependencies->l('paymentmethods.embedded.descriptions.popup.link', 'translation'),
                     ],
                     'redirect' => [
-                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect.text', 'paymentmethodstranslation'),
-                        'link' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect.link', 'paymentmethodstranslation'),
+                        'text' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect.text', 'translation'),
+                        'link' => $this->dependencies->l('paymentmethods.embedded.descriptions.redirect.link', 'translation'),
                     ],
                 ],
-                'link' => $this->dependencies->l('paymentmethods.embedded.link', 'paymentmethodstranslation'),
+                'link' => $this->dependencies->l('paymentmethods.embedded.link', 'translation'),
                 'options' => [
-                    'integrated' => $this->dependencies->l('paymentmethods.embedded.options.integrated', 'paymentmethodstranslation'),
-                    'popup' => $this->dependencies->l('paymentmethods.embedded.options.popup', 'paymentmethodstranslation'),
-                    'redirect' => $this->dependencies->l('paymentmethods.embedded.options.redirect', 'paymentmethodstranslation'),
+                    'integrated' => $this->dependencies->l('paymentmethods.embedded.options.integrated', 'translation'),
+                    'popup' => $this->dependencies->l('paymentmethods.embedded.options.popup', 'translation'),
+                    'redirect' => $this->dependencies->l('paymentmethods.embedded.options.redirect', 'translation'),
                 ],
             ],
             'one_click' => [
-                'title' => $this->dependencies->l('paymentmethods.one_click.title', 'paymentmethodstranslation'),
+                'title' => $this->dependencies->l('paymentmethods.one_click.title', 'translation'),
                 'descriptions' => [
-                    'live' => $this->dependencies->l('paymentmethods.one_click.descriptions.live', 'paymentmethodstranslation'),
+                    'live' => $this->dependencies->l('paymentmethods.one_click.descriptions.live', 'translation'),
                 ],
-                'link' => $this->dependencies->l('paymentmethods.one_click.link', 'paymentmethodstranslation'),
+                'link' => $this->dependencies->l('paymentmethods.one_click.link', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.one_click.call_to_action', 'translation'),
             ],
             'installment' => [
-                'title' => $this->dependencies->l('paymentmethods.installment.title', 'paymentmethodstranslation'),
+                'title' => $this->dependencies->l('paymentmethods.installment.title', 'translation'),
                 'descriptions' => [
-                    'description_1' => $this->dependencies->l('paymentmethods.installment.descriptions.description_1', 'paymentmethodstranslation'),
-                    'text_from' => $this->dependencies->l('paymentmethods.installment.descriptions.text_from', 'paymentmethodstranslation'),
-                    'description_2' => $this->dependencies->l('paymentmethods.installment.descriptions.description_2', 'paymentmethodstranslation'),
-                    'controller_link' => $this->dependencies->l('paymentmethods.installment.descriptions.controller_link', 'paymentmethodstranslation'),
+                    'description_1' => $this->dependencies->l('paymentmethods.installment.descriptions.description_1', 'translation'),
+                    'text_from' => $this->dependencies->l('paymentmethods.installment.descriptions.text_from', 'translation'),
+                    'description_2' => $this->dependencies->l('paymentmethods.installment.descriptions.description_2', 'translation'),
+                    'controller_link' => $this->dependencies->l('paymentmethods.installment.descriptions.controller_link', 'translation'),
                     'alert' => [
-                        'start' => $this->dependencies->l('paymentmethods.installment.descriptions.alert.start', 'paymentmethodstranslation'),
-                        'end' => $this->dependencies->l('paymentmethods.installment.descriptions.alert.end', 'paymentmethodstranslation'),
+                        'start' => $this->dependencies->l('paymentmethods.installment.descriptions.alert.start', 'translation'),
+                        'end' => $this->dependencies->l('paymentmethods.installment.descriptions.alert.end', 'translation'),
                     ],
                 ],
                 'select' => [
-                    '2_schedules' => $this->dependencies->l('paymentmethods.installment.select.2_schedules', 'paymentmethodstranslation'),
-                    '3_schedules' => $this->dependencies->l('paymentmethods.installment.select.3_schedules', 'paymentmethodstranslation'),
-                    '4_schedules' => $this->dependencies->l('paymentmethods.installment.select.4_schedules', 'paymentmethodstranslation'),
+                    '2_schedules' => $this->dependencies->l('paymentmethods.installment.select.2_schedules', 'translation'),
+                    '3_schedules' => $this->dependencies->l('paymentmethods.installment.select.3_schedules', 'translation'),
+                    '4_schedules' => $this->dependencies->l('paymentmethods.installment.select.4_schedules', 'translation'),
                 ],
-                'link' => $this->dependencies->l('paymentmethods.installment.link', 'paymentmethodstranslation'),
-                'error_limit' => $this->dependencies->l('paymentmethods.installment.error_limit', 'paymentmethodstranslation'),
+                'link' => $this->dependencies->l('paymentmethods.installment.link', 'translation'),
+                'error_limit' => $this->dependencies->l('paymentmethods.installment.error_limit', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.installment.call_to_action', 'translation'),
             ],
             'deferred' => [
-                'title' => $this->dependencies->l('paymentmethods.deferred.title', 'paymentmethodstranslation'),
+                'title' => $this->dependencies->l('paymentmethods.deferred.title', 'translation'),
                 'descriptions' => [
-                    'description_1' => $this->dependencies->l('paymentmethods.deferred.descriptions.description_1', 'paymentmethodstranslation'),
-                    'description_2' => $this->dependencies->l('paymentmethods.deferred.descriptions.description_2', 'paymentmethodstranslation'),
+                    'description_1' => $this->dependencies->l('paymentmethods.deferred.descriptions.description_1', 'translation'),
+                    'description_2' => $this->dependencies->l('paymentmethods.deferred.descriptions.description_2', 'translation'),
                 ],
                 'states' => [
-                    'default' => $this->dependencies->l('paymentmethods.deferred.states.default', 'paymentmethodstranslation'),
-                    'state' => $this->dependencies->l('paymentmethods.deferred.states.state', 'paymentmethodstranslation'),
-                    'alert' => $this->dependencies->l('paymentmethods.deferred.states.alert', 'paymentmethodstranslation'),
+                    'default' => $this->dependencies->l('paymentmethods.deferred.states.default', 'translation'),
+                    'state' => $this->dependencies->l('paymentmethods.deferred.states.state', 'translation'),
+                    'alert' => $this->dependencies->l('paymentmethods.deferred.states.alert', 'translation'),
                 ],
-                'link' => $this->dependencies->l('paymentmethods.deferred.link', 'paymentmethodstranslation'),
+                'link' => $this->dependencies->l('paymentmethods.deferred.link', 'translation'),
             ],
             'amex' => [
-                'title' => $this->dependencies->l('paymentmethods.amex.title', 'paymentmethodstranslation'),
+                'title' => $this->dependencies->l('paymentmethods.amex.title', 'translation'),
                 'descriptions' => [
-                    'live' => $this->dependencies->l('paymentmethods.amex.descriptions.live', 'paymentmethodstranslation'),
-                    'sandbox' => $this->dependencies->l('paymentmethods.amex.descriptions.sandbox', 'paymentmethodstranslation'),
+                    'live' => $this->dependencies->l('paymentmethods.amex.descriptions.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.amex.descriptions.sandbox', 'translation'),
                 ],
-                'link' => $this->dependencies->l('paymentmethods.amex.link', 'paymentmethodstranslation'),
+                'link' => $this->dependencies->l('paymentmethods.amex.link', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.amex.call_to_action', 'translation'),
             ],
             'applepay' => [
-                'title' => $this->dependencies->l('paymentmethods.applepay.title', 'paymentmethodstranslation'),
+                'title' => $this->dependencies->l('paymentmethods.applepay.title', 'translation'),
                 'descriptions' => [
-                    'live' => $this->dependencies->l('paymentmethods.applepay.descriptions.live', 'paymentmethodstranslation'),
-                    'sandbox' => $this->dependencies->l('paymentmethods.applepay.descriptions.sandbox', 'paymentmethodstranslation'),
+                    'live' => $this->dependencies->l('paymentmethods.applepay.descriptions.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.applepay.descriptions.sandbox', 'translation'),
                 ],
-                'link' => $this->dependencies->l('paymentmethods.applepay.link', 'paymentmethodstranslation'),
+                'link' => $this->dependencies->l('paymentmethods.applepay.link', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.applepay.call_to_action', 'translation'),
             ],
             'bancontact' => [
-                'title' => $this->dependencies->l('paymentmethods.bancontact.title', 'paymentmethodstranslation'),
+                'title' => $this->dependencies->l('paymentmethods.bancontact.title', 'translation'),
                 'descriptions' => [
-                    'live' => $this->dependencies->l('paymentmethods.bancontact.descriptions.live', 'paymentmethodstranslation'),
-                    'sandbox' => $this->dependencies->l('paymentmethods.bancontact.descriptions.sandbox', 'paymentmethodstranslation'),
+                    'live' => $this->dependencies->l('paymentmethods.bancontact.descriptions.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.bancontact.descriptions.sandbox', 'translation'),
                 ],
-                'link' => $this->dependencies->l('paymentmethods.bancontact.link', 'paymentmethodstranslation'),
+                'link' => $this->dependencies->l('paymentmethods.bancontact.link', 'translation'),
                 'user' => [
-                    'title' => $this->dependencies->l('paymentmethods.bancontact.user.title', 'paymentmethodstranslation'),
-                    'description' => $this->dependencies->l('paymentmethods.bancontact.user.description', 'paymentmethodstranslation'),
+                    'title' => $this->dependencies->l('paymentmethods.bancontact.user.title', 'translation'),
+                    'description' => $this->dependencies->l('paymentmethods.bancontact.user.description', 'translation'),
                 ],
+                'call_to_action' => $this->dependencies->l('paymentmethods.bancontact.call_to_action', 'translation'),
+            ],
+            'satispay' => [
+                'title' => $this->dependencies->l('paymentmethods.satispay.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.satispay.descriptions.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.satispay.descriptions.sandbox', 'translation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.satispay.link', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.satispay.call_to_action', 'translation'),
+            ],
+            'sofort' => [
+                'title' => $this->dependencies->l('paymentmethods.sofort.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.sofort.descriptions.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.sofort.descriptions.sandbox', 'translation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.sofort.link', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.sofort.call_to_action', 'translation'),
+            ],
+            'giropay' => [
+                'title' => $this->dependencies->l('paymentmethods.giropay.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.giropay.descriptions.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.giropay.descriptions.sandbox', 'translation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.giropay.link', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.giropay.call_to_action', 'translation'),
+            ],
+            'ideal' => [
+                'title' => $this->dependencies->l('paymentmethods.ideal.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.ideal.descriptions.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.ideal.descriptions.sandbox', 'translation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.ideal.link', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.ideal.call_to_action', 'translation'),
+            ],
+            'mybank' => [
+                'title' => $this->dependencies->l('paymentmethods.mybank.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->dependencies->l('paymentmethods.mybank.descriptions.live', 'translation'),
+                    'sandbox' => $this->dependencies->l('paymentmethods.mybank.descriptions.sandbox', 'translation'),
+                ],
+                'link' => $this->dependencies->l('paymentmethods.mybank.link', 'translation'),
+                'call_to_action' => $this->dependencies->l('paymentmethods.mybank.call_to_action', 'translation'),
             ],
         ];
     }
@@ -267,43 +319,43 @@ class Translation
     public function getPaylaterTranslations()
     {
         return [
-            'title' => $this->dependencies->l('paylater.title', 'paylatertranslation'),
-            'description' => $this->dependencies->l('paylater.description', 'paylatertranslation'),
-            'advanced' => $this->dependencies->l('paylater.advanced', 'paylatertranslation'),
-            'link' => $this->dependencies->l('paylater.link', 'paylatertranslation'),
+            'title' => $this->dependencies->l('paylater.title', 'translation'),
+            'description' => $this->dependencies->l('paylater.description', 'translation'),
+            'advanced' => $this->dependencies->l('paylater.advanced', 'translation'),
+            'link' => $this->dependencies->l('paylater.link', 'translation'),
             'options' => [
-                'title' => $this->dependencies->l('paylater.options.title', 'paylatertranslation'),
-                'description' => $this->dependencies->l('paylater.options.description', 'paylatertranslation'),
+                'title' => $this->dependencies->l('paylater.options.title', 'translation'),
+                'description' => $this->dependencies->l('paylater.options.description', 'translation'),
                 'with_fees' => [
-                    'label' => $this->dependencies->l('paylater.options.with_fees.label', 'paylatertranslation'),
-                    'subtext' => $this->dependencies->l('paylater.options.with_fees.subtext', 'paylatertranslation'),
+                    'label' => $this->dependencies->l('paylater.options.with_fees.label', 'translation'),
+                    'subtext' => $this->dependencies->l('paylater.options.with_fees.subtext', 'translation'),
                 ],
                 'without_fees' => [
-                    'label' => $this->dependencies->l('paylater.options.without_fees.label', 'paylatertranslation'),
-                    'subtext' => $this->dependencies->l('paylater.options.without_fees.subtext', 'paylatertranslation'),
+                    'label' => $this->dependencies->l('paylater.options.without_fees.label', 'translation'),
+                    'subtext' => $this->dependencies->l('paylater.options.without_fees.subtext', 'translation'),
                 ],
             ],
             'oneySchedule' => [
-                'title' => $this->dependencies->l('oneySchedule.title', 'paylatertranslation'),
-                'description' => $this->dependencies->l('oneySchedule.description', 'paylatertranslation'),
+                'title' => $this->dependencies->l('oneySchedule.title', 'translation'),
+                'description' => $this->dependencies->l('oneySchedule.description', 'translation'),
                 'knowMore' => [
-                    'text' => $this->dependencies->l('oneySchedule.knowMore.text', 'paylatertranslation'),
+                    'text' => $this->dependencies->l('oneySchedule.knowMore.text', 'translation'),
                 ],
             ],
             'oneyPopupProduct' => [
-                'title' => $this->dependencies->l('oneyPopupProduct.title', 'paylatertranslation'),
+                'title' => $this->dependencies->l('oneyPopupProduct.title', 'translation'),
             ],
             'oneyPopupCart' => [
-                'title' => $this->dependencies->l('oneyPopupCart.title', 'paylatertranslation'),
+                'title' => $this->dependencies->l('oneyPopupCart.title', 'translation'),
             ],
             'thresholds' => [
-                'title' => $this->dependencies->l('thresholds.title', 'paylatertranslation'),
-                'description' => $this->dependencies->l('thresholds.description', 'paylatertranslation'),
-                'inter' => $this->dependencies->l('thresholds.inter', 'paylatertranslation'),
+                'title' => $this->dependencies->l('thresholds.title', 'translation'),
+                'description' => $this->dependencies->l('thresholds.description', 'translation'),
+                'inter' => $this->dependencies->l('thresholds.inter', 'translation'),
                 'error' => [
-                    'default' => $this->dependencies->l('thresholds.error.text', 'paylatertranslation'),
-                    'max' => $this->dependencies->l('thresholds.error.max.text', 'paylatertranslation'),
-                    'min' => $this->dependencies->l('thresholds.error.min.text', 'paylatertranslation'),
+                    'default' => $this->dependencies->l('thresholds.error.text', 'translation'),
+                    'max' => $this->dependencies->l('thresholds.error.max.text', 'translation'),
+                    'min' => $this->dependencies->l('thresholds.error.min.text', 'translation'),
                 ],
             ],
         ];
@@ -374,31 +426,36 @@ class Translation
     {
         return [
             'confirmation' => [
-                'text' => $this->dependencies->l('modal.confirmation.text', 'modaltranslation'),
-                'submit' => $this->dependencies->l('modal.confirmation.submit', 'modaltranslation'),
+                'text' => $this->dependencies->l('modal.confirmation.text', 'translation'),
+                'submit' => $this->dependencies->l('modal.confirmation.submit', 'translation'),
             ],
             'premium' => [
-                'title' => $this->dependencies->l('modal.premium.title', 'modaltranslation'),
+                'title' => $this->dependencies->l('modal.premium.title', 'translation'),
                 'description' => [
-                    'unavailable' => $this->dependencies->l('modal.premium.description.unavailable', 'modaltranslation'),
-                    'form' => $this->dependencies->l('modal.premium.description.form', 'modaltranslation'),
-                    'contact' => $this->dependencies->l('modal.premium.description.contact', 'modaltranslation'),
-                    'default' => $this->dependencies->l('modal.premium.description.default', 'modaltranslation'),
-                    'oney' => $this->dependencies->l('modal.premium.description.oney', 'modaltranslation'),
+                    'unavailable' => $this->dependencies->l('modal.premium.description.unavailable', 'translation'),
+                    'form' => $this->dependencies->l('modal.premium.description.form', 'translation'),
+                    'contact' => $this->dependencies->l('modal.premium.description.contact', 'translation'),
+                    'default' => $this->dependencies->l('modal.premium.description.default', 'translation'),
+                    'oney' => $this->dependencies->l('modal.premium.description.oney', 'translation'),
                 ],
                 'link' => [
-                    'form' => $this->dependencies->l('modal.premium.link.form', 'modaltranslation'),
-                    'contact' => $this->dependencies->l('modal.premium.link.contact', 'modaltranslation'),
-                    'default' => $this->dependencies->l('modal.premium.link.default', 'modaltranslation'),
-                    'oney' => $this->dependencies->l('modal.premium.link.oney', 'modaltranslation'),
+                    'form' => $this->dependencies->l('modal.premium.link.form', 'translation'),
+                    'contact' => $this->dependencies->l('modal.premium.link.contact', 'translation'),
+                    'default' => $this->dependencies->l('modal.premium.link.default', 'translation'),
+                    'oney' => $this->dependencies->l('modal.premium.link.oney', 'translation'),
                 ],
                 'feature' => [
-                    'american_express' => $this->dependencies->l('modal.premium.feature.american_express', 'modaltranslation'),
-                    'applepay' => $this->dependencies->l('modal.premium.feature.applepay', 'modaltranslation'),
-                    'bancontact' => $this->dependencies->l('modal.premium.feature.bancontact', 'modaltranslation'),
-                    'integrated' => $this->dependencies->l('modal.premium.feature.integrated', 'modaltranslation'),
+                    'american_express' => $this->dependencies->l('modal.premium.feature.american_express', 'translation'),
+                    'applepay' => $this->dependencies->l('modal.premium.feature.applepay', 'translation'),
+                    'bancontact' => $this->dependencies->l('modal.premium.feature.bancontact', 'translation'),
+                    'integrated' => $this->dependencies->l('modal.premium.feature.integrated', 'translation'),
+                    'giropay' => $this->dependencies->l('modal.premium.feature.giropay', 'translation'),
+                    'ideal' => $this->dependencies->l('modal.premium.feature.ideal', 'translation'),
+                    'mybank' => $this->dependencies->l('modal.premium.feature.mybank', 'translation'),
+                    'satispay' => $this->dependencies->l('modal.premium.feature.satispay', 'translation'),
+                    'sofort' => $this->dependencies->l('modal.premium.feature.sofort', 'translation'),
                 ],
-                'submit' => $this->dependencies->l('modal.premium.submit', 'modaltranslation'),
+                'submit' => $this->dependencies->l('modal.premium.submit', 'translation'),
             ],
         ];
     }
@@ -409,8 +466,8 @@ class Translation
     public function getFrontIntegratedPaymentTranslations()
     {
         return [
-            'privacy' => $this->dependencies->l('ip.privacy', 'iptranslation'),
-            'secure' => $this->dependencies->l('ip.secure', 'iptranslation'),
+            'privacy' => $this->dependencies->l('ip.privacy', 'translation'),
+            'secure' => $this->dependencies->l('ip.secure', 'translation'),
         ];
     }
 }

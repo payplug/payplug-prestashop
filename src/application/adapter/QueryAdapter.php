@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -56,11 +56,11 @@ class QueryAdapter implements QueryInterface
         try {
             $action = 'execute';
 
-            if (stripos($SQLRequest, 'SELECT') !== false) {
+            if (false !== stripos($SQLRequest, 'SELECT')) {
                 $action = 'executeS';
             }
 
-            if (stripos($SQLRequest, 'SHOW TABLES LIKE') !== false) {
+            if (false !== stripos($SQLRequest, 'SHOW TABLES LIKE')) {
                 $action = 'ExecuteS';
             }
 

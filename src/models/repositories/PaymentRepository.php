@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -26,6 +26,29 @@ namespace PayPlug\src\models\repositories;
 class PaymentRepository extends QueryRepository
 {
     /**
+     * @description Get payment id from given cart id
+     *
+     * @param int $cart_id
+     *
+     * @return array
+     */
+    public function getByCart($cart_id = '')
+    {
+        if (!is_int($cart_id) || !$cart_id) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->prefix . $this->module_name . '_payment')
+            ->where('id_cart = ' . (int) $cart_id)
+            ->build('unique_row');
+
+        return $result ? $result : [];
+    }
+
+    /**
      * @description Get cart id from given payment id
      *
      * @param string $pay_id
@@ -49,25 +72,24 @@ class PaymentRepository extends QueryRepository
     }
 
     /**
-     * @description Get payment id from given cart id
+     * @description Delete stored payment
      *
      * @param int $cart_id
      *
-     * @return array
+     * @return bool
      */
-    public function getByCart($cart_id = '')
+    public function remove($cart_id = 0)
     {
         if (!is_int($cart_id) || !$cart_id) {
-            return [];
+            return false;
         }
 
         $result = $this
-            ->select()
-            ->fields('*')
+            ->delete()
             ->from($this->prefix . $this->module_name . '_payment')
             ->where('id_cart = ' . (int) $cart_id)
-            ->build('unique_row');
+            ->build();
 
-        return $result ? $result : [];
+        return $result ? $result : false;
     }
 }

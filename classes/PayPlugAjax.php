@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -29,7 +29,7 @@ require_once _PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php';
 
 /**
  * Class PayPlugAjax
- * use for treat ajax on prestashop 1.6
+ * use for treat ajax on prestashop 1.6.
  */
 class PayPlugAjax
 {
@@ -85,12 +85,11 @@ class PayPlugAjax
 
         if (($tools->tool('getValue', '_ajax')) == 1) {
             if ($tools->tool('getIsset', 'pc')) {
-                if ((int) $tools->tool('getValue', 'pay') == 1) {
+                if (1 == (int) $tools->tool('getValue', 'pay')) {
                     $is_installment = $tools->tool('getValue', 'i');
                     $is_installment = (isset($is_installment)) && (($tools->tool('getValue', 'i')) == 1);
-                    $is_deferred = $this->config->get(
-                        $this->dependencies->getConfigurationKey('deferred')
-                    ) == 1;
+                    $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+                    $is_deferred = (bool) $payment_methods['deferred'];
                     $is_oney = $tools->tool('getValue', 'io');
                     $is_bancontact = $tools->tool('getValue', 'bancontact');
                     $is_amex = $tools->tool('getValue', 'amex');
@@ -109,7 +108,7 @@ class PayPlugAjax
                 }
                 $cookie = $this->context->cookie;
                 $id_customer = (int) $cookie->id_customer;
-                if ((int) $id_customer == 0) {
+                if (0 == (int) $id_customer) {
                     exit(false);
                 }
                 $id_payplug_card = $tools->tool('getValue', 'pc');
@@ -122,9 +121,8 @@ class PayPlugAjax
                 exit(false);
             }
             if ($tools->tool('getIsset', 'checkOneyAddresses')) {
-                if (!$this->config->get(
-                    $this->dependencies->getConfigurationKey('oney')
-                )) {
+                $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+                if (!(bool) $payment_methods['oney']) {
                     exit(json_encode(['result' => false, 'error' => false]));
                 }
                 $id_shipping = $tools->tool('getValue', 'id_address_delivery');

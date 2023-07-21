@@ -81,21 +81,21 @@ You also could replace all the line :
 When your development are done, it last the update of your branch.
 To do it, go on your payplug-ui project with your terminal then run theses commands :  
 
-    npx vue-cli-service build --mode prestashop && cp -R [lib_path]/dist/ [module_path]/dev/dist/payplug/dist/
-    npx vue-cli-service build --mode pspaylater && cp -R [lib_path]/dist/ [module_path]/dev/dist/pspaylater/dist/
+    npx vue-cli-service build --mode prestashop && rm -rf [module_path]/dev/dist/payplug/views/ && cp -R [lib_path]/dist/ [module_path]/dev/dist/payplug/views/
+    npx vue-cli-service build --mode pspaylater && rm -rf [module_path]/dev/dist/pspaylater/views/ && cp -R [lib_path]/dist/ [module_path]/dev/dist/pspaylater/views/
 
 - `lib_path`: Must be replace by your lib vue.js project path
 - `module_path`: Must be replace by your module project path 
 
 There an example of usage:
 
-    npx vue-cli-service build --mode prestashop && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/payplug/dist/
-    npx vue-cli-service build --mode pspaylater && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/pspaylater/dist/
+    npx vue-cli-service build --mode prestashop && rm -rf ~/Sites/docker-module/build/modules/dev/dist/payplug/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/payplug/views/
+    npx vue-cli-service build --mode pspaylater && rm -rf ~/Sites/docker-module/build/modules/dev/dist/pspaylater/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/pspaylater/views/
 
 It is possible to use npm as alternative, adapte the following example to your need :
 
-    cp .env.prestashop .env && npm run build && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/payplug/dist/
-    cp .env.pspaylater .env && npm run build && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/pspaylater/dist/
+    cp .env.prestashop .env && npm run build && rm -rf ~/Sites/docker-module/build/modules/dev/dist/payplug/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/payplug/views/ 
+    cp .env.pspaylater .env && npm run build && rm -rf ~/Sites/docker-module/build/modules/dev/dist/pspaylater/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/pspaylater/views/
     
 NB: Use npm nor npx command will generate `.map` files who could be helpfull for the development of feature.
 

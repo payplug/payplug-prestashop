@@ -20,11 +20,7 @@ php cs fixer:
   stage: check php
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
-      || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"
-      || $CI_COMMIT_REF_NAME == "support"
-      || $CI_COMMIT_REF_NAME == "develop"
-      || $CI_COMMIT_REF_NAME == "hotfix"
+      || $CI_COMMIT_REF_NAME
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -39,11 +35,7 @@ check php version:
   stage: check-php-version
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
-      || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"
-      || $CI_COMMIT_REF_NAME == "support"
-      || $CI_COMMIT_REF_NAME == "develop"
-      || $CI_COMMIT_REF_NAME == "hotfix"
+      || $CI_COMMIT_REF_NAME
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - >
@@ -61,11 +53,7 @@ coverage test:
   stage: coverage and tests
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
-      || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"
-      || $CI_COMMIT_REF_NAME == "support"
-      || $CI_COMMIT_REF_NAME == "develop"
-      || $CI_COMMIT_REF_NAME == "hotfix"
+      || $CI_COMMIT_REF_NAME
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
@@ -81,11 +69,7 @@ check module translations:
   stage: translations
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
-      || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"
-      || $CI_COMMIT_REF_NAME == "support"
-      || $CI_COMMIT_REF_NAME == "develop"
-      || $CI_COMMIT_REF_NAME == "hotfix"
+      || $CI_COMMIT_REF_NAME
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -109,11 +93,7 @@ assets:
   stage: assets
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
-      || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"
-      || $CI_COMMIT_REF_NAME == "support"
-      || $CI_COMMIT_REF_NAME == "develop"
-      || $CI_COMMIT_REF_NAME == "hotfix"
+      || $CI_COMMIT_REF_NAME
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -143,11 +123,7 @@ build zip release:
   stage: build
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
-      || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"
-      || $CI_COMMIT_REF_NAME == "support"
-      || $CI_COMMIT_REF_NAME == "develop"
-      || $CI_COMMIT_REF_NAME == "hotfix"
+      || $CI_COMMIT_REF_NAME
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b payplug
@@ -173,11 +149,7 @@ asset-pspaylater:
   stage: asset-pspaylater
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
-      || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"
-      || $CI_COMMIT_REF_NAME == "support"
-      || $CI_COMMIT_REF_NAME == "develop"
-      || $CI_COMMIT_REF_NAME == "hotfix"
+      || $CI_COMMIT_REF_NAME
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater
@@ -207,11 +179,7 @@ build-pspaylater:
   stage: build-pspaylater
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"
-      || $CI_COMMIT_REF_NAME == "qa"
-      || $CI_COMMIT_REF_NAME == "master"
-      || $CI_COMMIT_REF_NAME == "support"
-      || $CI_COMMIT_REF_NAME == "develop"
-      || $CI_COMMIT_REF_NAME == "hotfix"
+      || $CI_COMMIT_REF_NAME
       || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
   before_script:
     - ./dev/ci/dist_files.sh -b pspaylater

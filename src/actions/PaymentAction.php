@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -30,9 +30,14 @@ class PaymentAction
         'amex',
         'applepay',
         'bancontact',
+        'giropay',
+        'ideal',
         'installment',
+        'mybank',
         'one_click',
         'oney',
+        'satispay',
+        'sofort',
         'standard',
     ];
 
@@ -96,6 +101,36 @@ class PaymentAction
             case 'bancontact':
                 $payment_options = [
                     'is_bancontact' => true,
+                ];
+
+                break;
+            case 'giropay':
+                $payment_options = [
+                    'is_giropay' => true,
+                ];
+
+                break;
+            case 'ideal':
+                $payment_options = [
+                    'is_ideal' => true,
+                ];
+
+                break;
+            case 'mybank':
+                $payment_options = [
+                    'is_mybank' => true,
+                ];
+
+                break;
+            case 'satispay':
+                $payment_options = [
+                    'is_satispay' => true,
+                ];
+
+                break;
+            case 'sofort':
+                $payment_options = [
+                    'is_sofort' => true,
                 ];
 
                 break;

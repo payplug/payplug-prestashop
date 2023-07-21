@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\repositories\PaymentRepository;
 
 use PayPlug\src\models\repositories\PaymentRepository;
-use PHPUnit\Framework\TestCase;
+use PayPlug\tests\models\repositories\BaseRepository;
 
 /**
  * @group unit
@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-class getByIdPaymentTest extends TestCase
+class getByIdPaymentTest extends BaseRepository
 {
     protected function setUp()
     {
@@ -22,14 +22,6 @@ class getByIdPaymentTest extends TestCase
             ->andReturnUsing(function ($value) {
                 return $value;
             });
-    }
-
-    public function invalidStringFormatDataProvider()
-    {
-        yield [42];
-        yield [['key' => 'value']];
-        yield [false];
-        yield [''];
     }
 
     /**

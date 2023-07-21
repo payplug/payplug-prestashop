@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -52,6 +52,9 @@ class ApiClass
     /** var Configuration */
     public $config;
 
+    /** var ConfigurationClass */
+    public $configuration;
+
     /** var DependenciesClass */
     public $dependencies;
     /** @var object */
@@ -74,6 +77,7 @@ class ApiClass
     {
         $this->dependencies = $dependencies;
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
         $this->checkEnvironment();
@@ -87,7 +91,7 @@ class ApiClass
     public function checkEnvironment()
     {
         if (isset($_SERVER['SERVER_NAME'])
-            && $_SERVER['SERVER_NAME'] == 'localhost'
+            && 'localhost' == $_SERVER['SERVER_NAME']
             || preg_match(
                 '/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io|ngrok-free.app)/i',
                 $_SERVER['SERVER_NAME']
@@ -115,7 +119,7 @@ class ApiClass
      */
     public function getAccountPermissions($api_key = null)
     {
-        if ($api_key == null) {
+        if (null == $api_key) {
             $api_key = $this->setAPIKey();
         }
 
@@ -126,23 +130,28 @@ class ApiClass
      * @description Get account permission from Payplug API
      *
      * @param $api_key
-     * @param bool $sandbox
+     * @param bool  $sandbox
+     * @param mixed $treat_account
      *
      * @throws ConfigurationException
      *
      * @return array|false
      */
-    public function getAccount($api_key, $sandbox = true)
+    public function getAccount($api_key, $sandbox = true, $treat_account = true)
     {
         $this->setSecretKey($api_key);
 
         try {
             $response = Authentication::getAccount();
-        } catch (ConfigurationException $e) {
+        } catch (Exception $e) {
             return false;
         }
 
         $json_answer = $response['httpResponse'];
+
+        if (!$treat_account) {
+            return $json_answer;
+        }
 
         if ($permissions = $this->treatAccountResponse($json_answer, $sandbox)) {
             return $permissions;
@@ -156,9 +165,9 @@ class ApiClass
      */
     public function getCurrentApiKey()
     {
-        if ((int) $this->config->get(
+        if (1 === (int) $this->config->get(
             $this->dependencies->getConfigurationKey('sandboxMode')
-        ) === 1) {
+        )) {
             return $this->config->get(
                 $this->dependencies->getConfigurationKey('testApiKey')
             );
@@ -218,7 +227,7 @@ class ApiClass
      */
     public function setSecretKey($token = false)
     {
-        if (!$token && $this->getCurrentApiKey() != null) {
+        if (!$token && null != $this->getCurrentApiKey()) {
             $token = $this->getCurrentApiKey();
         }
 
@@ -247,7 +256,7 @@ class ApiClass
      */
     public function initializeApi($sandbox = null)
     {
-        if ($sandbox === null && $this->current_api_key) {
+        if (null === $sandbox && $this->current_api_key) {
             $payplug_key = $this->current_api_key;
         } else {
             $configuration_key = ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY';
@@ -269,7 +278,7 @@ class ApiClass
         $parses = explode(';', $str);
         $response = null;
         foreach ($parses as $parse) {
-            if (strpos($parse, 'HTTP Response') !== false) {
+            if (false !== strpos($parse, 'HTTP Response')) {
                 $parse = str_replace('HTTP Response:', '', $parse);
                 $parse = trim($parse);
                 $response = json_decode($parse, true);
@@ -982,129 +991,60 @@ class ApiClass
      */
     private function treatAccountResponse($json_answer, $is_sandbox = true)
     {
-        if ((isset($json_answer['object']) && $json_answer['object'] == 'error')
+        if ((isset($json_answer['object']) && 'error' == $json_answer['object'])
             || empty($json_answer)
         ) {
             return false;
         }
 
-        $id = $json_answer['id'];
-
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
         $configuration = [
-            'currencies' => $this->config->get(
-                $this->dependencies->getConfigurationKey('currencies')
-            ),
-            'min_amounts' => $this->config->get(
-                $this->dependencies->getConfigurationKey('minAmounts')
-            ),
-            'max_amounts' => $this->config->get(
-                $this->dependencies->getConfigurationKey('maxAmounts')
-            ),
-            'oney_allowed_countries' => $this->config->get(
-                $this->dependencies->getConfigurationKey('oneyAllowedCountries')
-            ),
-            'oney_max_amounts' => $this->config->get(
-                $this->dependencies->getConfigurationKey('oneyMaxAmounts')
-            ),
-            'oney_min_amounts' => $this->config->get(
-                $this->dependencies->getConfigurationKey('oneyMinAmounts')
-            ),
+            'amounts' => json_decode($this->configuration->getValue('amounts'), true),
+            'company_id' => isset($json_answer['id']) ? $json_answer['id'] : $this->configuration->getValue('company_id'),
+            'company_iso' => isset($json_answer['country']) ? $json_answer['country'] : $this->configuration->getValue('company_iso'),
+            'countries' => json_decode($this->configuration->getValue('countries'), true),
+            'currencies' => $this->configuration->getValue('currencies'),
+            'oney' => isset($json_answer['permissions']['can_use_oney']) ? (int) $json_answer['permissions']['can_use_oney'] : (bool) $payment_methods['oney'],
+            'oney_allowed_countries' => $this->configuration->getValue('oney_allowed_countries'),
         ];
 
         if (isset($json_answer['configuration'])) {
-            if (isset($json_answer['configuration']['currencies'])
-                && !empty($json_answer['configuration']['currencies'])) {
-                $configuration['currencies'] = [];
-                foreach ($json_answer['configuration']['currencies'] as $value) {
-                    $configuration['currencies'][] = $value;
-                }
-            }
-
-            if (isset($json_answer['configuration']['min_amounts'])
-                && !empty($json_answer['configuration']['min_amounts'])) {
-                $configuration['min_amounts'] = '';
+            // Check payplug default amounts
+            if (isset($json_answer['configuration']['min_amounts']) && !empty($json_answer['configuration']['min_amounts'])) {
+                $configuration['amounts']['default']['min'] = '';
                 foreach ($json_answer['configuration']['min_amounts'] as $key => $value) {
-                    $configuration['min_amounts'] .= $key . ':' . $value . ';';
+                    $configuration['amounts']['default']['min'] .= $key . ':' . $value . ';';
                 }
-                $configuration['min_amounts'] = $this->tools->substr($configuration['min_amounts'], 0, -1);
+                $configuration['amounts']['default']['min'] = $this->tools->substr($configuration['amounts']['default']['min'], 0, -1);
             }
 
             if (isset($json_answer['configuration']['max_amounts'])
                 && !empty($json_answer['configuration']['max_amounts'])) {
-                $configuration['max_amounts'] = '';
+                $configuration['amounts']['default']['max'] = '';
                 foreach ($json_answer['configuration']['max_amounts'] as $key => $value) {
-                    $configuration['max_amounts'] .= $key . ':' . $value . ';';
+                    $configuration['amounts']['default']['max'] .= $key . ':' . $value . ';';
                 }
-                $configuration['max_amounts'] = $this->tools->substr($configuration['max_amounts'], 0, -1);
+                $configuration['amounts']['default']['max'] = $this->tools->substr($configuration['amounts']['default']['max'], 0, -1);
             }
 
-            if (isset($json_answer['configuration']['oney'])) {
-                if (isset($json_answer['configuration']['oney']['allowed_countries'])
-                    && !empty($json_answer['configuration']['oney']['allowed_countries'])
-                    && sizeof($json_answer['configuration']['oney']['allowed_countries'])
-                ) {
+            // Check Currency
+            if (isset($json_answer['configuration']['currencies'])
+                && !empty($json_answer['configuration']['currencies'])) {
+                $configuration['currencies'] = [];
+                foreach ($json_answer['configuration']['currencies'] as $key => $value) {
+                    $configuration['currencies'][] = $value;
+                }
+            }
+
+            // Check oney allowed countries
+            if (isset($json_answer['configuration']['oney'], $json_answer['configuration']['oney']['allowed_countries'])) {
+                $allowed_countries = $json_answer['configuration']['oney']['allowed_countries'];
+                if (!empty($allowed_countries)) {
                     $allowed = '';
                     foreach ($json_answer['configuration']['oney']['allowed_countries'] as $country) {
                         $allowed .= $country . ',';
                     }
                     $configuration['oney_allowed_countries'] = $this->tools->substr($allowed, 0, -1);
-                }
-
-                if (isset($json_answer['configuration']['oney']['min_amounts'])
-                    && !empty($json_answer['configuration']['oney']['min_amounts'])
-                ) {
-                    $configuration['oney_min_amounts'] = '';
-                    foreach ($json_answer['configuration']['oney']['min_amounts'] as $key => $value) {
-                        $configuration['oney_min_amounts'] .= $key . ':' . $value . ';';
-                    }
-                    $configuration['oney_min_amounts'] = $this->tools->substr($configuration['oney_min_amounts'], 0, -1);
-                }
-
-                if (isset($json_answer['configuration']['oney']['max_amounts'])
-                    && !empty($json_answer['configuration']['oney']['max_amounts'])
-                ) {
-                    $configuration['oney_max_amounts'] = '';
-                    foreach ($json_answer['configuration']['oney']['max_amounts'] as $key => $value) {
-                        $configuration['oney_max_amounts'] .= $key . ':' . $value . ';';
-                    }
-                    $configuration['oney_max_amounts'] = $this->tools->substr($configuration['oney_max_amounts'], 0, -1);
-                }
-            }
-        }
-
-        if (isset($json_answer['payment_methods']['bancontact']['enabled'])) {
-            $can_use_bancontact = $json_answer['payment_methods']['bancontact']['enabled'];
-        } else {
-            $can_use_bancontact = true;
-        }
-
-        if (isset($json_answer['payment_methods']['apple_pay']['enabled'])) {
-            $can_use_applepay = $json_answer['payment_methods']['apple_pay']['enabled'];
-        } else {
-            $can_use_applepay = true;
-        }
-
-        if (isset($json_answer['payment_methods']['american_express']['enabled'])) {
-            $can_use_amex = $json_answer['payment_methods']['american_express']['enabled'];
-        } else {
-            $can_use_amex = true;
-        }
-
-        $onboarding_oney_completed = false;
-        if (isset($json_answer['payment_methods']) && !empty(
-            $this->config->get(
-                $this->dependencies->getConfigurationKey('liveApiKey')
-            )
-            )) {
-            $oney_methods = [];
-            foreach ($json_answer['payment_methods'] as $key => $val) {
-                if ($this->tools->substr($key, 0, 5) == 'oney_') {
-                    $oney_methods[] = $val['enabled'];
-                }
-            }
-            foreach ($oney_methods as $value) {
-                if ($value == 'true') {
-                    $onboarding_oney_completed = true;
                 }
             }
         }
@@ -1113,63 +1053,73 @@ class ApiClass
             'is_live' => $json_answer['is_live'],
             'use_live_mode' => $json_answer['permissions']['use_live_mode'],
             'can_save_cards' => $json_answer['permissions']['can_save_cards'],
+            'apple_pay_allowed_domains' => [],
+            'onboarding_oney_completed' => false,
+            'can_use_oney' => $json_answer['permissions']['can_use_oney'],
             'can_create_installment_plan' => $json_answer['permissions']['can_create_installment_plan'],
             'can_create_deferred_payment' => $json_answer['permissions']['can_create_deferred_payment'],
             'can_use_integrated_payments' => $json_answer['permissions']['can_use_integrated_payments'],
-            'can_use_oney' => $json_answer['permissions']['can_use_oney'],
-            'can_use_bancontact' => $can_use_bancontact,
-            'can_use_applepay' => $can_use_applepay,
-            'can_use_amex' => $can_use_amex,
-            'onboarding_oney_completed' => $onboarding_oney_completed,
-            'apple_pay_allowed_domains' => [],
         ];
 
+        if (isset($json_answer['payment_methods'])) {
+            $payment_methods = $json_answer['payment_methods'];
+            foreach ($payment_methods as $payment_method_name => $payment_method) {
+                // Check the permissions..
+                if (isset($payment_method['enabled'])) {
+                    $permissions['can_use_' . $payment_method_name] = $payment_method['enabled'];
+                } else {
+                    $permissions['can_use_' . $payment_method_name] = true;
+                }
+
+                // then check the apple domain to use..
+                if ('apple_pay' == $payment_method_name && isset($payment_method['allowed_domain_names'])) {
+                    $permissions['apple_pay_allowed_domains'] = $payment_method['allowed_domain_names'];
+                }
+
+                // then check the amount related to the feature..
+                if (array_key_exists('min_amounts', $payment_method)) {
+                    $configuration['amounts'][$payment_method_name]['min'] = 'EUR:' . $payment_method['min_amounts']['EUR'];
+                }
+                if (array_key_exists('max_amounts', $payment_method)) {
+                    $configuration['amounts'][$payment_method_name]['max'] = 'EUR:' . $payment_method['max_amounts']['EUR'];
+                }
+
+                // then check the country restriction related to the feature
+                if (array_key_exists('allowed_countries', $payment_method)) {
+                    $allowed_countries = $payment_method['allowed_countries'];
+                    if (!empty($allowed_countries) && !in_array('ALL', $allowed_countries)) {
+                        $configuration['countries'][$payment_method_name] = $payment_method['allowed_countries'];
+                    }
+                }
+            }
+
+            // Check oney onboarding
+            if ($this->configuration->getValue('live_api_key')) {
+                foreach ($permissions as $permission => $enabled) {
+                    if (false !== strpos($permission, 'can_use_oney_')) {
+                        if (!$permissions['onboarding_oney_completed']) {
+                            $permissions['onboarding_oney_completed'] = $enabled;
+                        }
+                    }
+                }
+            }
+        }
+
         // Do not allow Spain or Belgium on Payplug
-        if (($configuration['oney_allowed_countries'] === 'ES'
-                || $configuration['oney_allowed_countries'] === 'BE')
-            && $this->dependencies->name === 'payplug') {
+        if (in_array($configuration['oney_allowed_countries'], ['ES', 'BE'])
+            && 'payplug' == $this->dependencies->name) {
             $permissions['can_use_oney'] = false;
         }
 
-        if (isset($json_answer['payment_methods']['apple_pay']['allowed_domain_names'])) {
-            $permissions['apple_pay_allowed_domains'] = $json_answer['payment_methods']['apple_pay']['allowed_domain_names'];
+        // Update globale configuration from account response
+
+        // Format amount, country and currency before update
+        $configuration['amounts'] = json_encode($configuration['amounts']);
+        $configuration['countries'] = json_encode($configuration['countries']);
+        $configuration['currencies'] = implode(';', $configuration['currencies']);
+        foreach ($configuration as $key => $value) {
+            $this->configuration->set($key, $value);
         }
-
-        // Get company country
-        $company_iso = isset($json_answer['country']) && $json_answer['country'] ? $json_answer['country'] : false;
-
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('companyId') . ($is_sandbox ? '_TEST' : ''),
-            $id
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('companyIso'),
-            $company_iso
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('currencies'),
-            implode(';', $configuration['currencies'])
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('minAmounts'),
-            $configuration['min_amounts']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('maxAmounts'),
-            $configuration['max_amounts']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('oneyAllowedCountries'),
-            $configuration['oney_allowed_countries']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('oneyMaxAmounts'),
-            $configuration['oney_max_amounts']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('oneyMinAmounts'),
-            $configuration['oney_min_amounts']
-        );
 
         return $permissions;
     }
@@ -1185,7 +1135,7 @@ class ApiClass
      */
     private function setApiKeysbyJsonResponse($json_answer)
     {
-        if (isset($json_answer['object']) && $json_answer['object'] == 'error') {
+        if (isset($json_answer['object']) && 'error' == $json_answer['object']) {
             return false;
         }
 
@@ -1251,7 +1201,7 @@ class ApiClass
      */
     private function setUserAgent()
     {
-        if ($this->current_api_key != null) {
+        if (null != $this->current_api_key) {
             HttpClient::setDefaultUserAgentProduct(
                 $this->dependencies->name . '-Prestashop',
                 $this->dependencies->version,

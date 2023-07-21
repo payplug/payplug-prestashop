@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -51,7 +51,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $this->display_column_left = false;
         parent::initContent();
 
-        if (Tools::getValue('process') == 'cardlist') {
+        if ('cardlist' == Tools::getValue('process')) {
             $this->renderCardList();
         }
     }

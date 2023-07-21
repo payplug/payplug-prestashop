@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -106,7 +106,7 @@ class Routes
             $iso_code = 'fr';
         }
 
-        if ($iso_code == 'en') {
+        if ('en' == $iso_code) {
             $iso_code = 'en-gb';
         }
 
@@ -117,13 +117,17 @@ class Routes
             'bancontact' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4408157435794',
             'contact' => 'https://www.payplug.com/contact',
             'deferred' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360010088420',
+            'embedded' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
             'forgot_password' => 'https://portal.payplug.com/forgot_password',
+            'giropay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089089179420',
             'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
             'help' => 'https://support.payplug.com/hc/' . $iso_code . '/requests/new',
+            'ideal' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089119071132',
             'install' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021389891',
             'installments' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022447972',
             'integrated' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021390191',
             'mail' => 'mailto:support@payplug.com',
+            'mybank' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089123857564',
             'one_click' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022213892',
             'oney' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360013071080',
             'oney_cgv' => 'https://portal.payplug.com/#/configuration/oney',
@@ -132,8 +136,9 @@ class Routes
             'portal' => 'https://portal.payplug.com/',
             'refund' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360022214692',
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
+            'satispay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089121532700',
             'signup' => 'https://portal.payplug.com/signup',
-            'embedded' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
+            'sofort' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089091941660',
         ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -76,6 +76,11 @@ class ApiRest
             case 'integrated_permissions':
             case 'one_click_permissions':
             case 'oney_permissions':
+            case 'satispay_permissions':
+            case 'mybank_permissions':
+            case 'sofort_permissions':
+            case 'giropay_permissions':
+            case 'ideal_permissions':
                 $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
                 $payment_method = str_replace('_permissions', '', $action);
                 $json = $configurationAction->checkPermissionAction($payment_method, (bool) $datas->env);
@@ -147,83 +152,41 @@ class ApiRest
             (bool) $configuration->getValue('enable')
         )['result'];
 
+        $payment_methods = json_decode($configuration->getValue('payment_methods'), true);
+        $amounts = json_decode($configuration->getValue('amounts'), true);
+
         return [
             'logged' => $logged,
             'email' => $configuration->getValue('email'),
             'enable' => $enable,
             'sandbox_mode' => (bool) $configuration->getValue('sandbox_mode'),
             'embedded_mode' => $configuration->getValue('embedded_mode'),
-            'standard' => (bool) $configuration->getValue('standard'),
-            'one_click' => (bool) $configuration->getValue('one_click'),
-            'inst' => (bool) $configuration->getValue('inst'),
+            'standard' => (bool) $payment_methods['standard'],
+            'one_click' => (bool) $payment_methods['one_click'],
+            'installment' => (bool) $payment_methods['installment'],
             'inst_mode' => $configuration->getValue('inst_mode'),
             'inst_min_amount' => $configuration->getValue('inst_min_amount'),
-            'deferred' => (bool) $configuration->getValue('deferred'),
+            'deferred' => (bool) $payment_methods['deferred'],
             'deferred_state' => $configuration->getValue('deferred_state'),
-            'oney' => (bool) $configuration->getValue('oney'),
+            'oney' => (bool) $payment_methods['oney'],
             'oney_fees' => (bool) $configuration->getValue('oney_fees'),
             'oney_schedule' => (bool) $configuration->getValue('oney_optimized'),
             'oney_product_animation' => (bool) $configuration->getValue('oney_product_cta'),
             'oney_cart_animation' => (bool) $configuration->getValue('oney_cart_cta'),
-            'oney_min_amounts' => $configuration->getValue('oney_min_amounts'),
-            'oney_max_amounts' => $configuration->getValue('oney_max_amounts'),
+            'oney_min_amounts' => isset($amounts['oney_x3_with_fees']['min']) ? $amounts['oney_x3_with_fees']['min'] : '',
+            'oney_max_amounts' => isset($amounts['oney_x3_with_fees']['max']) ? $amounts['oney_x3_with_fees']['max'] : '',
             'oney_custom_min_amounts' => $configuration->getValue('oney_custom_min_amounts'),
             'oney_custom_max_amounts' => $configuration->getValue('oney_custom_max_amounts'),
-            'bancontact' => (bool) $configuration->getValue('bancontact'),
+            'bancontact' => (bool) $payment_methods['bancontact'],
             'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
-            'applepay' => (bool) $configuration->getValue('applepay'),
-            'amex' => (bool) $configuration->getValue('amex'),
+            'applepay' => (bool) $payment_methods['applepay'],
+            'amex' => (bool) $payment_methods['amex'],
+            'satispay' => (bool) $payment_methods['satispay'],
+            'sofort' => (bool) $payment_methods['sofort'],
+            'giropay' => (bool) $payment_methods['giropay'],
+            'ideal' => (bool) $payment_methods['ideal'],
+            'mybank' => (bool) $payment_methods['mybank'],
         ];
-    }
-
-    /**
-     * @description Get available order state to use for the deferred payment
-     *
-     * @param int $deferred_state
-     *
-     * @return array
-     */
-    public function getDeferredState($deferred_state = 0)
-    {
-        if (!is_int($deferred_state)) {
-            return [];
-        }
-
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getPaymentMethodsTranslations();
-
-        $order_states = $this->dependencies
-            ->orderClass
-            ->getOrderStates();
-
-        $order_states_values = [
-            0 => [
-                'value' => 0,
-                'label' => $translation['deferred']['states']['default'],
-                'checked' => (int) $deferred_state ? false : true,
-            ],
-        ];
-        if ($order_states) {
-            foreach ($order_states as $order_state) {
-                $order_states_values[$order_state['id_order_state']] = [
-                    'value' => $order_state['id_order_state'],
-                    'label' => sprintf(
-                        $translation['deferred']['states']['state'],
-                        $order_state['name']
-                    ),
-                    'checked' => $order_state['id_order_state'] == $deferred_state ? true : false,
-                    'warning_msg' => sprintf(
-                        $translation['deferred']['states']['alert'],
-                        $order_state['name']
-                    ),
-                ];
-            }
-        }
-        ksort($order_states_values);
-
-        return (array) $order_states_values;
     }
 
     /**
@@ -513,129 +476,6 @@ class ApiRest
     }
 
     /**
-     * @description build oney schedule section for api usage
-     *
-     * @param false $active
-     *
-     * @return array
-     */
-    public function getOneySchedule($active = false)
-    {
-        if (!is_bool($active)) {
-            $logger = $this->dependencies->getPlugin()->getLogger();
-            $logger->addLog('ApiRest::getOneySchedule: Invalid parameter given, $active must be a boolean.');
-
-            return [];
-        }
-
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getPaylaterTranslations();
-
-        $img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
-
-        $iso_code = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get()->language->iso_code;
-
-        $external_url = $this->dependencies
-            ->getPlugin()
-            ->getRoutes()
-            ->getExternalUrl($iso_code);
-
-        return [
-            'name' => 'oney_schedule',
-            'image_url' => $img_path . $this->dependencies->name . '-optimized.jpg',
-            'title' => $translation['oneySchedule']['title'],
-            'descriptions' => [[
-                'description' => $translation['oneySchedule']['description'],
-                'link_know_more' => [
-                    'text' => $translation['link'],
-                    'url' => $external_url['oney'] . '#h_2595dd3d-a281-43ab-a51a-4986fecde5ee',
-                    'target' => '_blank',
-                ],
-            ]],
-            'switch' => true,
-            'checked' => $active,
-        ];
-    }
-
-    /**
-     * @description build oney cart popup section for api usage
-     *
-     * @param false $active
-     *
-     * @return array
-     */
-    public function getOneyPopupCart($active = false)
-    {
-        if (!is_bool($active)) {
-            $logger = $this->dependencies->getPlugin()->getLogger();
-            $logger->addLog('ApiRest::getOneyPopupCart: Invalid parameter given, $active must be a boolean.');
-
-            return [];
-        }
-
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getPaylaterTranslations();
-
-        $img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
-
-        return [
-            'name' => 'oney_cart_animation',
-            'image_url' => $img_path . $this->dependencies->name . '-cartOneyCta.jpg',
-            'title' => $translation['oneyPopupCart']['title'],
-            'switch' => true,
-            'checked' => $active,
-        ];
-    }
-
-    /**
-     * @description build oney product popup section for api usage
-     *
-     * @param false $active
-     *
-     * @return array
-     */
-    public function getOneyPopupProduct($active = false)
-    {
-        if (!is_bool($active)) {
-            $logger = $this->dependencies->getPlugin()->getLogger();
-            $logger->addLog('ApiRest::getOneyPopupProduct: Invalid parameter given, $active must be a boolean.');
-
-            return [];
-        }
-
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getPaylaterTranslations();
-
-        $img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
-
-        return [
-            'name' => 'oney_product_animation',
-            'image_url' => $img_path . $this->dependencies->name . '-productOneyCta.jpg',
-            'title' => $translation['oneyPopupProduct']['title'],
-            'switch' => true,
-            'checked' => $active,
-        ];
-    }
-
-    /**
      * @description build paylater section for api usage
      *
      * @param array $options
@@ -652,128 +492,14 @@ class ApiRest
             return [];
         }
 
-        $configuration = $this->dependencies
+        // todo : replace in appropriate OneyPaymentmethod
+        // 'amounts' => $configuration->getDefault('amounts'),
+
+        return $this->dependencies
             ->getPlugin()
-            ->getConfigurationClass();
-        $default_configuration = [
-            'oney' => $configuration->getDefault('oney'),
-            'oney_min_amounts' => $configuration->getDefault('oney_min_amounts'),
-            'oney_max_amounts' => $configuration->getDefault('oney_max_amounts'),
-            'oney_custom_min_amounts' => $configuration->getDefault('oney_custom_min_amounts'),
-            'oney_custom_max_amounts' => $configuration->getDefault('oney_custom_max_amounts'),
-            'oney_product_animation' => $configuration->getDefault('oney_product_animation'),
-            'oney_cart_animation' => $configuration->getDefault('oney_cart_animation'),
-            'oney_schedule' => $configuration->getDefault('oney_schedule'),
-            'oney_fees' => $configuration->getDefault('oney_fees'),
-        ];
-        foreach ($default_configuration as $k => $v) {
-            if (!isset($current_configuration[$k])) {
-                $current_configuration[$k] = $v;
-            }
-        }
-
-        $advanced_options = [];
-        $thresholds = $this->getThresholdsOptions($current_configuration);
-        if ($thresholds) {
-            $advanced_options[] = $thresholds;
-        }
-        $schedules = $this->getOneySchedule((bool) $current_configuration['oney_schedule']);
-        if ($schedules) {
-            $advanced_options[] = $schedules;
-        }
-
-        $config = $this->dependencies
-            ->getPlugin()
-            ->getConfiguration();
-
-        $can_use_cta = !in_array(
-            $config->get($this->dependencies->getConfigurationKey('oneyAllowedCountries')),
-            ['ES', 'BE']
-        );
-        if ($can_use_cta) {
-            $product = $this->getOneyPopupProduct((bool) $current_configuration['oney_product_animation']);
-            if ($product) {
-                $advanced_options[] = $product;
-            }
-            $cart = $this->getOneyPopupCart((bool) $current_configuration['oney_cart_animation']);
-            if ($cart) {
-                $advanced_options[] = $cart;
-            }
-        }
-
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getPaylaterTranslations();
-
-        $iso_code = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get()->language->iso_code;
-
-        $external_url = $this->dependencies
-            ->getPlugin()
-            ->getRoutes()
-            ->getExternalUrl($iso_code);
-
-        return [
-            'name' => 'paymentMethodsBlock',
-            'title' => $translation['title'],
-            'descriptions' => [
-                'live' => [
-                    'description' => $translation['description'],
-                ],
-                'sandbox' => [
-                    'description' => $translation['description'],
-                ],
-            ],
-            'options' => [
-                'name' => 'oney',
-                'title' => $translation['options']['title'],
-                'image' => 'assets/images/lg-oney.png',
-                'checked' => $current_configuration['oney'],
-                'descriptions' => [
-                    'live' => [
-                        'description' => $translation['options']['description'],
-                        'link_know_more' => [
-                            'text' => $translation['link'],
-                            'url' => $external_url['oney'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'sandbox' => [
-                        'description' => $translation['options']['description'],
-                        'link_know_more' => [
-                            'text' => $translation['link'],
-                            'url' => $external_url['oney'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'advanced' => [
-                        'description' => $translation['advanced'],
-                    ],
-                ],
-                'options' => [
-                    [
-                        'name' => 'payplug_oney',
-                        'className' => '_paylaterLabel',
-                        'label' => $translation['options']['with_fees']['label'],
-                        'subText' => $translation['options']['with_fees']['subtext'],
-                        'value' => 1,
-                        'checked' => $configuration->getValue('oney_fees'),
-                    ],
-                    [
-                        'name' => 'payplug_oney',
-                        'className' => '_paylaterLabel',
-                        'label' => $translation['options']['without_fees']['label'],
-                        'subText' => $translation['options']['without_fees']['subtext'],
-                        'value' => 0,
-                        'checked' => !$configuration->getValue('oney_fees'),
-                    ],
-                ],
-                'advanced_options' => $advanced_options,
-            ],
-        ];
+            ->getPaymentMethod()
+            ->getPaymentMethod('oney')
+            ->getOption($current_configuration);
     }
 
     /**
@@ -793,47 +519,21 @@ class ApiRest
             return [];
         }
 
-        $link = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get()->link;
-
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslation()
             ->getPaymentMethodsTranslations();
 
-        $img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/svg/payment/';
-
-        $iso_code = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get()->language->iso_code;
-
-        $external_url = $this->dependencies
-            ->getPlugin()
-            ->getRoutes()
-            ->getExternalUrl($iso_code);
-
         $configuration = $this->dependencies
             ->getPlugin()
             ->getConfigurationClass();
+
         $default_configuration = [
-            'standard' => $configuration->getDefault('standard'),
+            'bancontact_country' => $configuration->getDefault('bancontact_country'),
             'embedded_mode' => $configuration->getDefault('embedded_mode'),
-            'one_click' => $configuration->getDefault('one_click'),
-            'inst' => $configuration->getDefault('inst'),
             'inst_mode' => $configuration->getDefault('inst_mode'),
             'inst_min_amount' => $configuration->getDefault('inst_min_amount'),
-            'deferred' => $configuration->getDefault('deferred'),
             'deferred_state' => $configuration->getDefault('deferred_state'),
-            'amex' => $configuration->getDefault('amex'),
-            'bancontact' => $configuration->getDefault('bancontact'),
-            'bancontact_country' => $configuration->getDefault('bancontact_country'),
-            'applepay' => $configuration->getDefault('applepay'),
         ];
         foreach ($default_configuration as $k => $v) {
             if (!isset($current_configuration[$k])) {
@@ -841,380 +541,18 @@ class ApiRest
             }
         }
 
-        $payment_options = [];
-        $version = $this->dependencies
+        $default_payment_method = json_decode($configuration->getDefault('payment_methods'), true);
+        foreach ($default_payment_method as $k => $v) {
+            if (!isset($current_configuration[$k])) {
+                $current_configuration[$k] = $v;
+            }
+        }
+
+        $payment_options = $this->dependencies
             ->getPlugin()
-            ->getConstant()
-            ->get('_PS_VERSION_');
-
-        if ($this->dependencies->configClass->isValidFeature('feature_standard')) {
-            $advanced_settings = [];
-
-            $embedded_mode = [];
-            if (version_compare($version, '1.7', '>=')
-                && $this->dependencies->configClass->isValidFeature('feature_integrated')) {
-                $embedded_mode[] = [
-                    'name' => 'payplug_embedded',
-                    'label' => $translation['embedded']['options']['integrated'],
-                    'value' => 'integrated',
-                    'checked' => 'integrated' == $current_configuration['embedded_mode'],
-                ];
-            }
-            $embedded_mode[] = [
-                'name' => 'payplug_embedded',
-                'label' => $translation['embedded']['options']['popup'],
-                'value' => 'popup',
-                'checked' => 'popup' == $current_configuration['embedded_mode'],
-            ];
-            $embedded_mode[] = [
-                'name' => 'payplug_embedded',
-                'label' => $translation['embedded']['options']['redirect'],
-                'value' => 'redirect',
-                'checked' => 'redirect' == $current_configuration['embedded_mode'],
-            ];
-
-            if ($this->dependencies->configClass->isValidFeature('feature_installment')) {
-                $advanced_settings[] = [
-                    'name' => 'fractional',
-                    'title' => $translation['installment']['title'],
-                    'class' => '-installment',
-                    'enabled' => [
-                        'name' => 'payplug_inst',
-                        'checked' => $current_configuration['inst'],
-                    ],
-                    'descriptions' => [
-                        'live' => [
-                            'description_1' => $translation['installment']['descriptions']['description_1'],
-                            'text_from' => $translation['installment']['descriptions']['text_from'],
-                            'description_2' => $translation['installment']['descriptions']['description_2'],
-                            'links' => [
-                                [
-                                    'text' => $translation['installment']['descriptions']['controller_link'],
-                                    'url' => $link->getAdminLink('AdminPayPlugInstallment'),
-                                    'target' => '_blank',
-                                    'data_e2e' => 'data-panelInstallmentLink',
-                                ],
-                                [
-                                    'text' => $translation['installment']['link'],
-                                    'url' => $external_url['installments'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'notes' => [
-                                'type' => '-warning',
-                                'description' => $translation['installment']['descriptions']['alert']['start']
-                                    . '<br />' . $translation['installment']['descriptions']['alert']['end'],
-                            ],
-                        ],
-                        'sandbox' => [
-                            'description_1' => $translation['installment']['descriptions']['description_1'],
-                            'text_from' => $translation['installment']['descriptions']['text_from'],
-                            'description_2' => $translation['installment']['descriptions']['description_2'],
-                            'links' => [
-                                [
-                                    'text' => $translation['installment']['descriptions']['controller_link'],
-                                    'url' => $link->getAdminLink('AdminPayPlugInstallment'),
-                                    'target' => '_blank',
-                                ],
-                                [
-                                    'text' => $translation['installment']['link'],
-                                    'url' => $external_url['installments'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'notes' => [
-                                'type' => '-warning',
-                                'description' => $translation['installment']['descriptions']['alert']['start']
-                                    . '<br />' . $translation['installment']['descriptions']['alert']['end'],
-                            ],
-                        ],
-                    ],
-                    'options' => [
-                        [
-                            'name' => 'payplug_inst_mode',
-                            'type' => 'select',
-                            'disabled' => !$current_configuration['inst'],
-                            'options' => [
-                                [
-                                    'value' => 2,
-                                    'label' => $translation['installment']['select']['2_schedules'],
-                                    'checked' => 2 == (int) $current_configuration['inst_mode'],
-                                ],
-                                [
-                                    'value' => 3,
-                                    'label' => $translation['installment']['select']['3_schedules'],
-                                    'checked' => 3 == (int) $current_configuration['inst_mode'],
-                                ],
-                                [
-                                    'value' => 4,
-                                    'label' => $translation['installment']['select']['4_schedules'],
-                                    'checked' => 4 == (int) $current_configuration['inst_mode'],
-                                ],
-                            ],
-                        ],
-                        [
-                            'type' => 'input',
-                            'name' => 'payplug_inst_min_amount',
-                            'disabled' => !$current_configuration['inst'],
-                            'value' => (int) $current_configuration['inst_min_amount'],
-                            'min' => 4,
-                            'step' => 1,
-                            'max' => 20000,
-                            'out_of_bound_msg' => $translation['installment']['error_limit'],
-                        ],
-                    ],
-                    'notes' => [
-                        'type' => '-warning',
-                        'description' => $translation['installment']['descriptions']['alert'],
-                    ],
-                ];
-            }
-
-            if ($this->dependencies->configClass->isValidFeature('feature_deferred')) {
-                $advanced_settings[] = [
-                    'name' => 'deferred',
-                    'title' => $translation['deferred']['title'],
-                    'class' => '-deferred',
-                    'enabled' => [
-                        'name' => 'payplug_deferred',
-                        'checked' => $current_configuration['deferred'],
-                    ],
-                    'descriptions' => [
-                        'live' => [
-                            'description_1' => $translation['deferred']['descriptions']['description_1'],
-                            'description_2' => $translation['deferred']['descriptions']['description_2'],
-                            'links' => [
-                                [
-                                    'text' => $translation['deferred']['link'],
-                                    'url' => $external_url['deferred'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                        'sandbox' => [
-                            'description_1' => $translation['deferred']['descriptions']['description_1'],
-                            'description_2' => $translation['deferred']['descriptions']['description_2'],
-                            'links' => [
-                                [
-                                    'text' => $translation['deferred']['link'],
-                                    'url' => $external_url['deferred'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                    ],
-                    'options' => [
-                        'disabled' => !$current_configuration['deferred'],
-                        'name' => 'payplug_deferred_state',
-                        'type' => 'select',
-                        'options' => $this->getDeferredState((int) $current_configuration['deferred_state']),
-                    ],
-                ];
-            }
-
-            $popup_description = $translation['embedded']['descriptions']['popup']['text'];
-            $popup_description_link = '<a href="' . $external_url['portal'] . '" target="_blank">'
-                . $translation['embedded']['descriptions']['popup']['link']
-                . '</a>';
-            $popup_description = str_replace('$popup_description_link', $popup_description_link, $popup_description);
-
-            $redirect_description = $translation['embedded']['descriptions']['redirect']['text'];
-            $redirect_description_link = '<a href="' . $external_url['portal'] . '" target="_blank">'
-                . $translation['embedded']['descriptions']['redirect']['link']
-                . '</a>';
-            $redirect_description = str_replace('$redirect_description_link', $redirect_description_link, $redirect_description);
-
-            $payment_options[] = [
-                'type' => 'payment_method',
-                'name' => 'standard',
-                'title' => $translation['standard']['title'],
-                'image' => $img_path . 'standard.svg',
-                'checked' => $current_configuration['standard'],
-                'available_test_mode' => true,
-                'descriptions' => [
-                    'live' => [
-                        'description' => $translation['standard']['descriptions']['live'],
-                        'advanced_options' => $translation['standard']['advanced'],
-                    ],
-                    'sandbox' => [
-                        'description' => $translation['standard']['descriptions']['live'],
-                        'advanced_options' => $translation['standard']['advanced'],
-                    ],
-                ],
-                'options' => [
-                    [
-                        'type' => 'payment_option',
-                        'sub_type' => 'IOptions',
-                        'name' => 'embeded',
-                        'title' => $translation['embedded']['title'],
-                        'descriptions' => [
-                            'live' => [
-                                'description_popup' => $popup_description,
-                                'description_redirect' => $redirect_description,
-                                'description_integrated' => $translation['embedded']['descriptions']['integrated']['text'],
-                                'link_know_more' => [
-                                    'text' => $translation['embedded']['link'],
-                                    'url' => $external_url['embedded'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'sandbox' => [
-                                'description_popup' => $popup_description,
-                                'description_redirect' => $redirect_description,
-                                'description_integrated' => $translation['embedded']['descriptions']['integrated']['text'],
-                                'link_know_more' => [
-                                    'text' => $translation['embedded']['link'],
-                                    'url' => $external_url['embedded'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                        'options' => $embedded_mode,
-                    ],
-                    [
-                        'type' => 'payment_option',
-                        'sub_type' => 'switch',
-                        'name' => 'one_click',
-                        'title' => $translation['one_click']['title'],
-                        'descriptions' => [
-                            'live' => [
-                                'description' => $translation['one_click']['descriptions']['live'],
-                                'link_know_more' => [
-                                    'text' => $translation['one_click']['link'],
-                                    'url' => $external_url['one_click'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'sandbox' => [
-                                'description' => $translation['one_click']['descriptions']['live'],
-                                'link_know_more' => [
-                                    'text' => $translation['one_click']['link'],
-                                    'url' => $external_url['one_click'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                        'checked' => $current_configuration['one_click'],
-                    ],
-                ],
-                'advanced_settings' => $advanced_settings ? [
-                    'title' => $translation['standard']['advanced'],
-                    'options' => $advanced_settings,
-                ] : [],
-            ];
-        }
-        if ($this->dependencies->configClass->isValidFeature('feature_amex')) {
-            $payment_options[] = [
-                'type' => 'payment_method',
-                'name' => 'american_express',
-                'title' => $translation['amex']['title'],
-                'image' => $img_path . 'amex.svg',
-                'checked' => $current_configuration['amex'],
-                'available_test_mode' => false,
-                'descriptions' => [
-                    'live' => [
-                        'description' => $translation['amex']['descriptions']['live'],
-                        'link_know_more' => [
-                            'text' => $translation['amex']['link'],
-                            'url' => $external_url['amex'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'sandbox' => [
-                        'description' => $translation['amex']['descriptions']['sandbox'],
-                        'link_know_more' => [
-                            'text' => $translation['amex']['link'],
-                            'url' => $external_url['amex'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                ],
-            ];
-        }
-        if (version_compare($version, '1.7', '>=')
-            && $this->dependencies->configClass->isValidFeature('feature_applepay')) {
-            $payment_options[] = [
-                'type' => 'payment_method',
-                'name' => 'applepay',
-                'title' => $translation['applepay']['title'],
-                'image' => $img_path . 'apple_pay.svg',
-                'checked' => $current_configuration['applepay'],
-                'available_test_mode' => false,
-                'descriptions' => [
-                    'live' => [
-                        'description' => $translation['applepay']['descriptions']['live'],
-                        'link_know_more' => [
-                            'text' => $translation['applepay']['link'],
-                            'url' => $external_url['applepay'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'sandbox' => [
-                        'description' => $translation['applepay']['descriptions']['sandbox'],
-                        'link_know_more' => [
-                            'text' => $translation['applepay']['link'],
-                            'url' => $external_url['applepay'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                ],
-            ];
-        }
-        if ($this->dependencies->configClass->isValidFeature('feature_bancontact')) {
-            $payment_options[] = [
-                'type' => 'payment_method',
-                'name' => 'bancontact',
-                'title' => $translation['bancontact']['title'],
-                'image' => $img_path . 'bancontact.svg',
-                'checked' => $current_configuration['bancontact'],
-                'available_test_mode' => false,
-                'descriptions' => [
-                    'live' => [
-                        'description' => $translation['bancontact']['descriptions']['live'],
-                        'link_know_more' => [
-                            'text' => $translation['bancontact']['link'],
-                            'url' => $external_url['bancontact'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'sandbox' => [
-                        'description' => $translation['bancontact']['descriptions']['sandbox'],
-                        'link_know_more' => [
-                            'text' => $translation['bancontact']['link'],
-                            'url' => $external_url['bancontact'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                ],
-                'options' => [
-                    [
-                        'type' => 'payment_option',
-                        'sub_type' => 'switch',
-                        'name' => 'bancontact_country',
-                        'title' => $translation['bancontact']['user']['title'],
-                        'descriptions' => [
-                            'live' => [
-                                'description' => $translation['bancontact']['user']['description'],
-                                'link_know_more' => [
-                                    'text' => $translation['one_click']['link'],
-                                    'url' => $external_url['one_click'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                            'sandbox' => [
-                                'description' => $translation['bancontact']['user']['description'],
-                                'link_know_more' => [
-                                    'text' => $translation['one_click']['link'],
-                                    'url' => $external_url['one_click'],
-                                    'target' => '_blank',
-                                ],
-                            ],
-                        ],
-                        'checked' => $current_configuration['bancontact_country'],
-                    ],
-                ],
-            ];
-        }
+            ->getPaymentMethod()
+            ->getOptionCollection($current_configuration);
+        unset($payment_options['oney']);
 
         if (!$payment_options) {
             return [];
@@ -1231,7 +569,7 @@ class ApiRest
                     'description' => $translation['description'],
                 ],
             ],
-            'options' => $payment_options,
+            'options' => array_values($payment_options),
         ];
     }
 
@@ -1362,7 +700,7 @@ class ApiRest
             ->getPlugin()
             ->getRoutes()
             ->getExternalUrl()['signup'];
-        if ($this->dependencies->name == 'pspaylater') {
+        if ('pspaylater' == $this->dependencies->name) {
             $register_link .= '?sponsor=22101';
         }
 
@@ -1391,97 +729,6 @@ class ApiRest
                     'already_have_account' => $translation['connect'],
                 ],
             ],
-        ];
-    }
-
-    /**
-     * @description build oney thresholds section for oney
-     *
-     * @param array $current_configuration
-     *
-     * @return array
-     */
-    public function getThresholdsOptions($current_configuration = [])
-    {
-        if (!is_array($current_configuration)) {
-            $logger = $this->dependencies->getPlugin()->getLogger();
-            $logger->addLog('ApiRest::getThresholdsOptions: Invalid parameter given, $current_configuration must be an array.');
-
-            return [];
-        }
-
-        $default_configuration = [
-            'oney_min_amounts' => $current_configuration['oney_min_amounts'],
-            'oney_max_amounts' => $current_configuration['oney_max_amounts'],
-            'oney_custom_min_amounts' => $current_configuration['oney_custom_min_amounts'],
-            'oney_custom_max_amounts' => $current_configuration['oney_custom_max_amounts'],
-        ];
-
-        // todo: Create an helper to handle the two following line of logic
-        $custom_min = explode(':', $default_configuration['oney_custom_min_amounts']);
-        $custom_min = (int) $custom_min[1];
-        $custom_min = $this->helpers['amount']->formatOneyAmount($custom_min)['result'];
-
-        $custom_max = explode(':', $default_configuration['oney_custom_max_amounts']);
-        $custom_max = (int) $custom_max[1];
-        $custom_max = $this->helpers['amount']->formatOneyAmount($custom_max)['result'];
-
-        $min = explode(':', $default_configuration['oney_min_amounts']);
-        $min = (int) $min[1];
-        $min = $this->helpers['amount']->formatOneyAmount($min)['result'];
-
-        $max = explode(':', $default_configuration['oney_max_amounts']);
-        $max = (int) $max[1];
-        $max = $this->helpers['amount']->formatOneyAmount($max)['result'];
-
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslation()
-            ->getPaylaterTranslations();
-
-        $img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/admin/screen/';
-
-        return [
-            'name' => 'thresholds',
-            'image_url' => $img_path . $this->dependencies->name . '-thresholds.jpg',
-            'title' => $translation['thresholds']['title'],
-            'descriptions' => [
-                'description' => $translation['thresholds']['description'],
-                'min_amount' => [
-                    'name' => 'oney_min_amounts',
-                    'value' => $custom_min,
-                    'placeholder' => $custom_min,
-                    'default' => $min,
-                ],
-                'inter' => $translation['thresholds']['inter'],
-                'max_amount' => [
-                    'name' => 'oney_max_amounts',
-                    'value' => $custom_max,
-                    'placeholder' => $custom_max,
-                    'default' => $max,
-                ],
-                'error' => [
-                    'text' => sprintf(
-                        $translation['thresholds']['error']['default'],
-                        $min,
-                        $max
-                    ),
-                    'maxtext' => sprintf(
-                        $translation['thresholds']['error']['max'],
-                        $min,
-                        $max
-                    ),
-                    'mintext' => sprintf(
-                        $translation['thresholds']['error']['min'],
-                        $min,
-                        $max
-                    ),
-                ],
-            ],
-            'switch' => false,
         ];
     }
 }

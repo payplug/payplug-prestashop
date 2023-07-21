@@ -32,6 +32,7 @@ class HookClass
     private $card;
     private $cart;
     private $config;
+    private $configuration;
     private $constant;
     private $context;
     private $currency;
@@ -62,6 +63,7 @@ class HookClass
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->currency = $this->dependencies->getPlugin()->getCurrency();
@@ -189,7 +191,8 @@ class HookClass
         $order = $this->order->get((int) $params['id_order']);
         $active = $this->module->isEnabled($this->dependencies->name);
 
-        $can_use_deferred = (bool) $this->config->get($this->dependencies->getConfigurationKey('deferred'));
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $can_use_deferred = (bool) $payment_methods['deferred'];
         $deferredState = $this->config->get($this->dependencies->getConfigurationKey('deferredState'));
 
         if (!$active
@@ -204,7 +207,7 @@ class HookClass
         $cart = $this->cart->get((int) $order->id_cart);
         $payment_method = $this->dependencies->paymentClass->getPaymentMethodByCart($cart);
 
-        if ($payment_method['type'] == 'installment') {
+        if ('installment' == $payment_method['type']) {
             return;
         }
 
@@ -240,7 +243,7 @@ class HookClass
             $capture = $this->dependencies->apiClass->capturePayment($payment->id);
             if ($capture['result']) {
                 $payment = $capture['resource'];
-                if ($payment->card->id !== null) {
+                if (null !== $payment->card->id) {
                     $this->card->saveCard($payment);
                 }
             }
@@ -370,64 +373,35 @@ class HookClass
 
         $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
         $amount_refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
+        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
 
-        $inst_id = null;
-        $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCart((int) $order->id_cart);
-        $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $payment = $this->dependencies
+            ->getRepositories()['payment']
+            ->getByCart((int) $order->id_cart);
 
-        // Backward if order validated before
-        if (!$payment_id) {
-            $payment_id = $this->dependencies->cartClass->getPayplugInstallmentCartBackward((int) $order->id_cart);
+        if (empty($payment)) {
+            return;
         }
 
-        if ($payment_id && \strpos($payment_id, 'inst') !== false) {
-            $inst_id = $payment_id;
-        }
-
-        if ($inst_id) {
+        $resource_id = $payment['id_payment'];
+        if ($this->validators['payment']->isInstallment((string) $resource_id)['result']) {
             $payment_list = [];
 
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    )
-                );
-            } else {
-                $this->dependencies->apiClass->setSecretKey(
-                    $this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    )
-                );
-            }
-
-            // If no installment plan id, return false
-            if (!$inst_id || empty($inst_id)) {
-                return false;
-            }
-
             // Get the installment plan resource
-            $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
-
-            // If No installment plan resource, test the other live mode configuration
+            $installment = $this->dependencies->apiClass->retrieveInstallment($resource_id);
             if (!$installment['result']) {
                 if ($sandbox) {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    ));
-                    $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+                    $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
+                    $installment = $this->dependencies->apiClass->retrieveInstallment($resource_id);
                 } else {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    ));
-                    $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+                    $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
+                    $installment = $this->dependencies->apiClass->retrieveInstallment($resource_id);
                 }
             }
-
-            // If we still don't have a valid Installment plan resource, return false
             if (!$installment['result']) {
                 return false;
             }
+
             $installment = $installment['resource'];
 
             $pay_mode = $installment->is_live
@@ -443,7 +417,7 @@ class HookClass
 
             $payment_list_new = [];
             foreach ($installment->schedule as $schedule) {
-                if ($schedule->payment_ids != null) {
+                if (null != $schedule->payment_ids) {
                     foreach ($schedule->payment_ids as $pay_id) {
                         $p = $this->dependencies->apiClass->retrievePayment($pay_id);
                         if (!$p['result']) {
@@ -451,10 +425,10 @@ class HookClass
                         }
                         $p = $p['resource'];
                         $payment_list_new[] = $this->dependencies->paymentClass->buildPaymentDetails($p);
-                        if ((int) $p->is_paid == 0) {
+                        if (0 == (int) $p->is_paid) {
                             $amount_refunded_payplug += 0;
                             $amount_available += 0;
-                        } elseif ((int) $p->is_refunded == 1) {
+                        } elseif (1 == (int) $p->is_refunded) {
                             $amount_refunded_payplug += ($p->amount_refunded) / 100;
                             $amount_available += ($p->amount - $p->amount_refunded) / 100;
                         } elseif ((int) $p->amount_refunded > 0) {
@@ -520,7 +494,7 @@ class HookClass
             ));
             $inst_paid = $installment->is_fully_paid;
             $this->assign->assign([
-                'inst_id' => $inst_id,
+                'inst_id' => $resource_id,
                 'inst_status' => $inst_status,
                 'inst_status_code' => $inst_status_code,
                 'inst_aborted' => $inst_aborted,
@@ -530,56 +504,27 @@ class HookClass
                 'inst_can_be_aborted' => $inst_can_be_aborted,
             ]);
 
-            $sandbox = ((int) $installment->is_live == 1 ? false : true);
-            $state_addons = ($sandbox ? '_TEST' : '');
-            $id_new_order_state = (int) $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
-            );
+            $sandbox = (1 == (int) $installment->is_live ? false : true);
+            $state_addons = ($sandbox ? '_test' : '');
+            $id_new_order_state = (int) $this->configuration->getValue('order_state_refund' . $state_addons);
 
             $this->dependencies->installmentClass->updatePayplugInstallment($installment);
         } else {
-            $payment = $this->payment->checkPaymentTable((int) $order->id_cart);
-            $pay_id = isset($payment['id_payment']) ? $payment['id_payment'] : false;
-
-            if (!$this->validators['payment']->isPending($payment)['result']) {
-                $pay_id = $this->dependencies->orderClass->getPayplugOrderPayment($order->id);
-
-                if (!$pay_id) {
-                    $payments = $order->getOrderPaymentCollection();
-                    if (\count($payments->getResults()) > 1 || !$payments->getFirst()) {
-                        return false;
-                    }
-                    $pay_id = $payments->getFirst()->transaction_id;
-                }
-            }
-
-            // If no payment id, return false
-            if (!$pay_id || empty($pay_id)) {
-                return false;
-            }
-
             // Get the Payment resource
-            $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-
-            // If No Payment resource, test the other live mode configuration
+            $payment = $this->dependencies->apiClass->retrievePayment($resource_id);
             if (!$payment['result']) {
                 if ($sandbox) {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('liveApiKey')
-                    ));
-                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                    $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
+                    $payment = $this->dependencies->apiClass->retrievePayment($resource_id);
                 } else {
-                    $this->dependencies->apiClass->setSecretKey($this->config->get(
-                        $this->dependencies->getConfigurationKey('testApiKey')
-                    ));
-                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                    $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
+                    $payment = $this->dependencies->apiClass->retrievePayment($resource_id);
                 }
             }
-
-            // If we still don't have a valid Payment resource, return false
             if (!$payment['result']) {
                 return false;
             }
+
             $payment = $payment['resource'];
 
             // check if order is from oney payment
@@ -589,24 +534,18 @@ class HookClass
                 'oney_x3_without_fees',
                 'oney_x4_without_fees',
             ];
-
             $is_oney = isset($payment->payment_method, $payment->payment_method['type'])
-
                 && \in_array($payment->payment_method['type'], $oney_payment_method);
 
             $is_bancontact = isset($payment->payment_method, $payment->payment_method['type'])
 
-                && $payment->payment_method['type'] == 'bancontact';
+                && 'bancontact' == $payment->payment_method['type'];
 
             // Update order state if is pending
-            $state_addons = $payment->is_live ? '' : '_TEST';
-            $paid_state = $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
-            );
-            $oney_state = $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG') . $state_addons
-            );
-            $cancelled_state = $this->config->get('PS_OS_CANCELED');
+            $state_addons = ($sandbox ? '_test' : '');
+            $paid_state = (int) $this->configuration->getValue('order_state_paid' . $state_addons);
+            $oney_state = (int) $this->configuration->getValue('order_state_oney_pg' . $state_addons);
+            $cancelled_state = (int) $this->configuration->getValue('order_state_cancelled' . $state_addons);
 
             if ($is_oney) {
                 // update order state from payment status
@@ -640,12 +579,8 @@ class HookClass
             $id_currency = (int) $this->currency->getIdByIsoCode($payment->currency);
             $state_addons = (!$payment->is_live ? '_TEST' : '');
 
-            $id_new_order_state = (int) $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
-            );
-            $id_pending_order_state = (int) $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
-            );
+            $id_new_order_state = (int) $this->configuration->getValue('order_state_refund' . $state_addons);
+            $id_pending_order_state = (int) $this->configuration->getValue('order_state_pending' . $state_addons);
 
             $current_state = (int) $order->getCurrentState();
             if (!$this->validators['payment']->isPaid($payment)['result']) {
@@ -657,17 +592,17 @@ class HookClass
                 }
 
                 $display_refund = false;
-                if ($current_state != 0 && $current_state == $id_pending_order_state && !$is_bancontact) {
+                if (0 != $current_state && $current_state == $id_pending_order_state && !$is_bancontact) {
                     $show_menu_update = true;
                 }
             } elseif ((((int) $payment->amount_refunded > 0)
                     || $amount_refunded_presta > 0)
-                && (int) $payment->is_refunded != 1) {
+                && 1 != (int) $payment->is_refunded) {
                 $display_refund = true;
                 if ($is_oney) {
                     $refund_delay_oney = \time() <= $payment->refundable_after;
                 }
-            } elseif ((int) $payment->is_refunded == 1) {
+            } elseif (1 == (int) $payment->is_refunded) {
                 $show_menu_refunded = true;
                 $display_refund = false;
             } elseif (\time() >= $payment->refundable_until) {
@@ -680,7 +615,7 @@ class HookClass
             }
 
             $conf = (int) $this->tools->tool('getValue', 'conf');
-            if ($conf == 30 || $conf == 31) {
+            if (30 == $conf || 31 == $conf) {
                 $show_popin = true;
 
                 $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $params['id_order']);
@@ -688,33 +623,33 @@ class HookClass
                 $this->html .= '<a class="pp_admin_ajax_url" href="' . $admin_ajax_url . '"></a>';
             }
 
-            $pay_status = ((int) $payment->is_paid == 1)
+            $pay_status = (1 == (int) $payment->is_paid)
                 ? $this->dependencies->l('hook.displayAdminOrderMain.paid', 'hookclass')
                 : $this->dependencies->l('hook.displayAdminOrderMain.notPaid', 'hookclass');
-            if ((int) $payment->is_refunded == 1) {
+            if (1 == (int) $payment->is_refunded) {
                 $pay_status = $this->dependencies->l('hook.displayAdminOrderMain.refunded', 'hookclass');
             } elseif ((int) $payment->amount_refunded > 0) {
                 $pay_status = $this->dependencies->l('hook.displayAdminOrderMain.partiallyRefunded', 'hookclass');
             }
             $pay_amount = (int) $payment->amount / 100;
             $pay_date = \date('d/m/Y H:i', (int) $payment->created_at);
-            if ($payment->card->brand != '') {
+            if ('' != $payment->card->brand) {
                 $pay_brand = $payment->card->brand;
             } else {
                 $pay_brand = $this->dependencies->l('hook.displayAdminOrderMain.unavailable', 'hookclass');
             }
-            if ($payment->card->country != '') {
+            if ('' != $payment->card->country) {
                 $pay_brand .= ' ' . $this->dependencies->l('hook.displayAdminOrderMain.card', 'hookclass') .
                     ' (' . $payment->card->country . ')';
             }
-            if ($payment->card->last4 != '') {
+            if ('' != $payment->card->last4) {
                 $pay_card_mask = '**** **** **** ' . $payment->card->last4;
             } else {
                 $pay_card_mask = $this->dependencies->l('hook.displayAdminOrderMain.unavailable', 'hookclass');
             }
 
             // Deferred payment does'nt display 3DS option before capture so we have to consider it null
-            if ($payment->is_3ds !== null) {
+            if (null !== $payment->is_3ds) {
                 $pay_tds = $payment->is_3ds
                     ? $this->dependencies->l('hook.displayAdminOrderMain.yes', 'hookclass')
                     : $this->dependencies->l('hook.displayAdminOrderMain.no', 'hookclass');
@@ -725,7 +660,7 @@ class HookClass
                 ? $this->dependencies->l('hook.displayAdminOrderMain.live', 'hookclass')
                 : $this->dependencies->l('hook.displayAdminOrderMain.test', 'hookclass');
 
-            if ($payment->card->exp_month === null) {
+            if (null === $payment->card->exp_month) {
                 $pay_card_date = $this->dependencies->l('hook.displayAdminOrderMain.unavailable', 'hookclass');
             } else {
                 $pay_card_date = \date(
@@ -737,7 +672,7 @@ class HookClass
             $show_menu_payment = true;
 
             $this->assign->assign([
-                'pay_id' => $pay_id,
+                'pay_id' => $resource_id,
                 'pay_status' => $pay_status,
                 'pay_amount' => $pay_amount,
                 'pay_date' => $pay_date,
@@ -748,7 +683,7 @@ class HookClass
             ]);
 
             //Deferred payment does'nt display 3DS option before capture so we have to consider it null
-            if ($payment->is_3ds !== null) {
+            if (null !== $payment->is_3ds) {
                 $pay_tds = $payment->is_3ds
                     ? $this->dependencies->l('hook.displayAdminOrderMain.yes', 'hookclass')
                     : $this->dependencies->l('hook.displayAdminOrderMain.no', 'hookclass');
@@ -791,6 +726,19 @@ class HookClass
 
         $views_path = __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/';
         $display_single_payment = $show_menu_payment;
+
+        $refund_disable = false;
+        if (isset($payment->payment_method, $payment->payment_method['type'])
+            && in_array($payment->payment_method['type'], [
+                'giropay',
+                'ideal',
+                'mybank',
+                'satispay',
+                'sofort',
+            ])) {
+            $refund_disable = true;
+        }
+
         $this->assign->assign([
             'logo_url' => [
                 'payplug' => $views_path . 'img/payplug.svg',
@@ -800,6 +748,7 @@ class HookClass
             'display_single_payment' => $display_single_payment,
             'display_refund' => $display_refund,
             'refund_delay_oney' => $refund_delay_oney,
+            'refund_disable' => $refund_disable,
             'show_menu_payment' => $show_menu_payment,
             'show_menu_refunded' => $show_menu_refunded,
             'show_menu_update' => $show_menu_update,
@@ -1036,9 +985,9 @@ class HookClass
                 } else {
                     // else show the popin
 
-                    if ($this->config->get(
+                    if ('integrated' == $this->config->get(
                         $this->dependencies->getConfigurationKey('embeddedMode')
-                    ) == 'integrated') {
+                    )) {
                         $api_url = $integrated_payment_js_url;
                         $this->media->addJsDef([
                             'isIntegratedPayment' => true,
@@ -1066,9 +1015,9 @@ class HookClass
             }
         }
 
-        if ($this->config->get(
-            $this->dependencies->getConfigurationKey('oney')
-        )) {
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+
+        if ((bool) $payment_methods['oney']) {
             $this->media->addJsDef([
                 $this->dependencies->name . '_oney' => true,
                 $this->dependencies->name . '_oney_loading_msg' => $this->dependencies->l('hook.header.loading', 'hookclass'),
@@ -1083,9 +1032,7 @@ class HookClass
             ]);
         }
 
-        if ($this->config->get(
-            $this->dependencies->getConfigurationKey('applepay')
-        )) {
+        if ((bool) $payment_methods['applepay']) {
             $this->media->addJsDef([
                 'applePayPaymentRequestAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypaymentrequest', [], true),
                 'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
@@ -1105,14 +1052,14 @@ class HookClass
         $current_controller = $this->dispatcher->getInstance()->getController();
 
         if (!$this->oney->isOneyAllowed()
-            || $current_controller != 'product'
+            || 'product' != $current_controller
             || (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
             $this->config->get($this->dependencies->getConfigurationKey('companyIso'))) {
             return false;
         }
 
         $action = $this->tools->tool('getValue', 'action');
-        if ($action == 'quickview') {
+        if ('quickview' == $action) {
             return false;
         }
         if (!isset($param['product'])
@@ -1122,7 +1069,7 @@ class HookClass
             return false;
         }
 
-        if ($action == 'refresh') {
+        if ('refresh' == $action) {
             $use_taxes = (bool) $this->config->get('PS_TAX');
 
             $id_product = (int) $this->tools->tool('getValue', 'id_product');
@@ -1173,7 +1120,7 @@ class HookClass
      *
      * @throws Exception
      *
-     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
+     * @deprecated This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
      *
      * @return string
      */
@@ -1209,7 +1156,10 @@ class HookClass
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
-        $payment_options = $this->dependencies->paymentClass->getPaymentOptions();
+        $payment_options = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethod()
+            ->getPaymentOptionCollection();
 
         // Transforme tableau en TPL
         $paymentOptions = $this->dependencies->loadAdapterPresta()->displayPaymentOption(
@@ -1222,7 +1172,7 @@ class HookClass
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => $this->tools->tool('getHttpHost', true) .
-                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/img/admin/spinner.gif',
+                __PS_BASE_URI__ . 'modules/' . $this->dependencies->name . '/views/img/gif/spinner.gif',
             'front_ajax_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ajax', [], true),
             'api_url' => $this->dependencies->apiClass->getApiUrl(),
             'price2display' => $price2display,
@@ -1249,8 +1199,10 @@ class HookClass
         ]);
 
         // Données sous forme de tableau (pour 1.6 et 1.7)
-
-        $payment_options = $this->dependencies->paymentClass->getPaymentOptions();
+        $payment_options = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethod()
+            ->getPaymentOptionCollection();
 
         // Transforme tableau en object
         return $this->dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);

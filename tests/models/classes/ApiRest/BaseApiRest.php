@@ -4,14 +4,18 @@ namespace PayPlug\tests\models\classes\ApiRest;
 
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
+use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\moduleValidator;
+use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
 class BaseApiRest extends TestCase
 {
+    use FormatDataProvider;
+
     public $amount_helper;
     public $classe;
     public $configuration;
@@ -20,6 +24,7 @@ class BaseApiRest extends TestCase
     public $constant;
     public $dependencies;
     public $logger;
+    public $payment_method;
     public $plugin;
     public $tools;
 
@@ -65,6 +70,12 @@ class BaseApiRest extends TestCase
             });
 
         $this->configuration_class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
+        $this->configuration_class
+            ->shouldReceive('getDefault')
+            ->with('amounts')
+            ->andReturn('{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:99","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"ideal":{"min":"EUR:99","max":"EUR:2000000"},"mybank":{"min":"EUR:99","max":"EUR:2000000"},"satispay":{"min":"EUR:99","max":"EUR:2000000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}');
+
+        $this->payment_method = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
 
         $this->plugin = \Mockery::mock('Plugin');
@@ -75,6 +86,7 @@ class BaseApiRest extends TestCase
                 'getConfigurationClass' => $this->configuration_class,
                 'getConstant' => $this->constant,
                 'getLogger' => $this->logger,
+                'getPaymentMethod' => $this->payment_method,
                 'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),
                 'getTranslation' => $this->translation,
             ]);

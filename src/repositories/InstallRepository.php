@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -24,6 +24,7 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\application\dependencies\BaseClass;
+use PayPlug\src\models\classes\Configuration;
 
 class InstallRepository extends BaseClass
 {
@@ -309,18 +310,19 @@ class InstallRepository extends BaseClass
      */
     public function setConfig()
     {
-        foreach (array_keys($this->dependencies->configurationKeys) as $key) {
-            if ($this->dependencies->getConfigurationKeyOption($key, 'setConf')) {
-                if ($key == 'oney' && $this->dependencies->name == 'pspaylater') {
-                    $this->config->updateValue(
-                        $this->dependencies->getConfigurationKey($key),
-                        1
-                    );
-                } else {
-                    $this->config->updateValue(
-                        $this->dependencies->getConfigurationKey($key),
-                        $this->dependencies->getConfigurationKeyOption($key, 'defaultValue')
-                    );
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $configurations = $configuration->getConfiguration();
+
+        if ($configurations) {
+            foreach ($configurations as $key => $config) {
+                if ($config['setConf']) {
+                    if ('payment_methods' == $key && 'pspaylater' == $this->dependencies->name) {
+                        $payment_method = json_decode($config['defaultValue'], true);
+                        $payment_method['oney'] = true;
+                        $configuration->set('payment_methods', json_encode($payment_method));
+                    } else {
+                        $configuration->set($key, $config['defaultValue']);
+                    }
                 }
             }
         }
@@ -570,10 +572,13 @@ class InstallRepository extends BaseClass
      */
     private function deleteConfig()
     {
-        foreach (array_keys($this->dependencies->configurationKeys) as $key) {
-            $this->config->deleteByName(
-                $this->dependencies->getConfigurationKey($key)
-            );
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $configurations = $configuration->getConfiguration();
+
+        if ($configurations) {
+            foreach ($configurations as $key => $config) {
+                $configuration->delete($key);
+            }
         }
 
         return true;

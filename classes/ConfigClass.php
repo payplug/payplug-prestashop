@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -307,36 +307,43 @@ class ConfigClass
         }
 
         $permissions = $this->dependencies->apiClass->getAccountPermissions();
+
+        // in case if API is not available or not returning permissions
+        if (empty($permissions)) {
+            return $available_options = [];
+        }
+
         $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
         //check if we force integrated payment activation/rollback
-        if (isset($permissions['can_use_integrated_payments'])
-            && !(bool) $configurationClass->getValue('sandbox_mode')
-            && version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
-            if ((bool) $permissions['can_use_integrated_payments']) {
-                if (!$onboardingAction->enableIntegratedAction()['success']) {
-                    $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
-                }
-            } else {
-                if (!$onboardingAction->disableIntegratedAction()['success']) {
-                    $this->logger->addLog($onboardingAction->disableIntegratedAction()['message'], 'error');
-                }
-            }
-        }
+        //TODO: Clean this code and delete forcing IP onboarding usages
+//        if (isset($permissions['can_use_integrated_payments'])
+//            && !(bool) $configurationClass->getValue('sandbox_mode')
+//            && version_compare(_PS_VERSION_, '1.7', '>=')) {
+//            $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
+//            if ((bool) $permissions['can_use_integrated_payments']) {
+//                if (!$onboardingAction->enableIntegratedAction()['success']) {
+//                    $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
+//                }
+//            } else {
+//                if (!$onboardingAction->disableIntegratedAction()['success']) {
+//                    $this->logger->addLog($onboardingAction->disableIntegratedAction()['message'], 'error');
+//                }
+//            }
+//        }
+
         $available_options = [
-            'standard' => (bool) $configurationClass->getValue('standard'),
             'live' => !(bool) $configurationClass->getValue('sandbox_mode'),
             'embedded' => (string) $configurationClass->getValue('embedded_mode'),
-            'one_click' => (bool) $configurationClass->getValue('one_click'),
-            'installment' => (bool) $configurationClass->getValue('inst'),
-            'deferred' => (bool) $configurationClass->getValue('deferred'),
-            'oney' => (bool) $configurationClass->getValue('oney'),
-            'bancontact' => (bool) $configurationClass->getValue('bancontact'),
-            'applepay' => (bool) $configurationClass->getValue('applepay'),
-            'amex' => (bool) $configurationClass->getValue('amex'),
         ];
 
-        if ($configurationClass->getValue('email') === null
+        $payment_methods = json_decode($configurationClass->getValue('payment_methods'), true);
+        if ($payment_methods) {
+            foreach ($payment_methods as $payment_method => $enabled) {
+                $available_options[$payment_method] = (bool) $enabled;
+            }
+        }
+
+        if (null === $configurationClass->getValue('email')
             || !$this->dependencies->amountCurrencyClass->checkCurrency($cart)
             || !$this->dependencies->amountCurrencyClass->checkAmount($cart)
         ) {
@@ -352,17 +359,23 @@ class ConfigClass
             $available_options['amex'] = false;
         } else {
             if (!$this->validators['payment']->hasPermissions($permissions, 'use_live_mode')['result']
-                || $configurationClass->getValue('live_api_key') === null
+                || null === $configurationClass->getValue('live_api_key')
             ) {
                 $available_options['live'] = false;
             }
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_save_cards')['result']) {
                 $available_options['one_click'] = false;
             }
-            if (!$this->validators['payment']->hasPermissions($permissions, 'can_create_installment_plan')['result']) {
+            if (!$this->validators['payment']->hasPermissions(
+                $permissions,
+                'can_create_installment_plan'
+            )['result']) {
                 $available_options['installment'] = false;
             }
-            if (!$this->validators['payment']->hasPermissions($permissions, 'can_create_deferred_payment')['result']) {
+            if (!$this->validators['payment']->hasPermissions(
+                $permissions,
+                'can_create_deferred_payment'
+            )['result']) {
                 $available_options['deferred'] = false;
             }
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_oney')['result']) {
@@ -371,13 +384,19 @@ class ConfigClass
             if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_bancontact')['result']) {
                 $available_options['bancontact'] = false;
             }
-            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_applepay')['result'] || !$available_options['live']) {
+            if (!$this->validators['payment']->hasPermissions(
+                $permissions,
+                'can_use_apple_pay'
+            )['result'] || !$available_options['live']) {
                 $available_options['applepay'] = false;
             }
-            if (!$this->validators['payment']->hasPermissions($permissions, 'can_use_amex')['result'] || !$available_options['live']) {
+            if (!$this->validators['payment']->hasPermissions(
+                $permissions,
+                'can_use_american_express'
+            )['result'] || !$available_options['live']) {
                 $available_options['amex'] = false;
             }
-            if (!$permissions['can_use_integrated_payments'] && $available_options['embedded'] == 'integrated') {
+            if (!$permissions['can_use_integrated_payments'] && 'integrated' == $available_options['embedded']) {
                 $configurationClass->set('embedded_mode', 'redirect');
                 $available_options['embedded'] = 'redirect';
             }
@@ -425,7 +444,7 @@ class ConfigClass
      */
     public function checkPsAccount()
     {
-        if ($this->dependencies->name == 'pspaylater') {
+        if ('pspaylater' == $this->dependencies->name) {
             $module = $this->module->getInstanceByName($this->dependencies->name);
             $check_ps_account = $this->validators['module']->isAccountLinkedToPsAccount($module);
 
@@ -436,7 +455,7 @@ class ConfigClass
     }
 
     /**
-     * Get iso code from language code
+     * Get iso code from language code.
      *
      * @param $language
      *
@@ -463,7 +482,7 @@ class ConfigClass
     }
 
     /**
-     * Get live permissions
+     * Get live permissions.
      *
      * @return array
      */
@@ -476,7 +495,7 @@ class ConfigClass
     }
 
     /**
-     * Check if current device used is mobile
+     * Check if current device used is mobile.
      *
      * @return bool
      */
@@ -516,7 +535,7 @@ class ConfigClass
     }
 
     /**
-     * Check if given phone number is valid mobile phone number
+     * Check if given phone number is valid mobile phone number.
      *
      * @param string $phone_number
      * @param string $iso_code
@@ -549,7 +568,7 @@ class ConfigClass
     }
 
     /**
-     * Return international formatted phone number (norm E.164)
+     * Return international formatted phone number (norm E.164).
      *
      * @param $phone_number
      * @param $country
@@ -593,7 +612,7 @@ class ConfigClass
     }
 
     /**
-     * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm
+     * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm.
      *
      * @param int $country_id
      *
@@ -621,7 +640,7 @@ class ConfigClass
 
     /**
      * Get all country iso-code of ISO 3166-1 alpha-2 norm
-     * Source: DB PayPlug
+     * Source: DB PayPlug.
      *
      * @return null|array
      */
@@ -650,7 +669,7 @@ class ConfigClass
      */
     public function gdprCardExport($id_customer)
     {
-        if (!is_int($id_customer) || $id_customer === null) {
+        if (!is_int($id_customer) || null === $id_customer) {
             return [];
         }
 
@@ -750,7 +769,7 @@ class ConfigClass
     {
         if ($this->context->smarty->tpl_vars) {
             foreach (array_keys($this->context->smarty->tpl_vars) as $key) {
-                if (strpos($key, 'feature_') !== false && !$this->isValidFeature($key)) {
+                if (false !== strpos($key, 'feature_') && !$this->isValidFeature($key)) {
                     unset($this->context->smarty->tpl_vars[$key]);
                 }
             }
@@ -777,7 +796,7 @@ class ConfigClass
     }
 
     /**
-     * Create log files to be used everywhere in PayPlug module
+     * Create log files to be used everywhere in PayPlug module.
      */
     private function setLoggers()
     {
@@ -788,7 +807,7 @@ class ConfigClass
     }
 
     /**
-     * Set very adapter properties
+     * Set very adapter properties.
      */
     private function setConfigurationProperties()
     {

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - COPYRIGHT_YEAR Payplug SAS
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -41,7 +41,7 @@ class OneyEntity
         if ($oneyXtimes) {
             foreach ($oneyXtimes as $oney) {
                 $result = array_search($oney, $this->operations, true);
-                if ($result !== false) {
+                if (false !== $result) {
                     unset($this->operations[$result]);
                 }
             }

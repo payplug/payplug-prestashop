@@ -20,7 +20,7 @@ function getPath($list = [], $path = false)
 
         if (is_dir($file_path)) {
             $list = getPath($list, $file_path);
-        } elseif ('php' == $ext && $file != 'index.php') {
+        } elseif ('php' == $ext && 'index.php' != $file) {
             $list[] = $file_path;
         }
     }
@@ -36,8 +36,8 @@ foreach ($files as $path) {
     $check = shell_exec('php -l ' . $path);
 
     // if some error are detected, from simple warning to fatal error...
-    if (strpos($check, 'No syntax errors detected') === false) {
-        if (strpos($check, 'Fatal error: ') !== false) {
+    if (false === strpos($check, 'No syntax errors detected')) {
+        if (false !== strpos($check, 'Fatal error: ')) {
             $need_error_return = true;
             $errors[] = $check;
         } else {
