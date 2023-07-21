@@ -57,8 +57,9 @@ class PrestashopAdapter17
         $this->context->controller->addCSS($views_path . '/css/front-v' . $this->dependencies->version . '.css');
         $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
         $this->context->controller->addJS($views_path . '/js/front-v' . $this->dependencies->version . '.js');
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')
-            && true === (bool) $this->config->get($this->dependencies->getConfigurationKey('applepay'))) {
+            && (bool) $payment_methods['applepay']) {
             Media::addJsDef(
                 [
                     $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
@@ -167,7 +168,6 @@ class PrestashopAdapter17
             'type' => 'hidden',
             'value' => 'integrated',
         ];
-
         $integrated['action'] = 'javascript:payplugModule.integrated.form.validate();';
         $integrated['logo'] = $payment_options['standard']['logo'];
         $integrated['moduleName'] = 'payplug';
@@ -176,32 +176,27 @@ class PrestashopAdapter17
         $integrated['extra_classes'] = 'payplug integrated';
 
         $translation = $this->dependencies->getPlugin()->getTranslation()->getFrontIntegratedPaymentTranslations();
-
         switch ($this->context->language->iso_code) {
             case 'fr':
                 $privacyLink = 'https://www.payplug.com/fr/politique-de-confidentialite/';
 
                 break;
-
             case 'it':
                 $privacyLink = 'https://www.payplug.com/it/politica-di-confidenzialita/';
 
                 break;
-
             default:
                 $privacyLink = 'https://www.payplug.com/privacy-policy/';
 
                 break;
         }
 
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+
         $this->context->smarty->assign([
             'integrated_payment_js_url' => $integrated_payment_js_url,
-            'is_one_click_activated' => (bool) $this->config->get(
-                $this->dependencies->getConfigurationKey('oneClick')
-            ),
-            'is_deferred_activated' => (bool) $this->config->get(
-                $this->dependencies->getConfigurationKey('deferred')
-            ),
+            'is_one_click_activated' => (bool) $payment_methods['one_click'],
+            'is_deferred_activated' => (bool) $payment_methods['deferred'],
             'placeholderCardholder' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
             'placeholderPan' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
             'placeholderExp' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),

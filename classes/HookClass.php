@@ -191,7 +191,8 @@ class HookClass
         $order = $this->order->get((int) $params['id_order']);
         $active = $this->module->isEnabled($this->dependencies->name);
 
-        $can_use_deferred = (bool) $this->config->get($this->dependencies->getConfigurationKey('deferred'));
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $can_use_deferred = (bool) $payment_methods['deferred'];
         $deferredState = $this->config->get($this->dependencies->getConfigurationKey('deferredState'));
 
         if (!$active
@@ -1014,9 +1015,9 @@ class HookClass
             }
         }
 
-        if ($this->config->get(
-            $this->dependencies->getConfigurationKey('oney')
-        )) {
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+
+        if ((bool) $payment_methods['oney']) {
             $this->media->addJsDef([
                 $this->dependencies->name . '_oney' => true,
                 $this->dependencies->name . '_oney_loading_msg' => $this->dependencies->l('hook.header.loading', 'hookclass'),
@@ -1031,9 +1032,7 @@ class HookClass
             ]);
         }
 
-        if ($this->config->get(
-            $this->dependencies->getConfigurationKey('applepay')
-        )) {
+        if ((bool) $payment_methods['applepay']) {
             $this->media->addJsDef([
                 'applePayPaymentRequestAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypaymentrequest', [], true),
                 'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),

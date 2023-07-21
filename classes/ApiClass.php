@@ -997,13 +997,14 @@ class ApiClass
             return false;
         }
 
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
         $configuration = [
             'amounts' => json_decode($this->configuration->getValue('amounts'), true),
             'company_id' => isset($json_answer['id']) ? $json_answer['id'] : $this->configuration->getValue('company_id'),
             'company_iso' => isset($json_answer['country']) ? $json_answer['country'] : $this->configuration->getValue('company_iso'),
             'countries' => json_decode($this->configuration->getValue('countries'), true),
             'currencies' => $this->configuration->getValue('currencies'),
-            'oney' => isset($json_answer['permissions']['can_use_oney']) ? (int) $json_answer['permissions']['can_use_oney'] : $this->configuration->getValue('oney'),
+            'oney' => isset($json_answer['permissions']['can_use_oney']) ? (int) $json_answer['permissions']['can_use_oney'] : (bool) $payment_methods['oney'],
             'oney_allowed_countries' => $this->configuration->getValue('oney_allowed_countries'),
         ];
 

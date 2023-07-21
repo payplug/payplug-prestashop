@@ -289,9 +289,9 @@ class PaymentRepository extends BaseClass
             'sofort' => 'sofort',
             'standard' => 'standard',
         ];
-        $database_payment_methods = json_decode($this->configuration->getValue('payment_methods'));
+        $database_payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
         foreach ($payment_methods as $config_key => $payment_method) {
-            if ($payment_method == $paymentDetails['paymentMethod'] && !$database_payment_methods->{$config_key}) {
+            if ($payment_method == $paymentDetails['paymentMethod'] && !$database_payment_methods[$config_key]) {
                 return $this->returnPaymentError(
                     [
                         'name' => 'Configuration::get',

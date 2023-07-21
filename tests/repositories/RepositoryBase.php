@@ -3,6 +3,7 @@
 namespace PayPlug\tests\repositories;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\models\repositories\PaymentRepository;
@@ -81,7 +82,7 @@ class RepositoryBase extends TestCase
         $this->setRepository();
         $this->setTemporariesClasses();
 
-        $this->configuration = MockHelper::createAssignMock('PayPlug\src\models\classes\Configuration');
+        $this->configuration = \Mockery::mock(Configuration::class);
     }
 
     private function setAdapter()
