@@ -144,6 +144,10 @@ class ApiClass
         try {
             $response = Authentication::getAccount();
         } catch (Exception $e) {
+            if ('401' == (int) $e->getCode()) {
+                $this->dependencies->configClass->logout();
+            }
+
             return false;
         }
 
