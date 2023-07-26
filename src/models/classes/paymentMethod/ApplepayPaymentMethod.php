@@ -68,7 +68,7 @@ class ApplepayPaymentMethod extends PaymentMethod
 
             return $payment_options;
         }
-
+        $payment_options[$this->name]['action'] = 'javascript:void(0)';
         $payment_options[$this->name]['additionalInformation'] = $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
 
         return $payment_options;

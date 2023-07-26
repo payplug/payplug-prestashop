@@ -101,7 +101,7 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
                 'payment_controller_url' => 'link',
                 'logo' => 'modules/payplug/views/img/svg/checkout/applepay.svg',
                 'callToActionText' => 'paymentmethods.applepay.call_to_action',
-                'action' => 'link',
+                'action' => 'javascript:void(0)',
                 'moduleName' => 'payplug',
                 'additionalInformation' => 'template.tpl',
             ],
