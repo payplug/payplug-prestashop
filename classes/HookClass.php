@@ -577,7 +577,7 @@ class HookClass
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
             $id_currency = (int) $this->currency->getIdByIsoCode($payment->currency);
-            $state_addons = (!$payment->is_live ? '_TEST' : '');
+            $state_addons = (!$payment->is_live ? '_test' : '');
 
             $id_new_order_state = (int) $this->configuration->getValue('order_state_refund' . $state_addons);
             $id_pending_order_state = (int) $this->configuration->getValue('order_state_pending' . $state_addons);
