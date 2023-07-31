@@ -135,7 +135,7 @@ class ApiClass
      *
      * @throws ConfigurationException
      *
-     * @return array|false
+     * @return array
      */
     public function getAccount($api_key, $sandbox = true, $treat_account = true)
     {
@@ -144,11 +144,14 @@ class ApiClass
         try {
             $response = Authentication::getAccount();
         } catch (Exception $e) {
-            if ('401' == (int) $e->getCode()) {
-                $this->dependencies->configClass->logout();
+            if (401 == (int) $e->getCode()) {
+                $this->dependencies
+                    ->getPlugin()
+                    ->getConfigurationAction()
+                    ->logoutAction();
             }
 
-            return false;
+            return [];
         }
 
         $json_answer = $response['httpResponse'];
@@ -161,7 +164,7 @@ class ApiClass
             return $permissions;
         }
 
-        return false;
+        return [];
     }
 
     /**
