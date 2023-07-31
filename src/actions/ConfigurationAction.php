@@ -387,13 +387,18 @@ class ConfigurationAction
 
         $is_logged = isset($current_configuration['logged']) ? $current_configuration['logged'] : false;
 
+        $logged_section = [];
         if ((bool) $is_logged) {
+            $logged_section = $api_rest->getLoggedSection($current_configuration);
+        }
+
+        if (!empty($logged_section)) {
             $datas = [
                 'payplug_wooc_settings' => $current_configuration,
                 'settings' => $setting,
                 'header' => $header,
                 'login' => $api_rest->getLoginSection(),
-                'logged' => $api_rest->getLoggedSection($current_configuration),
+                'logged' => $logged_section,
                 'payment_paylater' => $api_rest->getPaylaterSection($current_configuration),
                 'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
