@@ -35,6 +35,15 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
         ;
 
         $this->list = OneySimulationsMock::getFormated();
+
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('oney_allowed_countries')
+            ->andReturn('"MQ","FR","BL","YT","RE","GF","PF","NC","GP","MF"');
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('oney_fees')
+            ->andReturn('1');
     }
 
     public function validListDataProvider()

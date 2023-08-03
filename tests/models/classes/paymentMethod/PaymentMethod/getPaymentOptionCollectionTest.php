@@ -8,7 +8,6 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
- * @group debug
  *
  * @runTestsInSeparateProcesses
  */

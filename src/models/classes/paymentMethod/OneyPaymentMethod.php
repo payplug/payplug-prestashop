@@ -201,7 +201,6 @@ class OneyPaymentMethod extends PaymentMethod
         $available_oney_payments = $this->dependencies
             ->getPlugin()
             ->getOney()
-            ->oneyEntity
             ->getOperations();
 
         foreach ($available_oney_payments as $oney_payment) {

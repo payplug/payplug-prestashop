@@ -84,11 +84,12 @@ class PayPlugNotifications
 
     private $amountCurrencyClass;
     private $apiClass;
+    private $configuration;
+    private $installmentClass;
+    private $module;
     private $orderClass;
     private $paymentClass;
-    private $installmentClass;
     private $payplugLock;
-    private $module;
     private $plugin;
     private $validators;
 
@@ -276,12 +277,8 @@ class PayPlugNotifications
         try {
             $resource = json_decode($body);
             $this->api_key = (bool) $resource->is_live ?
-                $this->configAdapter->get(
-                    $this->dependencies->getConfigurationKey('liveApiKey')
-                ) :
-                $this->configAdapter->get(
-                    $this->dependencies->getConfigurationKey('testApiKey')
-                );
+                $this->configuration->getValue('live_api_key') :
+                $this->configuration->getValue('test_api_key');
             $this->apiClass->setSecretKey($this->api_key);
             $this->resource = Notification::treat($body);
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
@@ -1005,8 +1002,9 @@ class PayPlugNotifications
         $this->amountCurrencyClass = $this->dependencies->amountCurrencyClass;
         $this->payplugLock = $this->dependencies->payplugLock;
 
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-        $this->sandbox = $this->configAdapter->get($this->dependencies->getConfigurationKey('sandboxMode'));
+        $this->sandbox = $this->configuration->getValue('sandbox_mode');
         $this->query = $this->dependencies->getPlugin()->getQuery();
 
         $this->setLogger();
@@ -1061,35 +1059,17 @@ class PayPlugNotifications
     private function setOrderStates()
     {
         $this->logger->addLog('Notification: setOrderStates');
-        $state_addons = ($this->payment->is_live ? '' : '_TEST');
+        $state_addons = ($this->payment->is_live ? '' : '_test');
         $this->order_states = [
-            'pending' => $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
-            ),
-            'paid' => $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
-            ),
-            'oos_paid' => $this->configAdapter->get(
-                'PS_OS_OUTOFSTOCK_PAID'
-            ),
-            'error' => $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR') . $state_addons
-            ),
-            'auth' => $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_AUTH') . $state_addons
-            ),
-            'expired' => $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_EXP') . $state_addons
-            ),
-            'oney' => $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG') . $state_addons
-            ),
-            'cancelled' => $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_CANCELED')
-            ),
-            'refund' => $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND') . $state_addons
-            ),
+            'auth' => $this->configuration->getValue('order_state_auth' . $state_addons),
+            'cancelled' => $this->configuration->getValue('order_state_canceled' . $state_addons),
+            'error' => $this->configuration->getValue('order_state_error' . $state_addons),
+            'expired' => $this->configuration->getValue('order_state_exp' . $state_addons),
+            'oney' => $this->configuration->getValue('order_state_oney_pg' . $state_addons),
+                'oos_paid' => $this->configAdapter->get('PS_OS_OUTOFSTOCK_PAID'),
+            'paid' => $this->configuration->getValue('order_state_paid' . $state_addons),
+            'pending' => $this->configuration->getValue('order_state_pending' . $state_addons),
+            'refund' => $this->configuration->getValue('order_state_refund' . $state_addons),
         ];
     }
 

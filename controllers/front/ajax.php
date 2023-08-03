@@ -75,8 +75,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $this->oney = $this->plugin->getOney();
             $this->productAdapter = $this->plugin->getProduct();
             $this->translate = $this->plugin->getTranslate();
-
-            $config = $this->configurationAdapter;
             $context = $this->contextAdapter->getContext(); // get the method
             $tools = $this->toolsAdapter;
 
@@ -101,7 +99,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'tpl' => $this->oney->getOneyCTA(),
                 ]));
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
-                $use_taxes = (bool) $config->get('PS_TAX');
+                $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
 
                 $is_elligible = null;
                 if ($id_product = (int) $tools->tool('getValue', 'id_product')) {
@@ -135,7 +133,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
                 exit(json_encode($is_elligible));
             } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
-                $use_taxes = (bool) $config->get('PS_TAX');
+                $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
 
                 if ($id_product = (int) $tools->tool('getValue', 'id_product')) {
                     $group = $tools->tool('getValue', 'group');

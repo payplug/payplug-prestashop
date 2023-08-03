@@ -70,6 +70,8 @@ class RepositoryBase extends TestCase
     // model/classes
     protected $configuration;
 
+    protected $plugin;
+
     public function setUp()
     {
         $this->myLogPhp = MockHelper::createMockFactory('PayPlug\classes\MyLogPHP');
@@ -79,10 +81,8 @@ class RepositoryBase extends TestCase
         ;
 
         $this->setAdapter();
+        $this->setDependenciesClass();
         $this->setRepository();
-        $this->setTemporariesClasses();
-
-        $this->configuration = \Mockery::mock(Configuration::class);
     }
 
     private function setAdapter()
@@ -108,20 +108,21 @@ class RepositoryBase extends TestCase
 
     private function setRepository()
     {
-        $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->logger = MockHelper::createMockFactory('PayPlug\src\repositories\LoggerRepository');
         $this->query = MockHelper::createQueryMock('PayPlug\src\repositories\QueryRepository');
         $this->sql = MockHelper::createMockFactory('PayPlug\src\repositories\SQLtableRepository');
     }
 
-    private function setTemporariesClasses()
+    private function setDependenciesClass()
     {
+        $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies
             ->shouldReceive('l')
             ->andReturnUsing(function ($string, $name) {
                 return $string;
             })
         ;
+
         $this->validators = [
             'account' => \Mockery::mock(accountValidator::class)->makePartial(),
             'card' => \Mockery::mock(cardValidator::class)->makePartial(),
@@ -134,10 +135,21 @@ class RepositoryBase extends TestCase
             'country' => \Mockery::mock(CountryRepository::class)->makePartial(),
             'payment' => \Mockery::mock(PaymentRepository::class)->makePartial(),
         ];
+
+        $this->configuration = \Mockery::mock(Configuration::class)->makePartial();
+        $this->plugin = \Mockery::mock('Plugin');
+        $this->plugin
+            ->shouldReceive([
+                'getConfiguration' => $this->config,
+                'getConfigurationClass' => $this->configuration,
+            ])
+        ;
+
         $this->dependencies
             ->shouldReceive([
                 'getValidators' => $this->validators,
                 'getRepositories' => $this->repositories,
+                'getPlugin' => $this->plugin,
             ])
         ;
         $this->dependencies

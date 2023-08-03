@@ -21,6 +21,8 @@
  *  International Registered Trademark & Property of Payplug SAS
  */
 // Check if prestashop Context
+use PayPlug\classes\MyLogPHP;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -329,8 +331,11 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayBeforeShoppingCartBlock($params)
     {
-        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyCartCta'))) {
-            return $this->payplug_dependencies->hookClass->displayBeforeShoppingCartBlock($params);
+        if ($this->module) {
+            $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
+            if ((bool) $configuration->getValue('oney_cart_cta')) {
+                return $this->payplug_dependencies->hookClass->displayBeforeShoppingCartBlock($params);
+            }
         }
     }
 
@@ -339,8 +344,11 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayExpressCheckout()
     {
-        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyCartCta'))) {
-            return $this->payplug_dependencies->hookClass->displayExpressCheckout();
+        if ($this->module) {
+            $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
+            if ((bool) $configuration->getValue('oney_cart_cta')) {
+                return $this->payplug_dependencies->hookClass->displayExpressCheckout();
+            }
         }
     }
 
@@ -351,8 +359,11 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayProductPriceBlock($params)
     {
-        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyProductCta'))) {
-            return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
+        if ($this->module) {
+            $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
+            if ((bool) $configuration->getValue('oney_product_cta')) {
+                return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
+            }
         }
     }
 
@@ -418,31 +429,41 @@ class Payplug extends PaymentModule
     public function install($soft_install = false)
     {
         if ($this->module) {
+            $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
+            $log->info('Payplug::install');
             $flag = true;
 
             // Use for update module is not fully installed
             if (!$soft_install) {
+                $log->info('Start update module is not fully installed');
                 $this->payplug_dependencies = null;
                 $flag = $flag && parent::install();
                 $this->setDependencies();
+                $log->info('End update module: ' . ($flag ? 'ok' : 'ko'));
             }
 
             // Install configuration
             if ($flag) {
+                $log->info('Start Install configuration');
                 $flag = $flag && $this->payplug_dependencies->getDependency('install')->install();
+                $log->info('End Install configuration: ' . ($flag ? 'ok' : 'ko'));
             }
 
             // Install hook
             if ($flag) {
+                $log->info('Start install module hook');
                 $hook_list = $this->getHookList();
                 foreach ($hook_list as $hook) {
                     $flag = $flag && $this->registerHook($hook);
                 }
+                $log->info('End install module hook: ' . ($flag ? 'ok' : 'ko'));
             }
 
             // Clean external files
+            $log->info('Start files cleaning');
             $helpers = $this->module->getHelpers();
-            $helpers['files']::clean();
+            $flag = $flag && $helpers['files']::clean();
+            $log->info('End files cleaning: ' . ($flag ? 'ok' : 'ko'));
 
             return $flag;
         }

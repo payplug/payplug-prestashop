@@ -25,7 +25,7 @@ namespace PayPlug\classes;
 
 class RefundClass
 {
-    private $config;
+    private $configuration;
     private $context;
     private $dependencies;
     private $logger;
@@ -39,7 +39,7 @@ class RefundClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->order = $this->dependencies->getPlugin()->getOrder();
@@ -344,13 +344,9 @@ class RefundClass
                 $new_state = (int) $this->tools->tool('getValue', 'id_state');
                 if (!$new_state) {
                     if (1 == $installment->is_live) {
-                        $new_state = (int) $this->config->get(
-                            $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
-                        );
+                        $new_state = (int) $this->configuration->getValue('order_state_refund');
                     } else {
-                        $new_state = (int) $this->config->get(
-                            $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND_TEST')
-                        );
+                        $new_state = (int) $this->configuration->getValue('order_state_refund_test');
                     }
                 }
                 $order = $this->order->get((int) $id_order);
@@ -393,13 +389,9 @@ class RefundClass
 
             if ($payment->is_refunded) {
                 if (1 == $payment->is_live) {
-                    $new_state = (int) $this->config->get(
-                        $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND')
-                    );
+                    $new_state = (int) $this->configuration->getValue('order_state_refund');
                 } else {
-                    $new_state = (int) $this->config->get(
-                        $this->dependencies->concatenateModuleNameTo('ORDER_STATE_REFUND_TEST')
-                    );
+                    $new_state = (int) $this->configuration->getValue('order_state_refund_test');
                 }
             }
 

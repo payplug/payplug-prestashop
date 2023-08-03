@@ -142,7 +142,6 @@ class PluginInit extends BaseClass
     public function __construct($dependencies = null)
     {
         $this->dependencies = $dependencies;
-        $this->myLogPhp = new MyLogPHP();
 
         $this->setActions();
         $this->setEntities();
@@ -220,6 +219,9 @@ class PluginInit extends BaseClass
 
     private function setRepositories()
     {
+        $module_dir = $this->constant->get('_PS_MODULE_DIR_');
+        $this->myLogPhp = new MyLogPHP($module_dir . $this->dependencies->name . '/log/install-log.csv');
+
         $this->logger = new LoggerRepository($this->dependencies);
         $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository();
@@ -229,7 +231,6 @@ class PluginInit extends BaseClass
             $this->query
         );
         $this->card = new CardRepository(
-            $this->configuration,
             $this->constant,
             $this->dependencies,
             $this->logger,
@@ -252,7 +253,7 @@ class PluginInit extends BaseClass
         $this->cache = new CacheRepository(
             $this->cacheEntity,
             $this->query,
-            $this->configuration,
+            $this->configuration_class,
             $this->dependencies,
             $this->logger,
             $this->constant
@@ -271,14 +272,13 @@ class PluginInit extends BaseClass
             $this->media,
             $this->dependencies,
             $this->logger,
-            $this->myLogPhp,
             $this->oneyEntity,
             $this->tools,
             $this->validate
         );
 
         $this->order_state = new OrderStateRepository(
-            $this->configuration,
+            $this->configuration_class,
             $this->constant,
             $this->dependencies,
             $this->language,
@@ -301,7 +301,7 @@ class PluginInit extends BaseClass
         );
 
         $this->install = new InstallRepository(
-            $this->configuration,
+            $this->configuration_class,
             $this->constant,
             $this->context,
             $this->dependencies,

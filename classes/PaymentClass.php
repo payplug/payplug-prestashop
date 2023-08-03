@@ -29,7 +29,7 @@ class PaymentClass
     private $assign;
     private $card;
     private $cart;
-    private $config;
+    private $configurationAdapter;
     private $configuration;
     private $constant;
     private $context;
@@ -58,7 +58,7 @@ class PaymentClass
         $this->assign = $this->dependencies->getPlugin()->getAssign();
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
-        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
@@ -89,23 +89,15 @@ class PaymentClass
 
         $abort = $this->dependencies->apiClass->abortInstallment($inst_id);
         if (!$abort['result']) {
-            $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
             if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey($this->config->get(
-                    $this->dependencies->getConfigurationKey('liveApiKey')
-                ));
+                $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('live_api_key'));
                 $abort = $this->dependencies->apiClass->abortInstallment($inst_id);
-                $this->dependencies->apiClass->setSecretKey($this->config->get(
-                    $this->dependencies->getConfigurationKey('testApiKey')
-                ));
+                $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('test_api_key'));
             } elseif (!$sandbox) {
-                $this->dependencies->apiClass->setSecretKey($this->config->get(
-                    $this->dependencies->getConfigurationKey('testApiKey')
-                ));
+                $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('test_api_key'));
                 $abort = $this->dependencies->apiClass->abortInstallment($inst_id);
-                $this->dependencies->apiClass->setSecretKey($this->config->get(
-                    $this->dependencies->getConfigurationKey('liveApiKey')
-                ));
+                $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('live_api_key'));
             }
         }
 
@@ -126,9 +118,9 @@ class PaymentClass
         $installment = $installment['resource'];
 
         if (1 == $installment->is_live) {
-            $new_state = (int) $this->config->get('PS_OS_CANCELED');
+            $new_state = (int) $this->configurationAdapter->get('PS_OS_CANCELED');
         } else {
-            $new_state = (int) $this->config->get('PS_OS_CANCELED');
+            $new_state = (int) $this->configurationAdapter->get('PS_OS_CANCELED');
         }
 
         $order = $this->order->get((int) $id_order);
@@ -162,12 +154,8 @@ class PaymentClass
         $standard = (bool) $payment_methods['standard'];
         $one_click = $standard && (bool) $payment_methods['one_click'];
         $installment = (bool) $payment_methods['inst'];
-        $installment_mode = $this->config->get(
-            $this->dependencies->getConfigurationKey('instMode')
-        );
-        $installment_min_amount = $this->config->get(
-            $this->dependencies->getConfigurationKey('instMinAmount')
-        );
+        $installment_mode = $this->configuration->getValue('inst_mode');
+        $installment_min_amount = $this->configuration->getValue('inst_min_amount');
 
         if (!$this->dependencies->amountCurrencyClass->checkCurrency($cart)
             || !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
@@ -176,7 +164,7 @@ class PaymentClass
 
         $payplug_cards = $this->card->getByCustomer((int) $cart->id_customer, true);
 
-        $use_taxes = $this->config->get('PS_TAX');
+        $use_taxes = $this->configurationAdapter->get('PS_TAX');
         $base_total_tax_inc = $cart->getOrderTotal(true);
         $base_total_tax_exc = $cart->getOrderTotal(false);
 
@@ -547,7 +535,7 @@ class PaymentClass
 
         $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
         if (!$payment['result']) {
-            $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
             if ($sandbox) {
                 $this->dependencies->apiClass->initializeApi(false);
                 $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
@@ -581,11 +569,8 @@ class PaymentClass
             $this->card->saveCard($payment);
         }
 
-        $state_addons = ($payment->is_live ? '' : '_TEST');
-        $new_state = (int) $this->config->get(
-            $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
-        );
-
+        $state_addons = ($payment->is_live ? '' : '_test');
+        $new_state = (int) $this->configuration->getValue('order_state_paid' . $state_addons);
         $order = $this->order->get((int) $id_order);
         if ($this->validate->validate('isLoadedObject', $order)) {
             if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
@@ -1057,7 +1042,7 @@ class PaymentClass
         $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
 
         if (!$shipping_iso || !$billing_iso) {
-            $default_language = $this->language->get((int) $this->config->get('PS_LANG_DEFAULT'));
+            $default_language = $this->language->get((int) $this->configurationAdapter->get('PS_LANG_DEFAULT'));
             $iso_code_list = $this->dependencies->configClass->getIsoCodeList();
             if (in_array($this->tools->tool('strtoupper', $default_language->iso_code), $iso_code_list, true)) {
                 $iso_code = $this->tools->tool('strtoupper', $default_language->iso_code);
@@ -1394,9 +1379,7 @@ class PaymentClass
             'authorizedAt' => null,
             'isPaid' => null,
             'isDeferred' => $options['is_deferred'],
-            'isEmbedded' => 'redirect' !== (string) $this->config->get(
-                $this->dependencies->getConfigurationKey('embeddedMode')
-            ),
+            'isEmbedded' => 'redirect' !== (string) $this->configuration->getValue('embedded_mode'),
             'isIntegrated' => $options['is_integrated'],
             'isMobileDevice' => ($this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result']),
             'cart' => $cart,
@@ -1616,19 +1599,13 @@ class PaymentClass
         }
         $payment = $payment['resource'];
 
-        $state_addons = ($payment->is_live ? '' : '_TEST');
-        if (1 == (int) $payment->is_paid) {
-            $new_state = (int) $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
-            );
-        } elseif (0 == (int) $payment->is_paid) {
-            if (1 == $payment->is_live) {
-                $new_state = (int) $this->dependencies->getPlugin()->getConfiguration()->get(
-                    $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR')
-                );
-            } else {
-                $new_state = $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ERROR') . $state_addons;
-            }
+        $state_addons = ($payment->is_live ? '' : '_test');
+        if ((bool) $payment->is_paid) {
+            $new_state = (int) $this->configuration->getValue('order_state_paid' . $state_addons);
+        } elseif ((bool) $payment->is_live) {
+            $new_state = (int) $this->configuration->getValue('order_state_error');
+        } else {
+            $new_state = (int) $this->configuration->getValue('order_state_error_test');
         }
 
         $order = $this->order->get((int) $order_id);

@@ -34,7 +34,7 @@ use Tools;
 class PrestashopAdapter17
 {
     public $payplug;
-    private $config;
+    private $configuration;
     private $constant;
     private $context;
     private $dependencies;
@@ -43,7 +43,7 @@ class PrestashopAdapter17
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
-        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
@@ -79,9 +79,7 @@ class PrestashopAdapter17
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
             && $this->dependencies->configClass->isValidFeature('feature_integrated')
             && array_key_exists('standard', $payment_options)
-            && 'integrated' == (string) $this->config->get(
-                $this->dependencies->getConfigurationKey('embeddedMode')
-            )
+            && 'integrated' == (string) $this->configuration->getvalue('embedded_mode')
         ) {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
         }

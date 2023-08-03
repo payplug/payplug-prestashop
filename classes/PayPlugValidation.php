@@ -36,6 +36,7 @@ class PayPlugValidation
     private $amountCurrencyClass;
     private $cartAdapter;
     private $configAdapter;
+    private $configuration;
     private $constantAdapter;
     private $context;
     private $customerAdapter;
@@ -68,6 +69,7 @@ class PayPlugValidation
         $this->apiClass = $this->dependencies->apiClass;
         $this->cartAdapter = $this->dependencies->getPlugin()->getCart();
         $this->configAdapter = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constantAdapter = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->customerAdapter = $this->dependencies->getPlugin()->getCustomer();
@@ -80,9 +82,6 @@ class PayPlugValidation
         $this->toolsAdapter = $this->dependencies->getPlugin()->getTools();
         $this->validateAdapter = $this->dependencies->getPlugin()->getValidate();
         $this->installmentClass = $this->dependencies->installmentClass;
-        $this->debug = $this->configAdapter->get(
-            $this->dependencies->getConfigurationKey('debugMode')
-        );
         $this->plugin = $this->dependencies->getPlugin();
         $this->setConfig();
         $this->moduleInstance = $this
@@ -224,8 +223,8 @@ class PayPlugValidation
 
                 $installment = $installment['resource'];
                 $this->api_key = (bool) $installment->is_live ?
-                    $this->configAdapter->get($this->dependencies->getConfigurationKey('liveApiKey')) :
-                    $this->configAdapter->get($this->dependencies->getConfigurationKey('testApiKey'));
+                    $this->configuration->getValue('live_api_key') :
+                    $this->configuration->getValue('test_api_key');
 
                 if (isset($installment->schedule)) {
                     foreach ($installment->schedule as $schedule) {
@@ -263,13 +262,9 @@ class PayPlugValidation
             }
 
             $payment = $payment['resource'];
-            $this->api_key = (bool) $payment->is_live ?
-                $this->configAdapter->get(
-                    $this->dependencies->getConfigurationKey('liveApiKey')
-                ) :
-                $this->configAdapter->get(
-                    $this->dependencies->getConfigurationKey('testApiKey')
-                );
+            $this->api_key = (bool) $payment->is_live
+                ? $this->configuration->getValue('live_api_key')
+                : $this->configuration->getValue('test_api_key');
             $this->logger->addLog('Retrieving payment: ' . $payment->id);
             if ($this->validators['payment']->isFailed($payment)['result']) {
                 if (!$this->payplugLock->deleteLockG2($cart->id)) {
@@ -442,30 +437,20 @@ class PayPlugValidation
             $this->logger->addLog('Order doesn\'t exists yet.');
 
             if ('payment' == $this->type) {
-                $state_addons = ($payment->is_live ? '' : '_TEST');
+                $state_addons = ($payment->is_live ? '' : '_test');
             } else {
-                $state_addons = ($installment->is_live ? '' : '_TEST');
+                $state_addons = ($installment->is_live ? '' : '_test');
             }
 
-            $pending_state = $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING') . $state_addons
-            );
-            $paid_state = $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID') . $state_addons
-            );
+            $pending_state = $this->configuration->getValue('order_state_pending' . $state_addons);
+            $paid_state = $this->configuration->getValue('order_state_paid' . $state_addons);
             /*
             * initialy, there was an order state for installment but no it has been removed and we use 'paid' state.
             * We keep this $inst_state to give more readability.
             */
-            $inst_state = $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID' . $state_addons)
-            );
-            $auth_state = $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_AUTH' . $state_addons)
-            );
-            $oney_state = $this->configAdapter->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_ONEY_PG' . $state_addons)
-            );
+            $inst_state = $this->configuration->getValue('order_state_paid' . $state_addons);
+            $auth_state = $this->configuration->getValue('order_state_auth' . $state_addons);
+            $oney_state = $this->configuration->getValue('order_state_oney_pg' . $state_addons);
 
             if ('installment' == $this->type) {
                 $installment = new PPPaymentInstallment($inst_id, $this->dependencies);
