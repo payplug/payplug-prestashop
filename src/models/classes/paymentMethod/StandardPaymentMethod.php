@@ -257,6 +257,14 @@ class StandardPaymentMethod extends PaymentMethod
                 'options' => $embedded_mode,
             ],
             [
+                'type' => 'warning_message',
+                'sub_type' => 'warning',
+                'name' => 'warning_message',
+                'payment_method' => 'integrated',
+                'description_title' => $this->translation['integrated']['alert']['title'],
+                'description' => $this->translation['integrated']['alert']['text'],
+            ],
+            [
                 'type' => 'payment_option',
                 'sub_type' => 'switch',
                 'name' => 'one_click',
