@@ -287,10 +287,9 @@ class InstallRepository extends BaseClass
     public function setConfig()
     {
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
-        $configurations = $configuration->getConfiguration();
 
-        if ($configurations) {
-            foreach ($configurations as $key => $config) {
+        if ($configuration->configurations) {
+            foreach ($configuration->configurations as $key => $config) {
                 if ($config['setConf']) {
                     if ('payment_methods' == $key && 'pspaylater' == $this->dependencies->name) {
                         $payment_method = json_decode($config['defaultValue'], true);
@@ -388,10 +387,9 @@ class InstallRepository extends BaseClass
     private function deleteConfig()
     {
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
-        $configurations = $configuration->getConfiguration();
 
-        if ($configurations) {
-            foreach ($configurations as $key => $config) {
+        if ($configuration->configurations) {
+            foreach ($configuration->configurations as $key => $config) {
                 $configuration->delete($key);
             }
         }

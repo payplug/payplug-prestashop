@@ -22,7 +22,7 @@ class BaseConfigurationAction extends TestCase
 
     protected function setUp()
     {
-        $this->configuration = \Mockery::mock('Configuration');
+        $this->configuration = \Mockery::mock(Configuration::class)->makePartial();
         $this->configuration
             ->shouldReceive([
                 'get' => true,

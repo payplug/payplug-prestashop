@@ -97,6 +97,9 @@ class PluginEntity
     private $logger;
 
     /** @var object */
+    private $merchantTelemetryAction;
+
+    /** @var object */
     private $message;
 
     /** @var object */
@@ -447,6 +450,22 @@ class PluginEntity
     public function getOnboardingAction()
     {
         return $this->onboardingAction;
+    }
+
+    /**
+     * @return object
+     */
+    public function getMerchantTelemetryAction()
+    {
+        return $this->merchantTelemetryAction;
+    }
+
+    /**
+     * @return object
+     */
+    public function getMerchantTelemetry()
+    {
+        return $this->merchantTelemetry;
     }
 
     /**
@@ -988,6 +1007,43 @@ class PluginEntity
         }
 
         $this->media = $media;
+
+        return $this;
+    }
+
+    /**
+     * @param object $merchantTelemetryAction
+     * @param mixed  $merchantTelemetry
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setMerchantTelemetry($merchantTelemetry)
+    {
+        if (!is_object($merchantTelemetry)) {
+            throw (new BadParameterException('Invalid argument, $merchantTelemetry must be a MerchantTelemetry'));
+        }
+
+        $this->merchantTelemetry = $merchantTelemetry;
+
+        return $this;
+    }
+
+    /**
+     * @param object $merchantTelemetryAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setMerchantTelemetryAction($merchantTelemetryAction)
+    {
+        if (!is_object($merchantTelemetryAction)) {
+            throw (new BadParameterException('Invalid argument, $merchantTelemetryAction must be a MerchantTelemetryAction'));
+        }
+
+        $this->merchantTelemetryAction = $merchantTelemetryAction;
 
         return $this;
     }
