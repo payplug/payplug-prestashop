@@ -192,6 +192,12 @@ class Translation
                     'redirect' => $this->dependencies->l('paymentmethods.embedded.options.redirect', 'translation'),
                 ],
             ],
+            'integrated' => [
+                'alert' => [
+                    'title' => $this->dependencies->l('paymentmethods.integrated.alert.text.title', 'translation'),
+                    'text' => $this->dependencies->l('paymentmethods.integrated.alert.text', 'translation'),
+                ],
+            ],
             'one_click' => [
                 'title' => $this->dependencies->l('paymentmethods.one_click.title', 'translation'),
                 'descriptions' => [
@@ -200,6 +206,7 @@ class Translation
                 'link' => $this->dependencies->l('paymentmethods.one_click.link', 'translation'),
                 'call_to_action' => $this->dependencies->l('paymentmethods.one_click.call_to_action', 'translation'),
             ],
+
             'installment' => [
                 'title' => $this->dependencies->l('paymentmethods.installment.title', 'translation'),
                 'descriptions' => [
