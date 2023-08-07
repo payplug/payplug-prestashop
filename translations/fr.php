@@ -300,6 +300,7 @@ $_MODULE['<{payplug}prestashop>refund_abdd50149fb40a1e973593bf5cd40878'] = 'Chan
 $_MODULE['<{payplug}prestashop>refund_data_01ddb6831cdf22a0055a2a42a09482d6'] = 'Montant disponible pour effectuer un remboursement avec Payplug :';
 $_MODULE['<{payplug}prestashop>refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Montant déjà remboursé avec Payplug :';
 $_MODULE['<{payplug}prestashop>refund_e162d1554608fdf9b48de943cc875208'] = 'Le remboursement automatique n\'est pas réalisable depuis votre back-office. Veuillez contacter [1]support@payplug.com[/1]';
+$_MODULE['<{payplug}prestashop>refund_e977bff453cdfb77ec703d677919b5fe'] = 'support@payplug.com';
 $_MODULE['<{payplug}prestashop>refundclass_27ec39e9a1d6272a48c0b91b8d679443'] = 'Une erreur est survenue';
 $_MODULE['<{payplug}prestashop>refundclass_3eaa3b62815d7a5dd90dbe998c744362'] = 'Le montant à été correctement remboursé';
 $_MODULE['<{payplug}prestashop>refundclass_5c446e2cf622154c5c2adfb199e5e77a'] = 'Le remboursement n\'a pas été effectué. Assurez-vous que le montant est correct puis essayez à nouveau.';
