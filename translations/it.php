@@ -300,6 +300,7 @@ $_MODULE['<{payplug}prestashop>refund_abdd50149fb40a1e973593bf5cd40878'] = 'Camb
 $_MODULE['<{payplug}prestashop>refund_data_01ddb6831cdf22a0055a2a42a09482d6'] = 'Importo disponibile per effettuare un rimborso con Payplug:';
 $_MODULE['<{payplug}prestashop>refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Importo già rimborsato con Payplug:';
 $_MODULE['<{payplug}prestashop>refund_e162d1554608fdf9b48de943cc875208'] = 'Il rimborso automatico non è possibile dal tuo back-office. Contatta [1]supporto@payplug.com[/1]';
+$_MODULE['<{payplug}prestashop>refund_e977bff453cdfb77ec703d677919b5fe'] = 'supporto@payplug.com';
 $_MODULE['<{payplug}prestashop>refundclass_27ec39e9a1d6272a48c0b91b8d679443'] = 'C\'è stato un errore';
 $_MODULE['<{payplug}prestashop>refundclass_3eaa3b62815d7a5dd90dbe998c744362'] = 'L\'importo é stato rimborsato con successo.';
 $_MODULE['<{payplug}prestashop>refundclass_5c446e2cf622154c5c2adfb199e5e77a'] = 'L\'importo non può essere rimborsato.';
