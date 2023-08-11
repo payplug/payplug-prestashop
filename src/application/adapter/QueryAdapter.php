@@ -56,11 +56,11 @@ class QueryAdapter implements QueryInterface
         try {
             $action = 'execute';
 
-            if (false !== stripos($SQLRequest, 'SELECT')) {
+            if (false !== stripos(substr($SQLRequest, 0, 10), 'SELECT')) {
                 $action = 'executeS';
             }
 
-            if (false !== stripos($SQLRequest, 'SHOW TABLES LIKE')) {
+            if (false !== stripos(substr($SQLRequest, 0, 10), 'SHOW TABLES LIKE')) {
                 $action = 'ExecuteS';
             }
 
