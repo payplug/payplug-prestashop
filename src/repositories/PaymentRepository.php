@@ -330,6 +330,23 @@ class PaymentRepository extends BaseClass
             $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
 
             if (!$payment['result']) {
+                // If the payment resource can not be created due to wrong permission, then disabled associated feature
+                if (403 == (int) $payment['code']) {
+                    $cart = $this->dependencies->getPlugin()->getCart()->get((int) $paymentDetails['cartId']);
+                    $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
+                    $this->dependencies->getPlugin()->getPaymentMethod()->resetPaymentMethodFromPermission($permissions);
+                    $paymentDetails['error_code'] = (int) $payment['code'];
+                }
+
+                // If the payment resource can not be created due to bad credential, we log out the merchand
+                if (401 == (int) $payment['code']) {
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getConfigurationAction()
+                        ->logoutAction();
+                    $paymentDetails['error_code'] = (int) $payment['code'];
+                }
+
                 return $this->returnPaymentError(
                     ['name' => 'paymentDetails', 'value' => $paymentDetails],
                     '[createPayment] Exception. Unable to create payment. Error: ' . $payment['message']
@@ -339,7 +356,23 @@ class PaymentRepository extends BaseClass
             $this->paymentEntity->setApiPayment($payment['resource']);
         } else {
             $payment = $this->dependencies->apiClass->createInstallment($paymentDetails['paymentTab']);
-            if ($this->validators['payment']->hasError($payment)['result']) {
+
+            if (!$payment['result']) {
+                // If the payment resource can not be created due to wrong permission, then disabled associated feature
+                if (403 == (int) $payment['code']) {
+                    $cart = $this->dependencies->getPlugin()->getCart()->get((int) $paymentDetails['cartId']);
+                    $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
+                    $this->dependencies->getPlugin()->getPaymentMethod()->resetPaymentMethodFromPermission($permissions);
+                }
+
+                // If the payment resource can not be created due to bad credential, we log out the merchand
+                if (401 == (int) $payment['code']) {
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getConfigurationAction()
+                        ->logoutAction();
+                }
+
                 unset($paymentDetails['paymentTab']);
 
                 return $this->returnPaymentError(

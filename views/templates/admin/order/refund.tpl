@@ -59,7 +59,8 @@
             <div class="{$module_name|escape:'htmlall':'UTF-8'}Order_delay">{l s='The refund will be possible 48h after the last payment or refund transaction.' mod='payplug'}</div>
         {/if}
         {if $refund_disable}
-            {assign "contact_link" "<a href='mailto:support@payplug.com' target='_blank'>"}
+            {capture assign="mailto_link"}{l s='admin.order.refund.mailto_link' mod='payplug'}{/capture}
+            {assign var="contact_link" value="<a href='mailto:"|cat:$mailto_link|cat:"' target='_blank'>"}
             <div class="{$module_name|escape:'htmlall':'UTF-8'}Order_delay">{l s='admin.order.refund.disabled' tags=[$contact_link]  mod='payplug'}</div>
         {/if}
     </div>

@@ -297,6 +297,16 @@ class ApiRest
             return [];
         }
 
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+
+        $live_api_key = $configuration->getValue('live_api_key');
+        $permissions = $this->dependencies->apiClass->getAccountPermissions($live_api_key);
+        if (!$permissions) {
+            return [];
+        }
+
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslation()
@@ -311,14 +321,6 @@ class ApiRest
             ->getRoutes()
             ->getExternalUrl($iso_code);
 
-        $configuration = $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass();
-
-        $live_api_key = $configuration->getValue('live_api_key');
-        $permissions = $this->dependencies->apiClass->getAccountPermissions(
-            $live_api_key
-        );
         if ('pspaylater' == $this->dependencies->name) {
             $active = $live_api_key && $permissions['onboarding_oney_completed'];
         } else {

@@ -9,7 +9,6 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group repository
  * @group oney
  * @group oney_repository
- * @group debug
  *
  * @runTestsInSeparateProcesses
  */

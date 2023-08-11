@@ -3,16 +3,20 @@
 namespace PayPlug\tests\actions\PaymentAction;
 
 use PayPlug\src\actions\PaymentAction;
+use PayPlug\src\models\classes\Configuration;
+use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
 class BasePaymentAction extends TestCase
 {
+    use FormatDataProvider;
+
     public $action;
     public $cartAdapter;
     public $configClass;
-    public $configurationClass;
+    public $configuration;
     public $context;
     public $dependencies;
     public $plugin;
@@ -20,11 +24,15 @@ class BasePaymentAction extends TestCase
 
     protected function setUp()
     {
-        $this->configurationClass = \Mockery::mock('ConfigurationClass');
-        $this->configurationClass
+        $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
+        $this->configuration
             ->shouldReceive([
                 'get' => true,
             ]);
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('payment_methods')
+            ->andReturn('{"standard":true, "deferred": true, "amex": true}');
 
         $this->cartAdapter = \Mockery::mock('CartAdapter');
         $this->toolsAdapter = \Mockery::mock('ToolsAdapter');
@@ -47,7 +55,7 @@ class BasePaymentAction extends TestCase
                 'getCart' => $this->cartAdapter,
                 'getContext' => $this->context,
                 'getTools' => $this->toolsAdapter,
-                'getConfigurationClass' => $this->configurationClass,
+                'getConfigurationClass' => $this->configuration,
             ]);
 
         $this->dependencies->name = 'payplug';

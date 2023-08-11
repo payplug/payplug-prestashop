@@ -355,6 +355,8 @@ var $document, $window, __moduleName__Module = {
                             integrated.props.paymentId = result.payment_id;
                             integrated.props.cart_id = result.cart_id;
                             integrated.form.submit();
+                        } else if (typeof result.force_reload != 'undefined' && result.force_reload) {
+                            window.location.href = result.return_url;
                         } else {
                             __moduleName__Module.popup.set(integratedPaymentError);
                             integrated.form.clear();

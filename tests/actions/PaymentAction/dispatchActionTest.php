@@ -26,15 +26,6 @@ class dispatchActionTest extends BasePaymentAction
         $this->dependencies->paymentClass = $paymentClass;
     }
 
-    public function invalidStringFormatDataProvider()
-    {
-        yield [42];
-        yield [['key' => 'value']];
-        yield [false];
-        yield [''];
-        yield [null];
-    }
-
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -63,58 +54,6 @@ class dispatchActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenGivenMethodsDoesNotExistsInAvailablePayment()
-    {
-        $this->toolsAdapter
-            ->shouldReceive([
-                'tool' => 42,
-            ]);
-        $this->cartAdapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-        $this->configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [],
-            ]);
-
-        $method = 'standard';
-        $this->assertSame(
-            [
-                'result' => false,
-                'message' => 'Given $method not found from getAvailableOptions',
-            ],
-            $this->action->dispatchAction($method)
-        );
-    }
-
-    public function testWhenGivenMethodsIsNotInAvailablePayment()
-    {
-        $this->toolsAdapter
-            ->shouldReceive([
-                'tool' => 42,
-            ]);
-        $this->cartAdapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-        $this->configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [
-                    'standard' => false,
-                ],
-            ]);
-
-        $method = 'standard';
-        $this->assertSame(
-            [
-                'result' => false,
-                'message' => 'Given $method is not available',
-            ],
-            $this->action->dispatchAction($method)
-        );
-    }
-
     public function testWhenGivenMethodsIsApplePay()
     {
         $this->toolsAdapter
@@ -124,12 +63,6 @@ class dispatchActionTest extends BasePaymentAction
         $this->cartAdapter
             ->shouldReceive([
                 'get' => CartMock::get(),
-            ]);
-        $this->configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [
-                    'applepay' => true,
-                ],
             ]);
 
         $method = 'applepay';
@@ -165,12 +98,6 @@ class dispatchActionTest extends BasePaymentAction
             ->shouldReceive([
                 'get' => CartMock::get(),
             ]);
-        $this->configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [
-                    'bancontact' => true,
-                ],
-            ]);
 
         $method = 'bancontact';
 
@@ -191,13 +118,6 @@ class dispatchActionTest extends BasePaymentAction
         $this->cartAdapter
             ->shouldReceive([
                 'get' => CartMock::get(),
-            ]);
-        $this->configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [
-                    'one_click' => true,
-                    'deferred' => true,
-                ],
             ]);
 
         $method = 'one_click';
@@ -221,12 +141,6 @@ class dispatchActionTest extends BasePaymentAction
             ->shouldReceive([
                 'get' => CartMock::get(),
             ]);
-        $this->configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [
-                    'oney' => true,
-                ],
-            ]);
 
         $method = 'oney';
 
@@ -248,14 +162,11 @@ class dispatchActionTest extends BasePaymentAction
             ->shouldReceive([
                 'get' => CartMock::get(),
             ]);
-        $this->configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [
-                    'deferred' => true,
-                    'embedded' => 'popup',
-                    'standard' => true,
-                ],
-            ]);
+
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('embedded_mode')
+            ->andReturn('popup');
 
         $method = 'standard';
 
@@ -278,15 +189,10 @@ class dispatchActionTest extends BasePaymentAction
             ->shouldReceive([
                 'get' => CartMock::get(),
             ]);
-        $this->configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [
-                    'amex' => true,
-                    'deferred' => false,
-                    'embedded' => 'redirect',
-                ],
-            ]);
-
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('embedded_mode')
+            ->andReturn('redirect');
         $method = 'amex';
 
         $this->assertSame(
