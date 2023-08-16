@@ -27,7 +27,7 @@
             "!.htaccess",
             "!payplug/composer.json",
             "!payplug/module_files.csv",
-            "dev",
+            "dev/",
 	        "*.sh",
             "test",
             "tests",
