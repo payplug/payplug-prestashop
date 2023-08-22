@@ -152,3 +152,13 @@ window[module_name + 'ModuleApplePay'] = {
         })
     }
 };
+
+$(document).ready(function () {
+    $('#payment-confirmation button').click(function () {
+    	var payment_method_id = $('.js-current-step .custom-radio input[type="radio"]:checked').attr('id');
+    	var payment_method = $('#pay-with-'+payment_method_id+'-form input[name="method"]').val();
+    	if (payment_method == 'applepay') {
+    		$('apple-pay-button').click();
+    	}
+    });
+});
