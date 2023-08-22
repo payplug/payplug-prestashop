@@ -22,7 +22,7 @@
 {if isset($iso_lang)}
     {assign var=iso_code value=$iso_lang}
 {else}
-    {assign var=iso_code value='fr'}
+    {assign var=iso_code value='en'}
 {/if}
 <div class="row">
     <div class="col-xs-12">
