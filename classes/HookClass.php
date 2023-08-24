@@ -31,7 +31,7 @@ class HookClass
     private $cache;
     private $card;
     private $cart;
-    private $config;
+    private $configurationAdapter;
     private $configuration;
     private $constant;
     private $context;
@@ -62,7 +62,7 @@ class HookClass
         $this->cache = $this->dependencies->getPlugin()->getCache();
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
-        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
@@ -89,41 +89,17 @@ class HookClass
     {
         $language = $params['return'];
 
-        if (!\in_array($language->iso_code, $this->dependencies->configClass->payplugLanguages)) {
-            return true;
+        if (!$this->validate->validate('isLoadedObject', $language)) {
+            // Given $params['lang'] must be an Language object
+            return false;
         }
 
-        // clear Language cache
-        $this->language->loadLanguages();
-
-        $all_order_states = \array_merge(
-            $this->configClass->orderStates,
-            $this->dependencies->configClass->orderStatesOney
-        );
-        $id_order_states = $this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
-        $payplug_order_states = \explode(',', $id_order_states);
-
-        foreach ($all_order_states as $state) {
-            foreach ($state['payplug_cfg'] as $config) {
-                $name = $state['name'][$language->iso_code];
-                $id_order_state = $this->config->get(
-                    $this->dependencies->concatenateModuleNameTo($config)
-                );
-                if (\in_array($id_order_state, $payplug_order_states)) {
-                    if (\strpos($this->dependencies->concatenateModuleNameTo($config), '_TEST')) {
-                        $name .= ' [TEST]';
-                    } else {
-                        $name .= ' [PayPlug]';
-                    }
-                }
-
-                $order_state = $this->orderStateAdapter->get((int) $id_order_state);
-                $order_state->name[$language->id] = $name;
-                $order_state->save();
-            }
+        if (!isset($language->iso_code) || !is_string($language->iso_code)) {
+            // Given $params['lang']->iso_code must be a non empty string
+            return false;
         }
 
-        return true;
+        return $this->updateOrderStateLang($language->iso_code, (int) $language->id);
     }
 
     /**
@@ -191,9 +167,9 @@ class HookClass
         $order = $this->order->get((int) $params['id_order']);
         $active = $this->module->isEnabled($this->dependencies->name);
 
-        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
         $can_use_deferred = (bool) $payment_methods['deferred'];
-        $deferredState = $this->config->get($this->dependencies->getConfigurationKey('deferredState'));
+        $deferredState = $this->configuration->getValue('deferred_state');
 
         if (!$active
             || $order->payment != $this->module->getInstanceByName($this->dependencies->name)->displayName
@@ -213,16 +189,12 @@ class HookClass
 
         $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
         if (!$retrieve['result']) {
-            $sandbox = (bool) $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
             if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey($this->config->get(
-                    $this->dependencies->getConfigurationKey('liveApiKey')
-                ));
+                $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('live_api_key'));
                 $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
             } else {
-                $this->dependencies->apiClass->setSecretKey($this->config->get(
-                    $this->dependencies->getConfigurationKey('testApiKey')
-                ));
+                $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('test_api_key'));
                 $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
             }
         }
@@ -257,43 +229,19 @@ class HookClass
      */
     public function actionUpdateLangAfter($params)
     {
-        $id_order_states = $this->dependencies->orderClass->getPayPlugOrderStates($this->dependencies->name);
-        $payplug_order_states = \explode(',', $id_order_states);
+        if (!$this->validate->validate('isLoadedObject', $params['lang'])) {
+            // Given $params['lang'] must be an Language object
 
-        if (empty($payplug_order_states)
-            || !\in_array($params['lang']->iso_code, $this->dependencies->configClass->payplugLanguages)) {
-            return true;
+            return false;
         }
 
-        $all_order_states = \array_merge(
-            $this->dependencies->configClass->orderStates,
-            $this->dependencies->configClass->orderStatesOney
-        );
+        if (!isset($params['lang']->iso_code) || !is_string($params['lang']->iso_code)) {
+            // Given $params['lang']->iso_code must be a non empty string
 
-        foreach ($all_order_states as $order_state) {
-            foreach ($order_state['payplug_cfg'] as $payplug_conf) {
-                if (\in_array($this->config->get(
-                    $this->dependencies->concatenateModuleNameTo($payplug_conf)
-                ), $payplug_order_states)) {
-                    $ps_order_state_name = $order_state['name'][$params['lang']->iso_code];
-                    if (\strpos($this->dependencies->concatenateModuleNameTo(
-                        $payplug_conf
-                    ), '_TEST')) {
-                        $ps_order_state_name .= ' [TEST]';
-                    } else {
-                        $ps_order_state_name .= ' [PayPlug]';
-                    }
-
-                    $ps_order_state = $this->orderStateAdapter->get((int) $this->config->get(
-                        $this->dependencies->concatenateModuleNameTo($payplug_conf)
-                    ));
-                    $ps_order_state->name[$params['lang']->id] = $ps_order_state_name;
-                    $ps_order_state->save();
-                }
-            }
+            return false;
         }
 
-        return true;
+        return $this->updateOrderStateLang($params['lang']->iso_code, (int) $params['lang']->id);
     }
 
     /**
@@ -793,7 +741,7 @@ class HookClass
     {
         $controller = $this->dispatcher->getInstance()->getController();
         if ($controller
-            && 'adminorders' == strtolower($controller)
+            && 'adminorders' == $this->tools->tool('strtolower', $controller)
             && $this->tools->tool('getValue', 'id_order')
         ) {
             $id_order = $this->tools->tool('getValue', 'id_order');
@@ -835,9 +783,7 @@ class HookClass
     {
         if (!$this->oney->isOneyAllowed()
             || (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
-            $this->config->get(
-                $this->dependencies->getConfigurationKey('companyIso')
-            )) {
+            $this->configuration->getValue('company_iso')) {
             return false;
         }
 
@@ -848,9 +794,7 @@ class HookClass
             'payplug_oney_amount' => $amount,
             'payplug_oney_allowed' => $is_valid_amount['result'],
             'payplug_oney_error' => $is_valid_amount['error'],
-            'use_fees' => (bool) $this->config->get(
-                $this->dependencies->getConfigurationKey('oneyFees')
-            ),
+            'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
 
@@ -864,12 +808,12 @@ class HookClass
     {
         if (!$this->oney->isOneyAllowed()
             || (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
-            $this->config->get($this->dependencies->getConfigurationKey('companyIso'))
+            $this->configuration->getValue('company_iso')
         ) {
             return false;
         }
 
-        $use_taxes = (bool) $this->config->get('PS_TAX');
+        $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
         $amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->oney->isValidOneyAmount($amount);
         $is_elligible = $is_elligible['result'];
@@ -877,7 +821,7 @@ class HookClass
         $this->assign->assign([
             'env' => 'checkout',
             'payplug_is_oney_elligible' => $is_elligible,
-            'use_fees' => (bool) $this->config->get($this->dependencies->getConfigurationKey('oneyFees')),
+            'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
 
@@ -911,9 +855,7 @@ class HookClass
             [
                 $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
                 'PAYPLUG_DOMAIN' => $payplug_domain,
-                'is_sandbox_mode' => (bool) $this->config->get(
-                    $this->dependencies->getConfigurationKey('sandboxMode')
-                ),
+                'is_sandbox_mode' => (bool) $this->configuration->getValue('sandbox_mode'),
             ]
         );
 
@@ -937,9 +879,9 @@ class HookClass
         $id_card = $this->tools->tool('getValue', 'pc', 'new_card');
 
         // Is embeddedMode configured to show the lightbox..
-        $show_lightbox = 'popup' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
+        $show_lightbox = 'popup' == $this->configuration->getValue('embedded_mode')
             || (
-                'integrated' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))
+                'integrated' == $this->configuration->getValue('embedded_mode')
                 && ($this->tools->tool('getValue', 'inst') || $this->tools->tool('getValue', 'amex'))
             );
         // ... or is the payment with one click
@@ -984,10 +926,7 @@ class HookClass
                     $this->tools->tool('redirect', $payment['return_url']);
                 } else {
                     // else show the popin
-
-                    if ('integrated' == $this->config->get(
-                        $this->dependencies->getConfigurationKey('embeddedMode')
-                    )) {
+                    if ('integrated' == $this->configuration->getValue('embedded_mode')) {
                         $api_url = $integrated_payment_js_url;
                         $this->media->addJsDef([
                             'isIntegratedPayment' => true,
@@ -1024,9 +963,9 @@ class HookClass
             ]);
         }
 
-        if ('integrated' == $this->config->get($this->dependencies->getConfigurationKey('embeddedMode'))) {
+        if ('integrated' == $this->configuration->getValue('embedded_mode')) {
             $integratedPaymentError = $this->dependencies->l('hook.header.integratedPayment.error', 'hookclass');
-            $sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
+            $sandbox = $this->configuration->getValue('sandbox_mode');
             $this->media->addJsDef([
                 'integratedPaymentError' => $integratedPaymentError,
             ]);
@@ -1054,7 +993,7 @@ class HookClass
         if (!$this->oney->isOneyAllowed()
             || 'product' != $current_controller
             || (string) $this->tools->tool('strtoupper', $this->context->language->iso_code) !=
-            $this->config->get($this->dependencies->getConfigurationKey('companyIso'))) {
+            $this->configuration->getValue('company_iso')) {
             return false;
         }
 
@@ -1070,7 +1009,7 @@ class HookClass
         }
 
         if ('refresh' == $action) {
-            $use_taxes = (bool) $this->config->get('PS_TAX');
+            $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
 
             $id_product = (int) $this->tools->tool('getValue', 'id_product');
             $group = $this->tools->tool('getValue', 'group');
@@ -1108,7 +1047,7 @@ class HookClass
 
         $this->assign->assign([
             'env' => 'product',
-            'use_fees' => (bool) $this->config->get($this->dependencies->getConfigurationKey('oneyFees')),
+            'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
         ]);
 
@@ -1130,7 +1069,7 @@ class HookClass
             return false;
         }
 
-        $use_taxes = $this->config->get('PS_TAX');
+        $use_taxes = $this->configurationAdapter->get('PS_TAX');
         $base_total_tax_inc = $params['cart']->getOrderTotal(true);
         $base_total_tax_exc = $params['cart']->getOrderTotal(false);
 
@@ -1143,16 +1082,12 @@ class HookClass
         $cart = $params['cart'];
 
         $result_currency = $this->currency->get((int) $cart->id_currency);
-        $supported_currencies = \explode(';', $this->config->get(
-            $this->dependencies->getConfigurationKey('currencies')
-        ));
+        $supported_currencies = \explode(';', $this->configuration->getValue('currencies'));
         if (!\in_array($result_currency->iso_code, $supported_currencies, true)) {
             return false;
         }
 
-        if ($this->config->get(
-            $this->dependencies->getConfigurationKey('oneyOptimized')
-        )) {
+        if ($this->configuration->getValue('oney_optimized')) {
             $this->oney->assignOneyPaymentOptions($cart);
         }
 
@@ -1168,7 +1103,7 @@ class HookClass
         );
 
         $this->assign->assign([
-            'use_fees' => (bool) $this->config->get($this->dependencies->getConfigurationKey('oneyFees')),
+            'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
             'iso_code' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
             'payplug_payment_options' => $paymentOptions,
             'spinner_url' => $this->tools->tool('getHttpHost', true) .
@@ -1225,27 +1160,19 @@ class HookClass
         // Check order state to display appropriate message
         $state = null;
         if (isset($order->current_state)
-            && $order->current_state == $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING')
-            )
+            && $order->current_state == $this->configuration->getValue('order_state_pending')
         ) {
             $state = 'pending';
         } elseif (isset($order->current_state)
-            && $order->current_state == $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID')
-            )
+            && $order->current_state == $this->configuration->getValue('order_state_paid')
         ) {
             $state = 'paid';
         } elseif (isset($order->current_state)
-            && $order->current_state == $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PENDING_TEST')
-            )
+            && $order->current_state == $this->configuration->getValue('order_state_pending_test')
         ) {
             $state = 'pending_test';
         } elseif (isset($order->current_state)
-            && $order->current_state == $this->config->get(
-                $this->dependencies->concatenateModuleNameTo('ORDER_STATE_PAID_TEST')
-            )
+            && $order->current_state == $this->configuration->getValue('order_state_paid_test')
         ) {
             $state = 'paid_test';
         }
@@ -1260,5 +1187,50 @@ class HookClass
         $this->assign->assign($context);
 
         return $this->dependencies->configClass->fetchTemplate('checkout/order-confirmation.tpl');
+    }
+
+    /**
+     * @param string $iso_code
+     * @param int    $id_lang
+     *
+     * @return bool
+     */
+    private function updateOrderStateLang($iso_code = '', $id_lang = 0)
+    {
+        if (!$iso_code || !is_string($iso_code)) {
+            // Given $iso_code must be a non empty string
+            return false;
+        }
+
+        if (!$id_lang || !is_int($id_lang)) {
+            // Given $id_lang must be a non null integer
+            return false;
+        }
+
+        if (!in_array($iso_code, $this->configuration->allowed_iso_lang)) {
+            return true;
+        }
+
+        $order_states = $this->configuration->order_states;
+
+        foreach ($order_states as $name => $order_state) {
+            // Update Live order state
+            $config_name = 'order_state_' . $name;
+            $order_state_name = $order_state['name'][$iso_code] . ' [PayPlug]';
+            $id_order_state = $this->configuration->getValue($config_name);
+            $live_order_state = $this->orderStateAdapter->get((int) $id_order_state);
+            $live_order_state->name[$id_lang] = $order_state_name;
+            $live_order_state->save();
+
+            // Update Test order state
+            $config_name .= '_test';
+            $order_state_name = $order_state['name'][$iso_code] . ' [TEST]';
+            $id_order_state = $this->configuration->getValue($config_name);
+            $test_order_state = $this->orderStateAdapter->get((int) $id_order_state);
+            $test_order_state->name[$id_lang] = $order_state_name;
+            $test_order_state->save();
+        }
+
+        return true;
     }
 }

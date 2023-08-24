@@ -45,6 +45,10 @@ final class GetCustomOneyPriceLimitTest extends BaseOneyRepository
                         return '{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:99","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"ideal":{"min":"EUR:99","max":"EUR:2000000"},"mybank":{"min":"EUR:99","max":"EUR:2000000"},"satispay":{"min":"EUR:99","max":"EUR:2000000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}';
                     case 'countries':
                         return '{"oney_x3_with_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x4_with_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x3_without_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x4_without_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"giropay":["DE"],"ideal":["NL"],"mybank":["IT"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"],"sofort":["AT","BE","DE","ES","IT","NL"]}';
+                    case 'oney_custom_max_amounts':
+                        return 'EUR:300000';
+                    case 'oney_custom_min_amounts':
+                        return 'EUR:10000';
                     default:
                         return $this->configuration->getDefault($key);
                 }
@@ -68,7 +72,10 @@ final class GetCustomOneyPriceLimitTest extends BaseOneyRepository
         ;
 
         $this->assertSame(
-            $this->amounts,
+            [
+                'min' => 10000,
+                'max' => 300000,
+            ],
             $this->repo->getOneyPriceLimit(true, $this->currencyMock)
         );
     }

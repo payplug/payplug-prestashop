@@ -32,6 +32,9 @@ class FilesHelper
      */
     public static function clean()
     {
+        $dependencies = new DependenciesClass();
+        $logger = $dependencies->getPlugin()->getLogger();
+
         // If we are on local environment then don't run the cleaning
         if (isset($_SERVER['SERVER_NAME']) && (
             'localhost' == $_SERVER['SERVER_NAME']
@@ -39,11 +42,10 @@ class FilesHelper
                 || preg_match('/ngrok-free.app/i', $_SERVER['SERVER_NAME'])
         )
         ) {
-            return;
-        }
+            $logger->addLog('No file cleaning needed');
 
-        $dependencies = new DependenciesClass();
-        $logger = $dependencies->getPlugin()->getLogger();
+            return true;
+        }
 
         $current_list = self::get();
         $allow_list = self::getList();
@@ -66,6 +68,8 @@ class FilesHelper
 
             $logger->addLog('End of cleaning');
         }
+
+        return true;
     }
 
     /**

@@ -40,9 +40,9 @@ final class SetCacheKeyTest extends BaseCacheRepository
 
     public function testWithValidData()
     {
-        $this->config->shouldReceive([
-            'get' => false,
-        ]);
+        $this->configuration->shouldReceive('getValue')
+            ->with('sandbox_mode')
+            ->andReturn(false);
         $this->assertSame(
             [
                 'result' => 'Payplug::OneySimulations_15000_FR_operation_live',

@@ -131,9 +131,7 @@ class CacheRepository extends BaseClass
             (int) $amount . '_' .
             (string) $country . '_' .
             (string) implode('_', $operations) . '_' .
-            ($this->config->get(
-                $this->dependencies->getConfigurationKey('sandboxMode')
-            ) ? 'test' : 'live');
+            ($this->config->getValue('sandbox_mode') ? 'test' : 'live');
 
         return [
             'result' => $cache_id,

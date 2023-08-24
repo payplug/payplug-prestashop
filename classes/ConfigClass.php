@@ -29,7 +29,6 @@ class ConfigClass
 {
     public $api_rest;
     public $amountCurrencyClass;
-    public $configurations;
     public $email;
     public $features_json;
     public $logger;
@@ -220,13 +219,11 @@ class ConfigClass
 
     private $api_live;
     private $api_test;
-    private $check_configuration;
-    private $config;
+    private $configurationAdapter;
     private $constant;
     private $context;
     private $country;
     private $dependencies;
-    private $html = '';
     private $img_lang;
     private $install;
     private $media;
@@ -237,7 +234,6 @@ class ConfigClass
     private $ssl_enable;
     private $tools;
     private $validate;
-    private $validationErrors = [];
     private $validators = [];
 
     public function __construct($dependencies)
@@ -245,7 +241,8 @@ class ConfigClass
         $this->dependencies = $dependencies;
 
         $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
-        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
@@ -290,7 +287,7 @@ class ConfigClass
      */
     public function disable()
     {
-        return $this->config->updateValue($this->dependencies->getConfigurationKey('enable'), 0);
+        return $this->configuration->set('enable', 0);
     }
 
     /**
@@ -414,7 +411,7 @@ class ConfigClass
     public function isAllowed()
     {
         $is_shown = $this->validators['module']->canBeShown(
-            (bool) $this->config->get($this->dependencies->getConfigurationKey('enable'))
+            (bool) $this->configuration->getValue('enable')
         );
         $is_allowed = $this->validators['module']->isAllowed(
             (bool) $this->module->isEnabled($this->dependencies->name),
@@ -488,7 +485,7 @@ class ConfigClass
      */
     public function getLivePermissions()
     {
-        $live_api_key = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
+        $live_api_key = $this->configuration->getValue('live_api_key');
         $livepermissions = $this->dependencies->apiClass->getAccount($live_api_key);
 
         return $livepermissions ? $livepermissions : [];
@@ -791,8 +788,8 @@ class ConfigClass
     public function logout()
     {
         $this->install->setConfig();
-        $this->config->updateValue($this->dependencies->getConfigurationKey('enable'), 0);
-        $this->config->loadConfiguration();
+        $this->configuration->set('enable', 0);
+        $this->configurationAdapter->loadConfiguration();
     }
 
     /**
@@ -811,9 +808,9 @@ class ConfigClass
      */
     private function setConfigurationProperties()
     {
-        $this->api_live = $this->config->get($this->dependencies->getConfigurationKey('liveApiKey'));
-        $this->api_test = $this->config->get($this->dependencies->getConfigurationKey('testApiKey'));
-        $this->email = $this->config->get($this->dependencies->getConfigurationKey('email'));
+        $this->api_live = $this->configuration->getValue('live_api_key');
+        $this->api_test = $this->configuration->getValue('test_api_key');
+        $this->email = $this->configuration->getValue('email');
 
         $available_img_lang = [
             'fr',
@@ -823,7 +820,7 @@ class ConfigClass
         ];
         $this->img_lang = in_array($this->context->language->iso_code, $available_img_lang)
             ? $this->context->language->iso_code : 'default';
-        $this->ssl_enable = $this->config->get('PS_SSL_ENABLED');
+        $this->ssl_enable = $this->configurationAdapter->get('PS_SSL_ENABLED');
 
         if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
             $this->warning = $this->dependencies->l('payplug.setConfigurationProperties.configureModule', 'configclass');

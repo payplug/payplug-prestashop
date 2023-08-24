@@ -313,8 +313,11 @@ class PsPaylater extends PaymentModule
      */
     public function hookDisplayExpressCheckout()
     {
-        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyCartCta'))) {
-            return $this->payplug_dependencies->hookClass->displayExpressCheckout();
+        if ($this->module) {
+            $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
+            if ((bool) $configuration->getValue('oney_cart_cta')) {
+                return $this->payplug_dependencies->hookClass->displayExpressCheckout();
+            }
         }
     }
 
@@ -325,8 +328,11 @@ class PsPaylater extends PaymentModule
      */
     public function hookDisplayProductPriceBlock($params)
     {
-        if ($this->module && Configuration::get($this->payplug_dependencies->dependencies->getConfigurationKey('oneyProductCta'))) {
-            return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
+        if ($this->module) {
+            $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
+            if ((bool) $configuration->getValue('oney_product_cta')) {
+                return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
+            }
         }
     }
 

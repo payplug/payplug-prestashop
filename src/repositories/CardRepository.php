@@ -31,7 +31,6 @@ class CardRepository extends BaseClass
     protected $dependencies;
 
     private $cardEntity;
-    private $configurationAdapter;
     private $constant;
     private $query;
     private $logger;
@@ -39,7 +38,6 @@ class CardRepository extends BaseClass
     private $validators;
 
     public function __construct(
-        $configurationAdapter,
         $constant,
         $dependencies,
         $logger,
@@ -47,20 +45,12 @@ class CardRepository extends BaseClass
         $tools
     ) {
         $this->cardEntity = new CardEntity();
-        $this->configurationAdapter = $configurationAdapter;
         $this->constant = $constant;
         $this->dependencies = $dependencies;
         $this->logger = $logger;
         $this->query = $query;
         $this->toolsAdapter = $tools;
         $this->validators = $this->dependencies->getValidators();
-
-        $isSandbox = $this->configurationAdapter->get(
-            $this->dependencies->getConfigurationKey('sandboxMode')
-        );
-        $idCompany = $this->configurationAdapter->get(
-            $this->dependencies->getConfigurationKey('companyId')
-        );
         $this->logger->setProcess('card');
 
         $this->cardEntity
@@ -70,13 +60,6 @@ class CardRepository extends BaseClass
             ->setFieldsValidate([])
             ->setTable($this->dependencies->name . '_card')
             ->setIdentifier('');
-        if ($idCompany && (!empty($idCompany))) {
-            $this->cardEntity->setIdCompany((int) $idCompany);
-        }
-
-        if ($isSandbox) {
-            $this->cardEntity->setIsSandbox((bool) $isSandbox);
-        }
     }
 
     /**
@@ -239,8 +222,10 @@ class CardRepository extends BaseClass
             return [];
         }
 
-        $id_company = $this->cardEntity->getIdCompany();
-        $is_sandbox = $this->cardEntity->getIsSandbox();
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $is_sandbox = $configuration->getValue('sandbox_mode');
+        $id_company = $configuration->getValue('company_id');
+
         $cards = $this->dependencies
             ->getRepositories()['card']
             ->getAllByCustomer((int) $id_customer, (int) $id_company, (bool) $is_sandbox);

@@ -63,7 +63,7 @@ class OrderStateRepository extends BaseClass
         $query,
         $tools,
         $validate,
-        $myLogPHP
+        $myLogPhp
     ) {
         $this->configuration = $configuration;
         $this->constant = $constant;
@@ -73,7 +73,7 @@ class OrderStateRepository extends BaseClass
         $this->query = $query;
         $this->tools = $tools;
         $this->validate = $validate;
-        $this->log = $myLogPHP;
+        $this->log = $myLogPhp;
     }
 
     public function add($name, $state = [], $sandbox = true)
@@ -83,12 +83,12 @@ class OrderStateRepository extends BaseClass
             return false;
         }
 
-        $this->log->info('Creating new order state.');
+        $this->log->info('Creating new order state: ' . $name);
         $order_state = $this->order_state_adapter->get();
         $order_state->logable = $state['logable'];
         $order_state->send_email = $state['send_email'];
         $order_state->paid = $state['paid'];
-        $order_state->module_name = $state['module_name'];
+        $order_state->module_name = $this->dependencies->name;
         $order_state->hidden = $state['hidden'];
         $order_state->delivery = $state['delivery'];
         $order_state->invoice = $state['invoice'];
@@ -132,19 +132,17 @@ class OrderStateRepository extends BaseClass
             return false;
         }
 
-        $this->log->info('Order state: ' . $name . ($sandbox ? ' - test' : ''));
-
-        $key_config = $this->getConfigKey($name, $sandbox);
-        $id_order_state = $this->configuration->get($key_config);
+        $key_config = 'order_state_' . $name . ($sandbox ? '_test' : '');
+        $id_order_state = $this->configuration->getValue($key_config);
 
         // Get order state id with given configuration key
         if (!$id_order_state && !$sandbox && isset($state['cfg']) && $state['cfg']) {
-            $id_order_state = $this->getOrderStateByConfiguration($state['cfg']);
+            $id_order_state = $this->dependencies->getPlugin()->getConfiguration()->get($state['cfg']);
             if ($id_order_state) {
                 // Valide order state
                 $os = $this->order_state_adapter->get((int) $id_order_state);
                 if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
-                    return $this->configuration->updateValue($key_config, $os->id);
+                    return $this->configuration->set($key_config, (int) $os->id);
                 }
             }
         }
@@ -171,7 +169,7 @@ class OrderStateRepository extends BaseClass
             $id_order_state = $this->add($name, $state, $sandbox);
         }
 
-        return $this->configuration->updateValue($key_config, $id_order_state);
+        return $this->configuration->set($key_config, (int) $id_order_state);
     }
 
     /**
@@ -283,24 +281,6 @@ class OrderStateRepository extends BaseClass
         return (int) $this->query->build('unique_value');
     }
 
-    public function getIdByKey($key)
-    {
-        return (int) $this->configuration->get($key);
-    }
-
-    public function getIdByName($name)
-    {
-        $this->query
-            ->select()
-            ->fields('osl.id_order_state')
-            ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
-            ->where('osl.name = \'' . $this->query->escape($name) . '\'')
-            ->limit(1, 1)
-        ;
-
-        return $this->query->build('unique_value');
-    }
-
     public function getIdsByModuleName($module_name)
     {
         $ids = [];
@@ -335,15 +315,6 @@ class OrderStateRepository extends BaseClass
         }
 
         return $ids;
-    }
-
-    public function getOrderStateByConfiguration($key = false)
-    {
-        if (!is_string($key) || !$key) {
-            return false;
-        }
-
-        return $this->configuration->get($key);
     }
 
     public function getOrderStateByTemplate($template = false)

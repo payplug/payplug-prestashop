@@ -27,7 +27,6 @@ class Configuration
 {
     // @todo: check the following keys, no usage found
     // COMPANY_STATUS
-    // DEBUG_MODE
     // OFFER
     public $configuration = [
         'allow_save_card' => [
@@ -289,6 +288,153 @@ class Configuration
             'setConf' => 1,
         ],
     ];
+    public $order_states = [
+        'paid' => [
+            'cfg' => 'PS_OS_PAYMENT',
+            'template' => 'payment',
+            'logable' => true,
+            'send_email' => true,
+            'paid' => true,
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#04b404',
+            'name' => [
+                'en' => 'Payment accepted',
+                'fr' => 'Paiement effectué',
+                'es' => 'Pago efectuado',
+                'it' => 'Pagamento effettuato',
+            ],
+            'type' => 'paid',
+        ],
+        'refund' => [
+            'cfg' => 'PS_OS_REFUND',
+            'template' => 'refund',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => true,
+            'color' => '#ea3737',
+            'name' => [
+                'en' => 'Refunded',
+                'fr' => 'Remboursé',
+                'es' => 'Reembolsado',
+                'it' => 'Rimborsato',
+            ],
+            'type' => 'refund',
+        ],
+        'pending' => [
+            'cfg' => 'PS_OS_PENDING',
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#a1f8a1',
+            'name' => [
+                'en' => 'Payment in progress',
+                'fr' => 'Paiement en cours',
+                'es' => 'Pago en curso',
+                'it' => 'Pagamento in corso',
+            ],
+            'type' => 'pending',
+        ],
+        'error' => [
+            'cfg' => 'PS_OS_ERROR',
+            'template' => 'payment_error',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#8f0621',
+            'name' => [
+                'en' => 'Payment failed',
+                'fr' => 'Paiement échoué',
+                'es' => 'Payment failed',
+                'it' => 'Payment failed',
+            ],
+            'type' => 'error',
+        ],
+        'cancelled' => [
+            'cfg' => 'PS_OS_CANCELED',
+            'template' => 'order_canceled',
+            'logable' => false,
+            'send_email' => true,
+            'paid' => false,
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#2C3E50',
+            'name' => [
+                'en' => 'Payment cancelled',
+                'fr' => 'Paiement annulé',
+                'es' => 'Payment cancelled',
+                'it' => 'Payment cancelled',
+            ],
+            'type' => 'cancelled',
+        ],
+        'auth' => [
+            'cfg' => null,
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => true,
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#04b404',
+            'name' => [
+                'en' => 'Payment authorized',
+                'fr' => 'Paiement autorisé',
+                'es' => 'Pago',
+                'it' => 'Pagamento',
+            ],
+            'type' => 'pending',
+        ],
+        'exp' => [
+            'cfg' => null,
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#8f0621',
+            'name' => [
+                'en' => 'Autorization expired',
+                'es' => 'Autorización vencida',
+                'fr' => 'Autorisation expirée',
+                'it' => 'Autorizzazione scaduta',
+            ],
+            'type' => 'expired',
+        ],
+        'oney_pg' => [
+            'cfg' => null,
+            'template' => null,
+            'logable' => false,
+            'send_email' => false,
+            'paid' => false,
+            'hidden' => false,
+            'delivery' => false,
+            'invoice' => false,
+            'color' => '#a1f8a1',
+            'name' => [
+                'en' => 'Oney - Pending',
+                'fr' => 'Oney - En attente',
+                'es' => 'Oney - Pending',
+                'it' => 'Oney - Pending',
+            ],
+            'type' => 'pending',
+        ],
+    ];
+    public $allowed_iso_lang = ['en', 'fr', 'es', 'it'];
     private $dependencies;
 
     public function __construct($dependencies)
@@ -403,7 +549,7 @@ class Configuration
     }
 
     /**
-     * @description get the value of a given configuration
+     * @description get the current value of a given configuration
      *
      * @param string $key
      *

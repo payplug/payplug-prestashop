@@ -68,31 +68,6 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
         );
     }
 
-    public function testIsValidCustomOneyMax()
-    {
-        $this->currency->shouldReceive('get')
-            ->andReturn($this->currencyMock)
-        ;
-        $custom_amount = $this->repo->getOneyPriceLimit(true, $this->currencyMock);
-        $amount = $this->repo->getOneyPriceLimit(false, $this->currencyMock);
-        $oney_custom_max_amount = $custom_amount['max'];
-        $oney_max_amount = $amount['max'] / 100;
-
-        $this->assertGreaterThanOrEqual($oney_custom_max_amount, $oney_max_amount);
-    }
-
-    public function testIsValidCustomOneyMin()
-    {
-        $this->currency->shouldReceive('get')
-            ->andReturn($this->currencyMock)
-        ;
-        $custom_amount = $this->repo->getOneyPriceLimit(true, $this->currencyMock);
-        $amount = $this->repo->getOneyPriceLimit(false, $this->currencyMock);
-        $oney_custom_min_amount = $custom_amount['min'];
-        $oney_min_amount = $amount['min'] / 100;
-        $this->assertGreaterThanOrEqual($oney_min_amount, $oney_custom_min_amount);
-    }
-
     public function validDataProvider()
     {
         yield ['wrong_parameter'];
