@@ -28,6 +28,7 @@ use PayPlug\src\application\dependencies\PluginInit;
 use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
 use PayPlug\src\models\repositories\ModuleRepository;
+use PayPlug\src\models\repositories\OrderRepository;
 use PayPlug\src\models\repositories\PaymentRepository;
 use PayPlug\src\models\repositories\ShopRepository;
 use PayPlug\src\utilities\helpers\AmountHelper;
@@ -208,6 +209,7 @@ class DependenciesClass
             'card' => new CardRepository($prefix, $this->name),
             'country' => new CountryRepository($prefix, $this->name, $logger),
             'module' => new ModuleRepository($prefix, $this->name, $logger),
+            'order' => new OrderRepository($prefix, $this->name, $logger),
             'payment' => new PaymentRepository($prefix, $this->name, $logger),
             'shop' => new ShopRepository($prefix, $this->name, $logger),
         ];
