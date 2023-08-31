@@ -3,6 +3,7 @@
 namespace PayPlug\tests\actions\OnboardingAction;
 
 use PayPlug\src\actions\OnboardingAction;
+use PayPlug\src\models\classes\Configuration;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +14,7 @@ class BaseOnboardingAction extends TestCase
 
     protected function setUp()
     {
-        $this->configurationClass = \Mockery::mock('ConfigurationClass');
+        $this->configurationClass = \Mockery::mock(Configuration::class)->makePartial();
         $this->configurationClass
             ->shouldReceive([
                 'get' => true,

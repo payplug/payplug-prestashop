@@ -25,6 +25,7 @@ namespace PayPlug\src\application\dependencies;
 
 use PayPlug\classes\MyLogPHP;
 use PayPlug\src\actions\ConfigurationAction;
+use PayPlug\src\actions\MerchantTelemetryAction;
 use PayPlug\src\actions\OnboardingAction;
 use PayPlug\src\actions\PaymentAction;
 use PayPlug\src\application\adapter\AddressAdapter;
@@ -71,6 +72,7 @@ use PayPlug\src\repositories\QueryRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
 use PayPlug\src\utilities\services\Browser;
+use PayPlug\src\utilities\services\MerchantTelemetry;
 use PayPlug\src\utilities\services\Routes;
 
 class PluginInit extends BaseClass
@@ -78,8 +80,9 @@ class PluginInit extends BaseClass
     protected $dependencies;
 
     // Actions
-    private $configurationAction;
-    private $onboardingAction;
+    private $configuration_action;
+    private $onboarding_action;
+    private $merchant_telemetry_action;
     private $paymentAction;
 
     // EntitiesApiRest
@@ -138,6 +141,7 @@ class PluginInit extends BaseClass
     // Utilities services
     private $browser;
     private $routes;
+    private $merchant_telemetry;
 
     public function __construct($dependencies = null)
     {
@@ -162,8 +166,10 @@ class PluginInit extends BaseClass
             ->setCarrier($this->carrier)
             ->setCart($this->cart)
             ->setConfiguration($this->configuration)
-            ->setConfigurationAction($this->configurationAction)
-            ->setOnboardingAction($this->onboardingAction)
+            ->setConfigurationAction($this->configuration_action)
+            ->setOnboardingAction($this->onboarding_action)
+            ->setMerchantTelemetry($this->merchant_telemetry)
+            ->setMerchantTelemetryAction($this->merchant_telemetry_action)
             ->setConfigurationClass($this->configuration_class)
             ->setConstant($this->constant)
             ->setContext($this->context)
@@ -203,8 +209,9 @@ class PluginInit extends BaseClass
 
     private function setActions()
     {
-        $this->configurationAction = new ConfigurationAction($this->dependencies);
-        $this->onboardingAction = new OnboardingAction($this->dependencies);
+        $this->configuration_action = new ConfigurationAction($this->dependencies);
+        $this->merchant_telemetry_action = new MerchantTelemetryAction($this->dependencies);
+        $this->onboarding_action = new OnboardingAction($this->dependencies);
         $this->paymentAction = new PaymentAction($this->dependencies);
     }
 
@@ -356,5 +363,6 @@ class PluginInit extends BaseClass
     {
         $this->browser = new Browser();
         $this->routes = new Routes();
+        $this->merchant_telemetry = new MerchantTelemetry();
     }
 }

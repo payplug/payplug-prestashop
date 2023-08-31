@@ -27,7 +27,9 @@ use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
 use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\src\models\repositories\CountryRepository;
+use PayPlug\src\models\repositories\ModuleRepository;
 use PayPlug\src\models\repositories\PaymentRepository;
+use PayPlug\src\models\repositories\ShopRepository;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\FilesHelper;
 use PayPlug\src\utilities\helpers\UserHelper;
@@ -203,9 +205,11 @@ class DependenciesClass
         $prefix = $constant->get('_DB_PREFIX_');
         $logger = $this->getPlugin()->getLogger();
         $this->repositories = [
-            'country' => new CountryRepository($prefix, $this->name, $logger),
             'card' => new CardRepository($prefix, $this->name),
+            'country' => new CountryRepository($prefix, $this->name, $logger),
+            'module' => new ModuleRepository($prefix, $this->name, $logger),
             'payment' => new PaymentRepository($prefix, $this->name, $logger),
+            'shop' => new ShopRepository($prefix, $this->name, $logger),
         ];
     }
 
