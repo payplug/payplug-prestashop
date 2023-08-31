@@ -612,6 +612,11 @@ class ConfigurationAction
             ];
         }
 
+        $render_telemetry = $this->dependencies->getPlugin()->getMerchantTelemetryAction()->sendAction('save');
+        if (!$render_telemetry) {
+            $logger->addLog('ConfigurationAction::saveAction: Error during telemetry sending');
+        }
+
         return [
             'success' => true,
             'data' => [
