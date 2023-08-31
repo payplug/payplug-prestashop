@@ -436,6 +436,9 @@ class PayPlugNotifications
             $module_name = $this->dependencies->l('notification.createOrder.sofort', 'payplugnotifications');
         }
 
+        // Check if this notification is the first of the day
+        $is_first_order = empty($this->dependencies->setRepositories()['order']->getCurrentOrders());
+
         // Create Order
         try {
             $this->logger->addLog('Order create with amount:' . $amount);
@@ -550,6 +553,11 @@ class PayPlugNotifications
             $this->exitProcess('There is more than one transaction using id_order: ' . (int) $id_order, 500);
         } else {
             $this->logger->addLog('OK');
+        }
+
+        // Before ending process, if this is the first order of the days, we send the telemetries
+        if ($is_first_order) {
+            $this->dependencies->getPlugin()->getMerchantTelemetryAction()->sendAction('notification');
         }
 
         $this->logger->addLog('Order created.');
