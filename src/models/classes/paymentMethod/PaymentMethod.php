@@ -405,6 +405,7 @@ class PaymentMethod
         }
 
         $payplug_countries = json_decode($this->configuration->getValue('countries'), true);
+
         if (isset($payplug_countries[$this->name])) {
             $shipping_address = $this->dependencies
                 ->getPlugin()

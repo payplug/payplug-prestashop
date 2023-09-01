@@ -6,7 +6,6 @@ namespace PayPlug\tests\actions\MerchantTelemetryAction;
  * @group unit
  * @group action
  * @group merchant_telemetry_action
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */
