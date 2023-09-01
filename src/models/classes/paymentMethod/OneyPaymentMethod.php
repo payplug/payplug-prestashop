@@ -167,8 +167,7 @@ class OneyPaymentMethod extends PaymentMethod
             return [];
         }
 
-        $payment_options = parent::getPaymentOption($payment_options);
-        $default_oney_option = $payment_options['oney'];
+        $this->setParameters();
 
         $use_taxes = (bool) $this->dependencies
             ->getPlugin()
@@ -194,6 +193,7 @@ class OneyPaymentMethod extends PaymentMethod
             ->getPlugin()
             ->getTools()
             ->tool('strtoupper', $this->context->language->iso_code);
+
         if (!in_array($iso, $this->oney_allowed_iso_codes)) {
             $iso = $this->configuration->getValue('company_iso');
         }
@@ -209,7 +209,13 @@ class OneyPaymentMethod extends PaymentMethod
                 continue;
             }
 
-            $payment_key = 'oney_' . $oney_payment;
+            $this->name = 'oney_' . $oney_payment;
+            $payment_options = parent::getPaymentOption($payment_options);
+
+            if (!isset($payment_options[$this->name])) {
+                continue;
+            }
+
             $type = explode('_', $oney_payment);
             $split = (int) str_replace('x', '', $type[0]);
 
@@ -230,28 +236,27 @@ class OneyPaymentMethod extends PaymentMethod
                 }
             }
 
-            $payment_options[$payment_key] = $default_oney_option;
-            $payment_options[$payment_key]['is_optimized'] = $optimized;
-            $payment_options[$payment_key]['type'] = $oney_payment;
-            $payment_options[$payment_key]['amount'] = $cart_amount;
-            $payment_options[$payment_key]['iso_code'] = $this->dependencies
+            $payment_options[$this->name]['is_optimized'] = $optimized;
+            $payment_options[$this->name]['type'] = $oney_payment;
+            $payment_options[$this->name]['amount'] = $cart_amount;
+            $payment_options[$this->name]['iso_code'] = $this->dependencies
                 ->configClass
                 ->getIsoCodeByCountryId((int) $delivery_address->id_country);
-            $payment_options[$payment_key]['inputs']['oney_type'] = [
+            $payment_options[$this->name]['inputs']['oney_type'] = [
                 'name' => $this->dependencies->name . 'Oney_type',
                 'type' => 'hidden',
                 'value' => $oney_payment,
             ];
-            $payment_options[$payment_key]['extra_classes'] = sprintf('oney%sx', $split);
-            $payment_options[$payment_key]['payment_controller_url'] = $this->context
+            $payment_options[$this->name]['extra_classes'] = sprintf('oney%sx', $split);
+            $payment_options[$this->name]['payment_controller_url'] = $this->context
                 ->link
                 ->getModuleLink($this->dependencies->name, 'payment', [
                     'type' => 'oney',
                     'io' => sprintf('%s', $split),
                 ], true);
-            $payment_options[$payment_key]['logo'] = $this->img_path . 'oney/' . $oneyLogo;
-            $payment_options[$payment_key]['callToActionText'] = $oneyLabel;
-            $payment_options[$payment_key]['err_label'] = $err_label;
+            $payment_options[$this->name]['logo'] = $this->img_path . 'oney/' . $oneyLogo;
+            $payment_options[$this->name]['callToActionText'] = $oneyLabel;
+            $payment_options[$this->name]['err_label'] = $err_label;
         }
 
         unset($payment_options['oney']);
