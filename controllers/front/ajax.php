@@ -29,6 +29,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
     private $card;
     private $configurationAdapter;
+    private $configurationClass;
     private $contextAdapter;
     private $logger;
     private $oney;
@@ -71,6 +72,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         if (1 == $this->toolsAdapter->tool('getValue', '_ajax')) {
             $this->card = $this->plugin->getCard();
             $this->configurationAdapter = $this->plugin->getConfiguration();
+            $this->configurationClass = $this->plugin->getConfigurationClass();
             $this->contextAdapter = $this->plugin->getContext(); // get ContextAdapter Repository object
             $this->oney = $this->plugin->getOney();
             $this->productAdapter = $this->plugin->getProduct();
@@ -225,9 +227,11 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     )
                     );
                 }
+
+                $payment_methods = json_decode($this->configurationClass->getValue('payment_methods'), true);
                 $payment = $this->paymentClass->preparePayment([
                     'is_integrated' => 1,
-                    'is_deferred' => (bool) $this->configurationAdapter->get('PAYPLUG_DEFERRED'),
+                    'is_deferred' => (bool) $payment_methods['deferred'],
                 ]);
                 $payment['force_reload'] = false;
 
