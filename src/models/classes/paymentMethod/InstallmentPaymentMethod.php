@@ -57,6 +57,18 @@ class InstallmentPaymentMethod extends PaymentMethod
             return [];
         }
 
+        $use_taxes = (bool) $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->get('PS_TAX');
+
+        $context = $this->dependencies->getPlugin()->getContext()->get();
+        $order_total = $context->cart->getOrderTotal($use_taxes);
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        if ($order_total < $this->configuration->getValue('inst_min_amount')) {
+            return $payment_options;
+        }
+
         $payment_options = parent::getPaymentOption($payment_options);
 
         if (!isset($payment_options[$this->name])) {

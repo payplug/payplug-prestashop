@@ -119,8 +119,8 @@ class BasePaymentMethod extends TestCase
 
         $this->dependencies
             ->shouldReceive([
-                'getPlugin' => $this->plugin,
                 'getHelpers' => $this->helpers,
+                'getPlugin' => $this->plugin,
                 'getValidators' => $this->validators,
             ]);
 
