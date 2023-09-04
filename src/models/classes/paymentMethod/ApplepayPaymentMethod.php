@@ -61,6 +61,10 @@ class ApplepayPaymentMethod extends PaymentMethod
 
         $payment_options = parent::getPaymentOption($payment_options);
 
+        if (!isset($payment_options[$this->name])) {
+            return $payment_options;
+        }
+
         $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
         $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
         if (!$isApplePayCompatible['result']) {

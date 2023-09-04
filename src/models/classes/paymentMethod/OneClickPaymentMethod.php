@@ -68,6 +68,11 @@ class OneClickPaymentMethod extends PaymentMethod
         }
 
         $payment_options = parent::getPaymentOption($payment_options);
+
+        if (!isset($payment_options[$this->name])) {
+            return $payment_options;
+        }
+
         $default_one_click_option = $payment_options[$this->name];
 
         foreach ($cards as $card) {

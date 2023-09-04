@@ -404,9 +404,7 @@ class PaymentMethod
             return [];
         }
 
-        $payplug_countries = $this->configuration->getValue('countries');
-        $payplug_countries = json_decode($payplug_countries, true);
-
+        $payplug_countries = json_decode($this->configuration->getValue('countries'), true);
         if (isset($payplug_countries[$this->name])) {
             $shipping_address = $this->dependencies
                 ->getPlugin()
@@ -419,6 +417,17 @@ class PaymentMethod
             if (!$this->dependencies
                 ->getValidators()['payment']
                 ->isAllowedCountry(implode(',', $payplug_countries[$this->name]), $shipping_iso)['result']) {
+                return $payment_options;
+            }
+        }
+
+        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
+        $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
+        $cart_amount = $this->context->cart->getOrderTotal(true);
+        if (false === strpos('oney', $this->name)) {
+            if (!$this->dependencies
+                ->getHelpers()['amount']
+                ->isValidAmount($price_limit, (float) $cart_amount)['result']) {
                 return $payment_options;
             }
         }

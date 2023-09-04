@@ -212,7 +212,7 @@ class DependenciesClass
     private function setHelpers()
     {
         $this->helpers = [
-            'amount' => new AmountHelper(),
+            'amount' => new AmountHelper($this),
             'files' => new FilesHelper(),
             'user' => new UserHelper(),
         ];
