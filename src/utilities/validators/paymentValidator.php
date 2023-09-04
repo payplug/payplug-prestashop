@@ -1160,7 +1160,7 @@ class paymentValidator
         }
 
         $given_date = date('Y-m-d H:i:s', strtotime($date));
-        $limits_date = date('Y-m-d H:i:s', strtotime('-3 minutes'));
+        $limits_date = date('Y-m-d H:i:s', strtotime('-10 minutes'));
 
         if ($given_date < $limits_date) {
             return [
