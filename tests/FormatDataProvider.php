@@ -28,6 +28,15 @@ trait FormatDataProvider
         yield ['lorem ipsum'];
     }
 
+    public function invalidFloatFormatDataProvider()
+    {
+        yield [null];
+        yield [['key' => 'value']];
+        yield [true];
+        yield ['lorem ipsum'];
+        yield [42];
+    }
+
     public function invalidJSONFormatDataProvider()
     {
         yield [''];

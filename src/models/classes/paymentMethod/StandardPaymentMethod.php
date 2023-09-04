@@ -366,6 +366,11 @@ class StandardPaymentMethod extends PaymentMethod
         }
 
         $payment_options = parent::getPaymentOption($payment_options);
+
+        if (!isset($payment_options[$this->name])) {
+            return $payment_options;
+        }
+
         $payment_options[$this->name]['callToActionText'] = $has_saved_card
             ? $this->translation[$this->name]['has_saved_card']
             : $payment_options[$this->name]['callToActionText'];

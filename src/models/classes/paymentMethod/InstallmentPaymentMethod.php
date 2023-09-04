@@ -59,6 +59,10 @@ class InstallmentPaymentMethod extends PaymentMethod
 
         $payment_options = parent::getPaymentOption($payment_options);
 
+        if (!isset($payment_options[$this->name])) {
+            return $payment_options;
+        }
+
         $payment_options[$this->name]['logo'] = $this->img_path
             . 'svg/checkout/installment/logos_schemes_installment_'
             . $this->configuration->getValue('inst_mode') . '_'

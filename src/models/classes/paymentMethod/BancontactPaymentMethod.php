@@ -81,6 +81,11 @@ class BancontactPaymentMethod extends PaymentMethod
         }
 
         $payment_options = parent::getPaymentOption($payment_options);
+
+        if (!isset($payment_options[$this->name])) {
+            return $payment_options;
+        }
+
         $address = $this->dependencies->getPlugin()->getAddress();
         $shipping_address = $address->get((int) $this->context->cart->id_address_delivery);
         $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
