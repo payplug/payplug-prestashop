@@ -32,11 +32,11 @@ class renderTelemetriesTest extends BaseMerchantTelemetryAction
         $source = 'source';
 
         // Expected hash for current mocked telemetries
-        $hash = '55adccc282d322c8d9ff632a3f31517cce07da223ae59c50707eb12864d66f58';
+        $expected_hash = '4b8611ab5ba4538dcf0b31881c33b52481b9b922088cf5283233a8ecc758a5bf';
         $this->configuration
             ->shouldReceive('getValue')
             ->with('telemetry_hash')
-            ->andReturn($hash);
+            ->andReturn($expected_hash);
 
         $this->assertSame(
             [
@@ -66,6 +66,7 @@ class renderTelemetriesTest extends BaseMerchantTelemetryAction
             'result' => true,
             'telemetries' => [
                 'version' => '1.0.0',
+                'php_version' => '',
                 'name' => 'payplug',
                 'configurations' => [],
                 'domains' => [
@@ -97,7 +98,6 @@ class renderTelemetriesTest extends BaseMerchantTelemetryAction
                     ],
                 ],
                 'source' => 'source',
-                'date_upd' => date('Y-m-d H:i:s'),
             ],
         ];
 

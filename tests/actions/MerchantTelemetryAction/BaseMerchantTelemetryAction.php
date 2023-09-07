@@ -16,6 +16,7 @@ class BaseMerchantTelemetryAction extends TestCase
 
     public $action;
     public $configuration;
+    public $constant;
     public $dependencies;
     public $module;
     public $module_repositories;
@@ -86,9 +87,16 @@ class BaseMerchantTelemetryAction extends TestCase
             'getInstanceByName' => $instance,
         ]);
 
+        $this->constant = \Mockery::mock('Constant');
+        $this->constant
+            ->shouldReceive('get')
+            ->with('PHP_VERSION')
+            ->andReturn('');
+
         $this->plugin
             ->shouldReceive([
             'getConfigurationClass' => $this->configuration,
+            'getConstant' => $this->constant,
             'getModule' => $this->module,
         ]);
 

@@ -34,7 +34,7 @@ class ShopRepository extends QueryRepository
     {
         $result = $this
             ->select()
-            ->fields('`domain`, `main` as `default`')
+            ->fields('`domain` as `url`, `main` as `default`')
             ->from($this->prefix . 'shop_url')
             ->where('active = 1')
             ->build();

@@ -6,7 +6,7 @@
     "require": {
 	    "php": "5.6.*",
         "giggsey/libphonenumber-for-php": "^8.12",
-        "payplug/payplug-php": "dev-PRE-1935-save-data-on-MPDC",
+        "payplug/payplug-php": "dev-develop",
         "symfony/dotenv": "3.4.*"
     },
     "require-dev": {

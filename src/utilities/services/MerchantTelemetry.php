@@ -52,7 +52,7 @@ class MerchantTelemetry
                 'result' => 201 == (int) $send['httpStatus'] ? true : false,
                 'message' => '',
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'code' => (int) $e->getCode(),
                 'result' => false,

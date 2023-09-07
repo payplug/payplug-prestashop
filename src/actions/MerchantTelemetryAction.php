@@ -76,10 +76,18 @@ class MerchantTelemetryAction
         $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
 
         // We get the needed telemetries of the merchant platform
+        $current_configurations = [];
+        foreach ($configuration->getCurrentConfigurations() as $name => $value) {
+            $current_configurations[] = [
+                'name' => $name,
+                'value' => $value,
+            ];
+        }
         $telemetries = [
             'version' => $module->version,
+            'php_version' => $this->dependencies->getPlugin()->getConstant()->get('PHP_VERSION'),
             'name' => $this->dependencies->name,
-            'configurations' => $configuration->getCurrentConfigurations(),
+            'configurations' => $current_configurations ?: [],
             'domains' => $this->dependencies->getRepositories()['shop']->getActiveShopUrl(),
             'modules' => $this->dependencies->getRepositories()['module']->getActiveModule(),
         ];
@@ -127,7 +135,6 @@ class MerchantTelemetryAction
         $configuration->set('telemetry_hash', $hash);
 
         $telemetries['source'] = $source;
-        $telemetries['date_upd'] = date('Y-m-d H:i:s');
 
         return [
             'result' => true,
