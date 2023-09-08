@@ -6,7 +6,7 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group card_repository
  *
  * @runTestsInSeparateProcesses

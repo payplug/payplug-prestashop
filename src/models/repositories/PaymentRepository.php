@@ -37,11 +37,10 @@ class PaymentRepository extends QueryRepository
         if (!is_int($cart_id) || !$cart_id) {
             return [];
         }
-
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->module_name . '_payment')
+            ->from($this->prefix . $this->dependencies->name . '_payment')
             ->where('id_cart = ' . (int) $cart_id)
             ->build('unique_row');
 
@@ -64,7 +63,7 @@ class PaymentRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->module_name . '_payment')
+            ->from($this->prefix . $this->dependencies->name . '_payment')
             ->where('id_payment = "' . $this->escape($pay_id) . '"')
             ->build('unique_row');
 
@@ -86,7 +85,7 @@ class PaymentRepository extends QueryRepository
 
         $result = $this
             ->delete()
-            ->from($this->prefix . $this->module_name . '_payment')
+            ->from($this->prefix . $this->dependencies->name . '_payment')
             ->where('id_cart = ' . (int) $cart_id)
             ->build();
 

@@ -73,7 +73,7 @@ class BaseConfigurationAction extends TestCase
                 'getConfiguration' => $this->configuration,
                 'getConfigurationClass' => $this->configuration_class,
                 'getOney' => $this->oney,
-                'getTranslation' => $this->translation,
+                'getTranslationClass' => $this->translation,
                 'getModule' => $this->module,
             ]);
 

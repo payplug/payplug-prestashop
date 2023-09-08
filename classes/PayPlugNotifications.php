@@ -437,7 +437,7 @@ class PayPlugNotifications
         }
 
         // Check if this notification is the first of the day
-        $is_first_order = empty($this->dependencies->setRepositories()['order']->getCurrentOrders());
+        $is_first_order = empty($this->dependencies->getPlugin()->getOrderRepository()->getCurrentOrders());
 
         // Create Order
         try {
@@ -932,8 +932,7 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: setCartFromResource');
         if ($this->is_installment) {
-            $payment = $this->dependencies
-                ->getRepositories()['payment']
+            $payment = $this->dependencies->getPlugin()->getPaymentRepository()
                 ->getByIdPayment($this->payment->installment_plan_id);
             if (!$payment['id_cart']) {
                 if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
@@ -945,8 +944,7 @@ class PayPlugNotifications
                 $this->exitProcess($error_msg, 500);
             }
         } else {
-            $payment = $this->dependencies
-                ->getRepositories()['payment']
+            $payment = $this->dependencies->getPlugin()->getPaymentRepository()
                 ->getByIdPayment($this->resource->id);
             if (!$payment['id_cart']) {
                 if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
@@ -1013,7 +1011,7 @@ class PayPlugNotifications
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->sandbox = $this->configuration->getValue('sandbox_mode');
-        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->query = $this->dependencies->getPlugin()->getQueryRepository();
 
         $this->setLogger();
         $this->getResource();

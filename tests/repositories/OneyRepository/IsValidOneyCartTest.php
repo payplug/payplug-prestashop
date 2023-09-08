@@ -6,7 +6,7 @@ use PayPlug\tests\mock\CartMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group oney
  * @group oney_repository
  *

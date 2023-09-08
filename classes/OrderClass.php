@@ -38,7 +38,7 @@ class OrderClass
         $this->dependencies = $dependencies;
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
-        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->query = $this->dependencies->getPlugin()->getQueryRepository();
         $this->orderState = $this->dependencies->getPlugin()->getOrderState();
     }
 

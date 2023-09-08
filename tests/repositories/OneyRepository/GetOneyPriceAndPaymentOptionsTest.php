@@ -8,7 +8,7 @@ use PayPlug\tests\mock\CountryMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group oney
  * @group oney_repository
  *

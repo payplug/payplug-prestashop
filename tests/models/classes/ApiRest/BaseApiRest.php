@@ -86,9 +86,9 @@ class BaseApiRest extends TestCase
                 'getConfigurationClass' => $this->configuration_class,
                 'getConstant' => $this->constant,
                 'getLogger' => $this->logger,
-                'getPaymentMethod' => $this->payment_method,
+                'getPaymentMethodClass' => $this->payment_method,
                 'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),
-                'getTranslation' => $this->translation,
+                'getTranslationClass' => $this->translation,
             ]);
 
         $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();

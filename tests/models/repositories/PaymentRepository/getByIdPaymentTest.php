@@ -2,9 +2,6 @@
 
 namespace PayPlug\tests\models\repositories\PaymentRepository;
 
-use PayPlug\src\models\repositories\PaymentRepository;
-use PayPlug\tests\models\repositories\BaseRepository;
-
 /**
  * @group unit
  * @group repository
@@ -12,11 +9,11 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getByIdPaymentTest extends BaseRepository
+class getByIdPaymentTest extends BasePaymentRepository
 {
     protected function setUp()
     {
-        $this->repository = \Mockery::mock(PaymentRepository::class)->makePartial();
+        parent::setUp();
         $this->repository
             ->shouldReceive('escape')
             ->andReturnUsing(function ($value) {

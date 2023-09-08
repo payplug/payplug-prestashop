@@ -2,9 +2,6 @@
 
 namespace PayPlug\tests\models\repositories\CardRepository;
 
-use PayPlug\src\models\repositories\CardRepository;
-use PayPlug\tests\models\repositories\BaseRepository;
-
 /**
  * @group unit
  * @group repository
@@ -12,11 +9,11 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class existsTest extends BaseRepository
+class existsTest extends BaseCardRepository
 {
     protected function setUp()
     {
-        $this->repository = \Mockery::mock(CardRepository::class)->makePartial();
+        parent::setUp();
         $this->repository
             ->shouldReceive('escape')
             ->andReturnUsing(function ($key) { return $key; });
@@ -86,6 +83,9 @@ class existsTest extends BaseRepository
         );
     }
 
+    /**
+     * @group debug
+     */
     public function testWhenTheCardExists()
     {
         $payment_id = 'pay_azertyui';

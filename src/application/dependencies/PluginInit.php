@@ -48,6 +48,7 @@ use PayPlug\src\application\adapter\OrderHistoryAdapter;
 use PayPlug\src\application\adapter\OrderSlipAdapter;
 use PayPlug\src\application\adapter\OrderStateAdapter;
 use PayPlug\src\application\adapter\ProductAdapter;
+use PayPlug\src\application\adapter\QueryAdapter;
 use PayPlug\src\application\adapter\ShopAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
@@ -68,7 +69,6 @@ use PayPlug\src\repositories\LoggerRepository;
 use PayPlug\src\repositories\OneyRepository;
 use PayPlug\src\repositories\OrderStateRepository;
 use PayPlug\src\repositories\PaymentRepository;
-use PayPlug\src\repositories\QueryRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
 use PayPlug\src\utilities\services\Browser;
@@ -103,40 +103,49 @@ class PluginInit extends BaseClass
     private $oney;
     private $order_state;
     private $payment;
-    private $query;
     private $sql;
     private $translate;
 
     // Adapter classes
-    private $address;
-    private $assign;
-    private $carrier;
-    private $cart;
-    private $configuration;
-    private $constant;
-    private $context;
-    private $country;
-    private $currency;
-    private $customer;
-    private $dispatcher;
-    private $language;
-    private $media;
-    private $message;
-    private $module;
-    private $order;
-    private $order_history;
-    private $order_slip;
+    private $address_adapter;
+    private $assign_adapter;
+    private $carrier_adapter;
+    private $cart_adapter;
+    private $configuration_adapter;
+    private $constant_adapter;
+    private $context_adapter;
+    private $country_adapter;
+    private $currency_adapter;
+    private $customer_adapter;
+    private $dispatcher_adapter;
+    private $language_adapter;
+    private $media_adapter;
+    private $message_adapter;
+    private $module_adapter;
+    private $order_adapter;
+    private $order_history_adapter;
+    private $order_slip_adapter;
     private $order_state_adapter;
-    private $product;
-    private $shop;
-    private $tools;
-    private $validate;
+    private $product_adapter;
+    private $query_adapter;
+    private $shop_adapter;
+    private $tools_adapter;
+    private $validate_adapter;
 
     // Model classes
-    private $api_rest;
+    private $api_rest_class;
     private $configuration_class;
-    private $payment_method;
-    private $translation;
+    private $payment_method_class;
+    private $translation_class;
+
+    // Model repositories
+    private $card_repository;
+    private $country_repository;
+    private $module_repository;
+    private $order_repository;
+    private $payment_repository;
+    private $query_repository;
+    private $shop_repository;
 
     // Utilities services
     private $browser;
@@ -152,56 +161,80 @@ class PluginInit extends BaseClass
         $this->setAdapter();
         $this->setClasses();
         $this->setRepositories();
+        $this->setOldRepositories();
         $this->setServices();
 
         $this->plugin
             ->setApiClass($this->apiClass)
-            ->setApiRest($this->api_rest)
             ->setApiVersion('2019-08-06')
-            ->setAddress($this->address)
-            ->setAssign($this->assign)
             ->setBrowser($this->browser)
             ->setCache($this->cache)
             ->setCard($this->card)
-            ->setCarrier($this->carrier)
-            ->setCart($this->cart)
-            ->setConfiguration($this->configuration)
-            ->setConfigurationAction($this->configuration_action)
-            ->setOnboardingAction($this->onboarding_action)
             ->setMerchantTelemetry($this->merchant_telemetry)
-            ->setMerchantTelemetryAction($this->merchant_telemetry_action)
-            ->setConfigurationClass($this->configuration_class)
-            ->setConstant($this->constant)
-            ->setContext($this->context)
-            ->setCountry($this->country)
-            ->setCurrency($this->currency)
-            ->setCustomer($this->customer)
-            ->setDispatcher($this->dispatcher)
             ->setHook($this->hook)
             ->setInstall($this->install)
-            ->setLanguage($this->language)
             ->setLogger($this->logger)
-            ->setMedia($this->media)
-            ->setMessage($this->message)
-            ->setModule($this->module)
             ->setPayment($this->payment)
-            ->setPaymentAction($this->paymentAction)
-            ->setPaymentMethod($this->payment_method)
-            ->setProduct($this->product)
             ->setOney($this->oney)
-            ->setOrder($this->order)
-            ->setOrderHistory($this->order_history)
             ->setOrderState($this->order_state)
-            ->setOrderSlip($this->order_slip)
-            ->setOrderStateAdapter($this->order_state_adapter)
-            ->setQuery($this->query)
             ->setSql($this->sql)
             ->setRoutes($this->routes)
-            ->setShop($this->shop)
-            ->setTools($this->tools)
             ->setTranslate($this->translate)
-            ->setTranslation($this->translation)
-            ->setValidate($this->validate)
+        ;
+
+        // Set application/adapter
+        $this->plugin
+            ->setAddress($this->address_adapter)
+            ->setAssign($this->assign_adapter)
+            ->setCarrier($this->carrier_adapter)
+            ->setCart($this->cart_adapter)
+            ->setConfiguration($this->configuration_adapter)
+            ->setConstant($this->constant_adapter)
+            ->setContext($this->context_adapter)
+            ->setCountry($this->country_adapter)
+            ->setCurrency($this->currency_adapter)
+            ->setCustomer($this->customer_adapter)
+            ->setDispatcher($this->dispatcher_adapter)
+            ->setLanguage($this->language_adapter)
+            ->setMedia($this->media_adapter)
+            ->setMessage($this->message_adapter)
+            ->setModule($this->module_adapter)
+            ->setOrder($this->order_adapter)
+            ->setOrderHistory($this->order_history_adapter)
+            ->setOrderSlip($this->order_slip_adapter)
+            ->setOrderStateAdapter($this->order_state_adapter)
+            ->setProduct($this->product_adapter)
+            ->setQueryAdapter($this->query_adapter)
+            ->setShop($this->shop_adapter)
+            ->setTools($this->tools_adapter)
+            ->setValidate($this->validate_adapter)
+        ;
+
+        // Set actions
+        $this->plugin
+            ->setConfigurationAction($this->configuration_action)
+            ->setMerchantTelemetryAction($this->merchant_telemetry_action)
+            ->setOnboardingAction($this->onboarding_action)
+            ->setPaymentAction($this->paymentAction)
+        ;
+
+        // Set models/classes
+        $this->plugin
+            ->setApiRestClass($this->api_rest_class)
+            ->setConfigurationClass($this->configuration_class)
+            ->setPaymentMethodClass($this->payment_method_class)
+            ->setTranslationClass($this->translation_class)
+        ;
+
+        // Set models/repositories
+        $this->plugin
+            ->setCardRepository($this->card_repository)
+            ->setCountryRepository($this->country_repository)
+            ->setModuleRepository($this->module_repository)
+            ->setOrderRepository($this->order_repository)
+            ->setPaymentRepository($this->payment_repository)
+            ->setQueryRepository($this->query_repository)
+            ->setShopRepository($this->shop_repository)
         ;
 
         $this->setEntity($this->plugin);
@@ -224,139 +257,153 @@ class PluginInit extends BaseClass
         $this->order_state_entity = new OrderStateEntity();
     }
 
-    private function setRepositories()
+    private function setOldRepositories()
     {
-        $module_dir = $this->constant->get('_PS_MODULE_DIR_');
+        $module_dir = $this->constant_adapter->get('_PS_MODULE_DIR_');
         $this->myLogPhp = new MyLogPHP($module_dir . $this->dependencies->name . '/log/install-log.csv');
 
         $this->logger = new LoggerRepository($this->dependencies);
-        $this->query = new QueryRepository();
         $this->translate = new TranslationsRepository();
 
         $this->sql = new SQLtableRepository(
             $this->dependencies,
-            $this->query
+            $this->query_repository
         );
         $this->card = new CardRepository(
-            $this->constant,
+            $this->constant_adapter,
             $this->dependencies,
             $this->logger,
-            $this->query,
-            $this->tools
+            $this->query_repository,
+            $this->tools_adapter
         );
 
         $this->sql = new SQLtableRepository(
             $this->dependencies,
-            $this->query
+            $this->query_repository
         );
 
         $this->hook = new HookRepository(
             $this->dependencies,
-            $this->constant,
-            $this->context,
-            $this->tools
+            $this->constant_adapter,
+            $this->context_adapter,
+            $this->tools_adapter
         );
 
         $this->cache = new CacheRepository(
             $this->cacheEntity,
-            $this->query,
+            $this->query_repository,
             $this->configuration_class,
             $this->dependencies,
             $this->logger,
-            $this->constant
+            $this->constant_adapter
         );
 
         $this->oney = new OneyRepository(
-            $this->address,
-            $this->assign,
+            $this->address_adapter,
+            $this->assign_adapter,
             $this->cache,
-            $this->carrier,
-            $this->cart,
-            $this->configuration,
-            $this->context,
-            $this->country,
-            $this->currency,
-            $this->media,
+            $this->carrier_adapter,
+            $this->cart_adapter,
+            $this->configuration_adapter,
+            $this->context_adapter,
+            $this->country_adapter,
+            $this->currency_adapter,
+            $this->media_adapter,
             $this->dependencies,
             $this->logger,
             $this->oneyEntity,
-            $this->tools,
-            $this->validate
+            $this->tools_adapter,
+            $this->validate_adapter
         );
 
         $this->order_state = new OrderStateRepository(
             $this->configuration_class,
-            $this->constant,
+            $this->constant_adapter,
             $this->dependencies,
-            $this->language,
+            $this->language_adapter,
             $this->order_state_adapter,
-            $this->query,
-            $this->tools,
-            $this->validate,
+            $this->query_repository,
+            $this->tools_adapter,
+            $this->validate_adapter,
             $this->myLogPhp
         );
 
         $this->payment = new PaymentRepository(
-            $this->cart,
-            $this->configuration,
+            $this->cart_adapter,
+            $this->configuration_adapter,
             $this->configuration_class,
-            $this->constant,
+            $this->constant_adapter,
             $this->dependencies,
             $this->logger,
             $this->paymentEntity,
-            $this->query
+            $this->query_repository
         );
 
         $this->install = new InstallRepository(
             $this->configuration_class,
-            $this->constant,
-            $this->context,
+            $this->constant_adapter,
+            $this->context_adapter,
             $this->dependencies,
             $this->order_state,
             $this->order_state_entity,
             $this->order_state_adapter,
-            $this->query,
-            $this->shop,
+            $this->query_repository,
+            $this->shop_adapter,
             $this->sql,
-            $this->tools,
-            $this->validate,
+            $this->tools_adapter,
+            $this->validate_adapter,
             $this->myLogPhp
         );
     }
 
     private function setAdapter()
     {
-        $this->address = new AddressAdapter();
-        $this->assign = new AssignAdapter();
-        $this->carrier = new CarrierAdapter();
-        $this->cart = new CartAdapter();
-        $this->configuration = new ConfigurationAdapter();
-        $this->constant = new ConstantAdapter();
-        $this->context = new ContextAdapter();
-        $this->country = new CountryAdapter();
-        $this->currency = new CurrencyAdapter();
-        $this->customer = new CustomerAdapter();
-        $this->dispatcher = new DispatcherAdapter();
-        $this->language = new LanguageAdapter();
-        $this->media = new MediaAdapter();
-        $this->message = new MessageAdapter();
-        $this->module = new ModuleAdapter();
-        $this->order = new OrderAdapter();
-        $this->order_history = new OrderHistoryAdapter();
-        $this->order_slip = new OrderSlipAdapter();
+        $this->address_adapter = new AddressAdapter();
+        $this->assign_adapter = new AssignAdapter();
+        $this->carrier_adapter = new CarrierAdapter();
+        $this->cart_adapter = new CartAdapter();
+        $this->configuration_adapter = new ConfigurationAdapter();
+        $this->constant_adapter = new ConstantAdapter();
+        $this->context_adapter = new ContextAdapter();
+        $this->country_adapter = new CountryAdapter();
+        $this->currency_adapter = new CurrencyAdapter();
+        $this->customer_adapter = new CustomerAdapter();
+        $this->dispatcher_adapter = new DispatcherAdapter();
+        $this->language_adapter = new LanguageAdapter();
+        $this->media_adapter = new MediaAdapter();
+        $this->message_adapter = new MessageAdapter();
+        $this->module_adapter = new ModuleAdapter();
+        $this->order_adapter = new OrderAdapter();
+        $this->order_history_adapter = new OrderHistoryAdapter();
+        $this->order_slip_adapter = new OrderSlipAdapter();
         $this->order_state_adapter = new OrderStateAdapter();
-        $this->product = new ProductAdapter();
-        $this->shop = new ShopAdapter();
-        $this->tools = new ToolsAdapter();
-        $this->validate = new ValidateAdapter();
+        $this->product_adapter = new ProductAdapter();
+        $this->query_adapter = new QueryAdapter();
+        $this->shop_adapter = new ShopAdapter();
+        $this->tools_adapter = new ToolsAdapter();
+        $this->validate_adapter = new ValidateAdapter();
     }
 
     private function setClasses()
     {
-        $this->api_rest = new ApiRest($this->dependencies);
+        $this->api_rest_class = new ApiRest($this->dependencies);
         $this->configuration_class = new Configuration($this->dependencies);
-        $this->payment_method = new PaymentMethod($this->dependencies);
-        $this->translation = new Translation($this->dependencies);
+        $this->payment_method_class = new PaymentMethod($this->dependencies);
+        $this->translation_class = new Translation($this->dependencies);
+    }
+
+    private function setRepositories()
+    {
+        $prefix = $this->constant_adapter->get('_DB_PREFIX_');
+
+        // We use complete path instead `use` to avoid confusion with old repositories
+        $this->card_repository = new \PayPlug\src\models\repositories\CardRepository($prefix, $this->dependencies);
+        $this->country_repository = new \PayPlug\src\models\repositories\CountryRepository($prefix, $this->dependencies);
+        $this->module_repository = new \PayPlug\src\models\repositories\ModuleRepository($prefix, $this->dependencies);
+        $this->order_repository = new \PayPlug\src\models\repositories\OrderRepository($prefix, $this->dependencies);
+        $this->payment_repository = new \PayPlug\src\models\repositories\PaymentRepository($prefix, $this->dependencies);
+        $this->query_repository = new \PayPlug\src\models\repositories\QueryRepository($prefix, $this->dependencies);
+        $this->shop_repository = new \PayPlug\src\models\repositories\ShopRepository($prefix, $this->dependencies);
     }
 
     private function setServices()

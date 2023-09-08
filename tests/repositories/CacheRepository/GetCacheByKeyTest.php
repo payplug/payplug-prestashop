@@ -4,7 +4,7 @@ namespace PayPlug\tests\repositories\CacheRepository;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group cache
  * @group cache_repository
  *

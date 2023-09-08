@@ -6,7 +6,7 @@ use PayPlug\tests\mock\OrderStateMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group order_state
  * @group order_state_repository
  *

@@ -6,7 +6,7 @@ use PayPlug\tests\mock\CartMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group payment
  * @group payment_repository
  *
@@ -64,7 +64,7 @@ final class CheckHashTest extends BasePaymentRepository
 
     public function testWhenNoPaymentFound()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $this->assertSame(
@@ -79,7 +79,7 @@ final class CheckHashTest extends BasePaymentRepository
 
     public function testWhenPaymentIsCached()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
                 'payment_method' => 'standard',
@@ -107,7 +107,7 @@ final class CheckHashTest extends BasePaymentRepository
     public function testWhenPaymentIsNotCreated()
     {
         $message = 'An error has occured';
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
                 'payment_method' => 'standard',
@@ -139,7 +139,7 @@ final class CheckHashTest extends BasePaymentRepository
     public function testWhenPaymentIsNotUpdated()
     {
         $message = 'An error has occured';
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
                 'payment_method' => 'standard',
@@ -181,7 +181,7 @@ final class CheckHashTest extends BasePaymentRepository
 
     public function testWhenPaymentIsUpdated()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
                 'payment_method' => 'standard',

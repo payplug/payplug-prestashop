@@ -56,7 +56,7 @@ class PayPlugValidation
     private $orderClass;
     private $payment;
     private $plugin;
-    private $queryAdapter;
+    private $query;
     private $toolsAdapter;
     private $payplugLock;
 
@@ -78,7 +78,7 @@ class PayPlugValidation
         $this->payment = $this->dependencies->getPlugin()->getPayment();
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->payplugLock = $this->dependencies->payplugLock;
-        $this->queryAdapter = $this->dependencies->getPlugin()->getQuery();
+        $this->query = $this->dependencies->getPlugin()->getQueryRepository();
         $this->toolsAdapter = $this->dependencies->getPlugin()->getTools();
         $this->validateAdapter = $this->dependencies->getPlugin()->getValidate();
         $this->installmentClass = $this->dependencies->installmentClass;
@@ -426,8 +426,7 @@ class PayPlugValidation
             $this->logger->addLog('Order already exists: ' . $id_order);
             if ('payment' == $this->type) {
                 $this->logger->addLog('Deleting stored payment.');
-                $payment = $this->dependencies
-                    ->getRepositories()['payment']
+                $payment = $this->dependencies->getPlugin()->getPaymentRepository()
                     ->getByCart((int) $cart_id);
                 if ($this->validators['payment']->isPending($payment)['result']) {
                     $this->logger->addLog('Transaction is pending so stored payment will not be deleted.');
@@ -645,7 +644,7 @@ class PayPlugValidation
             // Check number of order using this cart
             $this->logger->addLog('Checking number of order passed with this id_cart...');
 
-            $res_nb_orders = $this->queryAdapter
+            $res_nb_orders = $this->query
                 ->select()
                 ->fields('id_order')
                 ->from($this->constantAdapter->get('_DB_PREFIX_') . 'orders')

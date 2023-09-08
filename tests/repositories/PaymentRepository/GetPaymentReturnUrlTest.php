@@ -6,7 +6,7 @@ use PayPlug\tests\mock\CartMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group payment
  * @group payment_repository
  *
@@ -66,7 +66,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     public function testWhenNoPaymentFound()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $this->assertSame(
@@ -81,7 +81,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     public function testWhenInvalidPaymentMethodGiven()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
                 'payment_method' => 'payment_method',
@@ -101,7 +101,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     public function testWhenValidPaymentMethodGiven()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
                 'payment_method' => 'standard',

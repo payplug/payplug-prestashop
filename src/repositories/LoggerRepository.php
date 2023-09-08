@@ -31,13 +31,11 @@ class LoggerRepository extends BaseClass
 {
     private $dependencies;
     private $loggerEntity;
-    private $query;
     private $validators;
 
     public function __construct($dependencies)
     {
         $this->loggerEntity = new loggerEntity();
-        $this->query = new QueryRepository();
         $this->dependencies = $dependencies;
         $this->validators = $this->dependencies->getValidators();
         $this->setStdParams();
@@ -164,7 +162,10 @@ class LoggerRepository extends BaseClass
     public function addToDb()
     {
         $logger = $this->loggerEntity;
-        $this->query
+        $query = $this->dependencies
+            ->getPlugin()
+            ->getQueryRepository();
+        $query
             ->insert()
             ->into(_DB_PREFIX_ . $logger->getTable())
             ->fields('process')->values(pSQL($logger->getProcess()))
@@ -173,11 +174,11 @@ class LoggerRepository extends BaseClass
             ->fields('date_upd')->values(pSQL($logger->getDateAdd()))
         ;
 
-        if (!$this->query->build()) {
+        if (!$query->build()) {
             return false;
         }
 
-        $this->loggerEntity->setId($this->query->lastId());
+        $this->loggerEntity->setId($query->lastId());
     }
 
     /**
@@ -189,8 +190,10 @@ class LoggerRepository extends BaseClass
     {
         $logger = $this->loggerEntity;
         $table = _DB_PREFIX_ . $logger->getTable();
-
-        $this->query
+        $query = $this->dependencies
+            ->getPlugin()
+            ->getQueryRepository();
+        $query
             ->update()
             ->table($table)
             ->set('process =  \'' . pSQL($logger->getProcess()) . '\'')
@@ -199,7 +202,7 @@ class LoggerRepository extends BaseClass
             ->where('id_payplug_logger = ' . (int) $logger->getId())
             ;
 
-        if (!$this->query->build()) {
+        if (!$query->build()) {
             return false;
         }
 
@@ -237,7 +240,10 @@ class LoggerRepository extends BaseClass
     {
         try {
             $logger = $this->loggerEntity;
-            $this->query
+            $query = $this->dependencies
+                ->getPlugin()
+                ->getQueryRepository();
+            $query
                 ->select()
                 ->fields('*')
                 ->from(_DB_PREFIX_ . $logger->getTable())
@@ -247,12 +253,12 @@ class LoggerRepository extends BaseClass
         }
 
         if ($all) {
-            $this->query
+            $query
                 ->truncate()
                 ->table(_DB_PREFIX_ . $logger->getTable())
             ;
 
-            if (!$this->query->build()) {
+            if (!$query->build()) {
                 return false;
             }
 
@@ -267,19 +273,19 @@ class LoggerRepository extends BaseClass
         $flag = true;
 
         // clean old log
-        $this->query
+        $query
             ->delete()
             ->from(_DB_PREFIX_ . $logger->getTable())
-            ->where('`date_add` < ' . $this->query->escape($date_limit->format('Y-m-d')))
+            ->where('`date_add` < ' . $query->escape($date_limit->format('Y-m-d')))
         ;
 
-        if (!$this->query->build()) {
+        if (!$query->build()) {
             $flag = false;
         }
 
         // clean log beyong the limit
         $last_logs_valid =
-            $this->query
+            $query
                 ->select()
                 ->fields('`id_payplug_logger`')
                 ->from(_DB_PREFIX_ . $logger->getTable())
@@ -287,17 +293,17 @@ class LoggerRepository extends BaseClass
                 ->limit(($limits['number'] - 1), 1)
             ;
 
-        if (!$last_logs_valid || !$this->query->build()) {
+        if (!$last_logs_valid || !$query->build()) {
             $flag = false;
         }
 
-        $this->query
+        $query
             ->delete()
             ->from(_DB_PREFIX_ . $logger->getTable())
             ->where('`id_payplug_logger` < ' . (int) $last_logs_valid[0]['id_payplug_logger'])
         ;
 
-        if (!$this->query->build()) {
+        if (!$query->build()) {
             $flag = false;
         }
 

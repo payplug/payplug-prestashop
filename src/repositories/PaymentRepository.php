@@ -138,8 +138,7 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $paymentStored = $this->dependencies
-            ->getRepositories()['payment']
+        $paymentStored = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $paymentDetails['cartId']);
 
         if (empty($paymentStored)) {
@@ -304,8 +303,7 @@ class PaymentRepository extends BaseClass
 
         // Before create a new payment, delete the previous one, if exists and it's not a oneclick payment
         // to avoid double order creation
-        $apiPayment = $this->dependencies
-            ->getRepositories()['payment']
+        $apiPayment = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $paymentDetails['cartId']);
         if (!empty($apiPayment)) {
             $is_cancellable = $this->validators['payment']->isCancellable($apiPayment['payment_method']);
@@ -334,7 +332,7 @@ class PaymentRepository extends BaseClass
                 if (403 == (int) $payment['code']) {
                     $cart = $this->dependencies->getPlugin()->getCart()->get((int) $paymentDetails['cartId']);
                     $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
-                    $this->dependencies->getPlugin()->getPaymentMethod()->resetPaymentMethodFromPermission($permissions);
+                    $this->dependencies->getPlugin()->getPaymentMethodClass()->resetPaymentMethodFromPermission($permissions);
                     $paymentDetails['error_code'] = (int) $payment['code'];
                 }
 
@@ -362,7 +360,7 @@ class PaymentRepository extends BaseClass
                 if (403 == (int) $payment['code']) {
                     $cart = $this->dependencies->getPlugin()->getCart()->get((int) $paymentDetails['cartId']);
                     $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
-                    $this->dependencies->getPlugin()->getPaymentMethod()->resetPaymentMethodFromPermission($permissions);
+                    $this->dependencies->getPlugin()->getPaymentMethodClass()->resetPaymentMethodFromPermission($permissions);
                 }
 
                 // If the payment resource can not be created due to bad credential, we log out the merchand
@@ -522,8 +520,7 @@ class PaymentRepository extends BaseClass
             return false;
         }
 
-        $payment = $this->dependencies
-            ->getRepositories()['payment']
+        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $idCart);
         if (empty($payment)) {
             return true;
@@ -551,8 +548,7 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $paymentStored = $this->dependencies
-            ->getRepositories()['payment']
+        $paymentStored = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $paymentDetails['cartId']);
         if (!$paymentStored) {
             return $this->returnPaymentError(
@@ -716,8 +712,7 @@ class PaymentRepository extends BaseClass
             );
         }
         if ($paymentExist) {
-            $this->dependencies
-                ->getRepositories()['payment']
+            $this->dependencies->getPlugin()->getPaymentRepository()
                 ->remove((int) $paymentDetails['cartId']);
         }
         $this->query
@@ -781,8 +776,7 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $storedPayment = $this->dependencies
-            ->getRepositories()['payment']
+        $storedPayment = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $paymentDetails['cartId']);
         if (empty($storedPayment)) {
             return $this->returnPaymentError(

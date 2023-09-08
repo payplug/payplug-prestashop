@@ -49,7 +49,6 @@ class HookClass
     private $orderStateAdapter;
     private $payment;
     private $product;
-    private $query;
     private $sql;
     private $tools;
     private $validate;
@@ -78,7 +77,6 @@ class HookClass
         $this->orderStateAdapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
         $this->payment = $this->dependencies->getPlugin()->getPayment();
         $this->product = $this->dependencies->getPlugin()->getProduct();
-        $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->sql = $this->dependencies->getPlugin()->getSql();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
@@ -323,8 +321,7 @@ class HookClass
         $amount_refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
         $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
 
-        $payment = $this->dependencies
-            ->getRepositories()['payment']
+        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $order->id_cart);
 
         if (empty($payment)) {
@@ -1103,7 +1100,7 @@ class HookClass
 
         $payment_options = $this->dependencies
             ->getPlugin()
-            ->getPaymentMethod()
+            ->getPaymentMethodClass()
             ->getPaymentOptionCollection();
 
         // Transforme tableau en TPL
@@ -1146,7 +1143,7 @@ class HookClass
         // Données sous forme de tableau (pour 1.6 et 1.7)
         $payment_options = $this->dependencies
             ->getPlugin()
-            ->getPaymentMethod()
+            ->getPaymentMethodClass()
             ->getPaymentOptionCollection();
 
         // Transforme tableau en object

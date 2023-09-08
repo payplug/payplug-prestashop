@@ -2,9 +2,6 @@
 
 namespace PayPlug\tests\models\repositories\PaymentRepository;
 
-use PayPlug\src\models\repositories\PaymentRepository;
-use PayPlug\tests\models\repositories\BaseRepository;
-
 /**
  * @group unit
  * @group repository
@@ -12,13 +9,8 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getByCartTest extends BaseRepository
+class getByCartTest extends BasePaymentRepository
 {
-    protected function setUp()
-    {
-        $this->repository = \Mockery::mock(PaymentRepository::class)->makePartial();
-    }
-
     /**
      * @dataProvider invalidIntegerFormatDataProvider
      *
@@ -29,6 +21,9 @@ class getByCartTest extends BaseRepository
         $this->assertSame([], $this->repository->getByCart($id_cart));
     }
 
+    /**
+     * @group debug
+     */
     public function testWhenNoResultIsGivenByTheQuery()
     {
         $id_cart = 42;

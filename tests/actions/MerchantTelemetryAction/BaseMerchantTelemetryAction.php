@@ -4,8 +4,6 @@ namespace PayPlug\tests\actions\MerchantTelemetryAction;
 
 use PayPlug\src\actions\MerchantTelemetryAction;
 use PayPlug\src\models\classes\Configuration;
-use PayPlug\src\models\repositories\ModuleRepository;
-use PayPlug\src\models\repositories\ShopRepository;
 use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
@@ -19,10 +17,10 @@ class BaseMerchantTelemetryAction extends TestCase
     public $constant;
     public $dependencies;
     public $module;
-    public $module_repositories;
+    public $module_repository;
     public $plugin;
     public $repositories;
-    public $shop_repositories;
+    public $shop_repository;
 
     protected function setUp()
     {
@@ -36,8 +34,8 @@ class BaseMerchantTelemetryAction extends TestCase
             'getCurrentConfigurations' => [],
         ]);
 
-        $this->module_repositories = \Mockery::mock(ModuleRepository::class)->makePartial();
-        $this->module_repositories
+        $this->module_repository = \Mockery::mock('ModuleRepository');
+        $this->module_repository
             ->shouldReceive([
             'getActiveModule' => [
                 [
@@ -55,8 +53,8 @@ class BaseMerchantTelemetryAction extends TestCase
             ],
         ]);
 
-        $this->shop_repositories = \Mockery::mock(ShopRepository::class)->makePartial();
-        $this->shop_repositories
+        $this->shop_repository = \Mockery::mock('ShopRepository');
+        $this->shop_repository
             ->shouldReceive([
             'getActiveShopUrl' => [
                 [
@@ -73,11 +71,6 @@ class BaseMerchantTelemetryAction extends TestCase
                 ],
             ],
         ]);
-
-        $this->repositories = [
-            'module' => $this->module_repositories,
-            'shop' => $this->shop_repositories,
-        ];
 
         $this->module = \Mockery::mock('Module');
         $instance = \Mockery::mock('Payplug');
@@ -98,12 +91,13 @@ class BaseMerchantTelemetryAction extends TestCase
             'getConfigurationClass' => $this->configuration,
             'getConstant' => $this->constant,
             'getModule' => $this->module,
+            'getModuleRepository' => $this->module_repository,
+            'getShopRepository' => $this->shop_repository,
         ]);
 
         $this->dependencies
             ->shouldReceive([
             'getPlugin' => $this->plugin,
-            'getRepositories' => $this->repositories,
         ]);
 
         $this->action = \Mockery::mock(MerchantTelemetryAction::class, [$this->dependencies])->makePartial();

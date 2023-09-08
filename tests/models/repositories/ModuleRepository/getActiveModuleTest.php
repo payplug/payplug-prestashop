@@ -2,9 +2,6 @@
 
 namespace PayPlug\tests\models\repositories\ModuleRepository;
 
-use PayPlug\src\models\repositories\ModuleRepository;
-use PayPlug\tests\models\repositories\BaseRepository;
-
 /**
  * @group unit
  * @group repository
@@ -12,13 +9,8 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getActiveModuleTest extends BaseRepository
+class getActiveModuleTest extends BaseModuleRepository
 {
-    protected function setUp()
-    {
-        $this->repository = \Mockery::mock(ModuleRepository::class)->makePartial();
-    }
-
     public function testWhenNoActiveModuleFound()
     {
         $this->repository->shouldReceive([

@@ -94,7 +94,7 @@ class CardRepository extends BaseClass
             return false;
         }
 
-        $card = $this->dependencies->getRepositories()['card']->get((int) $id_payplug_card);
+        $card = $this->dependencies->getPlugin()->getCardRepository()->get((int) $id_payplug_card);
 
         if (!$card) {
             $this->logger->addLog('[deleteCard] No Card found with payplug card id given: ' . $id_payplug_card);
@@ -118,7 +118,7 @@ class CardRepository extends BaseClass
             }
         }
 
-        $delete = $this->dependencies->getRepositories()['card']->remove((int) $id_payplug_card);
+        $delete = $this->dependencies->getPlugin()->getCardRepository()->remove((int) $id_payplug_card);
 
         return (bool) $delete;
     }
@@ -226,8 +226,7 @@ class CardRepository extends BaseClass
         $is_sandbox = $configuration->getValue('sandbox_mode');
         $id_company = $configuration->getValue('company_id');
 
-        $cards = $this->dependencies
-            ->getRepositories()['card']
+        $cards = $this->dependencies->getPlugin()->getCardRepository()
             ->getAllByCustomer((int) $id_customer, (int) $id_company, (bool) $is_sandbox);
 
         if (!$cards) {
@@ -322,8 +321,7 @@ class CardRepository extends BaseClass
 
         $company_id = (int) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('company_id');
 
-        $exists = $this->dependencies
-            ->getRepositories()['card']
+        $exists = $this->dependencies->getPlugin()->getCardRepository()
             ->exists((string) $payment->card->id, (int) $company_id, !(bool) $payment->is_live);
         if ($exists) {
             $this->logger->addLog('Error: this card with id_card = '
@@ -332,8 +330,7 @@ class CardRepository extends BaseClass
             return false;
         }
 
-        $register = $this->dependencies
-            ->getRepositories()['card']
+        $register = $this->dependencies->getPlugin()->getCardRepository()
             ->set($payment->card, (int) $customer_id, (int) $company_id, !(bool) $payment->is_live);
 
         if (!$register) {

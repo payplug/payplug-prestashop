@@ -23,11 +23,9 @@
 
 namespace PayPlug\src\models\repositories;
 
-use PayPlug\src\application\adapter\QueryAdapter;
-
 class QueryRepository
 {
-    protected $module_name;
+    protected $dependencies;
 
     protected $prefix;
 
@@ -48,8 +46,6 @@ class QueryRepository
         'limit' => ['offset' => 0, 'limit' => 0],
         'lastId' => [],
     ];
-
-    private $adapter;
 
     private $data_type_text = [
         'char',
@@ -78,14 +74,10 @@ class QueryRepository
         'varbinary',
     ];
 
-    private $logger;
-
-    public function __construct($prefix = '', $module_name = '', $logger = null)
+    public function __construct($prefix = '', $dependencies = null)
     {
-        $this->setPrefix($prefix);
-        $this->setModuleName($module_name);
-        $this->adapter = new QueryAdapter();
-        $this->logger = $logger;
+        $this->dependencies = $dependencies;
+        $this->prefix = $prefix;
     }
 
     /**
@@ -340,12 +332,12 @@ class QueryRepository
 
     public function lastId()
     {
-        return $this->adapter->getLastId();
+        return $this->dependencies->getPlugin()->getQueryAdapter()->getLastId();
     }
 
     public function getValue($id)
     {
-        return $this->adapter->getValue($id);
+        return $this->dependencies->getPlugin()->getQueryAdapter()->getValue($id);
     }
 
     public function build($param = false)
@@ -575,10 +567,10 @@ class QueryRepository
         }
 
         try {
-            $result = $this->adapter->query($sql);
+            $result = $this->dependencies->getPlugin()->getQueryAdapter()->query($sql);
         } catch (\Exception $e) {
-            $this->logger->addLog('QueryRepository::build() - Exception thrown: ' . $e->getMessage());
-
+            // todo: add log
+            // $this->logger->addLog('QueryRepository::build() - Exception thrown: ' . $e->getMessage());
             return false;
         }
 
@@ -602,21 +594,16 @@ class QueryRepository
                 FROM INFORMATION_SCHEMA.COLUMNS 
                 WHERE TABLE_NAME = "' . str_replace('`', '', $table) . '" AND COLUMN_NAME = "' . str_replace('`', '', $column) . '"';
 
-        return $this->adapter->query($sql);
+        return $this->dependencies->getPlugin()->getQueryAdapter()->query($sql);
     }
 
     public function escape($string, $htmlOK = false)
     {
-        return $this->adapter->escape($string, $htmlOK);
+        return $this->dependencies->getPlugin()->getQueryAdapter()->escape($string, $htmlOK);
     }
 
     public function setPrefix($prefix = '')
     {
         $this->prefix = $prefix;
-    }
-
-    public function setModuleName($module_name = '')
-    {
-        $this->module_name = $module_name;
     }
 }

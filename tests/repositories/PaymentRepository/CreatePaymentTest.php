@@ -6,7 +6,7 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group payment
  * @group payment_repository
  *
@@ -180,7 +180,7 @@ final class CreatePaymentTest extends BasePaymentRepository
             'id_payment' => 'pay_1234567890azerty',
             'payment_method' => 'standard',
         ];
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => $payment,
         ]);
         $this->validators['payment']->shouldReceive([
@@ -217,7 +217,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true}');
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
 
@@ -244,7 +244,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true}');
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $message = 'An error occured while creating the payment';
@@ -281,7 +281,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true}');
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $payment = PaymentMock::getStandard();

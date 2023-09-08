@@ -4,9 +4,6 @@ namespace PayPlug\tests\repositories;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PayPlug\src\models\classes\Configuration;
-use PayPlug\src\models\repositories\CardRepository;
-use PayPlug\src\models\repositories\CountryRepository;
-use PayPlug\src\models\repositories\PaymentRepository;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
@@ -51,7 +48,7 @@ class RepositoryBase extends TestCase
     protected $translate;
     protected $validate;
 
-    // repository
+    // old repository
     protected $cache;
     protected $logger;
     protected $order_state;
@@ -67,8 +64,13 @@ class RepositoryBase extends TestCase
     protected $validators;
     protected $repositories;
 
-    // model/classes
+    // models/classes
     protected $configuration;
+
+    // models/repositories
+    protected $card_repository;
+    protected $country_repository;
+    protected $payment_repository;
 
     protected $plugin;
 
@@ -130,25 +132,27 @@ class RepositoryBase extends TestCase
             'browser' => \Mockery::mock(browserValidator::class)->makePartial(),
             'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
         ];
-        $this->repositories = [
-            'card' => \Mockery::mock(CardRepository::class)->makePartial(),
-            'country' => \Mockery::mock(CountryRepository::class)->makePartial(),
-            'payment' => \Mockery::mock(PaymentRepository::class)->makePartial(),
-        ];
 
         $this->configuration = \Mockery::mock(Configuration::class)->makePartial();
+
+        $this->card_repository = \Mockery::mock('CardRepository');
+        $this->country_repository = \Mockery::mock('CountryRepository');
+        $this->payment_repository = \Mockery::mock('PaymentRepository');
+
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
                 'getConfiguration' => $this->config,
                 'getConfigurationClass' => $this->configuration,
+                'getCardRepository' => $this->card_repository,
+                'getCountryRepository' => $this->country_repository,
+                'getPaymentRepository' => $this->payment_repository,
             ])
         ;
 
         $this->dependencies
             ->shouldReceive([
                 'getValidators' => $this->validators,
-                'getRepositories' => $this->repositories,
                 'getPlugin' => $this->plugin,
             ])
         ;

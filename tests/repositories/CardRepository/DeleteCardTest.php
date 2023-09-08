@@ -6,7 +6,7 @@ use PayPlug\tests\mock\PayPlugCardMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
@@ -50,7 +50,7 @@ final class DeleteCardTest extends BaseCardRepository
 
     public function testWhenNoCardFound()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'get' => [],
         ]);
 
@@ -62,7 +62,7 @@ final class DeleteCardTest extends BaseCardRepository
 
     public function testWhenCardNotExpiredAndErrorReturnByAPI()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'get' => $this->payplug_card,
         ]);
         $this->repo
@@ -79,7 +79,7 @@ final class DeleteCardTest extends BaseCardRepository
 
     public function testWhenCardCantBeDeletedFromDataBase()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'get' => $this->payplug_card,
             'remove' => false,
         ]);
@@ -98,7 +98,7 @@ final class DeleteCardTest extends BaseCardRepository
 
     public function testWhenCardIsDeletedFromDataBase()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'get' => $this->payplug_card,
             'remove' => true,
         ]);
@@ -122,7 +122,7 @@ final class DeleteCardTest extends BaseCardRepository
         $card = $this->payplug_card;
         $card['exp_year'] = 2020;
 
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'get' => $card,
             'remove' => true,
         ]);

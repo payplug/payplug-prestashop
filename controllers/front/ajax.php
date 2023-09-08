@@ -255,8 +255,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $payment_id = $tools->tool('getValue', 'pay_id');
                 $cart_id = $tools->tool('getValue', 'cart_id');
 
-                $payment = $this->dependencies
-                    ->getRepositories()['payment']
+                $payment = $this->dependencies->getPlugin()->getPaymentRepository()
                     ->getByCart((int) $cart_id);
 
                 if (empty($payment)) {
@@ -341,8 +340,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 // Check payment id correspondance between the given one and the one from the DB
-                $payment = $this->dependencies
-                    ->getRepositories()['payment']
+                $payment = $this->dependencies->getPlugin()->getPaymentRepository()
                     ->getByCart((int) $context->cart->id);
 
                 if (empty($payment)) {

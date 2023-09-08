@@ -30,13 +30,11 @@ class CartClass
 {
     private $logger;
     private $dependencies;
-    private $query;
     private $constant;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
     }
 

@@ -25,12 +25,6 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
-use PayPlug\src\models\repositories\CardRepository;
-use PayPlug\src\models\repositories\CountryRepository;
-use PayPlug\src\models\repositories\ModuleRepository;
-use PayPlug\src\models\repositories\OrderRepository;
-use PayPlug\src\models\repositories\PaymentRepository;
-use PayPlug\src\models\repositories\ShopRepository;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\FilesHelper;
 use PayPlug\src\utilities\helpers\UserHelper;
@@ -91,7 +85,6 @@ class DependenciesClass
         $this->setvalidators();
         $this->setHelpers();
         $this->setPlugin((new PluginInit($this))->getEntity());
-        $this->setRepositories();
 
         $this->apiClass = new ApiClass($this);
         $this->applePayClass = new ApplePayClass($this);
@@ -171,11 +164,6 @@ class DependenciesClass
         return $this->validators;
     }
 
-    public function getRepositories()
-    {
-        return $this->repositories;
-    }
-
     public function getHelpers()
     {
         return $this->helpers;
@@ -197,21 +185,6 @@ class DependenciesClass
             'module' => new moduleValidator(),
             'order' => new orderValidator(),
             'payment' => new paymentValidator(),
-        ];
-    }
-
-    private function setRepositories()
-    {
-        $constant = $this->getPlugin()->getConstant();
-        $prefix = $constant->get('_DB_PREFIX_');
-        $logger = $this->getPlugin()->getLogger();
-        $this->repositories = [
-            'card' => new CardRepository($prefix, $this->name),
-            'country' => new CountryRepository($prefix, $this->name, $logger),
-            'module' => new ModuleRepository($prefix, $this->name, $logger),
-            'order' => new OrderRepository($prefix, $this->name, $logger),
-            'payment' => new PaymentRepository($prefix, $this->name, $logger),
-            'shop' => new ShopRepository($prefix, $this->name, $logger),
         ];
     }
 

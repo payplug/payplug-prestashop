@@ -379,7 +379,7 @@ class PaymentMethod
         if (!$this->translation) {
             $this->translation = $this->dependencies
                 ->getPlugin()
-                ->getTranslation()
+                ->getTranslationClass()
                 ->getPaymentMethodsTranslations();
         }
     }

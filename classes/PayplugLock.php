@@ -43,7 +43,7 @@ class PayplugLock
         $this->dependencies = $dependencies;
 
         $this->constant = $this->dependencies->getPlugin()->getConstant();
-        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->query = $this->dependencies->getPlugin()->getQueryRepository();
         $this->validators = $this->dependencies->getValidators();
     }
 

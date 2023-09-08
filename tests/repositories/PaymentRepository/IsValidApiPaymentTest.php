@@ -6,7 +6,7 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group payment
  * @group payment_repository
  *
@@ -83,7 +83,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
 
     public function testWhenNoStoredPaymentIsFound()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
 
@@ -99,7 +99,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
 
     public function testWhenPaymentMethodIsMissingInStoredPayment()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
                 'id_payment' => 'pay_1234567890azerty',
@@ -118,7 +118,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
 
     public function testWhenIdPaymentIsMissingInStoredPayment()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
                 'payment_method' => 'standard',
@@ -142,7 +142,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
             'id_payment' => 'pay_1234567890azerty',
             'payment_method' => 'installment',
         ];
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => $payment,
         ]);
 
@@ -172,7 +172,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
             'id_payment' => 'pay_1234567890azerty',
             'payment_method' => 'standard',
         ];
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => $payment,
         ]);
         $this->dependencies->apiClass
@@ -202,7 +202,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
             'id_payment' => 'pay_1234567890azerty',
             'payment_method' => 'standard',
         ];
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => $payment,
         ]);
         $this->dependencies->apiClass

@@ -73,7 +73,7 @@ class PaymentClass
         $this->order = $this->dependencies->getPlugin()->getOrder();
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->payment = $this->dependencies->getPlugin()->getPayment();
-        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->query = $this->dependencies->getPlugin()->getQueryRepository();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
         $this->validators = $this->dependencies->getValidators();
@@ -695,8 +695,7 @@ class PaymentClass
             return '';
         }
 
-        $payment = $this->dependencies
-            ->getRepositories()['payment']
+        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $id_cart);
 
         if (!$payment) {
@@ -1183,7 +1182,7 @@ class PaymentClass
             $payment_tab['initiator'] = 'PAYER';
             $payment_tab['payment_method'] = null;
             if ($options['id_card'] && 'new_card' != $options['id_card']) {
-                $card = $this->dependencies->getRepositories()['card']->get((int) $options['id_card']);
+                $card = $this->dependencies->getPlugin()->getCardRepository()->get((int) $options['id_card']);
                 if ($card['id_customer'] != $customer->id) {
                     return [
                         'result' => false,
@@ -1390,8 +1389,7 @@ class PaymentClass
 
         // Create payment if inexistent
         $force_payment_creation = $options['is_applepay'] || $options['is_oney'];
-        $payment = $this->dependencies
-            ->getRepositories()['payment']
+        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $cart->id);
 
         if (empty($payment) || $force_payment_creation) {
@@ -1490,8 +1488,7 @@ class PaymentClass
             && $this->payment->checkHash($this->paymentDetails)
             && $this->payment->isValidApiPayment($this->paymentDetails)) {
             // If timeout < 3 min and hash OK
-            $store_payment = $this->dependencies
-                ->getRepositories()['payment']
+            $store_payment = $this->dependencies->getPlugin()->getPaymentRepository()
                 ->getByCart((int) $cart->id);
             $this->paymentDetails['paymentId'] = $store_payment['id_payment'];
 

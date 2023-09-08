@@ -6,7 +6,7 @@ use PayPlug\src\utilities\validators\accountValidator;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group oney
  * @group oney_repository
  *

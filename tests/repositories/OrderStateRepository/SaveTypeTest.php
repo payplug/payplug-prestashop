@@ -4,7 +4,7 @@ namespace PayPlug\tests\repositories\OrderStateRepository;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group order_state
  * @group order_state_repository
  *

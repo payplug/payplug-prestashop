@@ -2,9 +2,6 @@
 
 namespace PayPlug\tests\models\repositories\CardRepository;
 
-use PayPlug\src\models\repositories\CardRepository;
-use PayPlug\tests\models\repositories\BaseRepository;
-
 /**
  * @group unit
  * @group repository
@@ -12,13 +9,8 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class removeTest extends BaseRepository
+class removeTest extends BaseCardRepository
 {
-    protected function setUp()
-    {
-        $this->repository = \Mockery::mock(CardRepository::class)->makePartial();
-    }
-
     /**
      * @dataProvider invalidIntegerFormatDataProvider
      *

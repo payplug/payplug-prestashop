@@ -6,7 +6,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group oney
  * @group format_oney_repository
  *

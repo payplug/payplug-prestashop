@@ -2,9 +2,6 @@
 
 namespace PayPlug\tests\models\repositories\ShopRepository;
 
-use PayPlug\src\models\repositories\ShopRepository;
-use PayPlug\tests\models\repositories\BaseRepository;
-
 /**
  * @group unit
  * @group repository
@@ -12,13 +9,8 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getActiveShopUrlTest extends BaseRepository
+class getActiveShopUrlTest extends BaseShopRepository
 {
-    protected function setUp()
-    {
-        $this->repository = \Mockery::mock(ShopRepository::class)->makePartial();
-    }
-
     public function testWhenNoActiveShopUrlFound()
     {
         $this->repository->shouldReceive([

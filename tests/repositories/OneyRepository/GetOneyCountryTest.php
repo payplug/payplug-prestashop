@@ -4,7 +4,7 @@ namespace PayPlug\tests\repositories\OneyRepository;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group oney
  * @group oney_repository
  *

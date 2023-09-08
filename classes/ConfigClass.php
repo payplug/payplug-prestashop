@@ -230,7 +230,6 @@ class ConfigClass
     private $module;
     private $oney;
     private $payment_status;
-    private $query;
     private $ssl_enable;
     private $tools;
     private $validate;
@@ -240,7 +239,7 @@ class ConfigClass
     {
         $this->dependencies = $dependencies;
 
-        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRestClass();
         $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
@@ -250,7 +249,6 @@ class ConfigClass
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
-        $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
         $this->validators = $this->dependencies->getValidators();
@@ -625,7 +623,7 @@ class ConfigClass
             return '';
         }
 
-        $iso_code = $this->dependencies->getRepositories()['country']->getIsoCodeByCountry((int) $country_id);
+        $iso_code = $this->dependencies->getPlugin()->getCountryRepository()->getIsoCodeByCountry((int) $country_id);
         $iso_code = $this->tools->tool('strtoupper', $iso_code);
 
         if (!in_array($iso_code, $iso_code_list, true)) {
@@ -670,7 +668,7 @@ class ConfigClass
             return [];
         }
 
-        $cards = $this->dependencies->getRepositories()['card']->getAllByCustomer($id_customer);
+        $cards = $this->dependencies->getPlugin()->getCardRepository()->getAllByCustomer($id_customer);
         if (!$cards) {
             return [];
         }

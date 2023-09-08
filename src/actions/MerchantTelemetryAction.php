@@ -88,8 +88,8 @@ class MerchantTelemetryAction
             'php_version' => $this->dependencies->getPlugin()->getConstant()->get('PHP_VERSION'),
             'name' => $this->dependencies->name,
             'configurations' => $current_configurations ?: [],
-            'domains' => $this->dependencies->getRepositories()['shop']->getActiveShopUrl(),
-            'modules' => $this->dependencies->getRepositories()['module']->getActiveModule(),
+            'domains' => $this->dependencies->getPlugin()->getShopRepository()->getActiveShopUrl(),
+            'modules' => $this->dependencies->getPlugin()->getModuleRepository()->getActiveModule(),
         ];
 
         // Clean of the configuration keys we don't want to send

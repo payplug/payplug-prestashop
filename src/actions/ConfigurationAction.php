@@ -91,7 +91,7 @@ class ConfigurationAction
 
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getModalTranslations();
 
         $context = $this->dependencies
@@ -179,7 +179,7 @@ class ConfigurationAction
     {
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getLoggedTranslations();
         $logger = $this->dependencies->getPlugin()->getLogger();
         if (!is_object($datas) || !$datas) {
@@ -254,7 +254,7 @@ class ConfigurationAction
     {
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getLoginTranslations();
         $logger = $this->dependencies->getPlugin()->getLogger();
 
@@ -353,7 +353,7 @@ class ConfigurationAction
     public function logoutAction()
     {
         $this->dependencies->configClass->logout();
-        $api_rest = $this->dependencies->getPlugin()->getApiRest();
+        $api_rest = $this->dependencies->getPlugin()->getApiRestClass();
 
         return [
             'success' => true,
@@ -373,7 +373,7 @@ class ConfigurationAction
      */
     public function renderConfiguration()
     {
-        $api_rest = $this->dependencies->getPlugin()->getApiRest();
+        $api_rest = $this->dependencies->getPlugin()->getApiRestClass();
         $current_configuration = $api_rest->getDataFields();
 
         $setting = $api_rest->getSettingsSection($current_configuration);
@@ -437,7 +437,7 @@ class ConfigurationAction
     {
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getModalTranslations();
 
         $logger = $this->dependencies->getPlugin()->getLogger();

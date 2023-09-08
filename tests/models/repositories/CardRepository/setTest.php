@@ -2,9 +2,7 @@
 
 namespace PayPlug\tests\models\repositories\CardRepository;
 
-use PayPlug\src\models\repositories\CardRepository;
 use PayPlug\tests\mock\PaymentMock;
-use PayPlug\tests\models\repositories\BaseRepository;
 
 /**
  * @group unit
@@ -13,13 +11,13 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class setTest extends BaseRepository
+class setTest extends BaseCardRepository
 {
     protected function setUp()
     {
+        parent::setUp();
         $payment = PaymentMock::getOneClick();
         $this->card = $payment->card;
-        $this->repository = \Mockery::mock(CardRepository::class)->makePartial();
         $this->repository
             ->shouldReceive('escape')
             ->andReturnUsing(function ($key) { return $key; });

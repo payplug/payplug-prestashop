@@ -32,7 +32,7 @@ class InstallmentClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->query = $this->dependencies->getPlugin()->getQueryRepository();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
     }
 
@@ -172,8 +172,7 @@ class InstallmentClass
             return '';
         }
 
-        $payment = $this->dependencies
-            ->getRepositories()['payment']
+        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $id_cart);
 
         if (!$payment) {

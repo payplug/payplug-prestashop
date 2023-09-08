@@ -502,7 +502,7 @@ class OneyPaymentMethod extends PaymentMethod
         parent::setParameters();
         $this->translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getPaylaterTranslations();
     }
 }
