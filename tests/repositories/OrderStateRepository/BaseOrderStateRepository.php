@@ -22,7 +22,7 @@ class BaseOrderStateRepository extends RepositoryBase
         ;
 
         $this->repo = \Mockery::mock(OrderStateRepository::class, [
-            $this->config,
+            $this->configuration,
             $this->constant,
             $this->dependencies,
             $this->language,

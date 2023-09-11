@@ -57,22 +57,21 @@ class BaseOneyRepository extends RepositoryBase
                 }
             });
         $this->repo = \Mockery::mock(OneyRepository::class, [
-            $this->address,
-            $this->assign,
-            $this->cache,
-            $this->carrier,
-            $this->cart,
-            $this->config,
-            $this->context,
-            $this->country,
-            $this->currency,
-            $this->media,
-            $this->dependencies,
-            $this->logger,
-            $this->myLogPhp,
-            $this->oney,
-            $this->tools,
-            $this->validate,
+            $this->address, // $addressAdapter,
+            $this->assign, // $assign,
+            $this->cache, // $cache,
+            $this->carrier, // $carrierAdapter,
+            $this->cart, // $cartAdapter,
+            $this->config, // $configurationAdapter,
+            $this->context, // $contextAdapter,
+            $this->country, // $countryAdapter,
+            $this->currency, // $currencyAdapter,
+            $this->media, // $mediaAdapter,
+            $this->dependencies, // $dependencies,
+            $this->logger, // $logger,
+            $this->oney, // $oneyEntity,
+            $this->tools, // $toolsAdapter,
+            $this->validate, // $validateAdapter
         ])->makePartial();
 
         $this->arrayCache = [];

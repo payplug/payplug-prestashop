@@ -25,6 +25,7 @@ class BasePaymentMethod extends TestCase
     protected $constant;
     protected $context;
     protected $dependencies;
+    protected $helpers;
     protected $logger;
     protected $plugin;
     protected $route;
@@ -60,6 +61,14 @@ class BasePaymentMethod extends TestCase
 
         $this->context = \Mockery::mock('Context');
         $context = ContextMock::get();
+        $context->cart = \Mockery::mock('Cart');
+        $context->cart->id = 1;
+        $context->cart->id_address_delivery = 2;
+        $context->cart->id_address_invoice = 3;
+        $context->cart
+            ->shouldReceive('getOrderTotal')
+            ->andReturn(42.42);
+
         $link = \Mockery::mock('Link');
         $link->shouldReceive([
             'getModuleLink' => 'link',
@@ -71,6 +80,10 @@ class BasePaymentMethod extends TestCase
             ]);
 
         $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('amounts')
+            ->andReturn('{"default":{"min":"EUR:99","max":"EUR:2000000"}}');
 
         $this->address = \Mockery::mock('Address');
         $this->address->shouldReceive([
@@ -89,6 +102,16 @@ class BasePaymentMethod extends TestCase
                 'getTranslation' => $this->translation,
             ]);
 
+        $this->helpers = [
+            'amount' => \Mockery::mock(AmountHelper::class, [$this->dependencies])->makePartial(),
+        ];
+        $this->helpers['amount']
+            ->shouldReceive('isValidAmount')
+            ->andReturn([
+                'result' => true,
+                'message' => '',
+            ]);
+
         $this->validators = [
             'browser' => \Mockery::mock(browserValidator::class)->makePartial(),
             'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
@@ -96,10 +119,8 @@ class BasePaymentMethod extends TestCase
 
         $this->dependencies
             ->shouldReceive([
+                'getHelpers' => $this->helpers,
                 'getPlugin' => $this->plugin,
-                'getHelpers' => [
-                    'amount' => \Mockery::mock(AmountHelper::class)->makePartial(),
-                ],
                 'getValidators' => $this->validators,
             ]);
 

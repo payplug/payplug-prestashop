@@ -49,9 +49,6 @@ class ApiClass
     /** @var string */
     public $current_api_key;
 
-    /** var Configuration */
-    public $config;
-
     /** var ConfigurationClass */
     public $configuration;
 
@@ -76,7 +73,6 @@ class ApiClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
@@ -120,7 +116,7 @@ class ApiClass
     public function getAccountPermissions($api_key = null)
     {
         if (null == $api_key) {
-            $api_key = $this->setAPIKey();
+            $api_key = $this->getCurrentApiKey();
         }
 
         return $this->getAccount($api_key, false);
@@ -168,39 +164,15 @@ class ApiClass
     }
 
     /**
-     * @return string
-     */
-    public function getCurrentApiKey()
-    {
-        if (1 === (int) $this->config->get(
-            $this->dependencies->getConfigurationKey('sandboxMode')
-        )) {
-            return $this->config->get(
-                $this->dependencies->getConfigurationKey('testApiKey')
-            );
-        }
-
-        return $this->config->get(
-            $this->dependencies->getConfigurationKey('liveApiKey')
-        );
-    }
-
-    /**
      * @description Determine wich API key to use
      *
      * @return string
      */
-    public function setAPIKey()
+    public function getCurrentApiKey()
     {
-        $sandbox_mode = (int) $this->config->get(
-            $this->dependencies->getConfigurationKey('sandboxMode')
-        );
+        $sandbox_mode = (bool) $this->configuration->getValue('sandbox_mode');
 
-        return $sandbox_mode ? $this->config->get(
-            $this->dependencies->getConfigurationKey('testApiKey')
-        ) : $this->config->get(
-            $this->dependencies->getConfigurationKey('liveApiKey')
-        );
+        return (string) $this->configuration->getValue($sandbox_mode ? 'test_api_key' : 'live_api_key');
     }
 
     /**
@@ -266,8 +238,8 @@ class ApiClass
         if (null === $sandbox && $this->current_api_key) {
             $payplug_key = $this->current_api_key;
         } else {
-            $configuration_key = ($sandbox ? 'TEST' : 'LIVE') . '_API_KEY';
-            $payplug_key = $this->config->get($this->dependencies->concatenateModuleNameTo($configuration_key));
+            $configuration_key = ($sandbox ? 'test' : 'live') . '_api_key';
+            $payplug_key = $this->configuration->getValue($configuration_key);
         }
 
         return $this->setSecretKey($payplug_key);
@@ -329,9 +301,7 @@ class ApiClass
      */
     public function hasLiveKey()
     {
-        return (bool) $this->config->get(
-            $this->dependencies->getConfigurationKey('liveApiKey')
-        );
+        return (bool) $this->configuration->getValue('live_api_key');
     }
 
     /**
@@ -1158,21 +1128,11 @@ class ApiClass
                 $api_keys['live_key'] = $json_answer['secret_keys']['live'];
             }
         }
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('testApiKey'),
-            $api_keys['test_key']
-        );
-        $this->config->updateValue(
-            $this->dependencies->getConfigurationKey('liveApiKey'),
-            $api_keys['live_key']
-        );
+        $this->configuration->set('test_api_key', $api_keys['test_key']);
+        $this->configuration->set('live_api_key', $api_keys['live_key']);
 
-        $is_sandbox = $this->config->get($this->dependencies->getConfigurationKey('sandboxMode'));
-        if ($is_sandbox) {
-            $this->setSecretKey($api_keys['test_key']);
-        } else {
-            $this->setSecretKey($api_keys['live_key']);
-        }
+        $is_sandbox = (bool) $this->configuration->getValue('sandbox_mode');
+        $this->setSecretKey($api_keys[$is_sandbox ? 'test_key' : 'live_key']);
 
         return true;
     }

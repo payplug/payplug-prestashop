@@ -35,7 +35,6 @@ class OneyRepository extends BaseClass
     private $cache;
     private $carrierAdapter;
     private $dependencies;
-    private $log;
     private $logger;
     private $configurationAdapter;
     private $contextAdapter;
@@ -61,7 +60,6 @@ class OneyRepository extends BaseClass
         $mediaAdapter,
         $dependencies,
         $logger,
-        $myLogPHP,
         $oneyEntity,
         $toolsAdapter,
         $validateAdapter
@@ -81,11 +79,8 @@ class OneyRepository extends BaseClass
         $this->toolsAdapter = $toolsAdapter;
         $this->validateAdapter = $validateAdapter;
         $this->oneyEntity = $oneyEntity;
-        $this->log = $myLogPHP;
         $this->assign = $assign;
         $this->helpers = $this->dependencies->getHelpers();
-
-        $this->setOperations();
     }
 
     /**
@@ -196,15 +191,12 @@ class OneyRepository extends BaseClass
     public function assignLegalNotice()
     {
         $limits = $this->getOneyPriceLimit();
-        $learnMoreLink = 'IT' == $this->configurationAdapter->get(
-            $this->dependencies->getConfigurationKey('companyIso')
-        )
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $learnMoreLink = 'IT' == $configuration->getValue('company_iso')
         && 'it' == $this->toolsAdapter->tool('strtolower', $this->contextAdapter->getContext()->language->iso_code);
         $this->assign->assign([
             'learnMoreLink' => (bool) $learnMoreLink,
-            'oneyWithFees' => (bool) $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('oneyFees')
-            ),
+            'oneyWithFees' => (bool) $configuration->getValue('oney_fees'),
             'oneyMinAmounts' => $this->toolsAdapter->tool('displayPrice', $this->helpers['amount']->formatOneyAmount($limits['min'])['result']),
             'oneyMaxAmounts' => $this->toolsAdapter->tool('displayPrice', $this->helpers['amount']->formatOneyAmount($limits['max'])['result']),
             'oneyUrl' => 'https://www.oney.' . $this->contextAdapter->getContext()->language->iso_code,
@@ -333,11 +325,9 @@ class OneyRepository extends BaseClass
      */
     public function deleteOneyConfig()
     {
-        $config = $this->configurationAdapter;
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
 
-        return $config->deleteByName(
-            $this->dependencies->getConfigurationKey('oneyAllowedCountries')
-        );
+        return $configuration->delete('oney_allowed_countries');
     }
 
     /**
@@ -348,10 +338,9 @@ class OneyRepository extends BaseClass
     public function displayOneyPopin()
     {
         $this->assignLegalNotice();
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->assign->assign([
-            'use_fees' => (bool) $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('oneyFees')
-            ),
+            'use_fees' => (bool) $configuration->getValue('oney_fees'),
             'iso_code' => $this->toolsAdapter->tool(
                 'strtoupper',
                 $this->contextAdapter->getContext()->language->iso_code
@@ -374,10 +363,9 @@ class OneyRepository extends BaseClass
     public function displayOneySchedule($oney_payment, $amount)
     {
         $withFirstSchedule = 'it' == $this->contextAdapter->getContext()->language->iso_code;
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $vars = [
-            'use_fees' => (bool) $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('oneyFees')
-            ),
+            'use_fees' => (bool) $configuration->getValue('oney_fees'),
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
@@ -388,9 +376,7 @@ class OneyRepository extends BaseClass
                 'strtoupper',
                 $this->contextAdapter->getContext()->language->iso_code
             ),
-            'merchant_company_iso' => $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('companyIso')
-            ),
+            'merchant_company_iso' => $configuration->getValue('company_iso'),
         ];
         $this->assign->assign($vars);
 
@@ -426,9 +412,8 @@ class OneyRepository extends BaseClass
             $oneyImagex4 = '/modules/' . $this->dependencies->name . '/views/img/oney/x4_with';
             $oneyImage = '';
 
-            $use_fees = (bool) $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('oneyFees')
-            );
+            $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+            $use_fees = (bool) $configuration->getValue('oney_fees');
             if (!$use_fees) {
                 $oneyImage .= 'out';
             }
@@ -436,9 +421,7 @@ class OneyRepository extends BaseClass
             $oneyImage .= '_fees';
 
             $iso = $this->toolsAdapter->tool('strtoupper', $this->contextAdapter->getContext()->language->iso_code);
-            $merchant_company_iso = (string) $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('companyIso')
-            );
+            $merchant_company_iso = (string) $configuration->getValue('company_iso');
             if (false === $use_fees) {
                 if ('IT' != $iso && 'FR' != $iso) {
                     $iso = $merchant_company_iso;
@@ -508,7 +491,7 @@ class OneyRepository extends BaseClass
     {
         $tools = $this->toolsAdapter;
 
-        if (!in_array($operation, $this->oneyEntity->getOperations()) || !$operation) {
+        if (!in_array($operation, $this->getOperations()) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -695,11 +678,10 @@ class OneyRepository extends BaseClass
         }
 
         $amount = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
 
         if (!$country) {
-            $iso_code_list = $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('oneyAllowedCountries')
-            );
+            $iso_code_list = $configuration->getValue('oney_allowed_countries');
             if (!$iso_code_list) {
                 return $payment_list;
             }
@@ -711,15 +693,13 @@ class OneyRepository extends BaseClass
         }
         $country = $this->toolsAdapter->tool('strtoupper', $country);
 
-        $available_oney_payments = $this->oneyEntity->getOperations();
+        $available_oney_payments = $this->getOperations();
         $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
         if (!$oney_simulations['result']) {
             return $payment_list;
         }
 
-        $use_fees = (bool) $this->configurationAdapter->get(
-            $this->dependencies->getConfigurationKey('oneyFees')
-        );
+        $use_fees = (bool) $configuration->getValue('oney_fees');
 
         foreach (array_keys($oney_simulations['simulations']) as $key) {
             $with_fees = false !== (bool) strpos($key, 'with_fees');
@@ -813,10 +793,9 @@ class OneyRepository extends BaseClass
      */
     public function setCustomOneyLimit($custom_oney_amount)
     {
-        $config = $this->configurationAdapter;
         $tools = $this->toolsAdapter;
 
-        $id_currency = $config->get('PS_CURRENCY_DEFAULT');
+        $id_currency = $this->configurationAdapter->get('PS_CURRENCY_DEFAULT');
         $currency = $this->currencyAdapter->get((int) $id_currency);
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
@@ -839,7 +818,7 @@ class OneyRepository extends BaseClass
      */
     public function getOneyPriceLimit($custom = true, $id_currency = false)
     {
-        $config = $this->configurationAdapter;
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $tools = $this->toolsAdapter;
 
         if ($this->validateAdapter->validate('isLoadedObject', $id_currency)) {
@@ -849,7 +828,7 @@ class OneyRepository extends BaseClass
                 $id_currency = $this->countryAdapter->getByIso($id_currency);
             }
             if (!$id_currency) {
-                $id_currency = $config->get('PS_CURRENCY_DEFAULT');
+                $id_currency = $this->configurationAdapter->get('PS_CURRENCY_DEFAULT');
             }
 
             $currency = $this->currencyAdapter->get((int) $id_currency);
@@ -865,14 +844,12 @@ class OneyRepository extends BaseClass
         }
 
         $iso_code = $tools->tool('strtoupper', $currency->iso_code);
-        $amounts = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('amounts'), true);
+        $amounts = json_decode($configuration->getValue('amounts'), true);
 
         if ((bool) $custom) {
             $oney_min_amounts = explode(
                 ',',
-                $tools->tool('strtoupper', $config->get(
-                    $this->dependencies->getConfigurationKey('oneyCustomMinAmounts')
-                ))
+                $tools->tool('strtoupper', $configuration->getValue('oney_custom_min_amounts'))
             );
         } else {
             $oney_min_amounts = explode(
@@ -889,19 +866,10 @@ class OneyRepository extends BaseClass
             }
         }
         if ($custom) {
-            $oney_max_amounts = explode(
-                ',',
-                $tools->tool('strtoupper', $config->get(
-                    $this->dependencies->getConfigurationKey('oneyCustomMaxAmounts')
-                ))
-            );
+            $oney_max_amounts = explode(',', $tools->tool('strtoupper', $configuration->getValue('oney_custom_max_amounts')));
         } else {
-            $oney_max_amounts = explode(
-                ',',
-                $tools->tool('strtoupper', $config->get(
-                    $this->dependencies->getConfigurationKey('oneyMaxAmounts')
-                ))
-            );
+            $amounts = json_decode($configuration->getValue('amounts'), true);
+            $oney_max_amounts = explode(',', $tools->tool('strtoupper', $amounts['oney_x3_with_fees']['max']));
         }
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
@@ -1467,12 +1435,8 @@ class OneyRepository extends BaseClass
         }
 
         // Check if the allowed list is valid
-        $allow_countries = $this->toolsAdapter->tool(
-            'strtoupper',
-            $this->configurationAdapter->get(
-                $this->dependencies->getConfigurationKey('oneyAllowedCountries')
-            )
-        );
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $allow_countries = $this->toolsAdapter->tool('strtoupper', $configuration->getValue('oney_allowed_countries'));
         if (!$allow_countries) {
             return [
                 'result' => false,
@@ -1564,7 +1528,7 @@ class OneyRepository extends BaseClass
         ];
     }
 
-    protected function setOperations()
+    public function getOperations()
     {
         $options = [
             'x3_with_fees',
@@ -1573,9 +1537,8 @@ class OneyRepository extends BaseClass
             'x4_without_fees',
         ];
 
-        $oney_allowed_countries = $this->configurationAdapter->get(
-            $this->dependencies->getConfigurationKey('oneyAllowedCountries')
-        );
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $oney_allowed_countries = $configuration->getValue('oney_allowed_countries');
         if ('payplug' != $this->dependencies->name
             && $this->validators['payment']->isAllowedCountry($oney_allowed_countries, 'BE')['result']) {
             $options = [
@@ -1584,6 +1547,6 @@ class OneyRepository extends BaseClass
             ];
         }
 
-        $this->oneyEntity->setOperations($options);
+        return $options;
     }
 }

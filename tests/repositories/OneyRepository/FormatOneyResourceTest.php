@@ -33,6 +33,11 @@ final class FormatOneyResourceTest extends BaseOneyRepository
             ])
         ;
 
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('oney_allowed_countries')
+            ->andReturn('FR');
+
         $this->operation = 'x3_with_fees';
         $this->resource = OneySimulationsMock::get()[$this->operation];
     }

@@ -20,21 +20,11 @@ class BaseCardRepository extends RepositoryBase
         parent::setUp();
 
         $this->cardEntity = new CardEntity();
-
-        $this->config
-            ->shouldReceive('get')
-        ;
-
-        $this->constant
-            ->shouldReceive('get')
-        ;
-
         $this->logger->shouldReceive([
             'setProcess' => $this->logger,
         ]);
 
         $this->repo = Mockery::mock(CardRepository::class, [
-            $this->config,
             $this->constant,
             $this->dependencies,
             $this->logger,
@@ -46,7 +36,15 @@ class BaseCardRepository extends RepositoryBase
         MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
 
         $this->cardApi = Mockery::mock('alias:' . Card::class);
-
         $this->paymentApi = Mockery::mock('alias:' . Payment::class);
+
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('sandbox_mode')
+            ->andReturn(false);
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('company_id')
+            ->andReturn('42');
     }
 }

@@ -53,16 +53,11 @@ class ConfigurationAction
             ];
         }
 
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         if ($sandbox_mode) {
-            $permissions = $this->dependencies->apiClass->getAccountPermissions(
-                $config->get($this->dependencies->getConfigurationKey('testApiKey'))
-            );
+            $permissions = $this->dependencies->apiClass->getAccountPermissions($configuration->getValue('test_api_key'));
         } else {
-            $permissions = $this->dependencies->apiClass->getAccountPermissions(
-                $config->get($this->dependencies->getConfigurationKey('liveApiKey'))
-            );
+            $permissions = $this->dependencies->apiClass->getAccountPermissions($configuration->getValue('live_api_key'));
         }
 
         $allowed_methods = [
@@ -329,22 +324,22 @@ class ConfigurationAction
             ];
         }
 
-        $config = $this->dependencies->getPlugin()->getConfiguration();
-        $config->updateValue($this->dependencies->getConfigurationKey('email'), $email);
-        $config->updateValue($this->dependencies->getConfigurationKey('enable'), 1);
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $configuration->set('email', $email);
+        $configuration->set('enable', 1);
 
         // Update global configuration
         $permissions = $this->dependencies->apiClass->getAccountPermissions(
-            $config->get($this->dependencies->getConfigurationKey('liveApiKey'))
+            $configuration->getValue('live_api_key')
         );
 
         if ('pspaylater' == $this->dependencies->name) {
             if ((bool) $permissions['can_use_oney']
                 && (bool) $permissions['onboarding_oney_completed']) {
-                $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
+                $configuration->set('sandbox_mode', 0);
             }
-        } elseif ((bool) $config->get($this->dependencies->getConfigurationKey('liveApiKey'))) {
-            $config->updateValue($this->dependencies->getConfigurationKey('sandboxMode'), 0);
+        } elseif ((bool) $configuration->getValue('live_api_key')) {
+            $configuration->set('sandbox_mode', 0);
         }
 
         return $this->renderConfiguration();
@@ -533,6 +528,7 @@ class ConfigurationAction
                                 ->getValidators()['payment']
                                 ->isAmount((int) $amount_to_cent, $limit_oney);
                             $formated_amount = $oney->setCustomOneyLimit((int) $amount_to_cent);
+
                             if ($is_valid_amount && !$configuration->set($key, (string) $formated_amount)) {
                                 return [
                                     'success' => false,

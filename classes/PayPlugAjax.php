@@ -35,7 +35,7 @@ class PayPlugAjax
 {
     private $address;
     private $card;
-    private $config;
+    private $configurationAdapter;
     private $context;
     private $country;
     private $dependencies;
@@ -52,7 +52,7 @@ class PayPlugAjax
 
         $this->address = $this->dependencies->getPlugin()->getAddress();
         $this->card = $this->dependencies->getPlugin()->getCard();
-        $this->config = $this->dependencies->getPlugin()->getConfiguration();
+        $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
         $this->oney = $this->dependencies->getPlugin()->getOney();
@@ -131,7 +131,7 @@ class PayPlugAjax
                 exit(json_encode($this->oney->isValidOneyAddresses($id_shipping, $id_billing)));
             }
             if ($tools->tool('getIsset', 'isOneyElligible')) {
-                $use_taxes = (bool) $this->config->get('PS_TAX');
+                $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
 
                 if ($id_product = (int) $tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int) $tools->tool('getValue', 'id_product_attribute', 0);
@@ -171,7 +171,7 @@ class PayPlugAjax
                 exit(json_encode($is_elligible));
             }
             if ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
-                $use_taxes = (bool) $this->config->get('PS_TAX');
+                $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
 
                 if ($id_product = (int) $tools->tool('getValue', 'id_product')) {
                     $id_product_attribute = (int) $tools->tool('getValue', 'id_product_attribute', 0);
