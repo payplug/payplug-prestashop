@@ -856,6 +856,7 @@ class paymentValidator
         if (!is_bool($product_quantity)) {
             return [
                 'result' => false,
+                'code' => 'product_quantity',
                 'message' => 'Invalid argument given, $product_quantity must be a boolean',
             ];
         }
@@ -863,6 +864,7 @@ class paymentValidator
         if (!is_bool($address)) {
             return [
                 'result' => false,
+                'code' => 'address',
                 'message' => 'Invalid argument given, $address must be a boolean',
             ];
         }
@@ -870,6 +872,7 @@ class paymentValidator
         if (!is_bool($amount)) {
             return [
                 'result' => false,
+                'code' => 'amount',
                 'message' => 'Invalid argument given, $amount must be a boolean',
             ];
         }

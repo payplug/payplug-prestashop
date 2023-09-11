@@ -1255,7 +1255,7 @@ class OneyRepository extends BaseClass
 
         $is_elligible = $this->validators['payment']->isOneyElligible(
             $is_valid_cart['result'],
-            $country ? $is_valid_addresses['result'] : true,
+            $country ? $is_valid_addresses : true,
             $is_valid_amount['result']
         );
 

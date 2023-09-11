@@ -40,6 +40,7 @@ class isOneyElligibleTest extends TestCase
         $amount = true;
         $this->assertSame([
             'result' => false,
+            'code' => 'product_quantity',
             'message' => 'Invalid argument given, $product_quantity must be a boolean',
         ], $this->validator->isOneyElligible($product_quantity, $address, $amount));
     }
@@ -55,6 +56,7 @@ class isOneyElligibleTest extends TestCase
         $amount = true;
         $this->assertSame([
             'result' => false,
+            'code' => 'address',
             'message' => 'Invalid argument given, $address must be a boolean',
         ], $this->validator->isOneyElligible($product_quantity, $address, $amount));
     }
@@ -70,6 +72,7 @@ class isOneyElligibleTest extends TestCase
         $address = true;
         $this->assertSame([
             'result' => false,
+            'code' => 'amount',
             'message' => 'Invalid argument given, $amount must be a boolean',
         ], $this->validator->isOneyElligible($product_quantity, $address, $amount));
     }
