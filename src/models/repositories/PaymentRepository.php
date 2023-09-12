@@ -32,7 +32,7 @@ class PaymentRepository extends QueryRepository
      *
      * @return array
      */
-    public function getByCart($cart_id = '')
+    public function getByCart($cart_id = 0)
     {
         if (!is_int($cart_id) || !$cart_id) {
             return [];
@@ -44,7 +44,7 @@ class PaymentRepository extends QueryRepository
             ->where('id_cart = ' . (int) $cart_id)
             ->build('unique_row');
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 
     /**

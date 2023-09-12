@@ -39,6 +39,6 @@ class ModuleRepository extends QueryRepository
             ->where('active = 1')
             ->build();
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 }

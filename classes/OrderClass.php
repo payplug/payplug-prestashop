@@ -138,29 +138,6 @@ class OrderClass
     }
 
     /**
-     * @description Get the current Order State Id for a given Order ID
-     *
-     * @param bool $id_order
-     *
-     * @return false|int
-     */
-    public function getCurrentOrderState($id_order = false)
-    {
-        if (!$id_order) {
-            return false;
-        }
-
-        $this->query
-            ->select()
-            ->fields('current_state')
-            ->from($this->constant->get('_DB_PREFIX_') . 'orders')
-            ->where('id_order = ' . (int) $id_order)
-        ;
-
-        return $this->query->build('unique_value');
-    }
-
-    /**
      * @description get the undefined order state on an history
      *
      * @param int $orderId

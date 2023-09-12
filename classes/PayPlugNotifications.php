@@ -509,13 +509,11 @@ class PayPlugNotifications
         // Check number of order using this cart
         $this->logger->addLog('Checking number of order passed with this id_cart');
 
-        $res_nb_orders = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constantAdapter->get('_DB_PREFIX_') . 'orders')
-            ->where('id_cart = ' . (int) $this->cart->id)
-            ->build()
-        ;
+        $res_nb_orders = $this->dependencies
+            ->getPlugin()
+            ->getOrderRepository()
+            ->getByIdCart((int) $this->cart->id);
+
         if (!$res_nb_orders) {
             $this->logger->addLog(
                 'No order can be found using id_cart ' . (int) $this->cart->id,
@@ -693,7 +691,11 @@ class PayPlugNotifications
             } while (!$cart_lock);
 
             $new_order_state = $this->order_states['refund'];
-            $current_state = $this->orderClass->getCurrentOrderState($this->order->id);
+            $current_state = (int) $this->dependencies
+                ->getPlugin()
+                ->getOrderRepository()
+                ->getCurrentOrderState((int) $this->order->id);
+
             $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {

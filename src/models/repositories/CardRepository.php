@@ -163,7 +163,7 @@ class CardRepository extends QueryRepository
             ->where('is_sandbox = ' . ((bool) $is_sandbox ? 1 : 0))
             ->build('unique_value');
 
-        return $result ? true : false;
+        return (bool) $result;
     }
 
     /**
@@ -179,7 +179,7 @@ class CardRepository extends QueryRepository
             ->from($this->prefix . $this->dependencies->name . '_card')
             ->build();
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 
     /**
@@ -219,6 +219,6 @@ class CardRepository extends QueryRepository
 
         $result = $this->build();
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 }

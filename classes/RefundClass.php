@@ -358,7 +358,11 @@ class RefundClass
                         ]));
                     }
 
-                    $current_state = (int) $this->dependencies->orderClass->getCurrentOrderState($order->id);
+                    $current_state = (int) $this->dependencies
+                        ->getPlugin()
+                        ->getOrderRepository()
+                        ->getCurrentOrderState((int) $order->id);
+
                     $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                     if (0 != $current_state && $current_state != $new_state) {
                         $history = $this->orderHistory->get();
@@ -405,7 +409,11 @@ class RefundClass
                         ]));
                     }
 
-                    $current_state = (int) $this->dependencies->orderClass->getCurrentOrderState($order->id);
+                    $current_state = (int) $this->dependencies
+                        ->getPlugin()
+                        ->getOrderRepository()
+                        ->getCurrentOrderState((int) $order->id);
+
                     $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                     if (0 != $current_state && $current_state != $new_state) {
                         $history = $this->orderHistory->get();

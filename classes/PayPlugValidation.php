@@ -644,13 +644,11 @@ class PayPlugValidation
             // Check number of order using this cart
             $this->logger->addLog('Checking number of order passed with this id_cart...');
 
-            $res_nb_orders = $this->query
-                ->select()
-                ->fields('id_order')
-                ->from($this->constantAdapter->get('_DB_PREFIX_') . 'orders')
-                ->where('id_cart = ' . (int) $cart->id)
-                ->build()
-            ;
+            $res_nb_orders = $this->dependencies
+                ->getPlugin()
+                ->getOrderRepository()
+                ->getByIdCart((int) $cart->id);
+
             if (!$res_nb_orders) {
                 $this->logger->addLog('No order can be found using id_cart ' . (int) $cart->id, 'error');
                 if (!$this->payplugLock->deleteLockG2($cart->id)) {

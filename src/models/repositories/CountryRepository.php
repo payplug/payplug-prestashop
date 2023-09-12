@@ -45,6 +45,6 @@ class CountryRepository extends QueryRepository
             ->where('id_country = ' . (int) $id_country)
             ->build('unique_value');
 
-        return $result ? $result : '';
+        return $result ?: '';
     }
 }

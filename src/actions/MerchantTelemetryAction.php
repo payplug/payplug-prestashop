@@ -116,8 +116,10 @@ class MerchantTelemetryAction
             'test_api_key',
             'telemetry_hash',
         ];
-        foreach ($protected_configurations_keys as $key) {
-            unset($telemetries['configurations'][$key]);
+        foreach ($telemetries['configurations'] as $key => $cfg) {
+            if (in_array($cfg['name'], $protected_configurations_keys)) {
+                unset($telemetries['configurations'][$key]);
+            }
         }
 
         // Then through an hash, we check if the send of the datas is required

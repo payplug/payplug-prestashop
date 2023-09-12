@@ -47,6 +47,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         $this->deleted = false;
         $this->context = Context::getContext();
 
+        // todo: Check if we need to import this request in models/repository/OrderRepository
         $this->_select = '
             a.id_order AS `id_order`,
             CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,

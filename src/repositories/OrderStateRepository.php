@@ -345,25 +345,29 @@ class OrderStateRepository extends BaseClass
         ;
     }
 
-    public function isUsedByOrders($module_name)
+    public function isUsedByOrders($module_name = '')
     {
         $ids = [];
-        $res = $this->query
-            ->select()
-            ->fields('o.current_state')
-            ->from(_DB_PREFIX_ . 'orders', 'o')
-            ->where('o.module = \'' . $this->query->escape($module_name) . '\'')
-            ->groupBy('o.current_state')
-            ->build()
-        ;
 
-        foreach ($res as $os) {
-            if ($os) {
-                array_push($ids, (int) $os['current_state']);
-            }
+        if (!is_string($module_name) || !$module_name) {
+            return $ids;
         }
 
-        return $ids;
+        $order_states = [];
+        $module_orders = $this->dependencies
+            ->getPlugin()
+            ->getOrderRepository()
+            ->getByModule($module_name);
+
+        if (empty($module_orders)) {
+            return $ids;
+        }
+
+        foreach ($module_orders as $module_order) {
+            array_push($order_states, (int) $module_order['current_state']);
+        }
+
+        return array_unique($order_states);
     }
 
     public function removeIdsUnusedByPayPlug()

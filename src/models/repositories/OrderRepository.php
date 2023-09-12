@@ -41,6 +41,76 @@ class OrderRepository extends QueryRepository
             ->where('`date_add` > "' . $this->escape($current_date) . '"')
             ->build();
 
-        return $result ? $result : [];
+        return $result ?: [];
+    }
+
+    /**
+     * @description Get all order for a given cart id
+     *
+     * @param int $cart_id
+     *
+     * @return array
+     */
+    public function getByIdCart($cart_id = 0)
+    {
+        if (!is_int($cart_id) || !$cart_id) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->prefix . 'orders')
+            ->where('id_cart = ' . (int) $cart_id)
+            ->build();
+
+        return $result ?: [];
+    }
+
+    /**
+     * @description Get all order for a given module name
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getByModule($name = '')
+    {
+        if (!is_string($name) || !$name) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->prefix . 'orders')
+            ->where('module = \'' . $this->escape($name) . '\'')
+            ->build()
+        ;
+
+        return $result ?: [];
+    }
+
+    /**
+     * @description Get the current order state id for a given order id
+     *
+     * @param int $order_id
+     *
+     * @return int
+     */
+    public function getCurrentOrderState($order_id = false)
+    {
+        if (!is_int($order_id) || !$order_id) {
+            return 0;
+        }
+
+        $result = $this
+            ->select()
+            ->fields('current_state')
+            ->from($this->prefix . 'orders')
+            ->where('id_order = ' . (int) $order_id)
+            ->build('unique_value');
+
+        return $result ?: 0;
     }
 }
