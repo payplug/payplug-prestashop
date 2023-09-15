@@ -7,7 +7,7 @@ use PayPlug\tests\mock\CartMock;
 /**
  * @group unit
  * @group old_repository
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -34,7 +34,7 @@ final class GetHashedCartTest extends BasePaymentRepository
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method',
+            'method' => 'payment_method',
         ];
     }
 

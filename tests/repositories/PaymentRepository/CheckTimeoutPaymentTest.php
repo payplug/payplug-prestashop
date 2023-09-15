@@ -8,7 +8,7 @@ use PayPlug\tests\mock\CartMock;
  * @group unit
  * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -28,7 +28,7 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method',
+            'method' => 'payment_method',
         ];
     }
 
@@ -68,7 +68,7 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
         $idCart = 42;
         $this->payment_repository->shouldReceive([
             'getByCart' => [
-                'id_payment' => 'pay_12345678azertyu',
+                'resource_id' => 'pay_12345678azertyu',
                 'date_upd' => '2023-01-01 00:00:00',
             ],
         ]);
@@ -90,7 +90,7 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
         $idCart = 42;
         $this->payment_repository->shouldReceive([
             'getByCart' => [
-                'id_payment' => 'pay_12345678azertyu',
+                'resource_id' => 'pay_12345678azertyu',
                 'date_upd' => '2023-01-01 00:00:00',
             ],
         ]);

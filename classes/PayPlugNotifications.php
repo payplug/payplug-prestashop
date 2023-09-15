@@ -934,8 +934,10 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: setCartFromResource');
         if ($this->is_installment) {
-            $payment = $this->dependencies->getPlugin()->getPaymentRepository()
-                ->getByIdPayment($this->payment->installment_plan_id);
+            $payment = $this->dependencies
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getByResourceId($this->payment->installment_plan_id);
             if (!$payment['id_cart']) {
                 if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                     $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
@@ -946,8 +948,10 @@ class PayPlugNotifications
                 $this->exitProcess($error_msg, 500);
             }
         } else {
-            $payment = $this->dependencies->getPlugin()->getPaymentRepository()
-                ->getByIdPayment($this->resource->id);
+            $payment = $this->dependencies
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getByResourceId($this->resource->id);
             if (!$payment['id_cart']) {
                 if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                     $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);

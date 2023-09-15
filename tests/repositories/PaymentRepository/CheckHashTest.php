@@ -8,7 +8,7 @@ use PayPlug\tests\mock\CartMock;
  * @group unit
  * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -30,7 +30,7 @@ final class CheckHashTest extends BasePaymentRepository
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method',
+            'method' => 'test',
             'forceHash' => false,
         ];
     }
@@ -82,7 +82,7 @@ final class CheckHashTest extends BasePaymentRepository
         $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
                 'cart_hash' => $this->hash,
             ],
         ]);
@@ -110,7 +110,7 @@ final class CheckHashTest extends BasePaymentRepository
         $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
                 'cart_hash' => $this->hash,
             ],
         ]);
@@ -142,7 +142,7 @@ final class CheckHashTest extends BasePaymentRepository
         $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
                 'cart_hash' => $this->hash,
             ],
         ]);
@@ -184,7 +184,7 @@ final class CheckHashTest extends BasePaymentRepository
         $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
                 'cart_hash' => $this->hash,
             ],
         ]);

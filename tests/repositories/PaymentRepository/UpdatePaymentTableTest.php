@@ -8,7 +8,7 @@ use PayPlug\tests\mock\CartMock;
  * @group unit
  * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -22,8 +22,8 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
 
         $this->paymentDetails = [
             'cart' => CartMock::get(),
-            'paymentId' => 1,
-            'paymentMethod' => 'standard',
+            'resource_id' => 1,
+            'method' => 'standard',
             'paymentUrl' => 'htt://www.monsite.com',
             'paymentReturnUrl' => 'htt://www.monsite.com',
             'authorizedAt' => '2021-01-01 00:00:00',
@@ -66,40 +66,6 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
         );
     }
 
-    public function testWithUpdateThrowingException()
-    {
-        $expected_error = [
-            ['name' => 'paymentDetails', 'value' => $this->paymentDetails],
-            '[updatePaymentTable] Unable to fetch the query on DB. Error: Build method throw exception',
-        ];
-
-        $this->query
-            ->shouldReceive([
-                'update' => $this->query,
-                'table' => $this->query,
-                'set' => $this->query,
-                'where' => $this->query,
-            ])
-        ;
-
-        $this->query
-            ->shouldReceive('build')
-            ->andThrow('Exception', 'Build method throw exception', 500)
-        ;
-
-        $this->repo
-            ->shouldReceive([
-                'returnPaymentError' => $expected_error,
-                'getHashedCart' => 'b0a30e26e83b2a',
-            ])
-        ;
-
-        $this->assertSame(
-            $expected_error,
-            $this->repo->updatePaymentTable($this->paymentDetails)
-        );
-    }
-
     public function testWithUpdateReturningError()
     {
         $expected_error = [
@@ -107,15 +73,9 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
             '[updatePaymentTable] Unable to fetch the query on DB but no throw',
         ];
 
-        $this->query
-            ->shouldReceive([
-                'update' => $this->query,
-                'table' => $this->query,
-                'set' => $this->query,
-                'where' => $this->query,
-                'build' => false,
-            ])
-        ;
+        $this->payment_repository->shouldReceive([
+            'updateByCart' => false,
+        ]);
 
         $this->repo
             ->shouldReceive([
@@ -132,15 +92,9 @@ final class UpdatePaymentTableTest extends BasePaymentRepository
 
     public function testWithValidMethod()
     {
-        $this->query
-            ->shouldReceive([
-                'update' => $this->query,
-                'table' => $this->query,
-                'set' => $this->query,
-                'where' => $this->query,
-                'build' => true,
-            ])
-        ;
+        $this->payment_repository->shouldReceive([
+            'updateByCart' => true,
+        ]);
 
         $this->repo
             ->shouldReceive([

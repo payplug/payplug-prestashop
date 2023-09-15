@@ -28,12 +28,12 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
      *
      * @param mixed $payment_options
      */
-    public function atestWhenGivenPaymentOptionsIsNotValidArrayFormat($payment_options)
+    public function testWhenGivenPaymentOptionsIsNotValidArrayFormat($payment_options)
     {
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }
 
-    public function atestWhenNoCustomerCardsFound()
+    public function testWhenNoCustomerCardsFound()
     {
         $payment_options = [];
         $this->card->shouldReceive([

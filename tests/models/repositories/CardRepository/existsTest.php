@@ -83,9 +83,6 @@ class existsTest extends BaseCardRepository
         );
     }
 
-    /**
-     * @group debug
-     */
     public function testWhenTheCardExists()
     {
         $payment_id = 'pay_azertyui';

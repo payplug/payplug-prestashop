@@ -255,7 +255,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $payment_id = $tools->tool('getValue', 'pay_id');
                 $cart_id = $tools->tool('getValue', 'cart_id');
 
-                $payment = $this->dependencies->getPlugin()->getPaymentRepository()
+                $payment = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentRepository()
                     ->getByCart((int) $cart_id);
 
                 if (empty($payment)) {
@@ -265,7 +267,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
 
-                if ($payment_id != $payment['id_payment']) {
+                if ($payment_id != $payment['resource_id']) {
                     exit(json_encode([
                         'result' => false,
                         'message' => 'No correspondance with given payment id',
@@ -319,7 +321,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'message' => 'Success',
                 ]));
             } elseif ($tools->tool('getIsset', 'patchPayment')) {
-                $paymentId = $tools->tool('getValue', 'pay_id');
+                $resource_id = $tools->tool('getValue', 'pay_id');
                 $cartId = (int) $tools->tool('getValue', 'cart_id');
                 $token = $tools->tool('getValue', 'token');
 
@@ -332,7 +334,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 // Check if payment id is valid
-                if (!$paymentId) {
+                if (!$resource_id) {
                     exit(json_encode([
                         'result' => false,
                         'message' => 'Invalid payment id given',
@@ -340,7 +342,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 // Check payment id correspondance between the given one and the one from the DB
-                $payment = $this->dependencies->getPlugin()->getPaymentRepository()
+                $payment = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentRepository()
                     ->getByCart((int) $context->cart->id);
 
                 if (empty($payment)) {
@@ -350,7 +354,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
 
-                if ($paymentId != $payment['id_payment']) {
+                if ($resource_id != $payment['resource_id']) {
                     exit(json_encode([
                         'result' => false,
                         'message' => 'No correspondance with given payment id',
@@ -370,7 +374,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'payment_token' => $token,
                     ],
                 ];
-                $patchPayment = $this->apiClass->patchPayment($paymentId, $data);
+                $patchPayment = $this->apiClass->patchPayment($resource_id, $data);
 
                 if (!$patchPayment['result']) {
                     exit(json_encode([

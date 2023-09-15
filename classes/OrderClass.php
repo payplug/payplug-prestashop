@@ -107,17 +107,6 @@ class OrderClass
         return $this->query->build('unique_value');
     }
 
-    public function getOrderIdByPayplugInstallmentId($id_payplug_installment)
-    {
-        $this->query
-            ->select()
-            ->fields('id_order')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
-            ->where('id_' . $this->dependencies->name . '_installment = ' . (int) $id_payplug_installment);
-
-        return $this->query->build('unique_value');
-    }
-
     /**
      * @description Get all order payment for given id order
      *

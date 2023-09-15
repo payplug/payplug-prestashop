@@ -8,7 +8,7 @@ use PayPlug\tests\mock\CartMock;
  * @group unit
  * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -26,8 +26,8 @@ final class InsertPaymentTableTest extends BasePaymentRepository
             'cartId' => $cart->id,
             'authorizedAt' => true,
             'isPaid' => true,
-            'paymentId' => 'pay_5SnSQwmPty5UgKbUgrZQuT',
-            'paymentMethod' => 'standard',
+            'resource_id' => 'pay_5SnSQwmPty5UgKbUgrZQuT',
+            'method' => 'standard',
             'paymentUrl' => 'payment_return_url',
             'paymentReturnUrl' => 'payment_return_url',
             'cart' => CartMock::get(),
@@ -43,7 +43,7 @@ final class InsertPaymentTableTest extends BasePaymentRepository
     {
         yield [null, 'paymentDetails: null'];
         yield [[(string) 'I am a string!'], 'paymentDetails: ["I am a string!"]'];
-        yield [['paymentId' => null], 'paymentDetails: {"paymentId":null}'];
+        yield [['resource_id' => null], 'paymentDetails: {"resource_id":null}'];
     }
 
     /**
@@ -84,41 +84,6 @@ final class InsertPaymentTableTest extends BasePaymentRepository
         );
     }
 
-    public function testInsertPaymentTableThrowException()
-    {
-        $error = '[insertPaymentTable] Error: Bad Request';
-        $this->repo
-            ->shouldReceive([
-                'getHashedCart' => ['result' => true],
-                'returnPaymentError' => $error,
-            ])
-        ;
-        $this->repo
-            ->shouldReceive([
-                'getPayment' => false,
-            ])
-        ;
-
-        $this->query
-            ->shouldReceive([
-                'insert' => $this->query,
-                'into' => $this->query,
-                'fields' => $this->query,
-                'values' => $this->query,
-            ])
-        ;
-
-        $this->query
-            ->shouldReceive('build')
-            ->andThrow('Payplug\Exception\ConfigurationNotSetException', 'Bad Request', 400)
-        ;
-
-        $this->assertSame(
-            $error,
-            $this->repo->insertPaymentTable($this->paymentDetails)
-        );
-    }
-
     public function testInsertPaymentTableReturnFalse()
     {
         $error = '[insertPaymentCart] Unable to flush DB (build method)';
@@ -128,21 +93,11 @@ final class InsertPaymentTableTest extends BasePaymentRepository
                 'returnPaymentError' => $error,
             ])
         ;
-        $this->repo
-            ->shouldReceive([
-                'getPayment' => false,
-            ])
-        ;
 
-        $this->query
-            ->shouldReceive([
-                'insert' => $this->query,
-                'into' => $this->query,
-                'fields' => $this->query,
-                'values' => $this->query,
-                'build' => false,
-            ])
-        ;
+        $this->payment_repository->shouldReceive([
+            'getByCart' => [],
+            'createPayment' => false,
+        ]);
 
         $this->assertSame(
             $error,
@@ -157,21 +112,11 @@ final class InsertPaymentTableTest extends BasePaymentRepository
                 'getHashedCart' => ['result' => true],
             ])
         ;
-        $this->repo
-            ->shouldReceive([
-                'getPayment' => false,
-            ])
-        ;
 
-        $this->query
-            ->shouldReceive([
-                'insert' => $this->query,
-                'into' => $this->query,
-                'fields' => $this->query,
-                'values' => $this->query,
-                'build' => true,
-            ])
-        ;
+        $this->payment_repository->shouldReceive([
+            'getByCart' => [],
+            'createPayment' => true,
+        ]);
 
         $this->assertSame(
             [

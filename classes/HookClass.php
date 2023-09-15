@@ -179,21 +179,23 @@ class HookClass
         }
 
         $cart = $this->cart->get((int) $order->id_cart);
-        $payment_method = $this->dependencies->paymentClass->getPaymentMethodByCart($cart);
-
-        if ('installment' == $payment_method['type']) {
+        $payment = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByCart((int) $order->id_cart);
+        if ('installment' == $payment['method']) {
             return;
         }
 
-        $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
+        $retrieve = $this->dependencies->apiClass->retrievePayment($payment['resource_id']);
         if (!$retrieve['result']) {
             $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
             if ($sandbox) {
                 $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('live_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
+                $retrieve = $this->dependencies->apiClass->retrievePayment($payment['resource_id']);
             } else {
                 $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('test_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($payment_method['id']);
+                $retrieve = $this->dependencies->apiClass->retrievePayment($payment['resource_id']);
             }
         }
 
@@ -321,14 +323,16 @@ class HookClass
         $amount_refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
         $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
 
-        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
+        $payment = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
             ->getByCart((int) $order->id_cart);
 
         if (empty($payment)) {
             return;
         }
 
-        $resource_id = $payment['id_payment'];
+        $resource_id = $payment['resource_id'];
         if ($this->validators['payment']->isInstallment((string) $resource_id)['result']) {
             $payment_list = [];
 
@@ -430,13 +434,28 @@ class HookClass
                 'ongoing' :
                 ($installment->is_fully_paid ? 'paid' : 'suspended');
             $inst_aborted = !$installment->is_active;
-            $ppInstallment = new PPPaymentInstallment($installment->id, $this->dependencies);
-            $instPaymentOne = $ppInstallment->getFirstPayment();
 
+            $resource = $this->dependencies
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getByResourceId($installment->id);
+            if (!isset($resource['schedules']) || !$resource['schedules']) {
+                $this->dependencies->installmentClass->addPayplugInstallment($installment);
+                $resource = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentRepository()
+                    ->getByResourceId($installment->id);
+            }
+
+            $schedules = json_decode($resource['schedules'], true);
+            $first_schedule = reset($schedules);
+            $retrieve_inst = $this->dependencies->apiClass->retrievePayment($first_schedule['id_payment']);
+            $first_installment = $retrieve_inst['resource'];
             $inst_can_be_aborted = !($inst_aborted || (
-                $this->validators['payment']->isDeferred($instPaymentOne->resource)['result']
-                    && !$instPaymentOne->isPaid()
+                $this->validators['payment']->isDeferred($first_installment)['result']
+                    && !$first_installment->is_paid
             ));
+
             $inst_paid = $installment->is_fully_paid;
             $this->assign->assign([
                 'inst_id' => $resource_id,

@@ -9,21 +9,31 @@ namespace PayPlug\tests\models\repositories\PaymentRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getByCartTest extends BasePaymentRepository
+class getByResourceIdTest extends BasePaymentRepository
 {
-    /**
-     * @dataProvider invalidIntegerFormatDataProvider
-     *
-     * @param mixed $id_cart
-     */
-    public function testWhenGivenIdCartIsInvalidIntegerFormat($id_cart)
+    protected function setUp()
     {
-        $this->assertSame([], $this->repository->getByCart($id_cart));
+        parent::setUp();
+        $this->repository
+            ->shouldReceive('escape')
+            ->andReturnUsing(function ($value) {
+                return $value;
+            });
+    }
+
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $resource_id
+     */
+    public function testWhenGivenResourceIdIsInvalidIntegerFormat($resource_id)
+    {
+        $this->assertSame([], $this->repository->getByResourceId($resource_id));
     }
 
     public function testWhenNoResultIsGivenByTheQuery()
     {
-        $id_cart = 42;
+        $pay_id = 'pay_azerty12345';
         $this
             ->repository
             ->shouldReceive([
@@ -34,12 +44,12 @@ class getByCartTest extends BasePaymentRepository
                 'build' => [],
             ]);
 
-        $this->assertSame([], $this->repository->getByCart($id_cart));
+        $this->assertSame([], $this->repository->getByResourceId($pay_id));
     }
 
     public function testWhenExpectedResultIsGivenByTheQuery()
     {
-        $id_cart = 42;
+        $pay_id = 'pay_azerty12345';
         $payment = [
             'id_payplug_payment' => 42,
             'resource_id' => 'pay_azerty12345',
@@ -59,6 +69,6 @@ class getByCartTest extends BasePaymentRepository
                 'build' => $payment,
             ]);
 
-        $this->assertSame($payment, $this->repository->getByCart($id_cart));
+        $this->assertSame($payment, $this->repository->getByResourceId($pay_id));
     }
 }

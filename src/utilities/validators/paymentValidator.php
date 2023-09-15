@@ -1027,42 +1027,6 @@ class paymentValidator
     }
 
     /**
-     * @description Check if given payment is pending
-     *
-     * @param array $payment
-     *
-     * @return array
-     */
-    public function isPending($payment = [])
-    {
-        if (!is_array($payment) || !$payment) {
-            return [
-                'result' => false,
-                'message' => 'Invalid argument given, $payment must be a non empty array',
-            ];
-        }
-
-        if (!isset($payment['is_pending'])) {
-            return [
-                'result' => false,
-                'message' => 'Missing props, $payment does not contain is_pending',
-            ];
-        }
-
-        if (!(bool) $payment['is_pending']) {
-            return [
-                'result' => false,
-                'message' => 'Given payment is not pending',
-            ];
-        }
-
-        return [
-            'result' => true,
-            'message' => '',
-        ];
-    }
-
-    /**
      * @description Check if given phone number is valid format (E.164)
      *
      * @param string $phone

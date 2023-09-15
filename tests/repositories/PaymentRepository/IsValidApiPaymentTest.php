@@ -8,7 +8,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @internal
  * @coversNothing
@@ -24,7 +24,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
 
         $this->paymentDetails = [
             'cartId' => 42,
-            'paymentMethod' => 'payment_method',
+            'method' => 'payment_method',
         ];
     }
 
@@ -102,7 +102,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
         $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'id_payment' => 'pay_1234567890azerty',
+                'resource_id' => 'pay_1234567890azerty',
             ],
         ]);
 
@@ -121,7 +121,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
         $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
             ],
         ]);
 
@@ -129,7 +129,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
             [
                 'result' => false,
                 'paymentDetails' => json_encode($this->paymentDetails),
-                'response' => '[isValidApiPayment] Invalid stored payment getted, id_payment is not given',
+                'response' => '[isValidApiPayment] Invalid stored payment getted, resource_id is not given',
             ],
             $this->repo->isValidApiPayment($this->paymentDetails)
         );
@@ -139,8 +139,8 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
     {
         $payment = [
             'id_cart' => 42,
-            'id_payment' => 'pay_1234567890azerty',
-            'payment_method' => 'installment',
+            'resource_id' => 'pay_1234567890azerty',
+            'method' => 'installment',
         ];
         $this->payment_repository->shouldReceive([
             'getByCart' => $payment,
@@ -159,7 +159,7 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
             [
                 'result' => false,
                 'storedPayment' => json_encode($payment),
-                'response' => '[isValidApiPayment] Cannot retrieve payment with id: ' . $payment['id_payment'],
+                'response' => '[isValidApiPayment] Cannot retrieve payment with id: ' . $payment['resource_id'],
             ],
             $this->repo->isValidApiPayment($this->paymentDetails)
         );
@@ -169,8 +169,8 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
     {
         $payment = [
             'id_cart' => 42,
-            'id_payment' => 'pay_1234567890azerty',
-            'payment_method' => 'standard',
+            'resource_id' => 'pay_1234567890azerty',
+            'method' => 'standard',
         ];
         $this->payment_repository->shouldReceive([
             'getByCart' => $payment,
@@ -199,8 +199,8 @@ final class IsValidApiPaymentTest extends BasePaymentRepository
     {
         $payment = [
             'id_cart' => 42,
-            'id_payment' => 'pay_1234567890azerty',
-            'payment_method' => 'standard',
+            'resource_id' => 'pay_1234567890azerty',
+            'method' => 'standard',
         ];
         $this->payment_repository->shouldReceive([
             'getByCart' => $payment,

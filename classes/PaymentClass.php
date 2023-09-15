@@ -682,30 +682,6 @@ class PaymentClass
     }
 
     /**
-     * @description ONLY FOR VALIDATION
-     * Retrieve payment stored
-     *
-     * @param int $id_cart
-     *
-     * @return string
-     */
-    public function getPaymentByCart($id_cart)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return '';
-        }
-
-        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
-            ->getByCart((int) $id_cart);
-
-        if (!$payment) {
-            return '';
-        }
-
-        return 'installment' != $payment['payment_method'] ? $payment['id_payment'] : '';
-    }
-
-    /**
      * @description Get payment data from cookie
      *
      * @return mixed
@@ -739,37 +715,6 @@ class PaymentClass
 
         // if no error all good then return true
         return json_decode($payplug_errors, true);
-    }
-
-    /**
-     * @description Check payment method for given cart object
-     *
-     * @param object Cart
-     * @param mixed $cart
-     *
-     * @return array|bool pay_id or inst_id or False
-     */
-    public function getPaymentMethodByCart($cart)
-    {
-        if (!is_object($cart)) {
-            $cart = $this->cart->get((int) $cart);
-        }
-
-        if (!$this->validate->validate('isLoadedObject', $cart)) {
-            return false;
-        }
-
-        $inst_id = $this->dependencies->installmentClass->getInstallmentByCart($cart->id);
-        if ($inst_id) {
-            return ['id' => $inst_id, 'type' => 'installment'];
-        }
-
-        $pay_id = $this->getPaymentByCart($cart->id);
-        if ($pay_id) {
-            return ['id' => $pay_id, 'type' => 'payment'];
-        }
-
-        return false;
     }
 
     /**
@@ -860,7 +805,6 @@ class PaymentClass
 
     /**
      * @description Prepare the tab to create the payment resource
-     * prepare payment
      *
      * @param $options
      *
@@ -1182,7 +1126,10 @@ class PaymentClass
             $payment_tab['initiator'] = 'PAYER';
             $payment_tab['payment_method'] = null;
             if ($options['id_card'] && 'new_card' != $options['id_card']) {
-                $card = $this->dependencies->getPlugin()->getCardRepository()->get((int) $options['id_card']);
+                $card = $this->dependencies
+                    ->getPlugin()
+                    ->getCardRepository()
+                    ->get((int) $options['id_card']);
                 if ($card['id_customer'] != $customer->id) {
                     return [
                         'result' => false,
@@ -1369,9 +1316,9 @@ class PaymentClass
 
         // Prepare details to create / retrieve payment
         $this->paymentDetails = [
-            'paymentMethod' => $payment_method,
+            'method' => $payment_method,
             'paymentTab' => $payment_tab,
-            'paymentId' => null,
+            'resource_id' => null,
             'paymentReturnUrl' => null,
             'paymentUrl' => null,
             'paymentDate' => null,
@@ -1389,7 +1336,9 @@ class PaymentClass
 
         // Create payment if inexistent
         $force_payment_creation = $options['is_applepay'] || $options['is_oney'];
-        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
+        $payment = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
             ->getByCart((int) $cart->id);
 
         if (empty($payment) || $force_payment_creation) {
@@ -1408,6 +1357,7 @@ class PaymentClass
 
             // Insert payment to paymentTable
             $insertPaymentTable = $this->payment->insertPaymentTable($this->paymentDetails);
+
             if ($insertPaymentTable['result'] && $insertPaymentTable['paymentDetails']) {
                 $this->paymentDetails = $insertPaymentTable['paymentDetails'];
             } elseif (!$insertPaymentTable['result']) {
@@ -1488,12 +1438,12 @@ class PaymentClass
             && $this->payment->checkHash($this->paymentDetails)
             && $this->payment->isValidApiPayment($this->paymentDetails)) {
             // If timeout < 3 min and hash OK
-            $store_payment = $this->dependencies->getPlugin()->getPaymentRepository()
+            $store_payment = $this->dependencies
+                ->getPlugin()
+                ->getPaymentRepository()
                 ->getByCart((int) $cart->id);
-            $this->paymentDetails['paymentId'] = $store_payment['id_payment'];
-
+            $this->paymentDetails['resource_id'] = $store_payment['resource_id'];
             $getpaymentReturnUrl = $this->payment->getPaymentReturnUrl($this->paymentDetails);
-
             if ($getpaymentReturnUrl['result'] && isset($getpaymentReturnUrl['url']) && $getpaymentReturnUrl['url']) {
                 return $getpaymentReturnUrl['url'];
             }
@@ -1505,28 +1455,6 @@ class PaymentClass
                 ];
             }
         }
-    }
-
-    /**
-     * @description Register transaction as pending to etablish link with order in case of error
-     *
-     * @param int $id_cart
-     *
-     * @return bool
-     */
-    public function registerPendingTransaction($id_cart = false)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return false;
-        }
-
-        return $this->query
-            ->update()
-            ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->set('is_pending = 1')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->build()
-        ;
     }
 
     /**

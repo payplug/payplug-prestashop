@@ -6,7 +6,7 @@ namespace PayPlug\tests\repositories\PaymentRepository;
  * @group unit
  * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */

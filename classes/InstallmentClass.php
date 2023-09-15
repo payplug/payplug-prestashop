@@ -54,58 +54,68 @@ class InstallmentClass
             $installment = $installment['resource'];
         }
 
-        if (isset($installment->schedule)) {
-            $step_count = count($installment->schedule);
-            $index = 0;
-            foreach ($installment->schedule as $schedule) {
-                ++$index;
-                $pay_id = '';
-                if (count($schedule->payment_ids) > 0) {
-                    $pay_id = $schedule->payment_ids[0];
-                    $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-                    if (!$payment['result']) {
-                        return false;
-                    }
-                    $payment = $payment['resource'];
-                    $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($payment);
-                } else {
-                    if (1 == (int) $installment->is_active) {
-                        $status = 6; //ongoing
-                    } else {
-                        $status = 7; //cancelled
-                    }
-                }
-                $step = $index . '/' . $step_count;
+        if (!isset($installment->schedule)) {
+            return false;
+        }
 
-                if ($step2update = $this->getStoredInstallmentTransaction($installment, $step)) {
-                    $res_insert_installment = $this->query
-                        ->update()
-                        ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
-                        ->set('id_payment = "' . $this->query->escape($pay_id) . '"')
-                        ->set('status = ' . (int) $status)
-                        ->where('id_payplug_installment = ' . (int) $step2update['id_payplug_installment'])
-                        ->build()
-                    ;
-
-                    if (!$res_insert_installment) {
-                        return false;
-                    }
-                } else {
+        $step_count = count($installment->schedule);
+        $step_to_update = [];
+        $index = 0;
+        foreach ($installment->schedule as $schedule) {
+            ++$index;
+            $pay_id = '';
+            if (count($schedule->payment_ids) > 0) {
+                $pay_id = $schedule->payment_ids[0];
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                if (!$payment['result']) {
                     return false;
                 }
+                $payment = $payment['resource'];
+                $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($payment);
+            } else {
+                if (1 == (int) $installment->is_active) {
+                    $status = 6; //ongoing
+                } else {
+                    $status = 7; //cancelled
+                }
+            }
+            $step = $index . '/' . $step_count;
+            $step_to_update[$step] = [
+                'pay_id' => $pay_id,
+                'status' => (int) $status,
+            ];
+        }
+
+        $resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByResourceId($installment->id);
+
+        $schedules = json_decode($resource['schedules'], true);
+        foreach ($schedules as &$schedule) {
+            $step = $schedule['step'];
+            if (array_key_exists($step, $step_to_update)) {
+                $schedule['pay_id'] = $step_to_update[$step]['pay_id'];
+                $schedule['status'] = $step_to_update[$step]['status'];
             }
         }
+
+        return $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->updateByResourceId($installment->id, [
+                'schedules' => json_encode($schedules),
+            ]);
     }
 
     /**
      * @description insert installment payment in the database
      *
      * @param $installment
-     * @param $order
      *
      * @return bool
      */
-    public function addPayplugInstallment($installment, $order)
+    public function addPayplugInstallment($installment)
     {
         if (!is_object($installment)) {
             $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
@@ -116,138 +126,48 @@ class InstallmentClass
             $installment = $installment['resource'];
         }
 
-        if ($this->getStoredInstallment($installment)) {
-            $this->updatePayplugInstallment($installment);
-        } else {
-            if (isset($installment->schedule)) {
-                $step_count = count($installment->schedule);
-                $index = 0;
-                foreach ($installment->schedule as $schedule) {
-                    ++$index;
-                    $pay_id = '';
-                    if (is_array($schedule->payment_ids) && count($schedule->payment_ids) > 0) {
-                        $pay_id = $schedule->payment_ids[0];
-                        $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($pay_id);
-                    } else {
-                        $status = 6;
-                    }
-                    $amount = (int) $schedule->amount;
-                    $step = $index . '/' . $step_count;
-                    $date = $schedule->date;
-                    $req_insert_installment =
-                        $this->query
-                            ->insert()
-                            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
-                            ->fields('id_installment')->values($this->query->escape($installment->id))
-                            ->fields('id_payment')->values($this->query->escape($pay_id))
-                            ->fields('id_order')->values((int) $order->id)
-                            ->fields('id_customer')->values((int) $order->id_customer)
-                            ->fields('order_total')->values((int) (($order->total_paid * 1000) / 10))
-                            ->fields('step')->values($this->query->escape($this->query->escape($step)))
-                            ->fields('amount')->values((int) $amount)
-                            ->fields('status')->values((int) $status)
-                            ->fields('scheduled_date')->values($this->query->escape($date))
-                            ->build()
-                        ;
+        $resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByResourceId($installment->id);
 
-                    if (!$req_insert_installment) {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @description ONLY FOR VALIDATION
-     * Retrieve installment stored
-     *
-     * @param int $id_cart
-     *
-     * @return string
-     */
-    public function getInstallmentByCart($id_cart)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return '';
+        if (!empty($resource) && !empty($resource['schedules'])) {
+            return $this->updatePayplugInstallment($installment);
         }
 
-        $payment = $this->dependencies->getPlugin()->getPaymentRepository()
-            ->getByCart((int) $id_cart);
-
-        if (!$payment) {
-            return '';
-        }
-
-        return 'installment' == $payment['payment_method'] ? $payment['id_payment'] : '';
-    }
-
-    /**
-     * @description get the installment payment details
-     * related to id_installment
-     *
-     * @param $installment
-     * @param $step
-     *
-     * @return null|array|bool|object
-     */
-    private function getStoredInstallmentTransaction($installment, $step)
-    {
-        if (!is_object($installment)) {
-            $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
-            if (!$installment['result']) {
-                return false;
-            }
-
-            $installment = $installment['resource'];
-        }
-
-        $req_installment = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
-            ->where('id_installment  = "' . $this->query->escape($installment->id) . '"')
-            ->where('step = "' . $this->query->escape($step) . '"')
-            ->build()
-        ;
-
-        if (!$req_installment) {
+        if (!isset($installment->schedule)) {
             return false;
         }
 
-        return $req_installment[0];
-    }
-
-    /**
-     * @description get the installment payment details
-     *
-     * @param $installment
-     *
-     * @throws PrestaShopDatabaseException
-     *
-     * @return null|array|bool|false|mysqli_result|PDOStatement|resource
-     */
-    private function getStoredInstallment($installment)
-    {
-        if (!is_object($installment)) {
-            $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
-            if (!$installment['result']) {
-                return false;
+        $step_count = count($installment->schedule);
+        $index = 0;
+        $schedules = [];
+        foreach ($installment->schedule as $schedule) {
+            ++$index;
+            $pay_id = '';
+            if (is_array($schedule->payment_ids) && count($schedule->payment_ids) > 0) {
+                $pay_id = $schedule->payment_ids[0];
+                $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($pay_id);
+            } else {
+                $status = 6;
             }
-
-            $installment = $installment['resource'];
-        }
-        $req_installment = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_installment')
-            ->where('id_payment = ' . $this->query->escape(($installment->id)))
-            ->build()
-        ;
-        if (!$req_installment) {
-            return false;
+            $amount = (int) $schedule->amount;
+            $step = $index . '/' . $step_count;
+            $date = $schedule->date;
+            $schedules[] = [
+                'id_payment' => $pay_id,
+                'step' => $step,
+                'amount' => (int) $amount,
+                'status' => (int) $status,
+                'scheduled_date' => $date,
+            ];
         }
 
-        return $req_installment;
+        return $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->updateByResourceId($installment->id, [
+                'schedules' => json_encode($schedules),
+            ]);
     }
 }
