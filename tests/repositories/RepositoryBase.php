@@ -70,6 +70,7 @@ class RepositoryBase extends TestCase
     // models/repositories
     protected $card_repository;
     protected $country_repository;
+    protected $order_state_repository;
     protected $payment_repository;
 
     protected $plugin;
@@ -137,6 +138,7 @@ class RepositoryBase extends TestCase
 
         $this->card_repository = \Mockery::mock('CardRepository');
         $this->country_repository = \Mockery::mock('CountryRepository');
+        $this->order_state_repository = \Mockery::mock('OrderStateRepository');
         $this->payment_repository = \Mockery::mock('PaymentRepository');
 
         $this->plugin = \Mockery::mock('Plugin');
@@ -146,6 +148,7 @@ class RepositoryBase extends TestCase
                 'getConfigurationClass' => $this->configuration,
                 'getCardRepository' => $this->card_repository,
                 'getCountryRepository' => $this->country_repository,
+                'getOrderStateRepository' => $this->order_state_repository,
                 'getPaymentRepository' => $this->payment_repository,
             ])
         ;
