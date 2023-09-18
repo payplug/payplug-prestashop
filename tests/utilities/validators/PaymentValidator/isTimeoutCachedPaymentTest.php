@@ -64,7 +64,7 @@ class isTimeoutCachedPaymentTest extends TestCase
 
     public function testWhenGivenDateIsTimeout()
     {
-        $date = date('Y-m-d H:i:s', strtotime('-5 minutes'));
+        $date = date('Y-m-d H:i:s', strtotime('-12 minutes'));
         $this->assertSame([
             'result' => false,
             'message' => 'Given date is timeout',
