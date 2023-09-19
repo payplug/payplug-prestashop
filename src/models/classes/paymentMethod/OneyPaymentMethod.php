@@ -236,6 +236,8 @@ class OneyPaymentMethod extends PaymentMethod
                 }
             }
 
+            $payment_options[$this->name]['name'] = 'oney';
+            $payment_options[$this->name]['inputs']['method']['value'] = 'oney';
             $payment_options[$this->name]['is_optimized'] = $optimized;
             $payment_options[$this->name]['type'] = $oney_payment;
             $payment_options[$this->name]['amount'] = $cart_amount;
