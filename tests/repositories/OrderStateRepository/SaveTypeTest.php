@@ -57,34 +57,40 @@ final class SaveTypeTest extends BaseOrderStateRepository
 
     public function testWithExistingOrderStateType()
     {
-        $success_return = 'updateType: success';
-
         $this->repo
             ->shouldReceive([
                 'getType' => $this->type,
-                'updateType' => $success_return,
+                'updateType' => true,
             ])
         ;
 
+        $this->payplug_order_state_repository
+            ->shouldReceive([
+                'updateByOderState' => true,
+            ]);
+
         $this->assertSame(
-            $success_return,
+            true,
             $this->repo->saveType($this->idOrderState, $this->type)
         );
     }
 
     public function testWithoutExistingOrderStateType()
     {
-        $success_return = 'setType: success';
-
         $this->repo
             ->shouldReceive([
                 'getType' => false,
-                'setType' => $success_return,
+                'setType' => true,
             ])
         ;
 
+        $this->payplug_order_state_repository
+            ->shouldReceive([
+                'setOrderState' => true,
+            ]);
+
         $this->assertSame(
-            $success_return,
+            true,
             $this->repo->saveType($this->idOrderState, $this->type)
         );
     }

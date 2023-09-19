@@ -900,9 +900,15 @@ class PayPlugNotifications
         $id_order_state = $this->order->current_state;
 
         // check current order state type to create if it's empty
-        $type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $id_order_state);
+        $type = $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->getTypeByIdOrderState((int) $id_order_state);
         if ($type != $this->type) {
-            $this->dependencies->getPlugin()->getOrderState()->setType((int) $id_order_state, $this->type);
+            $this->dependencies
+                ->getPlugin()
+                ->getPayplugOrderStateRepository()
+                ->setOrderState((int) $id_order_state, $this->type);
         }
 
         $this->exitProcess('The order state is not defined');
@@ -917,7 +923,10 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: processUpdateOrder');
 
-        $type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $this->order->current_state);
+        $type = $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->getTypeByIdOrderState((int) $this->order->current_state);
         $this->type = $type ?: 'undefined';
 
         $this->logger->addLog('Current order state: ' . $this->order->current_state);
