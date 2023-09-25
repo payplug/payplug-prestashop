@@ -48,7 +48,8 @@
             "test.php",
             "*.zip",
             "webpack.config.js",
-            "upgrade/upgrade-methods.php"
+            "upgrade/upgrade-methods.php",
+            "changelog.md"
         ]
     },
     "autoload": {
