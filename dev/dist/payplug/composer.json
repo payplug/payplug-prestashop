@@ -2,7 +2,7 @@
     "name": "payplug/payplug-prestashop",
     "moduleName": "payplug",
     "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "4.3.1",
+    "version": "4.3.2",
     "require": {
 	    "php": "5.6.*",
         "giggsey/libphonenumber-for-php": "^8.12",
@@ -43,7 +43,8 @@
             "test.php",
             "*.zip",
             "webpack.config.js",
-            "upgrade/upgrade-methods.php"
+            "upgrade/upgrade-methods.php",
+            "changelog.md"
         ]
     },
     "autoload": {
