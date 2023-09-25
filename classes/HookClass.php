@@ -72,7 +72,7 @@ class HookClass
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
-        $this->order = $this->dependencies->getPlugin()->getOrder();
+        $this->orderAdapter = $this->dependencies->getPlugin()->getOrder();
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->orderState = $this->dependencies->getPlugin()->getOrderState();
         $this->orderStateAdapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
@@ -494,6 +494,7 @@ class HookClass
             $paid_state = (int) $this->configuration->getValue('order_state_paid' . $state_addons);
             $oney_state = (int) $this->configuration->getValue('order_state_oney_pg' . $state_addons);
             $cancelled_state = (int) $this->configuration->getValue('order_state_cancelled' . $state_addons);
+            $out_of_stock_state = $this->configurationAdapter->get('PS_OS_OUTOFSTOCK_PAID');
 
             if ($is_oney) {
                 // update order state from payment status
@@ -502,6 +503,14 @@ class HookClass
 
                     if ($this->validators['payment']->isPaid($payment)['result']) {
                         $new_order_state = $paid_state;
+                        $order_details = $order->getOrderDetailList();
+                        foreach ($order_details as $order_detail) {
+                            if ($this->configurationAdapter->get('PS_STOCK_MANAGEMENT')
+                                && ($order_detail['product_quantity_in_stock'] <= 0)) {
+                                //The paiment is paid and the product is out of stock
+                                $new_order_state = $out_of_stock_state;
+                            }
+                        }
                     } elseif ($this->validators['payment']->isFailed($payment)['result']) {
                         $new_order_state = $cancelled_state;
                     }
