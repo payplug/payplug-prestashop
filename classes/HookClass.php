@@ -43,7 +43,7 @@ class HookClass
     private $media;
     private $module;
     private $oney;
-    private $order;
+    private $orderAdapter;
     private $orderHistory;
     private $orderState;
     private $orderStateAdapter;
@@ -164,7 +164,7 @@ class HookClass
      */
     public function actionOrderStatusUpdate($params)
     {
-        $order = $this->order->get((int) $params['id_order']);
+        $order = $this->orderAdapter->get((int) $params['id_order']);
         $active = $this->module->isEnabled($this->dependencies->name);
 
         $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
@@ -299,7 +299,7 @@ class HookClass
     public function displayAdminOrderMain($params)
     {
         $this->html = '';
-        $order = $this->order->get((int) $params['id_order']);
+        $order = $this->orderAdapter->get((int) $params['id_order']);
         if (!$this->validate->validate('isLoadedObject', $order)) {
             return false;
         }
@@ -754,7 +754,7 @@ class HookClass
             && $this->tools->tool('getValue', 'id_order')
         ) {
             $id_order = $this->tools->tool('getValue', 'id_order');
-            $order = $this->order->get((int) $id_order);
+            $order = $this->orderAdapter->get((int) $id_order);
 
             if ($order->module == $this->dependencies->name) {
                 $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
@@ -1165,7 +1165,7 @@ class HookClass
         }
 
         $order_id = $this->tools->tool('getValue', 'id_order');
-        $order = $this->order->get((int) $order_id);
+        $order = $this->orderAdapter->get((int) $order_id);
         // Check order state to display appropriate message
         $state = null;
         if (isset($order->current_state)
