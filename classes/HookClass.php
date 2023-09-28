@@ -43,7 +43,7 @@ class HookClass
     private $media;
     private $module;
     private $oney;
-    private $order;
+    private $orderAdapter;
     private $orderHistory;
     private $orderState;
     private $orderStateAdapter;
@@ -72,7 +72,7 @@ class HookClass
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
-        $this->order = $this->dependencies->getPlugin()->getOrder();
+        $this->orderAdapter = $this->dependencies->getPlugin()->getOrder();
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->orderState = $this->dependencies->getPlugin()->getOrderState();
         $this->orderStateAdapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
@@ -164,7 +164,7 @@ class HookClass
      */
     public function actionOrderStatusUpdate($params)
     {
-        $order = $this->order->get((int) $params['id_order']);
+        $order = $this->orderAdapter->get((int) $params['id_order']);
         $active = $this->module->isEnabled($this->dependencies->name);
 
         $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
@@ -299,7 +299,7 @@ class HookClass
     public function displayAdminOrderMain($params)
     {
         $this->html = '';
-        $order = $this->order->get((int) $params['id_order']);
+        $order = $this->orderAdapter->get((int) $params['id_order']);
         if (!$this->validate->validate('isLoadedObject', $order)) {
             return false;
         }
@@ -494,14 +494,24 @@ class HookClass
             $paid_state = (int) $this->configuration->getValue('order_state_paid' . $state_addons);
             $oney_state = (int) $this->configuration->getValue('order_state_oney_pg' . $state_addons);
             $cancelled_state = (int) $this->configuration->getValue('order_state_cancelled' . $state_addons);
+            $out_of_stock_paid_state = $this->configurationAdapter->get('PS_OS_OUTOFSTOCK_PAID');
+            $out_of_stock_unpaid_state = $this->configurationAdapter->get('PS_OS_OUTOFSTOCK_UNPAID');
 
             if ($is_oney) {
                 // update order state from payment status
-                if ($order->getCurrentState() == $oney_state) {
+                if (in_array($order->getCurrentState(), [$oney_state, $out_of_stock_unpaid_state])) {
                     $new_order_state = false;
 
                     if ($this->validators['payment']->isPaid($payment)['result']) {
                         $new_order_state = $paid_state;
+                        $order_details = $order->getOrderDetailList();
+                        foreach ($order_details as $order_detail) {
+                            if ($this->configurationAdapter->get('PS_STOCK_MANAGEMENT')
+                                && ($order_detail['product_quantity_in_stock'] <= 0)) {
+                                //The paiment is paid and the product is out of stock
+                                $new_order_state = $out_of_stock_paid_state;
+                            }
+                        }
                     } elseif ($this->validators['payment']->isFailed($payment)['result']) {
                         $new_order_state = $cancelled_state;
                     }
@@ -745,7 +755,7 @@ class HookClass
             && $this->tools->tool('getValue', 'id_order')
         ) {
             $id_order = $this->tools->tool('getValue', 'id_order');
-            $order = $this->order->get((int) $id_order);
+            $order = $this->orderAdapter->get((int) $id_order);
 
             if ($order->module == $this->dependencies->name) {
                 $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
@@ -1156,7 +1166,7 @@ class HookClass
         }
 
         $order_id = $this->tools->tool('getValue', 'id_order');
-        $order = $this->order->get((int) $order_id);
+        $order = $this->orderAdapter->get((int) $order_id);
         // Check order state to display appropriate message
         $state = null;
         if (isset($order->current_state)
