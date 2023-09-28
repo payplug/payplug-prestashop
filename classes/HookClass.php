@@ -494,11 +494,12 @@ class HookClass
             $paid_state = (int) $this->configuration->getValue('order_state_paid' . $state_addons);
             $oney_state = (int) $this->configuration->getValue('order_state_oney_pg' . $state_addons);
             $cancelled_state = (int) $this->configuration->getValue('order_state_cancelled' . $state_addons);
-            $out_of_stock_state = $this->configurationAdapter->get('PS_OS_OUTOFSTOCK_PAID');
+            $out_of_stock_paid_state = $this->configurationAdapter->get('PS_OS_OUTOFSTOCK_PAID');
+            $out_of_stock_unpaid_state = $this->configurationAdapter->get('PS_OS_OUTOFSTOCK_UNPAID');
 
             if ($is_oney) {
                 // update order state from payment status
-                if ($order->getCurrentState() == $oney_state) {
+                if (in_array($order->getCurrentState(), [$oney_state, $out_of_stock_unpaid_state])) {
                     $new_order_state = false;
 
                     if ($this->validators['payment']->isPaid($payment)['result']) {
@@ -508,7 +509,7 @@ class HookClass
                             if ($this->configurationAdapter->get('PS_STOCK_MANAGEMENT')
                                 && ($order_detail['product_quantity_in_stock'] <= 0)) {
                                 //The paiment is paid and the product is out of stock
-                                $new_order_state = $out_of_stock_state;
+                                $new_order_state = $out_of_stock_paid_state;
                             }
                         }
                     } elseif ($this->validators['payment']->isFailed($payment)['result']) {
