@@ -80,7 +80,10 @@ class HookRepository extends BaseClass
     {
         $order_state = $param['object'];
 
-        return $this->dependencies->getPlugin()->getOrderState()->deleteType((int) $order_state->id);
+        return $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->removeByIdOrderState((int) $order_state->id);
     }
 
     /**
@@ -106,7 +109,10 @@ class HookRepository extends BaseClass
         ];
 
         $id_order_state = $this->tools->tool('getValue', 'id_order_state');
-        $current_order_state_type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $id_order_state);
+        $current_order_state_type = $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->getTypeByIdOrderState((int) $id_order_state);
         $payplug_order_state_url = $this->dependencies
             ->getPlugin()
             ->getRoutes()

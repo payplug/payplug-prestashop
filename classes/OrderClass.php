@@ -158,7 +158,10 @@ class OrderClass
         }
 
         foreach ($order_history_states as $key => &$state) {
-            $type = $this->orderState->getType((int) $state['id_order_state']);
+            $type = $this->dependencies
+                ->getPlugin()
+                ->getPayplugOrderStateRepository()
+                ->getTypeByIdOrderState((int) $state['id_order_state']);
             $state['type'] = $type;
             if (!$type || 'undefined' != $type) {
                 unset($order_history_states[$key]);

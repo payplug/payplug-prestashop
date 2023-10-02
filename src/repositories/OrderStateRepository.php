@@ -178,28 +178,6 @@ class OrderStateRepository extends BaseClass
         return $this->configuration->set($key_config, (int) $id_order_state);
     }
 
-    /**
-     * @param int $id_order_state
-     *
-     * @return bool
-     */
-    public function deleteType($id_order_state)
-    {
-        // FIXME: from php7, psr12 requires return type
-
-        if (!$id_order_state || !is_int($id_order_state)) {
-            return false;
-        }
-        $this->query
-            ->delete()
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->where('id_order_state = ' . (int) $id_order_state)
-            ->build()
-        ;
-
-        return true;
-    }
-
     public static function factory()
     {
         return new OrderStateRepository();
@@ -215,17 +193,6 @@ class OrderStateRepository extends BaseClass
         return $this->dependencies->concatenateModuleNameTo('ORDER_STATE_')
                     . $this->tools->tool('strtoupper', $name)
                     . ($sandbox ? '_TEST' : '');
-    }
-
-    public function getType($id_order_state)
-    {
-        return $this->query
-            ->select()
-            ->fields('type')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->where('id_order_state = ' . (int) $id_order_state)
-            ->build('unique_value')
-        ;
     }
 
     public function isUsedByOrders($module_name = '')
@@ -286,37 +253,15 @@ class OrderStateRepository extends BaseClass
         }
 
         if ($this->getType($id_order_state)) {
-            return $this->updateType($id_order_state, $type);
+            return $this->dependencies
+                ->getPlugin()
+                ->getPayplugOrderStateRepository()
+                ->updateByOderState($id_order_state, $type);
         }
 
-        return $this->setType($id_order_state, $type);
-    }
-
-    public function setType($id_order_state, $type)
-    {
-        $date = date('Y-m-d');
-        $this->query
-            ->insert()
-            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->fields('id_order_state')->values(pSQL($id_order_state))
-            ->fields('type')->values(pSQL($type))
-            ->fields('date_add')->values($date)
-            ->fields('date_upd')->values($date);
-
-        return $this->query->build();
-    }
-
-    public function updateType($id_order_state, $type)
-    {
-        $date = date('Y-m-d');
-        $this->query
-            ->update()
-            ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->set('type = \'' . $this->query->escape($type) . '\'')
-            ->set('date_upd = \'' . $this->query->escape($date) . '\'')
-            ->where('id_order_state = ' . (int) $id_order_state)
-        ;
-
-        return $this->query->build();
+        return $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->setOrderState($id_order_state, $type);
     }
 }
