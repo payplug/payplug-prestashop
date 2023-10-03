@@ -178,6 +178,9 @@ class PluginEntity
     private $country_repository;
 
     /** @var object */
+    private $logger_repository;
+
+    /** @var object */
     private $module_repository;
 
     /** @var object */
@@ -463,6 +466,14 @@ class PluginEntity
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * @return object
+     */
+    public function getLoggerRepository()
+    {
+        return $this->logger_repository;
     }
 
     /**
@@ -1101,6 +1112,24 @@ class PluginEntity
         }
 
         $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
+     * @param object $logger_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setLoggerRepository($logger_repository)
+    {
+        if (!is_object($logger_repository)) {
+            throw (new BadParameterException('Invalid argument, $logger_repository must be an LoggerRepository'));
+        }
+
+        $this->logger_repository = $logger_repository;
 
         return $this;
     }

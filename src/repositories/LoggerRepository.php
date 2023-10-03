@@ -161,24 +161,23 @@ class LoggerRepository extends BaseClass
      */
     public function addToDb()
     {
-        $logger = $this->loggerEntity;
-        $query = $this->dependencies
-            ->getPlugin()
-            ->getQueryRepository();
-        $query
-            ->insert()
-            ->into(_DB_PREFIX_ . $logger->getTable())
-            ->fields('process')->values(pSQL($logger->getProcess()))
-            ->fields('content')->values(pSQL($logger->getContent()))
-            ->fields('date_add')->values(pSQL($logger->getDateAdd()))
-            ->fields('date_upd')->values(pSQL($logger->getDateAdd()))
-        ;
+        $parameters = [
+            'process' => $this->loggerEntity->getProcess(),
+            'content' => $this->loggerEntity->getContent(),
+            'date_add' => $this->loggerEntity->getDateAdd(),
+            'date_upd' => $this->loggerEntity->getDateAdd(),
+        ];
 
-        if (!$query->build()) {
+        $id_logger = $this->dependencies
+            ->getPlugin()
+            ->getLoggerRepository()
+            ->createLog($parameters);
+
+        if (!$id_logger) {
             return false;
         }
 
-        $this->loggerEntity->setId($query->lastId());
+        $this->loggerEntity->setId($id_logger);
     }
 
     /**
@@ -188,25 +187,16 @@ class LoggerRepository extends BaseClass
      */
     public function updateLog()
     {
-        $logger = $this->loggerEntity;
-        $table = _DB_PREFIX_ . $logger->getTable();
-        $query = $this->dependencies
+        $parameters = [
+            'process' => $this->loggerEntity->getProcess(),
+            'content' => $this->loggerEntity->getContent(),
+            'date_upd' => $this->loggerEntity->getDateUpd(),
+        ];
+
+        return $this->dependencies
             ->getPlugin()
-            ->getQueryRepository();
-        $query
-            ->update()
-            ->table($table)
-            ->set('process =  \'' . pSQL($logger->getProcess()) . '\'')
-            ->set('content =  \'' . pSQL($logger->getContent()) . '\'')
-            ->set('date_upd = \'' . pSQL($logger->getDateUpd()) . '\'')
-            ->where('id_payplug_logger = ' . (int) $logger->getId())
-            ;
-
-        if (!$query->build()) {
-            return false;
-        }
-
-        return true;
+            ->getLoggerRepository()
+            ->updateLog((int) $this->loggerEntity->getId(), $parameters);
     }
 
     /**
