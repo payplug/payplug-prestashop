@@ -591,8 +591,11 @@ class PaymentClass
                 $order_history->changeIdOrderState($new_state, (int) $order->id, true);
                 $order_history->addWithemail();
             }
-
-            if (!$this->dependencies->cartClass->deleteLockFromCartId((int) $order->id_cart)) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $order->id_cart);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'notice');

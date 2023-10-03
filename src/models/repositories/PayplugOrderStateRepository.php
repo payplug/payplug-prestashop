@@ -125,7 +125,7 @@ class PayplugOrderStateRepository extends QueryRepository
             ->update()
             ->table($this->table_name)
             ->set('type = "' . $this->escape($type) . '"')
-            ->set('date_upd = ' . $this->escape($current_date))
+            ->set('date_upd = "' . $this->escape($current_date) . '"')
             ->where('id_order_state = ' . (int) $id_order_state)
             ->build()
         ;

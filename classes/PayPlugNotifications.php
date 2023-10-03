@@ -193,7 +193,11 @@ class PayPlugNotifications
             $this->logger->addLog($str);
         }
         if ($this->lock_key) {
-            if (!$this->payplugLock->deleteLockG2($this->lock_key)) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $this->lock_key);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');

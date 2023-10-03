@@ -216,7 +216,11 @@ class PayPlugValidation
                     'id_order' => $id_order,
                     'key' => $customer->secure_key,
                 ]);
-                if (!$this->payplugLock->deleteLockG2($cart->id)) {
+                $delete_lock = $this->dependencies
+                    ->getPlugin()
+                    ->getLockRepository()
+                    ->deleteLock((int) $cart->id);
+                if (!$delete_lock) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
                     $this->logger->addLog('Lock deleted.', 'debug');
@@ -230,7 +234,11 @@ class PayPlugValidation
                 $installment = $this->apiClass->retrieveInstallment($inst_id);
                 if (!$installment['result']) {
                     $this->logger->addLog('Installment cannot be retrieved.', 'error');
-                    if (!$this->payplugLock->deleteLockG2($cart->id)) {
+                    $delete_lock = $this->dependencies
+                        ->getPlugin()
+                        ->getLockRepository()
+                        ->deleteLock((int) $cart->id);
+                    if (!$delete_lock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->logger->addLog('Lock deleted.', 'debug');
@@ -270,7 +278,11 @@ class PayPlugValidation
             $payment = $this->apiClass->retrievePayment($pay_id);
             if (!$payment['result']) {
                 $this->logger->addLog('Payment cannot be retrieved. Exception : ' . $payment['message'], 'error');
-                if (!$this->payplugLock->deleteLockG2($cart->id)) {
+                $delete_lock = $this->dependencies
+                    ->getPlugin()
+                    ->getLockRepository()
+                    ->deleteLock((int) $cart->id);
+                if (!$delete_lock) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
                     $this->logger->addLog('Lock deleted.', 'debug');
@@ -287,7 +299,11 @@ class PayPlugValidation
                 : $this->configuration->getValue('test_api_key');
             $this->logger->addLog('Retrieving payment: ' . $payment->id);
             if ($this->validators['payment']->isFailed($payment)['result']) {
-                if (!$this->payplugLock->deleteLockG2($cart->id)) {
+                $delete_lock = $this->dependencies
+                    ->getPlugin()
+                    ->getLockRepository()
+                    ->deleteLock((int) $cart->id);
+                if (!$delete_lock) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
                     $this->logger->addLog('Lock deleted.', 'debug');
@@ -296,7 +312,11 @@ class PayPlugValidation
                 $this->paymentClass->setPaymentErrorsCookie([
                     $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation'),
                 ]);
-                if (!$this->payplugLock->deleteLockG2($cart->id)) {
+                $delete_lock = $this->dependencies
+                    ->getPlugin()
+                    ->getLockRepository()
+                    ->deleteLock((int) $cart->id);
+                if (!$delete_lock) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {
                     $this->logger->addLog('Lock deleted.', 'debug');
@@ -431,7 +451,11 @@ class PayPlugValidation
             $this->paymentClass->setPaymentErrorsCookie([
                 $this->dependencies->l('The transaction was not completed and your card was not charged.', 'payplugvalidation'),
             ]);
-            if (!$this->payplugLock->deleteLockG2($cart->id)) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $cart->id);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -444,7 +468,11 @@ class PayPlugValidation
         $id_order = $this->orderAdapter->getOrderByCartId((int) $cart->id);
 
         if ($id_order) {
-            if (!$this->payplugLock->deleteLockG2($cart->id)) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $cart->id);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -593,7 +621,11 @@ class PayPlugValidation
             $this->response = [
                 'exception' => $exception->getMessage(),
             ];
-            if (!$this->payplugLock->deleteLockG2($cart->id)) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $cart->id);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -610,8 +642,11 @@ class PayPlugValidation
 
         if (!$validateOrder_result) {
             $this->logger->addLog('Order not validated', 'error');
-            $cart_unlock = $this->payplugLock->deleteLockG2($cart->id);
-            if (!$cart_unlock) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $cart->id);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -625,8 +660,11 @@ class PayPlugValidation
         $check_order = $this->validators['order']->isCreated($order, (int) $cart->id);
         if (!$check_order['result']) {
             $this->logger->addLog($check_order['message'], 'error');
-            $cart_unlock = $this->payplugLock->deleteLockG2($cart->id);
-            if (!$cart_unlock) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $cart->id);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -652,7 +690,7 @@ class PayPlugValidation
             $create_order_payment = $this->dependencies
                 ->getPlugin()
                 ->getOrderPaymentRepository()
-                ->createOrderPayment((int) $this->order->id, $this->payment->id);
+                ->createOrderPayment((int) $order->id, $payment->id);
             if (!$create_order_payment) {
                 $this->logger->addLog('Unable to create order payment.', 'error');
             }
@@ -677,7 +715,11 @@ class PayPlugValidation
 
         if (!$res_nb_orders) {
             $this->logger->addLog('No order can be found using id_cart ' . (int) $cart->id, 'error');
-            if (!$this->payplugLock->deleteLockG2($cart->id)) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $cart->id);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -706,7 +748,11 @@ class PayPlugValidation
                 'No transaction can be found using id_order ' . (int) $id_order,
                 'error'
             );
-            if (!$this->payplugLock->deleteLockG2($cart->id)) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $cart->id);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -721,7 +767,11 @@ class PayPlugValidation
             $this->logger->addLog('Everything looks good.', 'info');
         }
 
-        if (!$this->payplugLock->deleteLockG2($cart->id)) {
+        $delete_lock = $this->dependencies
+            ->getPlugin()
+            ->getLockRepository()
+            ->deleteLock((int) $cart->id);
+        if (!$delete_lock) {
             $this->logger->addLog('Lock cannot be deleted.', 'error');
         } else {
             $this->logger->addLog('Lock deleted.', 'debug');

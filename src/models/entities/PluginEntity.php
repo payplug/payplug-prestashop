@@ -190,6 +190,12 @@ class PluginEntity
     private $order_repository;
 
     /** @var object */
+    private $order_state_repository;
+
+    /** @var object */
+    private $payplug_order_state_repository;
+
+    /** @var object */
     private $order_payment_repository;
 
     /** @var object */
@@ -560,6 +566,22 @@ class PluginEntity
     public function getOrderRepository()
     {
         return $this->order_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderStateRepository()
+    {
+        return $this->order_state_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getPayplugOrderStateRepository()
+    {
+        return $this->payplug_order_state_repository;
     }
 
     /**
@@ -1335,6 +1357,42 @@ class PluginEntity
         }
 
         $this->order_repository = $order_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $order_state_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setOrderStateRepository($order_state_repository)
+    {
+        if (!is_object($order_state_repository)) {
+            throw (new BadParameterException('Invalid argument, $order_state_repository must be an OrderStateRepository'));
+        }
+
+        $this->order_state_repository = $order_state_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $payplug_order_state_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setPayplugOrderStateRepository($payplug_order_state_repository)
+    {
+        if (!is_object($payplug_order_state_repository)) {
+            throw (new BadParameterException('Invalid argument, $payplug_order_state_repository must be an PayplugOrderStateRepository'));
+        }
+
+        $this->payplug_order_state_repository = $payplug_order_state_repository;
 
         return $this;
     }
