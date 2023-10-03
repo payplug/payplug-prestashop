@@ -25,6 +25,12 @@ namespace PayPlug\src\models\repositories;
 
 class ModuleRepository extends QueryRepository
 {
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . 'module';
+    }
+
     /**
      * @description Get all module use by the merchant
      *
@@ -35,7 +41,7 @@ class ModuleRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('name, version')
-            ->from($this->prefix . 'module')
+            ->from($this->table_name)
             ->where('active = 1')
             ->build();
 

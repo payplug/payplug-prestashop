@@ -182,4 +182,26 @@ class OrderStateRepository extends QueryRepository
 
         return $result ?: [];
     }
+
+    public function getOrderHistory($order_id = 0, $lang_id = 0)
+    {
+        if (!is_int($order_id) || !$order_id) {
+            return [];
+        }
+
+        if (!is_int($lang_id) || !$lang_id) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('oh.id_order_state, osl.name')
+            ->from($this->prefix . 'order_history', 'oh')
+            ->leftJoin($this->prefix . 'order_state_lang', 'osl', 'osl.`id_order_state` = oh.`id_order_state`')
+            ->where('oh.id_order = ' . (int) $order_id)
+            ->where('osl.id_lang = ' . (int) $lang_id)
+            ->build();
+
+        return $result ?: [];
+    }
 }

@@ -25,6 +25,12 @@ namespace PayPlug\src\models\repositories;
 
 class OrderRepository extends QueryRepository
 {
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . 'orders';
+    }
+
     /**
      * @description Get all domains use by the merchant
      *
@@ -36,7 +42,7 @@ class OrderRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('`id_order`')
-            ->from($this->prefix . 'orders')
+            ->from($this->table_name)
             ->where('`module` = "payplug"')
             ->where('`date_add` > "' . $this->escape($current_date) . '"')
             ->build();

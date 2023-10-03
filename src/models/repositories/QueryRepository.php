@@ -27,6 +27,8 @@ class QueryRepository
 {
     protected $dependencies;
 
+    protected $table_name;
+
     protected $prefix;
 
     protected $query = [

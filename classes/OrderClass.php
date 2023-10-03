@@ -43,26 +43,6 @@ class OrderClass
     }
 
     /**
-     * @description Add Order Payment
-     *
-     * @param int    $id_order
-     * @param string $id_payment
-     *
-     * @return bool
-     */
-    public function addPayplugOrderPayment($id_order, $id_payment)
-    {
-        $this->query
-            ->insert()
-            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_payment')
-            ->fields('id_order')->values((int) $id_order)
-            ->fields('id_payment')->values($this->query->escape($id_payment))
-        ;
-
-        return $this->query->build();
-    }
-
-    /**
      * @param null $id_lang
      *
      * @return array
@@ -74,56 +54,6 @@ class OrderClass
         }
 
         return OrderStateAdapter::getOrderStates($id_lang);
-    }
-
-    public function getPayPlugOrderStates($module)
-    {
-        $this->query
-            ->select()
-            ->fields('GROUP_CONCAT(id_order_state) as id_order_states')
-            ->from($this->constant->get('_DB_PREFIX_') . 'order_state')
-            ->where('module_name = "' . $this->query->escape($module) . '"')
-        ;
-
-        return $this->query->build('unique_value');
-    }
-
-    /**
-     * @description Get order payment
-     *
-     * @param int $id_order
-     *
-     * @return string
-     */
-    public function getPayplugOrderPayment($id_order)
-    {
-        $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_payment')
-            ->where('id_order = ' . (int) $id_order)
-        ;
-
-        return $this->query->build('unique_value');
-    }
-
-    /**
-     * @description Get all order payment for given id order
-     *
-     * @param int $id_order
-     *
-     * @return array
-     */
-    public function getPayplugOrderPayments($id_order)
-    {
-        $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_payment')
-            ->where('id_order = ' . (int) $id_order)
-        ;
-
-        return $this->query->build();
     }
 
     /**
@@ -139,19 +69,10 @@ class OrderClass
             return [];
         }
 
-        $order_history_states = $this->query
-            ->select()
-            ->fields('oh.id_order_state, osl.name')
-            ->from($this->constant->get('_DB_PREFIX_') . 'order_history', 'oh')
-            ->leftJoin(
-                $this->constant->get('_DB_PREFIX_') . 'order_state_lang',
-                'osl',
-                'osl.`id_order_state` = oh.`id_order_state`'
-            )
-            ->where('oh.id_order = ' . (int) $orderId)
-            ->where('osl.id_lang = ' . (int) $this->context->language->id)
-            ->build()
-        ;
+        $order_history_states = $this->dependencies
+            ->getPlugin()
+            ->getOrderStateRepository()
+            ->getOrderHistory((int) $orderId, (int) $this->context->language->id);
 
         if (empty($order_history_states)) {
             return [];

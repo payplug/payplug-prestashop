@@ -34,6 +34,12 @@ class PaymentRepository extends QueryRepository
         'date_upd' => 'string',
     ];
 
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . $this->dependencies->name . '_payment';
+    }
+
     /**
      * @description Create a payment from given parameters
      *
@@ -49,7 +55,7 @@ class PaymentRepository extends QueryRepository
 
         $this
             ->insert()
-            ->into($this->prefix . $this->dependencies->name . '_payment');
+            ->into($this->table_name);
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -101,7 +107,7 @@ class PaymentRepository extends QueryRepository
         $query = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->dependencies->name . '_payment')
+            ->from($this->table_name)
             ->where('`method` = "' . $this->escape($method_name) . '"');
 
         if ($asc) {
@@ -126,7 +132,7 @@ class PaymentRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->dependencies->name . '_payment')
+            ->from($this->table_name)
             ->where('id_cart = ' . (int) $cart_id)
             ->build('unique_row');
 
@@ -149,7 +155,7 @@ class PaymentRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->dependencies->name . '_payment')
+            ->from($this->table_name)
             ->where('`id_payplug_payment` = ' . (int) $id)
             ->build('unique_row');
 
@@ -172,7 +178,7 @@ class PaymentRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->dependencies->name . '_payment')
+            ->from($this->table_name)
             ->where('`resource_id` = "' . $this->escape($resource_id) . '"')
             ->build('unique_row');
 
@@ -194,7 +200,7 @@ class PaymentRepository extends QueryRepository
 
         $result = $this
             ->delete()
-            ->from($this->prefix . $this->dependencies->name . '_payment')
+            ->from($this->table_name)
             ->where('id_cart = ' . (int) $cart_id)
             ->build();
 
@@ -221,7 +227,7 @@ class PaymentRepository extends QueryRepository
 
         $this
             ->update()
-            ->table($this->prefix . $this->dependencies->name . '_payment');
+            ->table($this->table_name);
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -276,7 +282,7 @@ class PaymentRepository extends QueryRepository
 
         $this
             ->update()
-            ->table($this->prefix . $this->dependencies->name . '_payment');
+            ->table($this->table_name);
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
