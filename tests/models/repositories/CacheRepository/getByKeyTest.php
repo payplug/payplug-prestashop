@@ -1,29 +1,29 @@
 <?php
 
-namespace PayPlug\tests\models\repositories\PaymentRepository;
+namespace PayPlug\tests\models\repositories\CacheRepository;
 
 /**
  * @group unit
  * @group repository
- * @group payment_repository
+ * @group cache_repository
  *
  * @runTestsInSeparateProcesses
  */
-class getAllByMethodTest extends BasePaymentRepository
+class getByKeyTest extends BaseCacheRepository
 {
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
-     * @param mixed $method_name
+     * @param mixed $resource_id
      */
-    public function testWhenGivenMethodIsInvalidIntegerFormat($method_name)
+    public function testWhenGivenResourceIdIsInvalidIntegerFormat($resource_id)
     {
-        $this->assertSame([], $this->repository->getAllByMethod($method_name));
+        $this->assertSame([], $this->repository->getByKey($resource_id));
     }
 
     public function testWhenNoResultIsGivenByTheQuery()
     {
-        $method_name = 'method';
+        $pay_id = 'pay_azerty12345';
         $this
             ->repository
             ->shouldReceive([
@@ -34,14 +34,14 @@ class getAllByMethodTest extends BasePaymentRepository
                 'build' => [],
             ]);
 
-        $this->assertSame([], $this->repository->getAllByMethod($method_name));
+        $this->assertSame([], $this->repository->getByKey($pay_id));
     }
 
     public function testWhenExpectedResultIsGivenByTheQuery()
     {
-        $method_name = 'method';
-        $payment = [
-            'id_payplug_payment' => 42,
+        $pay_id = 'pay_azerty12345';
+        $cache = [
+            'id_payplug_cache' => 42,
             'resource_id' => 'pay_azerty12345',
             'method' => 'standard',
             'id_cart' => 42,
@@ -56,9 +56,9 @@ class getAllByMethodTest extends BasePaymentRepository
                 'fields' => $this->repository,
                 'from' => $this->repository,
                 'where' => $this->repository,
-                'build' => $payment,
+                'build' => $cache,
             ]);
 
-        $this->assertSame($payment, $this->repository->getAllByMethod($method_name));
+        $this->assertSame($cache, $this->repository->getByKey($pay_id));
     }
 }

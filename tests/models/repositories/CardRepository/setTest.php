@@ -13,14 +13,13 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class setTest extends BaseCardRepository
 {
+    private $card;
+
     protected function setUp()
     {
         parent::setUp();
         $payment = PaymentMock::getOneClick();
         $this->card = $payment->card;
-        $this->repository
-            ->shouldReceive('escape')
-            ->andReturnUsing(function ($key) { return $key; });
     }
 
     /**

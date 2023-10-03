@@ -1,15 +1,15 @@
 <?php
 
-namespace PayPlug\tests\models\repositories\LockRepository;
+namespace PayPlug\tests\models\repositories\CacheRepository;
 
 /**
  * @group unit
  * @group repository
- * @group lock_repository
+ * @group cache_repository
  *
  * @runTestsInSeparateProcesses
  */
-class createLockTest extends BaseLockRepository
+class createCacheTest extends BaseCacheRepository
 {
     /**
      * @dataProvider invalidArrayFormatDataProvider
@@ -18,7 +18,7 @@ class createLockTest extends BaseLockRepository
      */
     public function testWhenGivenParametersIsInvalidArrayFormat($parameters)
     {
-        $this->assertFalse($this->repository->createLock($parameters));
+        $this->assertFalse($this->repository->createCache($parameters));
     }
 
     public function testWhenNoResultIsGivenByTheQuery()
@@ -36,7 +36,7 @@ class createLockTest extends BaseLockRepository
                 'build' => false,
             ]);
 
-        $this->assertFalse($this->repository->createLock($parameters));
+        $this->assertFalse($this->repository->createCache($parameters));
     }
 
     public function testWhenExpectedResultIsGivenByTheQuery()
@@ -54,6 +54,6 @@ class createLockTest extends BaseLockRepository
                 'build' => true,
             ]);
 
-        $this->assertTrue($this->repository->createLock($parameters));
+        $this->assertTrue($this->repository->createCache($parameters));
     }
 }
