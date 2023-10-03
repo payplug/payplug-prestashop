@@ -190,6 +190,9 @@ class PluginEntity
     private $order_repository;
 
     /** @var object */
+    private $order_payment_repository;
+
+    /** @var object */
     private $payment_repository;
 
     /** @var object */
@@ -557,6 +560,14 @@ class PluginEntity
     public function getOrderRepository()
     {
         return $this->order_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderPaymentRepository()
+    {
+        return $this->order_payment_repository;
     }
 
     /**
@@ -1324,6 +1335,24 @@ class PluginEntity
         }
 
         $this->order_repository = $order_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $order_payment_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setOrderPaymentRepository($order_payment_repository)
+    {
+        if (!is_object($order_payment_repository)) {
+            throw (new BadParameterException('Invalid argument, $order_payment_repository must be an OrderPaymentRepository'));
+        }
+
+        $this->order_payment_repository = $order_payment_repository;
 
         return $this;
     }

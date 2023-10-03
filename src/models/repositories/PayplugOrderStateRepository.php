@@ -25,6 +25,12 @@ namespace PayPlug\src\models\repositories;
 
 class PayplugOrderStateRepository extends QueryRepository
 {
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . $this->dependencies->name . '_order_state';
+    }
+
     /**
      * @description Create a Payplug order state
      *
@@ -46,7 +52,7 @@ class PayplugOrderStateRepository extends QueryRepository
         $current_date = date('Y-m-d H:i:s');
         $result = $this
             ->insert()
-            ->into($this->prefix . $this->dependencies->name . '_order_state')
+            ->into($this->table_name)
             ->fields('id_order_state')->values((int) $id_order_state)
             ->fields('type')->values($this->escape($type))
             ->fields('date_add')->values($this->escape($current_date))
@@ -71,7 +77,7 @@ class PayplugOrderStateRepository extends QueryRepository
 
         $result = $this
             ->delete()
-            ->from($this->prefix . $this->dependencies->name . '_order_state')
+            ->from($this->table_name)
             ->where('id_order_state = ' . (int) $id_order_state)
             ->build()
         ;
@@ -117,7 +123,7 @@ class PayplugOrderStateRepository extends QueryRepository
         $current_date = date('Y-m-d H:i:s');
         $result = $this
             ->update()
-            ->table($this->prefix . $this->dependencies->name . '_order_state')
+            ->table($this->table_name)
             ->set('type = "' . $this->escape($type) . '"')
             ->set('date_upd = ' . $this->escape($current_date))
             ->where('id_order_state = ' . (int) $id_order_state)
@@ -143,7 +149,7 @@ class PayplugOrderStateRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('type')
-            ->from($this->prefix . $this->dependencies->name . '_order_state')
+            ->from($this->table_name)
             ->where('id_order_state = ' . (int) $id_order_state)
             ->build('unique_value')
         ;

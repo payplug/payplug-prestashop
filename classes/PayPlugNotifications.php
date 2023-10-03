@@ -488,7 +488,11 @@ class PayPlugNotifications
 
             $this->logger->addLog('Payment patched.', 'debug');
 
-            if (!$this->orderClass->addPayplugOrderPayment((int) $this->order->id, $this->payment->id)) {
+            $create_order_payment = $this->dependencies
+                ->getPlugin()
+                ->getOrderPaymentRepository()
+                ->createOrderPayment((int) $this->order->id, $this->payment->id);
+            if (!$create_order_payment) {
                 $this->logger->addLog(
                     'IPN Failed: unable to create order payment.',
                     'error'
@@ -848,7 +852,11 @@ class PayPlugNotifications
         }
 
         // Get associated transaction
-        $payplug_order_payments = $this->orderClass->getPayplugOrderPayments((int) $this->order->id);
+        $payplug_order_payments = $this->dependencies
+            ->getPlugin()
+            ->getOrderPaymentRepository()
+            ->getAllByOrder((int) $this->order->id);
+
         $order_payments = $this->order->getOrderPayments();
 
         // Check if the payment is related to the order with payplug order payment
