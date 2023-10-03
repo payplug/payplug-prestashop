@@ -178,6 +178,9 @@ class PluginEntity
     private $country_repository;
 
     /** @var object */
+    private $lock_repository;
+
+    /** @var object */
     private $logger_repository;
 
     /** @var object */
@@ -522,6 +525,14 @@ class PluginEntity
     public function getMerchantTelemetry()
     {
         return $this->merchantTelemetry;
+    }
+
+    /**
+     * @return object
+     */
+    public function getLockRepository()
+    {
+        return $this->lock_repository;
     }
 
     /**
@@ -1241,6 +1252,24 @@ class PluginEntity
         }
 
         $this->module_repository = $module_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $lock_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setLockRepository($lock_repository)
+    {
+        if (!is_object($lock_repository)) {
+            throw (new BadParameterException('Invalid argument, $lock_repository must be an LockRepository'));
+        }
+
+        $this->lock_repository = $lock_repository;
 
         return $this;
     }

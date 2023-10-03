@@ -10,6 +10,7 @@ class BaseRepository extends TestCase
     use FormatDataProvider;
 
     protected $dependencies;
+    protected $repository;
 
     protected function setUp()
     {
