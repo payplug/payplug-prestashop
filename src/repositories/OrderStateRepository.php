@@ -252,7 +252,12 @@ class OrderStateRepository extends BaseClass
             return false;
         }
 
-        if ($this->getType($id_order_state)) {
+        $exists = $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->getTypeByIdOrderState($id_order_state);
+
+        if ($exists) {
             return $this->dependencies
                 ->getPlugin()
                 ->getPayplugOrderStateRepository()

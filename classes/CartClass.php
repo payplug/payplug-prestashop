@@ -80,20 +80,4 @@ class CartClass
 
         return true;
     }
-
-    /**
-     * @description Delete payplug lock for given id cart
-     *
-     * @param int $id_cart
-     *
-     * @return bool
-     */
-    public function deleteLockFromCartId($id_cart = 0)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return false;
-        }
-
-        return $this->dependencies->payplugLock->deleteLockG2($id_cart);
-    }
 }

@@ -372,7 +372,11 @@ class RefundClass
                         $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                     }
 
-                    if (!$this->dependencies->cartClass->deleteLockFromCartId((int) $order->id_cart)) {
+                    $delete_lock = $this->dependencies
+                        ->getPlugin()
+                        ->getLockRepository()
+                        ->deleteLock((int) $order->id_cart);
+                    if (!$delete_lock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->logger->addLog('Lock deleted.', 'notice');
@@ -425,7 +429,11 @@ class RefundClass
                         $this->logger->addLog('Order status is already \'refunded\'', 'notice');
                     }
 
-                    if (!$this->dependencies->cartClass->deleteLockFromCartId((int) $order->id_cart)) {
+                    $delete_lock = $this->dependencies
+                        ->getPlugin()
+                        ->getLockRepository()
+                        ->deleteLock((int) $order->id_cart);
+                    if (!$delete_lock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->logger->addLog('Lock deleted.', 'notice');

@@ -145,8 +145,10 @@ class PluginInit extends BaseClass
     private $logger_repository;
     private $module_repository;
     private $order_repository;
+    private $order_state_repository;
     private $order_payment_repository;
     private $payment_repository;
+    private $payplug_order_state_repository;
     private $query_repository;
     private $shop_repository;
 
@@ -237,8 +239,10 @@ class PluginInit extends BaseClass
             ->setLoggerRepository($this->logger_repository)
             ->setModuleRepository($this->module_repository)
             ->setOrderRepository($this->order_repository)
+            ->setOrderStateRepository($this->order_state_repository)
             ->setOrderPaymentRepository($this->order_payment_repository)
             ->setPaymentRepository($this->payment_repository)
+            ->setPayplugOrderStateRepository($this->payplug_order_state_repository)
             ->setQueryRepository($this->query_repository)
             ->setShopRepository($this->shop_repository)
         ;
@@ -409,8 +413,10 @@ class PluginInit extends BaseClass
         $this->logger_repository = new \PayPlug\src\models\repositories\LoggerRepository($prefix, $this->dependencies);
         $this->module_repository = new \PayPlug\src\models\repositories\ModuleRepository($prefix, $this->dependencies);
         $this->order_repository = new \PayPlug\src\models\repositories\OrderRepository($prefix, $this->dependencies);
+        $this->order_state_repository = new \PayPlug\src\models\repositories\OrderStateRepository($prefix, $this->dependencies);
         $this->order_payment_repository = new \PayPlug\src\models\repositories\OrderPaymentRepository($prefix, $this->dependencies);
         $this->payment_repository = new \PayPlug\src\models\repositories\PaymentRepository($prefix, $this->dependencies);
+        $this->payplug_order_state_repository = new \PayPlug\src\models\repositories\PayplugOrderStateRepository($prefix, $this->dependencies);
         $this->query_repository = new \PayPlug\src\models\repositories\QueryRepository($prefix, $this->dependencies);
         $this->shop_repository = new \PayPlug\src\models\repositories\ShopRepository($prefix, $this->dependencies);
     }
