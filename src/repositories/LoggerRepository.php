@@ -229,30 +229,19 @@ class LoggerRepository extends BaseClass
     public function flush($all = false)
     {
         try {
-            $logger = $this->loggerEntity;
-            $query = $this->dependencies
+            $logs = $this->dependencies
                 ->getPlugin()
-                ->getQueryRepository();
-            $query
-                ->select()
-                ->fields('*')
-                ->from(_DB_PREFIX_ . $logger->getTable())
-            ;
+                ->LoggerRepository()
+                ->getAllLog();
         } catch (Exception $exception) {
             return false;
         }
 
         if ($all) {
-            $query
-                ->truncate()
-                ->table(_DB_PREFIX_ . $logger->getTable())
-            ;
-
-            if (!$query->build()) {
-                return false;
-            }
-
-            return true;
+            return $this->dependencies
+                ->getPlugin()
+                ->LoggerRepository()
+                ->getAllLog();
         }
 
         $limits = $this->getLimit();
@@ -260,44 +249,26 @@ class LoggerRepository extends BaseClass
         $interval = new DateInterval($limits['date']);
         $date_limit = $date->sub($interval);
 
-        $flag = true;
-
-        // clean old log
-        $query
-            ->delete()
-            ->from(_DB_PREFIX_ . $logger->getTable())
-            ->where('`date_add` < ' . $query->escape($date_limit->format('Y-m-d')))
-        ;
-
-        if (!$query->build()) {
-            $flag = false;
-        }
+        $flag = $this->dependencies
+            ->getPlugin()
+            ->LoggerRepository()
+            ->deleteFormDate($date_limit->format('Y-m-d'));
 
         // clean log beyong the limit
-        $last_logs_valid =
-            $query
-                ->select()
-                ->fields('`id_payplug_logger`')
-                ->from(_DB_PREFIX_ . $logger->getTable())
-                ->orderBy('`id_payplug_logger` DESC')
-                ->limit(($limits['number'] - 1), 1)
-            ;
+        $log_limit = $limits['number'] - 1;
+        $last_valid_log = $this->dependencies
+            ->getPlugin()
+            ->LoggerRepository()
+            ->getLastLimitLog((int) $log_limit);
 
-        if (!$last_logs_valid || !$query->build()) {
-            $flag = false;
+        if (empty($last_valid_log)) {
+            return false;
         }
 
-        $query
-            ->delete()
-            ->from(_DB_PREFIX_ . $logger->getTable())
-            ->where('`id_payplug_logger` < ' . (int) $last_logs_valid[0]['id_payplug_logger'])
-        ;
-
-        if (!$query->build()) {
-            $flag = false;
-        }
-
-        return $flag;
+        return $flag && $this->dependencies
+            ->getPlugin()
+            ->LoggerRepository()
+            ->deleteFormId((int) $last_valid_log['id_payplug_logger']);
     }
 
     /**

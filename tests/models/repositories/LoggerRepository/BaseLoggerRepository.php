@@ -11,5 +11,10 @@ class BaseLoggerRepository extends BaseRepository
     {
         parent::setUp();
         $this->repository = \Mockery::mock(LoggerRepository::class, ['prefix', $this->dependencies])->makePartial();
+        $this->repository
+            ->shouldReceive('escape')
+            ->andReturnUsing(function ($arg) {
+                return (string) $arg;
+            });
     }
 }
