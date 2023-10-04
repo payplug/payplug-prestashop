@@ -11,5 +11,10 @@ class BaseCardRepository extends BaseRepository
     {
         parent::setUp();
         $this->repository = \Mockery::mock(CardRepository::class, ['prefix', $this->dependencies])->makePartial();
+        $this->repository
+            ->shouldReceive('escape')
+            ->andReturnUsing(function ($value) {
+                return $value;
+            });
     }
 }

@@ -11,16 +11,6 @@ namespace PayPlug\tests\models\repositories\PaymentRepository;
  */
 class getByResourceIdTest extends BasePaymentRepository
 {
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->repository
-            ->shouldReceive('escape')
-            ->andReturnUsing(function ($value) {
-                return $value;
-            });
-    }
-
     /**
      * @dataProvider invalidStringFormatDataProvider
      *

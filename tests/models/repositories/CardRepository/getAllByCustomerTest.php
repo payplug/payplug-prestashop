@@ -11,14 +11,6 @@ namespace PayPlug\tests\models\repositories\CardRepository;
  */
 class getAllByCustomerTest extends BaseCardRepository
 {
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->repository
-            ->shouldReceive('escape')
-            ->andReturnUsing(function ($key) { return $key; });
-    }
-
     /**
      * @dataProvider invalidIntegerFormatDataProvider
      *
