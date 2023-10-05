@@ -175,6 +175,9 @@ class PluginEntity
     private $card_repository;
 
     /** @var object */
+    private $cache_repository;
+
+    /** @var object */
     private $country_repository;
 
     /** @var object */
@@ -358,6 +361,14 @@ class PluginEntity
     public function getCardRepository()
     {
         return $this->card_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getCacheRepository()
+    {
+        return $this->cache_repository;
     }
 
     /**
@@ -872,6 +883,24 @@ class PluginEntity
         }
 
         $this->card_repository = $card_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $cache_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setCacheRepository($cache_repository)
+    {
+        if (!is_object($cache_repository)) {
+            throw (new BadParameterException('Invalid argument, $cache_repository must be an CacheRepository'));
+        }
+
+        $this->cache_repository = $cache_repository;
 
         return $this;
     }
