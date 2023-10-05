@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\repositories\LockRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getByCartIdTest extends BaselockRepository
+class getByCartIdTest extends BaseLockRepository
 {
     /**
      * @dataProvider invalidIntegerFormatDataProvider

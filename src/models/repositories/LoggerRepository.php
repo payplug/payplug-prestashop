@@ -32,6 +32,13 @@ class LoggerRepository extends QueryRepository
         'date_upd' => 'string',
     ];
 
+    /**
+     * @description Create a log from given parameters
+     *
+     * @param array $parameters
+     *
+     * @return bool
+     */
     public function createLog($parameters = [])
     {
         if (!is_array($parameters) || empty($parameters)) {
@@ -70,6 +77,78 @@ class LoggerRepository extends QueryRepository
         }
 
         return (bool) $this->build() ? $this->lastId() : false;
+    }
+
+    /**
+     * @description Delete all log from a given date.
+     *
+     * @param string $date
+     *
+     * @return bool
+     */
+    public function deleteFromDate($date = '')
+    {
+        if (!is_string($date) || !$date) {
+            return false;
+        }
+
+        $this
+            ->delete()
+            ->from($this->table_name)
+            ->where('`date_add` < ' . $this->escape($date));
+
+        return (bool) $this->build();
+    }
+
+    /**
+     * @description Delete all log from a given id.
+     *
+     * @param int $id_logger
+     *
+     * @return bool
+     */
+    public function deleteFromId($id_logger = 0)
+    {
+        if (!is_int($id_logger) || !$id_logger) {
+            return false;
+        }
+
+        $this
+            ->delete()
+            ->from($this->table_name)
+            ->where('`id_payplug_logger` < ' . (int) $id_logger);
+
+        return (bool) $this->build();
+    }
+
+    /**
+     * @description Flush the log table.
+     *
+     * @return bool
+     */
+    public function flushLog()
+    {
+        $result = $this
+            ->truncate()
+            ->table($this->table_name);
+
+        return (bool) $result;
+    }
+
+    /**
+     * @description Get all log from table.
+     *
+     * @return array
+     */
+    public function getAllLog()
+    {
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->table_name)
+            ->build();
+
+        return $result ?: [];
     }
 
     /**
@@ -124,5 +203,29 @@ class LoggerRepository extends QueryRepository
         $this->where('`id_payplug_logger` = ' . (int) $id_logger);
 
         return (bool) $this->build();
+    }
+
+    /**
+     * @description Get last log from a given limit.
+     *
+     * @param int $limit
+     *
+     * @return array
+     */
+    public function getLastLimitLog($limit = 0)
+    {
+        if (!is_int($limit) || !$limit) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('`id_payplug_logger`')
+            ->from($this->table_name)
+            ->orderBy('`id_payplug_logger` DESC')
+            ->limit($limit, 1)
+            ->build('unique_row');
+
+        return $result ?: [];
     }
 }
