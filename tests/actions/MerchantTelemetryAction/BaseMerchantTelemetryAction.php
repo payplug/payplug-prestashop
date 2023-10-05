@@ -95,6 +95,13 @@ class BaseMerchantTelemetryAction extends TestCase
             'getShopRepository' => $this->shop_repository,
         ]);
 
+        $configClass = \Mockery::mock('Config');
+        $configClass
+            ->shouldReceive([
+                'isValidFeature' => true,
+            ]);
+        $this->dependencies->configClass = $configClass;
+
         $this->dependencies
             ->shouldReceive([
             'getPlugin' => $this->plugin,

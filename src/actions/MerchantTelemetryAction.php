@@ -39,6 +39,11 @@ class MerchantTelemetryAction
             return false;
         }
 
+        if (!$this->dependencies->configClass->isValidFeature('feature_merchant_telemetry')) {
+            // todo: add log ?
+            return true;
+        }
+
         $telemetries = $this->renderTelemetries($source);
         if (!$telemetries['result']) {
             // todo: add log ?
