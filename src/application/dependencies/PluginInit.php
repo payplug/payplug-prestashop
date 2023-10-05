@@ -140,6 +140,7 @@ class PluginInit extends BaseClass
 
     // Model repositories
     private $card_repository;
+    private $cache_repository;
     private $country_repository;
     private $lock_repository;
     private $logger_repository;
@@ -234,6 +235,7 @@ class PluginInit extends BaseClass
         // Set models/repositories
         $this->plugin
             ->setCardRepository($this->card_repository)
+            ->setCacheRepository($this->cache_repository)
             ->setCountryRepository($this->country_repository)
             ->setLockRepository($this->lock_repository)
             ->setLoggerRepository($this->logger_repository)
@@ -408,6 +410,7 @@ class PluginInit extends BaseClass
 
         // We use complete path instead `use` to avoid confusion with old repositories
         $this->card_repository = new \PayPlug\src\models\repositories\CardRepository($prefix, $this->dependencies);
+        $this->cache_repository = new \PayPlug\src\models\repositories\CacheRepository($prefix, $this->dependencies);
         $this->country_repository = new \PayPlug\src\models\repositories\CountryRepository($prefix, $this->dependencies);
         $this->lock_repository = new \PayPlug\src\models\repositories\LockRepository($prefix, $this->dependencies);
         $this->logger_repository = new \PayPlug\src\models\repositories\LoggerRepository($prefix, $this->dependencies);
