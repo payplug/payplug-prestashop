@@ -8,6 +8,7 @@
    - [PRE-1937](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2228): Mpdc on configuration save
    - [PRE-1938](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2227): Send telemetry on notification
    - [PRE-1951](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2245): Create rebase script
+   - [PRE-2052](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2270): Add a feature flag on telemetries send
    
 - Refactoring :
    - [PRE-1538](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2238): Set repositories in plugin init
