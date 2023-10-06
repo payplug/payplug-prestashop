@@ -125,7 +125,7 @@ class CacheRepository extends QueryRepository
 
     public function flushCache()
     {
-        $result = $this->query
+        $result = $this
             ->truncate()
             ->table($this->table_name);
 
