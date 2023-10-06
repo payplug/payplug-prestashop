@@ -602,8 +602,10 @@ class PaymentRepository extends BaseClass
             case 'satispay':
             case 'sofort':
             case 'standard':
-                $returnUrl = $retrievedPayment['resource']->hosted_payment->payment_url
-                            ?: $retrievedPayment['resource']->hosted_payment->return_url;
+                $returnUrl = $retrievedPayment['resource']->hosted_payment
+                    ? $retrievedPayment['resource']->hosted_payment->payment_url
+                        ?: $retrievedPayment['resource']->hosted_payment->return_url
+                    : '';
                 $paymentReturnUrl = [
                     'result' => 'new_card',
                     'embedded' => $paymentDetails['isEmbedded']
