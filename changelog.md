@@ -1,5 +1,9 @@
 # Payplug module changelog
 ## Next version
+- Refactoring :
+  - [PRE-1981](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2279): Add action Card
+
+## Version 4.4.0
 
 - Improvment : 
   - [PRE-2054](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2289): Set the job build release to fail if the zip is not generated

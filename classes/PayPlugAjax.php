@@ -34,7 +34,6 @@ require_once _PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php';
 class PayPlugAjax
 {
     private $address;
-    private $card;
     private $configurationAdapter;
     private $context;
     private $country;
@@ -51,7 +50,6 @@ class PayPlugAjax
         $this->dependencies = new DependenciesClass();
 
         $this->address = $this->dependencies->getPlugin()->getAddress();
-        $this->card = $this->dependencies->getPlugin()->getCard();
         $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
@@ -112,7 +110,10 @@ class PayPlugAjax
                     exit(false);
                 }
                 $id_payplug_card = $tools->tool('getValue', 'pc');
-                $deleted = $this->card->deleteCard((int) $id_customer, (int) $id_payplug_card);
+                $deleted = $this->dependencies
+                    ->getPlugin()
+                    ->getCardAction()
+                    ->deleteAction((int) $id_customer, (int) $id_payplug_card);
 
                 if ($deleted) {
                     exit(true);

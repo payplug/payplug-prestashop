@@ -27,7 +27,6 @@ class PaymentClass
 {
     private $address;
     private $assign;
-    private $card;
     private $cart;
     private $configurationAdapter;
     private $configuration;
@@ -56,7 +55,6 @@ class PaymentClass
 
         $this->address = $this->dependencies->getPlugin()->getAddress();
         $this->assign = $this->dependencies->getPlugin()->getAssign();
-        $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
         $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
@@ -138,98 +136,6 @@ class PaymentClass
         $reload = true;
 
         exit(json_encode(['reload' => $reload]));
-    }
-
-    /**
-     * @description Assign payment option
-     * @unused
-     *
-     * @param $cart
-     *
-     * @return bool
-     */
-    public function assignPaymentOptions($cart)
-    {
-        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
-        $standard = (bool) $payment_methods['standard'];
-        $one_click = $standard && (bool) $payment_methods['one_click'];
-        $installment = (bool) $payment_methods['inst'];
-        $installment_mode = $this->configuration->getValue('inst_mode');
-        $installment_min_amount = $this->configuration->getValue('inst_min_amount');
-
-        if (!$this->dependencies->amountCurrencyClass->checkCurrency($cart)
-            || !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
-            return false;
-        }
-
-        $payplug_cards = $this->card->getByCustomer((int) $cart->id_customer, true);
-
-        $use_taxes = $this->configurationAdapter->get('PS_TAX');
-        $base_total_tax_inc = $cart->getOrderTotal(true);
-        $base_total_tax_exc = $cart->getOrderTotal(false);
-
-        if ($base_total_tax_inc < $installment_min_amount) {
-            $installment = 0;
-        }
-
-        if ($use_taxes) {
-            $price2display = $base_total_tax_inc;
-        } else {
-            $price2display = $base_total_tax_exc;
-        }
-
-        $this->assign->assign([
-            'iso_lang' => $this->context->language->iso_code,
-            'price2display' => $price2display,
-        ]);
-
-        $front_ajax_url = $this->context->link->getModuleLink($this->dependencies->name, 'ajax', [], true);
-
-        $this->assign->assign([
-            'front_ajax_url' => $front_ajax_url,
-            'api_url' => $this->dependencies->apiClass->getApiUrl(),
-        ]);
-
-        if (!empty($payplug_cards) && 1 == $one_click) {
-            $this->assign->assign([
-                'payplug_cards' => $payplug_cards,
-                'payplug_one_click' => 1,
-            ]);
-        }
-
-        $payment_url = 'index.php?controller=order&step=3';
-
-        $payment_controller_url = $this->context->link->getModuleLink(
-            $this->dependencies->name,
-            'payment',
-            [],
-            true
-        );
-        $installment_controller_url = $this->context->link->getModuleLink(
-            $this->dependencies->name,
-            'payment',
-            ['i' => 1],
-            true
-        );
-        $current_lang = explode('-', $this->context->language->language_code);
-        $current_lang = $current_lang[0];
-        if (in_array($current_lang, ['it', 'en'], true)) {
-            $img_lang = $current_lang;
-        } else {
-            $img_lang = 'default';
-        }
-
-        $this->assign->assign([
-            'spinner_url' => $this->tools->tool('getHttpHost', true)
-                . $this->constant->get(__PS_BASE_URI__)
-                . 'modules/' . $this->dependencies->name . '/views/img/gif/spinner.gif',
-            'payment_url' => $payment_url,
-            'payment_controller_url' => $payment_controller_url,
-            'installment_controller_url' => $installment_controller_url,
-            'img_lang' => $img_lang,
-            'payplug_installment' => $installment,
-            'installment_mode' => $installment_mode,
-        ]);
     }
 
     /**
@@ -355,7 +261,10 @@ class PaymentClass
          */
         $card_details = false;
         if (isset($payment->card->last4) && (!empty($payment->card->last4))) {
-            $card_details = $this->card->getCardDetailFromPayment($payment);
+            $card_details = $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->renderOrderDetail($payment);
         }
 
         // Card brand
@@ -566,7 +475,10 @@ class PaymentClass
 
         if (null !== $payment->card->id) {
             $this->logger->addLog('Save the payment card', 'notice');
-            $this->card->saveCard($payment);
+            $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->saveAction($payment);
         }
 
         $state_addons = ($payment->is_live ? '' : '_test');

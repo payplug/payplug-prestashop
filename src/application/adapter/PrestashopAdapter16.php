@@ -32,7 +32,6 @@ use Validate;
 
 class PrestashopAdapter16
 {
-    private $card;
     private $config;
     private $constant;
     private $dependencies;
@@ -41,7 +40,6 @@ class PrestashopAdapter16
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
-        $this->card = $this->dependencies->getPlugin()->getCard();
         $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
@@ -124,8 +122,7 @@ class PrestashopAdapter16
             }
         }
 
-        $payplug_cards = $this->card->getByCustomer((int) $cart->id_customer, true);
-        $payplug_cards = (empty($payplug_cards)) ? '' : $payplug_cards;
+        $payplug_cards = null;
 
         foreach ($payment_options as &$payment_option) {
             if ((isset($payment_option['name']))) {

@@ -49,7 +49,7 @@ class PluginEntity
     private $cache;
 
     /** @var object */
-    private $card;
+    private $card_action;
 
     /** @var object */
     private $cart;
@@ -61,7 +61,7 @@ class PluginEntity
     private $configuration;
 
     /** @var object */
-    private $configurationAction;
+    private $configuration_action;
 
     /** @var object */
     private $configuration_class;
@@ -97,7 +97,7 @@ class PluginEntity
     private $logger;
 
     /** @var object */
-    private $merchantTelemetryAction;
+    private $merchantTelemetry_action;
 
     /** @var object */
     private $message;
@@ -112,7 +112,7 @@ class PluginEntity
     private $module;
 
     /** @var object */
-    private $onboardingAction;
+    private $onboarding_action;
 
     /** @var object */
     private $oney;
@@ -136,10 +136,7 @@ class PluginEntity
     private $payment;
 
     /** @var object */
-    private $paymentAction;
-
-    /** @var object */
-    private $orderClass;
+    private $payment_action;
 
     /** @var object */
     private $product;
@@ -350,14 +347,6 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getCard()
-    {
-        return $this->card;
-    }
-
-    /**
-     * @return object
-     */
     public function getCardRepository()
     {
         return $this->card_repository;
@@ -369,6 +358,14 @@ class PluginEntity
     public function getCacheRepository()
     {
         return $this->cache_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getCardAction()
+    {
+        return $this->card_action;
     }
 
     /**
@@ -400,7 +397,7 @@ class PluginEntity
      */
     public function getConfigurationAction()
     {
-        return $this->configurationAction;
+        return $this->configuration_action;
     }
 
     /**
@@ -528,7 +525,7 @@ class PluginEntity
      */
     public function getOnboardingAction()
     {
-        return $this->onboardingAction;
+        return $this->onboarding_action;
     }
 
     /**
@@ -536,7 +533,7 @@ class PluginEntity
      */
     public function getMerchantTelemetryAction()
     {
-        return $this->merchantTelemetryAction;
+        return $this->merchantTelemetry_action;
     }
 
     /**
@@ -640,7 +637,7 @@ class PluginEntity
      */
     public function getPaymentAction()
     {
-        return $this->paymentAction;
+        return $this->payment_action;
     }
 
     /**
@@ -852,24 +849,6 @@ class PluginEntity
     }
 
     /**
-     * @param object $card
-     *
-     * @throws BadParameterException
-     *
-     * @return self
-     */
-    public function setCard($card)
-    {
-        if (!is_object($card)) {
-            throw (new BadParameterException('Invalid argument, $card must be a CardRepository'));
-        }
-
-        $this->card = $card;
-
-        return $this;
-    }
-
-    /**
      * @param object $card_repository
      *
      * @throws BadParameterException
@@ -960,6 +939,24 @@ class PluginEntity
     }
 
     /**
+     * @param object $cardAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setCardAction($cardAction)
+    {
+        if (!is_object($cardAction)) {
+            throw (new BadParameterException('Invalid argument, $cardAction must be a CardAction'));
+        }
+
+        $this->card_action = $cardAction;
+
+        return $this;
+    }
+
+    /**
      * @param object $configurationAction
      *
      * @throws BadParameterException
@@ -972,7 +969,7 @@ class PluginEntity
             throw (new BadParameterException('Invalid argument, $configurationAction must be a ConfigurationAction'));
         }
 
-        $this->configurationAction = $configurationAction;
+        $this->configuration_action = $configurationAction;
 
         return $this;
     }
@@ -1258,7 +1255,7 @@ class PluginEntity
             throw (new BadParameterException('Invalid argument, $merchantTelemetryAction must be a MerchantTelemetryAction'));
         }
 
-        $this->merchantTelemetryAction = $merchantTelemetryAction;
+        $this->merchantTelemetry_action = $merchantTelemetryAction;
 
         return $this;
     }
@@ -1349,7 +1346,7 @@ class PluginEntity
             throw (new BadParameterException('Invalid argument, $onboardingAction must be a OnboardingAction'));
         }
 
-        $this->onboardingAction = $onboardingAction;
+        $this->onboarding_action = $onboardingAction;
 
         return $this;
     }
@@ -1525,7 +1522,7 @@ class PluginEntity
             throw (new BadParameterException('Invalid argument, $paymentAction must be a PaymentAction'));
         }
 
-        $this->paymentAction = $paymentAction;
+        $this->payment_action = $paymentAction;
 
         return $this;
     }

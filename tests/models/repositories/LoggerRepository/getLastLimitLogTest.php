@@ -6,7 +6,6 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  * @group unit
  * @group repository
  * @group logger_repository
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */

@@ -352,8 +352,11 @@ class InstallRepository extends BaseClass
         $keep_cards = (bool) $this->configuration->getValue('keep_cards');
         if (!$keep_cards) {
             $this->log->info('Saved cards will be deleted.');
-
-            if (!$this->dependencies->cardClass->uninstallCards()) {
+            $uninstall_cards = $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->uninstallAction();
+            if (!$uninstall_cards) {
                 return $this->setUninstallError('Unable to delete saved cards.');
             }
 

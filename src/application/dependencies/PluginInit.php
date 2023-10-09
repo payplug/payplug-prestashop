@@ -24,6 +24,7 @@
 namespace PayPlug\src\application\dependencies;
 
 use PayPlug\classes\MyLogPHP;
+use PayPlug\src\actions\CardAction;
 use PayPlug\src\actions\ConfigurationAction;
 use PayPlug\src\actions\MerchantTelemetryAction;
 use PayPlug\src\actions\OnboardingAction;
@@ -62,7 +63,6 @@ use PayPlug\src\models\entities\OrderStateEntity;
 use PayPlug\src\models\entities\PaymentEntity;
 use PayPlug\src\models\entities\PluginEntity;
 use PayPlug\src\repositories\CacheRepository;
-use PayPlug\src\repositories\CardRepository;
 use PayPlug\src\repositories\HookRepository;
 use PayPlug\src\repositories\InstallRepository;
 use PayPlug\src\repositories\LoggerRepository;
@@ -80,6 +80,7 @@ class PluginInit extends BaseClass
     protected $dependencies;
 
     // Actions
+    private $card_action;
     private $configuration_action;
     private $onboarding_action;
     private $merchant_telemetry_action;
@@ -95,7 +96,6 @@ class PluginInit extends BaseClass
     // Repositories & necessary classes
     private $apiClass;
     private $cache;
-    private $card;
     private $hook;
     private $install;
     private $logger;
@@ -175,7 +175,6 @@ class PluginInit extends BaseClass
             ->setApiVersion('2019-08-06')
             ->setBrowser($this->browser)
             ->setCache($this->cache)
-            ->setCard($this->card)
             ->setMerchantTelemetry($this->merchant_telemetry)
             ->setHook($this->hook)
             ->setInstall($this->install)
@@ -218,6 +217,7 @@ class PluginInit extends BaseClass
 
         // Set actions
         $this->plugin
+            ->setCardAction($this->card_action)
             ->setConfigurationAction($this->configuration_action)
             ->setMerchantTelemetryAction($this->merchant_telemetry_action)
             ->setOnboardingAction($this->onboarding_action)
@@ -254,6 +254,7 @@ class PluginInit extends BaseClass
 
     private function setActions()
     {
+        $this->card_action = new CardAction($this->dependencies);
         $this->configuration_action = new ConfigurationAction($this->dependencies);
         $this->merchant_telemetry_action = new MerchantTelemetryAction($this->dependencies);
         $this->onboarding_action = new OnboardingAction($this->dependencies);
@@ -280,13 +281,6 @@ class PluginInit extends BaseClass
         $this->sql = new SQLtableRepository(
             $this->dependencies,
             $this->query_repository
-        );
-        $this->card = new CardRepository(
-            $this->constant_adapter,
-            $this->dependencies,
-            $this->logger,
-            $this->query_repository,
-            $this->tools_adapter
         );
 
         $this->sql = new SQLtableRepository(

@@ -1,15 +1,15 @@
 <?php
 
-namespace PayPlug\tests\models\repositories\PaymentRepository;
+namespace PayPlug\tests\models\repositories\CardRepository;
 
 /**
  * @group unit
  * @group repository
- * @group payment_repository
+ * @group card_repository
  *
  * @runTestsInSeparateProcesses
  */
-class createPaymentTest extends BasePaymentRepository
+class createCardTest extends BaseCardRepository
 {
     /**
      * @dataProvider invalidArrayFormatDataProvider
@@ -18,7 +18,7 @@ class createPaymentTest extends BasePaymentRepository
      */
     public function testWhenGivenParametersIsInvalidArrayFormat($parameters)
     {
-        $this->assertFalse($this->repository->createPayment($parameters));
+        $this->assertFalse($this->repository->createCard($parameters));
     }
 
     public function testWhenNoResultIsGivenByTheQuery()
@@ -36,7 +36,7 @@ class createPaymentTest extends BasePaymentRepository
                 'build' => false,
             ]);
 
-        $this->assertFalse($this->repository->createPayment($parameters));
+        $this->assertFalse($this->repository->createCard($parameters));
     }
 
     public function testWhenExpectedResultIsGivenByTheQuery()
@@ -54,6 +54,6 @@ class createPaymentTest extends BasePaymentRepository
                 'build' => true,
             ]);
 
-        $this->assertTrue($this->repository->createPayment($parameters));
+        $this->assertTrue($this->repository->createCard($parameters));
     }
 }

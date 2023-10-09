@@ -726,7 +726,10 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: processSaveCard');
         if ($this->canSaveCard()) {
             $this->logger->addLog('[Save Card] Saving card...');
-            $res_payplug_card = $this->dependencies->getPlugin()->getCard()->saveCard($this->payment);
+            $res_payplug_card = $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->saveAction($this->payment);
 
             if (!$res_payplug_card) {
                 $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');

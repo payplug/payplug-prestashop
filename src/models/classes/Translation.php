@@ -32,6 +32,16 @@ class Translation
         $this->dependencies = $dependencies;
     }
 
+    public function getCardTranslation()
+    {
+        return [
+            'delete' => [
+                'confirm' => $this->dependencies->l('card.delete.confirm', 'translation'),
+                'success' => $this->dependencies->l('card.delete.success', 'translation'),
+            ],
+        ];
+    }
+
     /**
      * @return array
      */

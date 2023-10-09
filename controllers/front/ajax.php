@@ -27,7 +27,6 @@
  */
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
-    private $card;
     private $configurationAdapter;
     private $configurationClass;
     private $contextAdapter;
@@ -70,7 +69,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         $this->toolsAdapter = $this->plugin->getTools();
 
         if (1 == $this->toolsAdapter->tool('getValue', '_ajax')) {
-            $this->card = $this->plugin->getCard();
             $this->configurationAdapter = $this->plugin->getConfiguration();
             $this->configurationClass = $this->plugin->getConfigurationClass();
             $this->contextAdapter = $this->plugin->getContext(); // get ContextAdapter Repository object
@@ -88,7 +86,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         exit(false);
                     }
                     $id_payplug_card = $tools->tool('getValue', 'pc');
-                    $deleted = $this->card->deleteCard((int) $id_customer, (int) $id_payplug_card);
+                    $deleted = $this->dependencies
+                        ->getPlugin()
+                        ->getCardAction()
+                        ->deleteAction((int) $id_customer, (int) $id_payplug_card);
                     if ($deleted) {
                         exit(true);
                     }

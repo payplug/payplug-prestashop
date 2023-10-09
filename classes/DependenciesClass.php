@@ -48,7 +48,6 @@ class DependenciesClass
     public $amountCurrencyClass;
     public $apiClass;
     public $applePayClass;
-    public $cardClass;
     public $cartClass;
     public $configClass;
     public $installmentClass;
@@ -90,7 +89,6 @@ class DependenciesClass
         $this->applePayClass = new ApplePayClass($this);
         $this->amountCurrencyClass = new AmountCurrencyClass($this);
         $this->adminClass = new AdminClass($this);
-        $this->cardClass = new CardClass($this);
         $this->payplugLock = new PayplugLock($this);
         $this->cartClass = new CartClass($this);
         $this->configClass = new ConfigClass($this);

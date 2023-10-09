@@ -29,7 +29,6 @@ class HookClass
 {
     private $assign;
     private $cache;
-    private $card;
     private $cart;
     private $configurationAdapter;
     private $configuration;
@@ -59,7 +58,6 @@ class HookClass
         $this->dependencies = $dependencies;
         $this->assign = $this->dependencies->getPlugin()->getAssign();
         $this->cache = $this->dependencies->getPlugin()->getCache();
-        $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
         $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
@@ -131,7 +129,11 @@ class HookClass
      */
     public function actionDeleteGDPRCustomer($customer)
     {
-        if (!$this->card->deleteCards((int) $customer['id'])) {
+        $deleted = $this->dependencies
+            ->getPlugin()
+            ->getCardAction()
+            ->deleteByCustomerAction((int) $customer['id']);
+        if (!$deleted) {
             return \json_encode($this->dependencies->l('hook.actionDeleteGDPRCustomer.unableDelete', 'hookclass'));
         }
 
@@ -216,7 +218,10 @@ class HookClass
             if ($capture['result']) {
                 $payment = $capture['resource'];
                 if (null !== $payment->card->id) {
-                    $this->card->saveCard($payment);
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getCardAction()
+                        ->saveAction($payment);
                 }
             }
         }
