@@ -1,6 +1,6 @@
 # Payplug module changelog
 
-## Next version
+## Version 4.4.0
 
 - Improvment :
    - [PRE-720](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2232): Only show oney payment option according merchent allowed country
