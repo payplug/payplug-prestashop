@@ -135,8 +135,8 @@ build zip release:
     - ./dev/ci/build.sh -n payplug -c $CI_COMMIT_REF_NAME
   artifacts:
     paths:
-      - payplug_$CI_COMMIT_BRANCH.zip
-      - payplug_qa_$CI_COMMIT_BRANCH.zip
+      - payplug_$CI_COMMIT_REF_NAME.zip
+      - payplug_qa_$CI_COMMIT_REF_NAME.zip
 
 asset-pspaylater:
   image: node:16
@@ -193,8 +193,8 @@ build-pspaylater:
     - ./dev/ci/build.sh -n pspaylater -c $CI_COMMIT_REF_NAME
   artifacts:
     paths:
-      - pspaylater_$CI_COMMIT_BRANCH.zip
-      - pspaylater_qa_$CI_COMMIT_BRANCH.zip
+      - pspaylater_$CI_COMMIT_REF_NAME.zip
+      - pspaylater_qa_$CI_COMMIT_REF_NAME.zip
 
 run_test:
   image: composer:1.9
