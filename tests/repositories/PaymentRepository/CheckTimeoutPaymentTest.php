@@ -6,9 +6,9 @@ use PayPlug\tests\mock\CartMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -28,7 +28,7 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method',
+            'method' => 'payment_method',
         ];
     }
 
@@ -55,7 +55,7 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
     public function testWhenNoPaymentFound()
     {
         $idCart = 42;
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $this->assertTrue(
@@ -66,9 +66,9 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
     public function testWhenPaymentIsNotTimeout()
     {
         $idCart = 42;
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
-                'id_payment' => 'pay_12345678azertyu',
+                'resource_id' => 'pay_12345678azertyu',
                 'date_upd' => '2023-01-01 00:00:00',
             ],
         ]);
@@ -88,9 +88,9 @@ final class CheckTimeoutPaymentTest extends BasePaymentRepository
     public function testWhenPaymentIsTimeout()
     {
         $idCart = 42;
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
-                'id_payment' => 'pay_12345678azertyu',
+                'resource_id' => 'pay_12345678azertyu',
                 'date_upd' => '2023-01-01 00:00:00',
             ],
         ]);

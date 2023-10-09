@@ -4,7 +4,7 @@ namespace PayPlug\tests\repositories\CardRepository;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
@@ -56,7 +56,7 @@ final class GetByCustomerTest extends BaseCardRepository
 
     public function testWhenNoCardFoundForGivenCustomerId()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'getAllByCustomer' => [],
         ]);
 
@@ -68,7 +68,7 @@ final class GetByCustomerTest extends BaseCardRepository
 
     public function testWhenCardsIsExpiredAndAllowed()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'getAllByCustomer' => $this->cards,
         ]);
 
@@ -97,7 +97,7 @@ final class GetByCustomerTest extends BaseCardRepository
 
     public function testWhenCardsIsExpiredAndDisallowed()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'getAllByCustomer' => $this->cards,
         ]);
 
@@ -115,7 +115,7 @@ final class GetByCustomerTest extends BaseCardRepository
 
     public function testWhenCardsIsActive()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'getAllByCustomer' => $this->cards,
         ]);
 

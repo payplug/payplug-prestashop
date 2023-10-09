@@ -25,7 +25,6 @@ namespace PayPlug\classes;
 
 use DateInterval;
 use DateTime;
-use PrestaShopDatabaseException;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -34,16 +33,11 @@ if (!defined('_PS_VERSION_')) {
 class PayplugLock
 {
     private $dependencies;
-    private $constant;
-    private $query;
     private $validators;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-
-        $this->constant = $this->dependencies->getPlugin()->getConstant();
-        $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->validators = $this->dependencies->getValidators();
     }
 
@@ -61,7 +55,11 @@ class PayplugLock
         $lifetime = new DateInterval('PT20S');
 
         // Check if lock exists
-        $lock_exists = $this->existsLockG2($id_cart);
+        $lock_exists = $this->dependencies
+            ->getPlugin()
+            ->getLockRepository()
+            ->getByCartId((int) $id_cart);
+
         if ($lock_exists) {
             // Then define the expiration
             $last_update = new DateTime($lock_exists['date_upd']);
@@ -69,7 +67,9 @@ class PayplugLock
             $creation_date = new DateTime($lock_exists['date_add']);
             $end_of_life = $creation_date->add($lifetime);
             $time = new DateTime('now');
-            while ((false !== $this->existsLockG2($id_cart)) && ($time < $last_check)) {
+
+            $lock_repository = $this->dependencies->getPlugin()->getLockRepository();
+            while (!empty($lock_repository->getByCartId((int) $id_cart)) && ($time < $last_check)) {
                 if (function_exists('usleep')) {
                     usleep($loop_time * 1000000);
                 } else {
@@ -79,7 +79,10 @@ class PayplugLock
                 // If lock take too much time, end the process
                 if ($time > $end_of_life) {
                     if ('validation' == $process) {
-                        $this->deleteLockG2($id_cart);
+                        $this->dependencies
+                            ->getPlugin()
+                            ->getLockRepository()
+                            ->deleteLock((int) $id_cart);
                     } else {
                         return 'stop ipn';
                     }
@@ -94,72 +97,45 @@ class PayplugLock
     public function createLockG2($id_cart, $process_print = 'none')
     {
         // check if has lock
-        $lock_exists = $this->existsLockG2($id_cart);
-        if ($lock_exists) {
+        $lock_exists = $this->dependencies
+            ->getPlugin()
+            ->getLockRepository()
+            ->getByCartId((int) $id_cart);
+
+        if (!empty($lock_exists)) {
             $date_add = new DateTime($lock_exists['date_add']);
             if ($this->validators['lock']->isExpired($date_add)['result']) {
-                $this->deleteLockG2($id_cart);
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLockRepository()
+                    ->deleteLock((int) $id_cart);
             }
         }
 
         // prevent exeception if _PS_DEBUG_SQL_ is true and there is a active lock
-        try {
-            $req_lock = $this->query
-                ->insert()
-                ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_lock')
-                ->fields('id_cart')->values((int) $id_cart)
-                ->fields('id_order')->values(pSQL($process_print))
-                ->fields('date_add')->values(date('Y-m-d H:i:s'))
-                ->fields('date_upd')->values(date('Y-m-d H:i:s'))
-                ->build()
-            ;
-        } catch (PrestaShopDatabaseException $e) {
-            $req_lock = false;
-        } catch (Exception $e) {
-            $req_lock = false;
-        }
+        $parameters = [
+            'id_cart' => (int) $id_cart,
+            'id_order' => $process_print,
+            'date_add' => date('Y-m-d H:i:s'),
+            'date_upd' => date('Y-m-d H:i:s'),
+        ];
+        $req_lock = $this->dependencies
+            ->getPlugin()
+            ->getLockRepository()
+            ->createLock($parameters);
         if (!$req_lock) {
             return false;
         }
-        $lock = $this->existsLockG2($id_cart);
-        if (!$lock) {
+
+        $lock = $this->dependencies
+            ->getPlugin()
+            ->getLockRepository()
+            ->getByCartId((int) $id_cart);
+        if (empty($lock)) {
             return false;
         }
 
         return $lock['id_order'];
-    }
-
-    public function deleteLockG2($id_cart)
-    {
-        $req_lock = $this->query
-            ->delete()
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_lock')
-            ->where('`id_cart` = ' . (int) $id_cart)
-            ->build()
-        ;
-
-        if (!$req_lock) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function existsLockG2($id_cart)
-    {
-        $req_lock = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_lock')
-            ->where('id_cart = ' . (int) $id_cart)
-            ->build('unique_row')
-        ;
-
-        if (!$req_lock) {
-            return false;
-        }
-
-        return $req_lock;
     }
 
     /**

@@ -4,7 +4,7 @@ namespace PayPlug\tests\repositories\OrderStateRepository;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group order_state
  * @group order_state_repository
  *
@@ -57,34 +57,29 @@ final class SaveTypeTest extends BaseOrderStateRepository
 
     public function testWithExistingOrderStateType()
     {
-        $success_return = 'updateType: success';
-
-        $this->repo
+        $this->payplug_order_state_repository
             ->shouldReceive([
-                'getType' => $this->type,
-                'updateType' => $success_return,
-            ])
-        ;
+                'updateByOderState' => true,
+                'getTypeByIdOrderState' => $this->type,
+            ]);
 
         $this->assertSame(
-            $success_return,
+            true,
             $this->repo->saveType($this->idOrderState, $this->type)
         );
     }
 
     public function testWithoutExistingOrderStateType()
     {
-        $success_return = 'setType: success';
-
-        $this->repo
+        $this->payplug_order_state_repository
             ->shouldReceive([
-                'getType' => false,
-                'setType' => $success_return,
-            ])
-        ;
+                'setOrderState' => true,
+                'updateByOderState' => true,
+                'getTypeByIdOrderState' => $this->type,
+            ]);
 
         $this->assertSame(
-            $success_return,
+            true,
             $this->repo->saveType($this->idOrderState, $this->type)
         );
     }

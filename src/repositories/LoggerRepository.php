@@ -31,13 +31,11 @@ class LoggerRepository extends BaseClass
 {
     private $dependencies;
     private $loggerEntity;
-    private $query;
     private $validators;
 
     public function __construct($dependencies)
     {
         $this->loggerEntity = new loggerEntity();
-        $this->query = new QueryRepository();
         $this->dependencies = $dependencies;
         $this->validators = $this->dependencies->getValidators();
         $this->setStdParams();
@@ -163,21 +161,23 @@ class LoggerRepository extends BaseClass
      */
     public function addToDb()
     {
-        $logger = $this->loggerEntity;
-        $this->query
-            ->insert()
-            ->into(_DB_PREFIX_ . $logger->getTable())
-            ->fields('process')->values(pSQL($logger->getProcess()))
-            ->fields('content')->values(pSQL($logger->getContent()))
-            ->fields('date_add')->values(pSQL($logger->getDateAdd()))
-            ->fields('date_upd')->values(pSQL($logger->getDateAdd()))
-        ;
+        $parameters = [
+            'process' => $this->loggerEntity->getProcess(),
+            'content' => $this->loggerEntity->getContent(),
+            'date_add' => $this->loggerEntity->getDateAdd(),
+            'date_upd' => $this->loggerEntity->getDateAdd(),
+        ];
 
-        if (!$this->query->build()) {
+        $id_logger = $this->dependencies
+            ->getPlugin()
+            ->getLoggerRepository()
+            ->createLog($parameters);
+
+        if (!$id_logger) {
             return false;
         }
 
-        $this->loggerEntity->setId($this->query->lastId());
+        $this->loggerEntity->setId($id_logger);
     }
 
     /**
@@ -187,23 +187,16 @@ class LoggerRepository extends BaseClass
      */
     public function updateLog()
     {
-        $logger = $this->loggerEntity;
-        $table = _DB_PREFIX_ . $logger->getTable();
+        $parameters = [
+            'process' => $this->loggerEntity->getProcess(),
+            'content' => $this->loggerEntity->getContent(),
+            'date_upd' => $this->loggerEntity->getDateUpd(),
+        ];
 
-        $this->query
-            ->update()
-            ->table($table)
-            ->set('process =  \'' . pSQL($logger->getProcess()) . '\'')
-            ->set('content =  \'' . pSQL($logger->getContent()) . '\'')
-            ->set('date_upd = \'' . pSQL($logger->getDateUpd()) . '\'')
-            ->where('id_payplug_logger = ' . (int) $logger->getId())
-            ;
-
-        if (!$this->query->build()) {
-            return false;
-        }
-
-        return true;
+        return $this->dependencies
+            ->getPlugin()
+            ->getLoggerRepository()
+            ->updateLog((int) $this->loggerEntity->getId(), $parameters);
     }
 
     /**
@@ -236,27 +229,19 @@ class LoggerRepository extends BaseClass
     public function flush($all = false)
     {
         try {
-            $logger = $this->loggerEntity;
-            $this->query
-                ->select()
-                ->fields('*')
-                ->from(_DB_PREFIX_ . $logger->getTable())
-            ;
+            $logs = $this->dependencies
+                ->getPlugin()
+                ->LoggerRepository()
+                ->getAllLog();
         } catch (Exception $exception) {
             return false;
         }
 
         if ($all) {
-            $this->query
-                ->truncate()
-                ->table(_DB_PREFIX_ . $logger->getTable())
-            ;
-
-            if (!$this->query->build()) {
-                return false;
-            }
-
-            return true;
+            return $this->dependencies
+                ->getPlugin()
+                ->LoggerRepository()
+                ->getAllLog();
         }
 
         $limits = $this->getLimit();
@@ -264,44 +249,26 @@ class LoggerRepository extends BaseClass
         $interval = new DateInterval($limits['date']);
         $date_limit = $date->sub($interval);
 
-        $flag = true;
-
-        // clean old log
-        $this->query
-            ->delete()
-            ->from(_DB_PREFIX_ . $logger->getTable())
-            ->where('`date_add` < ' . $this->query->escape($date_limit->format('Y-m-d')))
-        ;
-
-        if (!$this->query->build()) {
-            $flag = false;
-        }
+        $flag = $this->dependencies
+            ->getPlugin()
+            ->LoggerRepository()
+            ->deleteFormDate($date_limit->format('Y-m-d'));
 
         // clean log beyong the limit
-        $last_logs_valid =
-            $this->query
-                ->select()
-                ->fields('`id_payplug_logger`')
-                ->from(_DB_PREFIX_ . $logger->getTable())
-                ->orderBy('`id_payplug_logger` DESC')
-                ->limit(($limits['number'] - 1), 1)
-            ;
+        $log_limit = $limits['number'] - 1;
+        $last_valid_log = $this->dependencies
+            ->getPlugin()
+            ->LoggerRepository()
+            ->getLastLimitLog((int) $log_limit);
 
-        if (!$last_logs_valid || !$this->query->build()) {
-            $flag = false;
+        if (empty($last_valid_log)) {
+            return false;
         }
 
-        $this->query
-            ->delete()
-            ->from(_DB_PREFIX_ . $logger->getTable())
-            ->where('`id_payplug_logger` < ' . (int) $last_logs_valid[0]['id_payplug_logger'])
-        ;
-
-        if (!$this->query->build()) {
-            $flag = false;
-        }
-
-        return $flag;
+        return $flag && $this->dependencies
+            ->getPlugin()
+            ->LoggerRepository()
+            ->deleteFormId((int) $last_valid_log['id_payplug_logger']);
     }
 
     /**

@@ -17,9 +17,9 @@ class PaymentDetailsMock
     public static function getPaymentDetailsStandard()
     {
         $paymentDetails = self::getPaymentDetailsRaw();
-        $paymentDetails['paymentMethod'] = 'standard';
+        $paymentDetails['method'] = 'standard';
         $paymentDetails['paymentTab'] = PaymentTabMock::getStandard();
-        $paymentDetails['paymentId'] = 'pay_6PSW2vfJxvT0Ji9c8iPZsw';
+        $paymentDetails['resource_id'] = 'pay_6PSW2vfJxvT0Ji9c8iPZsw';
         $paymentDetails['isPaid'] = false;
 
         return $paymentDetails;
@@ -33,9 +33,9 @@ class PaymentDetailsMock
     public static function getPaymentDetailsInstallment()
     {
         $paymentDetails = self::getPaymentDetailsRaw();
-        $paymentDetails['paymentMethod'] = 'installment';
+        $paymentDetails['method'] = 'installment';
         $paymentDetails['paymentTab'] = PaymentTabMock::getInstallment();
-        $paymentDetails['paymentId'] = 'inst_13TPOO67A5prqs9zZXW3qW';
+        $paymentDetails['resource_id'] = 'inst_13TPOO67A5prqs9zZXW3qW';
         $paymentDetails['isPaid'] = null;
 
         return $paymentDetails;
@@ -44,9 +44,9 @@ class PaymentDetailsMock
     public static function getPaymentDetailsRaw()
     {
         return [
-            'paymentMethod' => 'raw',
+            'method' => 'raw',
             'paymentTab' => ['raw'],
-            'paymentId' => 'raw',
+            'resource_id' => 'raw',
             'paymentReturnUrl' => 'http =>//localhost/prestashop_1.7.6.9/fr/module/payplug/validation?ps=1&cartid=21',
             'paymentUrl' => 'https =>//secure-qa.payplug.com/pay/6PSW2vfJxvT0Ji9c8iPZsw',
             'paymentDate' => null,

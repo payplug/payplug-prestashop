@@ -28,7 +28,7 @@ class Configuration
     // @todo: check the following keys, no usage found
     // COMPANY_STATUS
     // OFFER
-    public $configuration = [
+    public $configurations = [
         'allow_save_card' => [
             'type' => 'integer',
             'name' => 'ALLOW_SAVE_CARD',
@@ -287,6 +287,12 @@ class Configuration
             'defaultValue' => null,
             'setConf' => 1,
         ],
+        'telemetry_hash' => [
+            'type' => 'string',
+            'name' => 'TELEMETRY_HASH',
+            'defaultValue' => '',
+            'setConf' => 0,
+        ],
     ];
     public $order_states = [
         'paid' => [
@@ -448,7 +454,7 @@ class Configuration
             return false;
         }
 
-        if (!array_key_exists($key, $this->configuration)) {
+        if (!array_key_exists($key, $this->configurations)) {
             return false;
         }
 
@@ -471,11 +477,30 @@ class Configuration
             return [];
         }
 
-        if (!array_key_exists($key, $this->configuration)) {
+        if (!array_key_exists($key, $this->configurations)) {
             return [];
         }
 
-        return $this->configuration[$key];
+        return $this->configurations[$key];
+    }
+
+    /**
+     * @description get the current module configuration
+     *
+     * @param string $key
+     *
+     * @return false|mixed
+     */
+    public function getCurrentConfigurations()
+    {
+        $current_configurations = [];
+
+        foreach ($this->configurations as $name => $config) {
+            $value = $this->getValue($name);
+            $current_configurations[$name] = null !== $value ? $value : $this->getDefault($name);
+        }
+
+        return $current_configurations;
     }
 
     /**
@@ -491,21 +516,11 @@ class Configuration
             return false;
         }
 
-        if (!array_key_exists($key, $this->configuration)) {
+        if (!array_key_exists($key, $this->configurations)) {
             return false;
         }
 
-        return $this->configuration[$key]['defaultValue'];
-    }
-
-    /**
-     * @description get the configuration keys
-     *
-     * @return array[]
-     */
-    public function getConfiguration()
-    {
-        return $this->configuration;
+        return $this->configurations[$key]['defaultValue'];
     }
 
     /**
@@ -521,11 +536,11 @@ class Configuration
             return '';
         }
 
-        if (!array_key_exists($key, $this->configuration)) {
+        if (!array_key_exists($key, $this->configurations)) {
             return '';
         }
 
-        return strtoupper($this->dependencies->name) . '_' . $this->configuration[$key]['name'];
+        return strtoupper($this->dependencies->name) . '_' . $this->configurations[$key]['name'];
     }
 
     /**
@@ -541,11 +556,11 @@ class Configuration
             return '';
         }
 
-        if (!array_key_exists($key, $this->configuration)) {
+        if (!array_key_exists($key, $this->configurations)) {
             return '';
         }
 
-        return $this->configuration[$key]['type'];
+        return $this->configurations[$key]['type'];
     }
 
     /**
@@ -561,7 +576,7 @@ class Configuration
             return false;
         }
 
-        if (!array_key_exists($key, $this->configuration)) {
+        if (!array_key_exists($key, $this->configurations)) {
             return false;
         }
 
@@ -585,7 +600,7 @@ class Configuration
             return false;
         }
 
-        if (!array_key_exists($key, $this->configuration)) {
+        if (!array_key_exists($key, $this->configurations)) {
             return false;
         }
 

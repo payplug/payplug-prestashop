@@ -856,6 +856,7 @@ class paymentValidator
         if (!is_bool($product_quantity)) {
             return [
                 'result' => false,
+                'code' => 'product_quantity',
                 'message' => 'Invalid argument given, $product_quantity must be a boolean',
             ];
         }
@@ -863,6 +864,7 @@ class paymentValidator
         if (!is_bool($address)) {
             return [
                 'result' => false,
+                'code' => 'address',
                 'message' => 'Invalid argument given, $address must be a boolean',
             ];
         }
@@ -870,6 +872,7 @@ class paymentValidator
         if (!is_bool($amount)) {
             return [
                 'result' => false,
+                'code' => 'amount',
                 'message' => 'Invalid argument given, $amount must be a boolean',
             ];
         }
@@ -1014,42 +1017,6 @@ class paymentValidator
             return [
                 'result' => false,
                 'message' => 'Missing props, $payment does not valid amount nor authorized_amount',
-            ];
-        }
-
-        return [
-            'result' => true,
-            'message' => '',
-        ];
-    }
-
-    /**
-     * @description Check if given payment is pending
-     *
-     * @param array $payment
-     *
-     * @return array
-     */
-    public function isPending($payment = [])
-    {
-        if (!is_array($payment) || !$payment) {
-            return [
-                'result' => false,
-                'message' => 'Invalid argument given, $payment must be a non empty array',
-            ];
-        }
-
-        if (!isset($payment['is_pending'])) {
-            return [
-                'result' => false,
-                'message' => 'Missing props, $payment does not contain is_pending',
-            ];
-        }
-
-        if (!(bool) $payment['is_pending']) {
-            return [
-                'result' => false,
-                'message' => 'Given payment is not pending',
             ];
         }
 

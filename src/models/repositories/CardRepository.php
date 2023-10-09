@@ -25,6 +25,12 @@ namespace PayPlug\src\models\repositories;
 
 class CardRepository extends QueryRepository
 {
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . $this->dependencies->name . '_card';
+    }
+
     /**
      * @description Register a card from the api
      *
@@ -70,7 +76,7 @@ class CardRepository extends QueryRepository
 
         $result = $this
             ->insert()
-            ->into($this->prefix . $this->module_name . '_card')
+            ->into($this->table_name)
             ->fields('id_customer')->values((int) $customer_id)
             ->fields('id_company')->values((int) $company_id)
             ->fields('is_sandbox')->values((bool) $is_sandbox ? 1 : 0)
@@ -101,7 +107,7 @@ class CardRepository extends QueryRepository
 
         $result = $this
             ->delete()
-            ->from($this->prefix . $this->module_name . '_card')
+            ->from($this->table_name)
             ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
             ->build();
 
@@ -124,7 +130,7 @@ class CardRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->module_name . '_card')
+            ->from($this->table_name)
             ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
             ->build('unique_row');
 
@@ -157,13 +163,13 @@ class CardRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('id_card')
-            ->from($this->prefix . $this->module_name . '_card')
+            ->from($this->table_name)
             ->where('id_card = "' . $this->escape($payment_id) . '"')
             ->where('id_company = ' . (int) $company_id)
             ->where('is_sandbox = ' . ((bool) $is_sandbox ? 1 : 0))
             ->build('unique_value');
 
-        return $result ? true : false;
+        return (bool) $result;
     }
 
     /**
@@ -176,10 +182,10 @@ class CardRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->module_name . '_card')
+            ->from($this->table_name)
             ->build();
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 
     /**
@@ -206,7 +212,7 @@ class CardRepository extends QueryRepository
         $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->module_name . '_card')
+            ->from($this->table_name)
             ->where('`id_customer` = ' . (int) $id_customer);
 
         if (null !== $id_company) {
@@ -219,6 +225,6 @@ class CardRepository extends QueryRepository
 
         $result = $this->build();
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 }

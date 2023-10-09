@@ -97,6 +97,9 @@ class PluginEntity
     private $logger;
 
     /** @var object */
+    private $merchantTelemetryAction;
+
+    /** @var object */
     private $message;
 
     /** @var object */
@@ -142,7 +145,10 @@ class PluginEntity
     private $product;
 
     /** @var object */
-    private $query;
+    private $query_repository;
+
+    /** @var object */
+    private $query_adapter;
 
     /** @var object */
     private $routes;
@@ -164,6 +170,42 @@ class PluginEntity
 
     /** @var object */
     private $validate;
+
+    /** @var object */
+    private $card_repository;
+
+    /** @var object */
+    private $cache_repository;
+
+    /** @var object */
+    private $country_repository;
+
+    /** @var object */
+    private $lock_repository;
+
+    /** @var object */
+    private $logger_repository;
+
+    /** @var object */
+    private $module_repository;
+
+    /** @var object */
+    private $order_repository;
+
+    /** @var object */
+    private $order_state_repository;
+
+    /** @var object */
+    private $payplug_order_state_repository;
+
+    /** @var object */
+    private $order_payment_repository;
+
+    /** @var object */
+    private $payment_repository;
+
+    /** @var object */
+    private $shop_repository;
 
     /**
      * @return object
@@ -268,7 +310,7 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getApiRest()
+    public function getApiRestClass()
     {
         return $this->api_rest;
     }
@@ -311,6 +353,22 @@ class PluginEntity
     public function getCard()
     {
         return $this->card;
+    }
+
+    /**
+     * @return object
+     */
+    public function getCardRepository()
+    {
+        return $this->card_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getCacheRepository()
+    {
+        return $this->cache_repository;
     }
 
     /**
@@ -380,6 +438,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getCountryRepository()
+    {
+        return $this->country_repository;
+    }
+
+    /**
+     * @return object
+     */
     public function getCurrency()
     {
         return $this->currency;
@@ -428,9 +494,25 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getLoggerRepository()
+    {
+        return $this->logger_repository;
+    }
+
+    /**
+     * @return object
+     */
     public function getProduct()
     {
         return $this->product;
+    }
+
+    /**
+     * @return object
+     */
+    public function getQueryAdapter()
+    {
+        return $this->query_adapter;
     }
 
     /**
@@ -452,9 +534,73 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getMerchantTelemetryAction()
+    {
+        return $this->merchantTelemetryAction;
+    }
+
+    /**
+     * @return object
+     */
+    public function getMerchantTelemetry()
+    {
+        return $this->merchantTelemetry;
+    }
+
+    /**
+     * @return object
+     */
+    public function getLockRepository()
+    {
+        return $this->lock_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getModuleRepository()
+    {
+        return $this->module_repository;
+    }
+
+    /**
+     * @return object
+     */
     public function getOney()
     {
         return $this->oney;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderRepository()
+    {
+        return $this->order_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderStateRepository()
+    {
+        return $this->order_state_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getPayplugOrderStateRepository()
+    {
+        return $this->payplug_order_state_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderPaymentRepository()
+    {
+        return $this->order_payment_repository;
     }
 
     /**
@@ -500,7 +646,7 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getPaymentMethod()
+    public function getPaymentMethodClass()
     {
         return $this->paymentMethod;
     }
@@ -508,9 +654,17 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getQuery()
+    public function getPaymentRepository()
     {
-        return $this->query;
+        return $this->payment_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getQueryRepository()
+    {
+        return $this->query_repository;
     }
 
     /**
@@ -540,6 +694,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getShopRepository()
+    {
+        return $this->shop_repository;
+    }
+
+    /**
+     * @return object
+     */
     public function getTools()
     {
         return $this->tools;
@@ -556,7 +718,7 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getTranslation()
+    public function getTranslationClass()
     {
         return $this->translation;
     }
@@ -606,7 +768,7 @@ class PluginEntity
      *
      * @return self
      */
-    public function setApiRest($api_rest)
+    public function setApiRestClass($api_rest)
     {
         if (!is_object($api_rest)) {
             throw (new BadParameterException('Invalid argument, $api_rest must be ApiRest'));
@@ -703,6 +865,42 @@ class PluginEntity
         }
 
         $this->card = $card;
+
+        return $this;
+    }
+
+    /**
+     * @param object $card_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setCardRepository($card_repository)
+    {
+        if (!is_object($card_repository)) {
+            throw (new BadParameterException('Invalid argument, $card_repository must be an CardRepository'));
+        }
+
+        $this->card_repository = $card_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $cache_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setCacheRepository($cache_repository)
+    {
+        if (!is_object($cache_repository)) {
+            throw (new BadParameterException('Invalid argument, $cache_repository must be an CacheRepository'));
+        }
+
+        $this->cache_repository = $cache_repository;
 
         return $this;
     }
@@ -853,6 +1051,24 @@ class PluginEntity
     }
 
     /**
+     * @param object $country_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setCountryRepository($country_repository)
+    {
+        if (!is_object($country_repository)) {
+            throw (new BadParameterException('Invalid argument, $country_repository must be an CountryRepository'));
+        }
+
+        $this->country_repository = $country_repository;
+
+        return $this;
+    }
+
+    /**
      * @param object $currency
      *
      * @return PluginEntity
@@ -974,6 +1190,24 @@ class PluginEntity
     }
 
     /**
+     * @param object $logger_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setLoggerRepository($logger_repository)
+    {
+        if (!is_object($logger_repository)) {
+            throw (new BadParameterException('Invalid argument, $logger_repository must be an LoggerRepository'));
+        }
+
+        $this->logger_repository = $logger_repository;
+
+        return $this;
+    }
+
+    /**
      * @param object $module
      * @param mixed  $media
      *
@@ -988,6 +1222,43 @@ class PluginEntity
         }
 
         $this->media = $media;
+
+        return $this;
+    }
+
+    /**
+     * @param object $merchantTelemetryAction
+     * @param mixed  $merchantTelemetry
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setMerchantTelemetry($merchantTelemetry)
+    {
+        if (!is_object($merchantTelemetry)) {
+            throw (new BadParameterException('Invalid argument, $merchantTelemetry must be a MerchantTelemetry'));
+        }
+
+        $this->merchantTelemetry = $merchantTelemetry;
+
+        return $this;
+    }
+
+    /**
+     * @param object $merchantTelemetryAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setMerchantTelemetryAction($merchantTelemetryAction)
+    {
+        if (!is_object($merchantTelemetryAction)) {
+            throw (new BadParameterException('Invalid argument, $merchantTelemetryAction must be a MerchantTelemetryAction'));
+        }
+
+        $this->merchantTelemetryAction = $merchantTelemetryAction;
 
         return $this;
     }
@@ -1030,6 +1301,42 @@ class PluginEntity
     }
 
     /**
+     * @param object $module_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setModuleRepository($module_repository)
+    {
+        if (!is_object($module_repository)) {
+            throw (new BadParameterException('Invalid argument, $module_repository must be an ModuleRepository'));
+        }
+
+        $this->module_repository = $module_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $lock_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setLockRepository($lock_repository)
+    {
+        if (!is_object($lock_repository)) {
+            throw (new BadParameterException('Invalid argument, $lock_repository must be an LockRepository'));
+        }
+
+        $this->lock_repository = $lock_repository;
+
+        return $this;
+    }
+
+    /**
      * @param object $onboardingAction
      *
      * @throws BadParameterException
@@ -1061,6 +1368,78 @@ class PluginEntity
         }
 
         $this->oney = $oney;
+
+        return $this;
+    }
+
+    /**
+     * @param object $order_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setOrderRepository($order_repository)
+    {
+        if (!is_object($order_repository)) {
+            throw (new BadParameterException('Invalid argument, $order_repository must be an OrderRepository'));
+        }
+
+        $this->order_repository = $order_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $order_state_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setOrderStateRepository($order_state_repository)
+    {
+        if (!is_object($order_state_repository)) {
+            throw (new BadParameterException('Invalid argument, $order_state_repository must be an OrderStateRepository'));
+        }
+
+        $this->order_state_repository = $order_state_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $payplug_order_state_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setPayplugOrderStateRepository($payplug_order_state_repository)
+    {
+        if (!is_object($payplug_order_state_repository)) {
+            throw (new BadParameterException('Invalid argument, $payplug_order_state_repository must be an PayplugOrderStateRepository'));
+        }
+
+        $this->payplug_order_state_repository = $payplug_order_state_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $order_payment_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setOrderPaymentRepository($order_payment_repository)
+    {
+        if (!is_object($order_payment_repository)) {
+            throw (new BadParameterException('Invalid argument, $order_payment_repository must be an OrderPaymentRepository'));
+        }
+
+        $this->order_payment_repository = $order_payment_repository;
 
         return $this;
     }
@@ -1102,12 +1481,11 @@ class PluginEntity
     }
 
     /**
-     * @param object $order_state
-     * @param mixed  $order_state_adapter
+     * @param $order_state_adapter
      *
      * @throws BadParameterException
      *
-     * @return self
+     * @return $this
      */
     public function setOrderStateAdapter($order_state_adapter)
     {
@@ -1159,13 +1537,31 @@ class PluginEntity
      *
      * @return self
      */
-    public function setPaymentMethod($paymentMethod)
+    public function setPaymentMethodClass($paymentMethod)
     {
         if (!is_object($paymentMethod)) {
             throw (new BadParameterException('Invalid argument, $paymentMethod must be a PaymentMethod'));
         }
 
         $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    /**
+     * @param object $payment_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setPaymentRepository($payment_repository)
+    {
+        if (!is_object($payment_repository)) {
+            throw (new BadParameterException('Invalid argument, $payment_repository must be an PaymentRepository'));
+        }
+
+        $this->payment_repository = $payment_repository;
 
         return $this;
     }
@@ -1189,19 +1585,37 @@ class PluginEntity
     }
 
     /**
-     * @param object $query
+     * @param object $query_adapter
      *
      * @throws BadParameterException
      *
      * @return self
      */
-    public function setQuery($query)
+    public function setQueryAdapter($query_adapter)
     {
-        if (!is_object($query)) {
+        if (!is_object($query_adapter)) {
+            throw (new BadParameterException('Invalid argument, $query_adapter must be a QueryAdapter'));
+        }
+
+        $this->query_adapter = $query_adapter;
+
+        return $this;
+    }
+
+    /**
+     * @param object $query_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setQueryRepository($query_repository)
+    {
+        if (!is_object($query_repository)) {
             throw (new BadParameterException('Invalid argument, $card must be a QueryRepository'));
         }
 
-        $this->query = $query;
+        $this->query_repository = $query_repository;
 
         return $this;
     }
@@ -1262,6 +1676,24 @@ class PluginEntity
     }
 
     /**
+     * @param object $shop_repository
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setShopRepository($shop_repository)
+    {
+        if (!is_object($shop_repository)) {
+            throw (new BadParameterException('Invalid argument, $shop_repository must be an ShopRepository'));
+        }
+
+        $this->shop_repository = $shop_repository;
+
+        return $this;
+    }
+
+    /**
      * @param object $tools
      *
      * @throws BadParameterException
@@ -1304,7 +1736,7 @@ class PluginEntity
      *
      * @return self
      */
-    public function setTranslation($translation)
+    public function setTranslationClass($translation)
     {
         if (!is_object($translation)) {
             throw (new BadParameterException('Invalid argument, $translation must be a Translate'));

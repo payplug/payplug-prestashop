@@ -30,13 +30,11 @@ class CartClass
 {
     private $logger;
     private $dependencies;
-    private $query;
     private $constant;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
     }
 
@@ -81,21 +79,5 @@ class CartClass
         } while (!$cart_lock);
 
         return true;
-    }
-
-    /**
-     * @description Delete payplug lock for given id cart
-     *
-     * @param int $id_cart
-     *
-     * @return bool
-     */
-    public function deleteLockFromCartId($id_cart = 0)
-    {
-        if (!$id_cart || !is_int($id_cart)) {
-            return false;
-        }
-
-        return $this->dependencies->payplugLock->deleteLockG2($id_cart);
     }
 }

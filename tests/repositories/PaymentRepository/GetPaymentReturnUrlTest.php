@@ -3,12 +3,14 @@
 namespace PayPlug\tests\repositories\PaymentRepository;
 
 use PayPlug\tests\mock\CartMock;
+use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
@@ -32,7 +34,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
             'isEmbedded' => true,
             'isMobileDevice' => true,
             'isPaid' => true,
-            'paymentMethod' => 'payment_method',
+            'method' => 'method',
             'paymentReturnUrl' => 'payment_return_url',
             'paymentUrl' => 'payment_return_url',
             'isIntegrated' => false,
@@ -66,7 +68,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     public function testWhenNoPaymentFound()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $this->assertSame(
@@ -81,12 +83,19 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     public function testWhenInvalidPaymentMethodGiven()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'payment_method',
+                'resource_id' => 'pay_azerty12345',
+                'method' => 'method',
                 'payment_url' => 'https://secure.payplug.com/pay/1234567890azertyuiop',
                 'payment_return_url' => 'https://localhost:9080/fr/module/payplug/validation?ps=1&cartid=42',
+            ],
+        ]);
+        $this->dependencies->apiClass->shouldReceive([
+            'retrievePayment' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
             ],
         ]);
         $this->assertSame(
@@ -101,16 +110,25 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
 
     public function testWhenValidPaymentMethodGiven()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'resource_id' => 'pay_azerty12345',
+                'method' => 'standard',
                 'payment_url' => 'https://secure.payplug.com/pay/1234567890azertyuiop',
                 'payment_return_url' => 'https://localhost:9080/fr/module/payplug/validation?ps=1&cartid=42',
             ],
         ]);
 
-        $this->paymentDetails['paymentMethod'] = 'standard';
+        $payment = PaymentMock::getStandard();
+        $this->dependencies->apiClass->shouldReceive([
+            'retrievePayment' => [
+                'result' => true,
+                'resource' => $payment,
+            ],
+        ]);
+
+        $this->paymentDetails['method'] = 'standard';
 
         $this->assertSame(
             [
@@ -119,7 +137,7 @@ final class GetPaymentReturnUrlTest extends BasePaymentRepository
                     'result' => 'new_card',
                     'embedded' => false,
                     'redirect' => true,
-                    'return_url' => 'payment_return_url',
+                    'return_url' => $payment->hosted_payment->payment_url,
                 ],
                 'response' => 'Return URL successfully generated',
             ],

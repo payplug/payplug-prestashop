@@ -6,9 +6,9 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -28,7 +28,7 @@ final class CreatePaymentTest extends BasePaymentRepository
                 'auto_capture' => true,
                 'payment_method' => 'standard',
             ],
-            'paymentMethod' => 'standard',
+            'method' => 'standard',
             'cartId' => 42,
         ];
 
@@ -100,9 +100,9 @@ final class CreatePaymentTest extends BasePaymentRepository
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
-     * @param string $paymentMethod
+     * @param string $method
      */
-    public function testWhenGivenPaymentDetailsPaymentMethodIsNotAValidFormat($paymentMethod)
+    public function testWhenGivenPaymentDetailsPaymentMethodIsNotAValidFormat($method)
     {
         $paymentDetails = [
             'paymentTab' => [
@@ -110,14 +110,14 @@ final class CreatePaymentTest extends BasePaymentRepository
                 'auto_capture' => true,
                 'payment_method' => 'standard',
             ],
-            'paymentMethod' => $paymentMethod,
+            'method' => $method,
         ];
 
         $this->assertSame(
             [
                 'result' => false,
                 'paymentDetails' => json_encode($paymentDetails),
-                'response' => '[createPayment] Invalid parameters given, $paymentDetails[paymentMethod] must be a non empty string',
+                'response' => '[createPayment] Invalid parameters given, $paymentDetails[method] must be a non empty string',
             ],
             $this->repo->createPayment($paymentDetails)
         );
@@ -136,7 +136,7 @@ final class CreatePaymentTest extends BasePaymentRepository
                 'auto_capture' => true,
                 'payment_method' => 'standard',
             ],
-            'paymentMethod' => 'standard',
+            'method' => 'standard',
             'cartId' => $cartId,
         ];
 
@@ -177,10 +177,10 @@ final class CreatePaymentTest extends BasePaymentRepository
             ->andReturn('{"standard":true}');
         $payment = [
             'id_cart' => 42,
-            'id_payment' => 'pay_1234567890azerty',
-            'payment_method' => 'standard',
+            'resource_id' => 'pay_1234567890azerty',
+            'method' => 'standard',
         ];
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => $payment,
         ]);
         $this->validators['payment']->shouldReceive([
@@ -205,7 +205,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->assertSame(
             [
                 'result' => false,
-                'paymentId' => json_encode($payment['id_payment']),
+                'resource_id' => json_encode($payment['resource_id']),
                 'response' => '[createPayment] Exception. Unable to abort payment. Error: Payment cannot be aborted',
             ],
             $this->repo->createPayment($this->paymentDetails)
@@ -217,7 +217,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true}');
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
 
@@ -244,7 +244,7 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true}');
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $message = 'An error occured while creating the payment';
@@ -281,11 +281,11 @@ final class CreatePaymentTest extends BasePaymentRepository
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true}');
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $payment = PaymentMock::getStandard();
-        $this->paymentDetails['paymentId'] = $payment->id;
+        $this->paymentDetails['resource_id'] = $payment->id;
         $this->paymentDetails['paymentReturnUrl'] = $payment->hosted_payment->return_url;
         $this->paymentDetails['isPaid'] = $payment->is_paid;
         $this->paymentDetails['paymentUrl'] = $payment->hosted_payment->payment_url;

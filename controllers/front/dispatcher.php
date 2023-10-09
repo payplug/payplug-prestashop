@@ -88,7 +88,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 exit(json_encode([
                     'result' => true,
                     'apiResponse' => $payment['resource']->payment_method,
-                    'idPayment' => $payment['paymentDetails']['paymentId'],
+                    'idPayment' => $payment['paymentDetails']['resource_id'],
                     'idCart' => $this->context->cart->id,
                 ]));
             }

@@ -39,7 +39,7 @@ class AdminPayplugController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
-        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRestClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->tools = $this->dependencies->getPlugin()->getTools();

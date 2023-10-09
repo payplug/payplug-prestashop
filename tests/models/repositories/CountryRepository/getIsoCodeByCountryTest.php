@@ -2,9 +2,6 @@
 
 namespace PayPlug\tests\models\repositories\CountryRepository;
 
-use PayPlug\src\models\repositories\CountryRepository;
-use PayPlug\tests\models\repositories\BaseRepository;
-
 /**
  * @group unit
  * @group repository
@@ -12,14 +9,9 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getIsoCodeByCountryTest extends BaseRepository
+class getIsoCodeByCountryTest extends BaseCountryRepository
 {
     protected $accountValidator;
-
-    protected function setUp()
-    {
-        $this->repository = \Mockery::mock(CountryRepository::class)->makePartial();
-    }
 
     /**
      * @dataProvider invalidIntegerFormatDataProvider

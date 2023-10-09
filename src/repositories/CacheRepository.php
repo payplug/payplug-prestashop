@@ -77,18 +77,19 @@ class CacheRepository extends BaseClass
 
         if (!$cache['result']) {
             $this->cacheEntity->setDateAdd($this->logger->udate('Y-m-d H:i:s'));
+            $parameters = [
+                'cache_key' => $cache_key,
+                'cache_value' => json_encode($cache_value),
+                'date_add' => $this->cacheEntity->getDateAdd(),
+                'date_upd' => $this->cacheEntity->getDateAdd(),
+            ];
 
-            $this->query
-                ->insert()
-                ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_cache')
-                ->fields('cache_key')->values(pSQL($cache_key))
-                ->fields('cache_value')->values(json_encode($cache_value))
-                ->fields('date_add')->values(pSQL($this->cacheEntity->getDateAdd()))
-                ->fields('date_upd')->values(pSQL($this->cacheEntity->getDateAdd()));
+            $create_cache = $this->dependencies
+                ->getPlugin()
+                ->getCacheRepository()
+                ->createCache($parameters);
 
-            if (!$this->query->build()) {
-                return false;
-            }
+            return (bool) $create_cache;
         }
 
         return true;
@@ -155,23 +156,17 @@ class CacheRepository extends BaseClass
             ];
         }
 
-        $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_cache')
-            ->where('`cache_key` = \'' . $this->query->escape($cache_key) . '\'')
-        ;
+        $cache = $this->dependencies
+            ->getPlugin()
+            ->getCacheRepository()
+            ->getByKey($cache_key);
 
-        $result = $this->query->build();
-
-        if (!$result) {
+        if (empty($cache)) {
             return [
                 'result' => false,
                 'message' => 'No cache found',
             ];
         }
-
-        $cache = reset($result);
 
         // if the cache is older than 48 hours, return false after delete it
         $lifetime = new DateInterval('P2D');
@@ -179,7 +174,10 @@ class CacheRepository extends BaseClass
         $date_limit->sub($lifetime);
         $date_add = new DateTime($cache['date_add']);
         if ($date_limit >= $date_add) {
-            $this->deleteCacheByKey($cache_key);
+            $this->dependencies
+                ->getPlugin()
+                ->getCacheRepository()
+                ->deleteCache($cache_key);
 
             return [
                 'result' => false,
@@ -194,21 +192,6 @@ class CacheRepository extends BaseClass
     }
 
     /**
-     * @description Delete cache for a given key
-     *
-     * @param $cache_key
-     */
-    public function deleteCacheByKey($cache_key)
-    {
-        $this->query
-            ->delete()
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_cache')
-            ->where('`cache_key` = \'' . $this->query->escape($cache_key) . '\'')
-            ->build()
-        ;
-    }
-
-    /**
      * @description Flush all the cache.
      * Remove all Oney Simulation.
      *
@@ -216,12 +199,12 @@ class CacheRepository extends BaseClass
      */
     public function flushCache()
     {
-        $this->query
-            ->truncate()
-            ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_cache')
-        ;
+        $truncate = $this->dependencies
+            ->getPlugin()
+            ->getCacheRepository()
+            ->flushCache();
 
-        if (!$this->query->build()) {
+        if (!$truncate) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';
             $error_level = 'error';
             $this->logger->addLog($error_message, $error_level);

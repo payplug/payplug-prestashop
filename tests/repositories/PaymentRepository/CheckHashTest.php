@@ -6,9 +6,9 @@ use PayPlug\tests\mock\CartMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group payment
- * @group payment_repository
+ * @group old_payment_repository
  *
  * @runTestsInSeparateProcesses
  */
@@ -30,7 +30,7 @@ final class CheckHashTest extends BasePaymentRepository
         $this->paymentDetails = [
             'cartId' => $cart->id,
             'cart' => $cart,
-            'paymentMethod' => 'payment_method',
+            'method' => 'test',
             'forceHash' => false,
         ];
     }
@@ -64,7 +64,7 @@ final class CheckHashTest extends BasePaymentRepository
 
     public function testWhenNoPaymentFound()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [],
         ]);
         $this->assertSame(
@@ -79,10 +79,10 @@ final class CheckHashTest extends BasePaymentRepository
 
     public function testWhenPaymentIsCached()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
                 'cart_hash' => $this->hash,
             ],
         ]);
@@ -107,10 +107,10 @@ final class CheckHashTest extends BasePaymentRepository
     public function testWhenPaymentIsNotCreated()
     {
         $message = 'An error has occured';
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
                 'cart_hash' => $this->hash,
             ],
         ]);
@@ -139,10 +139,10 @@ final class CheckHashTest extends BasePaymentRepository
     public function testWhenPaymentIsNotUpdated()
     {
         $message = 'An error has occured';
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
                 'cart_hash' => $this->hash,
             ],
         ]);
@@ -181,10 +181,10 @@ final class CheckHashTest extends BasePaymentRepository
 
     public function testWhenPaymentIsUpdated()
     {
-        $this->repositories['payment']->shouldReceive([
+        $this->payment_repository->shouldReceive([
             'getByCart' => [
                 'id_cart' => 42,
-                'payment_method' => 'standard',
+                'method' => 'standard',
                 'cart_hash' => $this->hash,
             ],
         ]);

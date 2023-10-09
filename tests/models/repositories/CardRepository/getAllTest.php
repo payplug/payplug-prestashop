@@ -2,9 +2,6 @@
 
 namespace PayPlug\tests\models\repositories\CardRepository;
 
-use PayPlug\src\models\repositories\CardRepository;
-use PayPlug\tests\models\repositories\BaseRepository;
-
 /**
  * @group unit
  * @group repository
@@ -12,13 +9,8 @@ use PayPlug\tests\models\repositories\BaseRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getAllTest extends BaseRepository
+class getAllTest extends BaseCardRepository
 {
-    protected function setUp()
-    {
-        $this->repository = \Mockery::mock(CardRepository::class)->makePartial();
-    }
-
     public function testWhenNoCardsFind()
     {
         $this->repository->shouldReceive([

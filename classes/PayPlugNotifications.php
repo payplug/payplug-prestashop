@@ -193,7 +193,11 @@ class PayPlugNotifications
             $this->logger->addLog($str);
         }
         if ($this->lock_key) {
-            if (!$this->payplugLock->deleteLockG2($this->lock_key)) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $this->lock_key);
+            if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
@@ -436,6 +440,9 @@ class PayPlugNotifications
             $module_name = $this->dependencies->l('notification.createOrder.sofort', 'payplugnotifications');
         }
 
+        // Check if this notification is the first of the day
+        $is_first_order = empty($this->dependencies->getPlugin()->getOrderRepository()->getCurrentOrders());
+
         // Create Order
         try {
             $this->logger->addLog('Order create with amount:' . $amount);
@@ -485,7 +492,11 @@ class PayPlugNotifications
 
             $this->logger->addLog('Payment patched.', 'debug');
 
-            if (!$this->orderClass->addPayplugOrderPayment((int) $this->order->id, $this->payment->id)) {
+            $create_order_payment = $this->dependencies
+                ->getPlugin()
+                ->getOrderPaymentRepository()
+                ->createOrderPayment((int) $this->order->id, $this->payment->id);
+            if (!$create_order_payment) {
                 $this->logger->addLog(
                     'IPN Failed: unable to create order payment.',
                     'error'
@@ -506,13 +517,11 @@ class PayPlugNotifications
         // Check number of order using this cart
         $this->logger->addLog('Checking number of order passed with this id_cart');
 
-        $res_nb_orders = $this->query
-            ->select()
-            ->fields('*')
-            ->from($this->constantAdapter->get('_DB_PREFIX_') . 'orders')
-            ->where('id_cart = ' . (int) $this->cart->id)
-            ->build()
-        ;
+        $res_nb_orders = $this->dependencies
+            ->getPlugin()
+            ->getOrderRepository()
+            ->getByIdCart((int) $this->cart->id);
+
         if (!$res_nb_orders) {
             $this->logger->addLog(
                 'No order can be found using id_cart ' . (int) $this->cart->id,
@@ -550,6 +559,11 @@ class PayPlugNotifications
             $this->exitProcess('There is more than one transaction using id_order: ' . (int) $id_order, 500);
         } else {
             $this->logger->addLog('OK');
+        }
+
+        // Before ending process, if this is the first order of the days, we send the telemetries
+        if ($is_first_order) {
+            $this->dependencies->getPlugin()->getMerchantTelemetryAction()->sendAction('notification');
         }
 
         $this->logger->addLog('Order created.');
@@ -685,7 +699,11 @@ class PayPlugNotifications
             } while (!$cart_lock);
 
             $new_order_state = $this->order_states['refund'];
-            $current_state = $this->orderClass->getCurrentOrderState($this->order->id);
+            $current_state = (int) $this->dependencies
+                ->getPlugin()
+                ->getOrderRepository()
+                ->getCurrentOrderState((int) $this->order->id);
+
             $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {
@@ -838,7 +856,11 @@ class PayPlugNotifications
         }
 
         // Get associated transaction
-        $payplug_order_payments = $this->orderClass->getPayplugOrderPayments((int) $this->order->id);
+        $payplug_order_payments = $this->dependencies
+            ->getPlugin()
+            ->getOrderPaymentRepository()
+            ->getAllByOrder((int) $this->order->id);
+
         $order_payments = $this->order->getOrderPayments();
 
         // Check if the payment is related to the order with payplug order payment
@@ -890,9 +912,15 @@ class PayPlugNotifications
         $id_order_state = $this->order->current_state;
 
         // check current order state type to create if it's empty
-        $type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $id_order_state);
+        $type = $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->getTypeByIdOrderState((int) $id_order_state);
         if ($type != $this->type) {
-            $this->dependencies->getPlugin()->getOrderState()->setType((int) $id_order_state, $this->type);
+            $this->dependencies
+                ->getPlugin()
+                ->getPayplugOrderStateRepository()
+                ->setOrderState((int) $id_order_state, $this->type);
         }
 
         $this->exitProcess('The order state is not defined');
@@ -907,7 +935,10 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: processUpdateOrder');
 
-        $type = $this->dependencies->getPlugin()->getOrderState()->getType((int) $this->order->current_state);
+        $type = $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->getTypeByIdOrderState((int) $this->order->current_state);
         $this->type = $type ?: 'undefined';
 
         $this->logger->addLog('Current order state: ' . $this->order->current_state);
@@ -925,8 +956,9 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: setCartFromResource');
         if ($this->is_installment) {
             $payment = $this->dependencies
-                ->getRepositories()['payment']
-                ->getByIdPayment($this->payment->installment_plan_id);
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getByResourceId($this->payment->installment_plan_id);
             if (!$payment['id_cart']) {
                 if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                     $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
@@ -938,8 +970,9 @@ class PayPlugNotifications
             }
         } else {
             $payment = $this->dependencies
-                ->getRepositories()['payment']
-                ->getByIdPayment($this->resource->id);
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getByResourceId($this->resource->id);
             if (!$payment['id_cart']) {
                 if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                     $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
@@ -1005,7 +1038,7 @@ class PayPlugNotifications
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->sandbox = $this->configuration->getValue('sandbox_mode');
-        $this->query = $this->dependencies->getPlugin()->getQuery();
+        $this->query = $this->dependencies->getPlugin()->getQueryRepository();
 
         $this->setLogger();
         $this->getResource();

@@ -7,7 +7,7 @@ use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group oney
  * @group oney_repository
  *

@@ -4,7 +4,7 @@ namespace PayPlug\tests\repositories\CardRepository;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group card_repository
  *
  * @runTestsInSeparateProcesses

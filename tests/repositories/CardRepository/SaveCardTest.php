@@ -6,7 +6,7 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group card_repository
  *
  * @runTestsInSeparateProcesses
@@ -70,7 +70,7 @@ final class SaveCardTest extends BaseCardRepository
 
     public function testWhenCardAlreadyExists()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'exists' => true,
         ]);
 
@@ -79,7 +79,7 @@ final class SaveCardTest extends BaseCardRepository
 
     public function testWhenDataBaseReturnFalse()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'exists' => false,
             'set' => false,
         ]);
@@ -89,7 +89,7 @@ final class SaveCardTest extends BaseCardRepository
 
     public function testWhenCardIsSaved()
     {
-        $this->repositories['card']->shouldReceive([
+        $this->card_repository->shouldReceive([
             'exists' => false,
             'set' => true,
         ]);

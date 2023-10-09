@@ -28,7 +28,6 @@ class CardClass
     private $card;
     private $constant;
     private $dependencies;
-    private $query;
     private $sql;
 
     public function __construct($dependencies)
@@ -36,7 +35,6 @@ class CardClass
         $this->dependencies = $dependencies;
         $this->card = $this->dependencies->getPlugin()->getCard();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
-        $this->query = $this->dependencies->getPlugin()->getQuery();
         $this->sql = $this->dependencies->getPlugin()->getSql();
     }
 
@@ -51,7 +49,7 @@ class CardClass
     public function uninstallCards()
     {
         if ($this->sql->checkExistingTable($this->dependencies->name . '_card', 1)) {
-            $cards = $this->dependencies->getRepositories()['card']->getAll();
+            $cards = $this->dependencies->getPlugin()->getCardRepository()->getAll();
 
             if ($cards) {
                 foreach ($cards as $card) {

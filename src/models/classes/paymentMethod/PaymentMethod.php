@@ -379,7 +379,7 @@ class PaymentMethod
         if (!$this->translation) {
             $this->translation = $this->dependencies
                 ->getPlugin()
-                ->getTranslation()
+                ->getTranslationClass()
                 ->getPaymentMethodsTranslations();
         }
     }
@@ -405,6 +405,7 @@ class PaymentMethod
         }
 
         $payplug_countries = json_decode($this->configuration->getValue('countries'), true);
+
         if (isset($payplug_countries[$this->name])) {
             $shipping_address = $this->dependencies
                 ->getPlugin()
@@ -424,7 +425,7 @@ class PaymentMethod
         $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
         $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
         $cart_amount = $this->context->cart->getOrderTotal(true);
-        if (false === strpos('oney', $this->name)) {
+        if (false === strpos($this->name, 'oney')) {
             if (!$this->dependencies
                 ->getHelpers()['amount']
                 ->isValidAmount($price_limit, (float) $cart_amount)['result']) {

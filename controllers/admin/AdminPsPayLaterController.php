@@ -41,7 +41,7 @@ class AdminPsPayLaterController extends ModuleAdminController
         parent::__construct();
 
         $this->dependencies = new DependenciesClass();
-        $this->api_rest = $this->dependencies->getPlugin()->getApiRest();
+        $this->api_rest = $this->dependencies->getPlugin()->getApiRestClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->media = $this->dependencies->getPlugin()->getMedia();

@@ -96,39 +96,16 @@ class SQLtableRepository
             return false;
         }
 
-        // Create module Payment Cart table
-        $this->query
-            ->create()
-            ->table(_DB_PREFIX_ . $this->dependencies->name . '_payment_cart')
-            ->fields('`id_payplug_payment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
-            ->fields('`id_payment` VARCHAR(255) NOT NULL')
-            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
-            ->fields('`cart_hash` VARCHAR(64) NOT NULL')
-            ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
-            ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_)
-        ;
-
-        if (!$this->query->build()) {
-            $log->error('Installation SQL failed: ' . $this->dependencies->name . '_PAYMENT_CART.');
-
-            return false;
-        }
-
         // Create module Payment table
         $this->query
             ->create()
             ->table(_DB_PREFIX_ . $this->dependencies->name . '_payment')
             ->fields('`id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
-            ->fields('`id_payment` VARCHAR(255) NULL')
-            ->fields('`payment_method` VARCHAR(255) NULL')
-            ->fields('`payment_url` VARCHAR(255) NULL')
-            ->fields('`payment_return_url` VARCHAR(255) NULL')
+            ->fields('`resource_id` VARCHAR(255) NULL')
+            ->fields('`method` VARCHAR(255) NULL')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`cart_hash` VARCHAR(64) NULL')
-            ->fields('`authorized_at` INT(20) NOT NULL DEFAULT 0')
-            ->fields('`is_paid` TINYINT(1) NOT NULL DEFAULT 0')
-            ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
+            ->fields('`schedules` TEXT NULL')
             ->fields('`date_upd` DATETIME NULL')
             ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
             ->engine(_MYSQL_ENGINE_)
@@ -136,47 +113,6 @@ class SQLtableRepository
 
         if (!$this->query->build()) {
             $log->error('Installation SQL failed: ' . $this->dependencies->name . '_PAYMENT.');
-
-            return false;
-        }
-
-        // Create module Installment Cart table
-        $this->query
-            ->create()
-            ->table(_DB_PREFIX_ . $this->dependencies->name . '_installment_cart')
-            ->fields('`id_payplug_installment_cart` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
-            ->fields('`id_installment` VARCHAR(255) NOT NULL')
-            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
-            ->fields('`is_pending` TINYINT(1) NOT NULL DEFAULT 0')
-            ->fields('`date_upd` DATETIME NULL')
-            ->engine(_MYSQL_ENGINE_)
-        ;
-
-        if (!$this->query->build()) {
-            $log->error('Installation SQL failed: ' . $this->dependencies->name . '_INSTALLMENT_CART.');
-
-            return false;
-        }
-
-        // Create module Installment table
-        $this->query
-            ->create()
-            ->table(_DB_PREFIX_ . $this->dependencies->name . '_installment')
-            ->fields('`id_payplug_installment` int(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
-            ->fields('`id_installment` VARCHAR(255) NOT NULL')
-            ->fields('`id_payment` VARCHAR(255) NULL')
-            ->fields('`id_order` INT(11) UNSIGNED NOT NULL')
-            ->fields('`id_customer` INT(11) UNSIGNED NOT NULL')
-            ->fields('`order_total` INT(11) UNSIGNED NOT NULL')
-            ->fields('`step` VARCHAR(11) NOT NULL')
-            ->fields('`amount` INT(11) UNSIGNED NOT NULL')
-            ->fields('`status` INT(11) UNSIGNED NOT NULL')
-            ->fields('`scheduled_date` DATETIME NOT NULL')
-            ->engine(_MYSQL_ENGINE_)
-        ;
-
-        if (!$this->query->build()) {
-            $log->error('Installation SQL failed: ' . $this->dependencies->name . '_INSTALLMENT.');
 
             return false;
         }
@@ -273,10 +209,7 @@ class SQLtableRepository
 
         $tables = [
             _DB_PREFIX_ . $this->dependencies->name . '_lock',
-            _DB_PREFIX_ . $this->dependencies->name . '_payment_cart',
             _DB_PREFIX_ . $this->dependencies->name . '_payment',
-            _DB_PREFIX_ . $this->dependencies->name . '_installment',
-            _DB_PREFIX_ . $this->dependencies->name . '_installment_cart',
             _DB_PREFIX_ . $this->dependencies->name . '_logger',
             _DB_PREFIX_ . $this->dependencies->name . '_cache',
             _DB_PREFIX_ . $this->dependencies->name . '_order_payment',

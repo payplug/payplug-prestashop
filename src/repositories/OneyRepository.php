@@ -319,18 +319,6 @@ class OneyRepository extends BaseClass
     }
 
     /**
-     * @description Delete basic configuration
-     *
-     * @return bool
-     */
-    public function deleteOneyConfig()
-    {
-        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
-
-        return $configuration->delete('oney_allowed_countries');
-    }
-
-    /**
      * @description Display Oney popin template
      *
      * @return mixed
@@ -1267,7 +1255,7 @@ class OneyRepository extends BaseClass
 
         $is_elligible = $this->validators['payment']->isOneyElligible(
             $is_valid_cart['result'],
-            $country ? $is_valid_addresses['result'] : true,
+            $country ? $is_valid_addresses : true,
             $is_valid_amount['result']
         );
 
@@ -1345,7 +1333,7 @@ class OneyRepository extends BaseClass
             ->configClass
             ->getIsoCodeByCountryId((int) $billing->id_country);
 
-        return $this->isValidOneyCountry($shipping_iso_code, $billing_iso_code);
+        return $shipping_iso_code == $billing_iso_code;
     }
 
     /**
@@ -1406,70 +1394,6 @@ class OneyRepository extends BaseClass
             return [
                 'result' => false,
                 'error' => $this->dependencies->l($error, 'oneyrepository'),
-            ];
-        }
-
-        return ['result' => true, 'error' => false];
-    }
-
-    /**
-     * @description Check if billing and shipping addresses are valid
-     *
-     * @param string $shipping_iso
-     * @param string $billing_iso
-     *
-     * @return array
-     */
-    public function isValidOneyCountry($shipping_iso, $billing_iso)
-    {
-        // Check if the billing country and the shipping country are different then return false
-        $is_valid_country = $this->validators['payment']->isOneyCountry($shipping_iso, $billing_iso);
-        if (!$is_valid_country['result']) {
-            $error = 'Delivery and billing addresses must be in the same country to pay with Oney.';
-
-            return [
-                'result' => false,
-                'type' => 'different',
-                'error' => $this->dependencies->l($error, 'oneyrepository'),
-            ];
-        }
-
-        // Check if the allowed list is valid
-        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
-        $allow_countries = $this->toolsAdapter->tool('strtoupper', $configuration->getValue('oney_allowed_countries'));
-        if (!$allow_countries) {
-            return [
-                'result' => false,
-                'type' => 'no_country',
-                'error' => $this->dependencies->l('No countries are configured to use oney.', 'oneyrepository'),
-            ];
-        }
-
-        // Check if the shipping country is allowed
-        $iso_code = $this->toolsAdapter->tool('strtoupper', $shipping_iso);
-        $is_allowed_country = $this->validators['payment']->isAllowedCountry($allow_countries, $iso_code);
-        if (!$is_allowed_country['result']) {
-            $iso_list = explode(',', $allow_countries);
-            /*
-             * We first used Prestashop country list but translation was not ok so we had to write countries
-             * directly in the code. Maybe later it will be ok and dynamic.
-             */
-            $str_list = $this->dependencies->l('France, Martinique, Guadeloupe, La Reunion, Mayotte or French Guiana', 'oneyrepository');
-            if (in_array('IT', $iso_list)) {
-                $str_list = $this->dependencies->l('Italy', 'oneyrepository');
-            }
-            if (in_array('BE', $iso_list)) {
-                $str_list = $this->dependencies->l('Belgium', 'oneyrepository');
-            }
-            if (in_array('ES', $iso_list)) {
-                $str_list = $this->dependencies->l('Spain', 'oneyrepository');
-            }
-
-            return [
-                'result' => false,
-                'type' => 'invalid',
-                'error' => $this->dependencies->l('For a payment with Oney, delivery and billing addresses must be in', 'oneyrepository') . ' ' .
-                $str_list,
             ];
         }
 

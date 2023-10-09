@@ -27,31 +27,8 @@ class BaseOneyRepository extends RepositoryBase
                 switch ($key) {
                     case 'PS_CURRENCY_DEFAULT':
                         return 1;
-
-                    case 'PAYPLUG_ONEY_MIN_AMOUNTS':
-                        return 'EUR:10000';
-
-                    case 'PAYPLUG_ONEY_MAX_AMOUNTS':
-                        return 'EUR:300000';
-
-                    case 'PAYPLUG_ONEY_CUSTOM_MIN_AMOUNTS':
-                        return 'EUR:100';
-
-                    case 'PAYPLUG_ONEY_CUSTOM_MAX_AMOUNTS':
-                        return 'EUR:3000';
-
                     case 'PS_SHOP_NAME':
                         return 'Payplug';
-
-                    case 'PAYPLUG_ONEY_ALLOWED_COUNTRIES':
-                        return 'FR';
-
-                    case 'PAYPLUG_ONEY_FEES':
-                        return true;
-
-                    case 'PAYPLUG_SANDBOX_MODE':
-                        return false;
-
                     default:
                         return true;
                 }

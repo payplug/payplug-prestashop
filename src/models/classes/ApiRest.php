@@ -196,10 +196,12 @@ class ApiRest
      */
     public function getFooterSection()
     {
-        $translation = $this->dependencies->getPlugin()
-            ->getTranslation()
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
             ->getFooterTranslations();
-        $context = $this->dependencies->getPlugin()
+        $context = $this->dependencies
+            ->getPlugin()
             ->getContext()
             ->get();
 
@@ -236,7 +238,7 @@ class ApiRest
 
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getHeaderTranslations();
 
         $configuration = $this->dependencies
@@ -309,7 +311,7 @@ class ApiRest
 
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getLoggedTranslations();
 
         $context = $this->dependencies->getPlugin()
@@ -432,7 +434,7 @@ class ApiRest
     {
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getLoginTranslations();
 
         return [
@@ -499,7 +501,7 @@ class ApiRest
 
         return $this->dependencies
             ->getPlugin()
-            ->getPaymentMethod()
+            ->getPaymentMethodClass()
             ->getPaymentMethod('oney')
             ->getOption($current_configuration);
     }
@@ -523,7 +525,7 @@ class ApiRest
 
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getPaymentMethodsTranslations();
 
         $configuration = $this->dependencies
@@ -552,7 +554,7 @@ class ApiRest
 
         $payment_options = $this->dependencies
             ->getPlugin()
-            ->getPaymentMethod()
+            ->getPaymentMethodClass()
             ->getOptionCollection($current_configuration);
         unset($payment_options['oney']);
 
@@ -582,7 +584,10 @@ class ApiRest
      */
     public function getRequirementsSection()
     {
-        $translation = $this->dependencies->getPlugin()->getTranslation()->getRequirementsTranslations();
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getRequirementsTranslations();
 
         $requirements_reports = $this->dependencies->configClass->getReportRequirements();
 
@@ -695,7 +700,7 @@ class ApiRest
     {
         $translation = $this->dependencies
             ->getPlugin()
-            ->getTranslation()
+            ->getTranslationClass()
             ->getSubscribeTranslations();
 
         $register_link = $this->dependencies

@@ -100,7 +100,7 @@ class PaymentRepository extends BaseClass
 
         // For optimised / non optimised Oney + 3x / 4x to have a good hash ;-)
         if (isset($paymentDetails['oneyDetails'])) {
-            $paymentDetails['paymentMethod'] .= $paymentDetails['oneyDetails'];
+            $paymentDetails['method'] .= $paymentDetails['oneyDetails'];
         }
 
         // Adding cart informationObjectModel
@@ -113,7 +113,7 @@ class PaymentRepository extends BaseClass
         // Adding cart amount to hash
         $cartToHash[] = 'Cart amount: ' . (float) $paymentDetails['cart']->getOrderTotal(true);
 
-        return hash('sha256', $paymentDetails['paymentMethod'] . json_encode($cartToHash));
+        return hash('sha256', $paymentDetails['method'] . json_encode($cartToHash));
     }
 
     /**
@@ -138,8 +138,7 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $paymentStored = $this->dependencies
-            ->getRepositories()['payment']
+        $paymentStored = $this->dependencies->getPlugin()->getPaymentRepository()
             ->getByCart((int) $paymentDetails['cartId']);
 
         if (empty($paymentStored)) {
@@ -256,12 +255,12 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        if (!isset($paymentDetails['paymentMethod'])
-            || !is_string($paymentDetails['paymentMethod'])
-            || !$paymentDetails['paymentMethod']) {
+        if (!isset($paymentDetails['method'])
+            || !is_string($paymentDetails['method'])
+            || !$paymentDetails['method']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[createPayment] Invalid parameters given, $paymentDetails[paymentMethod] must be a non empty string'
+                '[createPayment] Invalid parameters given, $paymentDetails[method] must be a non empty string'
             );
         }
 
@@ -291,7 +290,7 @@ class PaymentRepository extends BaseClass
         ];
         $database_payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
         foreach ($payment_methods as $config_key => $payment_method) {
-            if ($payment_method == $paymentDetails['paymentMethod'] && !$database_payment_methods[$config_key]) {
+            if ($payment_method == $paymentDetails['method'] && !$database_payment_methods[$config_key]) {
                 return $this->returnPaymentError(
                     [
                         'name' => 'Configuration::get',
@@ -305,18 +304,19 @@ class PaymentRepository extends BaseClass
         // Before create a new payment, delete the previous one, if exists and it's not a oneclick payment
         // to avoid double order creation
         $apiPayment = $this->dependencies
-            ->getRepositories()['payment']
+            ->getPlugin()
+            ->getPaymentRepository()
             ->getByCart((int) $paymentDetails['cartId']);
         if (!empty($apiPayment)) {
-            $is_cancellable = $this->validators['payment']->isCancellable($apiPayment['payment_method']);
+            $is_cancellable = $this->validators['payment']->isCancellable($apiPayment['method']);
             if ($is_cancellable['result']) {
-                $payment = $this->dependencies->apiClass->retrievePayment($apiPayment['id_payment']);
+                $payment = $this->dependencies->apiClass->retrievePayment($apiPayment['resource_id']);
                 if ($payment['result'] && !$payment['resource']->failure) {
-                    $this->logger->addLog('Payment already exists: ' . $apiPayment['id_payment'] . ', so we delete it before create a new one');
-                    $abort = $this->dependencies->apiClass->abortPayment($apiPayment['id_payment']);
+                    $this->logger->addLog('Payment already exists: ' . $apiPayment['resource_id'] . ', so we delete it before create a new one');
+                    $abort = $this->dependencies->apiClass->abortPayment($apiPayment['resource_id']);
                     if (!$abort['result']) {
                         return $this->returnPaymentError(
-                            ['name' => 'paymentId', 'value' => $apiPayment['id_payment']],
+                            ['name' => 'resource_id', 'value' => $apiPayment['resource_id']],
                             '[createPayment] Exception. Unable to abort payment. Error: ' . $abort['message']
                         );
                     }
@@ -326,7 +326,7 @@ class PaymentRepository extends BaseClass
             }
         }
 
-        if ('installment' !== $paymentDetails['paymentMethod']) {
+        if ('installment' !== $paymentDetails['method']) {
             $payment = $this->dependencies->apiClass->createPayment($paymentDetails['paymentTab']);
 
             if (!$payment['result']) {
@@ -334,7 +334,7 @@ class PaymentRepository extends BaseClass
                 if (403 == (int) $payment['code']) {
                     $cart = $this->dependencies->getPlugin()->getCart()->get((int) $paymentDetails['cartId']);
                     $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
-                    $this->dependencies->getPlugin()->getPaymentMethod()->resetPaymentMethodFromPermission($permissions);
+                    $this->dependencies->getPlugin()->getPaymentMethodClass()->resetPaymentMethodFromPermission($permissions);
                     $paymentDetails['error_code'] = (int) $payment['code'];
                 }
 
@@ -362,7 +362,7 @@ class PaymentRepository extends BaseClass
                 if (403 == (int) $payment['code']) {
                     $cart = $this->dependencies->getPlugin()->getCart()->get((int) $paymentDetails['cartId']);
                     $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
-                    $this->dependencies->getPlugin()->getPaymentMethod()->resetPaymentMethodFromPermission($permissions);
+                    $this->dependencies->getPlugin()->getPaymentMethodClass()->resetPaymentMethodFromPermission($permissions);
                 }
 
                 // If the payment resource can not be created due to bad credential, we log out the merchand
@@ -393,9 +393,9 @@ class PaymentRepository extends BaseClass
         }
 
         // We can now hydrate our params
-        $paymentDetails['paymentId'] = $this->apiPayment->id;
+        $paymentDetails['resource_id'] = $this->apiPayment->id;
 
-        if (isset($paymentDetails['paymentTab']['integration']) || 'apple_pay' == $paymentDetails['paymentMethod']) {
+        if (isset($paymentDetails['paymentTab']['integration']) || 'apple_pay' == $paymentDetails['method']) {
             $paymentDetails['paymentReturnUrl'] = $paymentDetails['paymentTab']['hosted_payment']['return_url'];
         } elseif (isset($this->apiPayment->hosted_payment->return_url)) {
             $paymentDetails['paymentReturnUrl'] = $this->apiPayment->hosted_payment->return_url;
@@ -410,7 +410,7 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        if (('installment' !== $paymentDetails['paymentMethod']) && (null !== $this->apiPayment->authorization)) {
+        if (('installment' !== $paymentDetails['method']) && (null !== $this->apiPayment->authorization)) {
             if (null !== $this->apiPayment->authorization->authorized_at) {
                 $paymentDetails['authorizedAt'] = $this->apiPayment->authorization->authorized_at;
             }
@@ -452,8 +452,6 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $paymentDate = date('Y-m-d H:i:s');
-
         $cartHash = $this->getHashedCart($paymentDetails);
 
         if (isset($cartHash['result']) && !$cartHash['result']) {
@@ -470,32 +468,22 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $table = $this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment';
+        $parameters = [
+            'resource_id' => $paymentDetails['resource_id'],
+            'method' => $paymentDetails['method'],
+            'cart_hash' => $cartHash,
+            'date_upd' => date('Y-m-d H:i:s'),
+        ];
 
-        $this->query
-            ->update()
-            ->table($table)
-            ->set('id_payment =         "' . $this->query->escape($paymentDetails['paymentId']) . '"')
-            ->set('payment_method =     "' . $this->query->escape($paymentDetails['paymentMethod']) . '"')
-            ->set('payment_url =        "' . $this->query->escape($paymentDetails['paymentUrl']) . '"')
-            ->set('payment_return_url = "' . $this->query->escape($paymentDetails['paymentReturnUrl']) . '"')
-            ->set('cart_hash =          "' . $this->query->escape($cartHash) . '"')
-            ->set('authorized_at =      "' . $this->query->escape($paymentDetails['authorizedAt']) . '"')
-            ->set('is_paid =            "' . $this->query->escape($paymentDetails['isPaid']) . '"')
-            ->set('date_upd =           "' . $this->query->escape($paymentDate) . '"')
-            ->where('id_cart =          ' . (int) $paymentDetails['cartId']);
+        $update = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->updateByCart((int) $paymentDetails['cartId'], $parameters);
 
-        try {
-            if (!$this->query->build()) {
-                return $this->returnPaymentError(
-                    ['name' => 'paymentDetails', 'value' => $this->query],
-                    '[updatePaymentTable] Unable to fetch the query on DB but no throw'
-                );
-            }
-        } catch (Exception $e) {
+        if (!$update) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[updatePaymentTable] Unable to fetch the query on DB. Error: ' . $e->getMessage()
+                '[updatePaymentTable] Unable to fetch the query on DB but no throw'
             );
         }
 
@@ -523,7 +511,8 @@ class PaymentRepository extends BaseClass
         }
 
         $payment = $this->dependencies
-            ->getRepositories()['payment']
+            ->getPlugin()
+            ->getPaymentRepository()
             ->getByCart((int) $idCart);
         if (empty($payment)) {
             return true;
@@ -552,7 +541,8 @@ class PaymentRepository extends BaseClass
         }
 
         $paymentStored = $this->dependencies
-            ->getRepositories()['payment']
+            ->getPlugin()
+            ->getPaymentRepository()
             ->getByCart((int) $paymentDetails['cartId']);
         if (!$paymentStored) {
             return $this->returnPaymentError(
@@ -561,32 +551,32 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $keys_to_check = [
-            'paymentUrl',
-            'paymentReturnUrl',
-            'authorizedAt',
-            'isPaid',
-        ];
-        foreach ($keys_to_check as $key) {
-            if (!isset($paymentDetails[$key]) || !$paymentDetails[$key]) {
-                $key_from_stored = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
-                $paymentDetails[$key] = $paymentStored[$key_from_stored];
-            }
+        if ('installment' == $paymentStored['method']) {
+            $retrievedPayment = $this->dependencies->apiClass->retrieveInstallment($paymentStored['resource_id']);
+        } else {
+            $retrievedPayment = $this->dependencies->apiClass->retrievePayment($paymentStored['resource_id']);
+        }
+        if (!$retrievedPayment['result']) {
+            return $this->returnPaymentError(
+                ['name' => 'paymentStored', 'value' => false],
+                '[getPaymentReturnUrl] Can not retrieve payment related to given cart id'
+            );
         }
 
-        switch ($paymentDetails['paymentMethod']) {
+        switch ($paymentDetails['method']) {
             case 'oneclick':
-                $redirect = $paymentDetails['isPaid'];
+                $redirect = $retrievedPayment['resource']->is_paid;
                 if (!$redirect && $paymentDetails['isDeferred']) {
-                    $redirect = (bool) $paymentDetails['authorizedAt'];
+                    $redirect = (bool) isset($retrievedPayment['resource']->authorization)
+                        && $retrievedPayment['resource']->authorization->authorized_at;
                 }
 
                 $paymentReturnUrl = [
                     'result' => true,
                     'embedded' => true,
                     'redirect' => $redirect, // force `true` we are in 3DS 1
-                    'return_url' => $redirect ?
-                        $paymentDetails['paymentReturnUrl'] : $paymentDetails['paymentUrl'],
+                    'return_url' => $redirect ? $retrievedPayment['resource']->hosted_payment->return_url
+                        : $retrievedPayment['resource']->hosted_payment->payment_url,
                 ];
 
                 break;
@@ -596,7 +586,7 @@ class PaymentRepository extends BaseClass
                     'result' => 'new_card',
                     'embedded' => false,
                     'redirect' => true,
-                    'return_url' => $paymentDetails['paymentUrl'],
+                    'return_url' => $retrievedPayment['resource']->hosted_payment->payment_url,
                 ];
 
                 break;
@@ -612,14 +602,15 @@ class PaymentRepository extends BaseClass
             case 'satispay':
             case 'sofort':
             case 'standard':
-                $returnUrl = $paymentDetails['paymentUrl']
-                    ? $paymentDetails['paymentUrl']
-                    : $paymentDetails['paymentReturnUrl'];
+                $returnUrl = $retrievedPayment['resource']->hosted_payment
+                    ? $retrievedPayment['resource']->hosted_payment->payment_url
+                        ?: $retrievedPayment['resource']->hosted_payment->return_url
+                    : '';
                 $paymentReturnUrl = [
                     'result' => 'new_card',
                     'embedded' => $paymentDetails['isEmbedded']
                         && !$paymentDetails['isMobileDevice']
-                        && !in_array($paymentDetails['paymentMethod'], [
+                        && !in_array($paymentDetails['method'], [
                             'bancontact',
                             'giropay',
                             'ideal',
@@ -631,7 +622,7 @@ class PaymentRepository extends BaseClass
                     'return_url' => $returnUrl,
                 ];
                 if ($paymentDetails['isIntegrated']) {
-                    $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
+                    $paymentReturnUrl['resource_id'] = $paymentDetails['resource_id'];
                     $paymentReturnUrl['cart_id'] = $paymentDetails['cartId'];
                 }
 
@@ -644,7 +635,7 @@ class PaymentRepository extends BaseClass
                 );
         }
         if ($paymentDetails['isIntegrated']) {
-            $paymentReturnUrl['payment_id'] = $paymentDetails['paymentId'];
+            $paymentReturnUrl['payment_id'] = $paymentDetails['resource_id'];
         }
 
         return [
@@ -652,30 +643,6 @@ class PaymentRepository extends BaseClass
             'url' => $paymentReturnUrl,
             'response' => 'Return URL successfully generated',
         ];
-    }
-
-    /**
-     * @description  get payment id
-     *
-     * @param $idCart
-     *
-     * @return array
-     */
-    public function getPayment($idCart)
-    {
-        if (!$idCart || !is_int($idCart)) {
-            return $this->returnPaymentError(
-                ['name' => 'idCart', 'value' => $idCart],
-                '[getPayment] $cart id  is not valid'
-            );
-        }
-        $this->query
-            ->select()
-            ->fields('id_payment')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->where('id_cart = ' . (int) $idCart);
-
-        return $this->query->build('unique_value');
     }
 
     /**
@@ -689,12 +656,12 @@ class PaymentRepository extends BaseClass
     {
         if (!$paymentDetails
             || !is_array($paymentDetails)
-            || !isset($paymentDetails['paymentId'])
-            || !$paymentDetails['paymentId']
+            || !isset($paymentDetails['resource_id'])
+            || !$paymentDetails['resource_id']
         ) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[insertPaymentTable] $paymentDetail or paymentId is null, or $paymentDetail is not an array'
+                '[insertPaymentTable] $paymentDetail or resource_id is null, or $paymentDetail is not an array'
             );
         }
 
@@ -708,45 +675,35 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        $paymentExist = $this->getPayment((int) $paymentDetails['cartId']);
-        if (isset($paymentExist['result']) && !$paymentExist['result']) {
-            return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[insertPaymentTable] Problem with the getpayment method.'
-            );
-        }
-        if ($paymentExist) {
+        $paymentExist = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByCart((int) $paymentDetails['cartId']);
+
+        if (!empty($paymentExist)) {
             $this->dependencies
-                ->getRepositories()['payment']
+                ->getPlugin()
+                ->getPaymentRepository()
                 ->remove((int) $paymentDetails['cartId']);
         }
-        $this->query
-            ->insert()
-            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_payment')
-            ->fields('id_payment')->values($this->query->escape($paymentDetails['paymentId']))
-            ->fields('payment_method')->values($this->query->escape($paymentDetails['paymentMethod']))
-            ->fields('payment_return_url')->values($this->query->escape($paymentDetails['paymentReturnUrl']))
-            ->fields('id_cart')->values((int) $paymentDetails['cartId'])
-            ->fields('cart_hash')->values($this->query->escape($cartHash))
-            ->fields('authorized_at')->values((int) $paymentDetails['authorizedAt'])
-            ->fields('is_paid')->values((int) $paymentDetails['isPaid'])
-            ->fields('date_upd')->values($this->query->escape($paymentDate));
 
-        if ('' != $paymentDetails['paymentUrl']) {
-            $this->query->fields('payment_url')->values($this->query->escape($paymentDetails['paymentUrl']));
-        }
+        $parameters = [
+            'resource_id' => $paymentDetails['resource_id'],
+            'method' => $paymentDetails['method'],
+            'id_cart' => (int) $paymentDetails['cartId'],
+            'cart_hash' => $cartHash,
+            'date_upd' => $paymentDate,
+        ];
 
-        try {
-            if (!$this->query->build()) {
-                return $this->returnPaymentError(
-                    ['name' => 'DB Query', 'value' => $this->query],
-                    '[insertPaymentCart] Unable to flush DB (build method)'
-                );
-            }
-        } catch (Exception $e) {
+        $create_payment = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->createPayment($parameters);
+
+        if (!$create_payment) {
             return $this->returnPaymentError(
-                ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[insertPaymentTable] Error: ' . $e->getMessage()
+                ['name' => 'DB Query', 'value' => $this->query],
+                '[insertPaymentCart] Unable to flush DB (build method)'
             );
         }
 
@@ -782,7 +739,8 @@ class PaymentRepository extends BaseClass
         }
 
         $storedPayment = $this->dependencies
-            ->getRepositories()['payment']
+            ->getPlugin()
+            ->getPaymentRepository()
             ->getByCart((int) $paymentDetails['cartId']);
         if (empty($storedPayment)) {
             return $this->returnPaymentError(
@@ -791,35 +749,35 @@ class PaymentRepository extends BaseClass
             );
         }
 
-        if (!isset($storedPayment['payment_method']) || !$storedPayment['payment_method']) {
+        if (!isset($storedPayment['method']) || !$storedPayment['method']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
                 '[isValidApiPayment] Invalid stored payment getted, payment_method is not given'
             );
         }
 
-        if (!isset($storedPayment['id_payment']) || !$storedPayment['id_payment']) {
+        if (!isset($storedPayment['resource_id']) || !$storedPayment['resource_id']) {
             return $this->returnPaymentError(
                 ['name' => 'paymentDetails', 'value' => $paymentDetails],
-                '[isValidApiPayment] Invalid stored payment getted, id_payment is not given'
+                '[isValidApiPayment] Invalid stored payment getted, resource_id is not given'
             );
         }
 
-        if ('installment' == $storedPayment['payment_method']) {
-            $installment = $this->dependencies->apiClass->retrieveInstallment($storedPayment['id_payment']);
+        if ('installment' == $storedPayment['method']) {
+            $installment = $this->dependencies->apiClass->retrieveInstallment($storedPayment['resource_id']);
             if (!$installment['result']) {
                 return $this->returnPaymentError(
                     ['name' => 'storedPayment', 'value' => $storedPayment],
-                    '[isValidApiPayment] Cannot retrieve payment with id: ' . $storedPayment['id_payment']
+                    '[isValidApiPayment] Cannot retrieve payment with id: ' . $storedPayment['resource_id']
                 );
             }
             $installment = $installment['resource'];
             $firstSchedule = $installment->schedule[0]->payment_ids;
             // Try to see if the first schedule was cancelled
-            $storedPayment['id_payment'] = end($firstSchedule);
+            $storedPayment['resource_id'] = end($firstSchedule);
         }
 
-        $retrievedPayment = $this->dependencies->apiClass->retrievePayment($storedPayment['id_payment']);
+        $retrievedPayment = $this->dependencies->apiClass->retrievePayment($storedPayment['resource_id']);
         if (!$retrievedPayment['result']
             || (
                 isset($retrievedPayment['resource']->failure->code)

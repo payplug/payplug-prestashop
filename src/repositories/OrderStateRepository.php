@@ -149,12 +149,18 @@ class OrderStateRepository extends BaseClass
 
         // Get order state id with given template
         if (!$id_order_state && !$sandbox && isset($state['template']) && $state['template']) {
-            $id_order_state = $this->getOrderStateByTemplate($state['template']);
+            $id_order_state = $this->dependencies
+                ->getPlugin()
+                ->getOrderStateRepository()
+                ->getOrderStateByTemplate($state['template']);
         }
 
         // Get order state id with given name
         if (!$id_order_state && isset($state['name']) && $state['name']) {
-            $id_order_state = $this->findByName($state['name'], $sandbox);
+            $id_order_state = $this->dependencies
+                ->getPlugin()
+                ->getOrderStateRepository()
+                ->getByName($state['name'], $sandbox);
         }
 
         // Create order state if no id order state found
@@ -172,61 +178,9 @@ class OrderStateRepository extends BaseClass
         return $this->configuration->set($key_config, (int) $id_order_state);
     }
 
-    /**
-     * @param int $id_order_state
-     *
-     * @return bool
-     */
-    public function deleteType($id_order_state)
-    {
-        // FIXME: from php7, psr12 requires return type
-
-        if (!$id_order_state || !is_int($id_order_state)) {
-            return false;
-        }
-        $this->query
-            ->delete()
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->where('id_order_state = ' . (int) $id_order_state)
-            ->build()
-        ;
-
-        return true;
-    }
-
     public static function factory()
     {
         return new OrderStateRepository();
-    }
-
-    /**
-     * Find id_order_state by name.
-     *
-     * @param array $name
-     * @param bool  $test_mode
-     *
-     * @return int OR bool
-     */
-    public function findByName($name, $test_mode = false)
-    {
-        if (!is_array($name) || empty($name)) {
-            return false;
-        }
-        $this->query
-            ->select()
-            ->fields('DISTINCT osl.`id_order_state`')
-            ->from(_DB_PREFIX_ . 'order_state_lang', 'osl')
-            ->leftJoin(_DB_PREFIX_ . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
-            ->where('osl.`name` LIKE \'' . $this->query->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
-            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
-            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
-            ->whereOr('osl.`name` LIKE \'' . $this->query->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')));
-
-        if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
-            $this->query->where('os.`deleted` = 0');
-        }
-
-        return $this->query->build('unique_value');
     }
 
     public function getConfigKey($name = false, $sandbox = false)
@@ -241,137 +195,43 @@ class OrderStateRepository extends BaseClass
                     . ($sandbox ? '_TEST' : '');
     }
 
-    public function getIdByDefinition($definition)
-    {
-        if (!isset($definition['template'])
-            || !isset($definition['invoice'])
-            || !isset($definition['send_email'])
-            || !isset($definition['hidden'])
-            || !isset($definition['logable'])
-            || !isset($definition['delivery'])
-            || !isset($definition['shipped'])
-            || !isset($definition['paid'])
-            || !isset($definition['pdf_invoice'])
-            || !isset($definition['pdf_delivery'])
-        ) {
-            return false;
-        }
-        $this->query
-            ->select()
-            ->fields('os.id_order_state')
-            ->from(_DB_PREFIX_ . 'order_state', 'os')
-            ->leftJoin(
-                _DB_PREFIX_ . 'order_state_lang',
-                'osl',
-                'osl.id_order_state = os.id_order_state 
-                     AND osl.template = \'' . pSQL($definition['template']) . '\''
-            )
-            ->where('os.invoice = ' . (int) $definition['invoice'])
-            ->where('os.send_email = ' . (int) $definition['send_email'])
-            ->where('os.hidden = ' . (int) $definition['hidden'])
-            ->where('os.logable = ' . (int) $definition['logable'])
-            ->where('os.delivery = ' . (int) $definition['delivery'])
-            ->where('os.shipped = ' . (int) $definition['shipped'])
-            ->where('os.paid = ' . (int) $definition['paid'])
-            ->where('os.pdf_invoice = ' . (int) $definition['pdf_invoice'])
-            ->where('os.pdf_delivery = ' . (int) $definition['pdf_delivery'])
-            ->limit(1, 1)
-        ;
-
-        return (int) $this->query->build('unique_value');
-    }
-
-    public function getIdsByModuleName($module_name)
+    public function isUsedByOrders($module_name = '')
     {
         $ids = [];
-        $res = $this->query
-            ->select()
-            ->fields('os.id_order_state')
-            ->from(_DB_PREFIX_ . 'order_state', 'os')
-            ->where('os.module_name = \'' . $this->query->escape($module_name) . '\'')
-            ->build()
-        ;
 
-        foreach ($res as $os) {
-            array_push($ids, (int) $os['id_order_state']);
+        if (!is_string($module_name) || !$module_name) {
+            return $ids;
         }
 
-        return $ids;
-    }
+        $order_states = [];
+        $module_orders = $this->dependencies
+            ->getPlugin()
+            ->getOrderRepository()
+            ->getByModule($module_name);
 
-    public function getIdsUsedByPayPlug()
-    {
-        $ids = [];
-        $res = $this->query
-            ->select()
-            ->fields('c.value')
-            ->from(_DB_PREFIX_ . 'configuration', 'c')
-            ->where('c.name LIKE \'%' . $this->tools->tool('strtoupper', $this->dependencies->name) . '_ORDER_STATE_%\'')
-            ->build()
-        ;
-
-        foreach ($res as $os) {
-            array_push($ids, (int) $os['value']);
+        if (empty($module_orders)) {
+            return $ids;
         }
 
-        return $ids;
-    }
-
-    public function getOrderStateByTemplate($template = false)
-    {
-        if (!is_string($template) || !$template) {
-            return false;
+        foreach ($module_orders as $module_order) {
+            array_push($order_states, (int) $module_order['current_state']);
         }
 
-        $this->query
-            ->select()
-            ->fields('DISTINCT `id_order_state`')
-            ->from($this->constant->get('_DB_PREFIX_') . 'order_state_lang')
-            ->where('template = "' . $this->query->escape($template) . '"')
-            ->limit(1, 1)
-        ;
-
-        return $this->query->build('unique_value');
-    }
-
-    public function getType($id_order_state)
-    {
-        return $this->query
-            ->select()
-            ->fields('type')
-            ->from($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->where('id_order_state = ' . (int) $id_order_state)
-            ->build('unique_value')
-        ;
-    }
-
-    public function isUsedByOrders($module_name)
-    {
-        $ids = [];
-        $res = $this->query
-            ->select()
-            ->fields('o.current_state')
-            ->from(_DB_PREFIX_ . 'orders', 'o')
-            ->where('o.module = \'' . $this->query->escape($module_name) . '\'')
-            ->groupBy('o.current_state')
-            ->build()
-        ;
-
-        foreach ($res as $os) {
-            if ($os) {
-                array_push($ids, (int) $os['current_state']);
-            }
-        }
-
-        return $ids;
+        return array_unique($order_states);
     }
 
     public function removeIdsUnusedByPayPlug()
     {
         $deleted = true;
-        $payplug_os_id_list = $this->getIdsByModuleName($this->dependencies->name);
+        $payplug_os_id_list = $this->dependencies
+            ->getPlugin()
+            ->getOrderStateRepository()
+            ->getIdsByModuleName($this->dependencies->name);
         $used_order_os_id_list = $this->isUsedByOrders($this->dependencies->name);
-        $used_os_id_list = $this->getIdsUsedByPayPlug();
+        $used_os_id_list = $this->dependencies
+            ->getPlugin()
+            ->getOrderStateRepository()
+            ->getIdsUsedByPayPlug();
         foreach ($payplug_os_id_list as $payplug_os_id) {
             if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
                 $os = new OrderStateAdapter($payplug_os_id);
@@ -392,38 +252,21 @@ class OrderStateRepository extends BaseClass
             return false;
         }
 
-        if ($this->getType($id_order_state)) {
-            return $this->updateType($id_order_state, $type);
+        $exists = $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->getTypeByIdOrderState($id_order_state);
+
+        if ($exists) {
+            return $this->dependencies
+                ->getPlugin()
+                ->getPayplugOrderStateRepository()
+                ->updateByOderState($id_order_state, $type);
         }
 
-        return $this->setType($id_order_state, $type);
-    }
-
-    public function setType($id_order_state, $type)
-    {
-        $date = date('Y-m-d');
-        $this->query
-            ->insert()
-            ->into($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->fields('id_order_state')->values(pSQL($id_order_state))
-            ->fields('type')->values(pSQL($type))
-            ->fields('date_add')->values($date)
-            ->fields('date_upd')->values($date);
-
-        return $this->query->build();
-    }
-
-    public function updateType($id_order_state, $type)
-    {
-        $date = date('Y-m-d');
-        $this->query
-            ->update()
-            ->table($this->constant->get('_DB_PREFIX_') . $this->dependencies->name . '_order_state')
-            ->set('type = \'' . $this->query->escape($type) . '\'')
-            ->set('date_upd = \'' . $this->query->escape($date) . '\'')
-            ->where('id_order_state = ' . (int) $id_order_state)
-        ;
-
-        return $this->query->build();
+        return $this->dependencies
+            ->getPlugin()
+            ->getPayplugOrderStateRepository()
+            ->setOrderState($id_order_state, $type);
     }
 }

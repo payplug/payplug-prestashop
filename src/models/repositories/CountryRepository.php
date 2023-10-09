@@ -25,6 +25,12 @@ namespace PayPlug\src\models\repositories;
 
 class CountryRepository extends QueryRepository
 {
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . 'country';
+    }
+
     /**
      * @description Get Iso Code from a given country id
      *
@@ -41,10 +47,10 @@ class CountryRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('iso_code')
-            ->from($this->prefix . 'country')
+            ->from($this->table_name)
             ->where('id_country = ' . (int) $id_country)
             ->build('unique_value');
 
-        return $result ? $result : '';
+        return $result ?: '';
     }
 }

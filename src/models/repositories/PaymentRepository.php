@@ -25,6 +25,98 @@ namespace PayPlug\src\models\repositories;
 
 class PaymentRepository extends QueryRepository
 {
+    private $fields = [
+        'resource_id' => 'string',
+        'method' => 'string',
+        'id_cart' => 'integer',
+        'cart_hash' => 'string',
+        'schedules' => 'string',
+        'date_upd' => 'string',
+    ];
+
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . $this->dependencies->name . '_payment';
+    }
+
+    /**
+     * @description Create a payment from given parameters
+     *
+     * @param array $parameters
+     *
+     * @return bool
+     */
+    public function createPayment($parameters = [])
+    {
+        if (!is_array($parameters) || empty($parameters)) {
+            return false;
+        }
+
+        $this
+            ->insert()
+            ->into($this->table_name);
+
+        foreach ($parameters as $key => $value) {
+            if (array_key_exists($key, $this->fields)) {
+                switch ($this->fields[$key]) {
+                    case 'string':
+                        if (is_string($value) && $value) {
+                            $this->fields($key)->values($this->escape($value));
+                        }
+
+                        break;
+                    case 'integer':
+                        if (is_int($value)) {
+                            $this->fields($key)->values((int) $value);
+                        }
+
+                        break;
+                    case 'bool':
+                        if (is_bool($value)) {
+                            $this->fields($key)->values(($value ? 1 : 0));
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return (bool) $this->build();
+    }
+
+    /**
+     * @description Get all payments for a given method name.
+     *
+     * @param string $method_name
+     * @param bool   $asc
+     *
+     * @return array
+     */
+    public function getAllByMethod($method_name = '', $asc = false)
+    {
+        if (!is_string($method_name) || !$method_name) {
+            return [];
+        }
+        if (!is_bool($asc)) {
+            return [];
+        }
+
+        $query = $this
+            ->select()
+            ->fields('*')
+            ->from($this->table_name)
+            ->where('`method` = "' . $this->escape($method_name) . '"');
+
+        if ($asc) {
+            $query->orderBy('`id_payplug_payment` DESC');
+        }
+
+        return $query->build() ?: [];
+    }
+
     /**
      * @description Get payment id from given cart id
      *
@@ -32,43 +124,65 @@ class PaymentRepository extends QueryRepository
      *
      * @return array
      */
-    public function getByCart($cart_id = '')
+    public function getByCart($cart_id = 0)
     {
         if (!is_int($cart_id) || !$cart_id) {
             return [];
         }
-
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->module_name . '_payment')
+            ->from($this->table_name)
             ->where('id_cart = ' . (int) $cart_id)
             ->build('unique_row');
 
-        return $result ? $result : [];
+        return $result ?: [];
     }
 
     /**
-     * @description Get cart id from given payment id
+     * @description Get a payment for a given id.
      *
-     * @param string $pay_id
+     * @param int $id
      *
      * @return array
      */
-    public function getByIdPayment($pay_id = '')
+    public function getById($id = 0)
     {
-        if (!is_string($pay_id) || !$pay_id) {
+        if (!is_int($id) || !$id) {
             return [];
         }
 
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->module_name . '_payment')
-            ->where('id_payment = "' . $this->escape($pay_id) . '"')
+            ->from($this->table_name)
+            ->where('`id_payplug_payment` = ' . (int) $id)
             ->build('unique_row');
 
-        return $result ? $result : [];
+        return $result ?: [];
+    }
+
+    /**
+     * @description Get cart id from given resource id
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
+    public function getByResourceId($resource_id = '')
+    {
+        if (!is_string($resource_id) || !$resource_id) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->table_name)
+            ->where('`resource_id` = "' . $this->escape($resource_id) . '"')
+            ->build('unique_row');
+
+        return $result ?: [];
     }
 
     /**
@@ -86,10 +200,119 @@ class PaymentRepository extends QueryRepository
 
         $result = $this
             ->delete()
-            ->from($this->prefix . $this->module_name . '_payment')
+            ->from($this->table_name)
             ->where('id_cart = ' . (int) $cart_id)
             ->build();
 
-        return $result ? $result : false;
+        return $result ?: false;
+    }
+
+    /**
+     * @description Update an existing payment for a given cart id.
+     *
+     * @param int   $cart_id
+     * @param array $parameters
+     *
+     * @return bool
+     */
+    public function updateByCart($cart_id = 0, $parameters = [])
+    {
+        if (!is_int($cart_id) || !$cart_id) {
+            return false;
+        }
+
+        if (!is_array($parameters) || empty($parameters)) {
+            return false;
+        }
+
+        $this
+            ->update()
+            ->table($this->table_name);
+
+        foreach ($parameters as $key => $value) {
+            if (array_key_exists($key, $this->fields)) {
+                switch ($this->fields[$key]) {
+                    case 'string':
+                        if (is_string($value) && $value) {
+                            $this->set($key . ' = "' . $this->escape($value) . '"');
+                        }
+
+                        break;
+                    case 'integer':
+                        if (is_int($value)) {
+                            $this->set($key . ' = ' . (int) $value);
+                        }
+
+                        break;
+                    case 'bool':
+                        if (is_bool($value)) {
+                            $this->set($key . ' = ' . ($value ? 1 : 0));
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        $this->where('id_cart = ' . (int) $cart_id);
+
+        return (bool) $this->build();
+    }
+
+    /**
+     * @description Update an existing payment for a given cart id.
+     *
+     * @param int   $cart_id
+     * @param array $parameters
+     * @param mixed $resource_id
+     *
+     * @return bool
+     */
+    public function updateByResourceId($resource_id = '', $parameters = [])
+    {
+        if (!is_string($resource_id) || !$resource_id) {
+            return false;
+        }
+
+        if (!is_array($parameters) || empty($parameters)) {
+            return false;
+        }
+
+        $this
+            ->update()
+            ->table($this->table_name);
+
+        foreach ($parameters as $key => $value) {
+            if (array_key_exists($key, $this->fields)) {
+                switch ($this->fields[$key]) {
+                    case 'string':
+                        if (is_string($value) && $value) {
+                            $this->set($key . ' = "' . $this->escape($value) . '"');
+                        }
+
+                        break;
+                    case 'integer':
+                        if (is_int($value)) {
+                            $this->set($key . ' = ' . (int) $value);
+                        }
+
+                        break;
+                    case 'bool':
+                        if (is_bool($value)) {
+                            $this->set($key . ' = ' . ($value ? 1 : 0));
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        $this->where('`resource_id` = "' . $this->escape($resource_id) . '"');
+
+        return (bool) $this->build();
     }
 }

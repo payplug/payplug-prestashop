@@ -99,7 +99,7 @@ class BasePaymentMethod extends TestCase
                 'getContext' => $this->context,
                 'getLogger' => $this->logger,
                 'getRoutes' => $this->routes,
-                'getTranslation' => $this->translation,
+                'getTranslationClass' => $this->translation,
             ]);
 
         $this->helpers = [

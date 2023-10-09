@@ -4,7 +4,7 @@ namespace PayPlug\tests\repositories\InstallRepository;
 
 /**
  * @group unit
- * @group repository
+ * @group old_repository
  * @group install
  * @group install_repository
  *

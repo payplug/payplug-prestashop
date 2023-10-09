@@ -358,7 +358,11 @@ class RefundClass
                         ]));
                     }
 
-                    $current_state = (int) $this->dependencies->orderClass->getCurrentOrderState($order->id);
+                    $current_state = (int) $this->dependencies
+                        ->getPlugin()
+                        ->getOrderRepository()
+                        ->getCurrentOrderState((int) $order->id);
+
                     $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                     if (0 != $current_state && $current_state != $new_state) {
                         $history = $this->orderHistory->get();
@@ -368,7 +372,11 @@ class RefundClass
                         $this->logger->addLog('Change order state to ' . $new_state, 'notice');
                     }
 
-                    if (!$this->dependencies->cartClass->deleteLockFromCartId((int) $order->id_cart)) {
+                    $delete_lock = $this->dependencies
+                        ->getPlugin()
+                        ->getLockRepository()
+                        ->deleteLock((int) $order->id_cart);
+                    if (!$delete_lock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->logger->addLog('Lock deleted.', 'notice');
@@ -405,7 +413,11 @@ class RefundClass
                         ]));
                     }
 
-                    $current_state = (int) $this->dependencies->orderClass->getCurrentOrderState($order->id);
+                    $current_state = (int) $this->dependencies
+                        ->getPlugin()
+                        ->getOrderRepository()
+                        ->getCurrentOrderState((int) $order->id);
+
                     $this->logger->addLog('Current order state: ' . $current_state, 'notice');
                     if (0 != $current_state && $current_state != $new_state) {
                         $history = $this->orderHistory->get();
@@ -417,7 +429,11 @@ class RefundClass
                         $this->logger->addLog('Order status is already \'refunded\'', 'notice');
                     }
 
-                    if (!$this->dependencies->cartClass->deleteLockFromCartId((int) $order->id_cart)) {
+                    $delete_lock = $this->dependencies
+                        ->getPlugin()
+                        ->getLockRepository()
+                        ->deleteLock((int) $order->id_cart);
+                    if (!$delete_lock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
                         $this->logger->addLog('Lock deleted.', 'notice');
