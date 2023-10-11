@@ -230,14 +230,14 @@ class SQLtableRepository
     }
 
     /**
-     * Check if existing table.
+     * @description Check if existing table.
      *
-     * @param string   $table
-     * @param bool|int $canUsePayplugLogger
+     * @param string $table
+     * @param int $canUsePayplugLogger
      *
      * @return bool
      */
-    public function checkExistingTable($table, $canUsePayplugLogger = 1)
+    public function checkExistingTable($table = '', $canUsePayplugLogger = 1)
     {
         $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->dependencies->name . '/log/install-log.csv');
         $logger = null;

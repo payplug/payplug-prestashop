@@ -27,7 +27,7 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithValidPaymentData()
     {
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
@@ -42,7 +42,7 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidShippingEmail()
     {
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
@@ -77,7 +77,7 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidShippingMobilePhone()
     {
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
@@ -112,7 +112,7 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidShippingCity()
     {
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
@@ -167,7 +167,7 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidBillingMobilePhone()
     {
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
@@ -202,7 +202,7 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidBillingCity()
     {
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->repo->shouldReceive('checkOneyRequiredFields')
@@ -260,7 +260,7 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
         $contextWithoutCustomer->customer = null;
 
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn($contextWithoutCustomer)
         ;
 

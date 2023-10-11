@@ -75,7 +75,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $this->oney = $this->plugin->getOney();
             $this->productAdapter = $this->plugin->getProduct();
             $this->translate = $this->plugin->getTranslate();
-            $context = $this->contextAdapter->getContext(); // get the method
+            $context = $this->contextAdapter->get(); // get the method
             $tools = $this->toolsAdapter;
 
             if ($tools->tool('getIsset', 'pc')) {
@@ -170,7 +170,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     exit(json_encode([
                         'exception' => $e->getMessage(),
                         'result' => false,
-                        'error' => $this->translate->translate(5), //('Oney is momentarily unavailable.')
+                        'error' => $this->translate->translate(5), // ('Oney is momentarily unavailable.')
                     ]));
                 }
 
@@ -212,21 +212,17 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'result' => $result,
                     'message' => [
                         $result ?
-                            $this->translate->translate(3) : //('Your information has been saved') :
-                            $this->translate->translate(4), //('An error occurred. Please retry in few seconds.')
+                            $this->translate->translate(3) : // ('Your information has been saved') :
+                            $this->translate->translate(4), // ('An error occurred. Please retry in few seconds.')
                     ],
                 ]));
             } elseif ($tools->tool('getIsset', 'createIP')) {
                 $token = $tools->tool('getValue', 'token');
                 if (false == $token) {
-                    exit(
-                    json_encode(
-                        [
-                            'result' => true,
-                            'message' => $token,
-                        ]
-                    )
-                    );
+                    exit(json_encode([
+                        'result' => true,
+                        'message' => $token,
+                    ]));
                 }
 
                 $payment_methods = json_decode($this->configurationClass->getValue('payment_methods'), true);

@@ -23,23 +23,22 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Module;
 use PayPlug\src\interfaces\ModuleInterface;
 
 class ModuleAdapter implements ModuleInterface
 {
     public function displayError($error)
     {
-        return Module::displayError($error);
+        return \Module::displayError($error);
     }
 
     public function getInstanceByName($moduleName)
     {
-        return Module::getInstanceByName($moduleName);
+        return \Module::getInstanceByName($moduleName);
     }
 
     public function isEnabled($moduleName)
     {
-        return Module::isEnabled($moduleName);
+        return \Module::isEnabled($moduleName);
     }
 }

@@ -144,7 +144,7 @@ class PsPaylater extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
+        // todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->actionAdminPerformanceControllerAfter($params);
         }
@@ -159,7 +159,7 @@ class PsPaylater extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        //todo: Rajouter le test de la table payplug cache avant d'executer ce code
+        // todo: Rajouter le test de la table payplug cache avant d'executer ce code
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->actionClearCompileCache($params);
         }

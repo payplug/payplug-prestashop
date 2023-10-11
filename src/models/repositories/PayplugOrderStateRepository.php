@@ -34,7 +34,7 @@ class PayplugOrderStateRepository extends QueryRepository
     /**
      * @description Create a Payplug order state
      *
-     * @param int    $id_order_state
+     * @param int $id_order_state
      * @param string $type
      *
      * @return bool
@@ -105,7 +105,7 @@ class PayplugOrderStateRepository extends QueryRepository
     /**
      * @description Update a Payplug order state
      *
-     * @param int    $id_order_state
+     * @param int $id_order_state
      * @param string $type
      *
      * @return bool

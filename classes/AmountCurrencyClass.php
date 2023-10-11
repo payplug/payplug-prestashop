@@ -75,7 +75,7 @@ class AmountCurrencyClass
     /**
      * Check if amount is correct.
      *
-     * @param int    $amount
+     * @param int $amount
      * @param object $order
      *
      * @return bool
@@ -123,7 +123,7 @@ class AmountCurrencyClass
             return false;
         }
 
-        $currency = $this->currency->get((int) ($cart->id_currency));
+        $currency = $this->currency->get((int) $cart->id_currency);
         if (!$this->validate->validate('isLoadedObject', $currency)) {
             return false;
         }

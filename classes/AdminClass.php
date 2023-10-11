@@ -36,7 +36,7 @@ class AdminClass
 
     /**
      * @param string $controller_name
-     * @param int    $id_order
+     * @param int $id_order
      *
      * @return string
      */
@@ -64,8 +64,8 @@ class AdminClass
 
     /**
      * @param string $controller_name
-     * @param int    $id_order
-     * @param mixed  $params
+     * @param int $id_order
+     * @param mixed $params
      *
      * @return string
      */

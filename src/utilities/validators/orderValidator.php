@@ -26,10 +26,10 @@ namespace PayPlug\src\utilities\validators;
 class orderValidator
 {
     /**
-     * @description Check if given order match with the given cart id
+     * @description Check if given order match with the given cart id.
      *
      * @param object $order
-     * @param int    $id_cart
+     * @param int $id_cart
      *
      * @return array
      */

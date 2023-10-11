@@ -26,21 +26,21 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_0_7($object)
 {
-    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    // we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
 
-    //sql
+    // sql
     $req_payplug_lock = '
         ALTER TABLE ' . _DB_PREFIX_ . $object->name . '_lock 
         ADD COLUMN `id_order` VARCHAR(100) 
         AFTER `id_cart`';
     $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
 
-    //files
-    //$suppr_files = true;
-    //$suppr_dirs = true;
+    // files
+    // $suppr_files = true;
+    // $suppr_dirs = true;
     $old_files = [
         dirname(__FILE__) . '/../classes/PayplugTools.php',
         dirname(__FILE__) . '/../controllers/dispatcher.php',
@@ -74,9 +74,9 @@ function upgrade_module_2_0_7($object)
 
     foreach ($old_files as $file) {
         if (file_exists($file)) {
-            //$suppr_files = false;
+            // $suppr_files = false;
             if (unlink($file)) {
-                //$suppr_files = true;
+                // $suppr_files = true;
             } else {
                 break;
             }
@@ -85,15 +85,14 @@ function upgrade_module_2_0_7($object)
 
     foreach ($old_dirs as $dir) {
         if (is_dir($dir)) {
-            //$suppr_dirs = false;
+            // $suppr_dirs = false;
             if (rmdir($dir)) {
-                //$suppr_dirs = true;
+                // $suppr_dirs = true;
             } else {
                 break;
             }
         }
     }
 
-    //return ($res_payplug_lock && $suppr_files && $suppr_dirs);
     return $res_payplug_lock;
 }

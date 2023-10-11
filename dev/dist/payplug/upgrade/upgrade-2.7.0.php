@@ -26,12 +26,12 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_7_0($object)
 {
-    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    // we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
 
-    //sql
+    // sql
     $req_payplug_payment_cart = '
         ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_payment_cart`
         ADD COLUMN `date_upd` DATETIME NULL

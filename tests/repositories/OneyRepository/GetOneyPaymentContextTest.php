@@ -21,7 +21,7 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
         parent::setUp();
 
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->carrier->shouldReceive([

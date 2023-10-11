@@ -23,16 +23,12 @@
 
 namespace PayPlug\classes;
 
-use Exception;
 use Payplug\Authentication;
 use Payplug\Card;
 use Payplug\Core\APIRoutes;
 use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
-use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ConfigurationNotSetException;
-use Payplug\Exception\ForbiddenException;
-use Payplug\Exception\NotAllowedException;
 use Payplug\Exception\NotFoundException;
 use Payplug\Exception\PayplugServerException;
 use Payplug\Exception\UndefinedAttributeException;
@@ -109,9 +105,7 @@ class ApiClass
      *
      * @param null $api_key
      *
-     * @throws ConfigurationException
-     *
-     * @return array|bool
+     * @return array
      */
     public function getAccountPermissions($api_key = null)
     {
@@ -126,10 +120,8 @@ class ApiClass
      * @description Get account permission from Payplug API
      *
      * @param $api_key
-     * @param bool  $sandbox
-     * @param mixed $treat_account
-     *
-     * @throws ConfigurationException
+     * @param bool $sandbox
+     * @param bool $treat_account
      *
      * @return array
      */
@@ -139,7 +131,7 @@ class ApiClass
 
         try {
             $response = Authentication::getAccount();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if (401 == (int) $e->getCode()) {
                 $this->dependencies
                     ->getPlugin()
@@ -178,17 +170,15 @@ class ApiClass
     /**
      * @description configure the api url
      *
-     * @param string $api_url
+     * @param $api_url
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setApiUrl($api_url)
     {
         if (!is_string($api_url)
             || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
-            throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
+            throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
         }
         $this->api_url = $api_url;
 
@@ -196,13 +186,11 @@ class ApiClass
     }
 
     /**
-     * @description Set the current secret key used to interact with PayPlug API
+     * @description Set the current secret key used to interact with PayPlug API.
      *
      * @param false $token
      *
-     * @throws ConfigurationException
-     *
-     * @return false|Payplug
+     * @return Payplug
      */
     public function setSecretKey($token = false)
     {
@@ -229,9 +217,7 @@ class ApiClass
      *
      * @param null $sandbox
      *
-     * @throws ConfigurationException
-     *
-     * @return false|Payplug
+     * @return Payplug
      */
     public function initializeApi($sandbox = null)
     {
@@ -246,7 +232,7 @@ class ApiClass
     }
 
     /**
-     * @description  return exeption error form API
+     * @description Return exeption error form API
      *
      * @param $str
      *
@@ -309,8 +295,6 @@ class ApiClass
      *
      * @param $email
      * @param $password
-     *
-     * @throws BadRequestException|ConfigurationException
      *
      * @return bool
      */
@@ -409,7 +393,7 @@ class ApiClass
                     'code' => 200,
                 ];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'result' => false,
                 'code' => (int) $e->getCode(),
@@ -424,8 +408,6 @@ class ApiClass
      * @description Create InstallmentPlan from api for given attributes
      *
      * @param array $atttributes
-     *
-     * @throws ConfigurationNotSetException
      *
      * @return array
      */
@@ -457,7 +439,7 @@ class ApiClass
                     'resource' => InstallmentPlan::create($atttributes, $this->api),
                 ];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'code' => (int) $e->getCode(),
                 'result' => false,
@@ -471,9 +453,7 @@ class ApiClass
     /**
      * @description Retrieve InstallmentPlan from api for given id
      *
-     * @param $inst_id
-     *
-     * @throws ConfigurationException
+     * @param false $inst_id
      *
      * @return array
      */
@@ -533,8 +513,6 @@ class ApiClass
      *
      * @param false $pay_id
      *
-     * @throws Exception
-     *
      * @return array
      */
     public function abortPayment($pay_id = false)
@@ -565,7 +543,7 @@ class ApiClass
                     'code' => 200,
                 ];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'result' => false,
                 'code' => (int) $e->getCode(),
@@ -579,9 +557,7 @@ class ApiClass
     /**
      * @description Capture Payment from api for given id
      *
-     * @param $pay_id
-     *
-     * @throws ConfigurationException
+     * @param false $pay_id
      *
      * @return array
      */
@@ -631,7 +607,7 @@ class ApiClass
                 'code' => (int) $e->getCode(),
                 'message' => $e->getMessage(),
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'result' => false,
                 'code' => (int) $e->getCode(),
@@ -646,8 +622,6 @@ class ApiClass
      * @description Create Payment from api for given attributes
      *
      * @param array $atttributes
-     *
-     * @throws ConfigurationNotSetException
      *
      * @return array
      */
@@ -679,7 +653,7 @@ class ApiClass
                     'resource' => Payment::create($atttributes, $this->api),
                 ];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'code' => (int) $e->getCode(),
                 'result' => false,
@@ -733,7 +707,7 @@ class ApiClass
                 'resource' => $payment->update($data),
                 'code' => 200,
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'result' => false,
                 'code' => (int) $e->getCode(),
@@ -749,8 +723,6 @@ class ApiClass
      *
      * @param false $pay_id
      * @param array $data
-     *
-     * @throws ConfigurationNotSetException
      *
      * @return array
      */
@@ -790,7 +762,7 @@ class ApiClass
                     'code' => 200,
                 ];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'result' => false,
                 'code' => (int) $e->getCode(),
@@ -804,8 +776,7 @@ class ApiClass
     /**
      * @description Retrieve Payment from api for given id and mode
      *
-     * @param $pay_id false
-     * @param $mode false
+     * @param false $pay_id
      *
      * @return array
      */
@@ -864,8 +835,6 @@ class ApiClass
      * @description Delete Card from api for given id
      *
      * @param false $card_id
-     *
-     * @throws ConfigurationException
      *
      * @return array
      */
@@ -947,7 +916,7 @@ class ApiClass
                     'resource' => OneySimulation::getSimulations($data, $api),
                 ];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'result' => false,
                 'code' => (int) $e->getCode(),
@@ -1102,11 +1071,9 @@ class ApiClass
     }
 
     /**
-     * @description  Register API Keys
+     * @description Register API Keys
      *
      * @param $json_answer
-     *
-     * @throws ConfigurationException
      *
      * @return bool
      */
@@ -1139,8 +1106,6 @@ class ApiClass
 
     /**
      * @description Determine witch environment is used
-     *
-     * @throws BadParameterException
      */
     private function setEnvironment()
     {

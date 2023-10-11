@@ -31,8 +31,6 @@ class Routes
     /**
      * @description Get the Api url
      *
-     * @throws BadParameterException
-     *
      * @return string
      */
     public function getApiUrl()
@@ -48,7 +46,7 @@ class Routes
 
         if (!is_string($api_url)
             || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
-            throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
+            throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
         }
 
         return $api_url;
@@ -56,8 +54,6 @@ class Routes
 
     /**
      * @description Get the Api url
-     *
-     * @throws BadParameterException
      *
      * @return string
      */
@@ -76,8 +72,6 @@ class Routes
     }
 
     /**
-     * @description get CDN url
-     *
      * @return array
      */
     public function getSourceUrl()

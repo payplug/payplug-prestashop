@@ -178,11 +178,6 @@ class OrderStateRepository extends BaseClass
         return $this->configuration->set($key_config, (int) $id_order_state);
     }
 
-    public static function factory()
-    {
-        return new OrderStateRepository();
-    }
-
     public function getConfigKey($name = false, $sandbox = false)
     {
         if (!is_string($name)

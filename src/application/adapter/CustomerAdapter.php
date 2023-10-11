@@ -23,13 +23,12 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Customer;
 use PayPlug\src\interfaces\CustomerInterface;
 
 class CustomerAdapter implements CustomerInterface
 {
     public function get($idCustomer)
     {
-        return new Customer($idCustomer);
+        return new \Customer($idCustomer);
     }
 }

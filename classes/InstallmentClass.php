@@ -74,9 +74,9 @@ class InstallmentClass
                 $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($payment);
             } else {
                 if (1 == (int) $installment->is_active) {
-                    $status = 6; //ongoing
+                    $status = 6; // ongoing
                 } else {
-                    $status = 7; //cancelled
+                    $status = 7; // cancelled
                 }
             }
             $step = $index . '/' . $step_count;

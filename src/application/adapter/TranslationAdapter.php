@@ -24,17 +24,11 @@
 namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\TranslationInterface;
-use Translate;
 
 class TranslationAdapter implements TranslationInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
     public static function translate($module_class, $string, $repository_name)
     {
-        return Translate::getModuleTranslation($module_class, $string, $repository_name);
+        return \Translate::getModuleTranslation($module_class, $string, $repository_name);
     }
 }

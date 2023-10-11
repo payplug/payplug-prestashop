@@ -95,7 +95,7 @@ class BancontactPaymentMethod extends PaymentMethod
         if (
             (bool) $this->configuration->getValue('bancontact_country')
             && (
-                !($this->dependencies->getValidators()['payment']->isAllowedCountry('BE', $shipping_iso)['result'])
+                !$this->dependencies->getValidators()['payment']->isAllowedCountry('BE', $shipping_iso)['result']
                 || $shipping_iso != $invoice_iso
             )
         ) {

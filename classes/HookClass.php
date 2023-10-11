@@ -143,9 +143,7 @@ class HookClass
     /**
      * @param $customer
      *
-     * @throws PrestaShopDatabaseException
-     *
-     * @return false|string
+     * @return string
      */
     public function actionExportGDPRData($customer)
     {
@@ -280,8 +278,7 @@ class HookClass
         );
 
         $adapter = $this->dependencies->loadAdapterPresta();
-        if ($adapter
-            && (\method_exists($adapter, 'customerAccount'))) {
+        if ($adapter && \method_exists($adapter, 'customerAccount')) {
             $adapter->customerAccount();
         }
 
@@ -294,10 +291,7 @@ class HookClass
     }
 
     /**
-     * @param array $params
-     *
-     * @throws PrestaShopException
-     * @throws PrestaShopDatabaseException
+     * @param $params
      *
      * @return string
      */
@@ -383,10 +377,10 @@ class HookClass
                             $amount_refunded_payplug += 0;
                             $amount_available += 0;
                         } elseif (1 == (int) $p->is_refunded) {
-                            $amount_refunded_payplug += ($p->amount_refunded) / 100;
+                            $amount_refunded_payplug += $p->amount_refunded / 100;
                             $amount_available += ($p->amount - $p->amount_refunded) / 100;
                         } elseif ((int) $p->amount_refunded > 0) {
-                            $amount_refunded_payplug += ($p->amount_refunded) / 100;
+                            $amount_refunded_payplug += $p->amount_refunded / 100;
                             $amount_refundable_payment = ($p->amount - $p->amount_refunded);
                             if ($amount_refundable_payment >= 10) {
                                 $amount_available += $amount_refundable_payment / 100;
@@ -519,7 +513,7 @@ class HookClass
             $out_of_stock_unpaid_state = $this->configurationAdapter->get('PS_OS_OUTOFSTOCK_UNPAID');
 
             if ($is_oney) {
-                // update order state from payment status
+                // Update order state from payment status
                 if (in_array($order->getCurrentState(), [$oney_state, $out_of_stock_unpaid_state])) {
                     $new_order_state = false;
 
@@ -529,7 +523,7 @@ class HookClass
                         foreach ($order_details as $order_detail) {
                             if ($this->configurationAdapter->get('PS_STOCK_MANAGEMENT')
                                 && ($order_detail['product_quantity_in_stock'] <= 0)) {
-                                //The paiment is paid and the product is out of stock
+                                // The paiment is paid and the product is out of stock
                                 $new_order_state = $out_of_stock_paid_state;
                             }
                         }
@@ -552,7 +546,7 @@ class HookClass
 
             $single_payment = $this->dependencies->paymentClass->buildPaymentDetails($payment);
 
-            $amount_refunded_payplug = ($payment->amount_refunded) / 100;
+            $amount_refunded_payplug = $payment->amount_refunded / 100;
             $amount_available_payment = ($payment->amount - $payment->amount_refunded);
             $amount_available = ($amount_available_payment >= 10 ? $amount_available_payment / 100 : 0);
             $id_currency = (int) $this->currency->getIdByIsoCode($payment->currency);
@@ -661,7 +655,7 @@ class HookClass
                 'pay_error' => $pay_error,
             ]);
 
-            //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+            // Deferred payment does'nt display 3DS option before capture so we have to consider it null
             if (null !== $payment->is_3ds) {
                 $pay_tds = $payment->is_3ds
                     ? $this->dependencies->l('hook.displayAdminOrderMain.yes', 'hookclass')
@@ -860,11 +854,9 @@ class HookClass
     }
 
     /**
-     * @param array $params
+     * @param $params
      *
-     * @throws Exception
-     *
-     * @return string
+     * @return false|void
      */
     public function displayHeader($params)
     {
@@ -899,8 +891,7 @@ class HookClass
 
         $adapter = $this->dependencies->loadAdapterPresta();
 
-        if ($adapter
-            && (\method_exists($adapter, 'displayHeader'))) {
+        if ($adapter && \method_exists($adapter, 'displayHeader')) {
             $this->media->addJsDef([
                 'module_name' => $this->dependencies->name,
             ]);
@@ -1086,13 +1077,11 @@ class HookClass
     }
 
     /**
-     * @param array $params
-     *
-     * @throws Exception
-     *
      * @deprecated This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
      *
-     * @return string
+     * @param $params
+     *
+     * @return false
      */
     public function payment($params)
     {
@@ -1148,11 +1137,7 @@ class HookClass
     }
 
     /**
-     * @param array $params
-     *
-     * @throws Exception
-     *
-     * @return array
+     * @return false
      */
     public function paymentOptions()
     {
@@ -1175,10 +1160,7 @@ class HookClass
     }
 
     /**
-     * @throws PrestaShopException
-     * @throws PrestaShopDatabaseException
-     *
-     * @return string
+     * @return false
      */
     public function paymentReturn()
     {
@@ -1222,7 +1204,7 @@ class HookClass
 
     /**
      * @param string $iso_code
-     * @param int    $id_lang
+     * @param int $id_lang
      *
      * @return bool
      */

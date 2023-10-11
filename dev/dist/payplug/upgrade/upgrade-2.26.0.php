@@ -26,14 +26,14 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_26_0()
 {
-    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    // we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
 
     $flag = true;
 
-    //adding new configurations
+    // adding new configurations
     if (!Configuration::updateValue('PAYPLUG_ONEY_OPTIMIZED', 0)
         || !Configuration::updateValue('PAYPLUG_ONEY', 0)
         || !Configuration::updateValue('PAYPLUG_ONEY_ALLOWED_COUNTRIES', '')

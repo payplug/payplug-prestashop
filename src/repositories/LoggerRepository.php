@@ -41,11 +41,6 @@ class LoggerRepository extends BaseClass
         $this->setStdParams();
     }
 
-    public static function factory()
-    {
-        return new LoggerRepository();
-    }
-
     /**
      * @description Hydrate standard entities
      */
@@ -89,7 +84,7 @@ class LoggerRepository extends BaseClass
     {
         $validate = $this->validators['logger']->isAllowedProcess($process);
         if (!$validate['result']) {
-            throw (new BadParameterException($validate['message']));
+            throw new BadParameterException($validate['message']);
         }
 
         $this->loggerEntity->setProcess($process);
@@ -107,7 +102,7 @@ class LoggerRepository extends BaseClass
     {
         $validate = $this->validators['logger']->isContent($message);
         if (!$validate['result']) {
-            throw (new BadParameterException($validate['message']));
+            throw new BadParameterException($validate['message']);
         }
 
         // get content
@@ -200,12 +195,12 @@ class LoggerRepository extends BaseClass
     }
 
     /**
-     * @description Format date to help for more precisions
+     * @description Format date to help for more precisions.
      *
      * @param string $format
-     * @param null   $utimestamp
+     * @param null $utimestamp
      *
-     * @return false|string
+     * @return string
      */
     public function udate($format = 'u', $utimestamp = null)
     {

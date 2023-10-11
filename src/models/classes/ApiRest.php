@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\models\classes;
 
-use PayPlug\src\application\adapter\ToolsAdapter;
-
 class ApiRest
 {
     private $dependencies;
@@ -37,7 +35,6 @@ class ApiRest
         $this->dependencies = $dependencies;
         $this->validators = $this->dependencies->getValidators();
         $this->helpers = $this->dependencies->getHelpers();
-        //$this->tools = ToolsAdapter::factory();
     }
 
     /**
@@ -654,7 +651,7 @@ class ApiRest
                     'text' => $translation['requirements']['curl']['text'],
                 ],
             ],
-            'enable_debug_check' => false, //TODO: to be deleted
+            'enable_debug_check' => false, // todo: to be deleted
         ];
     }
 
@@ -688,7 +685,6 @@ class ApiRest
             'logged' => $current_configuration['logged'],
             'mode' => (bool) $current_configuration['sandbox_mode'] ? 1 : 0,
             'psaccount' => $this->dependencies->configClass->checkPsAccount(),
-
         ];
     }
 

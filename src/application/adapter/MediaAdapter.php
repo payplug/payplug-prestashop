@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Media;
 use PayPlug\src\interfaces\MediaInterface;
 
 class MediaAdapter implements MediaInterface
@@ -36,16 +35,16 @@ class MediaAdapter implements MediaInterface
             }
         }
 
-        return Media::addJsDef($files);
+        return \Media::addJsDef($files);
     }
 
     public static function getMediaPath($path)
     {
-        return Media::getMediaPath($path);
+        return \Media::getMediaPath($path);
     }
 
     public function getJsDef()
     {
-        return Media::getJsDef();
+        return \Media::getJsDef();
     }
 }

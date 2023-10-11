@@ -39,17 +39,14 @@ class OrderStateEntity
     }
 
     /**
-     * @param $apiPayment
-     * @param mixed $list
+     * @param $list
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setList($list)
     {
         if (!is_array($list)) {
-            throw (new BadParameterException('Invalid argument, $list must be an array'));
+            throw new BadParameterException('Invalid argument, $list must be an array');
         }
 
         $this->list = $list;

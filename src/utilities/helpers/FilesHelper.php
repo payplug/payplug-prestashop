@@ -128,7 +128,7 @@ class FilesHelper
     /**
      * @description Filter the type of files from a given array
      *
-     * @param array  $files
+     * @param array $files
      * @param string $type_clear
      * @param string $path
      *

@@ -31,11 +31,6 @@ class BaseClass
     protected $payplug;
     private $entity;
 
-    public static function factory()
-    {
-        return new self();
-    }
-
     public function setName()
     {
         $this->name = (new \ReflectionClass($this))->getShortName();

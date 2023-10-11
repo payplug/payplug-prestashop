@@ -110,7 +110,7 @@ class RefundClass
      * @param $amount
      * @param $metadata
      * @param string $pay_mode
-     * @param null   $inst_id
+     * @param null $inst_id
      *
      * @return mixed|string
      */
@@ -442,7 +442,7 @@ class RefundClass
                 $reload = true;
             }
 
-            $amount_refunded_payplug = ($payment->amount_refunded) / 100;
+            $amount_refunded_payplug = $payment->amount_refunded / 100;
             $amount_available = ($payment->amount - $payment->amount_refunded) / 100;
         }
 

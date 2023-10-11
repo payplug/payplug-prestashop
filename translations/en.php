@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{payplug}prestashop>abort_b3834d6f7a63e5e750e0ca5ecf31e3b9'] = 'Suspend';
 $_MODULE['<{payplug}prestashop>abort_bfc5d8b32c3c54d5cba76525ed56af39'] = 'Your customer won\'t be charged on the due dates.';
 $_MODULE['<{payplug}prestashop>abort_ea4788705e6873b424c65e91c2846b19'] = 'Cancel';

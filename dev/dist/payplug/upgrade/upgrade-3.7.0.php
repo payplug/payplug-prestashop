@@ -56,7 +56,7 @@ function upgrade_module_3_7_0($object)
     $date = date('Y-m-d');
     $payplug_order_states_sql = [];
     foreach ($prestashop_order_states as $key => $type) {
-        $id_order_state = (int) Configuration::get(($key));
+        $id_order_state = (int) Configuration::get($key);
         $getTypeQuery = ' 
             SELECT `type` 
             FROM `' . _DB_PREFIX_ . $object->name . '_order_state` 

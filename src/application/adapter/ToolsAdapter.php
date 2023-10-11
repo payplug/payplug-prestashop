@@ -24,19 +24,18 @@
 namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\ToolsInterface;
-use Tools;
 
 class ToolsAdapter implements ToolsInterface
 {
     public function tool($action, $param1 = null, $param2 = null, $param3 = null, $param4 = null)
     {
         if (isset($action)) {
-            return Tools::$action($param1, $param2, $param3, $param4);
+            return \Tools::$action($param1, $param2, $param3, $param4);
         }
     }
 
     public function substr($string, $offset = null, $length = null)
     {
-        return Tools::substr($string, $offset, $length);
+        return \Tools::substr($string, $offset, $length);
     }
 }

@@ -66,10 +66,10 @@ class PayplugPaymentModuleFrontController extends ModuleFrontController
         ]);
 
         // Invalid payment then return error
-        if (($payment_data['result'] && (isset($payment_data['return_url']) && $payment_data['return_url']))) {
+        if ($payment_data['result'] && (isset($payment_data['return_url']) && $payment_data['return_url'])) {
             Tools::redirect($payment_data['return_url']);
         }
-        if (($payment_data_16['result'] && (isset($payment_data_16['return_url']) && $payment_data_16['return_url']))) {
+        if ($payment_data_16['result'] && (isset($payment_data_16['return_url']) && $payment_data_16['return_url'])) {
             Tools::redirect($payment_data_16['return_url']);
         } elseif (!$payment_data['result']) {
             if (isset($payment_data['response']) && $payment_data['response']) {

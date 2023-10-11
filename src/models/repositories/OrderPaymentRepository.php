@@ -63,7 +63,7 @@ class OrderPaymentRepository extends QueryRepository
                         break;
                     case 'bool':
                         if (is_bool($value)) {
-                            $this->fields($key)->values(($value ? 1 : 0));
+                            $this->fields($key)->values($value ? 1 : 0);
                         }
 
                         break;

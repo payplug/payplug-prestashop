@@ -92,11 +92,6 @@ class QueryRepository
         return $this->build();
     }
 
-    public static function factory()
-    {
-        return new QueryRepository();
-    }
-
     public function select()
     {
         $this->query['type'] = 'SELECT';
@@ -345,7 +340,7 @@ class QueryRepository
     public function build($param = false)
     {
         if ('SELECT' == $this->query['type']) {
-            $sql = 'SELECT ' . ((($this->query['fields'])) ? implode(",\n", $this->query['fields']) : '*') . "\n";
+            $sql = 'SELECT ' . ($this->query['fields'] ? implode(",\n", $this->query['fields']) : '*') . "\n";
             if (!$this->query['from']) {
                 $this->query = null;
 
@@ -362,7 +357,7 @@ class QueryRepository
                 $sql .= 'VALUES (' . "\n" . implode(",\n", $this->query['values']) . ')' . "\n";
             }
         } elseif ('UPDATE' == $this->query['type']) {
-            $sql = 'UPDATE ' . ((($this->query['table'])) ?
+            $sql = 'UPDATE ' . ($this->query['table'] ?
                     implode(",\n", $this->query['table']) :
                     implode(",\n", $this->query['into'])) . "\n";
 
@@ -370,7 +365,7 @@ class QueryRepository
                 $sql .= 'SET ' . implode(',' . "\n", $this->query['set']) . "\n";
             }
         } elseif ('TRUNCATE' == $this->query['type']) {
-            $sql = 'TRUNCATE TABLE ' . ((($this->query['table'])) ?
+            $sql = 'TRUNCATE TABLE ' . ($this->query['table'] ?
                     implode(",\n", $this->query['table']) :
                     implode(",\n", $this->query['into'])) . "\n";
         } elseif ('DELETE' == $this->query['type']) {

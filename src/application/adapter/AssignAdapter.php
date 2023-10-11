@@ -23,18 +23,12 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Context;
 use PayPlug\src\interfaces\AssignInterface;
 
 class AssignAdapter implements AssignInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
     public function assign($parameters = [])
     {
-        return Context::getContext()->smarty->assign($parameters);
+        return \Context::getContext()->smarty->assign($parameters);
     }
 }
