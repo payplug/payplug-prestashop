@@ -133,6 +133,12 @@ build zip release:
   script:
     - shopt -s extglob
     - ./dev/ci/build.sh -n payplug -c $CI_COMMIT_REF_NAME
+  after_script:
+    - if [ ! -f "payplug_$CI_COMMIT_REF_NAME.zip" ] || [ ! -f "payplug_qa_$CI_COMMIT_REF_NAME.zip" ]; then
+      echo "ZIP files were not created. Failing the job.";
+      exit 1;
+      fi
+
   artifacts:
     paths:
       - payplug_$CI_COMMIT_REF_NAME.zip
@@ -191,6 +197,11 @@ build-pspaylater:
   script:
     - shopt -s extglob
     - ./dev/ci/build.sh -n pspaylater -c $CI_COMMIT_REF_NAME
+  after_script:
+    - if [ ! -f "pspaylater_$CI_COMMIT_REF_NAME.zip" ] || [ ! -f "pspaylater_qa_$CI_COMMIT_REF_NAME.zip" ]; then
+      echo "ZIP files were not created. Failing the job.";
+      exit 1;
+      fi
   artifacts:
     paths:
       - pspaylater_$CI_COMMIT_REF_NAME.zip

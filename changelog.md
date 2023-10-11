@@ -1,5 +1,9 @@
 # Payplug module changelog
+## Next version
 
+- Improvment : 
+  - [PRE-2054](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2289): Set the job build release to fail if the zip is not generated
+  
 ## Version 4.4.0
 
 - Improvment :
