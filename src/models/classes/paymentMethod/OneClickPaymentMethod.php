@@ -60,8 +60,8 @@ class OneClickPaymentMethod extends PaymentMethod
 
         $cards = $this->dependencies
             ->getPlugin()
-            ->getCard()
-            ->getByCustomer((int) $this->context->customer->id, true);
+            ->getCardAction()
+            ->renderList(true);
 
         if (empty($cards)) {
             return $payment_options;

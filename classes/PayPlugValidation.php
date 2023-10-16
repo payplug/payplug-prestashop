@@ -402,7 +402,10 @@ class PayPlugValidation
                 || ((isset($payment->card->id) && '' != $payment->card->id))
             ) {
                 $this->logger->addLog('[Save Card] Saving card...');
-                $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
+                $res_payplug_card = $this->dependencies
+                    ->getPlugin()
+                    ->getCardAction()
+                    ->saveAction($payment);
 
                 if (!$res_payplug_card) {
                     $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');

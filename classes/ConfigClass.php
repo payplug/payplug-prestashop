@@ -668,7 +668,12 @@ class ConfigClass
             return [];
         }
 
-        $cards = $this->dependencies->getPlugin()->getCardRepository()->getAllByCustomer($id_customer);
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $is_sandbox = $configuration->getValue('sandbox_mode');
+        $id_company = $configuration->getValue('company_id');
+        $cards = $this->dependencies->getPlugin()
+            ->getCardRepository()
+            ->getAllByCustomer($id_customer, $id_company, $is_sandbox);
         if (!$cards) {
             return [];
         }

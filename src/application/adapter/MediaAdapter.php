@@ -28,10 +28,10 @@ use PayPlug\src\interfaces\MediaInterface;
 
 class MediaAdapter implements MediaInterface
 {
-    public function addJsDef($files = [])
+    public function addJsDef($files = [], $template = false)
     {
         foreach ($files as &$file) {
-            if ($file && is_string($file)) {
+            if ($file && is_string($file) && !$template) {
                 $file = addslashes($file);
             }
         }
