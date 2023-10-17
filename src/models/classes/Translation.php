@@ -487,4 +487,21 @@ class Translation
             'secure' => $this->dependencies->l('ip.secure', 'translation'),
         ];
     }
+
+    /**
+     * @return array
+     */
+    public function getOrderStateActionRenderTranslations()
+    {
+        return [
+            'undefined' => $this->dependencies->l('action.orderState.renderOption.undefined', 'translation'),
+            'nothing' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeNothing', 'translation'),
+            'cancelled' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeCancelled', 'translation'),
+            'error' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeError', 'translation'),
+            'expired' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeExpired', 'translation'),
+            'paid' => $this->dependencies->l('action.orderState.renderOption.orderStateTypePaid', 'translation'),
+            'pending' => $this->dependencies->l('action.orderState.renderOption.orderStateTypePending', 'translation'),
+            'refund' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeRefund', 'translation'),
+        ];
+    }
 }

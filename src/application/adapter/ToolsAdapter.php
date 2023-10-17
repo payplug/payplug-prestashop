@@ -28,11 +28,6 @@ use Tools;
 
 class ToolsAdapter implements ToolsInterface
 {
-    public static function factory()
-    {
-        return new ToolsAdapter();
-    }
-
     public function tool($action, $param1 = null, $param2 = null, $param3 = null, $param4 = null)
     {
         if (isset($action)) {
