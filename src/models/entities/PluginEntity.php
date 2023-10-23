@@ -85,9 +85,6 @@ class PluginEntity
     private $dispatcher;
 
     /** @var object */
-    private $hook;
-
-    /** @var object */
     private $install;
 
     /** @var object */
@@ -128,6 +125,9 @@ class PluginEntity
 
     /** @var object */
     private $order_state;
+
+    /** @var object */
+    private $order_state_action;
 
     /** @var object */
     private $order_state_adapter;
@@ -465,14 +465,6 @@ class PluginEntity
     }
 
     /**
-     * @return object
-     */
-    public function getHook()
-    {
-        return $this->hook;
-    }
-
-    /**
      * @return mixed
      */
     public function getInstall()
@@ -574,6 +566,14 @@ class PluginEntity
     public function getOrderRepository()
     {
         return $this->order_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderStateAction()
+    {
+        return $this->order_state_action;
     }
 
     /**
@@ -1104,8 +1104,7 @@ class PluginEntity
     }
 
     /**
-     * @param object $hook
-     * @param mixed  $dispatcher
+     * @param mixed $dispatcher
      *
      * @throws BadParameterException
      *
@@ -1118,24 +1117,6 @@ class PluginEntity
         }
 
         $this->dispatcher = $dispatcher;
-
-        return $this;
-    }
-
-    /**
-     * @param object $hook
-     *
-     * @throws BadParameterException
-     *
-     * @return self
-     */
-    public function setHook($hook)
-    {
-        if (!is_object($hook)) {
-            throw (new BadParameterException('Invalid argument, $hook must be a HookRepository'));
-        }
-
-        $this->hook = $hook;
 
         return $this;
     }
@@ -1383,6 +1364,24 @@ class PluginEntity
         }
 
         $this->order_repository = $order_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $orderStateAction
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setOrderStateAction($orderStateAction)
+    {
+        if (!is_object($orderStateAction)) {
+            throw (new BadParameterException('Invalid argument, $orderStateAction must be a OrderStateAction'));
+        }
+
+        $this->order_state_action = $orderStateAction;
 
         return $this;
     }

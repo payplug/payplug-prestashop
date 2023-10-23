@@ -21,6 +21,7 @@
  *  International Registered Trademark & Property of Payplug SAS
  */
 // Check if prestashop Context
+use PayPlug\classes\DependenciesClass;
 use PayPlug\classes\MyLogPHP;
 
 if (!defined('_PS_VERSION_')) {
@@ -219,7 +220,12 @@ class Payplug extends PaymentModule
     public function hookActionObjectOrderStateAddAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateAddAfter', $params);
+            $dependencies = new DependenciesClass();
+
+            return $dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->addTypeAction($params);
         }
     }
 
@@ -233,20 +239,24 @@ class Payplug extends PaymentModule
     public function hookActionObjectOrderStateUpdateAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe(
-                'actionObjectOrderStateUpdateAfter',
-                $params
-            );
+            $dependencies = new DependenciesClass();
+
+            return $dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->updateTypeAction($params);
         }
     }
 
     public function hookActionObjectOrderStateDeleteAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe(
-                'actionObjectOrderStateDeleteAfter',
-                $params
-            );
+            $dependencies = new DependenciesClass();
+
+            return $dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->deleteTypeAction($params);
         }
     }
 
@@ -301,12 +311,23 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description This hook is used to display
+     * a select box in the order state page (BO)
+     * in order to create/update a type
+     *
+     * @param $param
+     *
      * @return mixed
      */
     public function hookDisplayAdminStatusesForm()
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('displayAdminStatusesForm');
+            $dependencies = new DependenciesClass();
+
+            return $dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->renderOption();
         }
     }
 
