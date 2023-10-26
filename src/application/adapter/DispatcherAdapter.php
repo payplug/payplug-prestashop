@@ -23,13 +23,12 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Dispatcher;
 use PayPlug\src\interfaces\DispatcherInterface;
 
 class DispatcherAdapter implements DispatcherInterface
 {
     public function getInstance()
     {
-        return Dispatcher::getInstance();
+        return \Dispatcher::getInstance();
     }
 }

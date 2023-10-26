@@ -126,7 +126,7 @@ class MockHelper extends Mockery
     {
         return \Mockery::mock($classPathname);
 //        $context
-//            ->shouldReceive('getContext')
+//            ->shouldReceive('get')
 //            ->andReturn(ContextMock::get());
     }
 

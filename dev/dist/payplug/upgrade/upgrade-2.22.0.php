@@ -26,14 +26,14 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_22_0($object)
 {
-    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    // we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '>=')) {
         return true;
     }
 
     $flag = true;
 
-    //adding new configurations
+    // Adding new configurations
     if (!Configuration::updateValue('PAYPLUG_DEFERRED', 0)
         || !Configuration::updateValue('PAYPLUG_DEFERRED_AUTO', 0)
         || !Configuration::updateValue('PAYPLUG_DEFERRED_STATE', 0)
@@ -44,7 +44,7 @@ function upgrade_module_2_22_0($object)
         $flag = false;
     }
 
-    //hooking
+    // Hooking
     if (version_compare(_PS_VERSION_, '1.5', '>=')) {
         if (!$object->registerHook('actionOrderStatusUpdate')) {
             $flag = false;
@@ -55,7 +55,7 @@ function upgrade_module_2_22_0($object)
         }
     }
 
-    //add order-state for deferred payment
+    // Add order-state for deferred payment
     if (!$object->createOrderStates()) {
         $flag = false;
     }

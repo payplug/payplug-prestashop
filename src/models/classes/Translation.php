@@ -383,9 +383,7 @@ class Translation
      */
     public function getPaymentStatusTranslations()
     {
-        return [
-
-        ];
+        return [];
     }
 
     /**

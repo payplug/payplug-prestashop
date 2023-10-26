@@ -317,7 +317,7 @@ class PaymentClass
             'paid' => (bool) $payment->is_paid,
         ];
 
-        //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+        // Deferred payment does'nt display 3DS option before capture so we have to consider it null
         if (null !== $payment->is_3ds) {
             $payment_details['tds'] = ($payment->is_3ds)
                 ? $this->dependencies->l('payplug.buildPaymentDetails.yes', 'paymentclass')
@@ -687,32 +687,32 @@ class PaymentClass
             $installment = null;
         }
 
-        $pay_status = 1; //not paid
+        $pay_status = 1; // not paid
         if (1 == (int) $payment->is_paid) {
-            $pay_status = 2; //paid
+            $pay_status = 2; // paid
         } elseif (isset($payment->payment_method, $payment->payment_method['is_pending'])
             && 1 == (int) $payment->payment_method['is_pending']
         ) {
-            $pay_status = 10; //oney pending
+            $pay_status = 10; // oney pending
         } elseif ($this->validators['payment']->isFailed($payment)['result'] && 9 != $pay_status) {
             if ('aborted' == $payment->failure->code) {
-                $pay_status = 7; //cancelled
+                $pay_status = 7; // cancelled
             } elseif ('timeout' == $payment->failure->code) {
-                $pay_status = 11; //abandoned
+                $pay_status = 11; // abandoned
             } else {
-                $pay_status = 3; //failed
+                $pay_status = 3; // failed
             }
         } elseif (null !== $payment->authorization && ($payment->authorization->expires_at - time()) > 0) {
-            $pay_status = 8; //authorized
+            $pay_status = 8; // authorized
         } elseif (null !== $payment->authorization && ($payment->authorization->expires_at - time()) <= 0) {
-            $pay_status = 9; //authorization expired
+            $pay_status = 9; // authorization expired
         } elseif (null !== $payment->installment_plan_id && 1 == (int) $installment->is_active) {
-            $pay_status = 6; //ongoing
+            $pay_status = 6; // ongoing
         }
         if (1 == (int) $payment->is_refunded) {
-            $pay_status = 5; //refunded
+            $pay_status = 5; // refunded
         } elseif ((int) $payment->amount_refunded > 0) {
-            $pay_status = 4; //partially refunded
+            $pay_status = 4; // partially refunded
         }
 
         return $pay_status;
@@ -723,9 +723,7 @@ class PaymentClass
      *
      * @param $options
      *
-     * @throws Exception
-     *
-     * @return mixed
+     * @return array
      */
     public function preparePayment($options)
     {
@@ -991,7 +989,7 @@ class PaymentClass
         // 3ds
         $force_3ds = false;
 
-        //save card
+        // save card
         $allow_save_card =
             $config['one_click']
             && 1 != $this->cart->isGuestCartByCartId($cart->id)
@@ -1242,7 +1240,7 @@ class PaymentClass
             'isDeferred' => $options['is_deferred'],
             'isEmbedded' => 'redirect' !== (string) $this->configuration->getValue('embedded_mode'),
             'isIntegrated' => $options['is_integrated'],
-            'isMobileDevice' => ($this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result']),
+            'isMobileDevice' => $this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'],
             'cart' => $cart,
             'cartId' => (int) $payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
@@ -1375,11 +1373,9 @@ class PaymentClass
     /**
      * @description Set payment data in cookie
      *
-     * @param mixed $payplug_data
+     * @param array $payplug_data
      *
-     * @throws Exception
-     *
-     * @return mixed
+     * @return bool
      */
     public function setPaymentDataCookie($payplug_data = [])
     {
@@ -1399,9 +1395,7 @@ class PaymentClass
      *
      * @param array $payplug_errors
      *
-     * @throws Exception
-     *
-     * @return mixed
+     * @return bool
      */
     public function setPaymentErrorsCookie($payplug_errors = [])
     {
@@ -1470,11 +1464,8 @@ class PaymentClass
     /**
      * @description Hydrate Oney Payment Tab from Cookie Payment Data
      *
-     * @param array $payment_tab
-     * @param array $payment_data
-     *
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @param $payment_tab
+     * @param $payment_data
      *
      * @return array
      */

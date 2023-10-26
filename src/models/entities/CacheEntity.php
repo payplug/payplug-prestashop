@@ -105,16 +105,14 @@ class CacheEntity
     }
 
     /**
-     * @param string $cache_key
+     * @param $cache_key
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setCacheKey($cache_key)
     {
         if (!is_string($cache_key)) {
-            throw (new BadParameterException('Invalid argument, $cache_key must be a string.'));
+            throw new BadParameterException('Invalid argument, $cache_key must be a string.');
         }
 
         $this->cache_key = $cache_key;
@@ -123,16 +121,14 @@ class CacheEntity
     }
 
     /**
-     * @param string $cache_value
+     * @param $cache_value
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setCacheValue($cache_value)
     {
         if (!is_string($cache_value)) {
-            throw (new BadParameterException('Invalid argument, $cache_value must be a string.'));
+            throw new BadParameterException('Invalid argument, $cache_value must be a string.');
         }
 
         $this->cache_value = $cache_value;
@@ -141,20 +137,14 @@ class CacheEntity
     }
 
     /**
-     * @param string $date_add with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
+     * @param $date_add
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setDateAdd($date_add)
     {
         if (!is_string($date_add) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_add)) {
-            throw (
-                new BadParameterException(
-                    'Invalid argument, $date_add must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
-                )
-            );
+            throw new BadParameterException('Invalid argument, $date_add must be at format: \'Y-m-d h:m:s\'');
         }
 
         $this->date_add = $date_add;
@@ -163,20 +153,14 @@ class CacheEntity
     }
 
     /**
-     * @param string $date_upd with a specific pattern matching 'yyyy-mm-dd hh:mm:ss'
+     * @param $date_upd
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setDateUpd($date_upd)
     {
         if (!is_string($date_upd) || !preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $date_upd)) {
-            throw (
-                new BadParameterException(
-                    'Invalid argument, $date_upd must be a string looking like \'yyyy-mm-dd hh:mm:ss\''
-                )
-            );
+            throw new BadParameterException('Invalid argument, $date_upd must be at format: \'Y-m-d h:m:s\'');
         }
 
         $this->date_upd = $date_upd;
@@ -185,16 +169,14 @@ class CacheEntity
     }
 
     /**
-     * @param array $definition
+     * @param $definition
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setDefinition($definition)
     {
         if (!is_array($definition)) {
-            throw (new BadParameterException('Invalid argument, $definition must be an array'));
+            throw new BadParameterException('Invalid argument, $definition must be an array');
         }
 
         $this->definition = $definition;
@@ -203,16 +185,14 @@ class CacheEntity
     }
 
     /**
-     * @param string $id_payplug_cache
+     * @param $id_payplug_cache
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setIdPayPlugCache($id_payplug_cache)
     {
         if (!is_string($id_payplug_cache)) {
-            throw (new BadParameterException('Invalid argument, $id_payplug_cache must be a string'));
+            throw new BadParameterException('Invalid argument, $id_payplug_cache must be a string');
         }
 
         $this->id_payplug_cache = $id_payplug_cache;
@@ -221,16 +201,14 @@ class CacheEntity
     }
 
     /**
-     * @param string $table
+     * @param $table
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setTable($table)
     {
         if (!is_string($table)) {
-            throw (new BadParameterException('Invalid argument, $table must be a string'));
+            throw new BadParameterException('Invalid argument, $table must be a string');
         }
 
         $this->table = $table;

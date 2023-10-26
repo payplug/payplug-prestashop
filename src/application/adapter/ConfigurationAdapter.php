@@ -23,48 +23,44 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Configuration;
 use PayPlug\src\interfaces\ConfigurationInterface;
 
 class ConfigurationAdapter implements ConfigurationInterface
 {
-    private $psConfiguration;
+    private $configuration;
 
     public function __construct()
     {
-        $this->psConfiguration = new Configuration();
-    }
-
-    public static function factory()
-    {
-        return new ConfigurationAdapter();
+        $this->configuration = new \Configuration();
     }
 
     public function get($configuration_name)
     {
         // Old PHP configs can't accept $this->classVar::staticMethod()
         // But only $var::staticMethod()
-        $config = $this->psConfiguration;
+        $config = $this->configuration;
 
         return $config::get($configuration_name);
     }
 
     public function updateValue($key, $value)
     {
-        $config = $this->psConfiguration;
+        $config = $this->configuration;
 
         return $config::updateValue($key, $value);
     }
 
     public function deleteByName($key)
     {
-        $config = $this->psConfiguration;
+        $config = $this->configuration;
 
         return $config::deleteByName($key);
     }
 
     public function loadConfiguration()
     {
-        return Configuration::loadConfiguration();
+        $config = $this->configuration;
+
+        return $config::loadConfiguration();
     }
 }

@@ -23,23 +23,21 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Context;
 use PayPlug\src\interfaces\ContextInterface;
 
 class ContextAdapter implements ContextInterface
 {
-    public static function factory()
+    private $context;
+
+    public function __construct()
     {
-        return new self();
+        $this->context = new \Context();
     }
 
     public function get()
     {
-        return Context::getContext();
-    }
+        $context = $this->context;
 
-    public function getContext()
-    {
-        return Context::getContext();
+        return $context::getContext();
     }
 }

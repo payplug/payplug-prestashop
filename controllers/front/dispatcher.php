@@ -43,13 +43,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * @description
-     * Method that is executed after init() and checkAccess().
-     * Used to process user input.
-     *
-     * @throws Exception
-     *
-     * @return bool|void
+     * @description Method that is executed after init() and checkAccess().
      */
     public function postProcess()
     {

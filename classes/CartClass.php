@@ -23,9 +23,6 @@
 
 namespace PayPlug\classes;
 
-use DateInterval;
-use DateTime;
-
 class CartClass
 {
     private $logger;
@@ -55,16 +52,16 @@ class CartClass
 
         $this->logger->addLog('Lock creation', 'notice');
 
-        $creation_date = new DateTime('now');
+        $creation_date = new \DateTime('now');
         $duration = '10S';
-        $lifetime = new DateInterval('PT' . $duration);
+        $lifetime = new \DateInterval('PT' . $duration);
         $end_of_life = $creation_date->add($lifetime);
 
         do {
             $cart_lock = $this->dependencies->payplugLock->createLockG2($id_cart, $this->dependencies->name);
 
             if (!$cart_lock) {
-                $time = new DateTime('now');
+                $time = new \DateTime('now');
                 if ($time > $end_of_life) {
                     $this->logger->addLog(
                         'Try to create lock during ' . $duration . ' sec, but can\'t proceed',

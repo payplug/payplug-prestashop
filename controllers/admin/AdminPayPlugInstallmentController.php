@@ -104,7 +104,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
     // Impossible to write this function in camelCase, Presta 1.6 & 1.7 need it as is
     public function viewPayplugInstallment()
     {
-        $id_payplug_payment = (int) (Tools::getValue('id_payplug_payment'));
+        $id_payplug_payment = (int) Tools::getValue('id_payplug_payment');
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()

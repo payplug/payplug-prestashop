@@ -23,13 +23,9 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Language;
-use Media;
 use PayPlug\classes\DependenciesClass;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Symfony\Component\Dotenv\Dotenv;
-use Tab;
-use Tools;
 
 class PrestashopAdapter17
 {
@@ -60,7 +56,7 @@ class PrestashopAdapter17
         $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')
             && (bool) $payment_methods['applepay']) {
-            Media::addJsDef(
+            \Media::addJsDef(
                 [
                     $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
                         [
@@ -212,23 +208,23 @@ class PrestashopAdapter17
         return $payment_options;
     }
 
-    // todo: set Tab install process in a adapter
+    // todo: set \Tab install process in a adapter
     public function installTab()
     {
         $installed = true;
 
         if (isset($this->module->adminControllers) && !empty($this->module->adminControllers)) {
             foreach ($this->module->adminControllers as $adminController) {
-                if (Tab::getIdFromClassName($adminController['className'])) {
+                if (\Tab::getIdFromClassName($adminController['className'])) {
                     continue;
                 }
 
-                $tab = new Tab();
+                $tab = new \Tab();
 
                 if (isset($adminController['name'])) {
-                    foreach (Language::getLanguages(false) as $language) {
+                    foreach (\Language::getLanguages(false) as $language) {
                         $id_lang = (int) $language['id_lang'];
-                        $iso_code = Tools::strtolower($language['iso_code']);
+                        $iso_code = \Tools::strtolower($language['iso_code']);
                         if (isset($adminController['name'][$iso_code])) {
                             $tab->name[$id_lang] = $adminController['name'][$iso_code];
                         } else {
@@ -236,14 +232,14 @@ class PrestashopAdapter17
                         }
                     }
                 } else {
-                    $tab->name = array_fill_keys(Language::getIDs(false), $this->module->displayName);
+                    $tab->name = array_fill_keys(\Language::getIDs(false), $this->module->displayName);
                 }
 
                 if (isset($adminController['parent'])) {
                     if (is_int($adminController['parent'])) {
                         $tab->id_parent = $adminController['parent'];
                     } else {
-                        $tab->id_parent = Tab::getIdFromClassName($adminController['parent']);
+                        $tab->id_parent = \Tab::getIdFromClassName($adminController['parent']);
                     }
                 }
 
@@ -257,15 +253,15 @@ class PrestashopAdapter17
         return $installed;
     }
 
-    // todo: set Tab uninstall process in a adapter
+    // todo: set \Tab uninstall process in a adapter
     public function uninstallTab()
     {
         $flag = true;
 
         if (isset($this->module->adminControllers) && !empty($this->module->adminControllers)) {
             foreach ($this->module->adminControllers as $adminController) {
-                if ($idTab = Tab::getIdFromClassName($adminController['className'])) {
-                    $tab = new Tab($idTab);
+                if ($idTab = \Tab::getIdFromClassName($adminController['className'])) {
+                    $tab = new \Tab($idTab);
                     $flag = $flag && $tab->delete();
                     unset($idTab);
                 }

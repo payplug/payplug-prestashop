@@ -27,11 +27,6 @@ use PayPlug\src\interfaces\ConstantInterface;
 
 class ConstantAdapter implements ConstantInterface
 {
-    public static function factory()
-    {
-        return new ConstantAdapter();
-    }
-
     public function get($constant)
     {
         if (isset($constant)) {

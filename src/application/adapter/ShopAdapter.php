@@ -24,7 +24,6 @@
 namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\ShopInterface;
-use Shop;
 
 class ShopAdapter implements ShopInterface
 {
@@ -34,16 +33,16 @@ class ShopAdapter implements ShopInterface
             $idShop = false;
         }
 
-        return new Shop($idShop);
+        return new \Shop($idShop);
     }
 
     public function isFeatureActive()
     {
-        return Shop::isFeatureActive();
+        return \Shop::isFeatureActive();
     }
 
     public function setContext()
     {
-        return Shop::setContext(Shop::CONTEXT_ALL);
+        return \Shop::setContext(Shop::CONTEXT_ALL);
     }
 }

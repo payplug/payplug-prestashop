@@ -61,7 +61,7 @@ class cardValidator
             ];
         }
 
-        $date = strtotime($year . '-' . $month . '-' . '01');
+        $date = strtotime($year . '-' . $month . '-01');
         $limit_date = date('Y-m-d', strtotime('+1 month', $date));
 
         if ('1970' == date('Y', strtotime($limit_date))) {

@@ -77,6 +77,7 @@ class BaseApiRest extends TestCase
 
         $this->payment_method = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
+        $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
 
         $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
 

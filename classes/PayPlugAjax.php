@@ -23,8 +23,6 @@
 
 namespace PayPlug\classes;
 
-use Exception;
-
 require_once _PS_MODULE_DIR_ . 'payplug/classes/PayplugLock.php';
 
 /**
@@ -67,25 +65,22 @@ class PayPlugAjax
      */
     public function run()
     {
-        //todo: split code into different functions if needed
+        // todo: split code into different functions if needed
         $this->postProcess();
     }
 
     /**
      * @description  Manage ajax processing
-     *
-     * @throws Exception
      */
     public function postProcess()
     {
-        $this->context = $this->context->getContext(); // get the method
         $tools = $this->toolsAdapter;
 
-        if (($tools->tool('getValue', '_ajax')) == 1) {
+        if (1 == $tools->tool('getValue', '_ajax')) {
             if ($tools->tool('getIsset', 'pc')) {
                 if (1 == (int) $tools->tool('getValue', 'pay')) {
                     $is_installment = $tools->tool('getValue', 'i');
-                    $is_installment = (isset($is_installment)) && (($tools->tool('getValue', 'i')) == 1);
+                    $is_installment = isset($is_installment) && 1 == $tools->tool('getValue', 'i');
                     $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
                     $is_deferred = (bool) $payment_methods['deferred'];
                     $is_oney = $tools->tool('getValue', 'io');
@@ -207,10 +202,10 @@ class PayPlugAjax
 
                 try {
                     $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount, $iso_code);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     exit(json_encode([
                         'result' => false,
-                        'error' => $this->translate->translate(5), //('Oney is momentarily unavailable.')
+                        'error' => $this->translate->translate(5), // Oney is momentarily unavailable.
                     ]));
                 }
 
@@ -229,21 +224,17 @@ class PayPlugAjax
             if ($tools->tool('getIsset', 'savePaymentData')) {
                 $payment_data = $tools->tool('getValue', 'payment_data');
 
-                try {
-                    if (empty($payment_data)) {
-                        exit(json_encode([
-                            'result' => false,
-                            'message' => $this->translate->translate(1), //('Empty payment data')
-                        ]));
-                    }
-                    if ($this->oney->checkOneyRequiredFields($payment_data)) {
-                        exit(json_encode([
-                            'result' => false,
-                            'message' => $this->translate->translate(2),
-                        ]));
-                    }
-                } catch (Exception $e) {
-                    throw new Exception($e);
+                if (empty($payment_data)) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => $this->translate->translate(1), // Empty payment data
+                    ]));
+                }
+                if ($this->oney->checkOneyRequiredFields($payment_data)) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => $this->translate->translate(2),
+                    ]));
                 }
 
                 $result = $this->paymentClass->setPaymentDataCookie($payment_data);
@@ -251,8 +242,8 @@ class PayPlugAjax
                 exit(json_encode([
                     'result' => $result,
                     'message' => $result ?
-                        $this->translate->translate(3) : //('Your information has been saved')
-                        $this->translate->translate(4), //('An error occurred. Please retry in few seconds.')
+                        $this->translate->translate(3) : // Your information has been saved.
+                        $this->translate->translate(4), // An error occurred. Please retry in few seconds.
                 ]));
             }
         }

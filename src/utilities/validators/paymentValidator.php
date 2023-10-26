@@ -202,7 +202,7 @@ class paymentValidator
     /**
      * @description Check if given amount is valid with the given limits
      *
-     * @param int   $amount
+     * @param int $amount
      * @param array $limits
      *
      * @return array
@@ -264,7 +264,7 @@ class paymentValidator
      * @description Check if given domain is allowed
      *
      * @param string $domain
-     * @param array  $allowed_domains
+     * @param array $allowed_domains
      *
      * @return array
      */
@@ -388,7 +388,7 @@ class paymentValidator
      * @description Check if given iso code match with the allowed list
      *
      * @param string $currency
-     * @param array  $currencies
+     * @param array $currencies
      *
      * @return array
      */

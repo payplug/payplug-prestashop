@@ -232,7 +232,7 @@ class moduleValidator
     /**
      * @description Check if a feature of the module is valid
      *
-     * @param array  $features
+     * @param array $features
      * @param string $name
      *
      * @return array

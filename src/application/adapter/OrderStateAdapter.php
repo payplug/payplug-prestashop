@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\application\adapter;
 
-use OrderState;
 use PayPlug\src\interfaces\OrderStateInterface;
 
 class OrderStateAdapter implements OrderStateInterface
@@ -32,7 +31,7 @@ class OrderStateAdapter implements OrderStateInterface
 
     public function __construct($id = null)
     {
-        $this->orderState = new OrderState($id);
+        $this->orderState = new \OrderState($id);
 
         return $this;
     }
@@ -44,17 +43,17 @@ class OrderStateAdapter implements OrderStateInterface
 
     public function get($id = null, $idLang = null)
     {
-        return new OrderState($id, $idLang);
+        return new \OrderState($id, $idLang);
     }
 
     public static function getOrderState($id = null)
     {
-        return new OrderState($id);
+        return new \OrderState($id);
     }
 
     public static function getOrderStates($id_lang = null)
     {
-        return OrderState::getOrderStates($id_lang);
+        return \OrderState::getOrderStates($id_lang);
     }
 
     public function softDelete()

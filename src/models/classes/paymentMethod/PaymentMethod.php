@@ -287,9 +287,7 @@ class PaymentMethod
      * @description Set object property
      *
      * @param string $key
-     * @param null   $value
-     *
-     * @throws BadParameterException
+     * @param null $value
      *
      * @return $this
      */
@@ -302,7 +300,7 @@ class PaymentMethod
         }
 
         if (is_null($value)) {
-            throw (new BadParameterException('Invalid argument, $value must be a non null'));
+            throw new BadParameterException('Invalid argument, $value must be a non null');
         }
         $this->{$key} = $value;
 

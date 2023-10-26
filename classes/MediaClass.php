@@ -63,8 +63,8 @@ class MediaClass
      * @description  Display messages template
      *
      * @param array $messages
-     * @param bool  $with_msg_button
-     * @param bool  $with_yes_no_buttons
+     * @param bool $with_msg_button
+     * @param bool $with_yes_no_buttons
      *
      * @return bool|string
      */
@@ -95,7 +95,7 @@ class MediaClass
      * @description Display the right pop-in
      *
      * @param string $type
-     * @param array  $args
+     * @param array $args
      *
      * @return string
      */
@@ -152,7 +152,7 @@ class MediaClass
                 $this->context->controller->addCSS($media);
             }
         }
-//        exit;
+
         return true;
     }
 

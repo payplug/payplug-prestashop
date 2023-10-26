@@ -23,12 +23,7 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Language;
-use Media;
 use PayPlug\classes\DependenciesClass;
-use Tab;
-use Tools;
-use Validate;
 
 class PrestashopAdapter16
 {
@@ -53,7 +48,7 @@ class PrestashopAdapter16
         $this->context->controller->addJS($views_path . '/js/front_1_6-v' . $this->dependencies->version . '.js');
         $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
 
-        Media::addJsDef([
+        \Media::addJsDef([
             'payplug_ajax_url' => $this->context->link->getModuleLink('payplug', 'ajax', [], true),
         ]);
         $this->oney->assignOneyJSVar();
@@ -97,7 +92,7 @@ class PrestashopAdapter16
                 }
             }
 
-            if (Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
+            if (\Validate::isLoadedObject($cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
                 $is_elligible = $this->oney->isOneyElligible($cart);
                 $error = !$is_elligible['result'];
             } else {
@@ -125,7 +120,7 @@ class PrestashopAdapter16
         $payplug_cards = null;
 
         foreach ($payment_options as &$payment_option) {
-            if ((isset($payment_option['name']))) {
+            if (isset($payment_option['name'])) {
                 $payment_method = $payment_option['name'];
                 $extraClass = (isset($payment_option['extra_classes'])) ? $payment_option['extra_classes'] : $img_lang;
                 if ((bool) $this->config->get('PAYPLUG_ONE_CLICK')
@@ -167,7 +162,7 @@ class PrestashopAdapter16
                     $oneyImage .= '_fees';
 
                     if (strpos($payment_option['type'], 'without_fees')) {
-                        $iso = Tools::strtoupper($this->context->getContext()->language->iso_code);
+                        $iso = \Tools::strtoupper($this->context->language->iso_code);
                         $merchant_company_iso = (string) $this->config->get('PAYPLUG_COMPANY_ISO');
                         if ('IT' != $iso && 'FR' != $iso) {
                             $iso = $merchant_company_iso;
@@ -178,19 +173,19 @@ class PrestashopAdapter16
 
                     if (false !== $error) {
                         $oneyImage .= '_alt.svg';
-                        $payment_option['logo'] = Media::getMediaPath(
+                        $payment_option['logo'] = \Media::getMediaPath(
                             _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImageOptimized . $oneyImage
                         );
                     } else {
                         $oneyImage .= '.svg';
                         $payment_option['logo'] = [
-                            'optimized' => Media::getMediaPath(
+                            'optimized' => \Media::getMediaPath(
                                 _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImageOptimized . $oneyImage
                             ),
-                            'x3' => Media::getMediaPath(
+                            'x3' => \Media::getMediaPath(
                                 _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImagex3 . $oneyImage
                             ),
-                            'x4' => Media::getMediaPath(
+                            'x4' => \Media::getMediaPath(
                                 _PS_MODULE_DIR_ . $this->dependencies->name . $oneyImagex4 . $oneyImage
                             ),
                         ];
@@ -244,7 +239,7 @@ class PrestashopAdapter16
 
         $installed = true;
 
-        if (!Tab::getIdFromClassName('AdminPayPlug')) {
+        if (!\Tab::getIdFromClassName('AdminPayPlug')) {
             $translations = [
                 'en' => 'Payplug',
                 'gb' => 'Payplug',
@@ -253,8 +248,8 @@ class PrestashopAdapter16
             ];
 
             $tab = new Tab();
-            foreach (Language::getLanguages(false) as $language) {
-                $iso_code = Tools::strtolower($language['iso_code']);
+            foreach (\Language::getLanguages(false) as $language) {
+                $iso_code = \Tools::strtolower($language['iso_code']);
                 if (isset($translations[$iso_code])) {
                     $tab->name[(int) $language['id_lang']] = $translations[$iso_code];
                 } else {
@@ -273,7 +268,7 @@ class PrestashopAdapter16
             return false;
         }
 
-        if (!Tab::getIdFromClassName('AdminPayPlugInstallment')) {
+        if (!\Tab::getIdFromClassName('AdminPayPlugInstallment')) {
             $translations = [
                 'en' => 'Installment Plans',
                 'gb' => 'Installment Plans',
@@ -281,11 +276,11 @@ class PrestashopAdapter16
                 'fr' => 'Paiements en plusieurs fois',
             ];
 
-            $adminPayPlugId = Tab::getIdFromClassName('AdminPayPlug');
+            $adminPayPlugId = \Tab::getIdFromClassName('AdminPayPlug');
 
             $tab = new Tab();
-            foreach (Language::getLanguages(false) as $language) {
-                $iso_code = Tools::strtolower($language['iso_code']);
+            foreach (\Language::getLanguages(false) as $language) {
+                $iso_code = \Tools::strtolower($language['iso_code']);
                 if (isset($translations[$iso_code])) {
                     $tab->name[(int) $language['id_lang']] = $translations[$iso_code];
                 } else {
@@ -311,7 +306,7 @@ class PrestashopAdapter16
 
         $flag = true;
 
-        $idTab = Tab::getIdFromClassName('AdminPayPlug');
+        $idTab = \Tab::getIdFromClassName('AdminPayPlug');
         if ($idTab) {
             $tab = new Tab($idTab);
             $flag = $flag && $tab->delete();
@@ -322,7 +317,7 @@ class PrestashopAdapter16
             return false;
         }
 
-        $idTab = Tab::getIdFromClassName('AdminPayPlugInstallment');
+        $idTab = \Tab::getIdFromClassName('AdminPayPlugInstallment');
         if ($idTab) {
             $tab = new Tab($idTab);
             $flag = $flag && $tab->delete();

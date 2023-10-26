@@ -237,16 +237,14 @@ class CardEntity
     }
 
     /**
-     * @param array $allowed_brand
+     * @param $allowed_brand
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setAllowedBrand($allowed_brand)
     {
         if (!is_array($allowed_brand)) {
-            throw (new BadParameterException('Invalid allowed brand, param $allowed_brand must be an array'));
+            throw new BadParameterException('Invalid allowed brand, param $allowed_brand must be an array');
         }
 
         $this->allowed_brand = $allowed_brand;
@@ -255,16 +253,14 @@ class CardEntity
     }
 
     /**
-     * @param string $brand
+     * @param $brand
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setBrand($brand)
     {
         if (!is_string($brand)) {
-            throw (new BadParameterException('Invalid brand, param $brand must be a string'));
+            throw new BadParameterException('Invalid brand, param $brand must be a string');
         }
 
         $this->brand = $brand;
@@ -273,16 +269,14 @@ class CardEntity
     }
 
     /**
-     * @param string $country
+     * @param $country
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setCountry($country)
     {
         if (!is_string($country)) {
-            throw (new BadParameterException('Invalid country, param $country must be a string'));
+            throw new BadParameterException('Invalid country, param $country must be a string');
         }
 
         $this->country = $country;
@@ -291,16 +285,14 @@ class CardEntity
     }
 
     /**
-     * @param array $definition
+     * @param $definition
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setDefinition($definition)
     {
         if (!is_array($definition)) {
-            throw (new BadParameterException('Invalid definition, $definition must be an array'));
+            throw new BadParameterException('Invalid definition, $definition must be an array');
         }
 
         $this->definition = $definition;
@@ -309,16 +301,14 @@ class CardEntity
     }
 
     /**
-     * @param string $exp_month
+     * @param $exp_month
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setExpMonth($exp_month)
     {
         if (!is_string($exp_month)) {
-            throw (new BadParameterException('Invalid expiry month, param $exp_month must be a string'));
+            throw new BadParameterException('Invalid expiry month, param $exp_month must be a string');
         }
 
         $this->exp_month = $exp_month;
@@ -327,16 +317,14 @@ class CardEntity
     }
 
     /**
-     * @param string $exp_year
+     * @param $exp_year
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setExpYear($exp_year)
     {
         if (!is_string($exp_year)) {
-            throw (new BadParameterException('Invalid expiry year, param $exp_year must be a string'));
+            throw new BadParameterException('Invalid expiry year, param $exp_year must be a string');
         }
 
         $this->exp_year = $exp_year;
@@ -345,16 +333,14 @@ class CardEntity
     }
 
     /**
-     * @param array $fieldsRequired
+     * @param $fieldsRequired
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setFieldsRequired($fieldsRequired)
     {
         if (!is_array($fieldsRequired)) {
-            throw (new BadParameterException('Invalid argument, $setFieldsRequired must be an array'));
+            throw new BadParameterException('Invalid argument, $setFieldsRequired must be an array');
         }
 
         $this->fieldsRequired = $fieldsRequired;
@@ -363,16 +349,14 @@ class CardEntity
     }
 
     /**
-     * @param array $fieldsSize
+     * @param $fieldsSize
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setFieldsSize($fieldsSize)
     {
         if (!is_array($fieldsSize)) {
-            throw (new BadParameterException('Invalid fieldsSize, param $fieldsSize must be an array'));
+            throw new BadParameterException('Invalid fieldsSize, param $fieldsSize must be an array');
         }
         $this->fieldsSize = $fieldsSize;
 
@@ -380,16 +364,14 @@ class CardEntity
     }
 
     /**
-     * @param array $fieldsValidate
+     * @param $fieldsValidate
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setFieldsValidate($fieldsValidate)
     {
         if (!is_array($fieldsValidate)) {
-            throw (new BadParameterException('Invalid fields validate, param $fieldsValidate must be an array'));
+            throw new BadParameterException('Invalid fields validate, param $fieldsValidate must be an array');
         }
         $this->fieldsValidate = $fieldsValidate;
 
@@ -397,16 +379,14 @@ class CardEntity
     }
 
     /**
-     * @param int $id
+     * @param $id
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setId($id)
     {
         if (!is_int($id)) {
-            throw (new BadParameterException('Invalid id, param $id must be an integer'));
+            throw new BadParameterException('Invalid id, param $id must be an integer');
         }
 
         $this->id = $id;
@@ -415,19 +395,14 @@ class CardEntity
     }
 
     /**
-     * @param string $id_card card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+     * @param $id_card
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setIdCard($id_card)
     {
         if (!is_string($id_card) || !preg_match('/card_[a-z0-9]{32}/', $id_card)) {
-            throw (new BadParameterException(
-                'Invalid card token format, param $id_card must be a string 
-                looking like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\''
-            ));
+            throw new BadParameterException('Invalid card token format, param $id_card must be a string looking like \'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\'');
         }
 
         $this->id_card = $id_card;
@@ -436,16 +411,14 @@ class CardEntity
     }
 
     /**
-     * @param int $id_company
+     * @param $id_company
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setIdCompany($id_company)
     {
         if (!is_int($id_company)) {
-            throw (new BadParameterException('Invalid id, param $id_company must be an integer'));
+            throw new BadParameterException('Invalid id, param $id_company must be an integer');
         }
 
         $this->id_company = $id_company;
@@ -454,16 +427,14 @@ class CardEntity
     }
 
     /**
-     * @param int $id_customer
+     * @param $id_customer
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setIdCustomer($id_customer)
     {
         if (!is_int($id_customer)) {
-            throw (new BadParameterException('Invalid id, param $id_customer must be an integer'));
+            throw new BadParameterException('Invalid id, param $id_customer must be an integer');
         }
 
         $this->id_customer = $id_customer;
@@ -472,16 +443,14 @@ class CardEntity
     }
 
     /**
-     * @param string $identifier
+     * @param $identifier
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setIdentifier($identifier)
     {
         if (!is_string($identifier)) {
-            throw (new BadParameterException('Invalid identifier, param $identifier must be a string'));
+            throw new BadParameterException('Invalid identifier, param $identifier must be a string');
         }
         $this->identifier = $identifier;
 
@@ -489,16 +458,14 @@ class CardEntity
     }
 
     /**
-     * @param bool $is_sandbox
+     * @param $is_sandbox
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setIsSandbox($is_sandbox)
     {
         if (!is_bool($is_sandbox)) {
-            throw (new BadParameterException('Param $is_sandbox must be a boolean'));
+            throw new BadParameterException('Param $is_sandbox must be a boolean');
         }
 
         $this->is_sandbox = $is_sandbox;
@@ -507,16 +474,14 @@ class CardEntity
     }
 
     /**
-     * @param string $last4
+     * @param $last4
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setLast4($last4)
     {
         if (!is_string($last4)) {
-            throw (new BadParameterException('Invalid last4, param $last4 must be a string'));
+            throw new BadParameterException('Invalid last4, param $last4 must be a string');
         }
 
         $this->last4 = $last4;
@@ -525,16 +490,14 @@ class CardEntity
     }
 
     /**
-     * @param string $metadata
+     * @param $metadata
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setMetadata($metadata)
     {
         if (!is_string($metadata)) {
-            throw (new BadParameterException('Invalid metadata, param $metadata must be a string'));
+            throw new BadParameterException('Invalid metadata, param $metadata must be a string');
         }
 
         $this->metadata = $metadata;
@@ -543,9 +506,9 @@ class CardEntity
     }
 
     /**
-     * @param object $module
+     * @param $module
      *
-     * @return self
+     * @return $this
      */
     public function setModule($module)
     {
@@ -555,16 +518,14 @@ class CardEntity
     }
 
     /**
-     * @param string $table
+     * @param $table
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setTable($table)
     {
         if (!is_string($table)) {
-            throw (new BadParameterException('Invalid table, param $table must be a string'));
+            throw new BadParameterException('Invalid table, param $table must be a string');
         }
         $this->table = $table;
 

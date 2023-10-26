@@ -24,14 +24,13 @@
 namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\ProductInterface;
-use Product;
 
 class ProductAdapter implements ProductInterface
 {
     public function product($method)
     {
         if (isset($method)) {
-            return Product::$method;
+            return \Product::$method;
         }
     }
 
@@ -45,10 +44,10 @@ class ProductAdapter implements ProductInterface
     {
         if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
             // @deprecated since 1.7.3.1 Use getIdProductAttributeByIdAttributes() instead
-            return Product::getIdProductAttributesByIdAttributes($idProduct, $group);
+            return \Product::getIdProductAttributesByIdAttributes($idProduct, $group);
         }
 
-        return Product::getIdProductAttributeByIdAttributes($idProduct, $group);
+        return \Product::getIdProductAttributeByIdAttributes($idProduct, $group);
     }
 
     public function getPriceStatic(
@@ -61,7 +60,7 @@ class ProductAdapter implements ProductInterface
         $usereduc = true,
         $quantity = 1
     ) {
-        return Product::getPriceStatic(
+        return \Product::getPriceStatic(
             $id_product,
             $usetax,
             $id_product_attribute,

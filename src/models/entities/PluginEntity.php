@@ -731,14 +731,12 @@ class PluginEntity
     /**
      * @param object $address
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setAddress($address)
     {
         if (!is_object($address)) {
-            throw (new BadParameterException('Invalid argument, $address must be an AddressAdapter'));
+            throw new BadParameterException('Invalid argument, $address must be an AddressAdapter');
         }
 
         $this->address = $address;
@@ -761,14 +759,12 @@ class PluginEntity
     /**
      * @param object $api_rest
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setApiRestClass($api_rest)
     {
         if (!is_object($api_rest)) {
-            throw (new BadParameterException('Invalid argument, $api_rest must be ApiRest'));
+            throw new BadParameterException('Invalid argument, $api_rest must be ApiRest');
         }
 
         $this->api_rest = $api_rest;
@@ -779,14 +775,12 @@ class PluginEntity
     /**
      * @param string $api_version
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setApiVersion($api_version)
     {
         if (!is_string($api_version) || !preg_match('/(\d{4})-(\d{2})-(\d{2})/', $api_version)) {
-            throw (new BadParameterException('Invalid argument, $api_url must be a a valid api url format'));
+            throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
         }
 
         $this->api_version = $api_version;
@@ -797,14 +791,12 @@ class PluginEntity
     /**
      * @param object $assign
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setAssign($assign)
     {
         if (!is_object($assign)) {
-            throw (new BadParameterException('Invalid argument, $assign must be an AssignAdapter'));
+            throw new BadParameterException('Invalid argument, $assign must be an AssignAdapter');
         }
 
         $this->assign = $assign;
@@ -815,14 +807,12 @@ class PluginEntity
     /**
      * @param object $browser
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setBrowser($browser)
     {
         if (!is_object($browser)) {
-            throw (new BadParameterException('Invalid argument, $browser must be a Services/Browser'));
+            throw new BadParameterException('Invalid argument, $browser must be a Services/Browser');
         }
 
         $this->browser = $browser;
@@ -833,14 +823,12 @@ class PluginEntity
     /**
      * @param object $cache
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCache($cache)
     {
         if (!is_object($cache)) {
-            throw (new BadParameterException('Invalid argument, $card must be a CacheRepository'));
+            throw new BadParameterException('Invalid argument, $card must be a CacheRepository');
         }
 
         $this->cache = $cache;
@@ -851,14 +839,12 @@ class PluginEntity
     /**
      * @param object $card_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCardRepository($card_repository)
     {
         if (!is_object($card_repository)) {
-            throw (new BadParameterException('Invalid argument, $card_repository must be an CardRepository'));
+            throw new BadParameterException('Invalid argument, $card_repository must be an CardRepository');
         }
 
         $this->card_repository = $card_repository;
@@ -869,14 +855,12 @@ class PluginEntity
     /**
      * @param object $cache_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCacheRepository($cache_repository)
     {
         if (!is_object($cache_repository)) {
-            throw (new BadParameterException('Invalid argument, $cache_repository must be an CacheRepository'));
+            throw new BadParameterException('Invalid argument, $cache_repository must be an CacheRepository');
         }
 
         $this->cache_repository = $cache_repository;
@@ -887,14 +871,12 @@ class PluginEntity
     /**
      * @param object $carrier
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCarrier($carrier)
     {
         if (!is_object($carrier)) {
-            throw (new BadParameterException('Invalid argument, $carrier must be CarrierAdapter'));
+            throw new BadParameterException('Invalid argument, $carrier must be CarrierAdapter');
         }
 
         $this->carrier = $carrier;
@@ -905,14 +887,12 @@ class PluginEntity
     /**
      * @param object $cart
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCart($cart)
     {
         if (!is_object($cart)) {
-            throw (new BadParameterException('Invalid argument, $cart must be CartAdapter'));
+            throw new BadParameterException('Invalid argument, $cart must be CartAdapter');
         }
 
         $this->cart = $cart;
@@ -923,14 +903,12 @@ class PluginEntity
     /**
      * @param object $configuration
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setConfiguration($configuration)
     {
         if (!is_object($configuration)) {
-            throw (new BadParameterException('Invalid argument, $configuration must be a ConfigurationAdapter'));
+            throw new BadParameterException('Invalid argument, $configuration must be a ConfigurationAdapter');
         }
 
         $this->configuration = $configuration;
@@ -941,14 +919,12 @@ class PluginEntity
     /**
      * @param object $cardAction
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCardAction($cardAction)
     {
         if (!is_object($cardAction)) {
-            throw (new BadParameterException('Invalid argument, $cardAction must be a CardAction'));
+            throw new BadParameterException('Invalid argument, $cardAction must be a CardAction');
         }
 
         $this->card_action = $cardAction;
@@ -959,14 +935,12 @@ class PluginEntity
     /**
      * @param object $configurationAction
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setConfigurationAction($configurationAction)
     {
         if (!is_object($configurationAction)) {
-            throw (new BadParameterException('Invalid argument, $configurationAction must be a ConfigurationAction'));
+            throw new BadParameterException('Invalid argument, $configurationAction must be a ConfigurationAction');
         }
 
         $this->configuration_action = $configurationAction;
@@ -975,16 +949,14 @@ class PluginEntity
     }
 
     /**
-     * @param object $configuration_class
+     * @param $configuration_class
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setConfigurationClass($configuration_class)
     {
         if (!is_object($configuration_class)) {
-            throw (new BadParameterException('Invalid argument, $configuration_class must be a setConfigurationClass'));
+            throw new BadParameterException('Invalid argument, $configuration_class must be a setConfigurationClass');
         }
 
         $this->configuration_class = $configuration_class;
@@ -993,17 +965,14 @@ class PluginEntity
     }
 
     /**
-     * @param object $context
-     * @param mixed  $constant
+     * @param $constant
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setConstant($constant)
     {
         if (!is_object($constant)) {
-            throw (new BadParameterException('Invalid argument, $constant must be a ConstantAdapter'));
+            throw new BadParameterException('Invalid argument, $constant must be a ConstantAdapter');
         }
 
         $this->constant = $constant;
@@ -1012,16 +981,14 @@ class PluginEntity
     }
 
     /**
-     * @param object $context
+     * @param $context
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setContext($context)
     {
         if (!is_object($context)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ContextAdapter'));
+            throw new BadParameterException('Invalid argument, $card must be a ContextAdapter');
         }
 
         $this->context = $context;
@@ -1032,14 +999,12 @@ class PluginEntity
     /**
      * @param object $country
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCountry($country)
     {
         if (!is_object($country)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ContextAdapter'));
+            throw new BadParameterException('Invalid argument, $card must be a ContextAdapter');
         }
 
         $this->country = $country;
@@ -1050,14 +1015,12 @@ class PluginEntity
     /**
      * @param object $country_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCountryRepository($country_repository)
     {
         if (!is_object($country_repository)) {
-            throw (new BadParameterException('Invalid argument, $country_repository must be an CountryRepository'));
+            throw new BadParameterException('Invalid argument, $country_repository must be an CountryRepository');
         }
 
         $this->country_repository = $country_repository;
@@ -1073,11 +1036,7 @@ class PluginEntity
     public function setCurrency($currency)
     {
         if (!is_object($currency)) {
-            throw (
-            new BadParameterException(
-                'Invalid Currency object, param $currency must be a CurrencyAdapter'
-            )
-            );
+            throw new BadParameterException('Invalid Currency object, param $currency must be a CurrencyAdapter');
         }
         $this->currency = $currency;
 
@@ -1092,11 +1051,7 @@ class PluginEntity
     public function setCustomer($customer)
     {
         if (!is_object($customer)) {
-            throw (
-            new BadParameterException(
-                'Invalid Currency object, param $customer must be a CurrencyAdapter'
-            )
-            );
+            throw new BadParameterException('Invalid Currency object, param $customer must be a CustomerAdapter');
         }
         $this->customer = $customer;
 
@@ -1106,14 +1061,12 @@ class PluginEntity
     /**
      * @param mixed $dispatcher
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setDispatcher($dispatcher)
     {
         if (!is_object($dispatcher)) {
-            throw (new BadParameterException('Invalid argument, $dispatcher must be a DispatcherAdapter'));
+            throw new BadParameterException('Invalid argument, $dispatcher must be a DispatcherAdapter');
         }
 
         $this->dispatcher = $dispatcher;
@@ -1129,7 +1082,7 @@ class PluginEntity
     public function setInstall($install)
     {
         if (!is_object($install)) {
-            throw (new BadParameterException('Invalid argument, param $install must be a InstallRepository'));
+            throw new BadParameterException('Invalid argument, param $install must be a InstallRepository');
         }
 
         $this->install = $install;
@@ -1152,14 +1105,12 @@ class PluginEntity
     /**
      * @param object $logger
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setLogger($logger)
     {
         if (!is_object($logger)) {
-            throw (new BadParameterException('Invalid argument, $card must be a LoggerRepository'));
+            throw new BadParameterException('Invalid argument, $card must be a LoggerRepository');
         }
 
         $this->logger = $logger;
@@ -1170,14 +1121,12 @@ class PluginEntity
     /**
      * @param object $logger_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setLoggerRepository($logger_repository)
     {
         if (!is_object($logger_repository)) {
-            throw (new BadParameterException('Invalid argument, $logger_repository must be an LoggerRepository'));
+            throw new BadParameterException('Invalid argument, $logger_repository must be an LoggerRepository');
         }
 
         $this->logger_repository = $logger_repository;
@@ -1187,16 +1136,14 @@ class PluginEntity
 
     /**
      * @param object $module
-     * @param mixed  $media
-     *
-     * @throws BadParameterException
+     * @param mixed $media
      *
      * @return self
      */
     public function setMedia($media)
     {
         if (!is_object($media)) {
-            throw (new BadParameterException('Invalid argument, $media must be a MediaAdapter'));
+            throw new BadParameterException('Invalid argument, $media must be a MediaAdapter');
         }
 
         $this->media = $media;
@@ -1205,17 +1152,14 @@ class PluginEntity
     }
 
     /**
-     * @param object $merchantTelemetryAction
-     * @param mixed  $merchantTelemetry
-     *
-     * @throws BadParameterException
+     * @param mixed $merchantTelemetry
      *
      * @return self
      */
     public function setMerchantTelemetry($merchantTelemetry)
     {
         if (!is_object($merchantTelemetry)) {
-            throw (new BadParameterException('Invalid argument, $merchantTelemetry must be a MerchantTelemetry'));
+            throw new BadParameterException('Invalid argument, $merchantTelemetry must be a MerchantTelemetry');
         }
 
         $this->merchantTelemetry = $merchantTelemetry;
@@ -1226,14 +1170,12 @@ class PluginEntity
     /**
      * @param object $merchantTelemetryAction
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setMerchantTelemetryAction($merchantTelemetryAction)
     {
         if (!is_object($merchantTelemetryAction)) {
-            throw (new BadParameterException('Invalid argument, $merchantTelemetryAction must be a MerchantTelemetryAction'));
+            throw new BadParameterException('Invalid argument, $merchantTelemetryAction must be a MerchantTelemetryAction');
         }
 
         $this->merchantTelemetry_action = $merchantTelemetryAction;
@@ -1242,17 +1184,14 @@ class PluginEntity
     }
 
     /**
-     * @param object $module
-     * @param mixed  $message
-     *
-     * @throws BadParameterException
+     * @param mixed $message
      *
      * @return self
      */
     public function setMessage($message)
     {
         if (!is_object($message)) {
-            throw (new BadParameterException('Invalid argument, $message must be a MessageAdapter'));
+            throw new BadParameterException('Invalid argument, $message must be a MessageAdapter');
         }
 
         $this->message = $message;
@@ -1263,14 +1202,12 @@ class PluginEntity
     /**
      * @param object $module
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setModule($module)
     {
         if (!is_object($module)) {
-            throw (new BadParameterException('Invalid argument, $module must be a ModuleAdapter'));
+            throw new BadParameterException('Invalid argument, $module must be a ModuleAdapter');
         }
 
         $this->module = $module;
@@ -1281,14 +1218,12 @@ class PluginEntity
     /**
      * @param object $module_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setModuleRepository($module_repository)
     {
         if (!is_object($module_repository)) {
-            throw (new BadParameterException('Invalid argument, $module_repository must be an ModuleRepository'));
+            throw new BadParameterException('Invalid argument, $module_repository must be an ModuleRepository');
         }
 
         $this->module_repository = $module_repository;
@@ -1299,14 +1234,12 @@ class PluginEntity
     /**
      * @param object $lock_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setLockRepository($lock_repository)
     {
         if (!is_object($lock_repository)) {
-            throw (new BadParameterException('Invalid argument, $lock_repository must be an LockRepository'));
+            throw new BadParameterException('Invalid argument, $lock_repository must be an LockRepository');
         }
 
         $this->lock_repository = $lock_repository;
@@ -1317,14 +1250,12 @@ class PluginEntity
     /**
      * @param object $onboardingAction
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setOnboardingAction($onboardingAction)
     {
         if (!is_object($onboardingAction)) {
-            throw (new BadParameterException('Invalid argument, $onboardingAction must be a OnboardingAction'));
+            throw new BadParameterException('Invalid argument, $onboardingAction must be a OnboardingAction');
         }
 
         $this->onboarding_action = $onboardingAction;
@@ -1335,14 +1266,12 @@ class PluginEntity
     /**
      * @param object $oney
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setOney($oney)
     {
         if (!is_object($oney)) {
-            throw (new BadParameterException('Invalid argument, $card must be a OneyRepository'));
+            throw new BadParameterException('Invalid argument, $card must be a OneyRepository');
         }
 
         $this->oney = $oney;
@@ -1353,14 +1282,12 @@ class PluginEntity
     /**
      * @param object $order_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setOrderRepository($order_repository)
     {
         if (!is_object($order_repository)) {
-            throw (new BadParameterException('Invalid argument, $order_repository must be an OrderRepository'));
+            throw new BadParameterException('Invalid argument, $order_repository must be an OrderRepository');
         }
 
         $this->order_repository = $order_repository;
@@ -1371,14 +1298,12 @@ class PluginEntity
     /**
      * @param object $orderStateAction
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setOrderStateAction($orderStateAction)
     {
         if (!is_object($orderStateAction)) {
-            throw (new BadParameterException('Invalid argument, $orderStateAction must be a OrderStateAction'));
+            throw new BadParameterException('Invalid argument, $orderStateAction must be a OrderStateAction');
         }
 
         $this->order_state_action = $orderStateAction;
@@ -1389,14 +1314,12 @@ class PluginEntity
     /**
      * @param object $order_state_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setOrderStateRepository($order_state_repository)
     {
         if (!is_object($order_state_repository)) {
-            throw (new BadParameterException('Invalid argument, $order_state_repository must be an OrderStateRepository'));
+            throw new BadParameterException('Invalid argument, $order_state_repository must be an OrderStateRepository');
         }
 
         $this->order_state_repository = $order_state_repository;
@@ -1407,14 +1330,12 @@ class PluginEntity
     /**
      * @param object $payplug_order_state_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setPayplugOrderStateRepository($payplug_order_state_repository)
     {
         if (!is_object($payplug_order_state_repository)) {
-            throw (new BadParameterException('Invalid argument, $payplug_order_state_repository must be an PayplugOrderStateRepository'));
+            throw new BadParameterException('Invalid argument, $payplug_order_state_repository must be an PayplugOrderStateRepository');
         }
 
         $this->payplug_order_state_repository = $payplug_order_state_repository;
@@ -1425,14 +1346,12 @@ class PluginEntity
     /**
      * @param mixed $order_payment_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setOrderPaymentRepository($order_payment_repository)
     {
         if (!is_object($order_payment_repository)) {
-            throw (new BadParameterException('Invalid argument, $order_payment_repository must be an OrderPaymentRepository'));
+            throw new BadParameterException('Invalid argument, $order_payment_repository must be an OrderPaymentRepository');
         }
 
         $this->order_payment_repository = $order_payment_repository;
@@ -1443,14 +1362,12 @@ class PluginEntity
     /**
      * @param object $order_state
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setOrderState($order_state)
     {
         if (!is_object($order_state)) {
-            throw (new BadParameterException('Invalid argument, $order_state must be an OrderState'));
+            throw new BadParameterException('Invalid argument, $order_state must be an OrderState');
         }
 
         $this->order_state = $order_state;
@@ -1461,14 +1378,12 @@ class PluginEntity
     /**
      * @param object $order_slip
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setOrderSlip($order_slip)
     {
         if (!is_object($order_slip)) {
-            throw (new BadParameterException('Invalid argument, $order_slip must be an OrderSlip'));
+            throw new BadParameterException('Invalid argument, $order_slip must be an OrderSlip');
         }
 
         $this->order_slip = $order_slip;
@@ -1479,8 +1394,6 @@ class PluginEntity
     /**
      * @param $order_state_adapter
      *
-     * @throws BadParameterException
-     *
      * @return $this
      */
     public function setOrderStateAdapter($order_state_adapter)
@@ -1488,7 +1401,7 @@ class PluginEntity
         if (!is_object($order_state_adapter)) {
             $error_msg = 'Invalid argument, $order_state_adapter must be an OrderStateAdapter';
 
-            throw (new BadParameterException($error_msg));
+            throw new BadParameterException($error_msg);
         }
 
         $this->order_state_adapter = $order_state_adapter;
@@ -1511,14 +1424,12 @@ class PluginEntity
     /**
      * @param object $paymentAction
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setPaymentAction($paymentAction)
     {
         if (!is_object($paymentAction)) {
-            throw (new BadParameterException('Invalid argument, $paymentAction must be a PaymentAction'));
+            throw new BadParameterException('Invalid argument, $paymentAction must be a PaymentAction');
         }
 
         $this->payment_action = $paymentAction;
@@ -1529,14 +1440,12 @@ class PluginEntity
     /**
      * @param object $paymentMethod
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setPaymentMethodClass($paymentMethod)
     {
         if (!is_object($paymentMethod)) {
-            throw (new BadParameterException('Invalid argument, $paymentMethod must be a PaymentMethod'));
+            throw new BadParameterException('Invalid argument, $paymentMethod must be a PaymentMethod');
         }
 
         $this->paymentMethod = $paymentMethod;
@@ -1547,14 +1456,12 @@ class PluginEntity
     /**
      * @param object $payment_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setPaymentRepository($payment_repository)
     {
         if (!is_object($payment_repository)) {
-            throw (new BadParameterException('Invalid argument, $payment_repository must be an PaymentRepository'));
+            throw new BadParameterException('Invalid argument, $payment_repository must be an PaymentRepository');
         }
 
         $this->payment_repository = $payment_repository;
@@ -1565,14 +1472,12 @@ class PluginEntity
     /**
      * @param object $product
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setProduct($product)
     {
         if (!is_object($product)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ProductAdapter'));
+            throw new BadParameterException('Invalid argument, $card must be a ProductAdapter');
         }
 
         $this->product = $product;
@@ -1583,14 +1488,12 @@ class PluginEntity
     /**
      * @param object $query_adapter
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setQueryAdapter($query_adapter)
     {
         if (!is_object($query_adapter)) {
-            throw (new BadParameterException('Invalid argument, $query_adapter must be a QueryAdapter'));
+            throw new BadParameterException('Invalid argument, $query_adapter must be a QueryAdapter');
         }
 
         $this->query_adapter = $query_adapter;
@@ -1601,14 +1504,12 @@ class PluginEntity
     /**
      * @param object $query_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setQueryRepository($query_repository)
     {
         if (!is_object($query_repository)) {
-            throw (new BadParameterException('Invalid argument, $card must be a QueryRepository'));
+            throw new BadParameterException('Invalid argument, $card must be a QueryRepository');
         }
 
         $this->query_repository = $query_repository;
@@ -1618,16 +1519,14 @@ class PluginEntity
 
     /**
      * @param object $query
-     * @param mixed  $sql
-     *
-     * @throws BadParameterException
+     * @param mixed $sql
      *
      * @return self
      */
     public function setSql($sql)
     {
         if (!is_object($sql)) {
-            throw (new BadParameterException('Invalid argument, $sql must be a SQLRepository'));
+            throw new BadParameterException('Invalid argument, $sql must be a SQLRepository');
         }
 
         $this->sql = $sql;
@@ -1638,14 +1537,12 @@ class PluginEntity
     /**
      * @param object $routes
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setRoutes($routes)
     {
         if (!is_object($routes)) {
-            throw (new BadParameterException('Invalid argument, $routes must be a Services/Routes'));
+            throw new BadParameterException('Invalid argument, $routes must be a Services/Routes');
         }
 
         $this->routes = $routes;
@@ -1656,14 +1553,12 @@ class PluginEntity
     /**
      * @param object $shop
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setShop($shop)
     {
         if (!is_object($shop)) {
-            throw (new BadParameterException('Invalid argument, $sql must be a ShopAdapter'));
+            throw new BadParameterException('Invalid argument, $sql must be a ShopAdapter');
         }
 
         $this->shop = $shop;
@@ -1674,14 +1569,12 @@ class PluginEntity
     /**
      * @param object $shop_repository
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setShopRepository($shop_repository)
     {
         if (!is_object($shop_repository)) {
-            throw (new BadParameterException('Invalid argument, $shop_repository must be an ShopRepository'));
+            throw new BadParameterException('Invalid argument, $shop_repository must be an ShopRepository');
         }
 
         $this->shop_repository = $shop_repository;
@@ -1692,14 +1585,12 @@ class PluginEntity
     /**
      * @param object $tools
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setTools($tools)
     {
         if (!is_object($tools)) {
-            throw (new BadParameterException('Invalid argument, $card must be a ToolsAdapter'));
+            throw new BadParameterException('Invalid argument, $card must be a ToolsAdapter');
         }
 
         $this->tools = $tools;
@@ -1710,14 +1601,12 @@ class PluginEntity
     /**
      * @param object $translate
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setTranslate($translate)
     {
         if (!is_object($translate)) {
-            throw (new BadParameterException('Invalid argument, $translate must be a Translate'));
+            throw new BadParameterException('Invalid argument, $translate must be a Translate');
         }
 
         $this->translate = $translate;
@@ -1728,14 +1617,12 @@ class PluginEntity
     /**
      * @param object $translation
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setTranslationClass($translation)
     {
         if (!is_object($translation)) {
-            throw (new BadParameterException('Invalid argument, $translation must be a Translate'));
+            throw new BadParameterException('Invalid argument, $translation must be a Translate');
         }
 
         $this->translation = $translation;
@@ -1746,14 +1633,12 @@ class PluginEntity
     /**
      * @param object $validate
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setValidate($validate)
     {
         if (!is_object($validate)) {
-            throw (new BadParameterException('Invalid argument, $validate must be ValidateAdapter'));
+            throw new BadParameterException('Invalid argument, $validate must be ValidateAdapter');
         }
 
         $this->validate = $validate;

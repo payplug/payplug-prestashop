@@ -23,37 +23,31 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Country;
 use PayPlug\src\interfaces\CountryInterface;
 
 class CountryAdapter implements CountryInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
     public function get($idCountry = false)
     {
         if (!is_int($idCountry)) {
             $idCountry = false;
         }
 
-        return new Country($idCountry);
+        return new \Country($idCountry);
     }
 
     public function getByIso($idCurrency)
     {
-        return Country::getByIso($idCurrency);
+        return \Country::getByIso($idCurrency);
     }
 
     public function getCountry($idCountry)
     {
-        return new Country($idCountry);
+        return new \Country($idCountry);
     }
 
     public function getNameById($param1, $param2)
     {
-        return Country::getNameById($param1, $param2);
+        return \Country::getNameById($param1, $param2);
     }
 }

@@ -25,7 +25,5 @@ namespace PayPlug\src\interfaces;
 
 interface ConstantInterface
 {
-    public static function factory();
-
     public function get($var);
 }

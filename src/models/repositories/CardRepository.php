@@ -47,9 +47,9 @@ class CardRepository extends QueryRepository
     /**
      * @description Register a card from the api
      *
-     * @param null  $card
-     * @param int   $customer_id
-     * @param int   $company_id
+     * @param null $card
+     * @param int $customer_id
+     * @param int $company_id
      * @param false $is_sandbox
      * @param mixed $parameters
      *
@@ -82,7 +82,7 @@ class CardRepository extends QueryRepository
                         break;
                     case 'bool':
                         if (is_bool($value)) {
-                            $this->fields($key)->values(($value ? 1 : 0));
+                            $this->fields($key)->values($value ? 1 : 0);
                         }
 
                         break;
@@ -195,8 +195,8 @@ class CardRepository extends QueryRepository
      * @description Check if a card is already register in the database
      *
      * @param string $payment_id
-     * @param int    $company_id
-     * @param false  $is_sandbox
+     * @param int $company_id
+     * @param false $is_sandbox
      *
      * @return bool
      */
@@ -245,8 +245,8 @@ class CardRepository extends QueryRepository
     /**
      * @description Get all registered cards for a given customer
      *
-     * @param int  $id_customer
-     * @param int  $id_company
+     * @param int $id_customer
+     * @param int $id_company
      * @param bool $is_sandbox
      *
      * @return array

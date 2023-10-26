@@ -23,32 +23,26 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Currency;
 use PayPlug\src\interfaces\CurrencyInterface;
 
 class CurrencyAdapter implements CurrencyInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
     public function get($idCurrency = false)
     {
         if (!is_int($idCurrency)) {
             $idCurrency = false;
         }
 
-        return new Currency($idCurrency);
+        return new \Currency($idCurrency);
     }
 
     public function getCurrency($idCurrency)
     {
-        return new Currency($idCurrency);
+        return new \Currency($idCurrency);
     }
 
     public function getIdByIsoCode($isoCode)
     {
-        return Currency::getIdByIsoCode($isoCode);
+        return \Currency::getIdByIsoCode($isoCode);
     }
 }

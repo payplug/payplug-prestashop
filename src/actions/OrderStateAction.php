@@ -23,17 +23,13 @@
 
 namespace PayPlug\src\actions;
 
-use PayPlug\src\application\adapter\ContextAdapter;
-
 class OrderStateAction
 {
-    private $context;
     private $dependencies;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->context = new ContextAdapter();
     }
 
     /**

@@ -23,10 +23,7 @@
 
 namespace PayPlug\src\repositories;
 
-use DateInterval;
-use DateTime;
 use PayPlug\src\application\dependencies\BaseClass;
-use PayPlug\src\exceptions\BadParameterException;
 
 class CacheRepository extends BaseClass
 {
@@ -55,18 +52,11 @@ class CacheRepository extends BaseClass
         $this->logger->setProcess('cache');
     }
 
-    public static function factory()
-    {
-        return new CacheRepository();
-    }
-
     /**
      * @description Set every Oney Simulation in the DB
      *
-     * @param string $cache_key
-     * @param string $cache_value
-     *
-     * @throws BadParameterException
+     * @param $cache_key
+     * @param $cache_value
      *
      * @return bool
      */
@@ -98,10 +88,9 @@ class CacheRepository extends BaseClass
     /**
      * @description Set Cache
      *
-     * @param int    $amount
-     * @param string $country
-     * @param array  $operation  contain x3|4_with_fees or x3|4_without_fees
-     * @param mixed  $operations
+     * @param $amount
+     * @param $country
+     * @param $operations
      *
      * @return array
      */
@@ -169,10 +158,10 @@ class CacheRepository extends BaseClass
         }
 
         // if the cache is older than 48 hours, return false after delete it
-        $lifetime = new DateInterval('P2D');
-        $date_limit = new DateTime('now');
+        $lifetime = new \DateInterval('P2D');
+        $date_limit = new \DateTime('now');
         $date_limit->sub($lifetime);
-        $date_add = new DateTime($cache['date_add']);
+        $date_add = new \DateTime($cache['date_add']);
         if ($date_limit >= $date_add) {
             $this->dependencies
                 ->getPlugin()

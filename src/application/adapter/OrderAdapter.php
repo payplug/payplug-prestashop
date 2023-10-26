@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Order;
 use PayPlug\src\interfaces\OrderInterface;
 
 class OrderAdapter implements OrderInterface
@@ -34,16 +33,18 @@ class OrderAdapter implements OrderInterface
             $idOrder = false;
         }
 
-        return new Order($idOrder);
+        return new \Order($idOrder);
     }
 
     /**
      * @deprecated since 1.7.1.0 Use getIdByCartId() instead
      *
-     * @param null|mixed $idCart
+     * @param int $idCart
+     *
+     * @return mixed
      */
-    public function getOrderByCartId($idCart = null)
+    public function getOrderByCartId($idCart = 0)
     {
-        return Order::getOrderByCartId($idCart);
+        return \Order::getOrderByCartId($idCart);
     }
 }
