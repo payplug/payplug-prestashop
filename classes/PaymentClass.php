@@ -946,9 +946,8 @@ class PaymentClass
         $billing['company_name'] = empty($billing['company_name']) || !$billing['company_name']
             ? $billing['first_name'] . ' ' . $billing['last_name']
             : $billing['company_name'];
-        $billing['mobile_phone_number'] = $billing['mobile_phone_number']
-            ? $billing['mobile_phone_number']
-            : $billing['landline_phone_number'];
+        $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: null;
+        $billing['mobile_phone_number'] = $billing['mobile_phone_number'] ?: $billing['landline_phone_number'];
 
         // Shipping
         $delivery_type = 'NEW';
@@ -982,9 +981,8 @@ class PaymentClass
         $shipping['company_name'] = empty($shipping['company_name']) || !$shipping['company_name']
             ? $shipping['first_name'] . ' ' . $shipping['last_name']
             : $shipping['company_name'];
-        $shipping['mobile_phone_number'] = $shipping['mobile_phone_number']
-            ? $shipping['mobile_phone_number']
-            : $shipping['landline_phone_number'];
+        $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: null;
+        $shipping['mobile_phone_number'] = $shipping['mobile_phone_number'] ?: $shipping['landline_phone_number'];
 
         // 3ds
         $force_3ds = false;
