@@ -688,10 +688,15 @@ class PayPlugValidation
             if (!$patchPayment['result']) {
                 $this->logger->addLog('Payment cannot be patched: ' . $patchPayment['message'], 'error');
             }
+
+            $parameters = [
+                'id_order' => (int) $this->order->id,
+                'id_payment' => $this->payment->id,
+            ];
             $create_order_payment = $this->dependencies
                 ->getPlugin()
                 ->getOrderPaymentRepository()
-                ->createOrderPayment((int) $order->id, $payment->id);
+                ->createOrderPayment($parameters);
             if (!$create_order_payment) {
                 $this->logger->addLog('Unable to create order payment.', 'error');
             }

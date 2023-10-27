@@ -491,10 +491,15 @@ class PayPlugNotifications
 
             $this->logger->addLog('Payment patched.', 'debug');
 
+            $parameters = [
+                'id_order' => (int) $this->order->id,
+                'id_payment' => $this->payment->id,
+            ];
+
             $create_order_payment = $this->dependencies
                 ->getPlugin()
                 ->getOrderPaymentRepository()
-                ->createOrderPayment((int) $this->order->id, $this->payment->id);
+                ->createOrderPayment($parameters);
             if (!$create_order_payment) {
                 $this->logger->addLog(
                     'IPN Failed: unable to create order payment.',
