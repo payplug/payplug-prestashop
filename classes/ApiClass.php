@@ -102,6 +102,9 @@ class ApiClass
         if (isset($_ENV['API_BASE_URL'])) {
             APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
+        if (isset($_ENV['MERCHANT_PLUGINS_DATA_COLLECTOR_RESOURCE'])) {
+            APIRoutes::setMerchantPluginsDataCollectorService($_ENV['MERCHANT_PLUGINS_DATA_COLLECTOR_RESOURCE']);
+        }
     }
 
     /**

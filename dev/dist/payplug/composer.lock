@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac759272dfbb4613c10a42b2fd098980",
+    "content-hash": "ae8a54b83daf7a9bd996b3e35d8e0ad5",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -125,16 +125,16 @@
         },
         {
             "name": "payplug/payplug-php",
-            "version": "3.5.5",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "ccde1991a3460505c547d9443e6bf5b5f7900905"
+                "reference": "09c836ceadc05f31907191615795d559f6bb3c67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/ccde1991a3460505c547d9443e6bf5b5f7900905",
-                "reference": "ccde1991a3460505c547d9443e6bf5b5f7900905",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/09c836ceadc05f31907191615795d559f6bb3c67",
+                "reference": "09c836ceadc05f31907191615795d559f6bb3c67",
                 "shasum": ""
             },
             "require": {
@@ -167,7 +167,7 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
-            "time": "2015-05-06T00:00:00+00:00"
+            "time": "2023-09-05T10:06:26+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -218,20 +218,6 @@
                 "dotenv",
                 "env",
                 "environment"
-            ],
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
             ],
             "time": "2020-10-24T10:57:07+00:00"
         },
@@ -295,20 +281,6 @@
                 "polyfill",
                 "portable",
                 "shim"
-            ],
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
             ],
             "time": "2020-10-23T09:01:57+00:00"
         }
@@ -772,20 +744,6 @@
             "keywords": [
                 "constructor",
                 "instantiate"
-            ],
-            "funding": [
-                {
-                    "url": "https://www.doctrine-project.org/sponsorship.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.patreon.com/phpdoctrine",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/doctrine%2Finstantiator",
-                    "type": "tidelift"
-                }
             ],
             "time": "2015-06-14T21:17:01+00:00"
         },
@@ -3293,7 +3251,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "payplug/payplug-php": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform-dev": [],
