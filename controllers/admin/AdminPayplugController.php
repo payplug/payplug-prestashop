@@ -70,14 +70,57 @@ class AdminPayplugController extends ModuleAdminController
                 $this->dependencies->refundClass->refundPayment();
             }
             if ($this->tools->tool('getValue', 'capture')) {
-                $this->dependencies->paymentClass->capturePayment();
+                $resource_id = $this->tools->tool('getValue', 'pay_id');
+                $order_id = $this->tools->tool('getValue', 'id_order');
+                $capture = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentAction()
+                    ->captureAction($resource_id, (int) $order_id);
+
+                if (!$capture['result']) {
+                    exit(json_encode([
+                        'status' => 'error',
+                        'data' => $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('payplug.capturePayment.cannotCapture', 'adminpayplugcontroller'),
+                        'message' => $capture['message'],
+                    ]));
+                }
+
+                exit(json_encode([
+                    'status' => 'ok',
+                    'data' => '',
+                    'message' => $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.capturePayment.captured', 'adminpayplugcontroller'),
+                    'reload' => true,
+                ]));
             }
             if ($this->tools->tool('getValue', 'confirmAbort')) {
                 $inst_id = $this->tools->tool('getValue', 'inst_id');
                 $this->dependencies->mediaClass->displayPopin('abort', ['inst_id' => $inst_id]);
             }
             if ($this->tools->tool('getValue', 'abort')) {
-                $this->dependencies->paymentClass->abortPayment();
+                $inst_id = $this->tools->tool('getValue', 'inst_id');
+                $id_order = $this->tools->tool('getValue', 'id_order');
+                $abort = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentAction()
+                    ->abortAction($inst_id, (int) $id_order);
+
+                if (!$abort['result']) {
+                    exit(json_encode([
+                        'status' => 'error',
+                        'data' => $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('payplug.abortPayment.cannotAbort', 'adminpayplugcontroller'),
+                    ]));
+                }
+
+                exit(json_encode(['reload' => true]));
             }
 
             if ($this->tools->tool('getValue', 'update')) {

@@ -59,7 +59,7 @@ coverage test:
   script:
     - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
     - echo 'error_reporting=22527' > /usr/local/etc/php/conf.d/ci.ini
-    - vendor/bin/phpunit --coverage-text --colors=never
+    - vendor/bin/phpunit tests --bootstrap tests/bootstrap.php --coverage-text --colors=never
 
 check module translations:
   image: composer:1.9

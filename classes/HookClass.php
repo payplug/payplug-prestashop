@@ -186,11 +186,11 @@ class HookClass
             return;
         }
 
-        $cart = $this->cart->get((int) $order->id_cart);
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
             ->getByCart((int) $order->id_cart);
+
         if ('installment' == $payment['method']) {
             return;
         }
@@ -206,30 +206,23 @@ class HookClass
                 $retrieve = $this->dependencies->apiClass->retrievePayment($payment['resource_id']);
             }
         }
-
         if (!$retrieve['result']) {
             return;
         }
+
         $payment = $retrieve['resource'];
 
-        $is_paid = $this->validators['payment']->isPaid($payment)['result'];
         $can_be_captured = $this->validators['payment']->isPayment($payment)['result']
             && !$this->validators['payment']->isFailed($payment)['result']
-            && !$is_paid
+            && !$this->validators['payment']->isPaid($payment)['result']
             && $this->validators['payment']->isDeferred($payment)['result']
             && !$this->validators['payment']->isExpired($payment)['result'];
 
         if ($can_be_captured) {
-            $capture = $this->dependencies->apiClass->capturePayment($payment->id);
-            if ($capture['result']) {
-                $payment = $capture['resource'];
-                if (null !== $payment->card->id) {
-                    $this->dependencies
-                        ->getPlugin()
-                        ->getCardAction()
-                        ->saveAction($payment);
-                }
-            }
+            $this->dependencies
+                ->getPlugin()
+                ->getPaymentAction()
+                ->captureAction($payment->id, (int) $order->id);
         }
     }
 
