@@ -690,7 +690,7 @@ class PayPlugValidation
             }
 
             $parameters = [
-                'id_order' => (int) $this->order->id,
+                'id_order' => (int) $order->id,
                 'id_payment' => $this->payment->id,
             ];
             $create_order_payment = $this->dependencies
