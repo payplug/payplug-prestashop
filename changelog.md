@@ -11,6 +11,7 @@
 
 - Bugfix :
    - [PRE-2057](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2296): Fix notification for deferred payment
+   - [PRE-2069](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2299): Fix IP form when only choice in checkout
 
 ## Version 4.4.0
 
