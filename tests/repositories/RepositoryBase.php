@@ -152,6 +152,7 @@ class RepositoryBase extends TestCase
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
+                'getCart' => $this->cart,
                 'getCardAction' => $this->card_action,
                 'getConfiguration' => $this->config,
                 'getConfigurationClass' => $this->configuration,
@@ -161,6 +162,7 @@ class RepositoryBase extends TestCase
                 'getPaymentRepository' => $this->payment_repository,
                 'getPayplugOrderStateRepository' => $this->payplug_order_state_repository,
                 'getTranslationClass' => $this->translation,
+                'getValidate' => $this->validate,
             ])
         ;
 

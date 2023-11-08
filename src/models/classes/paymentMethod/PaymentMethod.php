@@ -44,7 +44,13 @@ class PaymentMethod
     protected $configuration;
 
     /** @var object */
+    protected $configuration_adapter;
+
+    /** @var object */
     protected $context;
+
+    /** @var object */
+    protected $currency_adapter;
 
     /** @var object */
     protected $dependencies;
@@ -1139,11 +1145,21 @@ class PaymentMethod
                 ->getPlugin()
                 ->getConfigurationClass();
         }
+        if (!$this->configuration_adapter) {
+            $this->configuration_adapter = $this->dependencies
+                ->getPlugin()
+                ->getConfiguration();
+        }
         if (!$this->context) {
             $this->context = $this->dependencies
                 ->getPlugin()
                 ->getContext()
                 ->get();
+        }
+        if (!$this->currency_adapter) {
+            $this->currency_adapter = $this->dependencies
+                ->getPlugin()
+                ->getCurrency();
         }
         if (!$this->iso_code) {
             $this->iso_code = $this->dependencies

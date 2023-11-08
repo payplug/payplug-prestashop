@@ -275,6 +275,61 @@ class Translation
     }
 
     /**
+     * @description  get oney front office translations
+     *
+     * @return array
+     */
+    public function getOneyTranslations()
+    {
+        return [
+            'required_field' => $this->l('Please fill in the required fields', 'translation'),
+            'mobile' => $this->l('Please enter your mobile phone number.', 'translation'),
+            'shipping_firstname' => $this->l('Please enter your shipping firstname.', 'translation'),
+            'billing_firstname' => $this->l('Please enter your billing firstname.', 'translation'),
+            'shipping_lastname' => $this->l('Please enter your shipping lastname.', 'translation'),
+            'billing_lastname' => $this->l('Please enter your billing lastname.', 'translation'),
+            'shipping_address' => $this->l('Please enter your shipping address.', 'translation'),
+            'billing_address' => $this->l('Please enter your billing address.', 'translation'),
+            'shipping_postcode' => $this->l('Please enter your shipping postcode.', 'translation'),
+            'billing_postcode' => $this->l('Please enter your billing postcode.', 'translation'),
+            'schedules_unavailable' => $this->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'translation'),
+            'shipping_city' => $this->l('Please enter your shipping city.', 'translation'),
+            'billing_city' => $this->l('Please enter your billing city.', 'translation'),
+            'city_name_error' => $this->l('Your city name is too long (max 32 characters).', 'translation'),
+            'city_name_message' => $this->l(
+                ' Please change it to another one or select another payment method.',
+                'translation'
+            ),
+            'percentage' => $this->l('Payment in %sx', 'translation'),
+            'cart_error' => $this->l('The cart is unvalid', 'translation'),
+            'amount_error' => $this->l('oney.isValidOneyAmount.unvalid', 'translation'),
+            'email_error' => $this->l('Your email address is not a valid email', 'translation'),
+            'email_length_char_error' => $this->l(
+                'Your email address is too long and the + character is not valid',
+                'translation'
+            ),
+            'email_message' => $this->l(' please change it to another address (max 100 characters).', 'translation'),
+            'email_char_error' => $this->l(
+                'The + character is not valid. Please change your email address (100 characters max).',
+                'translation'
+            ),
+            'email_length_error' => $this->l(
+                'Your email address is too long. Please change your email address (100 characters max).',
+                'translation'
+            ),
+            'email_invalid' => $this->l('Your email address is not a valid email', 'translation'),
+            'pay_with_fee' => $this->l('payplug.getPaymentOptions.payWithOney', 'translation'),
+            'pay_without_fee' => $this->l('payplug.getPaymentOptions.payWithOneyWithout', 'translation'),
+            'payment_option_error' => $this->l('payplug.getPaymentOptions.errorOccurred', 'translation'),
+            'address_invalid' => $this->l('payplug.getPaymentOptions.invalidAddresses', 'translation'),
+            'invalid_amount' => $this->l('payplug.getPaymentOptions.invalidAmount', 'translation'),
+            'invalid_carrier' => $this->l('payplug.getPaymentOptions.invalidCarrier', 'translation'),
+            'invalid_cart' => $this->l('payplug.getPaymentOptions.invalidCart', 'translation'),
+
+        ];
+    }
+
+    /**
      * @return array
      */
     public function getOrderStateActionRenderTranslations()
@@ -288,6 +343,7 @@ class Translation
             'paid' => $this->l('action.orderState.renderOption.orderStateTypePaid', 'translation'),
             'pending' => $this->l('action.orderState.renderOption.orderStateTypePending', 'translation'),
             'refund' => $this->l('action.orderState.renderOption.orderStateTypeRefund', 'translation'),
+
         ];
     }
 

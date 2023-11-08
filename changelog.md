@@ -4,6 +4,7 @@
 - Refactoring :
   - [PRE-1985](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2309): Add action Order
   - [PRE-2091](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2339): Add Refund Action
+  - [PRE-1980](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2340): Add Oney Action
   - [PRE-2100](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2337): Add install method for configuration action
 
 ## Version 4.6.2

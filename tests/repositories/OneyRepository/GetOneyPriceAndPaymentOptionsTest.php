@@ -4,7 +4,7 @@ namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\ContextMock;
-use PayPlug\tests\mock\CountryMock;
+use PayPlug\tests\mock\CurrencyMock;
 
 /**
  * @group unit
@@ -26,9 +26,31 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
             ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
-        $this->country->shouldReceive('getCountry')
-            ->andReturn(CountryMock::get())
-        ;
+
+        $this->cart->shouldReceive([
+            'nbProducts' => 1001,
+        ]);
+
+        $config_class = \Mockery::mock('ConfigClass');
+        $config_class->shouldReceive([
+            'getIsoCodeByCountryId' => 'fr',
+        ]);
+        $this->dependencies->configClass = $config_class;
+
+        $this->country->shouldReceive([
+            'getByIso' => 4,
+        ]);
+
+        $this->currency->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+
+        $this->validators['payment']->shouldReceive([
+            'isValidProductQuantity' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->repo
             ->shouldAllowMockingProtectedMethods()
@@ -65,13 +87,19 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
             ])
         ;
 
+        $this->validators['payment']->shouldReceive([
+                'isOneyElligible' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
         $this->assertSame(
             $this->repo->getOneyPriceAndPaymentOptions($cart, $amount, $country),
             [
                 'result' => true,
                 'error' => false,
                 'popin' => 'popin',
-                'payment' => 'payment_option',
             ]
         );
     }
@@ -80,17 +108,23 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
     {
         $this->repo
             ->shouldReceive([
-                'isOneyElligible' => ['result' => false, 'error' => 'oney_ineligible'],
+                'isValidOneyAmount' => ['result' => true, 'error' => false],
                 'getOneyPaymentOptionsList' => ['payment_option_list'],
             ])
         ;
 
+        $this->validators['payment']->shouldReceive([
+                'isOneyElligible' => [
+                    'result' => false,
+                    'message' => '',
+                ],
+            ]);
+
         $this->assertSame(
             [
                 'result' => false,
-                'error' => 'oney_ineligible',
+                'error' => 'oney.getOneyPriceAndPaymentOptions.unavailable',
                 'popin' => 'popin',
-                'payment' => 'payment_option',
             ],
             $this->repo->getOneyPriceAndPaymentOptions($this->cartMock, 15000)
         );
@@ -110,7 +144,6 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
                 'result' => false,
                 'error' => 'invalid_amount',
                 'popin' => 'popin',
-                'payment' => 'payment_option',
             ],
             $this->repo->getOneyPriceAndPaymentOptions(null, 15000)
         );
@@ -120,17 +153,23 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
     {
         $this->repo
             ->shouldReceive([
-                'isOneyElligible' => ['result' => true, 'error' => false],
+                'isValidOneyAmount' => ['result' => true, 'error' => false],
                 'getOneyPaymentOptionsList' => [],
             ])
         ;
+
+        $this->validators['payment']->shouldReceive([
+                'isOneyElligible' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
 
         $this->assertSame(
             [
                 'result' => false,
                 'error' => 'oney.getOneyPriceAndPaymentOptions.unavailable',
                 'popin' => 'popin',
-                'payment' => 'payment_option',
             ],
             $this->repo->getOneyPriceAndPaymentOptions($this->cartMock, 15000)
         );

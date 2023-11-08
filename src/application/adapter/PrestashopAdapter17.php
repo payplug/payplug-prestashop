@@ -62,14 +62,17 @@ class PrestashopAdapter17
             && (bool) $payment_methods['applepay']) {
             \Media::addJsDef(
                 [
-                    $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
-                        [
+                    $this->dependencies->name . '_transaction_error_message' => $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentAction()
+                        ->renderPaymentErrors(
+                            [
                             $this->dependencies
                                 ->getPlugin()
                                 ->getTranslationClass()
                                 ->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopadapter17'),
                         ]
-                    ),
+                        ),
                 ]
             );
 
@@ -77,6 +80,13 @@ class PrestashopAdapter17
         }
     }
 
+    /**
+     * @description get the payment options
+     *
+     * @param $payment_options
+     *
+     * @return array
+     */
     public function displayPaymentOption($payment_options)
     {
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
@@ -110,20 +120,27 @@ class PrestashopAdapter17
             // load oney schedule on e page loading
             if ('oney' == $payment_method && $payment_option['is_optimized']) {
                 try {
-                    $payment_schedule = $this->oney->getOneyPaymentOptionsList(
-                        $payment_option['amount'],
-                        $payment_option['iso_code']
-                    );
+                    $payment_schedule = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('oney')
+                        ->getOneyPaymentOptionsList(
+                            $payment_option['amount'],
+                            $payment_option['iso_code']
+                        );
                 } catch (\Exception $e) {
                     // todo: set a permanent log
                     $payment_schedule = false;
                 }
 
                 if ($payment_schedule) {
-                    $schedules = $this->oney->displayOneySchedule(
-                        $payment_schedule[$payment_option['type']],
-                        $payment_option['amount']
-                    );
+                    $schedules = $this->dependencies
+                        ->getPlugin()
+                        ->getOneyAction()
+                        ->renderSchedule(
+                            $payment_schedule[$payment_option['type']],
+                            $payment_option['amount']
+                        );
                     $payment_option['additionalInformation'] = $schedules;
                 }
             }

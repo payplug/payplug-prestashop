@@ -88,6 +88,24 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
             ])
         ;
 
+        $this->validators['payment']->shouldReceive([
+                'isPhoneNumber' => [
+                    'result' => false,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->validators['payment']->shouldReceive([
+                'isValidMobilePhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->tools->shouldReceive([
+            'tool' => 15,
+        ]);
+
         $payment_data = [
             'shipping' => [
                 'email' => 'customer@payplug.com',
@@ -104,6 +122,32 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingCity()
     {
+        $this->repo
+            ->shouldReceive([
+                'isValidOneyEmail' => [
+                    'result' => true,
+                ],
+            ])
+        ;
+
+        $this->validators['payment']->shouldReceive([
+                'isPhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->validators['payment']->shouldReceive([
+                'isValidMobilePhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->tools->shouldReceive([
+            'tool' => 45,
+        ]);
+
         $this->repo
             ->shouldReceive([
                 'isValidOneyEmail' => [
@@ -141,11 +185,24 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                 ],
             ])
         ;
-        $this->dependencies->configClass
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => true,
-            ])
-        ;
+
+        $this->validators['payment']->shouldReceive([
+                'isPhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->validators['payment']->shouldReceive([
+                'isValidMobilePhoneNumber' => [
+                    'result' => false,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->tools->shouldReceive([
+            'tool' => 15,
+        ]);
 
         $payment_data = [
             'shipping' => [
@@ -176,11 +233,24 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                 ],
             ])
         ;
-        $this->dependencies->configClass
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => true,
-            ])
-        ;
+
+        $this->validators['payment']->shouldReceive([
+                'isPhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->validators['payment']->shouldReceive([
+                'isValidMobilePhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->tools->shouldReceive([
+            'tool' => 45,
+        ]);
 
         $payment_data = [
             'shipping' => [
@@ -211,11 +281,24 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                 ],
             ])
         ;
-        $this->dependencies->configClass
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => true,
-            ])
-        ;
+
+        $this->validators['payment']->shouldReceive([
+                'isPhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->validators['payment']->shouldReceive([
+                'isValidMobilePhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->tools->shouldReceive([
+            'tool' => 15,
+        ]);
 
         $payment_data = [
             'shipping' => [

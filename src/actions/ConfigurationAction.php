@@ -603,14 +603,21 @@ class ConfigurationAction
                     case 'oney_min_amounts':
                     case 'oney_max_amounts':
                         if ((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) {
-                            $oney = $this->dependencies->getPlugin()->getOney();
-                            $limit_oney = $oney->getOneyPriceLimit(false);
+                            $limit_oney = $this->dependencies
+                                ->getPlugin()
+                                ->getPaymentMethodClass()
+                                ->getPaymentMethod('oney')
+                                ->getOneyPriceLimit(false);
                             $amount = $datas->{$config};
                             $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
                             $is_valid_amount = $this->dependencies
                                 ->getValidators()['payment']
                                 ->isAmount((int) $amount_to_cent, $limit_oney);
-                            $formated_amount = $oney->setCustomOneyLimit((int) $amount_to_cent);
+                            $formated_amount = $this->dependencies
+                                ->getPlugin()
+                                ->getPaymentMethodClass()
+                                ->getPaymentMethod('oney')
+                                ->setCustomOneyLimit((int) $amount_to_cent);
 
                             if ($is_valid_amount && !$configuration->set($key, (string) $formated_amount)) {
                                 return [
