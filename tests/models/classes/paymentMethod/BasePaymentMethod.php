@@ -28,6 +28,7 @@ class BasePaymentMethod extends TestCase
     protected $configuration;
     protected $constant;
     protected $context;
+    protected $country;
     protected $context_adapter;
     protected $dependencies;
     protected $helpers;
@@ -115,6 +116,7 @@ class BasePaymentMethod extends TestCase
         $this->card_repository = \Mockery::mock('CardRepository');
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
+        $this->country = \Mockery::mock('Country');
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
@@ -124,6 +126,7 @@ class BasePaymentMethod extends TestCase
                 'getConfigurationClass' => $this->configuration,
                 'getConstant' => $this->constant,
                 'getContext' => $this->context_adapter,
+                'getCountry' => $this->country,
                 'getLogger' => $this->logger,
                 'getPaymentRepository' => $this->payment_repository,
                 'getRoutes' => $this->routes,
@@ -137,6 +140,22 @@ class BasePaymentMethod extends TestCase
             'cookies' => \Mockery::mock(CookiesHelper::class, [$this->dependencies])->makePartial(),
             'phone' => \Mockery::mock(PhoneHelper::class)->makePartial(),
         ];
+
+        $oney = \Mockery::mock('Oney');
+        $oney
+            ->shouldReceive([
+                'isOneyElligible' => [
+                    'result' => false,
+                    'error_type' => 'invalid_cart',
+                    'error' => 'An error occured',
+                ],
+                'getOperations' => [
+                    'x3_with_fees',
+                    'x3_without_fees',
+                    'x4_with_fees',
+                    'x4_without_fees',
+                ],
+            ]);
 
         $this->validators = [
             'browser' => \Mockery::mock(browserValidator::class)->makePartial(),

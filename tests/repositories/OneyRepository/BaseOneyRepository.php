@@ -2,17 +2,31 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
+use PayPlug\src\models\classes\paymentMethod\OneyPaymentMethod;
 use PayPlug\src\models\entities\OneyEntity;
-use PayPlug\src\repositories\OneyRepository;
+use PayPlug\src\utilities\validators\accountValidator;
+use PayPlug\tests\mock\AddressMock;
+use PayPlug\tests\mock\ContextMock;
+use PayPlug\tests\mock\CountryMock;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\repositories\RepositoryBase;
 
 class BaseOneyRepository extends RepositoryBase
 {
-    protected $oney;
-
+    protected $account_validator;
+    protected $address_adapter;
+    protected $amount_helper;
+    protected $assign_adapter;
     protected $arrayCache;
     protected $arrayLogger;
+    protected $cacheAdapter;
+    protected $contextAdapter;
+    protected $countryAdapter;
+    protected $dependencies;
+    protected $helpers;
+    protected $loggerRepository;
+    protected $oney;
+    protected $toolsAdapter;
 
     public function setUp()
     {
@@ -33,23 +47,80 @@ class BaseOneyRepository extends RepositoryBase
                         return true;
                 }
             });
-        $this->repo = \Mockery::mock(OneyRepository::class, [
-            $this->address, // $addressAdapter,
-            $this->assign, // $assign,
-            $this->cache, // $cache,
-            $this->carrier, // $carrierAdapter,
-            $this->cart, // $cartAdapter,
-            $this->config, // $configurationAdapter,
-            $this->context, // $contextAdapter,
-            $this->country, // $countryAdapter,
-            $this->currency, // $currencyAdapter,
-            $this->media, // $mediaAdapter,
-            $this->dependencies, // $dependencies,
-            $this->logger, // $logger,
-            $this->oney, // $oneyEntity,
-            $this->tools, // $toolsAdapter,
-            $this->validate, // $validateAdapter
-        ])->makePartial();
+
+        $this->validators = [
+            'account' => \Mockery::mock(accountValidator::class)->makePartial(),
+            'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
+        ];
+        $this->amount_helper = \Mockery::mock('AmountHelper');
+        $this->amount_helper->shouldReceive([
+                'formatOneyAmount' => [
+                    'result' => 10,
+                    'message' => '$amount is formatted',
+                ],
+            ]);
+
+        $this->address_adapter = \Mockery::mock('AddressAdapter');
+        $this->address_adapter->shouldReceive([
+            'get' => AddressMock::get(),
+        ]);
+        $this->assign_adapter = \Mockery::mock('AssignAdapter');
+        $this->assign_adapter->shouldReceive([
+            'assign' => '',
+        ]);
+        $this->cacheAdapter = \Mockery::mock('CacheAdapter');
+        $this->contextAdapter = \Mockery::mock('ContextAdapter');
+        $get_context = \Mockery::mock('GetContext');
+        $get_context->shouldReceive([
+            'getContext' => \Mockery::mock('GetContext'),
+        ]);
+        $get_context->shouldReceive([
+            'getContext' => \Mockery::mock('GetContext'),
+        ]);
+        $this->contextAdapter->shouldReceive([
+            'get' => ContextMock::get(),
+        ]);
+        $this->country->shouldReceive([
+            'getCountry' => CountryMock::get(),
+        ]);
+        $this->plugin
+            ->shouldReceive([
+                'getAddress' => $this->address_adapter,
+                'getAssign' => $this->assign_adapter,
+                'getCache' => $this->cacheAdapter,
+                'getCarrier' => $this->carrier,
+                'getCart' => $this->cart,
+                'getContext' => $this->contextAdapter,
+                'getCountry' => $this->country,
+                'getCurrency' => $this->currency,
+                'getLogger' => $this->logger,
+                'getTools' => $this->tools,
+            ]);
+
+        $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
+        $configClass = \Mockery::mock('Config');
+        $configClass
+            ->shouldReceive([
+                'isValidFeature' => true,
+            ]);
+        $this->dependencies->amountCurrencyClass = \Mockery::mock('alias:PayPlug\classes\AmountCurrencyClass');
+        $this->dependencies->configClass = $configClass;
+        $this->dependencies->name = 'payplug';
+        $this->dependencies
+            ->shouldReceive([
+                'getHelpers' => [
+                    'user' => \Mockery::mock(UserHelper::class)->makePartial(),
+                    'amount' => $this->amount_helper,
+                ],
+                'getPlugin' => $this->plugin,
+                'getValidators' => $this->validators,
+            ]);
+
+        $this->logger->shouldReceive([
+            'setProcess' => $this->logger,
+        ]);
+
+        $this->repo = \Mockery::mock(OneyPaymentMethod::class, [$this->dependencies])->makePartial();
 
         $this->arrayCache = [];
         $this->arrayLogger = [];

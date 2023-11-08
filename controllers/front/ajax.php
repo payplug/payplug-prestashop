@@ -30,6 +30,7 @@ if (!defined('_PS_VERSION_')) {
  */
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
+    private $apiClass;
     private $configurationAdapter;
     private $configurationClass;
     private $contextAdapter;
@@ -102,7 +103,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             } elseif ($tools->tool('getIsset', 'getOneyCta')) {
                 exit(json_encode([
                     'result' => true,
-                    'tpl' => $this->oney->getOneyCTA(),
+                    'tpl' => $this->dependencies
+                        ->getPlugin()
+                        ->getOneyAction()
+                        ->renderCTA(),
                 ]));
             } elseif ($tools->tool('getIsset', 'isOneyElligible')) {
                 $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
@@ -131,10 +135,18 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         $quantity
                     );
                     $amount = $product_price * $quantity;
-                    $is_elligible = $this->oney->isValidOneyAmount($amount);
+                    $is_elligible = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('oney')
+                        ->isValidOneyAmount($amount);
                 } else {
                     $amount = $context->cart->getOrderTotal($use_taxes);
-                    $is_elligible = $this->oney->isValidOneyAmount($amount);
+                    $is_elligible = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('oney')
+                        ->isValidOneyAmount($amount);
                 }
 
                 exit(json_encode($is_elligible));
@@ -168,7 +180,11 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 try {
-                    $payment_options = $this->oney->getOneyPriceAndPaymentOptions($cart, $amount);
+                    $payment_options = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('oney')
+                        ->getOneyPriceAndPaymentOptions($cart, $amount);
                 } catch (Exception $e) {
                     exit(json_encode([
                         'exception' => $e->getMessage(),
@@ -200,7 +216,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         ],
                     ]));
                 }
-                if ($this->oney->checkOneyRequiredFields($payment_data)) {
+
+                $check_oney_required_fields = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('oney')
+                    ->checkOneyRequiredFields($payment_data);
+
+                if ($check_oney_required_fields) {
                     exit(json_encode([
                         'result' => false,
                         'message' => [

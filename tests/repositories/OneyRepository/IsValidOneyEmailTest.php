@@ -25,6 +25,12 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
 
     public function testWithValidEmail()
     {
+        $this->validators['payment']->shouldReceive([
+                'isOneyEmail' => [
+                    'result' => true,
+                    'code' => '',
+                ],
+            ]);
         $response = $this->repo->isValidOneyEmail($this->email);
         $this->assertSame(
             [
@@ -74,6 +80,12 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
     public function testWithForbiddenChar()
     {
         $error_email = 'test+' . $this->email;
+        $this->validators['payment']->shouldReceive([
+                'isOneyEmail' => [
+                    'result' => false,
+                    'code' => 'char',
+                ],
+            ]);
         $response = $this->repo->isValidOneyEmail($error_email);
         $this->assertSame(
             [
@@ -92,6 +104,12 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
             $error_email .= 'a';
         }
         $error_email .= $this->email;
+        $this->validators['payment']->shouldReceive([
+                'isOneyEmail' => [
+                    'result' => false,
+                    'code' => 'length',
+                ],
+            ]);
         $response = $this->repo->isValidOneyEmail($error_email);
         $this->assertSame(
             [
@@ -110,6 +128,12 @@ final class IsValidOneyEmailTest extends BaseOneyRepository
             $error_email .= 'a';
         }
         $error_email .= '+' . $this->email;
+        $this->validators['payment']->shouldReceive([
+                'isOneyEmail' => [
+                    'result' => false,
+                    'code' => 'length-char',
+                ],
+            ]);
         $response = $this->repo->isValidOneyEmail($error_email);
         $this->assertSame(
             [

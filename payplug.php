@@ -368,7 +368,12 @@ class Payplug extends PaymentModule
         if ($this->module) {
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_cart_cta')) {
-                return $this->payplug_dependencies->hookClass->displayExpressCheckout();
+                $dependencies = new DependenciesClass();
+
+                return $dependencies
+                    ->getPlugin()
+                    ->getOneyAction()
+                    ->renderCTA();
             }
         }
     }
@@ -383,7 +388,12 @@ class Payplug extends PaymentModule
         if ($this->module) {
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_product_cta')) {
-                return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
+                $dependencies = new DependenciesClass();
+
+                return $dependencies
+                    ->getPlugin()
+                    ->getOneyAction()
+                    ->renderCTA($params);
             }
         }
     }
@@ -422,7 +432,25 @@ class Payplug extends PaymentModule
     public function hookPaymentOptions()
     {
         if ($this->module) {
-            return $this->payplug_dependencies->hookClass->paymentOptions();
+            $dependencies = new DependenciesClass();
+            $context = $dependencies->getPlugin()->getContext()->get();
+
+            if (!$dependencies->configClass->isAllowed()) {
+                return false;
+            }
+
+            $context->smarty->assign([
+                'api_url' => $dependencies->apiClass->getApiUrl(),
+            ]);
+
+            // Données sous forme de tableau
+            $payment_options = $dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentOptionCollection();
+
+            // Transforme tableau en object
+            return $dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);
         }
     }
 

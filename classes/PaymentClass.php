@@ -60,41 +60,10 @@ class PaymentClass
      */
     public function displayPaymentErrors($errors = [])
     {
-        if (empty($errors)) {
-            return false;
-        }
-
-        $formated = [];
-        $with_msg_button = false;
-
-        foreach ($errors as $error) {
-            if (false !== strpos($error, 'oney_required_field')) {
-                $this->assign->assign(['is_popin_tpl' => true]);
-                $fields = $this->oney->getOneyRequiredFields();
-                $this->assign->assign([
-                    'oney_type' => str_replace('oney_required_field_', '', $error),
-                    'oney_required_fields' => $fields,
-                ]);
-                $formated[] = [
-                    'type' => 'template',
-                    'value' => 'oney/required.tpl',
-                ];
-            } else {
-                $with_msg_button = true;
-                $formated[] = [
-                    'type' => 'string',
-                    'value' => $error,
-                ];
-            }
-        }
-
-        $this->assign->assign([
-            'is_error_message' => true,
-            'messages' => $formated,
-            'with_msg_button' => $with_msg_button,
-        ]);
-
-        return $this->dependencies->configClass->fetchTemplate('_partials/messages.tpl');
+        return $this->dependencies
+            ->getPlugin()
+            ->getPaymentAction()
+            ->renderPaymentErrors($errors);
     }
 
     /**

@@ -110,20 +110,27 @@ class PrestashopAdapter17
             // load oney schedule on e page loading
             if ('oney' == $payment_method && $payment_option['is_optimized']) {
                 try {
-                    $payment_schedule = $this->oney->getOneyPaymentOptionsList(
-                        $payment_option['amount'],
-                        $payment_option['iso_code']
-                    );
+                    $payment_schedule = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('oney')
+                        ->getOneyPaymentOptionsList(
+                            $payment_option['amount'],
+                            $payment_option['iso_code']
+                        );
                 } catch (\Exception $e) {
                     // todo: set a permanent log
                     $payment_schedule = false;
                 }
 
                 if ($payment_schedule) {
-                    $schedules = $this->oney->displayOneySchedule(
-                        $payment_schedule[$payment_option['type']],
-                        $payment_option['amount']
-                    );
+                    $schedules = $this->dependencies
+                        ->getPlugin()
+                        ->getOneyAction()
+                        ->renderSchedule(
+                            $payment_schedule[$payment_option['type']],
+                            $payment_option['amount']
+                        );
                     $payment_option['additionalInformation'] = $schedules;
                 }
             }

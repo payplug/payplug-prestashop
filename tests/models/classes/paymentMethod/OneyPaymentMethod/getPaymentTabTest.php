@@ -126,13 +126,26 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
 
     public function testWhenCurrentCartIsNotElligible()
     {
-        $this->oney
+        $this->validators['payment']
             ->shouldReceive([
                 'isOneyElligible' => [
                     'result' => false,
-                    'error' => 'failure',
+                    'message' => 'failure',
                 ],
             ]);
+
+        $cart_adapter = \Mockery::mock('CardAdapter');
+        $cart_adapter->shouldReceive([
+            'isGuestCartByCartId' => false,
+        ]);
+        $cart_adapter->shouldReceive([
+            'nbProducts' => 1001,
+        ]);
+        $this->plugin
+            ->shouldReceive([
+                'getCart' => $cart_adapter,
+            ]);
+
         $this->assertSame(
             [],
             $this->classe->getPaymentTab()
@@ -141,12 +154,15 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
 
     public function testWhenRequiredFieldsIsNeeded()
     {
-        $this->oney
+        $this->classe
+            ->shouldReceive([
+                'hasOneyRequiredFields' => true,
+            ]);
+        $this->validators['payment']
             ->shouldReceive([
                 'isOneyElligible' => [
                     'result' => true,
                 ],
-                'hasOneyRequiredFields' => true,
             ]);
         $this->helpers['phone']
             ->shouldReceive([
@@ -158,6 +174,18 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
             ->shouldReceive([
                 'getPaymentDataCookie' => [],
             ]);
+
+        $cart_adapter = \Mockery::mock('CardAdapter');
+        $cart_adapter->shouldReceive([
+            'isGuestCartByCartId' => false,
+        ]);
+        $cart_adapter->shouldReceive([
+            'nbProducts' => 1001,
+        ]);
+        $this->plugin
+            ->shouldReceive([
+                'getCart' => $cart_adapter,
+            ]);
         $this->assertSame(
             [],
             $this->classe->getPaymentTab()
@@ -166,13 +194,17 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
 
     public function testWhenPaymentTabIsReturned()
     {
-        $this->oney
+        $this->classe
+            ->shouldReceive([
+                'hasOneyRequiredFields' => false,
+                'getOneyPaymentContext' => [],
+            ]);
+
+        $this->validators['payment']
             ->shouldReceive([
                 'isOneyElligible' => [
                     'result' => true,
                 ],
-                'hasOneyRequiredFields' => false,
-                'getOneyPaymentContext' => [],
             ]);
         $this->helpers['phone']
             ->shouldReceive([
@@ -192,6 +224,19 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         $this->expected_tab['payment_context'] = [];
 
         unset($this->expected_tab['allow_save_card'], $this->expected_tab['amount']);
+
+        $cart_adapter = \Mockery::mock('CardAdapter');
+        $cart_adapter->shouldReceive([
+            'isGuestCartByCartId' => false,
+        ]);
+        $cart_adapter->shouldReceive([
+            'nbProducts' => 1001,
+        ]);
+
+        $this->plugin
+            ->shouldReceive([
+                'getCart' => $cart_adapter,
+            ]);
 
         $this->assertSame(
             $this->expected_tab,
