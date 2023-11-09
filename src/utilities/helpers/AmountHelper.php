@@ -83,7 +83,7 @@ class AmountHelper
      * @description Check is given amount is valid with price limit
      *
      * @param array $price_limit
-     * @param int   $amount
+     * @param int $amount
      *
      * @return array
      */

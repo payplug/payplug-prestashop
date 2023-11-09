@@ -41,14 +41,12 @@ class PaymentEntity
     /**
      * @param $apiPayment
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setApiPayment($apiPayment)
     {
         if (!is_object($apiPayment)) {
-            throw (new BadParameterException('Invalid argument, $apiPayment must be an object'));
+            throw new BadParameterException('Invalid argument, $apiPayment must be an object');
         }
 
         $this->apiPayment = $apiPayment;

@@ -78,13 +78,13 @@ class browserValidator
     /**
      * @description check if the device is ApplePay compatible
      *
-     * @param $browser
+     * @param string $browser
      *
      * @return array
      */
-    public function isApplePayCompatible($browser)
+    public function isApplePayCompatible($browser = '')
     {
-        if (!($browser) || !is_string($browser) || empty($browser)) {
+        if (!is_string($browser) || !$browser) {
             return [
                 'result' => false,
                 'message' => 'Invalid parameter given, $browser must be a non empty string.',

@@ -90,7 +90,7 @@ class ApplePayClass
             'supportedNetworks' => [
                 'visa',
                 'masterCard',
-                //'amex', Amex is not supported yet by PayPlug
+                // 'amex', Amex is not supported yet by PayPlug
                 'discover',
             ],
             'total' => [

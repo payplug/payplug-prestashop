@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\repositories;
 
-use Exception;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class PaymentRepository extends BaseClass
@@ -194,8 +193,8 @@ class PaymentRepository extends BaseClass
     /**
      * @description Return an error with some details in logger
      *
-     * @param array  $element
-     * @param null   $errorMessage
+     * @param array $element
+     * @param null $errorMessage
      * @param string $level
      *
      * @return array
@@ -498,8 +497,6 @@ class PaymentRepository extends BaseClass
      * @description Check if payment created < 3 min in DB
      *
      * @param $idCart
-     *
-     * @throws Exception
      *
      * @return bool
      */

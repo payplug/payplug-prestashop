@@ -23,7 +23,6 @@
 
 namespace PayPlug\classes;
 
-use Exception;
 use Payplug\Exception\UnknownAPIResourceException;
 use Payplug\Notification;
 use Payplug\Resource\InstallmentPlan;
@@ -114,7 +113,7 @@ class PayPlugNotifications
      */
     public function treat()
     {
-        //Notification identification
+        // Notification identification
         $this->logger->addLog('Notification treatment and authenticity verification:');
 
         $this->logger->addLog('OK');
@@ -184,7 +183,7 @@ class PayPlugNotifications
      * @description Entry point to treat the notification
      *
      * @param string $str
-     * @param int    $http_code
+     * @param int $http_code
      */
     private function exitProcess($str = '', $http_code = 200)
     {
@@ -329,7 +328,7 @@ class PayPlugNotifications
 
             $transaction_id = $this->resource->installment_plan_id;
         } else {
-            //We can't treat Oney pending IPN anymore because it's sent with no reason
+            // We can't treat Oney pending IPN anymore because it's sent with no reason
             if ($this->is_oney && !$is_paid) {
                 $order_state = $this->order_states['oney'];
             } elseif ($this->is_deferred && !$is_paid) {
@@ -358,7 +357,7 @@ class PayPlugNotifications
 
         try {
             $customer = $this->customerAdapter->get((int) $this->cart->id_customer);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->logger->addLog(
                 'Customer cannot be loaded: ' . $exception->getMessage(),
                 'error'
@@ -457,7 +456,7 @@ class PayPlugNotifications
                 false,
                 $secure_key
             );
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->logger->addLog('Order cannot be validated: ' . $exception->getMessage(), 'error');
             $this->exitProcess($exception->getMessage(), 500);
         }
@@ -492,10 +491,15 @@ class PayPlugNotifications
 
             $this->logger->addLog('Payment patched.', 'debug');
 
+            $parameters = [
+                'id_order' => (int) $this->order->id,
+                'id_payment' => $this->payment->id,
+            ];
+
             $create_order_payment = $this->dependencies
                 ->getPlugin()
                 ->getOrderPaymentRepository()
-                ->createOrderPayment((int) $this->order->id, $this->payment->id);
+                ->createOrderPayment($parameters);
             if (!$create_order_payment) {
                 $this->logger->addLog(
                     'IPN Failed: unable to create order payment.',
@@ -726,7 +730,10 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: processSaveCard');
         if ($this->canSaveCard()) {
             $this->logger->addLog('[Save Card] Saving card...');
-            $res_payplug_card = $this->dependencies->getPlugin()->getCard()->saveCard($this->payment);
+            $res_payplug_card = $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->saveAction($this->payment);
 
             if (!$res_payplug_card) {
                 $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');
@@ -846,7 +853,7 @@ class PayPlugNotifications
             try {
                 $message_saved = $message->save();
                 $this->logger->addLog('Message saved: ' . ($message_saved ? 'ok' : 'ko'));
-            } catch (Exception $exception) {
+            } catch (\Exception $exception) {
                 $this->logger->addLog('The message cannot be saved: ' . $exception->getMessage(), 'error');
                 $this->exitProcess($exception->getMessage(), 500);
             }
@@ -980,7 +987,7 @@ class PayPlugNotifications
                 }
 
                 $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-                $this->exitProcess($error_msg, ($this->is_oney ? 242 : 500));
+                $this->exitProcess($error_msg, $this->is_oney ? 242 : 500);
             }
         }
 
@@ -1015,8 +1022,6 @@ class PayPlugNotifications
 
     /**
      * @description Set the notification's global configuration
-     *
-     * @throws Exception
      */
     private function setConfig()
     {
@@ -1220,7 +1225,7 @@ class PayPlugNotifications
             $order_history->id_order = (int) $this->order->id;
             $order_history->changeIdOrderState((int) $new_order_state, $this->order->id, true);
             $order_history->save();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->logger->addLog(
                 'Order history cannot be saved: ' . $exception->getMessage(),
                 'error'
@@ -1237,7 +1242,7 @@ class PayPlugNotifications
 
         try {
             $this->order->update();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->logger->addLog('Order cannot be updated: ' . $exception->getMessage(), 'error');
             $this->exitProcess($exception->getMessage(), 500);
         }

@@ -28,7 +28,7 @@ function upgrade_module_3_1_2($object)
 {
     $flag = true;
 
-    //we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
+    // we cannot allow 1.6 versions tu update from 1.7 content (and vice versa)
     if (version_compare(_PS_VERSION_, '1.7', '<')) {
         return $flag;
     }

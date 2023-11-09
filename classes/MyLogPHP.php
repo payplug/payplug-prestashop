@@ -35,10 +35,10 @@ class MyLogPHP
     private $HEADERS;
 
     /**
-     * Constructor.
+     * @description Constructor.
      *
-     * @param string $logfilename path and name of the file log
-     * @param string $separator   character used for separate the field values
+     * @param string $logfilename
+     * @param string $separator
      */
     public function __construct($logfilename = './install-log.csv', $separator = ',')
     {
@@ -59,11 +59,11 @@ class MyLogPHP
     }
 
     /**
-     * Function to write non INFOrmation messages that will be written into $LOGFILENAME.
+     * @description Function to write non INFOrmation messages that will be written into $LOGFILENAME.
      *
-     * @param string     $value
-     * @param string     $tag
-     * @param null|mixed $line_n
+     * @param string $value
+     * @param string $tag
+     * @param null $line_n
      */
     public function info($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
@@ -71,14 +71,11 @@ class MyLogPHP
     }
 
     /**
-     * Function to write WARNING messages that will be written into $LOGFILENAME.
+     * @description Function to write WARNING messages that will be written into $LOGFILENAME.
      *
-     * Warning messages are for non-fatal errors, so, the script will work properly even
-     * if WARNING errors appears, but this is a thing that you must ponderate about.
-     *
-     * @param string     $value
-     * @param string     $tag
-     * @param null|mixed $line_n
+     * @param string $value
+     * @param string $tag
+     * @param null $line_n
      */
     public function warning($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
@@ -86,13 +83,11 @@ class MyLogPHP
     }
 
     /**
-     * Function to write ERROR messages that will be written into $LOGFILENAME.
+     * @description Function to write ERROR messages that will be written into $LOGFILENAME.
      *
-     * These messages are for fatal errors. Your script will NOT work properly if an ERROR happens, right?
-     *
-     * @param string     $value
-     * @param string     $tag
-     * @param null|mixed $line_n
+     * @param string $value
+     * @param string $tag
+     * @param null $line_n
      */
     public function error($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
@@ -100,13 +95,11 @@ class MyLogPHP
     }
 
     /**
-     * Function to write DEBUG messages that will be written into $LOGFILENAME.
+     * @description Function to write DEBUG messages that will be written into $LOGFILENAME.
      *
-     * DEBUG messages are for variable values and other technical issues.
-     *
-     * @param string     $value
-     * @param string     $tag
-     * @param null|mixed $line_n
+     * @param string $value
+     * @param string $tag
+     * @param null $line_n
      */
     public function debug($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
@@ -114,12 +107,12 @@ class MyLogPHP
     }
 
     /**
-     * Private method that will write the text messages into the log file.
+     * @description Private method that will write the text messages into the log file.
      *
-     * @param string     $errorlevel There are 4 possible levels: INFO, WARNING, DEBUG, ERROR
-     * @param string     $value      the value that will be recorded on log file
-     * @param string     $tag        any possible tag to help the developer to find adapter log messages
-     * @param null|mixed $line_n
+     * @param string $errorlevel
+     * @param string $value
+     * @param string $tag
+     * @param null $line_n
      */
     private function log($errorlevel = 'INFO', $value = '', $tag = '', $line_n = null)
     {

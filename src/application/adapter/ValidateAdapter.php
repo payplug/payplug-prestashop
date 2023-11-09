@@ -24,19 +24,13 @@
 namespace PayPlug\src\application\adapter;
 
 use PayPlug\src\interfaces\ValidateInterface;
-use Validate;
 
 class ValidateAdapter implements ValidateInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
     public function validate($action, $object)
     {
         if (isset($action)) {
-            return Validate::$action($object);
+            return \Validate::$action($object);
         }
     }
 }

@@ -51,7 +51,7 @@ final class InsertPaymentTableTest extends BasePaymentRepository
      *
      * @dataProvider invalidDataProvider
      *
-     * @param array  $parameter
+     * @param array $parameter
      * @param string $logMessage
      */
     public function testMethodWithInvalidData($parameter, $logMessage)

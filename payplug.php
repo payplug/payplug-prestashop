@@ -21,6 +21,7 @@
  *  International Registered Trademark & Property of Payplug SAS
  */
 // Check if prestashop Context
+use PayPlug\classes\DependenciesClass;
 use PayPlug\classes\MyLogPHP;
 
 if (!defined('_PS_VERSION_')) {
@@ -54,7 +55,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '4.4.0';
+        $this->version = '4.5.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -146,15 +147,15 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
+     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared.
      *
-     * @param $params   $this->setDependencies();
+     * @param $params
      *
-     * @return mixed
+     * return bool
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
+        // todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->actionAdminPerformanceControllerAfter($params);
         }
@@ -169,7 +170,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        //todo: Rajouter le test de la table payplug cache avant d'executer ce code
+        // todo: Rajouter le test de la table payplug cache avant d'executer ce code
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->actionClearCompileCache($params);
         }
@@ -219,7 +220,12 @@ class Payplug extends PaymentModule
     public function hookActionObjectOrderStateAddAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateAddAfter', $params);
+            $dependencies = new DependenciesClass();
+
+            return $dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->addTypeAction($params);
         }
     }
 
@@ -233,20 +239,24 @@ class Payplug extends PaymentModule
     public function hookActionObjectOrderStateUpdateAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe(
-                'actionObjectOrderStateUpdateAfter',
-                $params
-            );
+            $dependencies = new DependenciesClass();
+
+            return $dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->updateTypeAction($params);
         }
     }
 
     public function hookActionObjectOrderStateDeleteAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe(
-                'actionObjectOrderStateDeleteAfter',
-                $params
-            );
+            $dependencies = new DependenciesClass();
+
+            return $dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->deleteTypeAction($params);
         }
     }
 
@@ -301,12 +311,23 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description This hook is used to display
+     * a select box in the order state page (BO)
+     * in order to create/update a type
+     *
+     * @param $param
+     *
      * @return mixed
      */
     public function hookDisplayAdminStatusesForm()
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('displayAdminStatusesForm');
+            $dependencies = new DependenciesClass();
+
+            return $dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->renderOption();
         }
     }
 
@@ -496,7 +517,7 @@ class Payplug extends PaymentModule
 
         if (!defined('PHP_VERSION_ID')) {
             $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
+            define('PHP_VERSION_ID', $php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]);
         }
 
         return PHP_VERSION_ID >= $php_min_version;

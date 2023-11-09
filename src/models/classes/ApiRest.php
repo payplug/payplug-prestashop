@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\models\classes;
 
-use PayPlug\src\application\adapter\ToolsAdapter;
-
 class ApiRest
 {
     private $dependencies;
@@ -37,7 +35,6 @@ class ApiRest
         $this->dependencies = $dependencies;
         $this->validators = $this->dependencies->getValidators();
         $this->helpers = $this->dependencies->getHelpers();
-        $this->tools = ToolsAdapter::factory();
     }
 
     /**
@@ -57,10 +54,11 @@ class ApiRest
         }
 
         $configurationAction = $this->dependencies->getPlugin()->getConfigurationAction();
+        $tools = $this->dependencies->getPlugin()->getTools();
 
         switch ($action) {
             case 'login':
-                $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
+                $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->loginAction($datas);
 
                 break;
@@ -81,7 +79,7 @@ class ApiRest
             case 'sofort_permissions':
             case 'giropay_permissions':
             case 'ideal_permissions':
-                $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
+                $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $payment_method = str_replace('_permissions', '', $action);
                 $json = $configurationAction->checkPermissionAction($payment_method, (bool) $datas->env);
 
@@ -94,12 +92,12 @@ class ApiRest
                 break;
 
             case 'refresh_keys':
-                $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
+                $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->submitSandboxAction($datas);
 
                 break;
             case 'save':
-                $datas = json_decode($this->tools->tool('file_get_contents', 'php://input'), false);
+                $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->saveAction($datas);
 
                 break;
@@ -653,7 +651,7 @@ class ApiRest
                     'text' => $translation['requirements']['curl']['text'],
                 ],
             ],
-            'enable_debug_check' => false, //TODO: to be deleted
+            'enable_debug_check' => false, // todo: to be deleted
         ];
     }
 
@@ -687,7 +685,6 @@ class ApiRest
             'logged' => $current_configuration['logged'],
             'mode' => (bool) $current_configuration['sandbox_mode'] ? 1 : 0,
             'psaccount' => $this->dependencies->configClass->checkPsAccount(),
-
         ];
     }
 

@@ -23,13 +23,12 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Message;
 use PayPlug\src\interfaces\MessageInterface;
 
 class MessageAdapter implements MessageInterface
 {
-    public function get($idMessage = null)
+    public function get($idMessage = 0)
     {
-        return new Message((int) $idMessage);
+        return new \Message((int) $idMessage);
     }
 }

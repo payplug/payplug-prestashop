@@ -28,7 +28,7 @@ class canBeRefundTest extends TestCase
      */
     public function invalidDataProvider()
     {
-        //$pay_id
+        // $pay_id
         yield [1, ['amount' => 5, 'metadata' => ''], 2, 1, 'invalid argument, $pay_id must be a string.'];
         yield [['key' => 'value'], ['amount' => 5, 'metadata' => ''], 2, 1, 'invalid argument, $pay_id must be a string.'];
         // $data provide
@@ -40,12 +40,12 @@ class canBeRefundTest extends TestCase
         yield ['pay_1355', 1, 2, 1, '$data must be a non empty array.'];
         yield ['pay_1355', null, 2, 1, '$data must be a non empty array.'];
         yield ['pay_1355', [], 2, 1, '$data must be a non empty array.'];
-        //$truly_refundable_amount provider
+        // $truly_refundable_amount provider
         yield [[], ['amount' => 5, 'metadata' => ''], true, 1, 'invalid argument, $truly_refundable_amount must be a numeric type.'];
         yield [[], ['amount' => 5, 'metadata' => ''], 'amount', 1, 'invalid argument, $truly_refundable_amount must be a numeric type.'];
         yield [[], ['amount' => 5, 'metadata' => ''], null, 1, 'invalid argument, $truly_refundable_amount must be a numeric type.'];
         yield [[], ['amount' => 5, 'metadata' => ''], ['key' => 'value'], 1, 'invalid argument, $truly_refundable_amount must be a numeric type.'];
-        //$amount_total provider
+        // $amount_total provider
         yield [[], ['amount' => 5, 'metadata' => ''], 2, true, 'invalid argument, $total_amount must be a numeric type.'];
         yield [[], ['amount' => 5, 'metadata' => ''], 2, ['key' => 'value'], 'invalid argument, $total_amount must be a numeric type.'];
         yield [[], ['amount' => 5, 'metadata' => ''], 2, null, 'invalid argument, $total_amount must be a numeric type.'];

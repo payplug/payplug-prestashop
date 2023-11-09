@@ -23,9 +23,6 @@
 
 namespace PayPlug\classes;
 
-use DateInterval;
-use DateTime;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -44,15 +41,15 @@ class PayplugLock
     /**
      * Check.
      *
-     * @param int   $id_cart
-     * @param int   $loop_time
+     * @param int $id_cart
+     * @param int $loop_time
      * @param mixed $process
      */
     public function check($id_cart, $loop_time = 1, $process = 'none')
     {
         // Set delay
-        $delay = new DateInterval('PT10S');
-        $lifetime = new DateInterval('PT20S');
+        $delay = new \DateInterval('PT10S');
+        $lifetime = new \DateInterval('PT20S');
 
         // Check if lock exists
         $lock_exists = $this->dependencies
@@ -62,11 +59,11 @@ class PayplugLock
 
         if ($lock_exists) {
             // Then define the expiration
-            $last_update = new DateTime($lock_exists['date_upd']);
+            $last_update = new \DateTime($lock_exists['date_upd']);
             $last_check = $last_update->add($delay);
-            $creation_date = new DateTime($lock_exists['date_add']);
+            $creation_date = new \DateTime($lock_exists['date_add']);
             $end_of_life = $creation_date->add($lifetime);
-            $time = new DateTime('now');
+            $time = new \DateTime('now');
 
             $lock_repository = $this->dependencies->getPlugin()->getLockRepository();
             while (!empty($lock_repository->getByCartId((int) $id_cart)) && ($time < $last_check)) {
@@ -88,12 +85,12 @@ class PayplugLock
                     }
                 }
 
-                $time = new DateTime('now');
+                $time = new \DateTime('now');
             }
         }
     }
 
-    //TODO: check multishop si cart_id identiques ou uniques
+    // todo: check multishop si cart_id identiques ou uniques
     public function createLockG2($id_cart, $process_print = 'none')
     {
         // check if has lock
@@ -103,7 +100,7 @@ class PayplugLock
             ->getByCartId((int) $id_cart);
 
         if (!empty($lock_exists)) {
-            $date_add = new DateTime($lock_exists['date_add']);
+            $date_add = new \DateTime($lock_exists['date_add']);
             if ($this->validators['lock']->isExpired($date_add)['result']) {
                 $this->dependencies
                     ->getPlugin()

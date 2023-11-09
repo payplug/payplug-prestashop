@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Db;
 use PayPlug\src\interfaces\QueryInterface;
 
 class QueryAdapter implements QueryInterface
@@ -33,15 +32,10 @@ class QueryAdapter implements QueryInterface
     public function __construct()
     {
         try {
-            $this->db = Db::getInstance();
+            $this->db = \Db::getInstance();
         } catch (\Exception $e) {
             var_dump($e);
         }
-    }
-
-    public static function factory()
-    {
-        return new QueryAdapter();
     }
 
     /**

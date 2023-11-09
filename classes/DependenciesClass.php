@@ -36,7 +36,6 @@ use PayPlug\src\utilities\validators\loggerValidator;
 use PayPlug\src\utilities\validators\moduleValidator;
 use PayPlug\src\utilities\validators\orderValidator;
 use PayPlug\src\utilities\validators\paymentValidator;
-use Tools;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -48,7 +47,6 @@ class DependenciesClass
     public $amountCurrencyClass;
     public $apiClass;
     public $applePayClass;
-    public $cardClass;
     public $cartClass;
     public $configClass;
     public $installmentClass;
@@ -90,7 +88,6 @@ class DependenciesClass
         $this->applePayClass = new ApplePayClass($this);
         $this->amountCurrencyClass = new AmountCurrencyClass($this);
         $this->adminClass = new AdminClass($this);
-        $this->cardClass = new CardClass($this);
         $this->payplugLock = new PayplugLock($this);
         $this->cartClass = new CartClass($this);
         $this->configClass = new ConfigClass($this);
@@ -131,12 +128,7 @@ class DependenciesClass
      */
     public function loadAdapterPresta()
     {
-        //$AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter' . _PS_VERSION_[0] . _PS_VERSION_[2];
-        if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter16';
-        } else {
-            $AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter17';
-        }
+        $AdapterClass = '\PayPlug\src\application\adapter\PrestashopAdapter17';
         if (class_exists($AdapterClass)) {
             return new $AdapterClass();
         }
@@ -151,7 +143,7 @@ class DependenciesClass
             return [];
         }
 
-        $jsonContent = Tools::file_get_contents($json_path);
+        $jsonContent = \Tools::file_get_contents($json_path);
         if (!$jsonContent) {
             return [];
         }

@@ -23,14 +23,15 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Cart;
 use PayPlug\src\interfaces\CartInterface;
 
 class CartAdapter implements CartInterface
 {
-    public static function factory()
+    private $cart;
+
+    public function __construct()
     {
-        return new self();
+        $this->cart = new \Cart();
     }
 
     public function get($id_cart = false)
@@ -39,7 +40,7 @@ class CartAdapter implements CartInterface
             $id_cart = false;
         }
 
-        return new Cart($id_cart);
+        return new \Cart($id_cart);
     }
 
     public function isVirtualCart($cart)
@@ -75,6 +76,8 @@ class CartAdapter implements CartInterface
             return false;
         }
 
-        return Cart::isGuestCartByCartId($idCart);
+        $cart = $this->cart;
+
+        return $cart::isGuestCartByCartId($idCart);
     }
 }

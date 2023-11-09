@@ -1,6 +1,6 @@
 <?php
 
-$finder = (new PhpCsFixer\Finder)
+$finder = (new PhpCsFixer\Finder())
     ->exclude('test')
     ->exclude('vendor')
     ->exclude('translations')
@@ -8,7 +8,7 @@ $finder = (new PhpCsFixer\Finder)
     ->in(__DIR__)
 ;
 
-return (new PhpCsFixer\Config)
+return (new PhpCsFixer\Config())
     ->setUsingCache(true)
     ->setRules([
         '@PSR12' => true,
@@ -37,9 +37,9 @@ return (new PhpCsFixer\Config)
         'phpdoc_order' => true,
         'phpdoc_trim' => true,
         'single_line_comment_style' => true,
-        'phpdoc_align' => true,
+        'phpdoc_align' => ['align' => 'left'],
         'php_unit_internal_class' => false,
-        'php_unit_test_class_requires_covers' => false
+        'php_unit_test_class_requires_covers' => false,
     ])
     ->setFinder($finder)
 ;

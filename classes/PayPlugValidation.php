@@ -23,8 +23,6 @@
 
 namespace PayPlug\classes;
 
-use Exception;
-
 class PayPlugValidation
 {
     public $apiClass;
@@ -118,7 +116,7 @@ class PayPlugValidation
 
     public function treat()
     {
-        //todo: split code into different functions
+        // todo: split code into different functions
         $this->postProcess();
     }
 
@@ -133,7 +131,7 @@ class PayPlugValidation
             'step' => 3,
         ]);
 
-        //Cancelling
+        // Cancelling
         if (!($cart_id = $this->toolsAdapter->tool('getValue', 'cartid'))) {
             $this->logger->addLog('No Cart ID.', 'error');
             $this->paymentClass->setPaymentErrorsCookie([
@@ -152,7 +150,7 @@ class PayPlugValidation
             ]);
             $this->toolsAdapter->tool('redirect', $redirect_url_error);
         }
-        //Treatment
+        // Treatment
         $this->logger->addLog('Cart ID : ' . (int) $cart_id);
 
         $cart = $this->cartAdapter->get((int) $cart_id);
@@ -398,11 +396,14 @@ class PayPlugValidation
 
             $amount = $payment->amount;
 
-            if (((isset($payment->save_card) && 1 == (int) $payment->save_card))
-                || ((isset($payment->card->id) && '' != $payment->card->id))
+            if ((isset($payment->save_card) && 1 == (int) $payment->save_card)
+                || (isset($payment->card->id) && '' != $payment->card->id)
             ) {
                 $this->logger->addLog('[Save Card] Saving card...');
-                $res_payplug_card = $this->plugin->getCard()->saveCard($payment);
+                $res_payplug_card = $this->dependencies
+                    ->getPlugin()
+                    ->getCardAction()
+                    ->saveAction($payment);
 
                 if (!$res_payplug_card) {
                     $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');
@@ -616,7 +617,7 @@ class PayPlugValidation
             $id_order = $this->moduleInstance->currentOrder;
 
             $order = $this->orderAdapter->get($id_order);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->logger->addLog('Order cannot be created: ' . $exception->getMessage(), 'error');
             $this->response = [
                 'exception' => $exception->getMessage(),
@@ -687,10 +688,15 @@ class PayPlugValidation
             if (!$patchPayment['result']) {
                 $this->logger->addLog('Payment cannot be patched: ' . $patchPayment['message'], 'error');
             }
+
+            $parameters = [
+                'id_order' => (int) $order->id,
+                'id_payment' => $payment->id,
+            ];
             $create_order_payment = $this->dependencies
                 ->getPlugin()
                 ->getOrderPaymentRepository()
-                ->createOrderPayment((int) $order->id, $payment->id);
+                ->createOrderPayment($parameters);
             if (!$create_order_payment) {
                 $this->logger->addLog('Unable to create order payment.', 'error');
             }

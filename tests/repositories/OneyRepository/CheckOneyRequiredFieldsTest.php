@@ -21,7 +21,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
         parent::setUp();
 
         $this->context
-            ->shouldReceive('getContext')
+            ->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->country->shouldReceive('getCountry')

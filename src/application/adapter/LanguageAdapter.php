@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Language;
 use PayPlug\src\interfaces\LanguageInterface;
 
 class LanguageAdapter implements LanguageInterface
@@ -34,16 +33,16 @@ class LanguageAdapter implements LanguageInterface
             $idLanguage = false;
         }
 
-        return new Language($idLanguage);
+        return new \Language($idLanguage);
     }
 
     public function getLanguages($active = false)
     {
-        return Language::getLanguages($active);
+        return \Language::getLanguages($active);
     }
 
     public function loadLanguages()
     {
-        return Language::loadLanguages();
+        return \Language::loadLanguages();
     }
 }

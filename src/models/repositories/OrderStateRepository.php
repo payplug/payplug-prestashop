@@ -78,7 +78,7 @@ class OrderStateRepository extends QueryRepository
      * @description Find id_order_state by name.
      *
      * @param array $name
-     * @param bool  $test_mode
+     * @param bool $test_mode
      * @param mixed $check_version
      *
      * @return array

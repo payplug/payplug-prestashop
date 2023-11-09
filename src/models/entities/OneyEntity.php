@@ -31,7 +31,7 @@ class OneyEntity
     private $operations;
 
     /**
-     * @param mixed $oneyXtimes
+     * @param false $oneyXtimes
      *
      * @return array
      */
@@ -51,16 +51,14 @@ class OneyEntity
     }
 
     /**
-     * @param array $operations
+     * @param $operations
      *
-     * @throws BadParameterException
-     *
-     * @return self
+     * @return $this
      */
     public function setOperations($operations)
     {
         if (!is_array($operations)) {
-            throw (new BadParameterException('Invalid argument, $operations must be an array'));
+            throw new BadParameterException('Invalid argument, $operations must be an array');
         }
 
         $this->operations = $operations;

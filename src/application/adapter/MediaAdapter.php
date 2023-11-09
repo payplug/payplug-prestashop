@@ -23,29 +23,28 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Media;
 use PayPlug\src\interfaces\MediaInterface;
 
 class MediaAdapter implements MediaInterface
 {
-    public function addJsDef($files = [])
+    public function addJsDef($files = [], $template = false)
     {
         foreach ($files as &$file) {
-            if ($file && is_string($file)) {
+            if ($file && is_string($file) && !$template) {
                 $file = addslashes($file);
             }
         }
 
-        return Media::addJsDef($files);
+        return \Media::addJsDef($files);
     }
 
     public static function getMediaPath($path)
     {
-        return Media::getMediaPath($path);
+        return \Media::getMediaPath($path);
     }
 
     public function getJsDef()
     {
-        return Media::getJsDef();
+        return \Media::getJsDef();
     }
 }

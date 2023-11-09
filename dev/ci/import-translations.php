@@ -3,7 +3,7 @@
 $header = '<?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 ';
 
 $configuration = json_decode(file_get_contents(dirname(__FILE__) . '/../../composer.json'));

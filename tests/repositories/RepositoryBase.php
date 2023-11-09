@@ -64,6 +64,9 @@ class RepositoryBase extends TestCase
     protected $validators;
     protected $repositories;
 
+    // action
+    protected $card_action;
+
     // models/classes
     protected $configuration;
 
@@ -143,9 +146,12 @@ class RepositoryBase extends TestCase
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->payplug_order_state_repository = \Mockery::mock('PayplugOrderStateRepository');
 
+        $this->card_action = \Mockery::mock('CardAction');
+
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
+                'getCardAction' => $this->card_action,
                 'getConfiguration' => $this->config,
                 'getConfigurationClass' => $this->configuration,
                 'getCardRepository' => $this->card_repository,

@@ -25,6 +25,19 @@ namespace PayPlug\src\models\repositories;
 
 class CardRepository extends QueryRepository
 {
+    private $fields = [
+        'id_customer' => 'integer',
+        'id_company' => 'integer',
+        'is_sandbox' => 'bool',
+        'id_card' => 'string',
+        'last4' => 'string',
+        'exp_month' => 'string',
+        'exp_year' => 'string',
+        'brand' => 'string',
+        'country' => 'string',
+        'metadata' => 'string',
+    ];
+
     public function __construct($prefix = '', $dependencies = null)
     {
         parent::__construct($prefix, $dependencies);
@@ -34,13 +47,54 @@ class CardRepository extends QueryRepository
     /**
      * @description Register a card from the api
      *
-     * @param null  $card
-     * @param int   $customer_id
-     * @param int   $company_id
+     * @param null $card
+     * @param int $customer_id
+     * @param int $company_id
      * @param false $is_sandbox
+     * @param mixed $parameters
      *
      * @return bool
      */
+    public function createCard($parameters = [])
+    {
+        if (!is_array($parameters) || empty($parameters)) {
+            return false;
+        }
+
+        $this
+            ->insert()
+            ->into($this->table_name);
+
+        foreach ($parameters as $key => $value) {
+            if (array_key_exists($key, $this->fields)) {
+                switch ($this->fields[$key]) {
+                    case 'string':
+                        if (is_string($value) && $value) {
+                            $this->fields($key)->values($this->escape($value));
+                        }
+
+                        break;
+                    case 'integer':
+                        if (is_int($value)) {
+                            $this->fields($key)->values((int) $value);
+                        }
+
+                        break;
+                    case 'bool':
+                        if (is_bool($value)) {
+                            $this->fields($key)->values($value ? 1 : 0);
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return (bool) $this->build();
+    }
+
     public function set($card = null, $customer_id = 0, $company_id = 0, $is_sandbox = false)
     {
         if (!is_object($card) || !$card) {
@@ -141,8 +195,8 @@ class CardRepository extends QueryRepository
      * @description Check if a card is already register in the database
      *
      * @param string $payment_id
-     * @param int    $company_id
-     * @param false  $is_sandbox
+     * @param int $company_id
+     * @param false $is_sandbox
      *
      * @return bool
      */
@@ -191,8 +245,8 @@ class CardRepository extends QueryRepository
     /**
      * @description Get all registered cards for a given customer
      *
-     * @param int  $id_customer
-     * @param int  $id_company
+     * @param int $id_customer
+     * @param int $id_company
      * @param bool $is_sandbox
      *
      * @return array

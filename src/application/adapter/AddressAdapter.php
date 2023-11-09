@@ -23,27 +23,16 @@
 
 namespace PayPlug\src\application\adapter;
 
-use Address;
 use PayPlug\src\interfaces\AddressInterface;
 
 class AddressAdapter implements AddressInterface
 {
-    public static function factory()
-    {
-        return new self();
-    }
-
     public function get($idAddress = false)
     {
         if (!is_int($idAddress)) {
             $idAddress = false;
         }
 
-        return new Address($idAddress);
-    }
-
-    public function getAddress($idAddress)
-    {
-        return new Address($idAddress);
+        return new \Address($idAddress);
     }
 }

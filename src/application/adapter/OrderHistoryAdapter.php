@@ -23,13 +23,12 @@
 
 namespace PayPlug\src\application\adapter;
 
-use OrderHistory;
 use PayPlug\src\interfaces\OrderHistoryInterface;
 
 class OrderHistoryAdapter implements OrderHistoryInterface
 {
     public function get($idOrderHistory = null)
     {
-        return new OrderHistory($idOrderHistory);
+        return new \OrderHistory($idOrderHistory);
     }
 }

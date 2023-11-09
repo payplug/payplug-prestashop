@@ -77,6 +77,9 @@ class BaseApiRest extends TestCase
 
         $this->payment_method = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
+        $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
+
+        $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
@@ -88,6 +91,7 @@ class BaseApiRest extends TestCase
                 'getLogger' => $this->logger,
                 'getPaymentMethodClass' => $this->payment_method,
                 'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),
+                'getTools' => $this->tools,
                 'getTranslationClass' => $this->translation,
             ]);
 
@@ -98,8 +102,6 @@ class BaseApiRest extends TestCase
                 'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
                 'getHelpers' => ['amount' => $this->amount_helper],
             ]);
-
-        $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
 
         $this->classe = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();
         $this->dependencies->apiClass = \Mockery::mock('alias:PayPlug\classes\ApiClass');

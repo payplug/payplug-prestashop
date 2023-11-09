@@ -140,6 +140,11 @@ var $document, $window, __moduleName__Module = {
                 if (typeof $document == 'undefined') {
                     return false;
                 }
+
+                if ($('#' + payment_option_id).attr('checked') == 'checked') {
+                    integrated.form.set();
+                }
+
                 $document.on('click', '#' + payment_option_id, integrated.form.set);
             },
             clear: function (clear) {

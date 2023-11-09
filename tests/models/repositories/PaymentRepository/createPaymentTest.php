@@ -29,10 +29,10 @@ class createPaymentTest extends BasePaymentRepository
         $this
             ->repository
             ->shouldReceive([
-                'update' => $this->repository,
-                'table' => $this->repository,
-                'set' => $this->repository,
-                'where' => $this->repository,
+                'insert' => $this->repository,
+                'into' => $this->repository,
+                'fields' => $this->repository,
+                'values' => $this->repository,
                 'build' => false,
             ]);
 
@@ -47,10 +47,10 @@ class createPaymentTest extends BasePaymentRepository
         $this
             ->repository
             ->shouldReceive([
-                'update' => $this->repository,
-                'table' => $this->repository,
-                'set' => $this->repository,
-                'where' => $this->repository,
+                'insert' => $this->repository,
+                'into' => $this->repository,
+                'fields' => $this->repository,
+                'values' => $this->repository,
                 'build' => true,
             ]);
 

@@ -1,4 +1,17 @@
 # Payplug module changelog
+## Version 4.5.0
+
+- Refactoring :
+  - [PRE-1981](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2279): Add action Card
+  - [PRE-1982](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2290): Add action Order State
+  
+- Improvment : 
+  - [PRE-2054](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2289): Set the job build release to fail if the zip is not generated
+  - [PRE-2061](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2295): Add BO UI improvements
+
+- Bugfix :
+   - [PRE-2057](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2296): Fix notification for deferred payment
+   - [PRE-2069](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2299): Fix IP form when only choice in checkout
 
 ## Version 4.4.0
 

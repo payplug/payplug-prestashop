@@ -47,9 +47,6 @@ class PayPlugDependencies
     /** @var ConfigClass */
     private $configClass;
 
-    /** @var HookRepository */
-    private $hook;
-
     /** @var InstallRepository */
     private $install;
 
@@ -74,7 +71,6 @@ class PayPlugDependencies
         $this->dependencies = new DependenciesClass();
 
         $this->apiClass = $this->dependencies->apiClass;
-        $this->hook = $this->dependencies->getPlugin()->getHook();
         $this->install = $this->dependencies->getPlugin()->getInstall();
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->payment = $this->dependencies->getPlugin()->getPayment();

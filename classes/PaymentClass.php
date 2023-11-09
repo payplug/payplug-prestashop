@@ -27,7 +27,6 @@ class PaymentClass
 {
     private $address;
     private $assign;
-    private $card;
     private $cart;
     private $configurationAdapter;
     private $configuration;
@@ -56,7 +55,6 @@ class PaymentClass
 
         $this->address = $this->dependencies->getPlugin()->getAddress();
         $this->assign = $this->dependencies->getPlugin()->getAssign();
-        $this->card = $this->dependencies->getPlugin()->getCard();
         $this->cart = $this->dependencies->getPlugin()->getCart();
         $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
@@ -138,98 +136,6 @@ class PaymentClass
         $reload = true;
 
         exit(json_encode(['reload' => $reload]));
-    }
-
-    /**
-     * @description Assign payment option
-     * @unused
-     *
-     * @param $cart
-     *
-     * @return bool
-     */
-    public function assignPaymentOptions($cart)
-    {
-        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
-        $standard = (bool) $payment_methods['standard'];
-        $one_click = $standard && (bool) $payment_methods['one_click'];
-        $installment = (bool) $payment_methods['inst'];
-        $installment_mode = $this->configuration->getValue('inst_mode');
-        $installment_min_amount = $this->configuration->getValue('inst_min_amount');
-
-        if (!$this->dependencies->amountCurrencyClass->checkCurrency($cart)
-            || !$this->dependencies->amountCurrencyClass->checkAmount($cart)) {
-            return false;
-        }
-
-        $payplug_cards = $this->card->getByCustomer((int) $cart->id_customer, true);
-
-        $use_taxes = $this->configurationAdapter->get('PS_TAX');
-        $base_total_tax_inc = $cart->getOrderTotal(true);
-        $base_total_tax_exc = $cart->getOrderTotal(false);
-
-        if ($base_total_tax_inc < $installment_min_amount) {
-            $installment = 0;
-        }
-
-        if ($use_taxes) {
-            $price2display = $base_total_tax_inc;
-        } else {
-            $price2display = $base_total_tax_exc;
-        }
-
-        $this->assign->assign([
-            'iso_lang' => $this->context->language->iso_code,
-            'price2display' => $price2display,
-        ]);
-
-        $front_ajax_url = $this->context->link->getModuleLink($this->dependencies->name, 'ajax', [], true);
-
-        $this->assign->assign([
-            'front_ajax_url' => $front_ajax_url,
-            'api_url' => $this->dependencies->apiClass->getApiUrl(),
-        ]);
-
-        if (!empty($payplug_cards) && 1 == $one_click) {
-            $this->assign->assign([
-                'payplug_cards' => $payplug_cards,
-                'payplug_one_click' => 1,
-            ]);
-        }
-
-        $payment_url = 'index.php?controller=order&step=3';
-
-        $payment_controller_url = $this->context->link->getModuleLink(
-            $this->dependencies->name,
-            'payment',
-            [],
-            true
-        );
-        $installment_controller_url = $this->context->link->getModuleLink(
-            $this->dependencies->name,
-            'payment',
-            ['i' => 1],
-            true
-        );
-        $current_lang = explode('-', $this->context->language->language_code);
-        $current_lang = $current_lang[0];
-        if (in_array($current_lang, ['it', 'en'], true)) {
-            $img_lang = $current_lang;
-        } else {
-            $img_lang = 'default';
-        }
-
-        $this->assign->assign([
-            'spinner_url' => $this->tools->tool('getHttpHost', true)
-                . $this->constant->get(__PS_BASE_URI__)
-                . 'modules/' . $this->dependencies->name . '/views/img/gif/spinner.gif',
-            'payment_url' => $payment_url,
-            'payment_controller_url' => $payment_controller_url,
-            'installment_controller_url' => $installment_controller_url,
-            'img_lang' => $img_lang,
-            'payplug_installment' => $installment,
-            'installment_mode' => $installment_mode,
-        ]);
     }
 
     /**
@@ -355,7 +261,10 @@ class PaymentClass
          */
         $card_details = false;
         if (isset($payment->card->last4) && (!empty($payment->card->last4))) {
-            $card_details = $this->card->getCardDetailFromPayment($payment);
+            $card_details = $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->renderOrderDetail($payment);
         }
 
         // Card brand
@@ -408,7 +317,7 @@ class PaymentClass
             'paid' => (bool) $payment->is_paid,
         ];
 
-        //Deferred payment does'nt display 3DS option before capture so we have to consider it null
+        // Deferred payment does'nt display 3DS option before capture so we have to consider it null
         if (null !== $payment->is_3ds) {
             $payment_details['tds'] = ($payment->is_3ds)
                 ? $this->dependencies->l('payplug.buildPaymentDetails.yes', 'paymentclass')
@@ -566,7 +475,10 @@ class PaymentClass
 
         if (null !== $payment->card->id) {
             $this->logger->addLog('Save the payment card', 'notice');
-            $this->card->saveCard($payment);
+            $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->saveAction($payment);
         }
 
         $state_addons = ($payment->is_live ? '' : '_test');
@@ -775,32 +687,32 @@ class PaymentClass
             $installment = null;
         }
 
-        $pay_status = 1; //not paid
+        $pay_status = 1; // not paid
         if (1 == (int) $payment->is_paid) {
-            $pay_status = 2; //paid
+            $pay_status = 2; // paid
         } elseif (isset($payment->payment_method, $payment->payment_method['is_pending'])
             && 1 == (int) $payment->payment_method['is_pending']
         ) {
-            $pay_status = 10; //oney pending
+            $pay_status = 10; // oney pending
         } elseif ($this->validators['payment']->isFailed($payment)['result'] && 9 != $pay_status) {
             if ('aborted' == $payment->failure->code) {
-                $pay_status = 7; //cancelled
+                $pay_status = 7; // cancelled
             } elseif ('timeout' == $payment->failure->code) {
-                $pay_status = 11; //abandoned
+                $pay_status = 11; // abandoned
             } else {
-                $pay_status = 3; //failed
+                $pay_status = 3; // failed
             }
         } elseif (null !== $payment->authorization && ($payment->authorization->expires_at - time()) > 0) {
-            $pay_status = 8; //authorized
+            $pay_status = 8; // authorized
         } elseif (null !== $payment->authorization && ($payment->authorization->expires_at - time()) <= 0) {
-            $pay_status = 9; //authorization expired
+            $pay_status = 9; // authorization expired
         } elseif (null !== $payment->installment_plan_id && 1 == (int) $installment->is_active) {
-            $pay_status = 6; //ongoing
+            $pay_status = 6; // ongoing
         }
         if (1 == (int) $payment->is_refunded) {
-            $pay_status = 5; //refunded
+            $pay_status = 5; // refunded
         } elseif ((int) $payment->amount_refunded > 0) {
-            $pay_status = 4; //partially refunded
+            $pay_status = 4; // partially refunded
         }
 
         return $pay_status;
@@ -811,9 +723,7 @@ class PaymentClass
      *
      * @param $options
      *
-     * @throws Exception
-     *
-     * @return mixed
+     * @return array
      */
     public function preparePayment($options)
     {
@@ -1036,9 +946,8 @@ class PaymentClass
         $billing['company_name'] = empty($billing['company_name']) || !$billing['company_name']
             ? $billing['first_name'] . ' ' . $billing['last_name']
             : $billing['company_name'];
-        $billing['mobile_phone_number'] = $billing['mobile_phone_number']
-            ? $billing['mobile_phone_number']
-            : $billing['landline_phone_number'];
+        $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: null;
+        $billing['mobile_phone_number'] = $billing['mobile_phone_number'] ?: $billing['landline_phone_number'];
 
         // Shipping
         $delivery_type = 'NEW';
@@ -1072,14 +981,13 @@ class PaymentClass
         $shipping['company_name'] = empty($shipping['company_name']) || !$shipping['company_name']
             ? $shipping['first_name'] . ' ' . $shipping['last_name']
             : $shipping['company_name'];
-        $shipping['mobile_phone_number'] = $shipping['mobile_phone_number']
-            ? $shipping['mobile_phone_number']
-            : $shipping['landline_phone_number'];
+        $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: null;
+        $shipping['mobile_phone_number'] = $shipping['mobile_phone_number'] ?: $shipping['landline_phone_number'];
 
         // 3ds
         $force_3ds = false;
 
-        //save card
+        // save card
         $allow_save_card =
             $config['one_click']
             && 1 != $this->cart->isGuestCartByCartId($cart->id)
@@ -1330,7 +1238,7 @@ class PaymentClass
             'isDeferred' => $options['is_deferred'],
             'isEmbedded' => 'redirect' !== (string) $this->configuration->getValue('embedded_mode'),
             'isIntegrated' => $options['is_integrated'],
-            'isMobileDevice' => ($this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result']),
+            'isMobileDevice' => $this->validators['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'],
             'cart' => $cart,
             'cartId' => (int) $payment_tab['metadata']['ID Cart'],
             'cartHash' => null,
@@ -1463,11 +1371,9 @@ class PaymentClass
     /**
      * @description Set payment data in cookie
      *
-     * @param mixed $payplug_data
+     * @param array $payplug_data
      *
-     * @throws Exception
-     *
-     * @return mixed
+     * @return bool
      */
     public function setPaymentDataCookie($payplug_data = [])
     {
@@ -1487,9 +1393,7 @@ class PaymentClass
      *
      * @param array $payplug_errors
      *
-     * @throws Exception
-     *
-     * @return mixed
+     * @return bool
      */
     public function setPaymentErrorsCookie($payplug_errors = [])
     {
@@ -1558,11 +1462,8 @@ class PaymentClass
     /**
      * @description Hydrate Oney Payment Tab from Cookie Payment Data
      *
-     * @param array $payment_tab
-     * @param array $payment_data
-     *
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
+     * @param $payment_tab
+     * @param $payment_data
      *
      * @return array
      */

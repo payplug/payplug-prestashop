@@ -23,18 +23,17 @@
 
 namespace PayPlug\src\application\adapter;
 
-use OrderSlip;
 use PayPlug\src\interfaces\OrderSlipInterface;
 
 class OrderSlipAdapter implements OrderSlipInterface
 {
     public function get($idOrderSlip = null)
     {
-        return new OrderSlip($idOrderSlip);
+        return new \OrderSlip($idOrderSlip);
     }
 
     public function getOrdersSlip($idCustomer, $idOrder = false)
     {
-        return OrderSlip::getOrdersSlip($idCustomer, $idOrder);
+        return \OrderSlip::getOrdersSlip($idCustomer, $idOrder);
     }
 }

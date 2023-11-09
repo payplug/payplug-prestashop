@@ -32,6 +32,16 @@ class Translation
         $this->dependencies = $dependencies;
     }
 
+    public function getCardTranslation()
+    {
+        return [
+            'delete' => [
+                'confirm' => $this->dependencies->l('card.delete.confirm', 'translation'),
+                'success' => $this->dependencies->l('card.delete.success', 'translation'),
+            ],
+        ];
+    }
+
     /**
      * @return array
      */
@@ -373,9 +383,7 @@ class Translation
      */
     public function getPaymentStatusTranslations()
     {
-        return [
-
-        ];
+        return [];
     }
 
     /**
@@ -475,6 +483,23 @@ class Translation
         return [
             'privacy' => $this->dependencies->l('ip.privacy', 'translation'),
             'secure' => $this->dependencies->l('ip.secure', 'translation'),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getOrderStateActionRenderTranslations()
+    {
+        return [
+            'undefined' => $this->dependencies->l('action.orderState.renderOption.undefined', 'translation'),
+            'nothing' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeNothing', 'translation'),
+            'cancelled' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeCancelled', 'translation'),
+            'error' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeError', 'translation'),
+            'expired' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeExpired', 'translation'),
+            'paid' => $this->dependencies->l('action.orderState.renderOption.orderStateTypePaid', 'translation'),
+            'pending' => $this->dependencies->l('action.orderState.renderOption.orderStateTypePending', 'translation'),
+            'refund' => $this->dependencies->l('action.orderState.renderOption.orderStateTypeRefund', 'translation'),
         ];
     }
 }

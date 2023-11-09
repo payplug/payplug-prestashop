@@ -74,7 +74,7 @@ class PaymentRepository extends QueryRepository
                         break;
                     case 'bool':
                         if (is_bool($value)) {
-                            $this->fields($key)->values(($value ? 1 : 0));
+                            $this->fields($key)->values($value ? 1 : 0);
                         }
 
                         break;
@@ -91,7 +91,7 @@ class PaymentRepository extends QueryRepository
      * @description Get all payments for a given method name.
      *
      * @param string $method_name
-     * @param bool   $asc
+     * @param bool $asc
      *
      * @return array
      */
@@ -210,7 +210,7 @@ class PaymentRepository extends QueryRepository
     /**
      * @description Update an existing payment for a given cart id.
      *
-     * @param int   $cart_id
+     * @param int $cart_id
      * @param array $parameters
      *
      * @return bool
@@ -264,7 +264,7 @@ class PaymentRepository extends QueryRepository
     /**
      * @description Update an existing payment for a given cart id.
      *
-     * @param int   $cart_id
+     * @param int $cart_id
      * @param array $parameters
      * @param mixed $resource_id
      *

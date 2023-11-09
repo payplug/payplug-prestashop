@@ -309,23 +309,6 @@ class ConfigClass
         }
 
         $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
-        //check if we force integrated payment activation/rollback
-        //TODO: Clean this code and delete forcing IP onboarding usages
-//        if (isset($permissions['can_use_integrated_payments'])
-//            && !(bool) $configurationClass->getValue('sandbox_mode')
-//            && version_compare(_PS_VERSION_, '1.7', '>=')) {
-//            $onboardingAction = $this->dependencies->getPlugin()->getOnboardingAction();
-//            if ((bool) $permissions['can_use_integrated_payments']) {
-//                if (!$onboardingAction->enableIntegratedAction()['success']) {
-//                    $this->logger->addLog($onboardingAction->enableIntegratedAction()['message'], 'error');
-//                }
-//            } else {
-//                if (!$onboardingAction->disableIntegratedAction()['success']) {
-//                    $this->logger->addLog($onboardingAction->disableIntegratedAction()['message'], 'error');
-//                }
-//            }
-//        }
-
         $available_options = [
             'live' => !(bool) $configurationClass->getValue('sandbox_mode'),
             'embedded' => (string) $configurationClass->getValue('embedded_mode'),
@@ -401,8 +384,7 @@ class ConfigClass
     }
 
     /**
-     * @description
-     * Check if Payplug is allowed
+     * @description Check if Payplug is allowed
      *
      * @return bool
      */
@@ -432,8 +414,7 @@ class ConfigClass
     }
 
     /**
-     * @description check if account
-     * is linked to Psaccount
+     * @description check if account is linked to Psaccount
      *
      * @return bool
      */
@@ -450,7 +431,7 @@ class ConfigClass
     }
 
     /**
-     * Get iso code from language code.
+     * @description Get iso code from language code.
      *
      * @param $language
      *
@@ -477,7 +458,7 @@ class ConfigClass
     }
 
     /**
-     * Get live permissions.
+     * @description Get live permissions.
      *
      * @return array
      */
@@ -490,7 +471,7 @@ class ConfigClass
     }
 
     /**
-     * Check if current device used is mobile.
+     * @description Check if current device used is mobile.
      *
      * @return bool
      */
@@ -530,12 +511,10 @@ class ConfigClass
     }
 
     /**
-     * Check if given phone number is valid mobile phone number.
+     * @description Check if given phone number is valid mobile phone number.
      *
-     * @param string $phone_number
-     * @param string $iso_code
-     *
-     * @throws libphonenumberlight\NumberParseException
+     * @param $iso_code
+     * @param false $phone_number
      *
      * @return bool
      */
@@ -555,40 +534,38 @@ class ConfigClass
 
             $is_mobile = $phone_util->getNumberType($parsed);
 
-            return (bool) (in_array($is_mobile, [1, 2], true));
+            return in_array($is_mobile, [1, 2], true);
         } catch (libphonenumberlight\NumberParseException $e) {
-            // @todo : Add Log
+            // todo : Add error Log
             return false;
         }
     }
 
     /**
-     * Return international formatted phone number (norm E.164).
+     * @description Return international formatted phone number (norm E.164).
      *
      * @param $phone_number
      * @param $country
      *
-     * @throws libphonenumberlight\NumberParseException
-     *
-     * @return null|string
+     * @return string
      */
     public function formatPhoneNumber($phone_number, $country)
     {
         if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
-            return null;
+            return '';
         }
         if (!is_object($country)) {
             $country = $this->country->get((int) $country);
         }
         if (!$this->validate->validate('isLoadedObject', $country)) {
-            return null;
+            return '';
         }
 
         try {
             $iso_code = $this->getIsoCodeByCountryId($country->id);
 
             if (!$iso_code) {
-                return null;
+                return '';
             }
 
             $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
@@ -596,22 +573,22 @@ class ConfigClass
 
             if (!$phone_util->isValidNumber($parsed)) {
                 // todo: add log
-                return null;
+                return '';
             }
 
             return $phone_util->format($parsed, \libphonenumberlight\PhoneNumberFormat::E164);
         } catch (libphonenumberlight\NumberParseException $e) {
             // todo: add log
-            return null;
+            return '';
         }
     }
 
     /**
-     * Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm.
+     * @description Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm.
      *
-     * @param int $country_id
+     * @param $country_id
      *
-     * @return false|int
+     * @return string
      */
     public function getIsoCodeByCountryId($country_id)
     {
@@ -634,10 +611,9 @@ class ConfigClass
     }
 
     /**
-     * Get all country iso-code of ISO 3166-1 alpha-2 norm
-     * Source: DB PayPlug.
+     * @description Get all country iso-code of ISO 3166-1 alpha-2 norm
      *
-     * @return null|array
+     * @return array
      */
     public function getIsoCodeList()
     {
@@ -652,15 +628,15 @@ class ConfigClass
             return $iso_code_list;
         }
 
-        return null;
+        return [];
     }
 
     /**
+     * @description Export customer card for RGPD
+     *
      * @param $id_customer
      *
-     * @throws PrestaShopDatabaseException
-     *
-     * @return null|array|bool
+     * @return array
      */
     public function gdprCardExport($id_customer)
     {
@@ -668,7 +644,12 @@ class ConfigClass
             return [];
         }
 
-        $cards = $this->dependencies->getPlugin()->getCardRepository()->getAllByCustomer($id_customer);
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $is_sandbox = $configuration->getValue('sandbox_mode');
+        $id_company = $configuration->getValue('company_id');
+        $cards = $this->dependencies->getPlugin()
+            ->getCardRepository()
+            ->getAllByCustomer($id_customer, $id_company, $is_sandbox);
         if (!$cards) {
             return [];
         }
@@ -694,7 +675,7 @@ class ConfigClass
     }
 
     /**
-     * @description Check if current configuration requirements are respected
+     * @description Check if current configuration requirements are respected.
      *
      * @return array
      */
@@ -702,7 +683,7 @@ class ConfigClass
     {
         $php_min_version = 50600;
         $curl_min_version = '7.21';
-        $openssl_min_version = 0x1000100f;
+        $openssl_min_version = 0x1000100F;
         $report = [
             'php' => [
                 'version' => 0,
@@ -721,28 +702,24 @@ class ConfigClass
             ],
         ];
 
-        //PHP
+        // PHP
         if (!defined('PHP_VERSION_ID')) {
             $report['php']['version'] = PHP_VERSION;
             $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]));
+            define('PHP_VERSION_ID', $php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]);
         }
         $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
 
-        //cURL
+        // cURL
         $curl_exists = extension_loaded('curl');
         if ($curl_exists) {
             $curl_version = curl_version();
             $report['curl']['version'] = $curl_version['version'];
             $report['curl']['installed'] = true;
-            $report['curl']['up2date'] = version_compare(
-                $curl_version['version'],
-                $curl_min_version,
-                '>='
-            ) ? true : false;
+            $report['curl']['up2date'] = (bool) version_compare($curl_version['version'], $curl_min_version, '>=');
         }
 
-        //OpenSSl
+        // OpenSSl
         $openssl_exists = extension_loaded('openssl');
         if ($openssl_exists) {
             $report['openssl']['version'] = OPENSSL_VERSION_NUMBER;
@@ -820,7 +797,7 @@ class ConfigClass
             ? $this->context->language->iso_code : 'default';
         $this->ssl_enable = $this->configurationAdapter->get('PS_SSL_ENABLED');
 
-        if ((!isset($this->email) || (!isset($this->api_live) && empty($this->api_test)))) {
+        if (!isset($this->email) || (!isset($this->api_live) && empty($this->api_test))) {
             $this->warning = $this->dependencies->l('payplug.setConfigurationProperties.configureModule', 'configclass');
         }
 

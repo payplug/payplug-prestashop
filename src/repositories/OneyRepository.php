@@ -24,8 +24,6 @@
 namespace PayPlug\src\repositories;
 
 use PayPlug\src\application\dependencies\BaseClass;
-use PayPlug\src\exceptions\BadParameterException;
-use PrestaShop\PrestaShop\Core\Localization\Exception\LocalizationException;
 
 class OneyRepository extends BaseClass
 {
@@ -98,14 +96,13 @@ class OneyRepository extends BaseClass
     }
 
     /**
-     * ONLY PS 1.6
-     * Assign Oney var.
+     * @description Assign Oney var.
      *
-     * @param $cart Cart
+     * @deprecated This method has only usage for prestashop 1.6 and should be remove.
      *
-     * @throws Exception
+     * @param $cart
      *
-     * @return bool
+     * @return false|void
      */
     public function assignOneyPaymentOptions($cart)
     {
@@ -134,14 +131,9 @@ class OneyRepository extends BaseClass
     /**
      * @description Display Oney payment options
      *
-     * @param $cart Cart
+     * @param $cart
      * @param $amount
-     * @param bool $country
-     *
-     * @throws BadParameterException
-     * @throws ConfigurationNotSetException
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
+     * @param false $country
      */
     public function assignOneyPriceAndPaymentOptions($cart, $amount, $country = false)
     {
@@ -193,13 +185,13 @@ class OneyRepository extends BaseClass
         $limits = $this->getOneyPriceLimit();
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $learnMoreLink = 'IT' == $configuration->getValue('company_iso')
-        && 'it' == $this->toolsAdapter->tool('strtolower', $this->contextAdapter->getContext()->language->iso_code);
+        && 'it' == $this->toolsAdapter->tool('strtolower', $this->contextAdapter->get()->language->iso_code);
         $this->assign->assign([
             'learnMoreLink' => (bool) $learnMoreLink,
             'oneyWithFees' => (bool) $configuration->getValue('oney_fees'),
             'oneyMinAmounts' => $this->toolsAdapter->tool('displayPrice', $this->helpers['amount']->formatOneyAmount($limits['min'])['result']),
             'oneyMaxAmounts' => $this->toolsAdapter->tool('displayPrice', $this->helpers['amount']->formatOneyAmount($limits['max'])['result']),
-            'oneyUrl' => 'https://www.oney.' . $this->contextAdapter->getContext()->language->iso_code,
+            'oneyUrl' => 'https://www.oney.' . $this->contextAdapter->get()->language->iso_code,
         ]);
     }
 
@@ -241,8 +233,8 @@ class OneyRepository extends BaseClass
 
                 case 'mobile_phone_number':
                     $id_address = 'shipping' == $type ?
-                        $this->contextAdapter->getContext()->cart->id_address_delivery :
-                        $this->contextAdapter->getContext()->cart->id_address_invoice;
+                        $this->contextAdapter->get()->cart->id_address_delivery :
+                        $this->contextAdapter->get()->cart->id_address_invoice;
                     $address = $this->addressAdapter->get((int) $id_address);
                     $country = $this->countryAdapter->getCountry($address->id_country);
                     $is_valid_phone = $this
@@ -331,7 +323,7 @@ class OneyRepository extends BaseClass
             'use_fees' => (bool) $configuration->getValue('oney_fees'),
             'iso_code' => $this->toolsAdapter->tool(
                 'strtoupper',
-                $this->contextAdapter->getContext()->language->iso_code
+                $this->contextAdapter->get()->language->iso_code
             ),
         ]);
 
@@ -339,18 +331,16 @@ class OneyRepository extends BaseClass
     }
 
     /**
-     * @description Display Oney Schedule
+     * @description Display Oney Schedule.
      *
      * @param $oney_payment
      * @param $amount
      *
-     * @throws LocalizationException
-     *
-     * @return string
+     * @return mixed
      */
     public function displayOneySchedule($oney_payment, $amount)
     {
-        $withFirstSchedule = 'it' == $this->contextAdapter->getContext()->language->iso_code;
+        $withFirstSchedule = 'it' == $this->contextAdapter->get()->language->iso_code;
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $vars = [
             'use_fees' => (bool) $configuration->getValue('oney_fees'),
@@ -362,7 +352,7 @@ class OneyRepository extends BaseClass
             'withFirstSchedule' => $withFirstSchedule,
             'iso_code' => $this->toolsAdapter->tool(
                 'strtoupper',
-                $this->contextAdapter->getContext()->language->iso_code
+                $this->contextAdapter->get()->language->iso_code
             ),
             'merchant_company_iso' => $configuration->getValue('company_iso'),
         ];
@@ -373,16 +363,11 @@ class OneyRepository extends BaseClass
 
     /**
      * @description Display Oney popin payment option
-     *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     *
-     * @return mixed
      */
     public function displayOneyPaymentOptions()
     {
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
-            $cart = $this->contextAdapter->getContext()->cart;
+            $cart = $this->contextAdapter->get()->cart;
             if ($this->validateAdapter->validate('isLoadedObject', $cart)
                 && $cart->id_address_invoice && $cart->id_address_delivery) {
                 $is_elligible = $this->isOneyElligible($cart);
@@ -408,7 +393,7 @@ class OneyRepository extends BaseClass
 
             $oneyImage .= '_fees';
 
-            $iso = $this->toolsAdapter->tool('strtoupper', $this->contextAdapter->getContext()->language->iso_code);
+            $iso = $this->toolsAdapter->tool('strtoupper', $this->contextAdapter->get()->language->iso_code);
             $merchant_company_iso = (string) $configuration->getValue('company_iso');
             if (false === $use_fees) {
                 if ('IT' != $iso && 'FR' != $iso) {
@@ -443,13 +428,11 @@ class OneyRepository extends BaseClass
     }
 
     /**
-     * ONLY PS 1.6
-     * Display Oney required fields template.
+     * @description Display Oney required fields template.
      *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
+     * @deprecated This method has only usage for prestashop 1.6 and should be remove.
      *
-     * @return mixed
+     * @return false
      */
     public function displayOneyRequiredFields()
     {
@@ -469,9 +452,9 @@ class OneyRepository extends BaseClass
     /**
      * @description Format Oney simulation from resource
      *
-     * @param bool  $operation
+     * @param bool $operation
      * @param array $resource
-     * @param bool  $total_amount
+     * @param bool $total_amount
      *
      * @return array
      */
@@ -557,7 +540,7 @@ class OneyRepository extends BaseClass
     public function getOneyCTA($env = null)
     {
         $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
-        $amount = $this->contextAdapter->getContext()->cart->getOrderTotal($use_taxes);
+        $amount = $this->contextAdapter->get()->cart->getOrderTotal($use_taxes);
         $is_elligible = $this->isValidOneyAmount($amount);
         $is_elligible = $is_elligible['result'];
 
@@ -577,7 +560,7 @@ class OneyRepository extends BaseClass
      */
     public function getOneyDeliveryContext()
     {
-        $cart = $this->cartAdapter->get((int) $this->contextAdapter->getContext()->cart->id);
+        $cart = $this->cartAdapter->get((int) $this->contextAdapter->get()->cart->id);
 
         if ($this->cartAdapter->isVirtualCart($cart)) {
             return [
@@ -615,7 +598,7 @@ class OneyRepository extends BaseClass
     public function getOneyPaymentContext()
     {
         $cart_context = [];
-        $cart = $this->cartAdapter->get((int) $this->contextAdapter->getContext()->cart->id);
+        $cart = $this->cartAdapter->get((int) $this->contextAdapter->get()->cart->id);
         if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return ['cart' => $cart_context];
         }
@@ -649,11 +632,8 @@ class OneyRepository extends BaseClass
     /**
      * @description Get Oney payment options
      *
-     * @param int  $amount
-     * @param bool $country
-     *
-     * @throws BadParameterException
-     * @throws ConfigurationNotSetException
+     * @param int $amount
+     * @param false $country
      *
      * @return array
      */
@@ -711,12 +691,9 @@ class OneyRepository extends BaseClass
     /**
      * @description Display Oney payment options
      *
-     * @param $cart Cart
+     * @param $cart
      * @param $amount
-     * @param bool $country
-     *
-     * @throws BadParameterException
-     * @throws ConfigurationNotSetException
+     * @param false $country
      *
      * @return array
      */
@@ -742,7 +719,7 @@ class OneyRepository extends BaseClass
                 : $this->dependencies->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
         );
 
-        $withFirstSchedule = 'it' == $this->contextAdapter->getContext()->language->iso_code;
+        $withFirstSchedule = 'it' == $this->contextAdapter->get()->language->iso_code;
 
         $this->assign->assign([
             'payplug_oney_required_field' => $cart ? $this->displayOneyRequiredFields() : false,
@@ -799,8 +776,8 @@ class OneyRepository extends BaseClass
     /**
      * @description Get Oney price limit
      *
-     * @param bool  $id_currency
-     * @param mixed $custom
+     * @param bool $custom
+     * @param false $id_currency
      *
      * @return array
      */
@@ -874,20 +851,17 @@ class OneyRepository extends BaseClass
     /**
      * @description Get the Oney required fields from Context
      *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     *
      * @return array
      */
     public function getOneyRequiredFields()
     {
         $fields = [];
-        $customer = $this->contextAdapter->getContext()->customer;
+        $customer = $this->contextAdapter->get()->customer;
         if (!$this->validateAdapter->validate('isLoadedObject', $customer)) {
             return $fields;
         }
-        $id_address_delivery = $this->contextAdapter->getContext()->cart->id_address_delivery;
-        $id_address_invoice = $this->contextAdapter->getContext()->cart->id_address_invoice;
+        $id_address_delivery = $this->contextAdapter->get()->cart->id_address_delivery;
+        $id_address_invoice = $this->contextAdapter->get()->cart->id_address_invoice;
         $is_same = $id_address_delivery == $id_address_invoice;
 
         $shipping_fields = [];
@@ -897,7 +871,7 @@ class OneyRepository extends BaseClass
             return $fields;
         }
         $shipping_data = [
-            'email' => $this->contextAdapter->getContext()->customer->email,
+            'email' => $this->contextAdapter->get()->customer->email,
             'mobile_phone_number' => $shipping_address->phone_mobile
                 ? $shipping_address->phone_mobile
                 : $shipping_address->phone,
@@ -1053,14 +1027,11 @@ class OneyRepository extends BaseClass
     /**
      * @description Get Oney Payment Simulations
      *
-     * @param int    $amount
-     * @param string $country
-     * @param array  $operation contain x3|4_with_fees or x3|4_without_fees
+     * @param $amount
+     * @param $country
+     * @param $operation
      *
-     * @throws BadParameterException
-     * @throws ConfigurationNotSetException
-     *
-     * @return array
+     * @return array|mixed
      */
     public function getOneySimulations($amount, $country, $operation)
     {
@@ -1229,14 +1200,11 @@ class OneyRepository extends BaseClass
     }
 
     /**
-     * @description Check if a valid Cart for Oney
+     * @description Check if a valid Cart for Oney.
      *
-     * @param $cart Cart
-     * @param bool $amount
-     * @param bool $country
-     *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
+     * @param $cart
+     * @param false $amount
+     * @param false $country
      *
      * @return array
      */
@@ -1305,21 +1273,18 @@ class OneyRepository extends BaseClass
 
         return $this->dependencies->configClass->isAllowed()
             && (bool) $payment_methods['oney']
-            && $this->isOneyAllowedCurrency($this->contextAdapter->getContext()->currency);
+            && $this->isOneyAllowedCurrency($this->contextAdapter->get()->currency);
     }
 
     /**
-     * @description Check if billing and shipping addresses are valid
+     * @description Check if billing and shipping addresses are valid.
      *
      * @param int $id_shipping
      * @param int $id_billing
      *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     *
-     * @return array
+     * @return bool
      */
-    public function isValidOneyAddresses($id_shipping, $id_billing)
+    public function isValidOneyAddresses($id_shipping = 0, $id_billing = 0)
     {
         $shipping = $this->addressAdapter->get((int) $id_shipping);
         $billing = $this->addressAdapter->get((int) $id_billing);

@@ -34,9 +34,11 @@ class CarrierAdapter implements CarrierInterface
     /** @var string Default delivery type value for new carrier */
     public $default_delivery_type = 'storepickup';
 
-    public static function factory()
+    private $carrier;
+
+    public function __construct()
     {
-        return new self();
+        $this->carrier = new \Carrier();
     }
 
     public function get($id_carrier = false)
@@ -45,7 +47,7 @@ class CarrierAdapter implements CarrierInterface
             $id_carrier = false;
         }
 
-        return new Carrier($id_carrier);
+        return new \Carrier($id_carrier);
     }
 
     public function getDefaultDelay()
@@ -60,6 +62,8 @@ class CarrierAdapter implements CarrierInterface
 
     public function getCarriers($id_lang, $active = false, $delete = false, $id_zone = false, $ids_group = null, $modules_filters = 1)
     {
-        return Carrier::getCarriers($id_lang, $active, $delete, $id_zone, $ids_group, $modules_filters);
+        $carrier = $this->carrier;
+
+        return $carrier::getCarriers($id_lang, $active, $delete, $id_zone, $ids_group, $modules_filters);
     }
 }

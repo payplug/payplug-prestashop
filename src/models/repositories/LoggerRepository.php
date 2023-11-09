@@ -66,7 +66,7 @@ class LoggerRepository extends QueryRepository
                         break;
                     case 'bool':
                         if (is_bool($value)) {
-                            $this->fields($key)->values(($value ? 1 : 0));
+                            $this->fields($key)->values($value ? 1 : 0);
                         }
 
                         break;
@@ -154,7 +154,7 @@ class LoggerRepository extends QueryRepository
     /**
      * @description Update an existing payment for a given id logger.
      *
-     * @param int   $id_logger
+     * @param int $id_logger
      * @param array $parameters
      *
      * @return bool

@@ -17,9 +17,9 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
     {
         parent::setUp();
 
-        $this->card = \Mockery::mock('Card');
+        $this->card = \Mockery::mock('CardAction');
         $this->plugin->shouldReceive([
-            'getCard' => $this->card,
+            'getCardAction' => $this->card,
         ]);
     }
 
@@ -37,7 +37,7 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
     {
         $payment_options = [];
         $this->card->shouldReceive([
-            'getByCustomer' => [],
+            'renderList' => [],
         ]);
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }
@@ -46,7 +46,7 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
     {
         $payment_options = [];
         $this->card->shouldReceive([
-            'getByCustomer' => [
+            'renderList' => [
                 [
                     'id_payplug_card' => '1',
                     'brand' => 'CB',

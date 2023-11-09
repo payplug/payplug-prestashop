@@ -19,7 +19,10 @@
  * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
- */ // Check if prestashop Context.
+ */
+// Check if prestashop Context.
+use PayPlug\classes\DependenciesClass;
+
 if (!\defined('_PS_VERSION_')) {
     exit;
 }
@@ -29,6 +32,7 @@ require_once \dirname(__FILE__) . '/vendor/autoload.php';
 class PsPaylater extends PaymentModule
 {
     public $payplug_dependencies;
+    public $dependencies;
 
     /** @var array */
     public $adminControllers;
@@ -82,6 +86,8 @@ class PsPaylater extends PaymentModule
                 $this->getLocalPath()
             );
         }
+
+        $this->dependencies = new DependenciesClass();
     }
 
     /**
@@ -138,7 +144,7 @@ class PsPaylater extends PaymentModule
      */
     public function hookActionAdminPerformanceControllerAfter($params)
     {
-        //todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
+        // todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->actionAdminPerformanceControllerAfter($params);
         }
@@ -153,7 +159,7 @@ class PsPaylater extends PaymentModule
      */
     public function hookActionClearCompileCache($params)
     {
-        //todo: Rajouter le test de la table payplug cache avant d'executer ce code
+        // todo: Rajouter le test de la table payplug cache avant d'executer ce code
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->actionClearCompileCache($params);
         }
@@ -203,7 +209,10 @@ class PsPaylater extends PaymentModule
     public function hookActionObjectOrderStateAddAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('actionObjectOrderStateAddAfter', $params);
+            return $this->dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->addTypeAction($params);
         }
     }
 
@@ -217,20 +226,20 @@ class PsPaylater extends PaymentModule
     public function hookActionObjectOrderStateUpdateAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe(
-                'actionObjectOrderStateUpdateAfter',
-                $params
-            );
+            return $this->dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->updateTypeAction($params);
         }
     }
 
     public function hookActionObjectOrderStateDeleteAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe(
-                'actionObjectOrderStateDeleteAfter',
-                $params
-            );
+            return $this->dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->deleteTypeAction($params);
         }
     }
 
@@ -273,12 +282,21 @@ class PsPaylater extends PaymentModule
     }
 
     /**
+     * @description This hook is used to display
+     * a select box in the order state page (BO)
+     * in order to create/update a type
+     *
+     * @param $param
+     *
      * @return mixed
      */
     public function hookDisplayAdminStatusesForm()
     {
         if ($this->module) {
-            return $this->payplug_dependencies->getDependency('hook')->exe('displayAdminStatusesForm');
+            return $this->dependencies
+                ->getPlugin()
+                ->getOrderStateAction()
+                ->renderOption();
         }
     }
 

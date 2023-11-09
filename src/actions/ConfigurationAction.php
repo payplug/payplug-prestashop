@@ -36,7 +36,7 @@ class ConfigurationAction
      * @description check permission for a given payment method
      *
      * @param string $payment_method
-     * @param bool   $sandbox_mode
+     * @param bool $sandbox_mode
      *
      * @return array
      */
@@ -132,8 +132,7 @@ class ConfigurationAction
                         $context->shop->domain,
                         $permissions['apple_pay_allowed_domains']
                     )['result'] : false;
-
-                    // no break
+                // no break
             case 'integrated':
                 $message .= sprintf(
                     $translation['premium']['description']['contact'],
@@ -519,7 +518,7 @@ class ConfigurationAction
                         break;
                     case 'oney_min_amounts':
                     case 'oney_max_amounts':
-                        if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name)) {
+                        if ((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) {
                             $oney = $this->dependencies->getPlugin()->getOney();
                             $limit_oney = $oney->getOneyPriceLimit(false);
                             $amount = $datas->{$config};

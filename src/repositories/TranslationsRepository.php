@@ -28,16 +28,6 @@ use PayPlug\src\application\dependencies\BaseClass;
 class TranslationsRepository extends BaseClass
 {
     /**
-     * @description
-     *
-     * @return self
-     */
-    public static function factory()
-    {
-        return new TranslationsRepository();
-    }
-
-    /**
      * @description Return trnaslation for index
      *
      * @param $id
