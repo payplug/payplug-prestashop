@@ -83,39 +83,31 @@ class OrderStateRepository extends QueryRepository
      *
      * @param array $name
      * @param bool $test_mode
-     * @param mixed $check_version
      *
      * @return array
      */
-    public function getByName($name = [], $test_mode = false, $check_version = false)
+    public function getByName($name = [], $test_mode = false)
     {
         if (!is_array($name) || empty($name)) {
             return [];
         }
 
-        if (!is_bool($test_mode) || empty($test_mode)) {
+        if (!is_bool($test_mode)) {
             return [];
         }
 
-        if (!is_bool($check_version) || empty($check_version)) {
-            return [];
-        }
-
-        $result = $this
+        $this
             ->select()
             ->fields('DISTINCT osl.`id_order_state`')
             ->from($this->prefix . 'order_state_lang', 'osl')
             ->leftJoin($this->prefix . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
+            ->where('os.`deleted` = 0')
             ->where('osl.`name` LIKE \'' . $this->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
             ->whereOr('osl.`name` LIKE \'' . $this->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
             ->whereOr('osl.`name` LIKE \'' . $this->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
             ->whereOr('osl.`name` LIKE \'' . $this->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')));
 
-        if ($check_version) {
-            $result += $this->where('os.`deleted` = 0');
-        }
-
-        $result += $this->build('unique_value');
+        $result = $this->build('unique_value');
 
         return $result ?: [];
     }
