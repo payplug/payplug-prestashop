@@ -25,6 +25,10 @@
  */
 require_once _PS_MODULE_DIR_ . 'payplug/payplug.php';
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 include_once _PS_MODULE_DIR_ . 'payplug/classes/DependenciesClass.php';
 
 class AdminPayPlugInstallmentController extends ModuleAdminController

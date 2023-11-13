@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\interfaces;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 interface AssignInterface
 {
     public function assign($parameters);

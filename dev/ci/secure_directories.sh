@@ -12,10 +12,4 @@ if [ -d "./dist" ]; then
   find ./dist -type d -exec cp -v index.php {} \;
 fi
 
-for folder in $folderList
-  do
-    echo "copying htaccess recursively into folder "${folder}
-    find ./${folder} -type d -not -path "*.github*" -exec cp -v ./dev/ci/.htaccess {} \;
-  done
-
 echo "All directories secured"

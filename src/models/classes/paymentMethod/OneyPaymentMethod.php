@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\models\classes\paymentMethod;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class OneyPaymentMethod extends PaymentMethod
 {
     private $oney_allowed_iso_codes = ['FR', 'IT', 'ES', 'NL'];

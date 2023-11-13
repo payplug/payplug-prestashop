@@ -25,6 +25,10 @@ namespace PayPlug\classes;
 
 use Symfony\Component\Dotenv\Dotenv;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class HookClass
 {
     private $assign;

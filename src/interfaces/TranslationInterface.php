@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\interfaces;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 interface TranslationInterface
 {
     public static function translate($module_class, $string, $repository_name);

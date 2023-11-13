@@ -25,6 +25,10 @@ namespace PayPlug\classes;
 
 use PayPlug\src\application\adapter\MediaAdapter;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class MediaClass
 {
     private $dependencies;

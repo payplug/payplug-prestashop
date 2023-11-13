@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\actions;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class CardAction
 {
     private $dependencies;
@@ -251,7 +255,7 @@ class CardAction
             'exp_year' => (string) $payment->card->exp_year,
             'brand' => (string) $payment->card->brand,
             'country' => (string) $payment->card->country,
-            'metadata' => serialize($payment->card->metadata),
+            'metadata' => json_encode($payment->card->metadata),
         ];
 
         return (bool) $this->dependencies

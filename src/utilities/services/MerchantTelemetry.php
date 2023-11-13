@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\utilities\services;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Payplug\PluginTelemetry;
 
 class MerchantTelemetry

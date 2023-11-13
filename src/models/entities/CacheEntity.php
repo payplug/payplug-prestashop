@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\models\entities;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PayPlug\src\exceptions\BadParameterException;
 
 class CacheEntity

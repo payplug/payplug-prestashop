@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\application\adapter;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PayPlug\classes\DependenciesClass;
 
 class PrestashopAdapter16

@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\utilities\validators;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class browserValidator
 {
     /**

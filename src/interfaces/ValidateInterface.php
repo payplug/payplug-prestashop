@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\interfaces;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 interface ValidateInterface
 {
     public function validate($action, $object);

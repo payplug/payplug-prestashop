@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\application\adapter;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PayPlug\src\interfaces\ShopInterface;
 
 class ShopAdapter implements ShopInterface

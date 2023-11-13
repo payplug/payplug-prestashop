@@ -23,6 +23,10 @@
 
 use PayPlug\classes\DependenciesClass;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class PayplugCardsModuleFrontController extends ModuleFrontController
 {
     private $dependencies;

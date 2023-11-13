@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\models\repositories;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class LockRepository extends QueryRepository
 {
     private $fields = [

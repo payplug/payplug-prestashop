@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\interfaces;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 interface ToolsInterface
 {
     public function tool($action, $param1, $param2, $param3, $param4);

@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\actions;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class OrderStateAction
 {
     private $dependencies;
