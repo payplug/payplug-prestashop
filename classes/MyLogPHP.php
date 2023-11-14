@@ -15,6 +15,10 @@
 
 namespace PayPlug\classes;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class MyLogPHP
 {
     // @const Default tag.

@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\models\classes;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class ApiRest
 {
     private $dependencies;

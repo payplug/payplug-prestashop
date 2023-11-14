@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\utilities\services;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PayPlug\src\exceptions\BadParameterException;
 use Symfony\Component\Dotenv\Dotenv;
 

@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\utilities\helpers;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PayPlug\classes\DependenciesClass;
 
 class FilesHelper

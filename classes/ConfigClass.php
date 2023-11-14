@@ -25,6 +25,10 @@ namespace PayPlug\classes;
 
 use libphonenumberlight;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class ConfigClass
 {
     public $api_rest;

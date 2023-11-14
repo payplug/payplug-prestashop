@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\exceptions;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class BadParameterException extends \Exception
 {
 }

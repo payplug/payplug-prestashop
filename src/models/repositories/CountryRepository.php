@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\models\repositories;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class CountryRepository extends QueryRepository
 {
     public function __construct($prefix = '', $dependencies = null)

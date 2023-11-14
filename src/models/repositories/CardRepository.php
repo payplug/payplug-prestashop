@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\models\repositories;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class CardRepository extends QueryRepository
 {
     private $fields = [
@@ -140,7 +144,7 @@ class CardRepository extends QueryRepository
             ->fields('exp_year')->values($this->escape($card->exp_year))
             ->fields('brand')->values($this->escape($card->brand))
             ->fields('country')->values($this->escape($card->country))
-            ->fields('metadata')->values($this->escape(serialize($card->metadata)))
+            ->fields('metadata')->values($this->escape(json_encode($card->metadata)))
             ->build();
 
         return (bool) $result;

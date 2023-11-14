@@ -23,6 +23,10 @@
 
 use PayLaterModule\classes\DependenciesClass;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class AdminPsPayLaterController extends ModuleAdminController
 {
     public $module;
