@@ -54,6 +54,10 @@ class FilesHelper
         $current_list = self::get();
         $allow_list = self::getList();
 
+        if (empty($current_list || $allow_list)) {
+            $logger->addLog('No file cleaning needed');
+        }
+
         $files_to_remove = array_diff($current_list, $allow_list);
         if (!empty($files_to_remove)) {
             $logger->addLog('FilesHelper: Clean outters files');
@@ -113,7 +117,7 @@ class FilesHelper
      */
     private static function getList()
     {
-        // Hydrate $translations from CSV file
+        // Hydrate $allowed fileds from CSV file
         $files = [];
         $path = dirname(__FILE__) . '/../../../module_files.csv';
 

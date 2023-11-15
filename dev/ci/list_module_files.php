@@ -4,6 +4,11 @@ ini_set('display_errors', true);
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+// We set the minimal ps_version to allow this script to work with the helper FilesHelper
+if (!defined('_PS_VERSION_')) {
+    define('_PS_VERSION_', '1.7.0.0');
+}
+
 $target_dir = '';
 if (isset($argv) && !empty($argv)) {
     $target_dir = isset($argv[1]) && $argv[1] ? $argv[1] . '/' : '';
