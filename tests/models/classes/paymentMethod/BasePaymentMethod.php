@@ -58,6 +58,11 @@ class BasePaymentMethod extends TestCase
             ]);
 
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
+        $this->translation
+            ->shouldReceive('l')
+            ->andReturnUsing(function ($str) {
+                return $str;
+            });
 
         $this->context = \Mockery::mock('Context');
         $context = ContextMock::get();

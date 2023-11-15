@@ -667,10 +667,22 @@ class ConfigClass
             );
             $result[] = [
                 '#' => $i,
-                $this->dependencies->l('payplug.gdprCardExport.brand', 'configclass') => $card['brand'],
-                $this->dependencies->l('payplug.gdprCardExport.country', 'configclass') => $card['country'],
-                $this->dependencies->l('payplug.gdprCardExport.card', 'configclass') => '**** **** **** ' . $card['last4'],
-                $this->dependencies->l('payplug.gdprCardExport.expiryDate', 'configclass') => $card['expiry_date'],
+                $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.gdprCardExport.brand', 'configclass') => $card['brand'],
+                $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.gdprCardExport.country', 'configclass') => $card['country'],
+                $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.gdprCardExport.card', 'configclass') => '**** **** **** ' . $card['last4'],
+                $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.gdprCardExport.expiryDate', 'configclass') => $card['expiry_date'],
             ];
             ++$i;
         }
@@ -802,21 +814,57 @@ class ConfigClass
         $this->ssl_enable = $this->configurationAdapter->get('PS_SSL_ENABLED');
 
         if (!isset($this->email) || (!isset($this->api_live) && empty($this->api_test))) {
-            $this->warning = $this->dependencies->l('payplug.setConfigurationProperties.configureModule', 'configclass');
+            $this->warning = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.configureModule', 'configclass');
         }
 
         $this->payment_status = [
-            1 => $this->dependencies->l('payplug.setConfigurationProperties.notPaid', 'configclass'),
-            2 => $this->dependencies->l('payplug.setConfigurationProperties.paid', 'configclass'),
-            3 => $this->dependencies->l('payplug.setConfigurationProperties.failed', 'configclass'),
-            4 => $this->dependencies->l('payplug.setConfigurationProperties.partiallyRefunded', 'configclass'),
-            5 => $this->dependencies->l('payplug.setConfigurationProperties.refunded', 'configclass'),
-            6 => $this->dependencies->l('payplug.setConfigurationProperties.onGoing', 'configclass'),
-            7 => $this->dependencies->l('payplug.setConfigurationProperties.cancelled', 'configclass'),
-            8 => $this->dependencies->l('payplug.setConfigurationProperties.authorized', 'configclass'),
-            9 => $this->dependencies->l('payplug.setConfigurationProperties.authorizationExpired', 'configclass'),
-            10 => $this->dependencies->l('payplug.setConfigurationProperties.oneyPending', 'configclass'),
-            11 => $this->dependencies->l('payplug.setConfigurationProperties.abandoned', 'configclass'),
+            1 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.notPaid', 'configclass'),
+            2 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.paid', 'configclass'),
+            3 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.failed', 'configclass'),
+            4 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.partiallyRefunded', 'configclass'),
+            5 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.refunded', 'configclass'),
+            6 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.onGoing', 'configclass'),
+            7 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.cancelled', 'configclass'),
+            8 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.authorized', 'configclass'),
+            9 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.authorizationExpired', 'configclass'),
+            10 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.oneyPending', 'configclass'),
+            11 => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.setConfigurationProperties.abandoned', 'configclass'),
         ];
     }
 }

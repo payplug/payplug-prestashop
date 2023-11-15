@@ -129,7 +129,6 @@ build zip release:
     - ./dev/ci/assets_revision.sh -b payplug
     - ./dev/ci/update_year.sh
     - php ./dev/ci/import-translations.php
-    - ./dev/ci/copy_translations.sh
   script:
     - shopt -s extglob
     - ./dev/ci/build.sh -n payplug -c $CI_COMMIT_REF_NAME
@@ -193,7 +192,6 @@ build-pspaylater:
     - ./dev/ci/update_year.sh
     - mkdir pspaylater
     - php ./dev/ci/import-translations.php
-    - ./dev/ci/copy_translations.sh
   script:
     - shopt -s extglob
     - ./dev/ci/build.sh -n pspaylater -c $CI_COMMIT_REF_NAME

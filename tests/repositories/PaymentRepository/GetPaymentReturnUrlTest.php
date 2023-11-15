@@ -10,7 +10,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group old_repository
  * @group payment
  * @group old_payment_repository
- * @group debug
  *
  * @runTestsInSeparateProcesses
  */

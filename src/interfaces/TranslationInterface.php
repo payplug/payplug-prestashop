@@ -30,4 +30,6 @@ if (!defined('_PS_VERSION_')) {
 interface TranslationInterface
 {
     public static function translate($module_class, $string, $repository_name);
+
+    public function trans($module_class, $string, $repository_name);
 }

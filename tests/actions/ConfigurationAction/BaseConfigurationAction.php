@@ -65,6 +65,11 @@ class BaseConfigurationAction extends TestCase
         ;
 
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
+        $this->translation
+            ->shouldReceive('l')
+            ->andReturnUsing(function ($str) {
+                return $str;
+            });
 
         $this->configuration_class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->plugin

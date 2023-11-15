@@ -35,4 +35,9 @@ class TranslationAdapter implements TranslationInterface
     {
         return \Translate::getModuleTranslation($module_class, $string, $repository_name);
     }
+
+    public function trans($module_class, $string, $repository_name)
+    {
+        return \Translate::getModuleTranslation($module_class, $string, $repository_name);
+    }
 }

@@ -4,6 +4,7 @@ namespace PayPlug\tests\repositories;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PayPlug\src\models\classes\Configuration;
+use PayPlug\src\models\classes\Translation;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
@@ -69,6 +70,7 @@ class RepositoryBase extends TestCase
 
     // models/classes
     protected $configuration;
+    protected $translation;
 
     // models/repositories
     protected $card_repository;
@@ -123,12 +125,6 @@ class RepositoryBase extends TestCase
     private function setDependenciesClass()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
-        $this->dependencies
-            ->shouldReceive('l')
-            ->andReturnUsing(function ($string, $name) {
-                return $string;
-            })
-        ;
 
         $this->validators = [
             'account' => \Mockery::mock(accountValidator::class)->makePartial(),
@@ -139,13 +135,18 @@ class RepositoryBase extends TestCase
         ];
 
         $this->configuration = \Mockery::mock(Configuration::class)->makePartial();
+        $this->translation = \Mockery::mock(Translation::class)->makePartial();
+        $this->translation
+            ->shouldReceive('l')
+            ->andReturnUsing(function ($str) {
+                return $str;
+            });
 
         $this->card_repository = \Mockery::mock('CardRepository');
         $this->country_repository = \Mockery::mock('CountryRepository');
         $this->order_state_repository = \Mockery::mock('OrderStateRepository');
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->payplug_order_state_repository = \Mockery::mock('PayplugOrderStateRepository');
-
         $this->card_action = \Mockery::mock('CardAction');
 
         $this->plugin = \Mockery::mock('Plugin');
@@ -159,6 +160,7 @@ class RepositoryBase extends TestCase
                 'getOrderStateRepository' => $this->order_state_repository,
                 'getPaymentRepository' => $this->payment_repository,
                 'getPayplugOrderStateRepository' => $this->payplug_order_state_repository,
+                'getTranslationClass' => $this->translation,
             ])
         ;
 

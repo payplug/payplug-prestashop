@@ -400,22 +400,34 @@ class PayPlugNotifications
         if ($this->is_oney) {
             switch ($this->payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
-                    $name = $this->dependencies->l('Oney 3x', 'payplugnotifications');
+                    $name = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('Oney 3x', 'payplugnotifications');
 
                     break;
 
                 case 'oney_x4_with_fees':
-                    $name = $this->dependencies->l('Oney 4x', 'payplugnotifications');
+                    $name = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('Oney 4x', 'payplugnotifications');
 
                     break;
 
                 case 'oney_x3_without_fees':
-                    $name = $this->dependencies->l('notification.createOrder.oneyX3WithoutFees', 'payplugnotifications');
+                    $name = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('notification.createOrder.oneyX3WithoutFees', 'payplugnotifications');
 
                     break;
 
                 case 'oney_x4_without_fees':
-                    $name = $this->dependencies->l('notification.createOrder.oneyX4WithoutFees', 'payplugnotifications');
+                    $name = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('notification.createOrder.oneyX4WithoutFees', 'payplugnotifications');
 
                     break;
 
@@ -426,21 +438,45 @@ class PayPlugNotifications
             }
             $module_name = $name;
         } elseif ($this->is_bancontact) {
-            $module_name = $this->dependencies->l('notification.createOrder.bancontact', 'payplugnotifications');
+            $module_name = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('notification.createOrder.bancontact', 'payplugnotifications');
         } elseif ($this->is_applepay) {
-            $module_name = $this->dependencies->l('notification.createOrder.applepay', 'payplugnotifications');
+            $module_name = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('notification.createOrder.applepay', 'payplugnotifications');
         } elseif ($this->is_amex) {
-            $module_name = $this->dependencies->l('notification.createOrder.amex', 'payplugnotifications');
+            $module_name = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('notification.createOrder.amex', 'payplugnotifications');
         } elseif ($this->is_giropay) {
-            $module_name = $this->dependencies->l('notification.createOrder.giropay', 'payplugnotifications');
+            $module_name = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('notification.createOrder.giropay', 'payplugnotifications');
         } elseif ($this->is_ideal) {
-            $module_name = $this->dependencies->l('notification.createOrder.ideal', 'payplugnotifications');
+            $module_name = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('notification.createOrder.ideal', 'payplugnotifications');
         } elseif ($this->is_mybank) {
-            $module_name = $this->dependencies->l('notification.createOrder.mybank', 'payplugnotifications');
+            $module_name = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('notification.createOrder.mybank', 'payplugnotifications');
         } elseif ($this->is_satispay) {
-            $module_name = $this->dependencies->l('notification.createOrder.satispay', 'payplugnotifications');
+            $module_name = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('notification.createOrder.satispay', 'payplugnotifications');
         } elseif ($this->is_sofort) {
-            $module_name = $this->dependencies->l('notification.createOrder.sofort', 'payplugnotifications');
+            $module_name = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('notification.createOrder.sofort', 'payplugnotifications');
         }
 
         // Check if this notification is the first of the day
@@ -847,8 +883,14 @@ class PayPlugNotifications
 
         if (!$is_valid_amount) {
             $message = $this->messageAdapter->get();
-            $msg = $this->dependencies->l('The amount collected by PayPlug is not the same', 'payplugnotifications');
-            $msg .= $this->dependencies->l(' as the total value of the order', 'payplugnotifications');
+            $msg = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('The amount collected by PayPlug is not the same', 'payplugnotifications');
+            $msg .= $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l(' as the total value of the order', 'payplugnotifications');
             $message->message = $msg;
             $message->id_order = $this->order->id;
             $message->id_cart = $this->order->id_cart;

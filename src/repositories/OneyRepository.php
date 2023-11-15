@@ -92,7 +92,10 @@ class OneyRepository extends BaseClass
     {
         $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
         $js_var = [
-            'loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
+            'loading_msg' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('Loading', 'oneyrepository'),
             'can_use_oney' => (bool) $payment_methods['oney'],
         ];
 
@@ -128,7 +131,10 @@ class OneyRepository extends BaseClass
             'payplug_oney_required_field' => $this->displayOneyRequiredFields(),
             'payplug_oney_allowed' => $is_elligible['result'],
             'payplug_oney_error' => $is_elligible['error'],
-            'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
+            'payplug_oney_loading_msg' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('Loading', 'oneyrepository'),
         ]);
     }
 
@@ -160,7 +166,10 @@ class OneyRepository extends BaseClass
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
             $oney_payment_options
                 ? false
-                : $this->dependencies->l('oney.assignOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
+                : $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('oney.assignOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
         );
 
         $this->assign->assign([
@@ -215,7 +224,10 @@ class OneyRepository extends BaseClass
         $errors = [];
 
         if (!$payment_data || !is_array($payment_data)) {
-            return [$this->dependencies->l('Please fill in the required fields', 'oneyrepository')];
+            return [$this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('Please fill in the required fields', 'oneyrepository'), ];
         }
 
         foreach ($payment_data as $key => $data) {
@@ -247,7 +259,10 @@ class OneyRepository extends BaseClass
                     $valid = $is_valid_phone
                         && $this->dependencies->configClass->isValidMobilePhoneNumber($country->iso_code, $data);
                     if (!$valid) {
-                        $errors[] = $this->dependencies->l('Please enter your mobile phone number.', 'oneyrepository');
+                        $errors[] = $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('Please enter your mobile phone number.', 'oneyrepository');
                     }
 
                     break;
@@ -255,8 +270,14 @@ class OneyRepository extends BaseClass
                 case 'first_name':
                     if (!$validate->validate('isName', $data)) {
                         $text = 'shipping' == $type ?
-                            $this->dependencies->l('Please enter your shipping firstname.', 'oneyrepository') :
-                            $this->dependencies->l('Please enter your billing firstname.', 'oneyrepository');
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your shipping firstname.', 'oneyrepository') :
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your billing firstname.', 'oneyrepository');
                         $errors[] = $text;
                     }
 
@@ -265,8 +286,14 @@ class OneyRepository extends BaseClass
                 case 'last_name':
                     if (!$validate->validate('isName', $data)) {
                         $text = 'shipping' == $type ?
-                            $this->dependencies->l('Please enter your shipping lastname.', 'oneyrepository') :
-                            $this->dependencies->l('Please enter your billing lastname.', 'oneyrepository');
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your shipping lastname.', 'oneyrepository') :
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your billing lastname.', 'oneyrepository');
                         $errors[] = $text;
                     }
 
@@ -275,8 +302,14 @@ class OneyRepository extends BaseClass
                 case 'address1':
                     if (!$validate->validate('isAddress', $data)) {
                         $text = 'shipping' == $type ?
-                            $this->dependencies->l('Please enter your shipping address.', 'oneyrepository') :
-                            $this->dependencies->l('Please enter your billing address.', 'oneyrepository');
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your shipping address.', 'oneyrepository') :
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your billing address.', 'oneyrepository');
                         $errors[] = $text;
                     }
 
@@ -285,8 +318,14 @@ class OneyRepository extends BaseClass
                 case 'postcode':
                     if (!$validate->validate('isPostCode', $data)) {
                         $text = 'shipping' == $type ?
-                            $this->dependencies->l('Please enter your shipping postcode.', 'oneyrepository') :
-                            $this->dependencies->l('Please enter your billing postcode.', 'oneyrepository');
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your shipping postcode.', 'oneyrepository') :
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your billing postcode.', 'oneyrepository');
                         $errors[] = $text;
                     }
 
@@ -295,12 +334,24 @@ class OneyRepository extends BaseClass
                 case 'city':
                     if (!$validate->validate('isCityName', $data)) {
                         $text = 'shipping' == $type ?
-                            $this->dependencies->l('Please enter your shipping city.', 'oneyrepository') :
-                            $this->dependencies->l('Please enter your billing city.', 'oneyrepository');
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your shipping city.', 'oneyrepository') :
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please enter your billing city.', 'oneyrepository');
                         $errors[] = $text;
                     } elseif ($tools->tool('strlen', $data, 'UTF-8') > 32) {
-                        $text = $this->dependencies->l('Your city name is too long (max 32 characters). ', 'oneyrepository')
-                            . $this->dependencies->l('Please change it to another one or select another payment method.', 'oneyrepository');
+                        $text = $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('Your city name is too long (max 32 characters). ', 'oneyrepository')
+                            . $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Please change it to another one or select another payment method.', 'oneyrepository');
                         $errors[] = $text;
                     }
 
@@ -420,7 +471,10 @@ class OneyRepository extends BaseClass
 
             $this->assign->assign([
                 'use_fees' => $use_fees,
-                'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
+                'payplug_oney_loading_msg' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Loading', 'oneyrepository'),
                 'oney_required_fields' => $this->getOneyRequiredFields(),
                 'iso_code' => $iso,
                 'merchant_company_iso' => $merchant_company_iso,
@@ -483,7 +537,10 @@ class OneyRepository extends BaseClass
         $resource['effective_annual_percentage_rate'] = number_format($resource['effective_annual_percentage_rate'], 2);
 
         $resource['split'] = (int) str_replace('x', '', $type[0]);
-        $resource['title'] = sprintf($this->dependencies->l('Payment in %sx', 'oneyrepository'), $resource['split']);
+        $resource['title'] = sprintf($this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->l('Payment in %sx', 'oneyrepository'), $resource['split']);
 
         // format price
         $total_cost = $this->dependencies->amountCurrencyClass->convertAmount($resource['total_cost'], true);
@@ -550,7 +607,10 @@ class OneyRepository extends BaseClass
 
         $this->assign->assign([
             'env' => $env,
-            'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'oneyrepository'),
+            'payplug_oney_loading_msg' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('Loading', 'oneyrepository'),
             'payplug_is_oney_elligible' => $is_elligible,
         ]);
 
@@ -720,7 +780,10 @@ class OneyRepository extends BaseClass
         $error = $is_elligible['error'] ? $is_elligible['error'] : (
             $oney_payment_options
                 ? false
-                : $this->dependencies->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
+                : $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'oneyrepository')
         );
 
         $withFirstSchedule = 'it' == $this->contextAdapter->get()->language->iso_code;
@@ -1217,7 +1280,10 @@ class OneyRepository extends BaseClass
         if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return [
                 'result' => false,
-                'error' => $this->dependencies->l('The cart is unvalid', 'oneyrepository'),
+                'error' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('The cart is unvalid', 'oneyrepository'),
             ];
         }
 
@@ -1327,7 +1393,10 @@ class OneyRepository extends BaseClass
             return [
                 'result' => false,
                 'error' => sprintf(
-                    $this->dependencies->l('oney.isValidOneyAmount.unvalid', 'oneyrepository'),
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('oney.isValidOneyAmount.unvalid', 'oneyrepository'),
                     $this->helpers['amount']->formatOneyAmount($limits['min'])['result'],
                     $this->helpers['amount']->formatOneyAmount($limits['max'])['result']
                 ),
@@ -1349,7 +1418,10 @@ class OneyRepository extends BaseClass
         if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             return [
                 'result' => false,
-                'error' => $this->dependencies->l('The cart is unvalid', 'oneyrepository'),
+                'error' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('The cart is unvalid', 'oneyrepository'),
             ];
         }
 
@@ -1362,7 +1434,10 @@ class OneyRepository extends BaseClass
 
             return [
                 'result' => false,
-                'error' => $this->dependencies->l($error, 'oneyrepository'),
+                'error' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l($error, 'oneyrepository'),
             ];
         }
 
@@ -1382,7 +1457,10 @@ class OneyRepository extends BaseClass
         if (!$is_valid_email['result']) {
             return [
                 'result' => false,
-                'message' => $this->dependencies->l('Your email address is not a valid email', 'oneyrepository'),
+                'message' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Your email address is not a valid email', 'oneyrepository'),
             ];
         }
         $is_oney_email = $this->validators['payment']->isOneyEmail($email);
@@ -1390,21 +1468,36 @@ class OneyRepository extends BaseClass
             $code = isset($is_oney_email['code']) ? $is_oney_email['code'] : 'invalid';
             switch ($code) {
                 case 'length-char':
-                    $error = $this->dependencies->l('Your email address is too long and the + character is not valid', 'oneyrepository');
-                    $error .= $this->dependencies->l(' please change it to another address (max 100 characters).', 'oneyrepository');
+                    $error = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('Your email address is too long and the + character is not valid', 'oneyrepository');
+                    $error .= $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l(' please change it to another address (max 100 characters).', 'oneyrepository');
 
                     break;
                 case 'char':
-                    $error = $this->dependencies->l('The + character is not valid. Please change your email address (100 characters max).', 'oneyrepository');
+                    $error = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('The + character is not valid. Please change your email address (100 characters max).', 'oneyrepository');
 
                     break;
                 case 'length':
-                    $error = $this->dependencies->l('Your email address is too long. Please change your email address (100 characters max).', 'oneyrepository');
+                    $error = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('Your email address is too long. Please change your email address (100 characters max).', 'oneyrepository');
 
                     break;
                 case 'format':
                 default:
-                    $error = $this->dependencies->l('Your email address is not a valid email', 'oneyrepository');
+                    $error = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('Your email address is not a valid email', 'oneyrepository');
 
                     break;
             }

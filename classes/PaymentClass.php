@@ -106,14 +106,20 @@ class PaymentClass
         if (!$abort['result']) {
             exit(json_encode([
                 'status' => 'error',
-                'data' => $this->dependencies->l('payplug.abortPayment.cannotAbort', 'paymentclass'),
+                'data' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.abortPayment.cannotAbort', 'paymentclass'),
             ]));
         }
         $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
         if (!$installment['result']) {
             exit(json_encode([
                 'status' => 'error',
-                'data' => $this->dependencies->l('payplug.abortPayment.cannotAbort', 'paymentclass'),
+                'data' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.abortPayment.cannotAbort', 'paymentclass'),
             ]));
         }
 
@@ -316,16 +322,28 @@ class PaymentClass
             'card_date' => $card_date,
             'card_country' => $card_country,
             'mode' => ($payment->is_live)
-                ? $this->dependencies->l('payplug.buildPaymentDetails.live', 'paymentclass')
-                : $this->dependencies->l('payplug.buildPaymentDetails.test', 'paymentclass'),
+                ? $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.buildPaymentDetails.live', 'paymentclass')
+                : $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.buildPaymentDetails.test', 'paymentclass'),
             'paid' => (bool) $payment->is_paid,
         ];
 
         // Deferred payment does'nt display 3DS option before capture so we have to consider it null
         if (null !== $payment->is_3ds) {
             $payment_details['tds'] = ($payment->is_3ds)
-                ? $this->dependencies->l('payplug.buildPaymentDetails.yes', 'paymentclass')
-                : $this->dependencies->l('payplug.buildPaymentDetails.no', 'paymentclass');
+                ? $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.buildPaymentDetails.yes', 'paymentclass')
+                : $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.buildPaymentDetails.no', 'paymentclass');
         }
 
         $is_oney = false;
@@ -335,42 +353,63 @@ class PaymentClass
             switch ($payment->payment_method['type']) {
                 case 'oney_x3_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX3WithFees', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.buildPaymentDetails.oneyX3WithFees', 'paymentclass');
 
                     break;
 
                 case 'oney_x4_with_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX4WithFees', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.buildPaymentDetails.oneyX4WithFees', 'paymentclass');
 
                     break;
 
                 case 'oney_x3_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX3WithoutFees', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.buildPaymentDetails.oneyX3WithoutFees', 'paymentclass');
 
                     break;
 
                 case 'oney_x4_without_fees':
                     $is_oney = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.oneyX4WithoutFees', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.buildPaymentDetails.oneyX4WithoutFees', 'paymentclass');
 
                     break;
 
                 case 'bancontact':
                     $is_bancontact = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.bancontact', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.buildPaymentDetails.bancontact', 'paymentclass');
 
                     break;
 
                 case 'apple_pay':
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.applepay', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.buildPaymentDetails.applepay', 'paymentclass');
 
                     break;
 
                 case 'american_express':
                     $is_amex = true;
-                    $payment_details['type'] = $this->dependencies->l('payplug.buildPaymentDetails.amex', 'paymentclass');
+                    $payment_details['type'] = $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.buildPaymentDetails.amex', 'paymentclass');
 
                     break;
 
@@ -382,10 +421,10 @@ class PaymentClass
 
         $is_paid = $this->validators['payment']->isPaid($payment)['result'];
         $can_be_captured = $this->validators['payment']->isPayment($payment)['result']
-                            && !$this->validators['payment']->isFailed($payment)['result']
-                            && !$is_paid
-                            && $this->validators['payment']->isDeferred($payment)['result']
-                            && !$this->validators['payment']->isExpired($payment)['result'];
+            && !$this->validators['payment']->isFailed($payment)['result']
+            && !$is_paid
+            && $this->validators['payment']->isDeferred($payment)['result']
+            && !$this->validators['payment']->isExpired($payment)['result'];
         $payment_details['can_be_captured'] = $can_be_captured;
 
         if (null !== $payment->authorization && !$is_oney) {
@@ -409,7 +448,10 @@ class PaymentClass
                     $payment_details['date'] = date('d/m/Y', $payment->authorization->authorized_at);
                     $payment_details['date_expiration'] = $expiration;
                     $payment_details['expiration_display'] = sprintf(
-                        $this->dependencies->l('payplug.buildPaymentDetails.captureAuthorizedBeforeWarning', 'paymentclass'),
+                        $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('payplug.buildPaymentDetails.captureAuthorizedBeforeWarning', 'paymentclass'),
                         $expiration
                     );
                 } elseif (isset($payment->authorization->authorized_at)
@@ -460,7 +502,10 @@ class PaymentClass
             if (!$payment['result']) {
                 exit(json_encode([
                     'status' => 'error',
-                    'data' => $this->dependencies->l('payplug.capturePayment.cannotCapture', 'paymentclass'),
+                    'data' => $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.capturePayment.cannotCapture', 'paymentclass'),
                     'message' => $payment['message'],
                 ]));
             }
@@ -470,7 +515,10 @@ class PaymentClass
         if (!$capture['result']) {
             exit(json_encode([
                 'status' => 'error',
-                'data' => $this->dependencies->l('payplug.capturePayment.cannotCapture', 'paymentclass'),
+                'data' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.capturePayment.cannotCapture', 'paymentclass'),
                 'message' => $capture['message'],
             ]));
         }
@@ -494,7 +542,10 @@ class PaymentClass
 
                 exit(json_encode([
                     'status' => 'error',
-                    'data' => $this->dependencies->l('payplug.capturePayment.errorOccurred', 'paymentclass'),
+                    'data' => $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.capturePayment.errorOccurred', 'paymentclass'),
                 ]));
             }
 
@@ -521,7 +572,10 @@ class PaymentClass
         exit(json_encode([
             'status' => 'ok',
             'data' => '',
-            'message' => $this->dependencies->l('payplug.capturePayment.captured.', 'paymentclass'),
+            'message' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.capturePayment.captured.', 'paymentclass'),
             'reload' => true,
         ]));
     }
@@ -735,7 +789,10 @@ class PaymentClass
             // todo: add error log
             return [
                 'result' => false,
-                'response' => $this->dependencies->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'),
+                'response' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'),
             ];
         }
 
@@ -768,7 +825,10 @@ class PaymentClass
             // todo: add error log
             return [
                 'result' => false,
-                'response' => $this->dependencies->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'),
+                'response' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'),
             ];
         }
 
@@ -846,7 +906,10 @@ class PaymentClass
             // todo: add error log
             return [
                 'result' => false,
-                'response' => $this->dependencies->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'),
+                'response' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'),
             ];
         }
 
@@ -865,7 +928,10 @@ class PaymentClass
             // todo: add error log
             return [
                 'result' => false,
-                'response' => $this->dependencies->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'),
+                'response' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.preparePayment.transactionNotCompleted', 'paymentclass'),
             ];
         }
 
@@ -1124,7 +1190,10 @@ class PaymentClass
 
                         return [
                             'result' => false,
-                            'response' => $this->dependencies->l('payplug.preparePayment.fieldsNotCompleted', 'paymentclass'),
+                            'response' => $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('payplug.preparePayment.fieldsNotCompleted', 'paymentclass'),
                         ];
                     }
                 } else {
@@ -1429,9 +1498,12 @@ class PaymentClass
 
         if (!$payment['result']) {
             exit(json_encode([
-                                'data' => $this->dependencies->l('payplug.adminPayplugController.errorOccurred', 'paymentclass'),
-                                'status' => 'error',
-                            ]));
+                'data' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.adminPayplugController.errorOccurred', 'paymentclass'),
+                'status' => 'error',
+            ]));
         }
         $payment = $payment['resource'];
 
@@ -1458,9 +1530,12 @@ class PaymentClass
         }
 
         exit(json_encode([
-                            'message' => $this->dependencies->l('payplug.adminPayplugController.orderUpdated', 'paymentclass'),
-                            'reload' => true,
-                        ]));
+            'message' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.adminPayplugController.orderUpdated', 'paymentclass'),
+            'reload' => true,
+        ]));
     }
 
     /**

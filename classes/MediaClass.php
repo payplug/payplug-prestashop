@@ -107,7 +107,10 @@ class MediaClass
     {
         $admin_ajax_url = $this->dependencies->adminClass->getAdminAjaxUrl();
         $inst_id = isset($args['inst_id']) ? $args['inst_id'] : null;
-        $title = $this->dependencies->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
+        $title = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
         $this->context->smarty->assign([
             'title' => $title,
             'type' => $type,

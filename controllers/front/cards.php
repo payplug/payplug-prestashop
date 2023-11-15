@@ -77,7 +77,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
         $translations = $this->dependencies
             ->getPlugin()
             ->getTranslationClass()
-            ->getCardTranslation();
+            ->getCardTranslations();
 
         $card_confirm_deleted_msg = $this->dependencies->mediaClass->displayMessages(
             [$translations['delete']['confirm']],

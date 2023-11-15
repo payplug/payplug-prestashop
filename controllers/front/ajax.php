@@ -239,7 +239,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $payment_details = json_decode($payment['paymentDetails'], true);
                     if (isset($payment_details['error_code']) && in_array((int) $payment_details['error_code'], [401, 403])) {
                         $this->paymentClass->setPaymentErrorsCookie([
-                            $this->dependencies->l('The transaction was not completed and your card was not charged.', 'ajax'),
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('The transaction was not completed and your card was not charged.', 'ajax'),
                         ]);
                         $payment['force_reload'] = true;
                         $payment['return_url'] = $context->link->getPageLink('order', true, $context->language->id, [
