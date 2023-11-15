@@ -40,6 +40,10 @@ use Payplug\Refund;
 use PayPlug\src\exceptions\BadParameterException;
 use Symfony\Component\Dotenv\Dotenv;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class ApiClass
 {
     /** @var string */

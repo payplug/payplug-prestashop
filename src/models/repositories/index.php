@@ -12,7 +12,7 @@
  *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade Payplug module to newer
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
  * versions in the future.
  *
  *  @author    Payplug SAS
@@ -21,12 +21,10 @@
  *  International Registered Trademark & Property of Payplug SAS
  */
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-
+header('Last-Modified:  Mon, 26 Jul 1997 05:00:00 GMT');
 header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Cache-Control: post-check=0, pre-check=0', false);
 header('Pragma: no-cache');
-
 header('Location: ../');
 
 exit;

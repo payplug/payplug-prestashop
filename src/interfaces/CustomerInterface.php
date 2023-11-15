@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\interfaces;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 interface CustomerInterface
 {
     public function get($idCustomer);

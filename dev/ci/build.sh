@@ -25,6 +25,9 @@ echo "" > tmp/log/install-log.csv
 echo "... then add composer.json to the temporary folder..."
 cp composer.json tmp/composer.json
 
+echo "... then add .htaccess to the temporary folder..."
+cp ./.htaccess ./tmp/.htaccess
+
 echo "... then list the file contained"
 php dev/ci/list_module_files.php tmp
 
@@ -39,6 +42,7 @@ mkdir ${name}
 
 echo "Then move file in created folder"
 mv * ${name}
+mv ./.htaccess ./${name}/.htaccess
 
 echo "Retrieve composer.json file to create archive"
 cp ./${name}/composer.json ./composer.json

@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\application\dependencies;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PayPlug\src\application\adapter\TranslationAdapter;
 
 class BaseClass

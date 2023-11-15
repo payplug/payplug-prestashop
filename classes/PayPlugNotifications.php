@@ -29,6 +29,10 @@ use Payplug\Resource\InstallmentPlan;
 use Payplug\Resource\Payment;
 use Payplug\Resource\Refund;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 /**
  * Class PayPlugNotifications
  * Use for treat notification from Payplug API.

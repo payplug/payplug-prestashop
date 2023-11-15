@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\repositories;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PayPlug\classes\MyLogPHP;
 
 class SQLtableRepository

@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\utilities\services;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class Browser
 {
     public function getName()

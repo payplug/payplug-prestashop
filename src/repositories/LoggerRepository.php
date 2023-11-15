@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\repositories;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PayPlug\src\application\dependencies\BaseClass;
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\LoggerEntity;

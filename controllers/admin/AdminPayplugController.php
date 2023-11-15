@@ -24,6 +24,10 @@ require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
 use PayPlug\classes\DependenciesClass;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class AdminPayplugController extends ModuleAdminController
 {
     private $dependencies;

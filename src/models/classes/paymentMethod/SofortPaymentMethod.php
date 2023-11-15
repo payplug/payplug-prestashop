@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\models\classes\paymentMethod;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class SofortPaymentMethod extends PaymentMethod
 {
     public function __construct($dependencies)
