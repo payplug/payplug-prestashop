@@ -239,7 +239,7 @@ class PaymentMock
 
         $resource = self::getDefault($defaultInstallment);
 
-        return InstallmentPlan::fromAttributes(self::$payment_parameters['oneclick']);
+        return InstallmentPlan::fromAttributes($resource);
     }
 
     public static function getOneClick()

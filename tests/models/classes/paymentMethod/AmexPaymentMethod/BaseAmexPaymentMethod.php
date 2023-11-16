@@ -11,6 +11,7 @@ class BaseAmexPaymentMethod extends BasePaymentMethod
     {
         parent::setUp();
 
+        $this->parent = $this->classe;
         $this->classe = \Mockery::mock(AmexPaymentMethod::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();

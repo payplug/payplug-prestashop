@@ -52,7 +52,12 @@ class getPaymentOptionTest extends BasePaymentMethod
             ->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{"standard":["FR"]}');
-
+        $this->helpers['amount']
+            ->shouldReceive('validateAmount')
+            ->andReturn([
+                'result' => true,
+                'message' => '',
+            ]);
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
             'getIsoCodeByCountryId' => 'FR',
@@ -69,7 +74,12 @@ class getPaymentOptionTest extends BasePaymentMethod
             ->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
-
+        $this->helpers['amount']
+            ->shouldReceive('validateAmount')
+            ->andReturn([
+                'result' => true,
+                'message' => '',
+            ]);
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
             'getIsoCodeByCountryId' => 'FR',

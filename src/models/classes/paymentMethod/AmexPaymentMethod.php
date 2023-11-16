@@ -33,6 +33,7 @@ class AmexPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'amex';
+        $this->cancellable = false;
     }
 
     /**
@@ -49,5 +50,36 @@ class AmexPaymentMethod extends PaymentMethod
         $option['name'] = 'american_express';
 
         return $option;
+    }
+
+    public function getPaymentTab()
+    {
+        $payment_tab = parent::getPaymentTab();
+
+        if (empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        $payment_tab['payment_method'] = 'american_express';
+        unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+
+        return $payment_tab;
+    }
+
+    public function getReturnUrl()
+    {
+        $this->setParameters();
+
+        $return = parent::getReturnUrl();
+
+        if (empty($return)) {
+            return $return;
+        }
+
+        // todo: getter of $_SERVER['HTTP_USER_AGENT'] should be in a service
+        $return['embedded'] = 'redirect' != (string) $this->configuration->getValue('embedded_mode')
+            && !$this->dependencies->getValidators()['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'];
+
+        return $return;
     }
 }

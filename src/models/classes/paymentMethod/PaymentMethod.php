@@ -31,31 +31,52 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class PaymentMethod
 {
+    /** @var bool */
+    public $cancellable = true;
+
+    /** @var bool */
+    public $force_resource = true;
+
     /** @var object */
     protected $configuration;
+
     /** @var object */
     protected $context;
+
     /** @var object */
     protected $dependencies;
+
     /** @var array */
     protected $external_url;
+
     /** @var string */
     protected $img_path;
+
     /** @var string */
     protected $iso_code;
+
     /** @var object */
     protected $link;
+
     /** @var object */
     protected $logger;
-    /** @var array */
-    protected $translation;
 
     /** @var string */
     protected $name;
 
+    /** @var array */
+    protected $translation;
+
+    /** @var object */
+    protected $tools;
+
+    /** @var object */
+    protected $validate_adapter;
+
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->name = '';
     }
 
     /**
@@ -113,6 +134,44 @@ class PaymentMethod
         }
 
         return $payment_methods_obj;
+    }
+
+    /**
+     * @description Generate hash for a payment method from the current context
+     *
+     * @return string
+     */
+    public function getPaymentMethodHash()
+    {
+        $this->setParameters();
+        $cartToHash = [];
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
+            // todo: add error log
+            return '';
+        }
+
+        $products = $this->context->cart->getProducts();
+        if (!$products) {
+            // todo: add error log
+            return '';
+        }
+
+        foreach ($products as $product) {
+            $product = array_map('json_encode', $product);
+            $cartToHash[] = array_map('strval', $product);
+        }
+
+        // Adding cart informationObjectModel
+        $cartToHash[] = 'Cart $id_address_delivery: ' . $this->context->cart->id_address_delivery;
+        $cartToHash[] = 'Cart $id_address_invoice: ' . $this->context->cart->id_address_invoice;
+        $cartToHash[] = 'Cart $id_currency: ' . $this->context->cart->id_currency;
+        $cartToHash[] = 'Cart $id_customer: ' . $this->context->cart->id_customer;
+        $cartToHash[] = 'Cart $delivery_option: ' . $this->context->cart->delivery_option;
+
+        // Adding cart amount to hash
+        $cartToHash[] = 'Cart amount: ' . (float) $this->context->cart->getOrderTotal(true);
+
+        return hash('sha256', $this->name . json_encode($cartToHash));
     }
 
     /**
@@ -212,6 +271,12 @@ class PaymentMethod
     {
         $this->setParameters();
 
+        if (!is_array($current_configuration)) {
+            $this->logger->addLog('PaymentMethod::getOptionCollection: Invalid parameter given, $current_configuration must be an array.');
+
+            return [];
+        }
+
         $available_payment_methods = $this->getAvailablePaymentMethod();
         $options = [];
 
@@ -288,6 +353,365 @@ class PaymentMethod
     }
 
     /**
+     * @description Get the payment tab required to generate a resource payment.
+     *
+     * @return array
+     */
+    public function getPaymentTab()
+    {
+        $this->setParameters();
+
+        if (!isset($this->name) || !$this->name) {
+            // todo: add error log
+            return [];
+        }
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
+            // todo: add error log
+            return [];
+        }
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->customer)) {
+            // todo: add error log
+            return [];
+        }
+
+        // Check currency
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->currency)) {
+            // todo: add error log
+            return [];
+        }
+
+        $supported_currencies = explode(';', $this->configuration->getValue('currencies'));
+        if (!in_array($this->context->currency->iso_code, $supported_currencies, true)) {
+            // todo: add error log
+            return [];
+        }
+
+        // Check amount
+        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
+        $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
+        $cart_amount = $this->context->cart->getOrderTotal(true);
+        $is_valid_amount = $this->dependencies
+            ->getHelpers()['amount']
+            ->validateAmount($price_limit, (float) $cart_amount);
+        if (!$is_valid_amount['result']) {
+            // todo: add error log
+            return [];
+        }
+
+        // Set addresses
+        $billing_address = $this->dependencies
+            ->getPlugin()
+            ->getAddress()
+            ->get((int) $this->context->cart->id_address_invoice);
+        $billing_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $billing_address->id_country);
+        $shipping_address = $this->dependencies
+            ->getPlugin()
+            ->getAddress()
+            ->get((int) $this->context->cart->id_address_delivery);
+        $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+
+        if (!$shipping_iso || !$billing_iso) {
+            $default_language = $this->dependencies
+                ->getPlugin()
+                ->getLanguage()
+                ->get(
+                    (int) $this->dependencies
+                        ->getPlugin()
+                        ->getConfiguration()
+                        ->get('PS_LANG_DEFAULT')
+                );
+            $iso_code_list = $this->dependencies
+                ->getHelpers()['country']::getIsoCodeList();
+            if (in_array($this->tools->tool('strtoupper', $default_language->iso_code), $iso_code_list, true)) {
+                $iso_code = $this->tools->tool('strtoupper', $default_language->iso_code);
+            } else {
+                $iso_code = 'FR';
+            }
+            if (!$shipping_iso) {
+                $metadata['cms_shipping_country'] = $this
+                    ->dependencies
+                    ->configClass
+                    ->getIsoCodeByCountryId((int) $shipping_address->id_country);
+                $shipping_iso = $iso_code;
+            }
+            if (!$billing_iso) {
+                $metadata['cms_billing_country'] = $this
+                    ->dependencies
+                    ->configClass
+                    ->getIsoCodeByCountryId((int) $billing_address->id_country);
+                $billing_iso = $iso_code;
+            }
+        }
+
+        // Set billing informations
+        $billing = [
+            'title' => null,
+            'first_name' => !empty($billing_address->firstname) ? $billing_address->firstname : null,
+            'last_name' => !empty($billing_address->lastname) ? $billing_address->lastname : null,
+            'company_name' => !empty($billing_address->company) ? trim($billing_address->company) : null,
+            'email' => $this->context->customer->email,
+            'landline_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
+                $billing_address->phone,
+                $billing_address->id_country
+            ),
+            'mobile_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
+                $billing_address->phone_mobile,
+                $billing_address->id_country
+            ),
+            'address1' => !empty($billing_address->address1) ? $billing_address->address1 : null,
+            'address2' => !empty($billing_address->address2) ? $billing_address->address2 : null,
+            'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
+            'city' => !empty($billing_address->city) ? $billing_address->city : null,
+            'country' => $billing_iso,
+            'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
+        ];
+        $billing['company_name'] = empty($billing['company_name']) || !$billing['company_name']
+            ? $billing['first_name'] . ' ' . $billing['last_name']
+            : $billing['company_name'];
+        $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: null;
+        $billing['mobile_phone_number'] = $billing['mobile_phone_number'] ?: $billing['landline_phone_number'];
+
+        // Set shipping informations
+        $delivery_type = 'NEW';
+        if ($this->context->cart->id_address_delivery == $this->context->cart->id_address_invoice) {
+            $delivery_type = 'BILLING';
+        } elseif ($shipping_address->isUsed()) {
+            $delivery_type = 'VERIFIED';
+        }
+        $shipping = [
+            'title' => null,
+            'first_name' => !empty($shipping_address->firstname) ? $shipping_address->firstname : null,
+            'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
+            'company_name' => !empty($shipping_address->company) ? trim($shipping_address->company) : null,
+            'email' => $this->context->customer->email,
+            'landline_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
+                $shipping_address->phone,
+                $shipping_address->id_country
+            ),
+            'mobile_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
+                $shipping_address->phone_mobile,
+                $shipping_address->id_country
+            ),
+            'address1' => !empty($shipping_address->address1) ? $shipping_address->address1 : null,
+            'address2' => !empty($shipping_address->address2) ? $shipping_address->address2 : null,
+            'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,
+            'city' => !empty($shipping_address->city) ? $shipping_address->city : null,
+            'country' => $shipping_iso,
+            'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
+            'delivery_type' => $delivery_type,
+        ];
+        $shipping['company_name'] = empty($shipping['company_name']) || !$shipping['company_name']
+            ? $shipping['first_name'] . ' ' . $shipping['last_name']
+            : $shipping['company_name'];
+        $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: null;
+        $shipping['mobile_phone_number'] = $shipping['mobile_phone_number'] ?: $shipping['landline_phone_number'];
+
+        return [
+            'amount' => $this->dependencies
+                ->getHelpers()['amount']
+                ->convertAmount($cart_amount),
+            'currency' => $this->context->currency->iso_code,
+            'shipping' => $shipping,
+            'billing' => $billing,
+            'notification_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ipn', [], true),
+            'force_3ds' => false,
+            'hosted_payment' => [
+                'return_url' => $this->context->link->getModuleLink(
+                    $this->dependencies->name,
+                    'validation',
+                    ['ps' => 1, 'cartid' => (int) $this->context->cart->id],
+                    true
+                ),
+                'cancel_url' => $this->context->link->getModuleLink(
+                    $this->dependencies->name,
+                    'validation',
+                    ['ps' => 2, 'cartid' => (int) $this->context->cart->id],
+                    true
+                ),
+            ],
+            'metadata' => [
+                'ID Client' => (int) $this->context->customer->id,
+                'ID Cart' => (int) $this->context->cart->id,
+                'Website' => $this->tools->tool('getShopDomainSsl', true, false),
+            ],
+            'allow_save_card' => false,
+        ];
+    }
+
+    /**
+     * @description Generate and return correct resource return url
+     *
+     * @return array
+     */
+    public function getReturnUrl()
+    {
+        $this->setParameters();
+        if (!isset($this->name) || !$this->name) {
+            // todo: add error log
+            return [];
+        }
+
+        $resource_stored = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByCart((int) $this->context->cart->id);
+        if (!$resource_stored) {
+            // todo: add error log
+            return [];
+        }
+
+        $resource = $this->dependencies->apiClass->retrievePayment($resource_stored['resource_id']);
+        if (!$resource['result']) {
+            // todo: add error log
+            return [];
+        }
+
+        $resource = $resource['resource'];
+        $return_url = $resource->hosted_payment
+            ? $resource->hosted_payment->payment_url
+                ?: $resource->hosted_payment->return_url
+            : '';
+
+        return [
+            'return_url' => $return_url,
+            'resource_stored' => $resource_stored,
+        ];
+    }
+
+    /**
+     * @description Check if the stored resource is a non expired resource with no failure
+     *
+     * @return bool
+     */
+    public function isValidResource()
+    {
+        $this->setParameters();
+
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
+            // todo: Add error log
+            return false;
+        }
+        $id_cart = (int) $this->context->cart->id;
+
+        // Get the resource from context cart id
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByCart((int) $id_cart);
+        if (empty($stored_resource)) {
+            // todo: Add error log
+            return false;
+        }
+
+        // Check if resource is expired
+        $is_expired = $this->dependencies
+            ->getValidators()['payment']
+            ->isTimeoutCachedPayment($stored_resource['date_upd'])['result'];
+        if (!$is_expired) {
+            // todo: Add error log
+            return false;
+        }
+
+        // Get the resource from API
+        $retrieved_resource = $this->dependencies->apiClass->retrievePayment($stored_resource['resource_id']);
+        if (!$retrieved_resource['result']) {
+            // todo: Add error log
+            return false;
+        }
+
+        // Check if retrieved resource has failure
+        if (isset($retrieved_resource['resource']->failure->code) && $retrieved_resource['resource']->failure->code) {
+            // todo: Add error log
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @description Reset the permission from current permission
+     *
+     * @param array $permissions
+     */
+    public function resetPaymentMethodFromPermission($permissions = [])
+    {
+        $this->setParameters();
+
+        if (!is_array($permissions)) {
+            $this->logger->addLog('PaymentMethod::resetPaymentMethodFromPermission: Invalid parameter given, $permissions must be an array.');
+
+            return false;
+        }
+
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
+        foreach ($payment_methods as $payment_method => $active) {
+            if ($active
+                && isset($permissions[$payment_method])
+                && !$permissions[$payment_method]
+            ) {
+                $payment_methods[$payment_method] = false;
+            }
+        }
+
+        return $this->configuration->set('payment_methods', json_encode($payment_methods));
+    }
+
+    /**
+     * @description Create resource from a given tab
+     *
+     * @param array $payment_tab
+     *
+     * @return array
+     */
+    public function saveResource($payment_tab = [])
+    {
+        $this->setParameters();
+
+        if (!isset($this->name) || !$this->name) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('PaymentMethod::saveResource - Invalid argument, the method name must be defined.', 'error');
+
+            return [
+                'result' => false,
+            ];
+        }
+        if (!is_array($payment_tab) || empty($payment_tab)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('PaymentMethod::saveResource - Invalid argument, $payment_tab must be a non empty array.', 'error');
+
+            return [
+                'result' => false,
+            ];
+        }
+
+        $payment = $this->dependencies->apiClass->createPayment($payment_tab);
+
+        // If the payment resource can not be created due to to bad permission, we update the feature activation
+        if (403 == (int) $payment['code']) {
+            $cart = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get()->cart;
+            $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
+            $this->resetPaymentMethodFromPermission($permissions);
+        }
+
+        // If the payment resource can not be created due to bad credential, we log out the merchand
+        if (401 == (int) $payment['code']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->logoutAction();
+        }
+
+        return $payment;
+    }
+
+    /**
      * @description Set object property
      *
      * @param string $key
@@ -309,28 +733,6 @@ class PaymentMethod
         $this->{$key} = $value;
 
         return $this;
-    }
-
-    /**
-     * @description Reset the permission from current permission
-     *
-     * @param array $permissions
-     */
-    public function resetPaymentMethodFromPermission($permissions = [])
-    {
-        $this->setParameters();
-        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
-
-        foreach ($payment_methods as $payment_method => $active) {
-            if ($active
-                && isset($permissions[$payment_method])
-                && !$permissions[$payment_method]
-            ) {
-                $payment_methods[$payment_method] = false;
-            }
-        }
-
-        $this->configuration->set('payment_methods', json_encode($payment_methods));
     }
 
     /**
@@ -378,11 +780,21 @@ class PaymentMethod
                 ->getPlugin()
                 ->getLogger();
         }
+        if (!$this->tools) {
+            $this->tools = $this->dependencies
+                ->getPlugin()
+                ->getTools();
+        }
         if (!$this->translation) {
             $this->translation = $this->dependencies
                 ->getPlugin()
                 ->getTranslationClass()
                 ->getPaymentMethodsTranslations();
+        }
+        if (!$this->validate_adapter) {
+            $this->validate_adapter = $this->dependencies
+                ->getPlugin()
+                ->getValidate();
         }
     }
 
@@ -409,17 +821,17 @@ class PaymentMethod
         $payplug_countries = json_decode($this->configuration->getValue('countries'), true);
 
         if (isset($payplug_countries[$this->name])) {
-            $shipping_address = $this->dependencies
+            $address = $this->dependencies
                 ->getPlugin()
                 ->getAddress()
-                ->get((int) $this->context->cart->id_address_delivery);
-            $shipping_iso = $this->dependencies
+                ->get((int) $this->context->cart->id_address_invoice);
+            $iso = $this->dependencies
                 ->configClass
-                ->getIsoCodeByCountryId((int) $shipping_address->id_country);
+                ->getIsoCodeByCountryId((int) $address->id_country);
 
             if (!$this->dependencies
                 ->getValidators()['payment']
-                ->isAllowedCountry(implode(',', $payplug_countries[$this->name]), $shipping_iso)['result']) {
+                ->isAllowedCountry(implode(',', $payplug_countries[$this->name]), $iso)['result']) {
                 return $payment_options;
             }
         }
@@ -430,7 +842,7 @@ class PaymentMethod
         if (false === strpos($this->name, 'oney')) {
             if (!$this->dependencies
                 ->getHelpers()['amount']
-                ->isValidAmount($price_limit, (float) $cart_amount)['result']) {
+                ->validateAmount($price_limit, (float) $cart_amount)['result']) {
                 return $payment_options;
             }
         }

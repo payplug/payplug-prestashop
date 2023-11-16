@@ -50,7 +50,6 @@ class HookClass
     private $orderHistory;
     private $orderState;
     private $orderStateAdapter;
-    private $payment;
     private $product;
     private $sql;
     private $tools;
@@ -77,7 +76,6 @@ class HookClass
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->orderState = $this->dependencies->getPlugin()->getOrderState();
         $this->orderStateAdapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
-        $this->payment = $this->dependencies->getPlugin()->getPayment();
         $this->product = $this->dependencies->getPlugin()->getProduct();
         $this->sql = $this->dependencies->getPlugin()->getSql();
         $this->tools = $this->dependencies->getPlugin()->getTools();
@@ -994,8 +992,17 @@ class HookClass
                 'is_deferred' => (bool) $this->tools->tool('getValue', 'def'),
                 'is_amex' => (bool) $this->tools->tool('getValue', 'amex'),
             ];
-
-            $payment = $this->dependencies->paymentClass->preparePayment($payment_options);
+            $payment_method = 'new_card' != $id_card
+                ? 'one_click'
+                : ((bool) $this->tools->tool('getValue', 'inst')
+                    ? 'installment'
+                    : ((bool) $this->tools->tool('getValue', 'amex')
+                        ? 'amex'
+                        : 'standard'));
+            $payment = $this->dependencies
+                ->getPlugin()
+                ->getPaymentAction()
+                ->dispatchAction($payment_method, true);
 
             $dotenv = new Dotenv();
             $dotenvFile = \dirname(__FILE__, 4) . '/payplugroutes/.env';
@@ -1009,11 +1016,8 @@ class HookClass
                     ->getSourceUrl()['integrated'];
             }
 
-            if ($payment['result']) {
-                // If payment is paid then redirect
-                if ($payment['redirect']) {
-                    $this->tools->tool('redirect', $payment['return_url']);
-                } else {
+            if (!empty($payment)) {
+                if (isset($payment['embedded']) && $payment['embedded']) {
                     // else show the popin
                     if ('integrated' == $this->configuration->getValue('embedded_mode')) {
                         $api_url = $integrated_payment_js_url;
@@ -1034,8 +1038,9 @@ class HookClass
 
                     return $this->dependencies->configClass->fetchTemplate('checkout/embedded.tpl');
                 }
+                $this->tools->tool('redirect', $payment['return_url']);
             } else {
-                $this->dependencies->paymentClass->setPaymentErrorsCookie([
+                $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                     $this->dependencies
                         ->getPlugin()
                         ->getTranslationClass()

@@ -56,7 +56,6 @@ class PayPlugValidation
     private $isApplepay;
     private $orderAdapter;
     private $orderClass;
-    private $payment;
     private $plugin;
     private $query;
     private $toolsAdapter;
@@ -77,7 +76,6 @@ class PayPlugValidation
         $this->customerAdapter = $this->dependencies->getPlugin()->getCustomer();
         $this->orderAdapter = $this->dependencies->getPlugin()->getOrder();
         $this->orderClass = $this->dependencies->orderClass;
-        $this->payment = $this->dependencies->getPlugin()->getPayment();
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->payplugLock = $this->dependencies->payplugLock;
         $this->query = $this->dependencies->getPlugin()->getQueryRepository();
@@ -138,7 +136,7 @@ class PayPlugValidation
         // Cancelling
         if (!($cart_id = $this->toolsAdapter->tool('getValue', 'cartid'))) {
             $this->logger->addLog('No Cart ID.', 'error');
-            $this->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                 $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()
@@ -152,7 +150,7 @@ class PayPlugValidation
             }
 
             $this->logger->addLog('Wrong GET parameter ps = ' . $ps, 'error');
-            $this->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                 $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()
@@ -168,7 +166,7 @@ class PayPlugValidation
         // Check if valid cart
         if (!$this->validateAdapter->validate('isLoadedObject', $cart)) {
             $this->logger->addLog('Cart cannot be loaded.', 'error');
-            $this->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                 $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()
@@ -254,7 +252,7 @@ class PayPlugValidation
                     } else {
                         $this->logger->addLog('Lock deleted.', 'debug');
                     }
-                    $this->paymentClass->setPaymentErrorsCookie([
+                    $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                         $this->dependencies
                             ->getPlugin()
                             ->getTranslationClass()
@@ -281,7 +279,7 @@ class PayPlugValidation
 
                 if ($installment->failure) {
                     $this->logger->addLog('Installment failure : ' . $installment->failure->message, 'error');
-                    $this->paymentClass->setPaymentErrorsCookie([
+                    $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                         $this->dependencies
                             ->getPlugin()
                             ->getTranslationClass()
@@ -304,7 +302,7 @@ class PayPlugValidation
                 } else {
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
-                $this->paymentClass->setPaymentErrorsCookie([
+                $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                     $this->dependencies
                         ->getPlugin()
                         ->getTranslationClass()
@@ -329,7 +327,7 @@ class PayPlugValidation
                     $this->logger->addLog('Lock deleted.', 'debug');
                 }
                 $this->logger->addLog('Payment failure : ' . $payment->failure->message, 'error');
-                $this->paymentClass->setPaymentErrorsCookie([
+                $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                     $this->dependencies
                         ->getPlugin()
                         ->getTranslationClass()
@@ -420,7 +418,6 @@ class PayPlugValidation
             }
 
             $amount = $payment->amount;
-
             if ((isset($payment->save_card) && 1 == (int) $payment->save_card)
                 || (isset($payment->card->id) && '' != $payment->card->id)
             ) {
@@ -474,7 +471,7 @@ class PayPlugValidation
         $customer = $this->customerAdapter->get((int) $cart->id_customer);
         if (!$this->validateAdapter->validate('isLoadedObject', $customer)) {
             $this->logger->addLog('Customer cannot be loaded.', 'error');
-            $this->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                 $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()
@@ -716,7 +713,7 @@ class PayPlugValidation
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
             }
-            $this->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                 $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()
@@ -737,7 +734,7 @@ class PayPlugValidation
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
             }
-            $this->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                 $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()
@@ -800,7 +797,7 @@ class PayPlugValidation
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
             }
-            $this->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                 $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()
@@ -836,7 +833,7 @@ class PayPlugValidation
             } else {
                 $this->logger->addLog('Lock deleted.', 'debug');
             }
-            $this->paymentClass->setPaymentErrorsCookie([
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
                 $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()

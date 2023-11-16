@@ -167,9 +167,9 @@ class OrderStateAction
         $payplug_order_state_url = $this->dependencies
             ->getPlugin()
             ->getRoutes()
-            ->getExternalUrl($context->getContext()->language->iso_code)['order_state'];
+            ->getExternalUrl($context->get()->language->iso_code)['order_state'];
 
-        $context->getContext()->smarty->assign([
+        $context->get()->smarty->assign([
             'payplug_order_state_url' => $payplug_order_state_url,
             'current_order_state_type' => $current_order_state_type,
             'order_state_types' => $types,

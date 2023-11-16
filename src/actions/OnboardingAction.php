@@ -27,6 +27,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * @deprecated This action controller should be remove in next version
+ */
 class OnboardingAction
 {
     private $dependencies;

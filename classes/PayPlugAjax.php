@@ -99,7 +99,7 @@ class PayPlugAjax
                         'is_amex' => $is_amex,
                         '_ajax' => 1,
                     ];
-                    $payment = $this->paymentClass->preparePayment($options);
+                    $payment = [];
 
                     exit(json_encode($payment));
                 }
@@ -217,7 +217,7 @@ class PayPlugAjax
             }
             if ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
-                $errors = $this->paymentClass->getPaymentErrorsCookie();
+                $errors = $this->dependencies->getHelpers()['cookies']->getPaymentErrorsCookie();
 
                 if ($errors) {
                     exit(json_encode(['result' => $this->paymentClass->displayPaymentErrors($errors)]));
@@ -241,7 +241,7 @@ class PayPlugAjax
                     ]));
                 }
 
-                $result = $this->paymentClass->setPaymentDataCookie($payment_data);
+                $result = $this->dependencies->getHelpers()['cookies']->setPaymentDataCookie($payment_data);
 
                 exit(json_encode([
                     'result' => $result,

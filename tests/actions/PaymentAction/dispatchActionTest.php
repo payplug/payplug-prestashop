@@ -13,19 +13,6 @@ use PayPlug\tests\mock\CartMock;
  */
 class dispatchActionTest extends BasePaymentAction
 {
-    public function setUp()
-    {
-        parent::setUp();
-
-        $paymentClass = \Mockery::mock('PaymentClass');
-        $paymentClass
-            ->shouldReceive('preparePayment')
-            ->andReturnUsing(function ($payment_options) {
-                return $payment_options;
-            });
-        $this->dependencies->paymentClass = $paymentClass;
-    }
-
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -34,10 +21,7 @@ class dispatchActionTest extends BasePaymentAction
     public function testWhenGivenMethodsIsNotValidString($method)
     {
         $this->assertSame(
-            [
-                'result' => false,
-                'message' => 'Invalid argument, $method must be a string.',
-            ],
+            [],
             $this->action->dispatchAction($method)
         );
     }
@@ -46,161 +30,261 @@ class dispatchActionTest extends BasePaymentAction
     {
         $method = 'unexpected_method';
         $this->assertSame(
-            [
-                'result' => false,
-                'message' => 'Invalid argument, $method given is not expected.',
-            ],
+            [],
             $this->action->dispatchAction($method)
         );
     }
 
-    public function testWhenGivenMethodsIsApplePay()
+    public function testWhenSelectMethodIsOneClick()
     {
-        $this->toolsAdapter
-            ->shouldReceive([
-                'tool' => 42,
-            ]);
-        $this->cartAdapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-
-        $method = 'applepay';
-        $paymentClass = \Mockery::mock('PaymentClass');
-        $paymentClass
-            ->shouldReceive('preparePayment')
-            ->andReturnUsing(function ($payment_options) {
-                return $payment_options;
-            });
-        $this->dependencies->paymentClass = $paymentClass;
-
-        $this->assertSame(
-            [
-                'is_applepay' => true,
-                'payment_context' => [
-                    'apple_pay' => [
-                        'domain_name' => 'my-mock.com',
-                        'application_data' => 'eyJhcHBsZV9wYXlfZG9tYWluIjoibXktbW9jay5jb20ifQ==',
-                    ],
-                ],
-            ],
-            $this->action->dispatchAction($method)
-        );
-    }
-
-    public function testWhenGivenMethodsIsBancontact()
-    {
-        $this->toolsAdapter
-            ->shouldReceive([
-                'tool' => 42,
-            ]);
-        $this->cartAdapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-
-        $method = 'bancontact';
-
-        $this->assertSame(
-            [
-                'is_bancontact' => true,
-            ],
-            $this->action->dispatchAction($method)
-        );
-    }
-
-    public function testWhenGivenMethodsIsOneClick()
-    {
-        $this->toolsAdapter
-            ->shouldReceive([
-                'tool' => 42,
-            ]);
-        $this->cartAdapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-
         $method = 'one_click';
-
+        $this->toolsAdapter
+            ->shouldReceive([
+                'tool' => 42,
+            ]);
+        $this->cartAdapter
+            ->shouldReceive([
+                'get' => CartMock::get(),
+            ]);
         $this->assertSame(
             [
-                'result' => true,
                 'return_url' => 'index.php?controller=order&step=3&embedded=1&pc=42&def=1&modulename=payplug',
             ],
             $this->action->dispatchAction($method)
         );
     }
 
-    public function testWhenGivenMethodsIsOney()
+    public function testWhenModuleIsConfigureWithPopupDisplay()
     {
-        $this->toolsAdapter
-            ->shouldReceive([
-                'tool' => 42,
-            ]);
-        $this->cartAdapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-
-        $method = 'oney';
-
-        $this->assertSame(
-            [
-                'is_oney' => 42,
-            ],
-            $this->action->dispatchAction($method)
-        );
-    }
-
-    public function testWhenGivenMethodsIsEmbedded()
-    {
-        $this->toolsAdapter
-            ->shouldReceive([
-                'tool' => 42,
-            ]);
-        $this->cartAdapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-
+        $method = 'standard';
         $this->configuration
             ->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('popup');
 
-        $method = 'standard';
-
         $this->assertSame(
             [
-                'result' => true,
-                'return_url' => 'index.php?controller=order&step=3&embedded=1&def=1&modulename=payplug',
+                'return_url' => 'index.php?controller=order&step=3&embedded=1&def=1&modulename=' . $this->dependencies->name,
             ],
             $this->action->dispatchAction($method)
         );
     }
 
-    public function testWhenGivenMethodsIsAmex()
+    public function testWhenNoPaymentTabIsReturnForCurrentPaymentMethod()
     {
-        $this->toolsAdapter
-            ->shouldReceive([
-                'tool' => 42,
-            ]);
-        $this->cartAdapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
+        $method = 'standard';
         $this->configuration
             ->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('redirect');
-        $method = 'amex';
+
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
+            ]);
+
+        $payment_method
+            ->shouldReceive([
+                'getPaymentTab' => [],
+            ]);
 
         $this->assertSame(
-            [
-                'is_installment' => false,
-                'is_amex' => true,
-                'is_deferred' => false,
-            ],
+            [],
+            $this->action->dispatchAction($method)
+        );
+    }
+
+    public function testWhenCurrentPaymentMethodForceTheResourceCreation()
+    {
+        $method = 'standard';
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('embedded_mode')
+            ->andReturn('redirect');
+
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $payment_method->force_resource = true;
+
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
+            ]);
+
+        $payment_method
+            ->shouldReceive([
+                'getPaymentTab' => [
+                    'amount' => 4242,
+                    'force_3ds' => false,
+                    'hosted_payment' => [],
+                    'metadata' => [],
+                    'allow_save_card' => false,
+                ],
+            ]);
+
+        $this->payment_repository
+            ->shouldReceive([
+                'getByCart' => [],
+            ]);
+
+        $this->action
+            ->shouldReceive([
+                'createAction' => 'payment created',
+                'retrieveAction' => 'payment retrieved',
+            ]);
+
+        $this->assertSame(
+            'payment created',
+            $this->action->dispatchAction($method)
+        );
+    }
+
+    public function testWhenNoResourceExistForCurrentCart()
+    {
+        $method = 'standard';
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('embedded_mode')
+            ->andReturn('redirect');
+
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $payment_method->force_resource = false;
+
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
+            ]);
+
+        $payment_method
+            ->shouldReceive([
+                'getPaymentTab' => [
+                    'amount' => 4242,
+                    'force_3ds' => false,
+                    'hosted_payment' => [],
+                    'metadata' => [],
+                    'allow_save_card' => false,
+                ],
+            ]);
+
+        $this->payment_repository
+            ->shouldReceive([
+                'getByCart' => [],
+            ]);
+
+        $this->action
+            ->shouldReceive([
+                'createAction' => 'payment created',
+                'retrieveAction' => 'payment retrieved',
+            ]);
+
+        $this->assertSame(
+            'payment created',
+            $this->action->dispatchAction($method)
+        );
+    }
+
+    public function testWhenResourceAlreadyExistsButIsNoValid()
+    {
+        $method = 'standard';
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('embedded_mode')
+            ->andReturn('redirect');
+
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $payment_method->force_resource = false;
+
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
+            ]);
+
+        $payment_method
+            ->shouldReceive([
+                'getPaymentTab' => [
+                    'amount' => 4242,
+                    'force_3ds' => false,
+                    'hosted_payment' => [],
+                    'metadata' => [],
+                    'allow_save_card' => false,
+                ],
+                'isValidResource' => false,
+            ]);
+
+        $this->payment_repository
+            ->shouldReceive([
+                'getByCart' => [
+                    'id_payplug_payment' => 42,
+                    'resource_id' => 'pay_azerty1234',
+                    'method' => 'standard',
+                    'id_cart' => 42,
+                    'cart_hash' => 'cart-hash-azerty1234567',
+                    'schedules' => 'NULL',
+                    'date_upd' => '1970-01-01 00:00:00',
+                ],
+            ]);
+
+        $this->action
+            ->shouldReceive([
+                'createAction' => 'payment created',
+                'retrieveAction' => 'payment retrieved',
+            ]);
+
+        $this->assertSame(
+            'payment created',
+            $this->action->dispatchAction($method)
+        );
+    }
+
+    public function testWhenResourceCreatedAndIsValid()
+    {
+        $method = 'standard';
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('embedded_mode')
+            ->andReturn('redirect');
+
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $payment_method->force_resource = false;
+
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
+            ]);
+
+        $payment_method
+            ->shouldReceive([
+                'getPaymentTab' => [
+                    'amount' => 4242,
+                    'force_3ds' => false,
+                    'hosted_payment' => [],
+                    'metadata' => [],
+                    'allow_save_card' => false,
+                ],
+                'isValidResource' => true,
+            ]);
+
+        $this->payment_repository
+            ->shouldReceive([
+                'getByCart' => [
+                    'id_payplug_payment' => 42,
+                    'resource_id' => 'pay_azerty1234',
+                    'method' => 'standard',
+                    'id_cart' => 42,
+                    'cart_hash' => 'cart-hash-azerty1234567',
+                    'schedules' => 'NULL',
+                    'date_upd' => '1970-01-01 00:00:00',
+                ],
+            ]);
+
+        $this->action
+            ->shouldReceive([
+                'createAction' => 'payment created',
+                'retrieveAction' => 'payment retrieved',
+            ]);
+
+        $this->assertSame(
+            'payment retrieved',
             $this->action->dispatchAction($method)
         );
     }

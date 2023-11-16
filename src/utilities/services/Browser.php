@@ -49,7 +49,6 @@ class Browser
                 $user_browser = 'Internet Explorer';
 
                 break;
-
             case 'Edg':
                 $user_browser = 'Microsoft Edge';
 

@@ -212,6 +212,28 @@ class PaymentRepository extends QueryRepository
     }
 
     /**
+     * @description Delete stored payment from a given resource id
+     *
+     * @param string $resource_id
+     *
+     * @return false
+     */
+    public function removeByResourceId($resource_id = '')
+    {
+        if (!is_string($resource_id) || !$resource_id) {
+            return false;
+        }
+
+        $result = $this
+            ->delete()
+            ->from($this->table_name)
+            ->where('`resource_id` = "' . $this->escape($resource_id) . '"')
+            ->build();
+
+        return $result ?: false;
+    }
+
+    /**
      * @description Update an existing payment for a given cart id.
      *
      * @param int $cart_id

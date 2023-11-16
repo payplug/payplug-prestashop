@@ -33,6 +33,7 @@ class OneClickPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'one_click';
+        $this->cancellable = false;
     }
 
     /**
@@ -45,6 +46,78 @@ class OneClickPaymentMethod extends PaymentMethod
     public function getOption($current_configuration = [])
     {
         return [];
+    }
+
+    public function getPaymentTab()
+    {
+        $payment_tab = parent::getPaymentTab();
+
+        if (empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        $payment_tab['initiator'] = 'PAYER';
+        $id_cart = $this->tools->tool('getValue', 'pc', 'new_card');
+
+        // Check if getted card correspond to the current customer
+        $card = $this->dependencies
+            ->getPlugin()
+            ->getCardRepository()
+            ->get((int) $id_cart);
+
+        if (empty($card)) {
+            return [];
+        }
+
+        if ((int) $card['id_customer'] != (int) $this->context->customer->id) {
+            return [];
+        }
+
+        $payment_methods = $this->configuration->getValue('payment_methods');
+        $payment_methods = json_decode($payment_methods, true);
+
+        // Update if deferred payment is enable
+        if (isset($payment_methods['deferred']) && $payment_methods['deferred']) {
+            $payment_tab['authorized_amount'] = $payment_tab['amount'];
+            unset($payment_tab['amount']);
+        }
+
+        $payment_tab['payment_method'] = $card['id_card'];
+
+        return $payment_tab;
+    }
+
+    public function getReturnUrl()
+    {
+        $this->setParameters();
+
+        $return = parent::getReturnUrl();
+
+        if (empty($return)) {
+            return $return;
+        }
+
+        $retrieve = $this->dependencies->apiClass->retrievePayment($return['resource_stored']['resource_id']);
+        $redirect = $retrieve['resource']->is_paid;
+
+        $payment_methods = $this->configuration->getValue('payment_methods');
+        $payment_methods = json_decode($payment_methods, true);
+
+        // Update if deferred payment is enable
+        if (!$redirect && isset($payment_methods['deferred']) && $payment_methods['deferred']) {
+            $redirect = (bool) isset($retrieve['resource']->authorization)
+                && $retrieve['resource']->authorization
+                && $retrieve['resource']->authorization->authorized_at;
+        }
+
+        $return['embedded'] = !$redirect;
+        $return['return_url'] = $redirect
+            ? $retrieve['resource']->hosted_payment->return_url
+            : $retrieve['resource']->hosted_payment->payment_url;
+
+        unset($return['resource_stored']);
+
+        return $return;
     }
 
     /**
