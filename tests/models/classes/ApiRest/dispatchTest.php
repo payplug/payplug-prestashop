@@ -47,7 +47,7 @@ class dispatchTest extends BaseApiRest
                 'loginAction' => $response,
             ]);
 
-        $this->tools
+        $this->tools_adapter
             ->shouldReceive([
                'tool' => 'file_get_contents',
             ]);
@@ -107,7 +107,7 @@ class dispatchTest extends BaseApiRest
                 'saveAction' => $response,
             ]);
 
-        $this->tools
+        $this->tools_adapter
             ->shouldReceive([
                'tool' => 'file_get_contents',
             ]);

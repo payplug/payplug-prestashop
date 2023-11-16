@@ -280,12 +280,21 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: getResource');
         $body = $this->toolsAdapter->tool('file_get_contents', 'php://input');
+        if (!$body) {
+            $this->exitProcess('No resource found', 500);
+        }
+
+        $resource = json_decode($body, true);
+        if (!is_array($resource) || empty($resource)) {
+            $this->exitProcess('No resource found', 500);
+        }
+
+        $is_live = isset($resource['is_live']) && $resource['is_live'];
+        $this->api_key = (bool) $is_live ?
+            $this->configuration->getValue('live_api_key') :
+            $this->configuration->getValue('test_api_key');
 
         try {
-            $resource = json_decode($body);
-            $this->api_key = (bool) $resource->is_live ?
-                $this->configuration->getValue('live_api_key') :
-                $this->configuration->getValue('test_api_key');
             $this->apiClass->setSecretKey($this->api_key);
             $this->resource = Notification::treat($body);
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
@@ -1012,7 +1021,7 @@ class PayPlugNotifications
                 ->getPlugin()
                 ->getPaymentRepository()
                 ->getByResourceId($this->payment->installment_plan_id);
-            if (!$payment['id_cart']) {
+            if (empty($payment)) {
                 if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                     $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
                     $this->exitProcess('Payment timeout for paymentID: ' . $this->payment->installment_plan_id, 200);
@@ -1026,7 +1035,7 @@ class PayPlugNotifications
                 ->getPlugin()
                 ->getPaymentRepository()
                 ->getByResourceId($this->resource->id);
-            if (!$payment['id_cart']) {
+            if (empty($payment)) {
                 if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                     $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
                     $this->exitProcess('Payment timeout for payment ID: ' . $this->resource->id, 200);

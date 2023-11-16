@@ -55,24 +55,24 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
                 ],
             ],
         ]);
-
         $this->configuration
             ->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
-
+        $this->helpers['amount']
+            ->shouldReceive('validateAmount')
+            ->andReturn([
+                'result' => true,
+                'message' => '',
+            ]);
         $this->classe->shouldReceive([
             'getCardBrand' => 'CB',
         ]);
-
-        $tools = \Mockery::mock('Tools');
-        $tools
+        $this->tools_adapter
             ->shouldReceive([
                 'tool' => '',
+                'strtolower' => 'brand',
             ]);
-        $this->plugin->shouldReceive([
-            'getTools' => $tools,
-        ]);
 
         $expected = [
             'one_click_1' => [

@@ -71,6 +71,9 @@ class PluginEntity
     private $configuration_class;
 
     /** @var object */
+    private $country_class;
+
+    /** @var object */
     private $constant;
 
     /** @var object */
@@ -135,9 +138,6 @@ class PluginEntity
 
     /** @var object */
     private $order_state_adapter;
-
-    /** @var object */
-    private $payment;
 
     /** @var object */
     private $payment_action;
@@ -418,6 +418,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getCountryClass()
+    {
+        return $this->country_class;
+    }
+
+    /**
+     * @return object
+     */
     public function getConstant()
     {
         return $this->constant;
@@ -629,14 +637,6 @@ class PluginEntity
     public function getOrderStateAdapter()
     {
         return $this->order_state_adapter;
-    }
-
-    /**
-     * @return object
-     */
-    public function getPayment()
-    {
-        return $this->payment;
     }
 
     /**
@@ -975,6 +975,24 @@ class PluginEntity
         }
 
         $this->configuration_class = $configuration_class;
+
+        return $this;
+    }
+
+    /**
+     * @param object $country_class
+     *
+     * @throws BadParameterException
+     *
+     * @return self
+     */
+    public function setCountryClass($country_class)
+    {
+        if (!is_object($country_class)) {
+            throw (new BadParameterException('Invalid argument, $country_class must be a setCountryClass'));
+        }
+
+        $this->country_class = $country_class;
 
         return $this;
     }
@@ -1420,18 +1438,6 @@ class PluginEntity
         }
 
         $this->order_state_adapter = $order_state_adapter;
-
-        return $this;
-    }
-
-    /**
-     * @param object $payment
-     *
-     * @return self
-     */
-    public function setPayment($payment)
-    {
-        $this->payment = $payment;
 
         return $this;
     }

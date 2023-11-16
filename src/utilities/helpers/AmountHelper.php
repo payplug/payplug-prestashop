@@ -91,7 +91,7 @@ class AmountHelper
      *
      * @return array
      */
-    public function isValidAmount($price_limit = [], $amount = 0)
+    public function validateAmount($price_limit = [], $amount = 0)
     {
         if (!is_array($price_limit) || empty($price_limit)) {
             return [

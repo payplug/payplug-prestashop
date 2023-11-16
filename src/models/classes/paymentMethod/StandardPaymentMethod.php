@@ -304,6 +304,65 @@ class StandardPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    public function getPaymentTab()
+    {
+        $payment_tab = parent::getPaymentTab();
+
+        if (empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        $payment_methods = $this->configuration->getValue('payment_methods');
+        $payment_methods = json_decode($payment_methods, true);
+
+        // Update if deferred payment is enable
+        if (isset($payment_methods['deferred']) && $payment_methods['deferred']) {
+            $payment_tab['authorized_amount'] = $payment_tab['amount'];
+            unset($payment_tab['amount']);
+        }
+
+        // Update if current display is integrated
+        if ('integrated' == (string) $this->configuration->getValue('embedded_mode')) {
+            $payment_tab['integration'] = 'INTEGRATED_PAYMENT';
+            unset($payment_tab['hosted_payment']['cancel_url']);
+        }
+
+        // Update payment card could be saved
+        if (isset($payment_methods['one_click']) && $payment_methods['one_click']) {
+            $cart_adapter = $this->dependencies
+                ->getPlugin()
+                ->getCart();
+            $payment_tab['allow_save_card'] = !(bool) $cart_adapter->isGuestCartByCartId((int) $this->context->cart->id);
+        }
+
+        return $payment_tab;
+    }
+
+    public function getReturnUrl()
+    {
+        $this->setParameters();
+
+        $return = parent::getReturnUrl();
+
+        if (empty($return)) {
+            return $return;
+        }
+
+        // Update if current display is integrated
+        if ('integrated' == (string) $this->configuration->getValue('embedded_mode')) {
+            $return['resource_id'] = $return['resource_stored']['resource_id'];
+            $return['cart_id'] = (int) $this->context->cart->id;
+        }
+
+        // todo: getter of $_SERVER['HTTP_USER_AGENT'] should be in a service
+        $return['embedded'] = 'redirect' != (string) $this->configuration->getValue('embedded_mode')
+            && !$this->dependencies->getValidators()['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'];
+
+        unset($return['resource_stored']);
+
+        return $return;
+    }
+
     /**
      * @description Get deffered state for configuration usage
      *

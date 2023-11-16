@@ -26,7 +26,8 @@ class BaseApiRest extends TestCase
     public $logger;
     public $payment_method;
     public $plugin;
-    public $tools;
+    public $tools_adapter;
+    public $validate_adapter;
 
     protected function setUp()
     {
@@ -76,16 +77,14 @@ class BaseApiRest extends TestCase
             ->andReturn('{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:99","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"ideal":{"min":"EUR:99","max":"EUR:2000000"},"mybank":{"min":"EUR:99","max":"EUR:2000000"},"satispay":{"min":"EUR:99","max":"EUR:2000000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}');
 
         $this->payment_method = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
+        $this->tools_adapter = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
         $this->translation
             ->shouldReceive('l')
             ->andReturnUsing(function ($str) {
                 return $str;
             });
-
-        $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
-
-        $this->tools = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
+        $this->validate_adapter = \Mockery::mock('ValidateAdapter');
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
@@ -97,8 +96,9 @@ class BaseApiRest extends TestCase
                 'getLogger' => $this->logger,
                 'getPaymentMethodClass' => $this->payment_method,
                 'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),
-                'getTools' => $this->tools,
+                'getTools' => $this->tools_adapter,
                 'getTranslationClass' => $this->translation,
+                'getValidate' => $this->validate_adapter,
             ]);
 
         $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();

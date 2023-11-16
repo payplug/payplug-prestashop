@@ -49,4 +49,18 @@ class IdealPaymentMethod extends PaymentMethod
 
         return $option;
     }
+
+    public function getPaymentTab()
+    {
+        $payment_tab = parent::getPaymentTab();
+
+        if (empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        $payment_tab['payment_method'] = 'ideal';
+        unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+
+        return $payment_tab;
+    }
 }

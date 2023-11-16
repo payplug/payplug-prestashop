@@ -33,6 +33,7 @@ class ApplepayPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'applepay';
+        $this->force_resource = true;
     }
 
     /**
@@ -48,6 +49,28 @@ class ApplepayPaymentMethod extends PaymentMethod
         $option['available_test_mode'] = false;
 
         return $option;
+    }
+
+    public function getPaymentTab()
+    {
+        $payment_tab = parent::getPaymentTab();
+
+        if (empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        $payment_tab['payment_method'] = 'apple_pay';
+        $payment_tab['payment_context'] = [
+            'apple_pay' => [
+                'domain_name' => $this->tools->tool('getShopDomainSsl', true, false),
+                'application_data' => base64_encode(json_encode([
+                    'apple_pay_domain' => $this->context->shop->domain_ssl,
+                ])),
+            ],
+        ];
+        unset($payment_tab['force_3ds'], $payment_tab['allow_save_card'], $payment_tab['shipping']['delivery_type']);
+
+        return $payment_tab;
     }
 
     /**

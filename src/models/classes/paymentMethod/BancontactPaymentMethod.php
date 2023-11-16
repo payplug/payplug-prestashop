@@ -33,6 +33,7 @@ class BancontactPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'bancontact';
+        $this->cancellable = false;
     }
 
     /**
@@ -76,6 +77,20 @@ class BancontactPaymentMethod extends PaymentMethod
         ];
 
         return $option;
+    }
+
+    public function getPaymentTab()
+    {
+        $payment_tab = parent::getPaymentTab();
+
+        if (empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        $payment_tab['payment_method'] = 'bancontact';
+        unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
+
+        return $payment_tab;
     }
 
     protected function getPaymentOption($payment_options = [])

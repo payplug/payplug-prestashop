@@ -1,4 +1,9 @@
 # Payplug module changelog
+
+## Next version
+- Refactoring :
+  - [PRE-1983](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2279): Add action Payment
+
 ## Version 4.5.0
 
 - Refactoring :

@@ -41,9 +41,6 @@ class PayPlugDependencies
     /** @var object */
     public $dependencies;
 
-    /** @var object */
-    public $payment;
-
     /** @var ConfigClass */
     private $configClass;
 
@@ -73,7 +70,6 @@ class PayPlugDependencies
         $this->apiClass = $this->dependencies->apiClass;
         $this->install = $this->dependencies->getPlugin()->getInstall();
         $this->oney = $this->dependencies->getPlugin()->getOney();
-        $this->payment = $this->dependencies->getPlugin()->getPayment();
         $this->hookClass = $this->dependencies->hookClass;
         $this->configClass = $this->dependencies->configClass;
         $this->mylogphp = new MyLogPHP(_PS_MODULE_DIR_ . $this->dependencies->name . '/log/install-log.csv');

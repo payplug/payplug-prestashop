@@ -11,6 +11,13 @@ class BaseInstallmentPaymentMethod extends BasePaymentMethod
     {
         parent::setUp();
 
+        $this->helpers['amount']
+            ->shouldReceive('validateAmount')
+            ->andReturn([
+                'result' => true,
+                'message' => '',
+            ]);
+
         $this->classe = \Mockery::mock(InstallmentPaymentMethod::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
