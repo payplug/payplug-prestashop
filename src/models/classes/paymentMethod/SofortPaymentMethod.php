@@ -34,6 +34,7 @@ class SofortPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'sofort';
         $this->order_name = 'sofort';
+        $this->refundable = false;
     }
 
     /**
@@ -51,6 +52,7 @@ class SofortPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();

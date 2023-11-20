@@ -22,4 +22,4 @@
 
 <p><span class="ppbold">{l s='Refund your customer on his card directly with Payplug' mod='payplug'}</p>
 <p>{l s='This transaction was entirely refunded with Payplug' mod='payplug'}</p>
-<p class="refunded_amount">{l s='Amount refunded:' mod='payplug'} {displayPrice price=$amount_refunded_payplug}</p>
+<p class="refunded_amount">{l s='Amount refunded:' mod='payplug'} {displayPrice price=$refunded}</p>

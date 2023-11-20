@@ -78,7 +78,7 @@ class captureActionTest extends BasePaymentAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Can not capture the payment.',
+                'message' => 'Can\'t capture the payment.',
             ],
             $this->action->captureAction($resource_id, $order_id)
         );

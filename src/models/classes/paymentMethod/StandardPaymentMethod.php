@@ -304,6 +304,7 @@ class StandardPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    // todo: add coverage to this method
     public function getOrderTab($resource = null)
     {
         $this->setParameters();
@@ -323,6 +324,7 @@ class StandardPaymentMethod extends PaymentMethod
         return $order_tab;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();
@@ -357,6 +359,7 @@ class StandardPaymentMethod extends PaymentMethod
         return $payment_tab;
     }
 
+    // todo: add coverage to this method
     public function getReturnUrl()
     {
         $this->setParameters();
@@ -380,6 +383,110 @@ class StandardPaymentMethod extends PaymentMethod
         unset($return['resource_stored']);
 
         return $return;
+    }
+
+    // todo: add coverage to this method
+    public function getResourceDetail($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            // todo: add error log
+            return [
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
+        $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
+        if (!$retrieve['result']) {
+            if ($sandbox) {
+                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
+                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
+            } else {
+                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
+                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
+            }
+        }
+        if (!$retrieve['result']) {
+            // todo: add error log
+            return [];
+        }
+        $resource = $retrieve['resource'];
+
+        $resource_details = parent::getResourceDetail($resource_id);
+
+        if (!$this->dependencies->getValidators()['payment']->isDeferred($resource)['result']) {
+            return $resource_details;
+        }
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+
+        $can_be_captured = !$this->dependencies->getValidators()['payment']->isFailed($resource)['result']
+            && !(bool) $resource->is_paid
+            && !$this->dependencies->getValidators()['payment']->isExpired($resource)['result'];
+
+        $resource_details['can_be_captured'] = $can_be_captured;
+        $resource_details['authorization'] = true;
+
+        if ((bool) $resource->is_paid) {
+            $resource_details['date'] = date('d/m/Y', $resource->paid_at);
+            $resource_details['status_message'] = '(' . $translation['detail']['capture']['deferred'] . ')';
+        } else {
+            $expiration = date('d/m/Y', $resource->authorization->expires_at);
+            if ($can_be_captured) {
+                $resource_details['status_message'] = sprintf(
+                    '(' . $translation['detail']['capture']['expiration'] . ')',
+                    $expiration
+                );
+                $resource_details['date'] = date('d/m/Y', $resource->authorization->authorized_at);
+                $resource_details['date_expiration'] = $expiration;
+                $resource_details['expiration_display'] = sprintf(
+                    $translation['detail']['capture']['warning'],
+                    $expiration
+                );
+            } elseif (isset($resource->authorization->authorized_at) && (bool) $resource->authorization->authorized_at) {
+                $resource_details['date'] = date('d/m/Y', $resource->authorization->authorized_at);
+            }
+        }
+
+        return $resource_details;
+    }
+
+    // todo: add coverage to this method
+    public function getPaymentStatus($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
+        }
+
+        $status = parent::getPaymentStatus($resource);
+        if (in_array($status['code'], ['paid', 'abandoned', 'failed', 'refunded', 'partially_refunded'])) {
+            return $status;
+        }
+
+        if ((bool) $resource->authorization && ($resource->authorization->expires_at - time()) > 0) {
+            return [
+                'id_status' => 8,
+                'code' => 'authorized',
+            ];
+        }
+
+        if ((bool) $resource->authorization && ($resource->authorization->expires_at - time()) <= 0) {
+            return [
+                'id_status' => 9,
+                'code' => 'authorization_expired',
+            ];
+        }
+
+        return $status;
     }
 
     /**

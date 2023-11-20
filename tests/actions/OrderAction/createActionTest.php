@@ -42,7 +42,7 @@ class createActionTest extends BaseOrderAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Can not retrieve resource from database',
+                'message' => 'Can\'t retrieve resource from database',
             ],
             $this->action->createAction($resource_id)
         );
@@ -81,7 +81,7 @@ class createActionTest extends BaseOrderAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Can not retrieve resource from api',
+                'message' => 'Can\'t retrieve resource from api',
             ],
             $this->action->createAction($resource_id)
         );

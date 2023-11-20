@@ -18,31 +18,15 @@ class updateActionTest extends BaseOrderAction
     {
         parent::setUp();
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
-            ->with('order_state_canceled')
-            ->andReturn('1');
-        $this->configuration_class
-            ->shouldReceive('getValue')
-            ->with('order_state_error')
-            ->andReturn('2');
-        $this->configuration_class
-            ->shouldReceive('getValue')
-            ->with('order_state_exp')
-            ->andReturn('3');
-        $this->configuration_class
-            ->shouldReceive('getValue')
-            ->with('order_state_paid')
-            ->andReturn('5');
-
-        $config = \Mockery::mock('Configuration');
-        $config
-            ->shouldReceive('get')
-            ->with('PS_OS_OUTOFSTOCK_PAID')
-            ->andReturn('4');
-        $this->plugin
+        $this->order_class
             ->shouldReceive([
-                'getConfiguration' => $config,
+                'getOrderStates' => [
+                    'cancelled' => '1',
+                    'error' => '2',
+                    'expired' => '3',
+                    'outofstock_paid' => '4',
+                    'paid' => '5',
+                ],
             ]);
     }
 
@@ -72,7 +56,7 @@ class updateActionTest extends BaseOrderAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Can not retrieve resource from database',
+                'message' => 'Can\'t retrieve resource from database',
             ],
             $this->action->updateAction($resource_id)
         );
@@ -111,7 +95,7 @@ class updateActionTest extends BaseOrderAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Can not retrieve resource from api',
+                'message' => 'Can\'t retrieve resource from api',
             ],
             $this->action->updateAction($resource_id)
         );
@@ -375,7 +359,7 @@ class updateActionTest extends BaseOrderAction
             [
                 'result' => false,
                 'id_order' => 42,
-                'message' => 'Can not update order state',
+                'message' => 'Can\'t update order state',
             ],
             $this->action->updateAction($resource_id)
         );

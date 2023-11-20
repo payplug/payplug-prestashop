@@ -160,6 +160,7 @@ class OneyPaymentMethod extends PaymentMethod
         ];
     }
 
+    // todo: add coverage to this method
     public function getOrderTab($resource = null)
     {
         $this->setParameters();
@@ -207,6 +208,7 @@ class OneyPaymentMethod extends PaymentMethod
         return $order_tab;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();
@@ -323,6 +325,53 @@ class OneyPaymentMethod extends PaymentMethod
         unset($payment_tab['allow_save_card'], $payment_tab['amount']);
 
         return $payment_tab;
+    }
+
+    // todo: add coverage to this method
+    public function getResourceDetail($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            // todo: add error log
+            return [
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $resource_details = parent::getResourceDetail($resource_id);
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+        $method_name = str_replace('oney_', '', $resource_details['type']);
+        $resource_details['type'] = $translation['detail']['method']['oney'][$method_name];
+
+        unset($resource_details['card_brand'], $resource_details['card_mask'], $resource_details['card_date']);
+
+        return $resource_details;
+    }
+
+    // todo: add coverage to this method
+    public function getPaymentStatus($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
+        }
+
+        if (isset($resource->payment_method, $payment->payment_method['is_pending'])
+            && (bool) $resource->payment_method['is_pending']) {
+            return [
+                'id_status' => 10,
+                'code' => 'oney_pending',
+            ];
+        }
+
+        return parent::getPaymentStatus($resource);
     }
 
     /**
