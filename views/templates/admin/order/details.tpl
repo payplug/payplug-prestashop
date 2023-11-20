@@ -26,7 +26,7 @@
             <span class="pp_col2" data-e2e-payment-details="id">{$payment.id|escape:'htmlall':'UTF-8'}</span>
         </li>
     {/if}
-    {if isset($payment.type)}
+    {if isset($payment.type) && $payment.type}
         <li>
             <span class="pp_col1">{l s='Type' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="type" data-e2e-payment-details-type="{$payment.type_code|escape:'htmlall':'UTF-8'}">{$payment.type|escape:'htmlall':'UTF-8'}</span>
@@ -36,7 +36,9 @@
         <li data-e2e-state_code="{$payment.status_code|escape:'htmlall':'UTF-8'}">
             <span class="pp_col1">{l s='Status' mod='payplug'} :</span>
             <span class="pp_col2" data-e2e-payment-details="status">
-                <span class="pp_payment_status{if isset($payment.status_class)} {$payment.status_class|escape:'htmlall':'UTF-8'}{/if}">{$payment.status|escape:'htmlall':'UTF-8'}{if isset($payment.refunded) and ($payment.refunded gt 0) and (($payment.status_code eq 'refunded') or ($payment.status_code eq 'partially_refunded'))}: {displayPrice price=$payment.refunded}{/if}</span>
+                <span class="pp_payment_status{if isset($payment.status_class)} {$payment.status_class|escape:'htmlall':'UTF-8'}{/if}">
+                    {$payment.status|escape:'htmlall':'UTF-8'}{if isset($payment.refund.refunded) and 0 < $payment.refund.refunded}: {displayPrice price=$payment.refund.refunded}{/if}
+                </span>
                 <span>{if isset($payment.status_message)}{$payment.status_message|escape:'htmlall':'UTF-8'}{/if}</span>
                 <span>{if isset($payment.error)} {$payment.error|escape:'htmlall':'UTF-8'}{/if}</span>
             </span>
@@ -48,7 +50,7 @@
             <span class="pp_col2" data-e2e-payment-details="amount">{displayPrice price=$payment.amount}</span>
         </li>
     {/if}
-    {if isset($payment.authorization) && $payment.can_be_captured === true}
+    {if isset($payment.authorization) && $payment.authorization && $payment.can_be_captured === true}
         {if isset($payment.date)}
             <li>
                 <span class="pp_col1">{l s='Authorized on' mod='payplug'} :</span>

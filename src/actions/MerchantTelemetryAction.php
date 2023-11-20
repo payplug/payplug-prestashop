@@ -39,23 +39,29 @@ class MerchantTelemetryAction
     public function sendAction($source = '')
     {
         if (!$source || !is_string($source)) {
-            // todo: add log ?
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('MerchantTelemetryAction::sendAction - Invalid argument, given source must be non empty string', 'error');
+
             return false;
         }
 
         if (!$this->dependencies->configClass->isValidFeature('feature_merchant_telemetry')) {
-            // todo: add log ?
             return true;
         }
 
         $telemetries = $this->renderTelemetries($source);
         if (!$telemetries['result']) {
-            // todo: add log ?
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('MerchantTelemetryAction::sendAction - Can\'t get the merchant telemetries', 'error');
+
             return false;
         }
 
         if (!isset($telemetries['telemetries'])) {
-            // todo: add log ?
             return true;
         }
 
@@ -75,6 +81,11 @@ class MerchantTelemetryAction
     public function renderTelemetries($source = '')
     {
         if (!$source || !is_string($source)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('MerchantTelemetryAction::renderTelemetries - Invalid argument, given source must be non empty string', 'error');
+
             return [
                 'result' => false,
                 'message' => 'Invalid parameter given, $source must be a non empty string.',

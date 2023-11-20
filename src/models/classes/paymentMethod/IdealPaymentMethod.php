@@ -34,6 +34,7 @@ class IdealPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'ideal';
         $this->order_name = 'ideal';
+        $this->refundable = false;
     }
 
     /**
@@ -51,6 +52,7 @@ class IdealPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();

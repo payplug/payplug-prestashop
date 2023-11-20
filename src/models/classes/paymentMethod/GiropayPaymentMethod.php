@@ -34,6 +34,7 @@ class GiropayPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'giropay';
         $this->order_name = 'giropay';
+        $this->refundable = false;
     }
 
     /**
@@ -51,6 +52,7 @@ class GiropayPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();

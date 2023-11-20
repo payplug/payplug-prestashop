@@ -219,8 +219,10 @@ class RefundClass
         $this->logger->addLog('[Payplug] Start refund', 'notice');
         $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
         $id_order = $this->tools->tool('getValue', 'id_order');
-        $pay_id = $this->tools->tool('getValue', 'pay_id');
-        $inst_id = $this->tools->tool('getValue', 'inst_id');
+        $resource_id = $this->tools->tool('getValue', 'resource_id');
+        $is_installment = $this->dependencies->getValidators()['payment']->isInstallment($resource_id)['result'];
+        $pay_id = !$is_installment ? $resource_id : false;
+        $inst_id = $is_installment ? $resource_id : false;
         $pay_mode = $this->tools->tool('getValue', 'pay_mode');
 
         $this->dependencies->apiClass->initializeApi('test' == $pay_mode);

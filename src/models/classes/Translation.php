@@ -205,6 +205,9 @@ class Translation
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getOrderTranslations()
     {
         return [
@@ -228,6 +231,45 @@ class Translation
                 ],
                 'satispay' => $this->l('order.module.satispay', 'translation'),
                 'sofort' => $this->l('order.module.sofort', 'translation'),
+            ],
+            'detail' => [
+                'mode' => [
+                    'live' => $this->l('order.detail.mode.live', 'translation'),
+                    'test' => $this->l('order.detail.mode.test', 'translation'),
+                ],
+                'method' => [
+                    'bancontact' => $this->l('order.detail.method.bancontact', 'translation'),
+                    'applepay' => $this->l('order.detail.method.applepay', 'translation'),
+                    'amex' => $this->l('order.detail.method.amex', 'translation'),
+                    'oney' => [
+                        'x3_with_fees' => $this->l('order.detail.method.oney.x3_with_fees', 'translation'),
+                        'x4_with_fees' => $this->l('order.detail.method.oney.x4_with_fees', 'translation'),
+                        'x3_without_fees' => $this->l('order.detail.method.oney.x3_without_fees', 'translation'),
+                        'x4_without_fees' => $this->l('order.detail.method.oney.x4_without_fees', 'translation'),
+                    ],
+                ],
+                'status' => [
+                    'abandoned' => $this->l('order.detail.status.abandoned', 'translation'),
+                    'authorization_expired' => $this->l('order.detail.status.authorization_expired', 'translation'),
+                    'authorized' => $this->l('order.detail.status.authorized', 'translation'),
+                    'cancelled' => $this->l('order.detail.status.cancelled', 'translation'),
+                    'failed' => $this->l('order.detail.status.failed', 'translation'),
+                    'not_paid' => $this->l('order.detail.status.not_paid', 'translation'),
+                    'on_going' => $this->l('order.detail.status.on_going', 'translation'),
+                    'oney_pending' => $this->l('order.detail.status.oney_pending', 'translation'),
+                    'paid' => $this->l('order.detail.status.paid', 'translation'),
+                    'partially_refunded' => $this->l('order.detail.status.partially_refunded', 'translation'),
+                    'refunded' => $this->l('order.detail.status.refunded', 'translation'),
+                    'suspended' => $this->l('order.detail.status.suspended', 'translation'),
+                ],
+                'yes' => $this->l('order.detail.yes', 'translation'),
+                'no' => $this->l('order.detail.no', 'translation'),
+                'card' => $this->l('order.detail.card', 'translation'),
+                'capture' => [
+                    'deferred' => $this->l('order.detail.capture.deferred', 'translation'),
+                    'expiration' => $this->l('order.detail.capture.expiration', 'translation'),
+                    'warning' => $this->l('order.detail.capture.warning', 'translation'),
+                ],
             ],
         ];
     }
