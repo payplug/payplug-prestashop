@@ -16,6 +16,7 @@ class BaseMerchantTelemetryAction extends TestCase
     public $configuration;
     public $constant;
     public $dependencies;
+    public $logger;
     public $module;
     public $module_repository;
     public $plugin;
@@ -33,6 +34,12 @@ class BaseMerchantTelemetryAction extends TestCase
         $this->configuration->shouldReceive([
             'getCurrentConfigurations' => [],
         ]);
+
+        $this->logger = \Mockery::mock('Logger');
+        $this->logger
+            ->shouldReceive([
+                'addLog' => true,
+            ]);
 
         $this->module_repository = \Mockery::mock('ModuleRepository');
         $this->module_repository
@@ -90,6 +97,7 @@ class BaseMerchantTelemetryAction extends TestCase
             ->shouldReceive([
             'getConfigurationClass' => $this->configuration,
             'getConstant' => $this->constant,
+            'getLogger' => $this->logger,
             'getModule' => $this->module,
             'getModuleRepository' => $this->module_repository,
             'getShopRepository' => $this->shop_repository,

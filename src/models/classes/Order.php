@@ -161,7 +161,7 @@ class Order
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
-                ->addLog('Order::updateOrderState - Can not save order history.', 'error');
+                ->addLog('Order::updateOrderState - Can\'t save order history.', 'error');
 
             return false;
         }
@@ -172,11 +172,37 @@ class Order
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
-                ->addLog('Order::updateOrderState - Can not update order.', 'error');
+                ->addLog('Order::updateOrderState - Can\'t update order.', 'error');
 
             return false;
         }
 
         return true;
+    }
+
+    // todo: add coverage to this method
+    public function getOrderStates($is_live = true)
+    {
+        $configuration_class = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+        $configuration_adapter = $this->dependencies
+            ->getPlugin()
+            ->getConfiguration();
+
+        $state_addons = $is_live ? '' : '_test';
+
+        return [
+            'auth' => $configuration_class->getValue('order_state_auth' . $state_addons),
+            'cancelled' => $configuration_class->getValue('order_state_cancelled' . $state_addons),
+            'error' => $configuration_class->getValue('order_state_error' . $state_addons),
+            'expired' => $configuration_class->getValue('order_state_exp' . $state_addons),
+            'oney_pg' => $configuration_class->getValue('order_state_oney_pg' . $state_addons),
+            'outofstock_paid' => $configuration_adapter->get('PS_OS_OUTOFSTOCK_PAID'),
+            'outofstock_unpaid' => $configuration_adapter->get('PS_OS_OUTOFSTOCK_UNPAID'),
+            'paid' => $configuration_class->getValue('order_state_paid' . $state_addons),
+            'pending' => $configuration_class->getValue('order_state_pending' . $state_addons),
+            'refund' => $configuration_class->getValue('order_state_refund' . $state_addons),
+        ];
     }
 }

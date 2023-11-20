@@ -75,7 +75,11 @@ class InstallmentClass
                     return false;
                 }
                 $payment = $payment['resource'];
-                $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($payment);
+                $status = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('standard')
+                    ->getPaymentStatus($payment)['id_status'];
             } else {
                 if (1 == (int) $installment->is_active) {
                     $status = 6; // ongoing
@@ -151,7 +155,15 @@ class InstallmentClass
             $pay_id = '';
             if (is_array($schedule->payment_ids) && count($schedule->payment_ids) > 0) {
                 $pay_id = $schedule->payment_ids[0];
-                $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($pay_id);
+                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                if ($payment['result']) {
+                    $payment = $payment['resource'];
+                    $status = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('standard')
+                        ->getPaymentStatus($payment)['id_status'];
+                }
             } else {
                 $status = 6;
             }

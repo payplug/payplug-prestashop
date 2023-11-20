@@ -105,21 +105,21 @@ class PaymentAction
             }
         }
         if (!$abort['result']) {
-            $this->logger->addLog('PaymentAction::abortAction - Can not abort the payment.', 'error');
+            $this->logger->addLog('PaymentAction::abortAction - Can\'t abort the payment.', 'error');
 
             return [
                 'result' => false,
-                'message' => 'Can not abort the payment.',
+                'message' => 'Can\'t abort the payment.',
             ];
         }
 
         $retrieve = $this->dependencies->apiClass->retrieveInstallment($resource_id);
         if (!$retrieve['result']) {
-            $this->logger->addLog('PaymentAction::abortAction - Can not retrieve the aborted payment.', 'error');
+            $this->logger->addLog('PaymentAction::abortAction - Can\'t retrieve the aborted payment.', 'error');
 
             return [
                 'result' => false,
-                'message' => 'Can not retrieve the aborted payment.',
+                'message' => 'Can\'t retrieve the aborted payment.',
             ];
         }
         $installment = $retrieve['resource'];
@@ -168,7 +168,11 @@ class PaymentAction
                     ];
                 }
                 $payment = $payment['resource'];
-                $status = $this->dependencies->paymentClass->getPaymentStatusByPayment($payment);
+                $status = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('standard')
+                    ->getPaymentStatus($payment)['id_status'];
             } else {
                 if (1 == (int) $installment->is_active) {
                     $status = 6; // ongoing
@@ -258,11 +262,11 @@ class PaymentAction
             }
         }
         if (!$capture['result']) {
-            $this->logger->addLog('PaymentAction::captureAction - Can not capture the payment.', 'error');
+            $this->logger->addLog('PaymentAction::captureAction - Can\'t capture the payment.', 'error');
 
             return [
                 'result' => false,
-                'message' => 'Can not capture the payment.',
+                'message' => 'Can\'t capture the payment.',
             ];
         }
 
@@ -362,7 +366,7 @@ class PaymentAction
                 ->getPaymentMethod($resource['method']);
             $removed = $this->removeAction($resource['resource_id'], $payment_method->cancellable);
             if (!$removed) {
-                $this->logger->addLog('PaymentAction::createAction - Stored resource can not be remove.', 'error');
+                $this->logger->addLog('PaymentAction::createAction - Stored resource can\'t be remove.', 'error');
 
                 return [];
             }
@@ -375,7 +379,7 @@ class PaymentAction
 
         $resource = $payment_method->saveResource($payment_tab);
         if (!$resource['result']) {
-            $this->logger->addLog('PaymentAction::createAction - Resource can not be created from given tab.', 'error');
+            $this->logger->addLog('PaymentAction::createAction - Resource can\'t be created from given tab.', 'error');
 
             return [];
         }
@@ -393,7 +397,7 @@ class PaymentAction
             ->getPaymentRepository()
             ->createPayment($parameters);
         if (!$save_hash) {
-            $this->logger->addLog('PaymentAction::createAction - Payment method hash can not be generated.', 'error');
+            $this->logger->addLog('PaymentAction::createAction - Payment method hash can\'t be generated.', 'error');
 
             return [];
         }
@@ -532,7 +536,7 @@ class PaymentAction
             : $this->dependencies->apiClass->retrievePayment($resource_id);
 
         if (!$resource['result']) {
-            $this->logger->addLog('PaymentAction::removeAction - Can not retrieve the resource from given $resource_id.', 'error');
+            $this->logger->addLog('PaymentAction::removeAction - Can\'t retrieve the resource from given $resource_id.', 'error');
 
             return false;
         }
@@ -543,7 +547,7 @@ class PaymentAction
                 ? $this->dependencies->apiClass->abortInstallment($resource_id)
                 : $this->dependencies->apiClass->abortPayment($resource_id);
             if (!$abort['result']) {
-                $this->logger->addLog('PaymentAction::removeAction - Can not abord the retrieved resource.', 'error');
+                $this->logger->addLog('PaymentAction::removeAction - Can\'t abord the retrieved resource.', 'error');
 
                 return false;
             }

@@ -225,7 +225,7 @@ class ApiRest
     }
 
     /**
-     * @description  build header section of the json file
+     * @description build header section of the json file
      *
      * @param mixed $current_configuration
      *
