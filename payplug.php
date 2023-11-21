@@ -50,7 +50,7 @@ class Payplug extends PaymentModule
         $this->bootstrap = true;
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
-        $this->description = $this->l('payplug.construct.description');
+        $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
         $this->displayName = 'Payplug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
