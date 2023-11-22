@@ -30,7 +30,7 @@ php cs fixer:
       - vendor
 
 check php version:
-  image: php:8.0-alpine
+  image: php:8.2-rc-fpm
   stage: check-php-version
   rules:
     - if: '$CI_COMMIT_BRANCH
