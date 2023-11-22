@@ -57,11 +57,6 @@ class PPPayment
         return $payment['resource'];
     }
 
-    public function capture()
-    {
-        return $this->dependencies->apiClass->capturePayment($this->resource->id);
-    }
-
     public function isPaid()
     {
         return $this->resource->is_paid;

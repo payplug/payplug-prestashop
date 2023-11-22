@@ -6,7 +6,6 @@ namespace PayPlug\tests\models\classes\Translation;
  * @group unit
  * @group classes
  * @group translation_classes
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */
