@@ -53,7 +53,7 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
                     case 'getShopDomainSsl':
                         return true;
                     default:
-                        if ('io' == $arg) {
+                        if ('payplugOney_type' == $arg) {
                             return '2';
                         }
 
@@ -183,7 +183,7 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         $oney_schedule = 2;
         $this->tools_adapter
             ->shouldReceive('tool')
-            ->with('io')
+            ->with('payplugOney_type')
             ->andReturn($oney_schedule);
 
         $this->expected_tab['authorized_amount'] = $this->expected_tab['amount'];
