@@ -43,7 +43,7 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
 
         $this->dependencies = new DependenciesClass();
         $this->card_action = $this->dependencies->getPlugin()->getCardAction();
-        $this->context_adapter = $this->dependencies->getPlugin()->getContext();
+        $this->context_adapter = $this->dependencies->getPlugin()->getContext()->get();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->tools = $this->dependencies->getPlugin()->getTools();
     }
@@ -64,13 +64,13 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
     private function renderCardList()
     {
         $cards = $this->card_action->renderList();
-        $payplug_delete_card_url = $this->context_adapter->get()->link->getModuleLink(
+        $payplug_delete_card_url = $this->context_adapter->link->getModuleLink(
             'payplug',
             'ajax',
             ['_ajax' => 1],
             true
         );
-        $this->context_adapter->get()->smarty->assign([
+        $this->context_adapter->smarty->assign([
             'payplug_cards' => $cards,
             'payplug_delete_card_url' => $payplug_delete_card_url,
         ]);

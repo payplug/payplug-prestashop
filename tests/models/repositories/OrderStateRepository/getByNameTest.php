@@ -19,11 +19,10 @@ class getByNameTest extends BaseOrderStateRepository
     public function testWhenGivenNameIsInvalidArrayFormat($module_name)
     {
         $test_mode = true;
-        $check_version = true;
 
         $this->assertSame(
             [],
-            $this->repository->getByName($module_name, $test_mode, $check_version)
+            $this->repository->getByName($module_name, $test_mode)
         );
     }
 
@@ -35,27 +34,10 @@ class getByNameTest extends BaseOrderStateRepository
     public function testWhenGivenTestModeIsInvalidBoolFormat($test_mode)
     {
         $module_name = [];
-        $check_version = true;
 
         $this->assertSame(
             [],
-            $this->repository->getByName($module_name, $test_mode, $check_version)
-        );
-    }
-
-    /**
-     * @dataProvider invalidBoolFormatDataProvider
-     *
-     * @param mixed $check_version
-     */
-    public function testWhenGivenCheckVersionIsInvalidBoolFormat($check_version)
-    {
-        $module_name = [];
-        $test_mode = true;
-
-        $this->assertSame(
-            [],
-            $this->repository->getByName($module_name, $test_mode, $check_version)
+            $this->repository->getByName($module_name, $test_mode)
         );
     }
 
@@ -68,7 +50,6 @@ class getByNameTest extends BaseOrderStateRepository
             'it' => 'it',
         ];
         $test_mode = false;
-        $check_version = false;
 
         $this->repository->shouldReceive([
             'select' => $this->repository,
@@ -82,7 +63,7 @@ class getByNameTest extends BaseOrderStateRepository
 
         $this->assertSame(
             [],
-            $this->repository->getByName($name, $test_mode, $check_version)
+            $this->repository->getByName($name, $test_mode)
         );
     }
 
@@ -95,7 +76,6 @@ class getByNameTest extends BaseOrderStateRepository
             'it' => 'it',
         ];
         $test_mode = false;
-        $check_version = false;
 
         $this->repository->shouldReceive([
             'select' => $this->repository,
@@ -109,7 +89,7 @@ class getByNameTest extends BaseOrderStateRepository
 
         $this->assertSame(
             [],
-            $this->repository->getByName($name, $test_mode, $check_version)
+            $this->repository->getByName($name, $test_mode)
         );
     }
 }
