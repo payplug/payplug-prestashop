@@ -356,8 +356,8 @@ var $document, $window, __moduleName__Module = {
                         console.log(jqXHR, textStatus, errorThrown);
                     },
                     success: function (result) {
-                        if (result && result.payment_id) {
-                            integrated.props.paymentId = result.payment_id;
+                        if (result && result.resource_id) {
+                            integrated.props.paymentId = result.resource_id;
                             integrated.props.cart_id = result.cart_id;
                             integrated.form.submit();
                         } else if (typeof result.force_reload != 'undefined' && result.force_reload) {

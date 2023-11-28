@@ -1,10 +1,19 @@
 # Payplug module changelog
 
-## Next version
+## Version 4.6.0
 - Refactoring :
   - [PRE-1983](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2279): Add action Payment
   - [PRE-1983](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2279): Add action Payment::abort && Payment::capture
 
+- Improvment :
+  - [PRE-2014](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2302): Set default translation as english while still using translation key
+  - [PRE-2018](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2310): Update php checker on php 8.2 image
+
+- Bugfix :
+  - [PRE-2037](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2305): Fix multiple order states creation
+  - [SMP-2082](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2312): Fix 500 error in cards list page
+  - [SMP-2088](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2316): Fix multishop bug
+  
 ## Version 4.5.0
 
 - Refactoring :
