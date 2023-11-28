@@ -231,24 +231,22 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $payment = $this->dependencies
                     ->getPlugin()
                     ->getPaymentAction()
-                    ->dispatchAction('standard');
+                    ->dispatchAction('standard', true);
                 $payment['force_reload'] = false;
 
-                if (!$payment['result']) {
-                    if (isset($payment['code']) && in_array((int) $payment['code'], [401, 403])) {
-                        $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
-                            $this->dependencies
-                                ->getPlugin()
-                                ->getTranslationClass()
-                                ->l('The transaction was not completed and your card was not charged.', 'ajax'),
-                        ]);
-                        $payment['force_reload'] = true;
-                        $payment['return_url'] = $context->link->getPageLink('order', true, $context->language->id, [
-                            'step' => '3',
-                            'has_error' => '1',
-                            'modulename' => $this->dependencies->name,
-                        ]);
-                    }
+                if (empty($payment)) {
+                    $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
+                        $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('The transaction was not completed and your card was not charged.', 'ajax'),
+                    ]);
+                    $payment['force_reload'] = true;
+                    $payment['return_url'] = $context->link->getPageLink('order', true, $context->language->id, [
+                        'step' => '3',
+                        'has_error' => '1',
+                        'modulename' => $this->dependencies->name,
+                    ]);
                 }
 
                 exit(json_encode($payment));
