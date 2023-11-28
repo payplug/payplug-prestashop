@@ -168,7 +168,7 @@ class OneyPaymentMethod extends PaymentMethod
             return $payment_tab;
         }
 
-        $oney_schedule = $this->tools->tool('getValue', 'io');
+        $oney_schedule = $this->tools->tool('getValue', 'payplugOney_type');
         $payment_tab['authorized_amount'] = $payment_tab['amount'];
 
         // Check if oney was elligible then return if not
@@ -677,6 +677,8 @@ class OneyPaymentMethod extends PaymentMethod
             return $payment_tab;
         }
 
+        $country = $this->dependencies->getPlugin()->getCountry();
+
         foreach ($payment_data as $k => $field) {
             $keys = explode('-', $k);
             $type = $keys[0];
@@ -685,18 +687,18 @@ class OneyPaymentMethod extends PaymentMethod
             if (false != strpos($field_name, 'phone')) {
                 switch ($type) {
                     case 'billing':
-                        $id_country = $this->country->getByIso($payment_tab['billing']['country']);
-                        $country = $this->country->get((int) $id_country);
-                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $country);
+                        $id_country = $country->getByIso($payment_tab['billing']['country']);
+                        $billing_country = $country->get((int) $id_country);
+                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $billing_country);
 
                         break;
 
                     case 'same':
                     case 'shipping':
                     default:
-                        $id_country = $this->country->getByIso($payment_tab['shipping']['country']);
-                        $country = $this->country->get($id_country);
-                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $country);
+                        $id_country = $country->getByIso($payment_tab['shipping']['country']);
+                        $shipping_country = $country->get((int) $id_country);
+                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $shipping_country);
 
                         break;
                 }
