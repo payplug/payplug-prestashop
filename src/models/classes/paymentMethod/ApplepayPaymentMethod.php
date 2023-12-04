@@ -62,7 +62,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $payment_tab['payment_method'] = 'apple_pay';
         $payment_tab['payment_context'] = [
             'apple_pay' => [
-                'domain_name' => $this->tools->tool('getShopDomainSsl', true, false),
+                'domain_name' => $this->context->shop->domain_ssl,
                 'application_data' => base64_encode(json_encode([
                     'apple_pay_domain' => $this->context->shop->domain_ssl,
                 ])),

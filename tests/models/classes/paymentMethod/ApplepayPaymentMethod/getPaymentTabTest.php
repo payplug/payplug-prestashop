@@ -96,7 +96,7 @@ class getPaymentTabTest extends BaseApplepayPaymentMethod
             'payment_method' => 'apple_pay',
             'payment_context' => [
                 'apple_pay' => [
-                    'domain_name' => 'shop domain ssl',
+                    'domain_name' => 'my-mock.com',
                     'application_data' => 'eyJhcHBsZV9wYXlfZG9tYWluIjoibXktbW9jay5jb20ifQ==',
                 ],
             ],
