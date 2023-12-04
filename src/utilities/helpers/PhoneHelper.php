@@ -45,7 +45,7 @@ class PhoneHelper
 
             $is_mobile = $phone_util->getNumberType($parsed);
 
-            return (bool) (in_array($is_mobile, [1, 2], true));
+            return (bool) in_array($is_mobile, [1, 2], true);
         } catch (libphonenumberlight\NumberParseException $e) {
             // @todo : Add Log
             return false;

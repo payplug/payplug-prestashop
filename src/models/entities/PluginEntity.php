@@ -982,14 +982,12 @@ class PluginEntity
     /**
      * @param object $country_class
      *
-     * @throws BadParameterException
-     *
      * @return self
      */
     public function setCountryClass($country_class)
     {
         if (!is_object($country_class)) {
-            throw (new BadParameterException('Invalid argument, $country_class must be a setCountryClass'));
+            throw new BadParameterException('Invalid argument, $country_class must be a setCountryClass');
         }
 
         $this->country_class = $country_class;
