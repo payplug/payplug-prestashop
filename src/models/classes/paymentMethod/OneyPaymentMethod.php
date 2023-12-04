@@ -229,7 +229,6 @@ class OneyPaymentMethod extends PaymentMethod
             ->getPlugin()
             ->getOney()
             ->hasOneyRequiredFields($payment_tab)) {
-
             // check oney required fields
             $payment_data = $this->dependencies->getHelpers()['cookies']->getPaymentDataCookie();
             if (!$payment_data) {
@@ -661,9 +660,6 @@ class OneyPaymentMethod extends PaymentMethod
      *
      * @param array $payment_tab
      * @param array $payment_data
-     *
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
      *
      * @return array
      */
