@@ -163,7 +163,7 @@ class OrderStateAction
             ->getPayplugOrderStateRepository()
             ->getTypeByIdOrderState((int) $id_order_state);
 
-        $context = $this->dependencies->getPlugin()->getContext();
+        $context = $this->dependencies->getPlugin()->getContext()->get();
         $payplug_order_state_url = $this->dependencies
             ->getPlugin()
             ->getRoutes()

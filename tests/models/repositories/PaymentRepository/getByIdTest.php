@@ -46,7 +46,7 @@ class getByIdTest extends BasePaymentRepository
             'method' => 'standard',
             'id_cart' => 42,
             'cart_hash' => '4cbaebd7df677672ac3d571012ea0498129a5314271b0c38603c66425560bf43',
-            'schedule' => '',
+            'schedules' => '',
             'date_upd' => '1970-01-01 00:00:00',
         ];
         $this

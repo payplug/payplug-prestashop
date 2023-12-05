@@ -13,6 +13,7 @@
         "feature_oney",
         "feature_satispay",
         "feature_sofort",
-        "feature_standard"
+        "feature_standard",
+        "feature_merchant_telemetry"
     ]
 }

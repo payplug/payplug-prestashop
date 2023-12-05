@@ -41,6 +41,11 @@ class BaseOrderStateAction extends TestCase
             ]);
 
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
+        $this->translation
+            ->shouldReceive('l')
+            ->andReturnUsing(function ($str) {
+                return $str;
+            });
 
         $this->action = \Mockery::mock(OrderStateAction::class, [$this->dependencies])->makePartial();
     }

@@ -26,7 +26,9 @@ namespace PayPlug\classes;
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\dependencies\PluginInit;
 use PayPlug\src\utilities\helpers\AmountHelper;
+use PayPlug\src\utilities\helpers\CookiesHelper;
 use PayPlug\src\utilities\helpers\FilesHelper;
+use PayPlug\src\utilities\helpers\PhoneHelper;
 use PayPlug\src\utilities\helpers\UserHelper;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
@@ -184,7 +186,9 @@ class DependenciesClass
     {
         $this->helpers = [
             'amount' => new AmountHelper($this),
+            'cookies' => new CookiesHelper($this),
             'files' => new FilesHelper(),
+            'phone' => new PhoneHelper(),
             'user' => new UserHelper(),
         ];
     }

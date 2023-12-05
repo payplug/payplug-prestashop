@@ -6,6 +6,8 @@ use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\utilities\helpers\AmountHelper;
+use PayPlug\src\utilities\helpers\CookiesHelper;
+use PayPlug\src\utilities\helpers\PhoneHelper;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\paymentValidator;
@@ -20,16 +22,23 @@ class BasePaymentMethod extends TestCase
     use FormatDataProvider;
 
     protected $address;
+    protected $address_adapter;
+    protected $card_repository;
     protected $classe;
     protected $configuration;
     protected $constant;
     protected $context;
+    protected $context_adapter;
     protected $dependencies;
     protected $helpers;
     protected $logger;
+    protected $parent;
+    protected $payment_repository;
     protected $plugin;
     protected $route;
+    protected $tools_adapter;
     protected $translation;
+    protected $validate_adapter;
     protected $validators;
 
     protected function setUp()
@@ -57,26 +66,38 @@ class BasePaymentMethod extends TestCase
                 'addLog' => true,
             ]);
 
-        $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
+        $this->tools_adapter = \Mockery::mock('ToolsAdapter');
 
-        $this->context = \Mockery::mock('Context');
-        $context = ContextMock::get();
-        $context->cart = \Mockery::mock('Cart');
-        $context->cart->id = 1;
-        $context->cart->id_address_delivery = 2;
-        $context->cart->id_address_invoice = 3;
-        $context->cart
-            ->shouldReceive('getOrderTotal')
-            ->andReturn(42.42);
+        $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
+        $this->translation
+            ->shouldReceive('l')
+            ->andReturnUsing(function ($str) {
+                return $str;
+            });
+
+        $this->context_adapter = \Mockery::mock('Context');
+        $this->context = ContextMock::get();
+        $this->context->cart = \Mockery::mock('Cart');
+        $this->context->cart->id = 1;
+        $this->context->cart->id_address_delivery = 42;
+        $this->context->cart->id_address_invoice = 42;
+        $this->context->cart->id_currency = 42;
+        $this->context->cart->id_customer = 42;
+        $this->context->cart->delivery_option = '';
+        $this->context->cart
+            ->shouldReceive([
+                'getOrderTotal' => 42.42,
+            ]);
 
         $link = \Mockery::mock('Link');
         $link->shouldReceive([
+            'getAdminLink' => 'link',
             'getModuleLink' => 'link',
         ]);
-        $context->link = $link;
-        $this->context
+        $this->context->link = $link;
+        $this->context_adapter
             ->shouldReceive([
-                'get' => $context,
+                'get' => $this->context,
             ]);
 
         $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
@@ -86,31 +107,36 @@ class BasePaymentMethod extends TestCase
             ->andReturn('{"default":{"min":"EUR:99","max":"EUR:2000000"}}');
 
         $this->address = \Mockery::mock('Address');
-        $this->address->shouldReceive([
+        $this->address_adapter = \Mockery::mock('AddressAdapter');
+        $this->address_adapter->shouldReceive([
             'get' => AddressMock::get(),
         ]);
+
+        $this->card_repository = \Mockery::mock('CardRepository');
+        $this->payment_repository = \Mockery::mock('PaymentRepository');
+        $this->validate_adapter = \Mockery::mock('ValidateAdapter');
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
-                'getAddress' => $this->address,
+                'getAddress' => $this->address_adapter,
+                'getCardRepository' => $this->card_repository,
                 'getConfigurationClass' => $this->configuration,
                 'getConstant' => $this->constant,
-                'getContext' => $this->context,
+                'getContext' => $this->context_adapter,
                 'getLogger' => $this->logger,
+                'getPaymentRepository' => $this->payment_repository,
                 'getRoutes' => $this->routes,
+                'getTools' => $this->tools_adapter,
                 'getTranslationClass' => $this->translation,
+                'getValidate' => $this->validate_adapter,
             ]);
 
         $this->helpers = [
             'amount' => \Mockery::mock(AmountHelper::class, [$this->dependencies])->makePartial(),
+            'cookies' => \Mockery::mock(CookiesHelper::class, [$this->dependencies])->makePartial(),
+            'phone' => \Mockery::mock(PhoneHelper::class)->makePartial(),
         ];
-        $this->helpers['amount']
-            ->shouldReceive('isValidAmount')
-            ->andReturn([
-                'result' => true,
-                'message' => '',
-            ]);
 
         $this->validators = [
             'browser' => \Mockery::mock(browserValidator::class)->makePartial(),

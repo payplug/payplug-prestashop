@@ -231,7 +231,10 @@ class RefundClass
             if (!$installment['result']) {
                 exit(json_encode([
                     'status' => 'error',
-                    'data' => $this->dependencies->l('payplug.refundPayment.cannotRefund', 'refundclass'),
+                    'data' => $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.refundPayment.cannotRefund', 'refundclass'),
                 ]));
             }
 
@@ -248,7 +251,10 @@ class RefundClass
             if (!$payment['result']) {
                 exit(json_encode([
                     'status' => 'error',
-                    'data' => $this->dependencies->l('payplug.refundPayment.cannotRefund', 'refundclass'),
+                    'data' => $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.refundPayment.cannotRefund', 'refundclass'),
                 ]));
             }
             $amount_available = $payment['resource']->amount - $payment['resource']->amount_refunded;
@@ -267,20 +273,29 @@ class RefundClass
                     $this->logger->addLog('Incorrect amount to refund', 'notice');
                     exit(json_encode([
                         'status' => 'error',
-                        'data' => $this->dependencies->l('payplug.refundPayment.incorrectAmount', 'refundclass'),
+                        'data' => $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('payplug.refundPayment.incorrectAmount', 'refundclass'),
                     ]));
                 case 'lower':
                     $this->logger->addLog('The amount to be refunded must be at least 0.10 €', 'notice');
                     exit(json_encode([
                         'status' => 'error',
-                        'data' => $this->dependencies->l('payplug.refundPayment.amountAtLeast', 'refundclass'),
+                        'data' => $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('payplug.refundPayment.amountAtLeast', 'refundclass'),
                     ]));
                 case 'upper':
                 default:
                     $this->logger->addLog('Cannot refund that amount.', 'notice');
                     exit(json_encode([
                         'status' => 'error',
-                        'data' => $this->dependencies->l('payplug.refundPayment.cannotRefund', 'refundclass'),
+                        'data' => $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('payplug.refundPayment.cannotRefund', 'refundclass'),
                     ]));
             }
         }
@@ -303,7 +318,10 @@ class RefundClass
 
             exit(json_encode([
                 'status' => 'error',
-                'data' => $this->dependencies->l('payplug.refundPayment.cannotRefund', 'refundclass'),
+                'data' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.refundPayment.cannotRefund', 'refundclass'),
             ]));
         }
         $new_state = 7;
@@ -316,7 +334,10 @@ class RefundClass
 
                 exit(json_encode([
                     'status' => 'error',
-                    'data' => $this->dependencies->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+                    'data' => $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
                 ]));
             }
 
@@ -358,7 +379,10 @@ class RefundClass
                     if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
                         exit(json_encode([
                             'status' => 'error',
-                            'data' => $this->dependencies->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+                            'data' => $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
                         ]));
                     }
 
@@ -393,7 +417,10 @@ class RefundClass
             if (!$payment['result']) {
                 exit(json_encode([
                     'status' => 'error',
-                    'data' => $this->dependencies->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+                    'data' => $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
                 ]));
             }
             $payment = $payment['resource'];
@@ -413,7 +440,10 @@ class RefundClass
                     if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
                         exit(json_encode([
                             'status' => 'error',
-                            'data' => $this->dependencies->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+                            'data' => $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
                         ]));
                     }
 
@@ -459,7 +489,10 @@ class RefundClass
             'status' => 'ok',
             'data' => $data,
             'template' => $this->dependencies->hookClass->displayAdminOrderMain(['id_order' => $id_order]),
-            'message' => $this->dependencies->l('payplug.refundPayment.success', 'refundclass'),
+            'message' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.refundPayment.success', 'refundclass'),
             'reload' => $reload,
         ]));
     }

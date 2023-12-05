@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-class isValidAmountTest extends TestCase
+class validateAmountTest extends TestCase
 {
     use FormatDataProvider;
 
@@ -38,7 +38,7 @@ class isValidAmountTest extends TestCase
                 'result' => false,
                 'message' => 'Wrong paramaters given, $price_limit must be a non empty array',
             ],
-            $this->helper->isValidAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount)
         );
     }
 
@@ -58,7 +58,7 @@ class isValidAmountTest extends TestCase
                 'result' => false,
                 'message' => 'Wrong paramaters given, $amount must be a non null float',
             ],
-            $this->helper->isValidAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount)
         );
     }
 
@@ -77,7 +77,7 @@ class isValidAmountTest extends TestCase
                 'result' => false,
                 'message' => 'Given $amount is lower than expected',
             ],
-            $this->helper->isValidAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount)
         );
     }
 
@@ -96,7 +96,7 @@ class isValidAmountTest extends TestCase
                 'result' => false,
                 'message' => 'Given $amount is higher than expected',
             ],
-            $this->helper->isValidAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount)
         );
     }
 
@@ -115,7 +115,7 @@ class isValidAmountTest extends TestCase
                 'result' => true,
                 'message' => '',
             ],
-            $this->helper->isValidAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount)
         );
     }
 }

@@ -57,22 +57,22 @@ use PayPlug\src\application\adapter\ProductAdapter;
 use PayPlug\src\application\adapter\QueryAdapter;
 use PayPlug\src\application\adapter\ShopAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
+use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
+use PayPlug\src\models\classes\Country;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\src\models\entities\OneyEntity;
 use PayPlug\src\models\entities\OrderStateEntity;
-use PayPlug\src\models\entities\PaymentEntity;
 use PayPlug\src\models\entities\PluginEntity;
 use PayPlug\src\repositories\CacheRepository;
 use PayPlug\src\repositories\InstallRepository;
 use PayPlug\src\repositories\LoggerRepository;
 use PayPlug\src\repositories\OneyRepository;
 use PayPlug\src\repositories\OrderStateRepository;
-use PayPlug\src\repositories\PaymentRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
 use PayPlug\src\utilities\services\Browser;
@@ -94,7 +94,6 @@ class PluginInit extends BaseClass
     // EntitiesApiRest
     private $cacheEntity;
     private $oneyEntity;
-    private $paymentEntity;
     private $plugin;
     private $order_state_entity;
 
@@ -106,7 +105,6 @@ class PluginInit extends BaseClass
     private $myLogPhp;
     private $oney;
     private $order_state;
-    private $payment;
     private $sql;
     private $translate;
 
@@ -134,10 +132,12 @@ class PluginInit extends BaseClass
     private $query_adapter;
     private $shop_adapter;
     private $tools_adapter;
+    private $translation_adapter;
     private $validate_adapter;
 
     // Model classes
     private $api_rest_class;
+    private $country_class;
     private $configuration_class;
     private $payment_method_class;
     private $translation_class;
@@ -182,7 +182,6 @@ class PluginInit extends BaseClass
             ->setMerchantTelemetry($this->merchant_telemetry)
             ->setInstall($this->install)
             ->setLogger($this->logger)
-            ->setPayment($this->payment)
             ->setOney($this->oney)
             ->setOrderState($this->order_state)
             ->setSql($this->sql)
@@ -215,6 +214,7 @@ class PluginInit extends BaseClass
             ->setQueryAdapter($this->query_adapter)
             ->setShop($this->shop_adapter)
             ->setTools($this->tools_adapter)
+            ->setTranslationAdapter($this->translation_adapter)
             ->setValidate($this->validate_adapter)
         ;
 
@@ -232,6 +232,7 @@ class PluginInit extends BaseClass
         $this->plugin
             ->setApiRestClass($this->api_rest_class)
             ->setConfigurationClass($this->configuration_class)
+            ->setCountryClass($this->country_class)
             ->setPaymentMethodClass($this->payment_method_class)
             ->setTranslationClass($this->translation_class)
         ;
@@ -270,7 +271,6 @@ class PluginInit extends BaseClass
     {
         $this->cacheEntity = new CacheEntity();
         $this->oneyEntity = new OneyEntity();
-        $this->paymentEntity = new PaymentEntity();
         $this->plugin = new PluginEntity();
         $this->order_state_entity = new OrderStateEntity();
     }
@@ -332,17 +332,6 @@ class PluginInit extends BaseClass
             $this->myLogPhp
         );
 
-        $this->payment = new PaymentRepository(
-            $this->cart_adapter,
-            $this->configuration_adapter,
-            $this->configuration_class,
-            $this->constant_adapter,
-            $this->dependencies,
-            $this->logger,
-            $this->paymentEntity,
-            $this->query_repository
-        );
-
         $this->install = new InstallRepository(
             $this->configuration_class,
             $this->constant_adapter,
@@ -385,6 +374,7 @@ class PluginInit extends BaseClass
         $this->query_adapter = new QueryAdapter();
         $this->shop_adapter = new ShopAdapter();
         $this->tools_adapter = new ToolsAdapter();
+        $this->translation_adapter = new TranslationAdapter();
         $this->validate_adapter = new ValidateAdapter();
     }
 
@@ -392,6 +382,7 @@ class PluginInit extends BaseClass
     {
         $this->api_rest_class = new ApiRest($this->dependencies);
         $this->configuration_class = new Configuration($this->dependencies);
+        $this->country_class = new Country($this->dependencies);
         $this->payment_method_class = new PaymentMethod($this->dependencies);
         $this->translation_class = new Translation($this->dependencies);
     }

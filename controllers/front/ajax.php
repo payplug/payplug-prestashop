@@ -180,7 +180,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 exit(json_encode($payment_options));
             } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
-                $errors = $this->paymentClass->getPaymentErrorsCookie();
+                $errors = $this->dependencies->getHelpers()['cookies']->getPaymentErrorsCookie();
 
                 if ($errors) {
                     exit(json_encode(
@@ -209,7 +209,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
 
-                $result = $this->paymentClass->setPaymentDataCookie($payment_data);
+                $result = $this->dependencies->getHelpers()['cookies']->setPaymentDataCookie($payment_data);
 
                 exit(json_encode([
                     'result' => $result,
@@ -228,26 +228,25 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ]));
                 }
 
-                $payment_methods = json_decode($this->configurationClass->getValue('payment_methods'), true);
-                $payment = $this->paymentClass->preparePayment([
-                    'is_integrated' => 1,
-                    'is_deferred' => (bool) $payment_methods['deferred'],
-                ]);
+                $payment = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentAction()
+                    ->dispatchAction('standard', true);
                 $payment['force_reload'] = false;
 
-                if (!$payment['result']) {
-                    $payment_details = json_decode($payment['paymentDetails'], true);
-                    if (isset($payment_details['error_code']) && in_array((int) $payment_details['error_code'], [401, 403])) {
-                        $this->paymentClass->setPaymentErrorsCookie([
-                            $this->dependencies->l('The transaction was not completed and your card was not charged.', 'ajax'),
-                        ]);
-                        $payment['force_reload'] = true;
-                        $payment['return_url'] = $context->link->getPageLink('order', true, $context->language->id, [
-                            'step' => '3',
-                            'has_error' => '1',
-                            'modulename' => $this->dependencies->name,
-                        ]);
-                    }
+                if (empty($payment)) {
+                    $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
+                        $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('The transaction was not completed and your card was not charged.', 'ajax'),
+                    ]);
+                    $payment['force_reload'] = true;
+                    $payment['return_url'] = $context->link->getPageLink('order', true, $context->language->id, [
+                        'step' => '3',
+                        'has_error' => '1',
+                        'modulename' => $this->dependencies->name,
+                    ]);
                 }
 
                 exit(json_encode($payment));

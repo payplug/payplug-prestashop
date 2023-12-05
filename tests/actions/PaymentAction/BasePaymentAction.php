@@ -4,6 +4,7 @@ namespace PayPlug\tests\actions\PaymentAction;
 
 use PayPlug\src\actions\PaymentAction;
 use PayPlug\src\models\classes\Configuration;
+use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
@@ -13,14 +14,17 @@ class BasePaymentAction extends TestCase
 {
     use FormatDataProvider;
 
-    public $action;
-    public $cartAdapter;
-    public $configClass;
-    public $configuration;
-    public $context;
-    public $dependencies;
-    public $plugin;
-    public $toolsAdapter;
+    protected $action;
+    protected $cartAdapter;
+    protected $configClass;
+    protected $configuration;
+    protected $context;
+    protected $dependencies;
+    protected $logger;
+    protected $payment_method_class;
+    protected $payment_repository;
+    protected $plugin;
+    protected $toolsAdapter;
 
     protected function setUp()
     {
@@ -50,12 +54,24 @@ class BasePaymentAction extends TestCase
             'get' => ContextMock::get(),
         ]);
 
+        $this->logger = \Mockery::mock('Logger');
+        $this->logger
+            ->shouldReceive([
+                'addLog' => true,
+            ]);
+
+        $this->payment_method_class = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
+        $this->payment_repository = \Mockery::mock('PaymentRepository');
+
         $this->plugin
             ->shouldReceive([
                 'getCart' => $this->cartAdapter,
                 'getContext' => $this->context,
+                'getLogger' => $this->logger,
                 'getTools' => $this->toolsAdapter,
                 'getConfigurationClass' => $this->configuration,
+                'getPaymentMethodClass' => $this->payment_method_class,
+                'getPaymentRepository' => $this->payment_repository,
             ]);
 
         $this->dependencies->name = 'payplug';

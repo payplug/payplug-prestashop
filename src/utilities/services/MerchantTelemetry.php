@@ -50,7 +50,7 @@ class MerchantTelemetry
         }
 
         try {
-            $send = PluginTelemetry::mockSend($datas);
+            $send = PluginTelemetry::Send($datas);
             $response = [
                 'code' => $send['httpStatus'],
                 'result' => 201 == (int) $send['httpStatus'] ? true : false,

@@ -112,7 +112,10 @@ class PrestashopAdapter16
                     'payplug_oney_required_field' => $this->oney->displayOneyRequiredFields(),
                     'payplug_oney_allowed' => $is_elligible['result'],
                     'payplug_oney_error' => $is_elligible['error'],
-                    'payplug_oney_loading_msg' => $this->dependencies->l('Loading', 'prestashopadapter16'),
+                    'payplug_oney_loading_msg' => $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('Loading', 'prestashopadapter16'),
                 ]);
             } catch (\Exception $e) {
                 var_dump($e);

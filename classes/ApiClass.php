@@ -102,6 +102,9 @@ class ApiClass
         if (isset($_ENV['API_BASE_URL'])) {
             APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
+        if (isset($_ENV['MERCHANT_PLUGINS_DATA_COLLECTOR_RESOURCE'])) {
+            APIRoutes::setMerchantPluginsDataCollectorService($_ENV['MERCHANT_PLUGINS_DATA_COLLECTOR_RESOURCE']);
+        }
     }
 
     /**
@@ -259,10 +262,13 @@ class ApiClass
         if (!isset($response['details']) || empty($response['details'])) {
             // set a default error message
             $error_key = md5('The transaction was not completed and your card was not charged.');
-            $errors[$error_key] = $this->dependencies->l(
-                'payplug.catchErrorsFromApi.transactionNotCompleted',
-                'apiclass'
-            );
+            $errors[$error_key] = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l(
+                    'payplug.catchErrorsFromApi.transactionNotCompleted',
+                    'apiclass'
+                );
 
             return $errors;
         }
@@ -276,7 +282,10 @@ class ApiClass
                     // push error only if not catched before
                     if (!array_key_exists($error_key, $errors)) {
                         $errors[$error_key] =
-                            $this->dependencies->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('payplug.catchErrorsFromApi.transactionNotCompleted', 'apiclass');
                     }
             }
         }

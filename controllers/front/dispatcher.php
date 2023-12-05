@@ -60,7 +60,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                 ->getValidators()['order']
                 ->isCreated($order, (int) $cart->id);
             if ($order_exists['result']) {
-                $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
+                $this->dependenciesClass->getHelpers()['cookies']->setPaymentErrorsCookie([
                     $this->dependenciesClass->l('The transaction was not completed and your card was not charged.'),
                 ]);
                 $this->toolsAdapter->tool('redirect', $error_url);
@@ -68,7 +68,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             $payment = $this->paymentAction->dispatchAction($method);
 
-            if (!$payment['result']) {
+            if (empty($payment)) {
                 if ('applepay' == $method) {
                     exit(json_encode([
                         'result' => false,
@@ -76,16 +76,17 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
                     ]));
                 }
 
-                $this->dependenciesClass->paymentClass->setPaymentErrorsCookie([
+                $this->dependenciesClass->getHelpers()['cookies']->setPaymentErrorsCookie([
                     $this->dependenciesClass->l('The transaction was not completed and your card was not charged.'),
                 ]);
                 $this->toolsAdapter->tool('redirect', $error_url);
             }
+
             if ('applepay' == $method) {
                 exit(json_encode([
                     'result' => true,
                     'apiResponse' => $payment['resource']->payment_method,
-                    'idPayment' => $payment['paymentDetails']['resource_id'],
+                    'idPayment' => $payment['resource']->id,
                     'idCart' => $this->context->cart->id,
                 ]));
             }

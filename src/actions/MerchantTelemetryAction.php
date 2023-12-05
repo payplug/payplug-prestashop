@@ -130,6 +130,8 @@ class MerchantTelemetryAction
                 unset($telemetries['configurations'][$key]);
             }
         }
+        // get the right structure of configurations list
+        $telemetries['configurations'] = array_values($telemetries['configurations']);
 
         // Then through an hash, we check if the send of the datas is required
         $hash = hash('sha256', 'merchant_telemetry_' . json_encode($telemetries));

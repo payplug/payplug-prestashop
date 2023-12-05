@@ -64,7 +64,10 @@ class PrestashopAdapter17
                 [
                     $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
                         [
-                            $this->dependencies->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopadapter17'),
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopadapter17'),
                         ]
                     ),
                 ]
@@ -169,7 +172,10 @@ class PrestashopAdapter17
         $integrated['action'] = 'javascript:payplugModule.integrated.form.validate();';
         $integrated['logo'] = $payment_options['standard']['logo'];
         $integrated['moduleName'] = 'payplug';
-        $integrated['callToActionText'] = $this->dependencies->l('specific17.setIntegratedPaymentOption.name', 'prestashopadapter17');
+        $integrated['callToActionText'] = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->l('specific17.setIntegratedPaymentOption.name', 'prestashopadapter17');
         $integrated['tpl'] = 'integrated_payment.tpl';
         $integrated['extra_classes'] = 'payplug integrated';
 
@@ -195,10 +201,22 @@ class PrestashopAdapter17
             'integrated_payment_js_url' => $integrated_payment_js_url,
             'is_one_click_activated' => (bool) $payment_methods['one_click'],
             'is_deferred_activated' => (bool) $payment_methods['deferred'],
-            'placeholderCardholder' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
-            'placeholderPan' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
-            'placeholderExp' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
-            'placeholderCvv' => $this->dependencies->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopadapter17'),
+            'placeholderCardholder' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
+            'placeholderPan' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
+            'placeholderExp' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
+            'placeholderCvv' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopadapter17'),
             'privacy' => $translation['privacy'],
             'secure' => $translation['secure'],
             'privacyLink' => $privacyLink,
@@ -304,7 +322,10 @@ class PrestashopAdapter17
         // show module to the customer
         $switch['show'] = [
             'name' => 'payplug_enable',
-            'label' => $this->dependencies->l('payplug.assignSwitchConfiguration.showPayplug', 'prestashopadapter17'),
+            'label' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.showPayplug', 'prestashopadapter17'),
             'active' => $connected,
             'small' => true,
             'checked' => $configurations['enable'],
@@ -314,8 +335,14 @@ class PrestashopAdapter17
             'name' => 'payplug_sandbox',
             'active' => $connected,
             'checked' => $configurations['sandbox_mode'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.test', 'prestashopadapter17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.live', 'prestashopadapter17'),
+            'label_left' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.test', 'prestashopadapter17'),
+            'label_right' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.live', 'prestashopadapter17'),
         ];
 
         $switch['embedded'] = [
@@ -323,33 +350,60 @@ class PrestashopAdapter17
             'active' => $connected,
             'format' => true,
             'checked' => $configurations['embedded_mode'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.embedded', 'prestashopadapter17'),
-            'label_center' => $this->dependencies->l('payplug.assignSwitchConfiguration.popup', 'prestashopadapter17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.redirected', 'prestashopadapter17'),
+            'label_left' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.embedded', 'prestashopadapter17'),
+            'label_center' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.popup', 'prestashopadapter17'),
+            'label_right' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.redirected', 'prestashopadapter17'),
         ];
 
         $switch['one_click'] = [
             'name' => 'payplug_one_click',
             'active' => $connected,
             'checked' => $configurations['one_click'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
+            'label_left' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
+            'label_right' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
         ];
 
         $switch['standard'] = [
             'name' => 'payplug_standard',
             'active' => $connected,
             'checked' => $configurations['standard'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
+            'label_left' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
+            'label_right' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
         ];
 
         $switch['oney'] = [
             'name' => 'payplug_oney',
             'active' => $connected,
             'checked' => $configurations['oney'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
+            'label_left' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
+            'label_right' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
         ];
 
         $switch['oney_optimized'] = [
@@ -382,24 +436,42 @@ class PrestashopAdapter17
             'name' => 'payplug_bancontact',
             'active' => $connected,
             'checked' => $configurations['bancontact'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
+            'label_left' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
+            'label_right' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
         ];
 
         $switch['installment'] = [
             'name' => 'payplug_inst',
             'active' => $connected,
             'checked' => $configurations['installment'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
+            'label_left' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
+            'label_right' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
         ];
 
         $switch['deferred'] = [
             'name' => 'payplug_deferred',
             'active' => $connected,
             'checked' => $configurations['deferred'],
-            'label_left' => $this->dependencies->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
-            'label_right' => $this->dependencies->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
+            'label_left' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.yes', 'prestashopadapter17'),
+            'label_right' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.assignSwitchConfiguration.no', 'prestashopadapter17'),
         ];
 
         $this->context->smarty->assign([

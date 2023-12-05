@@ -35,7 +35,10 @@ class AdminClass
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->context = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get();
     }
 
     /**

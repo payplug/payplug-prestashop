@@ -47,6 +47,6 @@ class ShopAdapter implements ShopInterface
 
     public function setContext()
     {
-        return \Shop::setContext(Shop::CONTEXT_ALL);
+        return \Shop::setContext(\Shop::CONTEXT_ALL);
     }
 }

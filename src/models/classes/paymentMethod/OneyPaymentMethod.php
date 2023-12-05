@@ -35,6 +35,8 @@ class OneyPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'oney';
+        $this->force_resource = true;
+        $this->cancellable = false;
     }
 
     /**
@@ -158,6 +160,124 @@ class OneyPaymentMethod extends PaymentMethod
         ];
     }
 
+    public function getPaymentTab()
+    {
+        $payment_tab = parent::getPaymentTab();
+
+        if (empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        $oney_schedule = $this->tools->tool('getValue', 'payplugOney_type');
+        $payment_tab['authorized_amount'] = $payment_tab['amount'];
+
+        // Check if oney was elligible then return if not
+        $is_elligible = $this->dependencies
+            ->getPlugin()
+            ->getOney()
+            ->isOneyElligible($this->context->cart, false, true);
+        if (!$is_elligible['result']) {
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$is_elligible['error']]);
+
+            return [];
+        }
+
+        // Check billing phonenumber
+        $is_valid_phone = $this->dependencies
+            ->getValidators()['payment']
+            ->isPhoneNumber($payment_tab['billing']['mobile_phone_number'])['result'];
+        if (!$is_valid_phone || !$this->dependencies
+            ->getHelpers()['phone']::isMobilePhoneNumber(
+                $payment_tab['billing']['country'],
+                $payment_tab['billing']['mobile_phone_number']
+            )) {
+            $is_valid_phone = $this->dependencies
+                ->getValidators()['payment']
+                ->isPhoneNumber($payment_tab['billing']['landline_phone_number'])['result'];
+
+            if ($is_valid_phone && $this->dependencies
+                ->getHelpers()['phone']::isMobilePhoneNumber(
+                    $payment_tab['billing']['country'],
+                    $payment_tab['billing']['landline_phone_number']
+                )) {
+                $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
+            }
+        }
+
+        // check shipping phonenumber
+        $is_valid_phone = $this->dependencies
+            ->getValidators()['payment']
+            ->isPhoneNumber($payment_tab['shipping']['mobile_phone_number'])['result'];
+        if (!$is_valid_phone || !$this->dependencies
+            ->getHelpers()['phone']::isMobilePhoneNumber(
+                $payment_tab['shipping']['country'],
+                $payment_tab['shipping']['mobile_phone_number']
+            )) {
+            $is_valid_phone = $this->dependencies
+                ->getValidators()['payment']
+                ->isPhoneNumber($payment_tab['shipping']['landline_phone_number'])['result'];
+            if ($is_valid_phone && $this->dependencies
+                ->getHelpers()['phone']::isMobilePhoneNumber(
+                    $payment_tab['shipping']['country'],
+                    $payment_tab['shipping']['landline_phone_number']
+                )) {
+                $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
+            }
+        }
+
+        if ($this->dependencies
+            ->getPlugin()
+            ->getOney()
+            ->hasOneyRequiredFields($payment_tab)) {
+            // check oney required fields
+            $payment_data = $this->dependencies->getHelpers()['cookies']->getPaymentDataCookie();
+            if (!$payment_data) {
+                $payment_data = $this->tools->tool('getValue', 'oney_form');
+            }
+
+            if ((bool) $payment_data) {
+                // hydrate with payment data
+                $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
+
+                // then recheck
+                if ($this->dependencies
+                    ->getPlugin()
+                    ->getOney()
+                    ->hasOneyRequiredFields($payment_tab)) {
+                    $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie(['oney_required_field_' . $oney_schedule]);
+
+                    return [];
+                }
+            } else {
+                $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie(['oney_required_field_' . $oney_schedule]);
+
+                return [];
+            }
+        }
+
+        $payment_tab['force_3ds'] = false;
+        $payment_tab['auto_capture'] = true;
+        $payment_tab['payment_method'] = 'oney_' . $oney_schedule;
+        $payment_tab['payment_context'] = $this->dependencies
+            ->getPlugin()
+            ->getOney()
+            ->getOneyPaymentContext();
+        $payment_tab['hosted_payment']['return_url'] = $this->context->link->getModuleLink(
+            $this->dependencies->name,
+            'validation',
+            [
+                'ps' => 1,
+                'cartid' => (int) $this->context->cart->id,
+                'isoney' => $this->tools->tool('getValue', 'io'),
+            ],
+            true
+        );
+
+        unset($payment_tab['allow_save_card'], $payment_tab['amount']);
+
+        return $payment_tab;
+    }
+
     /**
      * @description Get payment option
      *
@@ -225,8 +345,14 @@ class OneyPaymentMethod extends PaymentMethod
 
             $oneyLogo = $oney_payment . (!$use_fees ? '_side_' . $iso : '') . ($error ? '_alt' : '') . '.svg';
             $text = $use_fees
-                ? $this->dependencies->l('payplug.getPaymentOptions.payWithOney', 'oneypaymentmethod')
-                : $this->dependencies->l('payplug.getPaymentOptions.payWithOneyWithout', 'oneypaymentmethod');
+                ? $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.getPaymentOptions.payWithOney', 'oneypaymentmethod')
+                : $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.getPaymentOptions.payWithOneyWithout', 'oneypaymentmethod');
 
             $oneyLabel = $error ? $err_label : sprintf($text, $split);
 
@@ -463,35 +589,53 @@ class OneyPaymentMethod extends PaymentMethod
     protected function getErrorLabel($error = '')
     {
         if (!is_string($error) || !$error) {
-            return $this->dependencies->l('payplug.getPaymentOptions.errorOccurred', 'oneypaymentmethod');
+            return $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('payplug.getPaymentOptions.errorOccurred', 'oneypaymentmethod');
         }
 
         switch ($error) {
             case 'invalid_addresses':
                 $err_label =
-                    $this->dependencies->l('payplug.getPaymentOptions.invalidAddresses', 'oneypaymentmethod');
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.getPaymentOptions.invalidAddresses', 'oneypaymentmethod');
 
                 break;
             case 'invalid_amount_bottom':
             case 'invalid_amount_top':
                 $limits = $this->dependencies->getPlugin()->getOney()->getOneyPriceLimit(true);
                 $err_label = sprintf(
-                    $this->dependencies->l('payplug.getPaymentOptions.invalidAmount', 'oneypaymentmethod'),
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getTranslationClass()
+                        ->l('payplug.getPaymentOptions.invalidAmount', 'oneypaymentmethod'),
                     $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
                     $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result']
                 );
 
                 break;
             case 'invalid_carrier':
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidCarrier', 'oneypaymentmethod');
+                $err_label = $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.getPaymentOptions.invalidCarrier', 'oneypaymentmethod');
 
                 break;
             case 'invalid_cart':
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.invalidCart', 'oneypaymentmethod');
+                $err_label = $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.getPaymentOptions.invalidCart', 'oneypaymentmethod');
 
                 break;
             default:
-                $err_label = $this->dependencies->l('payplug.getPaymentOptions.errorOccurred', 'oneypaymentmethod');
+                $err_label = $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.getPaymentOptions.errorOccurred', 'oneypaymentmethod');
 
                 break;
         }
@@ -509,5 +653,64 @@ class OneyPaymentMethod extends PaymentMethod
             ->getPlugin()
             ->getTranslationClass()
             ->getPaylaterTranslations();
+    }
+
+    /**
+     * @description Hydrate Oney Payment Tab from Cookie Payment Data
+     *
+     * @param array $payment_tab
+     * @param array $payment_data
+     *
+     * @return array
+     */
+    private function hydratePaymentTabFromPaymentData($payment_tab = [], $payment_data = [])
+    {
+        if (!is_array($payment_tab) || empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        if (!is_array($payment_data) || empty($payment_data)) {
+            return $payment_tab;
+        }
+
+        $country = $this->dependencies->getPlugin()->getCountry();
+
+        foreach ($payment_data as $k => $field) {
+            $keys = explode('-', $k);
+            $type = $keys[0];
+            $field_name = $keys[1];
+
+            if (false != strpos($field_name, 'phone')) {
+                switch ($type) {
+                    case 'billing':
+                        $id_country = $country->getByIso($payment_tab['billing']['country']);
+                        $billing_country = $country->get((int) $id_country);
+                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $billing_country);
+
+                        break;
+
+                    case 'same':
+                    case 'shipping':
+                    default:
+                        $id_country = $country->getByIso($payment_tab['shipping']['country']);
+                        $shipping_country = $country->get((int) $id_country);
+                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $shipping_country);
+
+                        break;
+                }
+            }
+
+            if ('email' == $field_name) {
+                $payment_tab['billing']['email'] = $field;
+                $payment_tab['shipping']['email'] = $field;
+            } elseif ('same' == $type) {
+                $payment_tab['billing'][$field_name] = $field;
+                $payment_tab['shipping'][$field_name] = $field;
+            } else {
+                $payment_tab[$type][$field_name] = $field;
+            }
+        }
+
+        return $payment_tab;
     }
 }

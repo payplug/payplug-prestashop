@@ -49,6 +49,195 @@ class InstallmentPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @return array
+     */
+    public function getPaymentTab()
+    {
+        $payment_tab = parent::getPaymentTab();
+
+        if (empty($payment_tab)) {
+            return $payment_tab;
+        }
+
+        // Update from current schedule configuration
+        $schedule_nb = (int) $this->configuration->getValue('inst_mode');
+        $schedule = [];
+        for ($i = 0; $i < $schedule_nb; ++$i) {
+            if (0 == $i) {
+                $schedule[$i]['date'] = 'TODAY';
+                $int_part = (int) ($payment_tab['amount'] / $schedule_nb);
+                $schedule[$i]['amount'] = (int) ($int_part + ($payment_tab['amount'] - ($int_part * $schedule_nb)));
+            } else {
+                $delay = $i * 30;
+                $schedule[$i]['date'] = date('Y-m-d', strtotime("+ {$delay} days"));
+                $schedule[$i]['amount'] = (int) ($payment_tab['amount'] / $schedule_nb);
+            }
+        }
+        $payment_tab['schedule'] = $schedule;
+
+        unset($payment_tab['force_3ds'], $payment_tab['allow_save_card'], $payment_tab['amount']);
+
+        return $payment_tab;
+    }
+
+    /**
+     * @return array
+     */
+    public function getReturnUrl()
+    {
+        $this->setParameters();
+
+        if (!isset($this->name) || !$this->name) {
+            // todo: add error log
+            return [];
+        }
+
+        $resource_stored = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByCart((int) $this->context->cart->id);
+        if (!$resource_stored) {
+            // todo: add error log
+            return [];
+        }
+
+        $resource = $this->dependencies->apiClass->retrieveInstallment($resource_stored['resource_id']);
+        if (!$resource['result']) {
+            // todo: add error log
+            return [];
+        }
+
+        $resource = $resource['resource'];
+        $return_url = $resource->hosted_payment
+            ? $resource->hosted_payment->payment_url
+                ?: $resource->hosted_payment->return_url
+            : '';
+
+        // todo: getter of $_SERVER['HTTP_USER_AGENT'] should be in a service
+        return [
+            'return_url' => $return_url,
+            'embedded' => 'redirect' != (string) $this->configuration->getValue('embedded_mode')
+                && !$this->dependencies
+                    ->getValidators()['browser']
+                    ->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'],
+        ];
+    }
+
+    /**
+     * @description Check if the stored resource is a non expired resource with no failure
+     *
+     * @return bool
+     */
+    public function isValidResource()
+    {
+        $this->setParameters();
+
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
+            // todo: Add error log
+            return false;
+        }
+        $id_cart = (int) $this->context->cart->id;
+
+        // Get the resource from context cart id
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByCart((int) $id_cart);
+        if (empty($stored_resource)) {
+            // todo: Add error log
+            return false;
+        }
+
+        // Check if resource is expired
+        $is_expired = $this->dependencies
+            ->getValidators()['payment']
+            ->isTimeoutCachedPayment($stored_resource['date_upd'])['result'];
+        if (!$is_expired) {
+            // todo: Add error log
+            return false;
+        }
+
+        // Get the resource from API
+        $retrieved_resource = $this->dependencies->apiClass->retrieveInstallment($stored_resource['resource_id']);
+        if (!$retrieved_resource['result']) {
+            // todo: Add error log
+            return false;
+        }
+
+        // Check if schedule has failure
+        $first_chedule = $retrieved_resource['resource']->schedule[0]->payment_ids;
+        $schedule_id = end($first_chedule);
+        $retrieved_schedule = $this->dependencies->apiClass->retrievePayment($schedule_id);
+        if (isset($retrieved_schedule['resource']->failure->code) && $retrieved_schedule['resource']->failure->code) {
+            // todo: Add error log
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $payment_tab
+     *
+     * @return array
+     */
+    public function saveResource($payment_tab = [])
+    {
+        $this->setParameters();
+
+        if (!isset($this->name) || !$this->name) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('InstallmentPaymentMethod::saveResource - Invalid argument, the method name must be defined.', 'error');
+
+            return [
+                'result' => false,
+            ];
+        }
+        if (!is_array($payment_tab) || empty($payment_tab)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('InstallmentPaymentMethod::saveResource - Invalid argument, $payment_tab must be a non empty array.', 'error');
+
+            return [
+                'result' => false,
+            ];
+        }
+
+        $payment = $this->dependencies->apiClass->createInstallment($payment_tab);
+
+        // If the payment resource can not be created due to to bad permission, we update the feature activation
+        if (403 == (int) $payment['code']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('InstallmentPaymentMethod::saveResource - Bad permission error is returned by API.', 'error');
+            $cart = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get()->cart;
+            $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
+            $this->resetPaymentMethodFromPermission($permissions);
+        }
+
+        // If the payment resource can not be created due to bad credential, we log out the merchand
+        if (401 == (int) $payment['code']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('InstallmentPaymentMethod::saveResource - Bad credential error is returned by API.', 'error');
+            $this->dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->logoutAction();
+        }
+
+        return $payment;
+    }
+
+    /**
      * @description Get payment option
      *
      * @param array $payment_options
