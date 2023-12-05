@@ -84,6 +84,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             if ('applepay' == $method) {
                 exit(json_encode([
+                    'result' => true,
                     'apiResponse' => $payment['resource']->payment_method,
                     'idPayment' => $payment['resource']->id,
                     'idCart' => $this->context->cart->id,
