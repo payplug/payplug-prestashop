@@ -77,6 +77,14 @@ class getTranslationsTest extends BaseTranslation
         );
     }
 
+    public function testIfOrderTranslations()
+    {
+        $this->assertTrue(
+            is_array($this->classe->getOrderTranslations())
+            && !empty($this->classe->getOrderTranslations())
+        );
+    }
+
     public function testIfOrderStateActionRenderTranslations()
     {
         $this->assertTrue(

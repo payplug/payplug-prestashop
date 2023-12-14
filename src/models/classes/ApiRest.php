@@ -31,7 +31,6 @@ class ApiRest
 {
     private $dependencies;
     private $helpers;
-    private $tools;
     private $validators;
 
     public function __construct($dependencies)

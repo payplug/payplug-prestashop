@@ -1,5 +1,17 @@
 # Payplug module changelog
 
+## Next Version
+- Refactoring :
+  - [PRE-1985](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2309): Add action Order
+
+  
+TO COVER :
+- InstallmentPaymentMethod::getOrderTab
+- InstallmentPaymentMethod::postProcessOrder
+- OneClickPaymentMethod::getOrderTab
+- OneyPaymentMethod::getOrderTab
+- StandardPaymentMethod::getOrderTab
+
 ## Version 4.6.1
 - Bugfix :
   - [PRE-2136](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2324): Fix set default language

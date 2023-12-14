@@ -125,6 +125,9 @@ class PluginEntity
     private $order;
 
     /** @var object */
+    private $order_class;
+
+    /** @var object */
     private $orderHistory;
 
     /** @var object */
@@ -132,6 +135,9 @@ class PluginEntity
 
     /** @var object */
     private $order_state;
+
+    /** @var object */
+    private $order_action;
 
     /** @var object */
     private $order_state_action;
@@ -581,6 +587,22 @@ class PluginEntity
     public function getOrderRepository()
     {
         return $this->order_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderClass()
+    {
+        return $this->order_class;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderAction()
+    {
+        return $this->order_action;
     }
 
     /**
@@ -1327,17 +1349,33 @@ class PluginEntity
     }
 
     /**
-     * @param object $orderStateAction
+     * @param object $order_action
      *
      * @return self
      */
-    public function setOrderStateAction($orderStateAction)
+    public function setOrderAction($order_action)
     {
-        if (!is_object($orderStateAction)) {
+        if (!is_object($order_action)) {
+            throw new BadParameterException('Invalid argument, $order_action must be a OrderAction');
+        }
+
+        $this->order_action = $order_action;
+
+        return $this;
+    }
+
+    /**
+     * @param object $order_state_action
+     *
+     * @return self
+     */
+    public function setOrderStateAction($order_state_action)
+    {
+        if (!is_object($order_state_action)) {
             throw new BadParameterException('Invalid argument, $orderStateAction must be a OrderStateAction');
         }
 
-        $this->order_state_action = $orderStateAction;
+        $this->order_state_action = $order_state_action;
 
         return $this;
     }
@@ -1468,6 +1506,22 @@ class PluginEntity
         }
 
         $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    /**
+     * @param object $order_class
+     *
+     * @return self
+     */
+    public function setOrderClass($order_class)
+    {
+        if (!is_object($order_class)) {
+            throw new BadParameterException('Invalid argument, $paymentMethod must be a PaymentMethod');
+        }
+
+        $this->order_class = $order_class;
 
         return $this;
     }

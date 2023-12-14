@@ -242,6 +242,17 @@ class PaymentMock
         return InstallmentPlan::fromAttributes($resource);
     }
 
+    public static function getInstallmentSchedule()
+    {
+        $defaultConfiguration = [
+            'installment_plan_id' => 'inst_1gDmrsoMdIAJfV2MxzkBPX',
+        ];
+
+        $resource = self::getDefault($defaultConfiguration);
+
+        return Payment::fromAttributes($resource);
+    }
+
     public static function getOneClick()
     {
         return Payment::fromAttributes(self::$payment_parameters['oneclick']);
