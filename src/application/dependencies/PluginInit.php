@@ -32,6 +32,7 @@ use PayPlug\src\actions\CardAction;
 use PayPlug\src\actions\ConfigurationAction;
 use PayPlug\src\actions\MerchantTelemetryAction;
 use PayPlug\src\actions\OnboardingAction;
+use PayPlug\src\actions\OrderAction;
 use PayPlug\src\actions\OrderStateAction;
 use PayPlug\src\actions\PaymentAction;
 use PayPlug\src\application\adapter\AddressAdapter;
@@ -62,6 +63,7 @@ use PayPlug\src\application\adapter\ValidateAdapter;
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\Country;
+use PayPlug\src\models\classes\Order;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
@@ -87,6 +89,7 @@ class PluginInit extends BaseClass
     private $card_action;
     private $configuration_action;
     private $onboarding_action;
+    private $order_action;
     private $order_state_action;
     private $merchant_telemetry_action;
     private $paymentAction;
@@ -139,6 +142,7 @@ class PluginInit extends BaseClass
     private $api_rest_class;
     private $country_class;
     private $configuration_class;
+    private $order_class;
     private $payment_method_class;
     private $translation_class;
 
@@ -224,6 +228,7 @@ class PluginInit extends BaseClass
             ->setConfigurationAction($this->configuration_action)
             ->setMerchantTelemetryAction($this->merchant_telemetry_action)
             ->setOnboardingAction($this->onboarding_action)
+            ->setOrderAction($this->order_action)
             ->setOrderStateAction($this->order_state_action)
             ->setPaymentAction($this->paymentAction)
         ;
@@ -233,6 +238,7 @@ class PluginInit extends BaseClass
             ->setApiRestClass($this->api_rest_class)
             ->setConfigurationClass($this->configuration_class)
             ->setCountryClass($this->country_class)
+            ->setOrderClass($this->order_class)
             ->setPaymentMethodClass($this->payment_method_class)
             ->setTranslationClass($this->translation_class)
         ;
@@ -263,6 +269,7 @@ class PluginInit extends BaseClass
         $this->configuration_action = new ConfigurationAction($this->dependencies);
         $this->merchant_telemetry_action = new MerchantTelemetryAction($this->dependencies);
         $this->onboarding_action = new OnboardingAction($this->dependencies);
+        $this->order_action = new OrderAction($this->dependencies);
         $this->order_state_action = new OrderStateAction($this->dependencies);
         $this->paymentAction = new PaymentAction($this->dependencies);
     }
@@ -383,6 +390,7 @@ class PluginInit extends BaseClass
         $this->api_rest_class = new ApiRest($this->dependencies);
         $this->configuration_class = new Configuration($this->dependencies);
         $this->country_class = new Country($this->dependencies);
+        $this->order_class = new Order($this->dependencies);
         $this->payment_method_class = new PaymentMethod($this->dependencies);
         $this->translation_class = new Translation($this->dependencies);
     }

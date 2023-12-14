@@ -526,7 +526,7 @@ class PaymentAction
             return false;
         }
 
-        $is_installment = false !== strpos($resource_id, 'inst_');
+        $is_installment = $this->dependencies->getValidators()['payment']->isInstallment($resource_id)['result'];
         $resource = $is_installment
             ? $this->dependencies->apiClass->retrieveInstallment($resource_id)
             : $this->dependencies->apiClass->retrievePayment($resource_id);
@@ -592,6 +592,9 @@ class PaymentAction
         return $payment_method->getReturnUrl();
     }
 
+    /**
+     * @description Set needed object from dependencies
+     */
     private function setParameters()
     {
         $this->plugin = $this->plugin ?: $this->dependencies
