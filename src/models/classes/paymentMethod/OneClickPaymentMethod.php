@@ -48,6 +48,25 @@ class OneClickPaymentMethod extends PaymentMethod
         return [];
     }
 
+    public function getOrderTab($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
+        }
+
+        $order_tab = parent::getOrderTab($resource);
+
+        if ($this->dependencies->getValidators()['payment']->isDeferred($resource)['result']) {
+            $state_addons = $resource->is_live ? '' : '_test';
+            $order_tab['order_state'] = $this->configuration->getValue('order_state_auth' . $state_addons);
+        }
+
+        return $order_tab;
+    }
+
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();

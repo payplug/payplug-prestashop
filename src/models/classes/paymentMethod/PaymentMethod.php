@@ -64,6 +64,9 @@ class PaymentMethod
     /** @var string */
     protected $name;
 
+    /** @var string */
+    protected $order_name;
+
     /** @var array */
     protected $translation;
 
@@ -77,6 +80,7 @@ class PaymentMethod
     {
         $this->dependencies = $dependencies;
         $this->name = '';
+        $this->order_name = '';
     }
 
     /**
@@ -295,6 +299,41 @@ class PaymentMethod
         }
 
         return $options;
+    }
+
+    /**
+     * @description Get order tab for given resource
+     *
+     * @param null $resource
+     *
+     * @return array
+     */
+    public function getOrderTab($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
+        }
+
+        $amount = $this->dependencies
+            ->getHelpers()['amount']
+            ->convertAmount($resource->amount, true);
+
+        $state_addons = $resource->is_live ? '' : '_test';
+        $order_state = $this->configuration->getValue('order_state_paid' . $state_addons);
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+
+        return [
+            'order_state' => $order_state,
+            'amount' => $amount,
+            'module_name' => $translation['module_name'][$this->order_name ?: 'default'],
+        ];
     }
 
     /**
@@ -622,6 +661,45 @@ class PaymentMethod
         // Check if retrieved resource has failure
         if (isset($retrieved_resource['resource']->failure->code) && $retrieved_resource['resource']->failure->code) {
             // todo: Add error log
+            return false;
+        }
+
+        return true;
+    }
+
+    public function postProcessOrder($resource = null, $order = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return false;
+        }
+
+        if (!is_object($order) || !$order) {
+            // todo: add error log
+            return false;
+        }
+
+        $data = [];
+        $data['metadata'] = $resource->metadata;
+        $data['metadata']['Order'] = $order->id;
+
+        $patchPayment = $this->dependencies->apiClass->patchPayment($resource->id, $data);
+        if (!$patchPayment['result']) {
+            // todo: add error log
+            return false;
+        }
+
+        $create_order_payment = $this->dependencies
+            ->getPlugin()
+            ->getOrderPaymentRepository()
+            ->createOrderPayment([
+                'id_order' => (int) $order->id,
+                'id_payment' => $resource->id,
+            ]);
+        if (!$create_order_payment) {
+            // todo: add error log
             return false;
         }
 

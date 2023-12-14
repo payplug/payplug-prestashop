@@ -160,6 +160,53 @@ class OneyPaymentMethod extends PaymentMethod
         ];
     }
 
+    public function getOrderTab($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
+        }
+
+        $order_tab = parent::getOrderTab($resource);
+
+        if (!$resource->is_paid) {
+            $state_addons = $resource->is_live ? '' : '_test';
+            $order_tab['order_state'] = $this->configuration->getValue('order_state_oney_pg' . $state_addons);
+        }
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+
+        switch ($resource->payment_method['type']) {
+            case 'oney_x3_with_fees':
+                $order_tab['module_name'] = $translation['module_name']['oney']['x3_with_fees'];
+
+                break;
+            case 'oney_x3_without_fees':
+                $order_tab['module_name'] = $translation['module_name']['oney']['x3_without_fees'];
+
+                break;
+            case 'oney_x4_with_fees':
+                $order_tab['module_name'] = $translation['module_name']['oney']['x4_with_fees'];
+
+                break;
+            case 'oney_x4_without_fees':
+                $order_tab['module_name'] = $translation['module_name']['oney']['x4_without_fees'];
+
+                break;
+            default:
+                $order_tab['module_name'] = $translation['module_name']['oney']['default'];
+
+                break;
+        }
+
+        return $order_tab;
+    }
+
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();

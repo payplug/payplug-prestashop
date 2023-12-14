@@ -100,6 +100,32 @@ class paymentValidator
     }
 
     /**
+     * @description Check if given resource can save a card
+     *
+     * @param null $payment
+     * @param null|mixed $resource
+     *
+     * @return bool
+     */
+    public function canSaveCard($resource = null)
+    {
+        if (!is_object($resource) || !$resource) {
+            return false;
+        }
+
+        $can_save_card = false === \strpos($resource->id, 'inst')
+            && (!isset($resource->installment_plan_id) || !$resource->installment_plan_id);
+
+        return $can_save_card && (
+            $resource->save_card
+                || (
+                    $resource->card->id
+                    && $resource->hosted_payment
+                )
+        );
+    }
+
+    /**
      * @description Check if the payment creation went well
      * todo: this method should check if there is an error in the payment resource nor in his creation (already sending a result)
      *

@@ -33,6 +33,7 @@ class BancontactPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'bancontact';
+        $this->order_name = 'bancontact';
         $this->cancellable = false;
     }
 

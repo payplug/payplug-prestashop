@@ -173,13 +173,31 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: dispatchPayment');
         $id_order = $this->orderAdapter->getOrderByCartId($this->cart->id);
         if ($id_order) {
-            $this->order = $this->orderAdapter->get((int) $id_order);
-            if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
-                $this->exitProcess('Order cannot be loaded.', 500);
+            if (isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id) {
+                $this->exitProcess('No need to update a installment plan schedule.');
             }
-            $this->processUpdateOrder();
+
+            $order_update = $this->dependencies
+                ->getPlugin()
+                ->getOrderAction()
+                ->updateAction($this->resource->id);
+            if (!$order_update['result']) {
+                $this->exitProcess('An error while order creation: ' . $order_update['message'], 500);
+            }
+            $this->exitProcess('Order updated: ' . $order_update['message']);
         } else {
-            $this->processCreateOrder();
+            $resource_id = isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id
+                ? $this->resource->installment_plan_id
+                : $this->resource->id;
+
+            $order_create = $this->dependencies
+                ->getPlugin()
+                ->getOrderAction()
+                ->createAction($resource_id);
+            if (!$order_create['result']) {
+                $this->exitProcess('An error while order creation.');
+            }
+            $this->exitProcess('Order created.');
         }
     }
 
@@ -297,330 +315,11 @@ class PayPlugNotifications
         try {
             $this->apiClass->setSecretKey($this->api_key);
             $this->resource = Notification::treat($body);
+
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
         } catch (UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), 500);
         }
-    }
-
-    /**
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    private function processCreateOrder()
-    {
-        $this->logger->addLog('Notification: processCreateOrder');
-
-        if (isset($this->resource->failure) && null !== $this->resource->failure) {
-            $this->logger->addLog('The payment has failed.');
-            $this->exitProcess('No treatment because payment has failed.');
-        }
-
-        $is_paid = $this->resource->is_paid;
-
-        if ($this->is_installment) {
-            $installment = new PPPaymentInstallment($this->resource->installment_plan_id, $this->dependencies);
-            $first_payment = $installment->getFirstPayment();
-            if ($this->validators['payment']->isDeferred($first_payment->resource)['result']) {
-                $order_state = $this->order_states['auth'];
-            } else {
-                $order_state = $this->order_states['paid'];
-            }
-
-            $amount = 0;
-            $installment = $this->apiClass->retrieveInstallment($this->resource->installment_plan_id);
-            if (!$installment['result']) {
-                $this->logger->addLog('Can\'t retrieve installment: ' . $installment['message']);
-                $this->exitProcess('Can\'t retrieve installment: ' . $installment['message']);
-            }
-
-            $installment = $installment['resource'];
-            foreach ($installment->schedule as $schedule) {
-                $amount += (int) $schedule->amount;
-            }
-
-            $transaction_id = $this->resource->installment_plan_id;
-        } else {
-            // We can't treat Oney pending IPN anymore because it's sent with no reason
-            if ($this->is_oney && !$is_paid) {
-                $order_state = $this->order_states['oney'];
-            } elseif ($this->is_deferred && !$is_paid) {
-                $order_state = $this->order_states['auth'];
-            } else {
-                $order_state = $this->order_states['paid'];
-            }
-
-            $amount = $this->payment->amount;
-            $transaction_id = $this->payment->id;
-        }
-
-        $extra_vars = [
-            'transaction_id' => $transaction_id,
-        ];
-
-        $amount = $this->amountCurrencyClass->convertAmount($amount, true);
-        $cart_amount = $this->cart->getOrderTotal(true);
-        $check_amount = $this->validators['order']->isSameAmount((float) $amount, (float) $cart_amount);
-        if (!$check_amount['result']) {
-            $this->logger->addLog($check_amount['message']);
-            $this->logger->addLog('Cart amount:' . $cart_amount);
-        }
-
-        $currency = (int) $this->cart->id_currency;
-
-        try {
-            $customer = $this->customerAdapter->get((int) $this->cart->id_customer);
-        } catch (\Exception $exception) {
-            $this->logger->addLog(
-                'Customer cannot be loaded: ' . $exception->getMessage(),
-                'error'
-            );
-            $this->exitProcess($exception->getMessage(), 500);
-        }
-        if (!$this->validateAdapter->validate('isLoadedObject', $customer)) {
-            $this->logger->addLog('Customer cannot be loaded.', 'error');
-            $this->exitProcess('Customer cannot be loaded.', 500);
-        }
-
-        /*
-             * For some reasons, secure key form cart can differ from secure key from customer
-             * Maybe due to migration or Prestashop's Update
-             */
-        $secure_key = false;
-        if (isset($customer->secure_key) && !empty($customer->secure_key)) {
-            if (isset($this->cart->secure_key)
-                && !empty($this->cart->secure_key)
-                && $this->cart->secure_key !== $customer->secure_key
-            ) {
-                $secure_key = $this->cart->secure_key;
-                $this->logger->addLog('Secure keys do not match.', 'error');
-                $this->logger->addLog(
-                    'Customer Secure Key: ' . $customer->secure_key,
-                    'error'
-                );
-                $this->logger->addLog('Cart Secure Key: ' . $this->cart->secure_key, 'error');
-            } else {
-                $secure_key = $customer->secure_key;
-            }
-        }
-
-        $module_name = $this->module->displayName;
-
-        if ($this->is_oney) {
-            switch ($this->payment->payment_method['type']) {
-                case 'oney_x3_with_fees':
-                    $name = $this->dependencies
-                        ->getPlugin()
-                        ->getTranslationClass()
-                        ->l('Oney 3x', 'payplugnotifications');
-
-                    break;
-
-                case 'oney_x4_with_fees':
-                    $name = $this->dependencies
-                        ->getPlugin()
-                        ->getTranslationClass()
-                        ->l('Oney 4x', 'payplugnotifications');
-
-                    break;
-
-                case 'oney_x3_without_fees':
-                    $name = $this->dependencies
-                        ->getPlugin()
-                        ->getTranslationClass()
-                        ->l('notification.createOrder.oneyX3WithoutFees', 'payplugnotifications');
-
-                    break;
-
-                case 'oney_x4_without_fees':
-                    $name = $this->dependencies
-                        ->getPlugin()
-                        ->getTranslationClass()
-                        ->l('notification.createOrder.oneyX4WithoutFees', 'payplugnotifications');
-
-                    break;
-
-                default:
-                    $name = $module_name;
-
-                    break;
-            }
-            $module_name = $name;
-        } elseif ($this->is_bancontact) {
-            $module_name = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('notification.createOrder.bancontact', 'payplugnotifications');
-        } elseif ($this->is_applepay) {
-            $module_name = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('notification.createOrder.applepay', 'payplugnotifications');
-        } elseif ($this->is_amex) {
-            $module_name = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('notification.createOrder.amex', 'payplugnotifications');
-        } elseif ($this->is_giropay) {
-            $module_name = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('notification.createOrder.giropay', 'payplugnotifications');
-        } elseif ($this->is_ideal) {
-            $module_name = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('notification.createOrder.ideal', 'payplugnotifications');
-        } elseif ($this->is_mybank) {
-            $module_name = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('notification.createOrder.mybank', 'payplugnotifications');
-        } elseif ($this->is_satispay) {
-            $module_name = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('notification.createOrder.satispay', 'payplugnotifications');
-        } elseif ($this->is_sofort) {
-            $module_name = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('notification.createOrder.sofort', 'payplugnotifications');
-        }
-
-        // Check if this notification is the first of the day
-        $is_first_order = empty($this->dependencies->getPlugin()->getOrderRepository()->getCurrentOrders());
-
-        // Create Order
-        try {
-            $this->logger->addLog('Order create with amount:' . $amount);
-            $is_order_validated = $this->module->validateOrder(
-                $this->cart->id,
-                $order_state,
-                $amount,
-                $module_name,
-                null,
-                $extra_vars,
-                $currency,
-                false,
-                $secure_key
-            );
-        } catch (\Exception $exception) {
-            $this->logger->addLog('Order cannot be validated: ' . $exception->getMessage(), 'error');
-            $this->exitProcess($exception->getMessage(), 500);
-        }
-        if (!$is_order_validated) {
-            $this->logger->addLog('Order cannot be validated.', 'error');
-            $this->exitProcess('Order cannot be validated.', 500);
-        }
-        $this->logger->addLog('Order validated.');
-
-        // Then load it
-        $this->order = $this->orderAdapter->get((int) $this->module->currentOrder);
-        $check_order = $this->validators['order']->isCreated($this->order, (int) $this->cart->id);
-        if (!$check_order['result']) {
-            $this->logger->addLog($check_order['message'], 'error');
-            $this->exitProcess('Order cannot be loaded.', 500);
-        }
-        $this->logger->addLog('Order loaded.', 'debug');
-
-        // Add payplug OrderPayment && Installment
-        if ($this->is_installment) {
-            $this->installmentClass->addPayplugInstallment($this->resource->installment_plan_id, $this->order);
-        } else {
-            $data = [];
-            $data['metadata'] = $this->payment->metadata;
-            $data['metadata']['Order'] = $this->order->id;
-
-            $patchPayment = $this->apiClass->patchPayment($this->payment->id, $data);
-            if (!$patchPayment['result']) {
-                $this->logger->addLog('Payment cannot be patched: ' . $patchPayment['message'], 'error');
-                $this->exitProcess($patchPayment['message'], 500);
-            }
-
-            $this->logger->addLog('Payment patched.', 'debug');
-
-            $parameters = [
-                'id_order' => (int) $this->order->id,
-                'id_payment' => $this->payment->id,
-            ];
-
-            $create_order_payment = $this->dependencies
-                ->getPlugin()
-                ->getOrderPaymentRepository()
-                ->createOrderPayment($parameters);
-            if (!$create_order_payment) {
-                $this->logger->addLog(
-                    'IPN Failed: unable to create order payment.',
-                    'error'
-                );
-                $this->exitProcess('IPN Failed: unable to create order payment.', 500);
-            } else {
-                $this->logger->addLog('Order payment created.');
-            }
-        }
-
-        // Add prestashop OrderPayment
-        $order_payments = $this->order->getOrderPayments();
-        if (!$order_payments) {
-            $this->logger->addLog('Add new orderPayment for deferred - ' . count($order_payments), 'debug');
-            $this->order->addOrderPayment($amount, null, $transaction_id);
-        }
-
-        // Check number of order using this cart
-        $this->logger->addLog('Checking number of order passed with this id_cart');
-
-        $res_nb_orders = $this->dependencies
-            ->getPlugin()
-            ->getOrderRepository()
-            ->getByIdCart((int) $this->cart->id);
-
-        if (!$res_nb_orders) {
-            $this->logger->addLog(
-                'No order can be found using id_cart ' . (int) $this->cart->id,
-                'error'
-            );
-            $this->exitProcess('No order can be found using id_cart: ' . (int) $this->cart->id, 500);
-        } elseif (count($res_nb_orders) > 1) {
-            $this->logger->addLog(
-                'There is more than one order using id_cart ' . (int) $this->cart->id,
-                'error'
-            );
-            foreach ($res_nb_orders as $o) {
-                $this->logger->addLog('Order ID : ' . $o['id_order'], 'debug');
-            }
-            $this->exitProcess('There is more than one order using id_cart: ' . (int) $this->cart->id, 500);
-        } else {
-            $this->logger->addLog('OK');
-            $id_order = (int) $res_nb_orders[0]['id_order'];
-        }
-
-        // Check number of orderPayment using this cart
-        $this->logger->addLog('Checking number of transaction validated for this order');
-        $payments = $this->order->getOrderPayments();
-        if (!$payments) {
-            $this->logger->addLog(
-                'No transaction can be found using id_order ' . (int) $id_order,
-                'error'
-            );
-            $this->exitProcess('No transaction can be found using id_order: ' . (int) $id_order, 500);
-        } elseif (count($payments) > 1) {
-            $this->logger->addLog(
-                'There is more than one transaction using id_order ' . (int) $id_order,
-                'error'
-            );
-            $this->exitProcess('There is more than one transaction using id_order: ' . (int) $id_order, 500);
-        } else {
-            $this->logger->addLog('OK');
-        }
-
-        // Before ending process, if this is the first order of the days, we send the telemetries
-        if ($is_first_order) {
-            $this->dependencies->getPlugin()->getMerchantTelemetryAction()->sendAction('notification');
-        }
-
-        $this->logger->addLog('Order created.');
-        $this->exitProcess('Order created.');
     }
 
     /**
@@ -656,9 +355,6 @@ class PayPlugNotifications
 
         // Check the payment ressource
         $this->checkIsValidPaymentResource();
-
-        // Save card
-        $this->processSaveCard();
 
         // Set cart from resource
         $this->setCartFromResource();
@@ -760,7 +456,10 @@ class PayPlugNotifications
             $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {
-                $this->updateOrderState($new_order_state);
+                $this->dependencies
+                    ->getPlugin()
+                    ->getOrderClass()
+                    ->updateOrderState($this->order, (int) $new_order_state);
             } else {
                 $this->logger->addLog('Order status is already \'refunded\'');
                 $this->exitProcess('Order status is already \'refunded\'');
@@ -772,278 +471,26 @@ class PayPlugNotifications
     }
 
     /**
-     * @description Process the card saving for one click use
-     */
-    private function processSaveCard()
-    {
-        $this->logger->addLog('Notification: processSaveCard');
-        if ($this->canSaveCard()) {
-            $this->logger->addLog('[Save Card] Saving card...');
-            $res_payplug_card = $this->dependencies
-                ->getPlugin()
-                ->getCardAction()
-                ->saveAction($this->payment);
-
-            if (!$res_payplug_card) {
-                $this->logger->addLog('[Save Card] Card cannot be saved.', 'error');
-
-                if (!isset($this->payment->save_card)) {
-                    $this->logger->addLog('[Save Card] $payment->save_card is not set', 'debug');
-                }
-
-                if (isset($this->payment->save_card) && 1 !== $this->payment->save_card) {
-                    $this->logger->addLog('[Save Card] $this->payment->save_card is set but not equal to 1', 'debug');
-                }
-
-                if (!isset($this->payment->card->id)) {
-                    $this->logger->addLog('[Save Card] $this->payment->card->id is not set', 'debug');
-                }
-
-                if (isset($this->payment->card->id) && '' == $this->payment->card->id) {
-                    $this->logger->addLog('[Save Card] $this->payment->card->id is set but empty', 'debug');
-                }
-
-                if (!isset($this->payment->hosted_payment)) {
-                    $this->logger->addLog('[Save Card] $this->payment->hosted_payment is not set', 'debug');
-                }
-
-                if ((isset($this->payment->hosted_payment)) && '' == $this->payment->hosted_payment) {
-                    $this->logger->addLog('[Save Card] $this->payment->hosted_payment is set but empty', 'debug');
-                }
-            } else {
-                $this->logger->addLog('[Save Card] Card saved', 'debug');
-            }
-        }
-    }
-
-    /**
-     * @description Process Payment Ressource when related Order is with a status Cancelled
-     */
-    private function processTypeCancelled()
-    {
-        $this->logger->addLog('Notification: processTypeCancelled');
-        $this->exitProcess('Order is already set as cancelled.');
-    }
-
-    /**
-     * @description Process Payment Ressource when related Order is with a status Error
-     */
-    private function processTypeError()
-    {
-        $this->logger->addLog('Notification: processTypeError');
-        $this->exitProcess('Order is set as error.');
-    }
-
-    /**
-     * @description Process Payment Ressource when related Order is with a status Expired
-     */
-    private function processTypeExpired()
-    {
-        $this->logger->addLog('Notification: processTypeExpired');
-        $this->exitProcess('Order is already set as expired.');
-    }
-
-    /**
-     * @description Process Payment Ressource when related Order is with a status Nothing
-     */
-    private function processTypeNothing()
-    {
-        $this->logger->addLog('Notification: processTypeNothing');
-        $this->exitProcess('Order is configure to not be treat');
-    }
-
-    /**
-     * @description Process Payment Ressource when related Order is with a status Paid
-     */
-    private function processTypePaid()
-    {
-        $this->logger->addLog('Notification: processTypePaid');
-        $this->exitProcess('Order is already paid.');
-    }
-
-    /**
-     * @description Process Payment Ressource when related Order is with a status Pending
-     */
-    private function processTypePending()
-    {
-        $this->logger->addLog('Notification: processTypePending');
-
-        // Get the new order state
-        $new_order_state = $this->getNewOrderState();
-        $new_order_state_id = $this->order_states[$new_order_state['status']];
-        if (!$new_order_state['valid']) {
-            $this->updateOrderState($new_order_state_id);
-        }
-
-        // Check if payment is paid
-        if (!$this->payment->is_paid) {
-            $this->exitProcess('The payment is not paid yet.');
-        }
-
-        // Check if order amount is valid
-        $is_valid_amount = (bool) $this->payment->is_paid;
-        if ($this->is_installment) {
-            $is_valid_amount = $this->amountCurrencyClass->checkAmountPaidIsCorrect(
-                $this->payment->amount / 100,
-                $this->order
-            );
-        }
-        $this->logger->addLog('Is valid amount: ' . ($is_valid_amount ? 'ok' : 'ko'));
-
-        if (!$is_valid_amount) {
-            $message = $this->messageAdapter->get();
-            $msg = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('The amount collected by PayPlug is not the same', 'payplugnotifications');
-            $msg .= $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l(' as the total value of the order', 'payplugnotifications');
-            $message->message = $msg;
-            $message->id_order = $this->order->id;
-            $message->id_cart = $this->order->id_cart;
-            $message->private = true;
-
-            try {
-                $message_saved = $message->save();
-                $this->logger->addLog('Message saved: ' . ($message_saved ? 'ok' : 'ko'));
-            } catch (\Exception $exception) {
-                $this->logger->addLog('The message cannot be saved: ' . $exception->getMessage(), 'error');
-                $this->exitProcess($exception->getMessage(), 500);
-            }
-
-            $new_order_state_id = $this->order_states['error'];
-            $this->updateOrderState($new_order_state_id);
-        }
-
-        // Get associated transaction
-        $payplug_order_payments = $this->dependencies
-            ->getPlugin()
-            ->getOrderPaymentRepository()
-            ->getAllByOrder((int) $this->order->id);
-
-        $order_payments = $this->order->getOrderPayments();
-
-        // Check if the payment is related to the order with payplug order payment
-        $related = false;
-        if ($payplug_order_payments) {
-            foreach ($payplug_order_payments as $payment) {
-                if ($payment['id_payment'] == $this->payment->id) {
-                    $related = true;
-                }
-            }
-        } elseif ($order_payments) {
-            foreach ($order_payments as $payment) {
-                if ($payment->transaction_id == $this->payment->id) {
-                    $related = true;
-                }
-            }
-        }
-        $this->logger->addLog('Is related: ' . ($related ? 'ok' : 'ko'));
-        if (!$related) {
-            $this->exitProcess('The payment is not related to this order.');
-        }
-
-        // Add prestashop OrderPayment if need
-        $this->logger->addLog('Has order payments ' . ($order_payments ? 'ok' : 'ko'));
-        if (!$order_payments) {
-            $this->logger->addLog('Create new order payment');
-            $this->order->addOrderPayment($this->payment->amount / 100, null, $this->payment->id);
-        }
-
-        // Then update the order state
-        $this->updateOrderState($new_order_state_id);
-    }
-
-    /**
-     * @description Process Payment Ressource when related Order is with a status Refund
-     */
-    private function processTypeRefund()
-    {
-        $this->logger->addLog('Notification: processTypeRefund');
-        $this->exitProcess('Order is already set as refunded.');
-    }
-
-    /**
-     * @description Process Payment Ressource when related Order is with a status Nothing
-     */
-    private function processTypeUndefined()
-    {
-        $this->logger->addLog('Notification: processTypeUndefined');
-        $id_order_state = $this->order->current_state;
-
-        // check current order state type to create if it's empty
-        $type = $this->dependencies
-            ->getPlugin()
-            ->getPayplugOrderStateRepository()
-            ->getTypeByIdOrderState((int) $id_order_state);
-        if ($type != $this->type) {
-            $this->dependencies
-                ->getPlugin()
-                ->getPayplugOrderStateRepository()
-                ->setOrderState((int) $id_order_state, $this->type);
-        }
-
-        $this->exitProcess('The order state is not defined');
-    }
-
-    /**
-     * @description Update order from the notification
-     *
-     * @param $id_order Identificer of the order to update
-     */
-    private function processUpdateOrder()
-    {
-        $this->logger->addLog('Notification: processUpdateOrder');
-
-        $type = $this->dependencies
-            ->getPlugin()
-            ->getPayplugOrderStateRepository()
-            ->getTypeByIdOrderState((int) $this->order->current_state);
-        $this->type = $type ?: 'undefined';
-
-        $this->logger->addLog('Current order state: ' . $this->order->current_state);
-        $this->logger->addLog('Type: ' . $this->type);
-
-        $method = 'processType' . $this->toolsAdapter->tool('ucfirst', $this->type);
-        $this->{$method}();
-    }
-
-    /**
      * @description Set $this->cart in the DB from the resource id
      */
     private function setCartFromResource()
     {
         $this->logger->addLog('Notification: setCartFromResource');
-        if ($this->is_installment) {
-            $payment = $this->dependencies
-                ->getPlugin()
-                ->getPaymentRepository()
-                ->getByResourceId($this->payment->installment_plan_id);
-            if (empty($payment)) {
-                if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
-                    $this->logger->addLog('Payment timeout for paymentID: ' . $this->payment->installment_plan_id);
-                    $this->exitProcess('Payment timeout for paymentID: ' . $this->payment->installment_plan_id, 200);
-                }
-
-                $error_msg = 'The cart cannot be found with payment ID: ' . $this->payment->installment_plan_id;
-                $this->exitProcess($error_msg, 500);
+        $resource_id = isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id
+            ? $this->resource->installment_plan_id
+            : $this->resource->id;
+        $payment = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByResourceId($resource_id);
+        if (empty($payment)) {
+            if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
+                $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
+                $this->exitProcess('Payment timeout for payment ID: ' . $this->resource->id, 200);
             }
-        } else {
-            $payment = $this->dependencies
-                ->getPlugin()
-                ->getPaymentRepository()
-                ->getByResourceId($this->resource->id);
-            if (empty($payment)) {
-                if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
-                    $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
-                    $this->exitProcess('Payment timeout for payment ID: ' . $this->resource->id, 200);
-                }
 
-                $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-                $this->exitProcess($error_msg, $this->is_oney ? 242 : 500);
-            }
+            $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
+            $this->exitProcess($error_msg, $this->is_oney ? 242 : 500);
         }
 
         $this->cart = $this->cartAdapter->get((int) $payment['id_cart']);
@@ -1159,7 +606,7 @@ class PayPlugNotifications
             'error' => $this->configuration->getValue('order_state_error' . $state_addons),
             'expired' => $this->configuration->getValue('order_state_exp' . $state_addons),
             'oney' => $this->configuration->getValue('order_state_oney_pg' . $state_addons),
-                'oos_paid' => $this->configAdapter->get('PS_OS_OUTOFSTOCK_PAID'),
+            'oos_paid' => $this->configAdapter->get('PS_OS_OUTOFSTOCK_PAID'),
             'paid' => $this->configuration->getValue('order_state_paid' . $state_addons),
             'pending' => $this->configuration->getValue('order_state_pending' . $state_addons),
             'refund' => $this->configuration->getValue('order_state_refund' . $state_addons),
@@ -1215,7 +662,7 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: is_deferred: ' . ($this->is_deferred ? 'ok' : 'nok'));
 
         // Define if payment is from installment
-        $this->is_installment = $this->payment->installment_plan_id ?: false;
+        $this->is_installment = $this->validators['payment']->isInstallment($this->payment->id)['result'];
         $this->logger->addLog('Notification: is_installment: ' . ($this->is_installment ? 'ok' : 'nok'));
 
         // Define if payment is applepay resource
@@ -1259,48 +706,5 @@ class PayPlugNotifications
             $this->is_sofort = 'sofort' == $this->payment->payment_method['type'];
         }
         $this->logger->addLog('Notification: is_sofort ' . ($this->is_sofort ? 'ok' : 'nok'));
-    }
-
-    /**
-     * @param int $new_order_state
-     *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
-     */
-    private function updateOrderState($new_order_state = false)
-    {
-        if (!is_int($new_order_state) && !$new_order_state) {
-            $this->exitProcess('Try to update order without valid order state id', 500);
-        } elseif ($new_order_state == $this->order->current_state) {
-            $this->exitProcess('The order is already with the status id: ' . $new_order_state, 200);
-        }
-
-        try {
-            $order_history = $this->orderHistoryAdapter->get();
-            $order_history->id_order = (int) $this->order->id;
-            $order_history->changeIdOrderState((int) $new_order_state, $this->order->id, true);
-            $order_history->save();
-        } catch (\Exception $exception) {
-            $this->logger->addLog(
-                'Order history cannot be saved: ' . $exception->getMessage(),
-                'error'
-            );
-            $this->logger->addLog(
-                'Please check if order state ' . (int) $new_order_state . ' exists.',
-                'error'
-            );
-            $this->exitProcess($exception->getMessage(), 500);
-        }
-
-        $this->order = $this->orderAdapter->get((int) $this->order->id);
-        $this->order->current_state = $order_history->id_order_state;
-
-        try {
-            $this->order->update();
-        } catch (\Exception $exception) {
-            $this->logger->addLog('Order cannot be updated: ' . $exception->getMessage(), 'error');
-            $this->exitProcess($exception->getMessage(), 500);
-        }
-        $this->exitProcess('Order updated with state id: ' . $new_order_state);
     }
 }

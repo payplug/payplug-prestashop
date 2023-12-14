@@ -9,7 +9,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group action
  * @group payment_action
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */

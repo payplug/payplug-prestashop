@@ -48,6 +48,51 @@ class InstallmentPaymentMethod extends PaymentMethod
         return [];
     }
 
+    public function getOrderTab($installment = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($installment) || !$installment) {
+            // todo: add error log
+            return [];
+        }
+
+        $amount = 0;
+        $order_state = 0;
+        foreach ($installment->schedule as $schedule) {
+            if (!$amount) {
+                $pay_id = $schedule->payment_ids[0];
+                $retrieve_payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                if (!$retrieve_payment['result']) {
+                    return [];
+                }
+                $payment = $retrieve_payment['resource'];
+                $state_addons = $installment->is_live ? '' : '_test';
+                if ($this->dependencies->getValidators()['payment']->isDeferred($payment)['result']) {
+                    $order_state = $this->configuration->getValue('order_state_auth' . $state_addons);
+                } else {
+                    $order_state = $this->configuration->getValue('order_state_paid' . $state_addons);
+                }
+            }
+            $amount += (int) $schedule->amount;
+        }
+
+        $amount = $this->dependencies
+            ->getHelpers()['amount']
+            ->convertAmount($amount, true);
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+
+        return [
+            'order_state' => $order_state,
+            'amount' => $amount,
+            'module_name' => $translation['module_name']['default'],
+        ];
+    }
+
     /**
      * @return array
      */
@@ -174,6 +219,13 @@ class InstallmentPaymentMethod extends PaymentMethod
         }
 
         return true;
+    }
+
+    public function postProcessOrder($resource = null, $order = null)
+    {
+        return $this->dependencies
+            ->installmentClass
+            ->addPayplugInstallment($resource->id, $order);
     }
 
     /**

@@ -33,6 +33,7 @@ class ApplepayPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'applepay';
+        $this->order_name = 'applepay';
         $this->force_resource = true;
     }
 
