@@ -10,6 +10,7 @@ class OrderMock
 
         $order->id = 42;
         $order->id_cart = 42;
+        $order->current_state = 42;
 
         return $order;
     }

@@ -215,6 +215,33 @@ class Translation
         ];
     }
 
+    public function getOrderTranslations()
+    {
+        return [
+            'update' => [
+                'invalid_amount_message' => $this->l('order.update.invalid_amount_message', 'translation'),
+            ],
+            'module_name' => [
+                'amex' => $this->l('order.module.amex', 'translation'),
+                'applepay' => $this->l('order.module.applepay', 'translation'),
+                'bancontact' => $this->l('order.module.bancontact', 'translation'),
+                'default' => $this->l('order.module.default', 'translation'),
+                'giropay' => $this->l('order.module.giropay', 'translation'),
+                'ideal' => $this->l('order.module.ideal', 'translation'),
+                'mybank' => $this->l('order.module.mybank', 'translation'),
+                'oney' => [
+                    'default' => $this->l('order.module.oney.default', 'translation'),
+                    'x3_with_fees' => $this->l('order.module.oney.x3_with_fees', 'translation'),
+                    'x3_without_fees' => $this->l('order.module.oney.x3_without_fees', 'translation'),
+                    'x4_with_fees' => $this->l('order.module.oney.x4_with_fees', 'translation'),
+                    'x4_without_fees' => $this->l('order.module.oney.x4_without_fees', 'translation'),
+                ],
+                'satispay' => $this->l('order.module.satispay', 'translation'),
+                'sofort' => $this->l('order.module.sofort', 'translation'),
+            ],
+        ];
+    }
+
     /**
      * @return array
      */

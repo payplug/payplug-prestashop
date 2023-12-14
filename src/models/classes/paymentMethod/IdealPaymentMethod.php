@@ -33,6 +33,7 @@ class IdealPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'ideal';
+        $this->order_name = 'ideal';
     }
 
     /**

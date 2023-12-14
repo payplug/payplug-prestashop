@@ -33,6 +33,7 @@ class GiropayPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'giropay';
+        $this->order_name = 'giropay';
     }
 
     /**
