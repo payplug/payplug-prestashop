@@ -43,10 +43,11 @@ class getDefaultTranslationTest extends BaseTranslation
     {
         $string = 'translation.key';
         $template = 'alias';
-        $this->classe->default_translations = [];
+        $default_lang = 'zh';
+        $default_translations = [];
         $this->assertSame(
             '',
-            $this->classe->getDefaultTranslation($string, $template)
+            $this->classe->getDefaultTranslation($string, $template, $default_translations, $default_lang)
         );
     }
 
@@ -54,12 +55,12 @@ class getDefaultTranslationTest extends BaseTranslation
     {
         $string = 'translation.key';
         $template = 'alias';
-        $this->classe->default_translations = [
+        $default_translations = [
             'key' => 'translation',
         ];
         $this->assertSame(
             $string,
-            $this->classe->getDefaultTranslation($string, $template)
+            $this->classe->getDefaultTranslation($string, $template, $default_translations)
         );
     }
 
@@ -67,15 +68,16 @@ class getDefaultTranslationTest extends BaseTranslation
     {
         $string = 'translation.key';
         $template = 'alias';
+        $default_lang = 'zh';
         $expected_key = '<{' . $this->dependencies->name . '}prestashop>' . strtolower($template) . '_' . md5($string);
         $expected_translation = 'expected translation';
-        $this->classe->default_translations = [
+        $default_translations = [
             $expected_key => $expected_translation,
         ];
 
         $this->assertSame(
             $expected_translation,
-            $this->classe->getDefaultTranslation($string, $template)
+            $this->classe->getDefaultTranslation($string, $template, $default_translations, $default_lang)
         );
     }
 }

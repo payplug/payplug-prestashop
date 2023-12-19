@@ -29,21 +29,11 @@ if (!defined('_PS_VERSION_')) {
 
 class Translation
 {
-    public $default_translations = [];
-    private $default_lang;
     private $dependencies;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-
-        // Set default translations
-        $this->default_lang = 'en';
-        $default_translation_file = dirname(__FILE__) . '/../../../translations/' . $this->default_lang . '.php';
-        if (file_exists($default_translation_file)) {
-            @include $default_translation_file;
-            $this->default_translations = $GLOBALS['_MODULE'];
-        }
     }
 
     /**
@@ -545,10 +535,12 @@ class Translation
      *
      * @param string $string
      * @param string $name
+     * @param mixed $default_translations
+     * @param mixed $default_lang
      *
      * @return string
      */
-    protected function getDefaultTranslation($string = '', $name = '')
+    protected function getDefaultTranslation($string = '', $name = '', $default_translations = [], $default_lang = 'en')
     {
         if (!is_string($string) || !$string) {
             return '';
@@ -558,12 +550,18 @@ class Translation
             return '';
         }
 
-        if (empty($this->default_translations)) {
+        $default_translation_file = dirname(__FILE__) . '/../../../translations/' . $default_lang . '.php';
+        if (file_exists($default_translation_file)) {
+            include $default_translation_file;
+            $default_translations = $GLOBALS['_MODULE'];
+        }
+
+        if (empty($default_translations)) {
             return '';
         }
 
         $translation_key = '<{' . $this->dependencies->name . '}prestashop>' . strtolower($name) . '_' . md5($string);
 
-        return isset($this->default_translations[$translation_key]) ? $this->default_translations[$translation_key] : $string;
+        return isset($default_translations[$translation_key]) ? $default_translations[$translation_key] : $string;
     }
 }
