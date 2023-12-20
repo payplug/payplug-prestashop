@@ -36,6 +36,7 @@ class PaymentRepository extends QueryRepository
         'cart_hash' => 'string',
         'schedules' => 'string',
         'date_upd' => 'string',
+        'is_live' => 'integer',
     ];
 
     public function __construct($prefix = '', $dependencies = null)
@@ -190,6 +191,29 @@ class PaymentRepository extends QueryRepository
     }
 
     /**
+     * @description Get cart id from given resource id
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
+    public function getByScheduleId($resource_id = '')
+    {
+        if (!is_string($resource_id) || !$resource_id) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->table_name)
+            ->where('`schedules` LIKE "%' . $this->escape($resource_id) . '%"')
+            ->build('unique_row');
+
+        return $result ?: [];
+    }
+
+    /**
      * @description Create the table in the database
      *
      * @param string $engine
@@ -207,6 +231,7 @@ class PaymentRepository extends QueryRepository
             ->table($this->table_name)
             ->fields('`id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`resource_id` VARCHAR(255) NULL')
+            ->fields('`is_live` TINYINT(1) NOT NULL DEFAULT 1')
             ->fields('`method` VARCHAR(255) NULL')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`cart_hash` VARCHAR(64) NULL')

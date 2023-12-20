@@ -93,6 +93,61 @@ class PaymentMethod
         $this->refundable = true;
     }
 
+    // todo: add coverage to this method
+    public function abort($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::retrieve - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $stored_payment = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByResourceId($resource_id);
+
+        if (!$stored_payment) {
+            $this->logger->addLog('PaymentMethod::retrieve - Can\'t find stored payment from given resource id.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Can\'t find stored payment from given resource id',
+            ];
+        }
+
+        // We retrieve the payment from the stored payment configuration
+        $api_key = (bool) $stored_payment['is_live']
+            ? $this->configuration->getValue('live_api_key')
+            : $this->configuration->getValue('test_api_key');
+
+        $this->dependencies->apiClass->setSecretKey($api_key);
+        $is_installment = 'installment' == $stored_payment['payment_method'];
+        $abort = $is_installment
+            ? $this->dependencies->apiClass->abortPayment($resource_id)
+            : $this->dependencies->apiClass->abortInstallment($resource_id);
+
+        // If we don't find the payment, for retrocompatibility we switch the mode then try again
+        // This section could be removed for next version
+        if (!$abort['result']) {
+            $reverse_api_key = (bool) $stored_payment['is_live']
+                ? $this->configuration->getValue('test_api_key')
+                : $this->configuration->getValue('live_api_key');
+
+            $this->dependencies->apiClass->setSecretKey($reverse_api_key);
+            $abort = $this->dependencies->apiClass->abortPayment($resource_id);
+        }
+
+        return $abort;
+    }
+
     /**
      * @description Get an object property
      *
@@ -249,6 +304,7 @@ class PaymentMethod
      * @description Get order tab for given resource
      *
      * @param null $resource
+     * @param mixed $retrieve
      *
      * @return array
      */
@@ -591,6 +647,7 @@ class PaymentMethod
     public function getResourceDetail($resource_id = '')
     {
         $this->setParameters();
+
         if (!is_string($resource_id) || !$resource_id) {
             $this->logger->addLog('PaymentMethod::getResourceDetail - Invalid argument, $resource_id must be a non empty string.', 'error');
 
@@ -599,18 +656,7 @@ class PaymentMethod
                 'message' => 'Invalid argument, $resource_id must be a non empty string.',
             ];
         }
-
-        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
-        $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-        if (!$retrieve['result']) {
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-            } else {
-                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-            }
-        }
+        $retrieve = $this->retrieve($resource_id);
         if (!$retrieve['result']) {
             $this->logger->addLog('PaymentMethod::getResourceDetail - Cannot retrieve the resource.', 'error');
 
@@ -1043,6 +1089,67 @@ class PaymentMethod
             'id_status' => 1,
             'code' => 'not_paid',
         ];
+    }
+
+    // todo: add coverage to this method
+    public function retrieve($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::retrieve - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $stored_payment = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByResourceId($resource_id);
+
+        if (!$stored_payment) {
+            $this->logger->addLog('PaymentMethod::retrieve - Can\'t find stored payment from given resource id.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Can\'t find stored payment from given resource id',
+            ];
+        }
+
+        // We retrieve the payment from the stored payment configuration
+        $api_key = (bool) $stored_payment['is_live']
+            ? $this->configuration->getValue('live_api_key')
+            : $this->configuration->getValue('test_api_key');
+
+        $this->dependencies->apiClass->setSecretKey($api_key);
+        $is_installment = 'installment' == $stored_payment['payment_method'];
+        $retrieve = $is_installment
+            ? $this->dependencies->apiClass->retrievePayment($resource_id)
+            : $this->dependencies->apiClass->retrieveInstallment($resource_id);
+
+        // If we don't find the payment, for retrocompatibility we switch the mode then try again
+        // This section could be removed for highter module version
+        if (!$retrieve['result']) {
+            $reverse_api_key = (bool) $stored_payment['is_live']
+                ? $this->configuration->getValue('test_api_key')
+                : $this->configuration->getValue('live_api_key');
+
+            $this->dependencies->apiClass->setSecretKey($reverse_api_key);
+            $retrieve = $is_installment
+                ? $this->dependencies->apiClass->retrievePayment($resource_id)
+                : $this->dependencies->apiClass->retrieveInstallment($resource_id);
+        }
+
+        return $is_installment
+            ? $retrieve
+            : $this
+                ->getPaymentMethod($stored_payment['payment_method'])
+                ->retrieveSchedules($retrieve);
     }
 
     /**

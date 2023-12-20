@@ -142,6 +142,10 @@ class saveResourceTest extends BaseInstallmentPaymentMethod
                 'createInstallment' => $resource,
             ]);
         $this->dependencies->apiClass = $apiClass;
+        $this->classe
+            ->shouldReceive([
+                'addInstallmentSchedules' => true,
+            ]);
         $this->assertSame(
             $resource,
             $this->classe->saveResource($payment_tab)
