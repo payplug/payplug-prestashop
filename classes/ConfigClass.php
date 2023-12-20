@@ -277,11 +277,6 @@ class ConfigClass
         return $this->img_lang;
     }
 
-    public function getPaymentStatus()
-    {
-        return $this->payment_status;
-    }
-
     /**
      * @param bool $force_all
      *
@@ -819,52 +814,5 @@ class ConfigClass
                 ->getTranslationClass()
                 ->l('payplug.setConfigurationProperties.configureModule', 'configclass');
         }
-
-        $this->payment_status = [
-            1 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.notPaid', 'configclass'),
-            2 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.paid', 'configclass'),
-            3 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.failed', 'configclass'),
-            4 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.partiallyRefunded', 'configclass'),
-            5 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.refunded', 'configclass'),
-            6 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.onGoing', 'configclass'),
-            7 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.cancelled', 'configclass'),
-            8 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.authorized', 'configclass'),
-            9 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.authorizationExpired', 'configclass'),
-            10 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.oneyPending', 'configclass'),
-            11 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.abandoned', 'configclass'),
-        ];
     }
 }

@@ -25,33 +25,30 @@
     </h3>
     <div class="card-body">
         <span class="logo">
-            <img src="{$logo_url.payplug|escape:'htmlall':'UTF-8'}" />
-            {if $module_name == 'pspaylater'}
-                <span></span>
-                <img src="{$logo_url.pspaylater|escape:'htmlall':'UTF-8'}" />
-            {/if}
+            <img src="{$logo_url|escape:'htmlall':'UTF-8'}" />
         </span>
         {if isset($undefined_history_states) && $undefined_history_states}
             {include file='./order_state.tpl'}
         {/if}
 
-        {if $show_menu_installment}
-            {include file='./installment.tpl'}
+        {if isset($installment) && $installment}
+            {include file='./installment.tpl' installment=$installment}
         {/if}
 
-        {if $display_single_payment}
-            {if $single_payment.can_be_captured && isset($single_payment.date)}
-                <span class="{$module_name|escape:'htmlall':'UTF-8'}Alert -warning">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$single_payment.date_expiration mod='payplug'}</span>
+        {if isset($payment) && $payment}
+            {if isset($payment.can_be_captured) && $payment.can_be_captured && isset($payment.date)}
+                <span class="{$module_name|escape:'htmlall':'UTF-8'}Alert -warning">{l s='Capture of this payment is authorized before %s. After this date, you will not be able to get paid.' sprintf=$payment.date_expiration mod='payplug'}</span>
             {/if}
-            {include file='./details.tpl' payment=$single_payment}
+            {include file='./details.tpl' payment=$payment}
         {/if}
-        {if $display_refund}
+
+        {if $refund}
             <hr />
             {include file='./refund.tpl'}
-        {elseif $show_menu_refunded}
+        {elseif $refunded}
             <hr />
-            {include file='./refunded.tpl'}
-        {elseif $show_menu_update}
+            {include file='./refunded.tpl' refunded=$refunded}
+        {elseif $update}
             <hr />
             {include file='./update.tpl'}
         {/if}

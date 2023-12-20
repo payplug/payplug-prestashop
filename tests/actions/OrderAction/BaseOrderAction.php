@@ -12,8 +12,8 @@ class BaseOrderAction extends TestCase
     use FormatDataProvider;
 
     protected $cart_adapter;
-    protected $customer_adapter;
     protected $configuration_class;
+    protected $customer_adapter;
     protected $dependencies;
     protected $logger;
     protected $module;

@@ -38,6 +38,7 @@ class ConfigurationAction
 
     /**
      * @description check permission for a given payment method
+     * todo: add coverage to this method
      *
      * @param string $payment_method
      * @param bool $sandbox_mode
@@ -46,7 +47,6 @@ class ConfigurationAction
      */
     public function checkPermissionAction($payment_method = '', $sandbox_mode = null)
     {
-        // todo: add unit tests
         if ((!is_string($payment_method) || !$payment_method)
             || !is_bool($sandbox_mode)) {
             return [

@@ -32,6 +32,7 @@ class OrderAction
     private $configuration;
     private $dependencies;
     private $logger;
+    private $order;
     private $plugin;
     private $validate_adapter;
 
@@ -65,11 +66,11 @@ class OrderAction
             ->getPaymentRepository()
             ->getByResourceId($resource_id);
         if (empty($payment_tab)) {
-            $this->logger->addLog('OrderAction::createAction - Can not retrieve resource from database', 'error');
+            $this->logger->addLog('OrderAction::createAction - Can\'t retrieve resource from database', 'error');
 
             return [
                 'result' => false,
-                'message' => 'Can not retrieve resource from database',
+                'message' => 'Can\'t retrieve resource from database',
             ];
         }
 
@@ -79,11 +80,11 @@ class OrderAction
             ? $this->dependencies->apiClass->retrieveInstallment($resource_id)
             : $this->dependencies->apiClass->retrievePayment($resource_id);
         if (!$retrieve['result']) {
-            $this->logger->addLog('OrderAction::createAction - Can not retrieve resource from api', 'error');
+            $this->logger->addLog('OrderAction::createAction - Can\'t retrieve resource from api', 'error');
 
             return [
                 'result' => false,
-                'message' => 'Can not retrieve resource from api',
+                'message' => 'Can\'t retrieve resource from api',
             ];
         }
         $resource = $retrieve['resource'];
@@ -199,7 +200,7 @@ class OrderAction
         // Post process
         $post_process = $payment_method->postProcessOrder($resource, $order);
         if (!$post_process) {
-            $this->logger->addLog('OrderAction::createAction - Can not post process the order', 'error');
+            $this->logger->addLog('OrderAction::createAction - Can\'t post process the order', 'error');
         }
 
         // Add prestashop OrderPayment
@@ -262,22 +263,22 @@ class OrderAction
             ->getPaymentRepository()
             ->getByResourceId($resource_id);
         if (empty($payment_tab)) {
-            $this->logger->addLog('OrderAction::updateAction - Can not retrieve resource from database', 'error');
+            $this->logger->addLog('OrderAction::updateAction - Can\'t retrieve resource from database', 'error');
 
             return [
                 'result' => false,
-                'message' => 'Can not retrieve resource from database',
+                'message' => 'Can\'t retrieve resource from database',
             ];
         }
 
         // Get the resource form API
         $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
         if (!$retrieve['result']) {
-            $this->logger->addLog('OrderAction::updateAction - Can not retrieve resource from api', 'error');
+            $this->logger->addLog('OrderAction::updateAction - Can\'t retrieve resource from api', 'error');
 
             return [
                 'result' => false,
-                'message' => 'Can not retrieve resource from api',
+                'message' => 'Can\'t retrieve resource from api',
             ];
         }
 
@@ -289,8 +290,7 @@ class OrderAction
             ];
         }
 
-        $order = $this->plugin
-            ->getOrder()
+        $order = $this->order
             ->get((int) $resource->metadata['Order']);
         if (!$this->dependencies
             ->getPlugin()
@@ -327,15 +327,10 @@ class OrderAction
             ];
         }
 
-        $state_addons = $resource->is_live ? '' : '_test';
-        // todo: We should move this order state collection in the appropriate service
-        $order_states = [
-            'cancelled' => $this->configuration->getValue('order_state_canceled' . $state_addons),
-            'error' => $this->configuration->getValue('order_state_error' . $state_addons),
-            'expired' => $this->configuration->getValue('order_state_exp' . $state_addons),
-            'oos_paid' => $this->dependencies->getPlugin()->getConfiguration()->get('PS_OS_OUTOFSTOCK_PAID'),
-            'paid' => $this->configuration->getValue('order_state_paid' . $state_addons),
-        ];
+        $order_states = $this->dependencies
+            ->getPlugin()
+            ->getOrderClass()
+            ->getOrderStates($resource->is_live);
 
         $new_order_state = $this->plugin
             ->getOrderClass()
@@ -345,12 +340,12 @@ class OrderAction
             if (!$this->plugin
                 ->getOrderClass()
                 ->updateOrderState($order, (int) $order_states[$new_order_state['status']])) {
-                $this->logger->addLog('OrderAction::updateAction - Can not update order state', 'error');
+                $this->logger->addLog('OrderAction::updateAction - Can\'t update order state', 'error');
 
                 return [
                     'result' => false,
                     'id_order' => $order->id,
-                    'message' => 'Can not update order state',
+                    'message' => 'Can\'t update order state',
                 ];
             }
 
@@ -378,12 +373,12 @@ class OrderAction
         if (!$this->plugin
             ->getOrderClass()
             ->updateOrderState($order, (int) $order_states[$new_order_state['status']])) {
-            $this->logger->addLog('OrderAction::updateAction - Can not update order state', 'error');
+            $this->logger->addLog('OrderAction::updateAction - Can\'t update order state', 'error');
 
             return [
                 'result' => false,
                 'id_order' => $order->id,
-                'message' => 'Can not update order state',
+                'message' => 'Can\'t update order state',
             ];
         }
 
@@ -394,12 +389,116 @@ class OrderAction
         ];
     }
 
-    public function stopAction()
+    // todo: add coverage to this method
+    public function renderDetail($order_id = 0)
     {
-    }
+        $this->setParameters();
 
-    public function renderDetail()
-    {
+        $order_details = [];
+
+        if (!is_int($order_id) || !$order_id) {
+            $this->logger->addLog('OrderAction::renderDetail - Invalid argument, $order_id must be a non null integer.', 'error');
+
+            return $order_details;
+        }
+
+        $order = $this->order
+            ->get((int) $order_id);
+        if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
+            $this->logger->addLog('OrderAction::renderDetail - $order can\'t be retrieve.', 'error');
+
+            return $order_details;
+        }
+
+        if ($order->module != $this->dependencies->name) {
+            return $order_details;
+        }
+
+        // Retrieve the resource from database
+        $payment_tab = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByCart((int) $order->id_cart);
+        if (empty($payment_tab)) {
+            return $order_details;
+        }
+
+        $order_details = [
+            'logo_url' => $this->dependencies->getPlugin()->getConstant()->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/payplug.svg',
+            'admin_ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $order->id),
+            'order' => $order,
+            'refund' => false,
+            'refunded' => false,
+            'update' => false,
+        ];
+
+        // Create the detail from given payment_tab
+        $payment_method = $this->plugin
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($payment_tab['method']);
+
+        // Check order state history
+        $undefined_history_states = $this->dependencies->orderClass->getUndefinedOrderHistory((int) $order->id);
+        if (!empty($undefined_history_states)) {
+            $order_details['payplug_order_state_url'] = $this->dependencies
+                ->getPlugin()
+                ->getRoutes()
+                ->getExternalUrl($this->context->language->iso_code)['order_state'];
+            $order_details['undefined_history_states'] = $undefined_history_states;
+        }
+
+        // Get payment detail section
+        $resource_detail = $payment_method->getResourceDetail($payment_tab['resource_id']);
+        $state_addons = 'live' == strtolower($resource_detail['mode']) ? '' : '_test';
+        if ('installment' == $payment_tab['method']) {
+            $order_details['installment'] = $resource_detail;
+        } else {
+            $order_details['payment'] = $resource_detail;
+            $pending_order_state = (int) $this->configuration->getValue('order_state_pending' . $state_addons);
+            $order_details['update'] = $pending_order_state == $order->current_state;
+        }
+
+        if (!isset($resource_detail['refund'])) {
+            return $order_details;
+        }
+
+        // Get the refund section
+        if ($resource_detail['refund']['available']) {
+            $refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
+            $amount_suggested = \min($refunded_presta, $resource_detail['refund']['available']) - $resource_detail['refund']['refunded'];
+            $amount_suggested = \number_format((float) $amount_suggested, 2);
+            $amount_suggested = 0 <= $amount_suggested ? $amount_suggested : 0;
+
+            $id_currency = (int) $this->dependencies
+                ->getPlugin()
+                ->getCurrency()
+                ->getIdByIsoCode($resource_detail['currency']);
+            $currency = $this->dependencies
+                ->getPlugin()
+                ->getCurrency()
+                ->get((int) $id_currency);
+            if (!$this->validate_adapter->validate('isLoadedObject', $currency)) {
+                $this->logger->addLog('OrderAction::renderDetail - $currency is not a valid object.', 'error');
+
+                return $order_details;
+            }
+
+            $order_details['refund'] = [
+                'refunded' => $resource_detail['refund']['refunded'],
+                'available' => $resource_detail['refund']['available'],
+                'refunded_presta' => $refunded_presta,
+                'suggested' => $amount_suggested,
+                'mode' => \strtolower($resource_detail['mode']),
+                'id' => $resource_detail['id'],
+                'new_order_state' => (int) $this->configuration->getValue('order_state_refund' . $state_addons),
+                'currency' => $currency,
+                'disabled' => !(bool) $payment_method->refundable,
+            ];
+        } elseif ($resource_detail['refund']['is_refunded']) {
+            $order_details['refunded'] = $resource_detail['refund']['refunded'];
+        }
+
+        return $order_details;
     }
 
     /**
@@ -413,6 +512,8 @@ class OrderAction
             ->getConfigurationClass();
         $this->logger = $this->logger ?: $this->plugin
             ->getLogger();
+        $this->order = $this->order ?: $this->plugin
+            ->getOrder();
         $this->validate_adapter = $this->validate_adapter ?: $this->plugin
             ->getValidate();
     }
