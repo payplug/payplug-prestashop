@@ -158,6 +158,9 @@ class PluginEntity
     private $query_adapter;
 
     /** @var object */
+    private $refund_action;
+
+    /** @var object */
     private $routes;
 
     /** @var object */
@@ -667,6 +670,14 @@ class PluginEntity
     public function getPaymentAction()
     {
         return $this->payment_action;
+    }
+
+    /**
+     * @return object
+     */
+    public function getRefundAction()
+    {
+        return $this->refund_action;
     }
 
     /**
@@ -1360,6 +1371,22 @@ class PluginEntity
         }
 
         $this->order_action = $order_action;
+
+        return $this;
+    }
+
+    /**
+     * @param object $refund_action
+     *
+     * @return self
+     */
+    public function setRefundAction($refund_action)
+    {
+        if (!is_object($refund_action)) {
+            throw new BadParameterException('Invalid argument, $refund_action must be a RefundAction');
+        }
+
+        $this->refund_action = $refund_action;
 
         return $this;
     }
