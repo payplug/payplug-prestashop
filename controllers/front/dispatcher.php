@@ -33,6 +33,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
     private $dependenciesClass;
     private $orderAdapter;
     private $paymentAction;
+    private $refundAction;
     private $toolsAdapter;
 
     public function __construct()
@@ -42,6 +43,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
         $this->cartAdapter = $this->dependenciesClass->getPlugin()->getCart();
         $this->orderAdapter = $this->dependenciesClass->getPlugin()->getOrder();
         $this->paymentAction = $this->dependenciesClass->getPlugin()->getPaymentAction();
+        $this->refundAction = $this->dependenciesClass->getPlugin()->getRefundAction();
         $this->toolsAdapter = $this->dependenciesClass->getPlugin()->getTools();
     }
 

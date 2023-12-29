@@ -118,96 +118,96 @@ class RefundClass
      *
      * @return mixed|string
      */
-    public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
-    {
-        $this->logger->setProcess('refund');
+    /*  public function makeRefund($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
+      {
+          $this->logger->setProcess('refund');
 
-        $sandbox = 'TEST' == $this->tools->tool('strtoupper', $pay_mode);
-        $this->dependencies->apiClass->initializeApi($sandbox);
-        $response = [];
-        if (null == $pay_id) {
-            if ($inst_id) {
-                $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
-                if (!$installment['result']) {
-                    $error = 'error [PayPlugClass - makeRefund()]: '
-                        . 'Can\'t retrieve InstallmentPlan with given id: ' . $inst_id;
-                    $this->logger->addLog($error, 'error');
+          $sandbox = 'TEST' == $this->tools->tool('strtoupper', $pay_mode);
+          $this->dependencies->apiClass->initializeApi($sandbox);
+          $response = [];
+          if (null == $pay_id) {
+              if ($inst_id) {
+                  $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
+                  if (!$installment['result']) {
+                      $error = 'error [PayPlugClass - makeRefund()]: '
+                          . 'Can\'t retrieve InstallmentPlan with given id: ' . $inst_id;
+                      $this->logger->addLog($error, 'error');
 
-                    return 'error';
-                }
-                $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve installment id: ' . $inst_id);
-                $installment = $installment['resource'];
-                if (isset($installment->schedule) && $installment->schedule) {
-                    $total_amount = $amount;
-                    $refund_to_go = [];
-                    $truly_refundable_amount = 0;
-                    foreach ($installment->schedule as $schedule) {
-                        if (!empty($schedule->payment_ids)) {
-                            foreach ($schedule->payment_ids as $p_id) {
-                                $payment = $this->dependencies->apiClass->retrievePayment($p_id);
-                                if (!$payment['result']) {
-                                    return 'error';
-                                }
-                                $payment = $payment['resource'];
-                                $this->logger->addLog('[PayPlugClass - makeRefund()] '
-                                    . 'Retrieve payment id: ' . $payment->id);
-                                if ($payment->is_paid && !$payment->is_refunded && $amount > 0) {
-                                    $amount_refundable = (int) ($payment->amount - $payment->amount_refunded);
-                                    $truly_refundable_amount += $amount_refundable;
-                                    if ($truly_refundable_amount < 10) {
-                                        continue;
-                                    }
-                                    if ($amount >= $amount_refundable) {
-                                        $data = [
-                                            'amount' => $amount_refundable,
-                                            'metadata' => $metadata,
-                                        ];
-                                        $amount -= $amount_refundable;
-                                    } else {
-                                        $data = [
-                                            'amount' => $amount,
-                                            'metadata' => $metadata,
-                                        ];
-                                        $amount = 0;
-                                    }
-                                    $refund_to_go[] = ['id' => $p_id, 'data' => $data];
-                                }
-                            }
-                        }
-                    }
+                      return 'error';
+                  }
+                  $this->logger->addLog('[PayPlugClass - makeRefund()] Retrieve installment id: ' . $inst_id);
+                  $installment = $installment['resource'];
+                  if (isset($installment->schedule) && $installment->schedule) {
+                      $total_amount = $amount;
+                      $refund_to_go = [];
+                      $truly_refundable_amount = 0;
+                      foreach ($installment->schedule as $schedule) {
+                          if (!empty($schedule->payment_ids)) {
+                              foreach ($schedule->payment_ids as $p_id) {
+                                  $payment = $this->dependencies->apiClass->retrievePayment($p_id);
+                                  if (!$payment['result']) {
+                                      return 'error';
+                                  }
+                                  $payment = $payment['resource'];
+                                  $this->logger->addLog('[PayPlugClass - makeRefund()] '
+                                      . 'Retrieve payment id: ' . $payment->id);
+                                  if ($payment->is_paid && !$payment->is_refunded && $amount > 0) {
+                                      $amount_refundable = (int) ($payment->amount - $payment->amount_refunded);
+                                      $truly_refundable_amount += $amount_refundable;
+                                      if ($truly_refundable_amount < 10) {
+                                          continue;
+                                      }
+                                      if ($amount >= $amount_refundable) {
+                                          $data = [
+                                              'amount' => $amount_refundable,
+                                              'metadata' => $metadata,
+                                          ];
+                                          $amount -= $amount_refundable;
+                                      } else {
+                                          $data = [
+                                              'amount' => $amount,
+                                              'metadata' => $metadata,
+                                          ];
+                                          $amount = 0;
+                                      }
+                                      $refund_to_go[] = ['id' => $p_id, 'data' => $data];
+                                  }
+                              }
+                          }
+                      }
 
-                    if ($this->validators['payment']->canBeRefund($pay_id, $refund_to_go, $truly_refundable_amount, $total_amount)['result']) {
-                        foreach ($refund_to_go as $ref) {
-                            $response = $this->dependencies->apiClass->refundPayment($ref['id'], $ref['data']);
-                            if (!$response['result']) {
-                                return 'error';
-                            }
-                        }
-                    } else {
-                        return 'error';
-                    }
-                    $this->dependencies->installmentClass->updatePayplugInstallment($installment);
-                } else {
-                    return 'error';
-                }
-            } else {
-                return 'error';
-            }
-        } else {
-            $data = [
-                'amount' => (int) $amount,
-                'metadata' => $metadata,
-            ];
-            if ($this->validators['payment']->canBeRefund($pay_id, $data)['result']) {
-                $response = $this->dependencies->apiClass->refundPayment($pay_id, $data);
-                if (!$response['result']) {
-                    return 'error';
-                }
-            }
-        }
+                      if ($this->validators['payment']->canBeRefund($pay_id, $refund_to_go, $truly_refundable_amount, $total_amount)['result']) {
+                          foreach ($refund_to_go as $ref) {
+                              $response = $this->dependencies->apiClass->refundPayment($ref['id'], $ref['data']);
+                              if (!$response['result']) {
+                                  return 'error';
+                              }
+                          }
+                      } else {
+                          return 'error';
+                      }
+                      $this->dependencies->installmentClass->updatePayplugInstallment($installment);
+                  } else {
+                      return 'error';
+                  }
+              } else {
+                  return 'error';
+              }
+          } else {
+              $data = [
+                  'amount' => (int) $amount,
+                  'metadata' => $metadata,
+              ];
+              if ($this->validators['payment']->canBeRefund($pay_id, $data)['result']) {
+                  $response = $this->dependencies->apiClass->refundPayment($pay_id, $data);
+                  if (!$response['result']) {
+                      return 'error';
+                  }
+              }
+          }
 
-        return $response['resource'];
-    }
+          return $response['resource'];
+      }*/
 
     /**
      * @description  Refund a payment
@@ -306,7 +306,11 @@ class RefundClass
             'ID Client' => (int) $this->tools->tool('getValue', 'id_customer'),
             'reason' => 'Refunded with Prestashop',
         ];
-        $refund = $this->makeRefund($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+
+        $refund = $this->dependencies
+            ->getPlugin()
+            ->getRefundAction()->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+
         if ('error' == $refund) {
             $this->logger->addLog('Cannot refund that amount.', 'notice');
             $this->logger->addLog(
@@ -415,7 +419,7 @@ class RefundClass
                 $reload = true;
             }
         } else {
-            $payment = $this->dependencies->apiClass->retrievePayment($refund->payment_id);
+            $payment = $this->dependencies->apiClass->retrievePayment($refund['id']);
             if (!$payment['result']) {
                 exit(json_encode([
                     'status' => 'error',
