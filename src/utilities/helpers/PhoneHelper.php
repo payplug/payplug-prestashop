@@ -23,6 +23,10 @@
 
 namespace PayPlug\src\utilities\helpers;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class PhoneHelper
 {
     public static function isMobilePhoneNumber($iso_code = '', $phone_number = false)
