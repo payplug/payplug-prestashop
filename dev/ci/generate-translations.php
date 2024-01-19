@@ -17,7 +17,7 @@ if ('payplug' != $moduleName) {
 }
 
 $missing_translations = [];
-$available_languages = ['fr', 'en', 'gb', 'it', 'es', 'nl'];
+$available_languages = ['fr', 'en', 'gb', 'it', 'es', 'nl', 'de'];
 $messages = [];
 
 // Open a file in write mode ('w')

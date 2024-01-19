@@ -9,7 +9,7 @@ $_MODULE = [];
 $configuration = json_decode(file_get_contents(dirname(__FILE__) . '/../../composer.json'));
 $moduleName = $configuration->moduleName;
 
-$available_languages = ['fr', 'en', 'gb', 'it', 'es', 'nl'];
+$available_languages = ['fr', 'en', 'gb', 'it', 'es', 'nl', 'de'];
 $language_index = [];
 $translations = [];
 
