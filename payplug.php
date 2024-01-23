@@ -542,7 +542,7 @@ class Payplug extends PaymentModule
 
     public function setDependencies()
     {
-        $this->payplug_dependencies = new \PayPlug\classes\PayPlugDependencies();
+        $this->payplug_dependencies = new PayPlug\classes\PayPlugDependencies();
     }
 
     /**
