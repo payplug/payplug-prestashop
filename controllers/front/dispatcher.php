@@ -38,7 +38,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
     public function __construct()
     {
         parent::__construct();
-        $this->dependenciesClass = new \PayPlug\classes\DependenciesClass();
+        $this->dependenciesClass = new PayPlug\classes\DependenciesClass();
         $this->cartAdapter = $this->dependenciesClass->getPlugin()->getCart();
         $this->orderAdapter = $this->dependenciesClass->getPlugin()->getOrder();
         $this->paymentAction = $this->dependenciesClass->getPlugin()->getPaymentAction();

@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.6.2
+- Improvment :
+  - [PRE-2142](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2332): Add missing IP trads es/de
+
 ## Version 4.6.1
 - Bugfix :
   - [PRE-2136](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2324): Fix set default language
