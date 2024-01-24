@@ -39,8 +39,8 @@ class LoggerRepository extends BaseClass
 
     public function __construct($dependencies)
     {
-        $this->loggerEntity = new loggerEntity();
         $this->dependencies = $dependencies;
+        $this->loggerEntity = new LoggerEntity();
         $this->validators = $this->dependencies->getValidators();
         $this->setStdParams();
     }

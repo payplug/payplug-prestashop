@@ -572,7 +572,7 @@ class ConfigClass
                 return '';
             }
 
-            $phone_util = \libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             if (!$phone_util->isValidNumber($parsed)) {
@@ -580,7 +580,7 @@ class ConfigClass
                 return '';
             }
 
-            return $phone_util->format($parsed, \libphonenumberlight\PhoneNumberFormat::E164);
+            return $phone_util->format($parsed, libphonenumberlight\PhoneNumberFormat::E164);
         } catch (libphonenumberlight\NumberParseException $e) {
             // todo: add log
             return '';

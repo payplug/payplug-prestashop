@@ -38,7 +38,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function __construct()
     {
-        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->dependencies = new PayPlug\classes\DependenciesClass();
         $this->orderClass = $this->dependencies->orderClass;
 
         $this->bootstrap = true;

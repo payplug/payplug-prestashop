@@ -28,7 +28,7 @@ class PayplugApplePayPaymentRequestModuleFrontController extends ModuleFrontCont
 {
     public function postProcess()
     {
-        $dependencies = new \PayPlug\classes\DependenciesClass();
+        $dependencies = new PayPlug\classes\DependenciesClass();
         $dispatcher = $dependencies->getPlugin()->getDispatcher();
 
         $applePayPaymentRequest = $dependencies->applePayClass->getPaymentRequest($dispatcher->getInstance()->getController());
