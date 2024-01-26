@@ -99,102 +99,6 @@ class CardRepository extends QueryRepository
         return (bool) $this->build();
     }
 
-    public function set($card = null, $customer_id = 0, $company_id = 0, $is_sandbox = false)
-    {
-        if (!is_object($card) || !$card) {
-            return false;
-        }
-
-        if (!is_int($customer_id) || !$customer_id) {
-            return false;
-        }
-
-        if (!is_int($company_id) || !$company_id) {
-            return false;
-        }
-
-        if (!is_bool($is_sandbox)) {
-            return false;
-        }
-
-        $fields = [
-            'id',
-            'last4',
-            'exp_month',
-            'exp_year',
-            'brand',
-            'country',
-            'metadata',
-        ];
-        foreach ($fields as $field) {
-            if (!isset($card->{$field})) {
-                return false;
-            }
-        }
-
-        $result = $this
-            ->insert()
-            ->into($this->table_name)
-            ->fields('id_customer')->values((int) $customer_id)
-            ->fields('id_company')->values((int) $company_id)
-            ->fields('is_sandbox')->values((bool) $is_sandbox ? 1 : 0)
-            ->fields('id_card')->values($this->escape($card->id))
-            ->fields('last4')->values($this->escape($card->last4))
-            ->fields('exp_month')->values($this->escape($card->exp_month))
-            ->fields('exp_year')->values($this->escape($card->exp_year))
-            ->fields('brand')->values($this->escape($card->brand))
-            ->fields('country')->values($this->escape($card->country))
-            ->fields('metadata')->values($this->escape(json_encode($card->metadata)))
-            ->build();
-
-        return (bool) $result;
-    }
-
-    /**
-     * @description Delete a card from a given id
-     *
-     * @param int $id_payplug_card
-     *
-     * @return bool
-     */
-    public function remove($id_payplug_card = 0)
-    {
-        if (!is_int($id_payplug_card) || !$id_payplug_card) {
-            return false;
-        }
-
-        $result = $this
-            ->delete()
-            ->from($this->table_name)
-            ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
-            ->build();
-
-        return (bool) $result;
-    }
-
-    /**
-     * @description Get a card from a given id
-     *
-     * @param int $id_payplug_card
-     *
-     * @return array
-     */
-    public function get($id_payplug_card = 0)
-    {
-        if (!is_int($id_payplug_card) || !$id_payplug_card) {
-            return [];
-        }
-
-        $result = $this
-            ->select()
-            ->fields('*')
-            ->from($this->table_name)
-            ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
-            ->build('unique_row');
-
-        return $result ?: [];
-    }
-
     /**
      * @description Check if a card is already register in the database
      *
@@ -228,6 +132,29 @@ class CardRepository extends QueryRepository
             ->build('unique_value');
 
         return (bool) $result;
+    }
+
+    /**
+     * @description Get a card from a given id
+     *
+     * @param int $id_payplug_card
+     *
+     * @return array
+     */
+    public function get($id_payplug_card = 0)
+    {
+        if (!is_int($id_payplug_card) || !$id_payplug_card) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->table_name)
+            ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
+            ->build('unique_row');
+
+        return $result ?: [];
     }
 
     /**
@@ -284,5 +211,120 @@ class CardRepository extends QueryRepository
         $result = $this->build();
 
         return $result ?: [];
+    }
+
+    /**
+     * @description Create the table in the database
+     *
+     * @param string $engine
+     *
+     * @return bool
+     */
+    public function initialize($engine = '')
+    {
+        if (!is_string($engine) || !$engine) {
+            return false;
+        }
+
+        $this
+            ->create()
+            ->table($this->table_name)
+            ->fields('`id_payplug_card` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_customer` int(11) UNSIGNED NOT NULL')
+            ->fields('`id_company` int(11) UNSIGNED NOT NULL')
+            ->fields('`is_sandbox` int(1) UNSIGNED NOT NULL')
+            ->fields('`id_card` varchar(255) NOT NULL')
+            ->fields('`last4` varchar(4) NOT NULL')
+            ->fields('`exp_month` varchar(4) NOT NULL')
+            ->fields('`exp_year` varchar(4) NOT NULL')
+            ->fields('`brand` varchar(255) DEFAULT NULL')
+            ->fields('`country` varchar(3) NOT NULL')
+            ->fields('`metadata` varchar(255) DEFAULT NULL')
+            ->engine($engine);
+
+        return $this->build();
+    }
+
+    /**
+     * @description Delete a card from a given id
+     *
+     * @param int $id_payplug_card
+     *
+     * @return bool
+     */
+    public function remove($id_payplug_card = 0)
+    {
+        if (!is_int($id_payplug_card) || !$id_payplug_card) {
+            return false;
+        }
+
+        $result = $this
+            ->delete()
+            ->from($this->table_name)
+            ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
+            ->build();
+
+        return (bool) $result;
+    }
+
+    /**
+     * @description Insert a new card in the database
+     *
+     * @param null $card
+     * @param int $customer_id
+     * @param int $company_id
+     * @param false $is_sandbox
+     *
+     * @return bool
+     */
+    public function set($card = null, $customer_id = 0, $company_id = 0, $is_sandbox = false)
+    {
+        if (!is_object($card) || !$card) {
+            return false;
+        }
+
+        if (!is_int($customer_id) || !$customer_id) {
+            return false;
+        }
+
+        if (!is_int($company_id) || !$company_id) {
+            return false;
+        }
+
+        if (!is_bool($is_sandbox)) {
+            return false;
+        }
+
+        $fields = [
+            'id',
+            'last4',
+            'exp_month',
+            'exp_year',
+            'brand',
+            'country',
+            'metadata',
+        ];
+        foreach ($fields as $field) {
+            if (!isset($card->{$field})) {
+                return false;
+            }
+        }
+
+        $result = $this
+            ->insert()
+            ->into($this->table_name)
+            ->fields('id_customer')->values((int) $customer_id)
+            ->fields('id_company')->values((int) $company_id)
+            ->fields('is_sandbox')->values((bool) $is_sandbox ? 1 : 0)
+            ->fields('id_card')->values($this->escape($card->id))
+            ->fields('last4')->values($this->escape($card->last4))
+            ->fields('exp_month')->values($this->escape($card->exp_month))
+            ->fields('exp_year')->values($this->escape($card->exp_year))
+            ->fields('brand')->values($this->escape($card->brand))
+            ->fields('country')->values($this->escape($card->country))
+            ->fields('metadata')->values($this->escape(json_encode($card->metadata)))
+            ->build();
+
+        return (bool) $result;
     }
 }

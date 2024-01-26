@@ -112,6 +112,13 @@ class CacheRepository extends QueryRepository
         return $result ?: [];
     }
 
+    /**
+     * @description Delete the cache for a given key
+     *
+     * @param string $cache_key
+     *
+     * @return bool
+     */
     public function deleteCache($cache_key = '')
     {
         if (!is_string($cache_key) || !$cache_key) {
@@ -127,6 +134,7 @@ class CacheRepository extends QueryRepository
         return $result ?: false;
     }
 
+    // todo: add coverage to this method
     public function flushCache()
     {
         $result = $this
@@ -134,5 +142,31 @@ class CacheRepository extends QueryRepository
             ->table($this->table_name);
 
         return (bool) $result;
+    }
+
+    /**
+     * @description Create the table in the database
+     *
+     * @param string $engine
+     *
+     * @return bool
+     */
+    public function initialize($engine = '')
+    {
+        if (!is_string($engine) || !$engine) {
+            return false;
+        }
+
+        $this
+            ->create()
+            ->table($this->table_name)
+            ->fields('`id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`cache_key` VARCHAR(255) NOT NULL')
+            ->fields('`cache_value` TEXT NOT NULL')
+            ->fields('`date_add` DATETIME NULL')
+            ->fields('`date_upd` DATETIME NULL')
+            ->engine($engine);
+
+        return $this->build();
     }
 }

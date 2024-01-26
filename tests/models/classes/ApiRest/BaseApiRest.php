@@ -6,6 +6,8 @@ use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
+use PayPlug\src\utilities\helpers\AmountHelper;
+use PayPlug\src\utilities\helpers\ConfigurationHelper;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\moduleValidator;
 use PayPlug\tests\FormatDataProvider;
@@ -21,6 +23,7 @@ class BaseApiRest extends TestCase
     public $configuration;
     public $configuration_action;
     public $configuration_class;
+    public $configuration_helper;
     public $constant;
     public $dependencies;
     public $logger;
@@ -102,11 +105,15 @@ class BaseApiRest extends TestCase
             ]);
 
         $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();
+        $this->configuration_helper = \Mockery::mock(ConfigurationHelper::class)->makePartial();
         $this->dependencies
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
                 'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
-                'getHelpers' => ['amount' => $this->amount_helper],
+                'getHelpers' => [
+                    'amount' => $this->amount_helper,
+                    'configuration' => $this->configuration_helper,
+                ],
             ]);
 
         $this->classe = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();

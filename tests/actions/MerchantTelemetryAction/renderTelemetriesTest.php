@@ -16,7 +16,7 @@ class renderTelemetriesTest extends BaseMerchantTelemetryAction
      *
      * @param mixed $source
      */
-    public function testWhenGivenSourceIsNotValidString($source)
+    public function testWhenGivenSourceIsntValidString($source)
     {
         $this->assertSame(
             [

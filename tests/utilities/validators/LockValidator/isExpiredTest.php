@@ -75,7 +75,7 @@ class isExpiredTest extends TestCase
     /**
      * @description asserting lock is not expired
      */
-    public function testWhenGivenLockDateIsNotExpired()
+    public function testWhenGivenLockDateIsntExpired()
     {
         $date = date('Y-m-d H:i:s', strtotime('-1 minutes'));
         $this->assertSame([

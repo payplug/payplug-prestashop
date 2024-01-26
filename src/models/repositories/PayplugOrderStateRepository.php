@@ -160,4 +160,31 @@ class PayplugOrderStateRepository extends QueryRepository
 
         return $result ?: [];
     }
+
+    /**
+     * @description Create the table in the database
+     *
+     * @param string $engine
+     *
+     * @return bool
+     */
+    public function initialize($engine = '')
+    {
+        if (!is_string($engine) || !$engine) {
+            return false;
+        }
+
+        $this
+            ->create()
+            ->table($this->table_name)
+            ->fields('`id_payplug_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_order_state` INT(11) UNSIGNED NOT NULL')
+            ->fields('`type` VARCHAR(64) NOT NULL')
+            ->fields('`date_add` DATETIME NULL')
+            ->fields('`date_upd` DATETIME NULL')
+            ->condition('CONSTRAINT order_state_unique UNIQUE (id_order_state)')
+            ->engine($engine);
+
+        return $this->build();
+    }
 }

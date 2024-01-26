@@ -26,7 +26,7 @@ class setTest extends BaseConfiguration
     {
         $key = 'config_key';
         $value = 'value';
-        $this->classe->configuration = [
+        $this->classe->configurations = [
             'feature' => [],
         ];
         $this->assertFalse($this->classe->set($key, $value));
@@ -36,7 +36,7 @@ class setTest extends BaseConfiguration
     {
         $key = 'config_key';
         $value = 'value';
-        $this->classe->configuration = [
+        $this->classe->configurations = [
             'feature' => [
                 'name' => 'FEATURE',
                 'defaultValue' => 0,
@@ -46,21 +46,21 @@ class setTest extends BaseConfiguration
         $this->assertFalse($this->classe->set($key, $value));
     }
 
-    public function testWhenGivenValueIsNotAIntegerAsExpected()
+    public function testWhenGivenValueIsntAIntegerAsExpected()
     {
         $key = 'standard';
         $value = 'value';
         $this->assertFalse($this->classe->set($key, $value));
     }
 
-    public function testWhenGivenValueIsNotAStringAsExpected()
+    public function testWhenGivenValueIsntAStringAsExpected()
     {
         $key = 'company_iso';
         $value = 42;
         $this->assertFalse($this->classe->set($key, $value));
     }
 
-    public function testWhenConfigurationCanNotBeUpdated()
+    public function testWhenConfigurationCantBeUpdated()
     {
         $key = 'enable';
         $value = 1;

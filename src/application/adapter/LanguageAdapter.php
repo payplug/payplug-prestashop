@@ -40,6 +40,11 @@ class LanguageAdapter implements LanguageInterface
         return new \Language($idLanguage);
     }
 
+    public function getIDs($active = false)
+    {
+        return \Language::getIDs($active);
+    }
+
     public function getLanguages($active = false)
     {
         return \Language::getLanguages($active);

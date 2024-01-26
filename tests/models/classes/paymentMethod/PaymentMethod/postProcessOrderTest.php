@@ -20,7 +20,7 @@ class postProcessOrderTest extends BasePaymentMethod
      *
      * @param mixed $resource
      */
-    public function testWhenGivenResourceIsNotValidObject($resource)
+    public function testWhenGivenResourceIsntValidObject($resource)
     {
         $order = OrderMock::get();
         $this->assertFalse($this->classe->postProcessOrder($resource, $order));
@@ -31,7 +31,7 @@ class postProcessOrderTest extends BasePaymentMethod
      *
      * @param mixed $order
      */
-    public function testWhenGivenOrderIsNotValidObject($order)
+    public function testWhenGivenOrderIsntValidObject($order)
     {
         $resource = PaymentMock::getStandard();
         $this->assertFalse($this->classe->postProcessOrder($resource, $order));

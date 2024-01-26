@@ -45,7 +45,7 @@ class getHeaderSectionTest extends BaseApiRest
         );
     }
 
-    public function testWhenUserIsNotLoggedAndModuleIsNotEnable()
+    public function testWhenUserIsntLoggedAndModuleIsntEnable()
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
@@ -94,7 +94,7 @@ class getHeaderSectionTest extends BaseApiRest
         );
     }
 
-    public function testWhenCheckPsAccountReturnFalseAndModuleIsNotEnable()
+    public function testWhenCheckPsAccountReturnFalseAndModuleIsntEnable()
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([

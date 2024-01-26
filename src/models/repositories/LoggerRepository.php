@@ -36,6 +36,12 @@ class LoggerRepository extends QueryRepository
         'date_upd' => 'string',
     ];
 
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . $this->dependencies->name . '_logger';
+    }
+
     /**
      * @description Create a log from given parameters
      *
@@ -51,7 +57,7 @@ class LoggerRepository extends QueryRepository
 
         $this
             ->insert()
-            ->into($this->prefix . $this->dependencies->name . '_logger');
+            ->into($this->table_name);
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -156,6 +162,56 @@ class LoggerRepository extends QueryRepository
     }
 
     /**
+     * @description Get last log from a given limit.
+     *
+     * @param int $limit
+     *
+     * @return array
+     */
+    public function getLastLimitLog($limit = 0)
+    {
+        if (!is_int($limit) || !$limit) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('`id_payplug_logger`')
+            ->from($this->table_name)
+            ->orderBy('`id_payplug_logger` DESC')
+            ->limit($limit, 1)
+            ->build('unique_row');
+
+        return $result ?: [];
+    }
+
+    /**
+     * @description Create the table in the database
+     *
+     * @param string $engine
+     *
+     * @return bool
+     */
+    public function initialize($engine = '')
+    {
+        if (!is_string($engine) || !$engine) {
+            return false;
+        }
+
+        $this
+            ->create()
+            ->table($this->table_name)
+            ->fields('`id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`process` VARCHAR(255) NOT NULL')
+            ->fields('`content` TEXT NOT NULL')
+            ->fields('`date_add` DATETIME NULL')
+            ->fields('`date_upd` DATETIME NULL')
+            ->engine($engine);
+
+        return $this->build();
+    }
+
+    /**
      * @description Update an existing payment for a given id logger.
      *
      * @param int $id_logger
@@ -175,7 +231,7 @@ class LoggerRepository extends QueryRepository
 
         $this
             ->update()
-            ->table($this->prefix . $this->dependencies->name . '_logger');
+            ->table($this->table_name);
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -207,29 +263,5 @@ class LoggerRepository extends QueryRepository
         $this->where('`id_payplug_logger` = ' . (int) $id_logger);
 
         return (bool) $this->build();
-    }
-
-    /**
-     * @description Get last log from a given limit.
-     *
-     * @param int $limit
-     *
-     * @return array
-     */
-    public function getLastLimitLog($limit = 0)
-    {
-        if (!is_int($limit) || !$limit) {
-            return [];
-        }
-
-        $result = $this
-            ->select()
-            ->fields('`id_payplug_logger`')
-            ->from($this->table_name)
-            ->orderBy('`id_payplug_logger` DESC')
-            ->limit($limit, 1)
-            ->build('unique_row');
-
-        return $result ?: [];
     }
 }

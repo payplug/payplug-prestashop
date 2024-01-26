@@ -19,6 +19,7 @@ class BaseConfigurationAction extends TestCase
     public $oney;
     public $plugin;
     public $validator;
+    public $validate_adapter;
 
     protected function setUp()
     {
@@ -34,20 +35,10 @@ class BaseConfigurationAction extends TestCase
                 'addLog' => true,
             ]);
 
-        $module = \Mockery::mock('PrestashopModule');
-        $module
-            ->shouldReceive([
-                'enable' => true,
-            ]);
-
-        $this->module = \Mockery::mock('Module');
-        $this->module
-            ->shouldReceive([
-                'getInstanceByName' => $module,
-            ]);
-
         $this->oney = \Mockery::mock('Oney');
         $this->plugin = \Mockery::mock('Plugin');
+        $this->module = \Mockery::mock('Module');
+        $this->validate_adapter = \Mockery::mock('ValidateAdapter');
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies
@@ -80,6 +71,7 @@ class BaseConfigurationAction extends TestCase
                 'getOney' => $this->oney,
                 'getTranslationClass' => $this->translation,
                 'getModule' => $this->module,
+                'getValidate' => $this->validate_adapter,
             ]);
 
         $this->dependencies
@@ -96,6 +88,8 @@ class BaseConfigurationAction extends TestCase
             })
         ;
 
-        $this->action = \Mockery::mock(ConfigurationAction::class, [$this->dependencies])->makePartial();
+        $this->action = \Mockery::mock(ConfigurationAction::class, [$this->dependencies])
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods();
     }
 }

@@ -144,7 +144,7 @@ class getSettingsSectionTest extends BaseApiRest
     /**
      * @description  check if psaccount is not connected for pspl
      */
-    public function testWhenPsaccountIsNotConnected()
+    public function testWhenPsaccountIsntConnected()
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
@@ -188,7 +188,7 @@ class getSettingsSectionTest extends BaseApiRest
     /**
      * @description check that logged must be false when psaccount is disconnected
      */
-    public function testNotLoggedWhenPsaccountIsNotConnected()
+    public function testNotLoggedWhenPsaccountIsntConnected()
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive(

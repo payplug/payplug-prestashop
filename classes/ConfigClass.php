@@ -229,7 +229,6 @@ class ConfigClass
     private $country;
     private $dependencies;
     private $img_lang;
-    private $install;
     private $media;
     private $module;
     private $oney;
@@ -249,7 +248,6 @@ class ConfigClass
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
-        $this->install = $this->dependencies->getPlugin()->getInstall();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
@@ -406,7 +404,9 @@ class ConfigClass
     public function checkState()
     {
         $state = $this->validators['module']->isAllRequirementsChecked(
-            $this->getReportRequirements()
+            $this->dependencies
+                ->getHelpers()['configuration']
+                ->getRequirements()
         );
 
         return $state['result'];
@@ -773,7 +773,7 @@ class ConfigClass
      */
     public function logout()
     {
-        $this->install->setConfig();
+        $this->dependencies->getPlugin()->getConfigurationClass()->initialize();
         $this->configuration->set('enable', 0);
         $this->configurationAdapter->loadConfiguration();
     }

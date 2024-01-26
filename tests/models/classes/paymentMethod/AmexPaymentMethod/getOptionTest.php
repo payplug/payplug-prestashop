@@ -11,7 +11,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\AmexPaymentMethod;
  */
 class getOptionTest extends BaseAmexPaymentMethod
 {
-    public function testWhenGivenOptionIsNotAvailableWithSandboxMode()
+    public function testWhenGivenOptionIsntAvailableWithSandboxMode()
     {
         $this->assertFalse($this->classe->getOption([])['available_test_mode']);
     }

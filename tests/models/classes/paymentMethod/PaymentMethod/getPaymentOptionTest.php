@@ -18,7 +18,7 @@ class getPaymentOptionTest extends BasePaymentMethod
      *
      * @param mixed $payment_options
      */
-    public function testWhenGivenPaymentOptionsIsNotValidArray($payment_options)
+    public function testWhenGivenPaymentOptionsIsntValidArray($payment_options)
     {
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }

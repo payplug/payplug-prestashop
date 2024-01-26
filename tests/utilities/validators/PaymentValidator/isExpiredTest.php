@@ -74,7 +74,7 @@ class isExpiredTest extends TestCase
         ], $this->validator->isExpired($payment));
     }
 
-    public function testWhenThePaymentIsNotExpired()
+    public function testWhenThePaymentIsntExpired()
     {
         $parameters = [
             'authorization' => [

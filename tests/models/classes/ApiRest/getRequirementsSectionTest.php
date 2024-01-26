@@ -18,7 +18,6 @@ class getRequirementsSectionTest extends BaseApiRest
     public function setUp()
     {
         parent::setUp();
-        $context = \Mockery::mock('Context');
         $this->moduleValidator = new ModuleValidator();
     }
 
@@ -44,14 +43,9 @@ class getRequirementsSectionTest extends BaseApiRest
                 'up2date' => true,
             ],
         ];
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                                'getReportRequirements' => $report,
-                            ])
-        ;
-
-        $this->dependencies->configClass = $configClass;
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => $report,
+        ]);
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
@@ -83,15 +77,9 @@ class getRequirementsSectionTest extends BaseApiRest
                 'up2date' => true,
             ],
         ];
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive(
-                [
-                    'getReportRequirements' => $report,
-                ]
-            );
-
-        $this->dependencies->configClass = $configClass;
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => $report,
+        ]);
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
@@ -123,15 +111,9 @@ class getRequirementsSectionTest extends BaseApiRest
                 'up2date' => true,
             ],
         ];
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive(
-                [
-                    'getReportRequirements' => $report,
-                ]
-            );
-
-        $this->dependencies->configClass = $configClass;
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => $report,
+        ]);
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
@@ -163,15 +145,9 @@ class getRequirementsSectionTest extends BaseApiRest
                 'up2date' => true,
             ],
         ];
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive(
-                [
-                    'getReportRequirements' => $report,
-                ]
-            );
-
-        $this->dependencies->configClass = $configClass;
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => $report,
+        ]);
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
@@ -203,15 +179,9 @@ class getRequirementsSectionTest extends BaseApiRest
                 'up2date' => true,
             ],
         ];
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive(
-                [
-                    'getReportRequirements' => $report,
-                ]
-            );
-
-        $this->dependencies->configClass = $configClass;
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => $report,
+        ]);
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
@@ -243,15 +213,9 @@ class getRequirementsSectionTest extends BaseApiRest
                 'up2date' => true,
             ],
         ];
-        $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive(
-                [
-                    'getReportRequirements' => $report,
-                ]
-            );
-
-        $this->dependencies->configClass = $configClass;
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => $report,
+        ]);
         $response = $this->classe->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {

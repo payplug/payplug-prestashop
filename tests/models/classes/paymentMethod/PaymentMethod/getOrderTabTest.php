@@ -19,7 +19,7 @@ class getOrderTabTest extends BasePaymentMethod
      *
      * @param mixed $resource
      */
-    public function testWhenGivenResourceIsNotValidObject($resource)
+    public function testWhenGivenResourceIsntValidObject($resource)
     {
         $this->assertSame([], $this->classe->getOrderTab($resource));
     }

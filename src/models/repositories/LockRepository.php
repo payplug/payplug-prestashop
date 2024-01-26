@@ -36,6 +36,12 @@ class LockRepository extends QueryRepository
         'date_upd' => 'string',
     ];
 
+    public function __construct($prefix = '', $dependencies = null)
+    {
+        parent::__construct($prefix, $dependencies);
+        $this->table_name = $this->prefix . $this->dependencies->name . '_lock';
+    }
+
     /**
      * @description Create a lock from given parameters
      *
@@ -51,7 +57,7 @@ class LockRepository extends QueryRepository
 
         $this
             ->insert()
-            ->into($this->prefix . $this->dependencies->name . '_lock');
+            ->into($this->table_name);
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -92,7 +98,7 @@ class LockRepository extends QueryRepository
 
         $result = $this
             ->delete()
-            ->from($this->prefix . $this->dependencies->name . '_lock')
+            ->from($this->table_name)
             ->where('`id_cart` = ' . (int) $cart_id)
             ->build();
 
@@ -115,10 +121,37 @@ class LockRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . $this->dependencies->name . '_lock')
+            ->from($this->table_name)
             ->where('`id_cart` = ' . (int) $cart_id)
             ->build('unique_row');
 
         return $result ?: [];
+    }
+
+    /**
+     * @description Create the table in the database
+     *
+     * @param string $engine
+     *
+     * @return bool
+     */
+    public function initialize($engine = '')
+    {
+        if (!is_string($engine) || !$engine) {
+            return false;
+        }
+
+        $this
+            ->create()
+            ->table($this->table_name)
+            ->fields('`id_payplug_lock` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`id_order` VARCHAR(100)')
+            ->fields('`date_add` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
+            ->fields('`date_upd` DATETIME NOT NULL DEFAULT \'1000-01-01 00:00:00\'')
+            ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
+            ->engine($engine);
+
+        return $this->build();
     }
 }

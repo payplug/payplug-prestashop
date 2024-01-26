@@ -18,7 +18,7 @@ class createActionTest extends BasePaymentAction
      *
      * @param mixed $method
      */
-    public function testWhenGivenMethodIsNotValidString($method)
+    public function testWhenGivenMethodIsntValidString($method)
     {
         $payment_tab = [
             'amount' => 4242,
@@ -38,7 +38,7 @@ class createActionTest extends BasePaymentAction
      *
      * @param mixed $payment_tab
      */
-    public function testWhenGivenPaymentTabIsNotValidArray($payment_tab)
+    public function testWhenGivenPaymentTabIsntValidArray($payment_tab)
     {
         $method = 'standard';
         $this->assertSame(
@@ -47,7 +47,7 @@ class createActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenAResourceAlreadyExistsAndCantBeRemove()
+    public function testWhenAResourceAlreadyExistsAndCantBeRemoved()
     {
         $method = 'standard';
         $payment_tab = [

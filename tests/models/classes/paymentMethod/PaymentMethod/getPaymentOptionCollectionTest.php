@@ -56,7 +56,7 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getPaymentOptionCollection());
     }
 
-    public function testWhenPaymentMethodIsNotAllowed()
+    public function testWhenPaymentMethodIsntAllowed()
     {
         $configClass = \Mockery::mock('Config');
         $this->classe->shouldReceive([
@@ -79,7 +79,7 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
      *
      * @param mixed $payment_method
      */
-    public function testWhenPaymentMethodObjectIsNotValid($payment_method)
+    public function testWhenPaymentMethodObjectIsntValid($payment_method)
     {
         $configClass = \Mockery::mock('Config');
         $this->classe->shouldReceive([

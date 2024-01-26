@@ -590,7 +590,9 @@ class ApiRest
             ->getTranslationClass()
             ->getRequirementsTranslations();
 
-        $requirements_reports = $this->dependencies->configClass->getReportRequirements();
+        $requirements_reports = $this->dependencies
+            ->getHelpers()['configuration']
+            ->getRequirements();
 
         $is_requirements_checked = $this->validators['module']->isAllRequirementsChecked(
             $requirements_reports

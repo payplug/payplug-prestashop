@@ -29,9 +29,9 @@ if (!defined('_PS_VERSION_')) {
 
 class QueryRepository
 {
-    protected $dependencies;
+    public $table_name;
 
-    protected $table_name;
+    protected $dependencies;
 
     protected $prefix;
 
@@ -606,5 +606,68 @@ class QueryRepository
     public function setPrefix($prefix = '')
     {
         $this->prefix = $prefix;
+    }
+
+    public function initialize()
+    {
+        $flag = true;
+        $repositories = $this->getChildRepositories();
+        $engine = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('_MYSQL_ENGINE_');
+        $engine = $engine ?: 'InnoDB';
+
+        foreach ($repositories as $repository) {
+            if ($flag) {
+                $flag = $flag && $repository->initialize($engine);
+            }
+        }
+
+        return $flag;
+    }
+
+    public function uninstall()
+    {
+        $flag = true;
+        $repositories = $this->getChildRepositories();
+        foreach ($repositories as $repository) {
+            if (!$flag) {
+                continue;
+            }
+
+            $exists = $this->ifExists()
+                ->table($repository->table_name)
+                ->build();
+
+            if (!$exists) {
+                continue;
+            }
+
+            $flag = $flag && $this
+                ->drop()
+                ->table($repository->table_name)
+                ->build();
+        }
+
+        return $flag;
+    }
+
+    private function getChildRepositories()
+    {
+        $repositories = [];
+
+        $query = get_class($this);
+
+        foreach (get_declared_classes() as $repository) {
+            if (is_subclass_of($repository, $query)) {
+                $repository_class = new $repository($this->prefix, $this->dependencies);
+                if ($repository_class->table_name && strpos($repository_class->table_name, $this->dependencies->name)) {
+                    $repositories[] = $repository_class;
+                }
+            }
+        }
+
+        return $repositories;
     }
 }

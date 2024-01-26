@@ -19,7 +19,7 @@ class abortActionTest extends BasePaymentAction
      *
      * @param mixed $resource_id
      */
-    public function testWhenGivenResourceIdIsNotValidString($resource_id)
+    public function testWhenGivenResourceIdIsntValidString($resource_id)
     {
         $order_id = 42;
         $this->assertSame(
@@ -36,7 +36,7 @@ class abortActionTest extends BasePaymentAction
      *
      * @param mixed $order_id
      */
-    public function testWhenGivenOrderIdIsNotValidInteger($order_id)
+    public function testWhenGivenOrderIdIsntValidInteger($order_id)
     {
         $resource_id = 'inst_azerty';
         $this->assertSame(
@@ -125,7 +125,7 @@ class abortActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenRelatedOrderIsNotValid()
+    public function testWhenRelatedOrderIsntValid()
     {
         $order_id = 42;
         $resource_id = 'inst_azerty';

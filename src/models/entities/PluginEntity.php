@@ -170,7 +170,10 @@ class PluginEntity
     private $sql;
 
     /** @var object */
-    private $tools;
+    private $tab_adapter;
+
+    /** @var object */
+    private $tools_adapter;
 
     /** @var object */
     private $translation;
@@ -739,9 +742,17 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getTabAdapter()
+    {
+        return $this->tab_adapter;
+    }
+
+    /**
+     * @return object
+     */
     public function getTools()
     {
-        return $this->tools;
+        return $this->tools_adapter;
     }
 
     /**
@@ -1682,18 +1693,29 @@ class PluginEntity
         return $this;
     }
 
+    public function setTabAdapter($tab_adapter)
+    {
+        if (!is_object($tab_adapter)) {
+            throw new BadParameterException('Invalid argument, $tab_adapter must be a TabAdapter');
+        }
+
+        $this->tab_adapter = $tab_adapter;
+
+        return $this;
+    }
+
     /**
-     * @param object $tools
+     * @param object $tools_adapter
      *
      * @return self
      */
-    public function setTools($tools)
+    public function setTools($tools_adapter)
     {
-        if (!is_object($tools)) {
-            throw new BadParameterException('Invalid argument, $tools must be a ToolsAdapter');
+        if (!is_object($tools_adapter)) {
+            throw new BadParameterException('Invalid argument, $tools_adapter must be a ToolsAdapter');
         }
 
-        $this->tools = $tools;
+        $this->tools_adapter = $tools_adapter;
 
         return $this;
     }

@@ -140,7 +140,7 @@ class updateActionTest extends BaseOrderAction
         );
     }
 
-    public function testWhenRelatedOrderIsNotValid()
+    public function testWhenRelatedOrderIsntValid()
     {
         $resource_id = 'pay_azerty123456';
 

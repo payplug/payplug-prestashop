@@ -230,69 +230,6 @@ class PrestashopAdapter17
         return $payment_options;
     }
 
-    // todo: set \Tab install process in a adapter
-    public function installTab()
-    {
-        $installed = true;
-
-        if (isset($this->module->adminControllers) && !empty($this->module->adminControllers)) {
-            foreach ($this->module->adminControllers as $adminController) {
-                if (\Tab::getIdFromClassName($adminController['className'])) {
-                    continue;
-                }
-
-                $tab = new \Tab();
-
-                if (isset($adminController['name'])) {
-                    foreach (\Language::getLanguages(false) as $language) {
-                        $id_lang = (int) $language['id_lang'];
-                        $iso_code = \Tools::strtolower($language['iso_code']);
-                        if (isset($adminController['name'][$iso_code])) {
-                            $tab->name[$id_lang] = $adminController['name'][$iso_code];
-                        } else {
-                            $tab->name[$id_lang] = $adminController['name']['en'];
-                        }
-                    }
-                } else {
-                    $tab->name = array_fill_keys(\Language::getIDs(false), $this->module->displayName);
-                }
-
-                if (isset($adminController['parent'])) {
-                    if (is_int($adminController['parent'])) {
-                        $tab->id_parent = $adminController['parent'];
-                    } else {
-                        $tab->id_parent = \Tab::getIdFromClassName($adminController['parent']);
-                    }
-                }
-
-                $tab->class_name = $adminController['className'];
-                $tab->active = true;
-                $tab->module = $this->module->name;
-                $installed = $installed && $tab->add();
-            }
-        }
-
-        return $installed;
-    }
-
-    // todo: set \Tab uninstall process in a adapter
-    public function uninstallTab()
-    {
-        $flag = true;
-
-        if (isset($this->module->adminControllers) && !empty($this->module->adminControllers)) {
-            foreach ($this->module->adminControllers as $adminController) {
-                if ($idTab = \Tab::getIdFromClassName($adminController['className'])) {
-                    $tab = new \Tab($idTab);
-                    $flag = $flag && $tab->delete();
-                    unset($idTab);
-                }
-            }
-        }
-
-        return $flag;
-    }
-
     /**
      * @description Link to order by order state
      *
