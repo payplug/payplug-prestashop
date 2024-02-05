@@ -35,6 +35,7 @@ use PayPlug\src\actions\OnboardingAction;
 use PayPlug\src\actions\OrderAction;
 use PayPlug\src\actions\OrderStateAction;
 use PayPlug\src\actions\PaymentAction;
+use PayPlug\src\actions\RefundAction;
 use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
 use PayPlug\src\application\adapter\CarrierAdapter;
@@ -90,6 +91,7 @@ class PluginInit extends BaseClass
     private $configuration_action;
     private $onboarding_action;
     private $order_action;
+    private $refund_action;
     private $order_state_action;
     private $merchant_telemetry_action;
     private $paymentAction;
@@ -229,6 +231,7 @@ class PluginInit extends BaseClass
             ->setMerchantTelemetryAction($this->merchant_telemetry_action)
             ->setOnboardingAction($this->onboarding_action)
             ->setOrderAction($this->order_action)
+            ->setRefundAction($this->refund_action)
             ->setOrderStateAction($this->order_state_action)
             ->setPaymentAction($this->paymentAction)
         ;
@@ -270,6 +273,7 @@ class PluginInit extends BaseClass
         $this->merchant_telemetry_action = new MerchantTelemetryAction($this->dependencies);
         $this->onboarding_action = new OnboardingAction($this->dependencies);
         $this->order_action = new OrderAction($this->dependencies);
+        $this->refund_action = new RefundAction($this->dependencies);
         $this->order_state_action = new OrderStateAction($this->dependencies);
         $this->paymentAction = new PaymentAction($this->dependencies);
     }

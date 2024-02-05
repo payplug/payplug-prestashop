@@ -3,7 +3,8 @@
 ## Next Version
 - Refactoring :
   - [PRE-1985](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2309): Add action Order
-  
+  - [PRE-2091](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2339): Add Refund Action
+
 TO COVER :
 - InstallmentPaymentMethod::getOrderTab
 - InstallmentPaymentMethod::postProcessOrder
