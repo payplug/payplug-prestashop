@@ -89,7 +89,7 @@ class ApiClass
         if (isset($_SERVER['SERVER_NAME'])
             && 'localhost' == $_SERVER['SERVER_NAME']
             || preg_match(
-                '/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io|ngrok-free.app)/i',
+                '/(shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io|ngrok-free.app|prestashop-qa.test)/i',
                 $_SERVER['SERVER_NAME']
             )
         ) {
