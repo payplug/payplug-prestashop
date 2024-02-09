@@ -21,7 +21,7 @@ class getOptionTest extends BaseBancontactPaymentMethod
         ];
     }
 
-    public function testWhenGivenOptionIsNotAvailableWithSandboxMode()
+    public function testWhenGivenOptionIsntAvailableWithSandboxMode()
     {
         $this->assertFalse($this->classe->getOption($this->config)['available_test_mode']);
     }

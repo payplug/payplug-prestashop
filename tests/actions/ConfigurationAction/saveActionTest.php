@@ -6,12 +6,28 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  * @group unit
  * @group action
  * @group configuration_action
- * @group configuration_action_save
  *
  * @runTestsInSeparateProcesses
  */
 class saveActionTest extends BaseConfigurationAction
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        $module = \Mockery::mock('PrestashopModule');
+        $module
+            ->shouldReceive([
+                'enable' => true,
+            ]);
+
+        $this->module = \Mockery::mock('Module');
+        $this->module
+            ->shouldReceive([
+                'getInstanceByName' => $module,
+            ]);
+    }
+
     public function invalidObjectFormatDataProvider()
     {
         yield [42];

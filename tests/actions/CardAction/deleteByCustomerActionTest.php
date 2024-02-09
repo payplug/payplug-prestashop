@@ -43,7 +43,7 @@ class deleteByCustomerActionTest extends BaseCardAction
         $this->assertFalse($this->action->deleteByCustomerAction($customer_id));
     }
 
-    public function testWhenRetrievedCardCanNotBeDeleted()
+    public function testWhenRetrievedCardCantBeDeleted()
     {
         $customer_id = 42;
 

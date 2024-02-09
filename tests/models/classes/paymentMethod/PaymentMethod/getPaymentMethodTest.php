@@ -18,7 +18,7 @@ class getPaymentMethodTest extends BasePaymentMethod
      *
      * @param mixed $name
      */
-    public function testWhenGivenNameIsNotValidStringFormat($name)
+    public function testWhenGivenNameIsntValidStringFormat($name)
     {
         $this->assertSame([], $this->classe->getPaymentMethod($name));
     }
@@ -32,7 +32,7 @@ class getPaymentMethodTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getPaymentMethod($name));
     }
 
-    public function testWhenPaymentMethodIsNotInAvailablePaymentMethodsObject()
+    public function testWhenPaymentMethodIsntInAvailablePaymentMethodsObject()
     {
         $name = 'standard';
         $this->classe->shouldReceive([

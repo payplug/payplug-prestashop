@@ -58,6 +58,7 @@ use PayPlug\src\application\adapter\OrderStateAdapter;
 use PayPlug\src\application\adapter\ProductAdapter;
 use PayPlug\src\application\adapter\QueryAdapter;
 use PayPlug\src\application\adapter\ShopAdapter;
+use PayPlug\src\application\adapter\TabAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
@@ -136,6 +137,7 @@ class PluginInit extends BaseClass
     private $product_adapter;
     private $query_adapter;
     private $shop_adapter;
+    private $tab_adapter;
     private $tools_adapter;
     private $translation_adapter;
     private $validate_adapter;
@@ -219,6 +221,7 @@ class PluginInit extends BaseClass
             ->setProduct($this->product_adapter)
             ->setQueryAdapter($this->query_adapter)
             ->setShop($this->shop_adapter)
+            ->setTabAdapter($this->tab_adapter)
             ->setTools($this->tools_adapter)
             ->setTranslationAdapter($this->translation_adapter)
             ->setValidate($this->validate_adapter)
@@ -384,6 +387,7 @@ class PluginInit extends BaseClass
         $this->product_adapter = new ProductAdapter();
         $this->query_adapter = new QueryAdapter();
         $this->shop_adapter = new ShopAdapter();
+        $this->tab_adapter = new TabAdapter();
         $this->tools_adapter = new ToolsAdapter();
         $this->translation_adapter = new TranslationAdapter();
         $this->validate_adapter = new ValidateAdapter();

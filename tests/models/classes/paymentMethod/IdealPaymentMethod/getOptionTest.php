@@ -11,7 +11,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\IdealPaymentMethod;
  */
 class getOptionTest extends BaseIdealPaymentMethod
 {
-    public function testWhenGivenOptionIsNotAvailableWithSandboxMode()
+    public function testWhenGivenOptionIsntAvailableWithSandboxMode()
     {
         $this->assertFalse($this->classe->getOption([])['available_test_mode']);
     }

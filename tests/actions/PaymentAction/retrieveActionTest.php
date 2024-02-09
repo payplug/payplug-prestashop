@@ -16,7 +16,7 @@ class retrieveActionTest extends BasePaymentAction
      *
      * @param mixed $stored_resource
      */
-    public function testWhenGivenStoredResourceIsNotValidArray($stored_resource)
+    public function testWhenGivenStoredResourceIsntValidArray($stored_resource)
     {
         $payment_tab = [
             'amount' => 4242,
@@ -36,7 +36,7 @@ class retrieveActionTest extends BasePaymentAction
      *
      * @param mixed $payment_tab
      */
-    public function testWhenGivenPaymentTabIsNotValidArray($payment_tab)
+    public function testWhenGivenPaymentTabIsntValidArray($payment_tab)
     {
         $stored_resource = [
             'id_payplug_payment' => 42,

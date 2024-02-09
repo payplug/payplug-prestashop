@@ -29,9 +29,6 @@ if (!defined('_PS_VERSION_')) {
 
 class Configuration
 {
-    // @todo: check the following keys, no usage found
-    // COMPANY_STATUS
-    // OFFER
     public $configurations = [
         'allow_save_card' => [
             'type' => 'integer',
@@ -452,6 +449,13 @@ class Configuration
         $this->dependencies = $dependencies;
     }
 
+    /**
+     * @description Delete a given configuration from a key
+     *
+     * @param string $key
+     *
+     * @return false
+     */
     public function delete($key = '')
     {
         if (!is_string($key) || !$key) {
@@ -466,6 +470,29 @@ class Configuration
             ->getPlugin()
             ->getConfiguration()
             ->deleteByName($this->getName($key));
+    }
+
+    /**
+     * @description Delete all module configuration
+     *
+     * @return bool
+     */
+    public function deleteAll()
+    {
+        $flag = true;
+
+        if (empty($this->configurations)) {
+            return false;
+        }
+
+        foreach ($this->configurations as $key => $config) {
+            if (!$flag) {
+                continue;
+            }
+            $flag = $flag && $this->delete($key);
+        }
+
+        return $flag;
     }
 
     /**
@@ -580,14 +607,38 @@ class Configuration
             return false;
         }
 
-        if (!array_key_exists($key, $this->configurations)) {
-            return false;
-        }
+        // If the configuration is not from module configuration, use adapter method
+        $configuration_key = !array_key_exists($key, $this->configurations) ? $key : $this->getName($key);
 
         return $this->dependencies
             ->getPlugin()
             ->getConfiguration()
-            ->get($this->getName($key));
+            ->get($configuration_key);
+    }
+
+    /**
+     * @description Set the default configuration for module in the database
+     *
+     * @return bool
+     */
+    public function initialize()
+    {
+        $flag = true;
+
+        if (empty($this->configurations)) {
+            return false;
+        }
+
+        foreach ($this->configurations as $key => $config) {
+            if (!$flag) {
+                continue;
+            }
+            if ($config['setConf']) {
+                $flag = $flag && $this->set($key, $config['defaultValue']);
+            }
+        }
+
+        return $flag;
     }
 
     /**

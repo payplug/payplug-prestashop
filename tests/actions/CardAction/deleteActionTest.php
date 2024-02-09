@@ -57,7 +57,7 @@ class deleteActionTest extends BaseCardAction
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
-    public function testWhenCardFoundDoesIsNotExpiredAndCartCanNotBeDeletedFromAPI()
+    public function testWhenCardFoundDoesIsntExpiredAndCartCantBeDeletedFromAPI()
     {
         $card_id = 4242;
         $customer_id = 4242;
@@ -91,7 +91,7 @@ class deleteActionTest extends BaseCardAction
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
-    public function testWhenCardFoundDoesIsNotExpiredAndCartCanNotBeDeletedFromDatabase()
+    public function testWhenCardFoundDoesIsntExpiredAndCartCantBeDeletedFromDatabase()
     {
         $card_id = 4242;
         $customer_id = 4242;
@@ -125,7 +125,7 @@ class deleteActionTest extends BaseCardAction
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
-    public function testWhenCardFoundDoesIsNotExpiredAndCartIsDeletedFromDatabase()
+    public function testWhenCardFoundDoesIsntExpiredAndCartIsDeletedFromDatabase()
     {
         $card_id = 4242;
         $customer_id = 4242;
@@ -159,7 +159,7 @@ class deleteActionTest extends BaseCardAction
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
-    public function testWhenCardFoundDoesIsExpiredAndCartCanNotBeDeletedFromDatabase()
+    public function testWhenCardFoundDoesIsExpiredAndCartCantBeDeletedFromDatabase()
     {
         $card_id = 4242;
         $customer_id = 4242;

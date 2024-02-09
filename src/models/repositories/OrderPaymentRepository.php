@@ -40,6 +40,13 @@ class OrderPaymentRepository extends QueryRepository
         $this->table_name = $this->prefix . $this->dependencies->name . '_order_payment';
     }
 
+    /**
+     * @description Insert new order payment in the database
+     *
+     * @param array $parameters
+     *
+     * @return bool
+     */
     public function createOrderPayment($parameters = [])
     {
         if (!is_array($parameters) || empty($parameters)) {
@@ -80,6 +87,13 @@ class OrderPaymentRepository extends QueryRepository
         return (bool) $this->build();
     }
 
+    /**
+     * @description Get all the order payment from a given id
+     *
+     * @param int $order_id
+     *
+     * @return array
+     */
     public function getAllByOrder($order_id = 0)
     {
         if (!is_int($order_id) || !$order_id) {
@@ -94,5 +108,29 @@ class OrderPaymentRepository extends QueryRepository
             ->build();
 
         return $result ?: [];
+    }
+
+    /**
+     * @description Create the table in the database
+     *
+     * @param string $engine
+     *
+     * @return bool
+     */
+    public function initialize($engine = '')
+    {
+        if (!is_string($engine) || !$engine) {
+            return false;
+        }
+
+        $this
+            ->create()
+            ->table($this->table_name)
+            ->fields('`id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`id_order` INT(11) UNSIGNED NOT NULL')
+            ->fields('`id_payment` VARCHAR(255) NOT NULL')
+            ->engine($engine);
+
+        return $this->build();
     }
 }

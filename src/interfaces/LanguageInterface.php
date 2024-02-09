@@ -31,6 +31,8 @@ interface LanguageInterface
 {
     public function get($idLanguage);
 
+    public function getIDs($active);
+
     public function getLanguages($active);
 
     public function loadLanguages();

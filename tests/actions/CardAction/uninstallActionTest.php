@@ -23,7 +23,7 @@ class uninstallActionTest extends BaseCardAction
         );
     }
 
-    public function testWhenCardsCanNotBeDeleted()
+    public function testWhenCardsCantBeDeleted()
     {
         $this->card_repository
             ->shouldReceive([

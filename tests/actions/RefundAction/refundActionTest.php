@@ -63,7 +63,7 @@ class refundActionTest extends BaseRefundAction
      *
      * @param mixed $amount
      */
-    public function testRefundActionWhenGivenAmountIsNotNumeric($amount)
+    public function testRefundActionWhenGivenAmountIsntNumeric($amount)
     {
         $pay_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
         $metadata = [
@@ -111,7 +111,7 @@ class refundActionTest extends BaseRefundAction
      *
      * @param mixed $metadata
      */
-    public function testRefundActionWhenGivenMetaDataIsNotArray($metadata)
+    public function testRefundActionWhenGivenMetaDataIsntArray($metadata)
     {
         $pay_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
 
@@ -156,7 +156,7 @@ class refundActionTest extends BaseRefundAction
      *
      * @param mixed $pay_mode
      */
-    public function testRefundActionWhenGivenPayModeIsNotString($pay_mode)
+    public function testRefundActionWhenGivenPayModeIsntString($pay_mode)
     {
         $pay_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
         $metadata = [

@@ -57,7 +57,7 @@ class renderDetailTest extends BaseOrderAction
         );
     }
 
-    public function testWhenRelatedOrderIsNotRelatedToCurrentModule()
+    public function testWhenRelatedOrderIsntRelatedToCurrentModule()
     {
         $order_id = 42;
         $order = OrderMock::get();

@@ -66,7 +66,7 @@ class processInstallmentRefundTest extends BaseRefundAction
      * @description  test processInstallmentrefund When
      * amount can not be refund
      */
-    public function testProcessInstallmentRefundWithCanNotBeRefund()
+    public function testProcessInstallmentRefundWithCantBeRefunded()
     {
         $inst_id = 'inst_5jjL5sWDZ5pkSty6eNjPtU';
         $amount = 100;

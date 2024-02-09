@@ -132,7 +132,7 @@ class createActionTest extends BaseOrderAction
         );
     }
 
-    public function testWhenRelatedCartIsNotValid()
+    public function testWhenRelatedCartIsntValid()
     {
         $resource_id = 'pay_azerty123456';
         $this->payment_repository
@@ -183,7 +183,7 @@ class createActionTest extends BaseOrderAction
         );
     }
 
-    public function testWhenRelatedCustomerIsNotValid()
+    public function testWhenRelatedCustomerIsntValid()
     {
         $resource_id = 'pay_azerty123456';
         $this->payment_repository
@@ -388,7 +388,7 @@ class createActionTest extends BaseOrderAction
         );
     }
 
-    public function testWhenOrderCreatedIsNotValid()
+    public function testWhenOrderCreatedIsntValid()
     {
         $resource_id = 'pay_azerty123456';
         $payment_method = \Mockery::mock('PaymentMethod');

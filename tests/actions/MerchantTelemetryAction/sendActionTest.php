@@ -16,7 +16,7 @@ class sendActionTest extends BaseMerchantTelemetryAction
      *
      * @param mixed $source
      */
-    public function testWhenGivenSourceIsNotValidString($source)
+    public function testWhenGivenSourceIsntValidString($source)
     {
         $this->assertFalse($this->action->sendAction($source));
     }

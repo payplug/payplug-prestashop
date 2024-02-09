@@ -51,7 +51,7 @@ class getExternalUrlTest extends TestCase
         $this->assertTrue(strpos($routes['activation'], 'hc/en-gb/articles') > 0);
     }
 
-    public function testWhenReturnIsNotEmptyArray()
+    public function testWhenReturnIsntEmptyArray()
     {
         $routes = $this->service->getExternalUrl('fr');
         $this->assertTrue(is_array($routes) && !empty($routes));

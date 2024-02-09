@@ -190,6 +190,35 @@ class PaymentRepository extends QueryRepository
     }
 
     /**
+     * @description Create the table in the database
+     *
+     * @param string $engine
+     *
+     * @return bool
+     */
+    public function initialize($engine = '')
+    {
+        if (!is_string($engine) || !$engine) {
+            return false;
+        }
+
+        $this
+            ->create()
+            ->table($this->table_name)
+            ->fields('`id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
+            ->fields('`resource_id` VARCHAR(255) NULL')
+            ->fields('`method` VARCHAR(255) NULL')
+            ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
+            ->fields('`cart_hash` VARCHAR(64) NULL')
+            ->fields('`schedules` TEXT NULL')
+            ->fields('`date_upd` DATETIME NULL')
+            ->condition('CONSTRAINT lock_cart_unique UNIQUE (id_cart)')
+            ->engine($engine);
+
+        return $this->build();
+    }
+
+    /**
      * @description Delete stored payment
      *
      * @param int $cart_id

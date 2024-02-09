@@ -37,81 +37,60 @@ class OrderStateAction
     }
 
     /**
-     * @description This is a function that allows creating a new type of the order state
-     *
-     * @param $param
-     *
-     * @return bool
-     */
-    public function addTypeAction($param)
-    {
-        if (!is_array($param) || !$param) {
-            // todo: add log
-            return false;
-        }
-
-        $order_state = $param['object'];
-        if (!is_int($order_state->id) || !$order_state->id) {
-            // todo: add log
-            return false;
-        }
-
-        $tools = $this->dependencies->getPlugin()->getTools();
-        $type = $tools->tool('getValue', 'order_state_type');
-        if (!is_string($type) || !$type) {
-            // todo: add log
-            return false;
-        }
-
-        return (bool) $this->dependencies
-            ->getPlugin()
-            ->getPayplugOrderStateRepository()
-            ->setOrderState($order_state->id, $type);
-    }
-
-    /**
      * @description This is a function that allows to update the type of the order state
      *
+     * todo: add coverage to this method
+     *
      * @param $param
+     * @param mixed $id_order_state
+     * @param mixed $type
      *
      * @return bool
      */
-    public function updateTypeAction($param)
+    public function saveTypeAction($id_order_state = 0, $type = '')
     {
-        if (!is_array($param) || !$param) {
+        if (!is_int($id_order_state) || !$id_order_state) {
             // todo: add log
             return false;
         }
 
-        $order_state = $param['object'];
-        if (!is_int($order_state->id) || !$order_state->id) {
-            // todo: add log
-            return false;
-        }
-
-        $tools = $this->dependencies->getPlugin()->getTools();
-        $type = $tools->tool('getValue', 'order_state_type');
         if (!is_string($type) || !$type) {
+            // todo: add log
+            return false;
+        }
+
+        $order_state = $this->dependencies
+            ->getPlugin()
+            ->getOrderStateAdapter()
+            ->get((int) $id_order_state);
+
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getValidate()
+            ->validate('isLoadedObject', $order_state)) {
             // todo: add log
             return false;
         }
 
         if (isset($order_state->deleted) && $order_state->deleted) {
-            return $this->deleteTypeAction($param);
+            return $this->deleteTypeAction((int) $id_order_state);
         }
 
         $payplug_order_state = $this->dependencies
             ->getPlugin()
             ->getPayplugOrderStateRepository()
-            ->getTypeByIdOrderState($order_state->id);
+            ->getTypeByIdOrderState((int) $id_order_state);
 
         if (empty($payplug_order_state)) {
-            $result = $this->addTypeAction($param);
+            $result = (bool) $this->dependencies
+                ->getPlugin()
+                ->getPayplugOrderStateRepository()
+                ->setOrderState($id_order_state, $type);
         } else {
             $result = (bool) $this->dependencies
                 ->getPlugin()
                 ->getPayplugOrderStateRepository()
-                ->updateByOderState($order_state->id, $type);
+                ->updateByOderState((int) $id_order_state, $type);
         }
 
         return $result;
@@ -121,18 +100,13 @@ class OrderStateAction
      * @description This is a function that deletes an order state
      *
      * @param $param
+     * @param mixed $id_order_state
      *
      * @return bool
      */
-    public function deleteTypeAction($param)
+    public function deleteTypeAction($id_order_state = 0)
     {
-        if (!is_array($param) || !$param) {
-            // todo: add log
-            return false;
-        }
-
-        $order_state = $param['object'];
-        if (!is_int($order_state->id) || !$order_state->id) {
+        if (!is_int($id_order_state) || !$id_order_state) {
             // todo: add log
             return false;
         }
@@ -140,11 +114,13 @@ class OrderStateAction
         return (bool) $this->dependencies
             ->getPlugin()
             ->getPayplugOrderStateRepository()
-            ->removeByIdOrderState($order_state->id);
+            ->removeByIdOrderState((int) $id_order_state);
     }
 
     /**
      * @description Display a form in the admin statuses template
+     *
+     * todo: add coverage to this method
      *
      * @param $param
      *
@@ -176,5 +152,62 @@ class OrderStateAction
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('order_state/type.tpl');
+    }
+
+    /**
+     * @description Process order state type installation
+     *
+     * todo: add coverage to this method
+     *
+     * @param $param
+     *
+     * @return string
+     */
+    public function installTypeAction()
+    {
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+
+        foreach ($configuration->order_states as $key => $state) {
+            // live status
+            $live_key = 'order_state_' . $key;
+            $id_order_state_live = $configuration->getValue($live_key);
+            if ($id_order_state_live) {
+                $this->saveTypeAction((int) $id_order_state_live, $state['type']);
+            }
+
+            // sandbox status
+            $sandbox_key = 'order_state_' . $key . '_test';
+            $id_order_state_sandbox = $configuration->getValue($sandbox_key);
+            if ($id_order_state_sandbox) {
+                $this->saveTypeAction((int) $id_order_state_sandbox, $state['type']);
+            }
+        }
+
+        // mapping of the native prestashop statuses
+        $prestashop_order_states = [
+            'PS_OS_BANKWIRE' => 'nothing',
+            'PS_OS_CANCELED' => 'cancelled',
+            'PS_OS_CHEQUE' => 'nothing',
+            'PS_OS_COD_VALIDATION' => 'nothing',
+            'PS_OS_DELIVERED' => 'nothing',
+            'PS_OS_ERROR' => 'error',
+            'PS_OS_PAYMENT' => 'paid',
+            'PS_OS_PREPARATION' => 'nothing',
+            'PS_OS_OUTOFSTOCK_PAID' => 'paid',
+            'PS_OS_OUTOFSTOCK_UNPAID' => 'pending',
+            'PS_OS_SHIPPING' => 'nothing',
+            'PS_OS_REFUND' => 'refund',
+            'PS_OS_WS_PAYMENT' => 'nothing',
+        ];
+        foreach ($prestashop_order_states as $config_key => $type) {
+            $id_order_state = $configuration->getValue($config_key);
+            if ($id_order_state) {
+                $this->saveTypeAction((int) $id_order_state, $type);
+            }
+        }
+
+        return true;
     }
 }

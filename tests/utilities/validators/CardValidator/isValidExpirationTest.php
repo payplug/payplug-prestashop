@@ -57,7 +57,7 @@ class isValidExpirationTest extends TestCase
         ], $this->validator->isValidExpiration($month, $year));
     }
 
-    public function testWhenMonthIsNotAValidDigit()
+    public function testWhenMonthIsntAValidDigit()
     {
         $month = 123;
         $year = 2050;
@@ -67,7 +67,7 @@ class isValidExpirationTest extends TestCase
         ], $this->validator->isValidExpiration($month, $year));
     }
 
-    public function testWhenYearIsNotAValidDigit()
+    public function testWhenYearIsntAValidDigit()
     {
         $month = 12;
         $year = 20500;
@@ -97,7 +97,7 @@ class isValidExpirationTest extends TestCase
         ], $this->validator->isValidExpiration($month, $year));
     }
 
-    public function testWhenGivenDateIsNotExpired()
+    public function testWhenGivenDateIsntExpired()
     {
         $month = 1;
         $year = 2030;

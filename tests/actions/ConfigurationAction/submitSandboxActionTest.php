@@ -175,7 +175,7 @@ class submitSandboxActionTest extends BaseConfigurationAction
     /**
      * description test submitSandboxAction when merchant is not onboarded.
      */
-    public function testWhenUserIsNotOnboarded()
+    public function testWhenUserIsntOnboarded()
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_login';

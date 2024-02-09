@@ -62,7 +62,7 @@ class isLoggedTest extends TestCase
     /**
      * test return with invalid Email.
      */
-    public function testIsNotLoggedWithInvalidEmail()
+    public function testIsntLoggedWithInvalidEmail()
     {
         $this->assertSame(
             [
@@ -76,7 +76,7 @@ class isLoggedTest extends TestCase
     /**
      * description test return with invalid Apikey.
      */
-    public function testIsNotLoggedWithInvalidApiKey()
+    public function testIsntLoggedWithInvalidApiKey()
     {
         $this->assertSame(
             [

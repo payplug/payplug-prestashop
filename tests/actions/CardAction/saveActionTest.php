@@ -45,7 +45,7 @@ class saveActionTest extends BaseCardAction
         $this->assertFalse($this->action->saveAction($this->payment));
     }
 
-    public function testWhenCardCanNotBeRegistered()
+    public function testWhenCardCantBeRegistered()
     {
         $this->card_repository
             ->shouldReceive([

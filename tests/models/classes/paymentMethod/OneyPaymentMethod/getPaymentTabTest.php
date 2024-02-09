@@ -124,7 +124,7 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         );
     }
 
-    public function testWhenCurrentCartIsNotElligible()
+    public function testWhenCurrentCartIsntElligible()
     {
         $this->oney
             ->shouldReceive([
