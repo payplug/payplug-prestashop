@@ -1,6 +1,6 @@
 # Payplug module changelog
 
-## Next Version
+## Version 4.7.0
 - Refactoring :
   - [PRE-1985](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2309): Add action Order
   - [PRE-2091](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2339): Add Refund Action
