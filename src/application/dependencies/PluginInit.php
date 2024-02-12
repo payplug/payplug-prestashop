@@ -32,6 +32,7 @@ use PayPlug\src\actions\CardAction;
 use PayPlug\src\actions\ConfigurationAction;
 use PayPlug\src\actions\MerchantTelemetryAction;
 use PayPlug\src\actions\OnboardingAction;
+use PayPlug\src\actions\OneyAction;
 use PayPlug\src\actions\OrderAction;
 use PayPlug\src\actions\OrderStateAction;
 use PayPlug\src\actions\PaymentAction;
@@ -75,7 +76,6 @@ use PayPlug\src\models\entities\PluginEntity;
 use PayPlug\src\repositories\CacheRepository;
 use PayPlug\src\repositories\InstallRepository;
 use PayPlug\src\repositories\LoggerRepository;
-use PayPlug\src\repositories\OneyRepository;
 use PayPlug\src\repositories\OrderStateRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
@@ -91,6 +91,7 @@ class PluginInit extends BaseClass
     private $card_action;
     private $configuration_action;
     private $onboarding_action;
+    private $oney_action;
     private $order_action;
     private $refund_action;
     private $order_state_action;
@@ -109,7 +110,6 @@ class PluginInit extends BaseClass
     private $install;
     private $logger;
     private $myLogPhp;
-    private $oney;
     private $order_state;
     private $sql;
     private $translate;
@@ -190,7 +190,6 @@ class PluginInit extends BaseClass
             ->setMerchantTelemetry($this->merchant_telemetry)
             ->setInstall($this->install)
             ->setLogger($this->logger)
-            ->setOney($this->oney)
             ->setOrderState($this->order_state)
             ->setSql($this->sql)
             ->setRoutes($this->routes)
@@ -233,6 +232,7 @@ class PluginInit extends BaseClass
             ->setConfigurationAction($this->configuration_action)
             ->setMerchantTelemetryAction($this->merchant_telemetry_action)
             ->setOnboardingAction($this->onboarding_action)
+            ->setOneyAction($this->oney_action)
             ->setOrderAction($this->order_action)
             ->setRefundAction($this->refund_action)
             ->setOrderStateAction($this->order_state_action)
@@ -275,6 +275,7 @@ class PluginInit extends BaseClass
         $this->configuration_action = new ConfigurationAction($this->dependencies);
         $this->merchant_telemetry_action = new MerchantTelemetryAction($this->dependencies);
         $this->onboarding_action = new OnboardingAction($this->dependencies);
+        $this->oney_action = new OneyAction($this->dependencies);
         $this->order_action = new OrderAction($this->dependencies);
         $this->refund_action = new RefundAction($this->dependencies);
         $this->order_state_action = new OrderStateAction($this->dependencies);
@@ -314,24 +315,6 @@ class PluginInit extends BaseClass
             $this->dependencies,
             $this->logger,
             $this->constant_adapter
-        );
-
-        $this->oney = new OneyRepository(
-            $this->address_adapter,
-            $this->assign_adapter,
-            $this->cache,
-            $this->carrier_adapter,
-            $this->cart_adapter,
-            $this->configuration_adapter,
-            $this->context_adapter,
-            $this->country_adapter,
-            $this->currency_adapter,
-            $this->media_adapter,
-            $this->dependencies,
-            $this->logger,
-            $this->oneyEntity,
-            $this->tools_adapter,
-            $this->validate_adapter
         );
 
         $this->order_state = new OrderStateRepository(

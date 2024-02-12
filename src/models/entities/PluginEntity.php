@@ -122,6 +122,9 @@ class PluginEntity
     private $oney;
 
     /** @var object */
+    private $oney_action;
+
+    /** @var object */
     private $order;
 
     /** @var object */
@@ -585,6 +588,14 @@ class PluginEntity
     public function getOney()
     {
         return $this->oney;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOneyAction()
+    {
+        return $this->oney_action;
     }
 
     /**
@@ -1350,6 +1361,22 @@ class PluginEntity
         }
 
         $this->oney = $oney;
+
+        return $this;
+    }
+
+    /**
+     * @param object $oneyAction
+     *
+     * @return self
+     */
+    public function setOneyAction($oneyAction)
+    {
+        if (!is_object($oneyAction)) {
+            throw new BadParameterException('Invalid argument, $card must be a OneyRepository');
+        }
+
+        $this->oney_action = $oneyAction;
 
         return $this;
     }

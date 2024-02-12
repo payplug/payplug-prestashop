@@ -443,6 +443,7 @@ class PaymentAction
             ->getConfigurationClass()
             ->getValue('payment_methods');
         $payment_methods = json_decode($payment_methods, true);
+
         if (!$force) {
             switch ($method) {
                 case 'one_click':
@@ -479,7 +480,9 @@ class PaymentAction
         $payment_method = $this->plugin
             ->getPaymentMethodClass()
             ->getPaymentMethod($method);
+
         $payment_tab = $payment_method->getPaymentTab();
+
         if (empty($payment_tab)) {
             $this->logger->addLog('PaymentAction::dispatchAction - Cannot generate payment tab.', 'error');
 
@@ -594,6 +597,49 @@ class PaymentAction
         }
 
         return $payment_method->getReturnUrl();
+    }
+
+    /**
+     * @description display payment errors
+     *
+     * @param $errors
+     *
+     * @return bool
+     */
+    public function renderPaymentErrors($errors)
+    {
+        if (empty($errors)) {
+            return false;
+        }
+
+        $context = $this->dependencies->getPlugin()->getContext()->get();
+
+        $formated = [];
+        $with_msg_button = false;
+
+        foreach ($errors as $error) {
+            if (false !== strpos($error, 'oney_required_field')) {
+                $context->getContext()->smarty->assign(['is_popin_tpl' => true]);
+                $formated[] = $this->dependencies
+                    ->getPlugin()
+                    ->getOneyAction()
+                    ->renderRequiredFields($error);
+            } else {
+                $with_msg_button = true;
+                $formated[] = [
+                    'type' => 'string',
+                    'value' => $error,
+                ];
+            }
+        }
+
+        $context->getContext()->smarty->assign([
+            'is_error_message' => true,
+            'messages' => $formated,
+            'with_msg_button' => $with_msg_button,
+        ]);
+
+        return $this->dependencies->configClass->fetchTemplate('_partials/messages.tpl');
     }
 
     /**

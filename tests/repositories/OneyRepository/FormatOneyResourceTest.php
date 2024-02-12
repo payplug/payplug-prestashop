@@ -42,6 +42,10 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         $this->resource = OneySimulationsMock::get()[$this->operation];
     }
 
+    /**
+     * @description test formatOneyResource
+     * with invalid method
+     */
     public function testWithInvalidMethod()
     {
         $method = 'wrong method';
@@ -51,6 +55,10 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test formatOneyResource
+     * with invalid resource
+     */
     public function testWithInvalidResource()
     {
         $resource = 'wrong resource';
@@ -60,8 +68,16 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test formatOneyResource
+     * when the split is valid
+     */
     public function testGetValidSplit()
     {
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 3.50,
+            ]);
+
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = 3;
         $this->assertSame(
@@ -70,8 +86,16 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test formatOneyResource returns
+     * valid title
+     */
     public function testGetValidTitle()
     {
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 3.50,
+            ]);
+
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = 'Payment in 3x';
         $this->assertSame(
@@ -80,8 +104,16 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test formatOneyResource
+     * returns valid total cost
+     */
     public function testGetValidTotalCost()
     {
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 3.50,
+            ]);
+
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
             'amount' => number_format(3.5, 2),
@@ -93,8 +125,16 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test formatOneyResource
+     * returns valid down payment amount
+     */
     public function testGetValidDownPaymentAmount()
     {
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 83.92,
+            ]);
+
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
             'amount' => number_format(83.92, 2),
@@ -106,8 +146,16 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test formatOneyResource
+     * returns valid installment
+     */
     public function testGetValidInstallments()
     {
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 80.42,
+            ]);
+
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
 
         // check installments count
@@ -124,16 +172,21 @@ final class FormatOneyResourceTest extends BaseOneyRepository
             ],
             $response['installments'][0]
         );
+
         $this->assertSame(
             [
                 'date' => '2021-03-19T01:00:00.000Z',
-                'amount' => number_format(80.41, 2),
-                'value' => '80,41 €',
+                'amount' => number_format(80.42, 2),
+                'value' => '80,42 €',
             ],
             $response['installments'][1]
         );
     }
 
+    /**
+     * @description  test formatOneyResource
+     * returns invalid amount
+     */
     public function testWithInvalidAmount()
     {
         $this->assertSame(
@@ -142,8 +195,16 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test formatOneyResource
+     * returns invalid total amount
+     */
     public function testGetValidTotalAmountWithEmptyValue()
     {
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 1.75,
+            ]);
+
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
             'amount' => number_format(3.5, 2),
@@ -155,8 +216,16 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test formatOneyResource
+     * returns valid total amount
+     */
     public function testGetValidTotalAmount()
     {
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 2.25,
+            ]);
+
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, 100);
         $expected_value = [
             'amount' => number_format(4.5, 2),

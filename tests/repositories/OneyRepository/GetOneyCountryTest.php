@@ -2,6 +2,8 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
+use PayPlug\tests\FormatDataProvider;
+
 /**
  * @group unit
  * @group old_repository
@@ -12,6 +14,27 @@ namespace PayPlug\tests\repositories\OneyRepository;
  */
 final class GetOneyCountryTest extends BaseOneyRepository
 {
+    use FormatDataProvider;
+
+    /**
+     * @description  test getOneyCountry
+     * when invalid $iso_code is given
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $iso_country
+     */
+    public function testWhenGivenPaymentIsInvalidIntegerFormat($iso_country)
+    {
+        $this->assertSame(
+            false,
+            $this->repo->getOneyCountry($iso_country)
+        );
+    }
+
+    /**
+     * @description test getOneyCountry
+     * when empty iso code is given
+     */
     public function testWithEmptyIsoCode()
     {
         $this->assertSame(
@@ -20,6 +43,10 @@ final class GetOneyCountryTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test getOneyCountry
+     * when wrong is code is given
+     */
     public function testWithWrongIsoCode()
     {
         $this->assertSame(
@@ -28,6 +55,10 @@ final class GetOneyCountryTest extends BaseOneyRepository
         );
     }
 
+    /**
+     * @description test getOneyCountry
+     * with default iso code
+     */
     public function testGetDefaultIsoCode()
     {
         $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
@@ -40,6 +71,10 @@ final class GetOneyCountryTest extends BaseOneyRepository
         }
     }
 
+    /**
+     * @description test getOneyCountry
+     * with custom iso_code
+     */
     public function testGetCustomIsoCode()
     {
         $iso_code = 'BE';

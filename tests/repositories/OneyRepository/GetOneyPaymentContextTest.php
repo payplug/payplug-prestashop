@@ -50,6 +50,10 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             'isVirtualCart' => false,
         ]);
 
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 3446,
+            ]);
+
         $this->assertSame(
             [
                 'cart' => [
@@ -108,6 +112,10 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             'getProducts' => [CartMock::getProducts()[4]],
             'isVirtualCart' => false,
         ]);
+
+        $this->amount_helper->shouldReceive([
+                'convertAmount' => 2268,
+            ]);
 
         $this->assertSame(
             [

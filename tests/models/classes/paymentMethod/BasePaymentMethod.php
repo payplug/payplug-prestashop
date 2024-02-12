@@ -22,13 +22,19 @@ class BasePaymentMethod extends TestCase
     use FormatDataProvider;
 
     protected $address;
+    protected $assign_adapter;
     protected $address_adapter;
     protected $card_repository;
+    protected $carrier_adapter;
+    protected $cart_adapter;
     protected $classe;
     protected $configuration;
+    protected $configuration_adapter;
     protected $constant;
     protected $context;
+    protected $country;
     protected $context_adapter;
+    protected $currency_adapter;
     protected $dependencies;
     protected $helpers;
     protected $logger;
@@ -106,24 +112,41 @@ class BasePaymentMethod extends TestCase
             ->with('amounts')
             ->andReturn('{"default":{"min":"EUR:99","max":"EUR:2000000"}}');
 
+        $this->configuration_adapter = \Mockery::mock('ConfigurationAdapter');
+
         $this->address = \Mockery::mock('Address');
         $this->address_adapter = \Mockery::mock('AddressAdapter');
         $this->address_adapter->shouldReceive([
             'get' => AddressMock::get(),
         ]);
 
+        $this->assign_adapter = \Mockery::mock('AssignAdapter');
+        $this->assign_adapter->shouldReceive([
+            'assign' => '',
+        ]);
+
         $this->card_repository = \Mockery::mock('CardRepository');
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
+        $this->country = \Mockery::mock('Country');
+        $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $this->carrier_adapter = \Mockery::mock('CarrierAdapter');
+        $this->cart_adapter = \Mockery::mock('CartAdapter');
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
                 'getAddress' => $this->address_adapter,
+                'getAssign' => $this->assign_adapter,
                 'getCardRepository' => $this->card_repository,
+                'getCarrier' => $this->carrier_adapter,
+                'getCart' => $this->cart_adapter,
+                'getConfiguration' => $this->configuration_adapter,
                 'getConfigurationClass' => $this->configuration,
                 'getConstant' => $this->constant,
                 'getContext' => $this->context_adapter,
+                'getCountry' => $this->country,
+                'getCurrency' => $this->currency_adapter,
                 'getLogger' => $this->logger,
                 'getPaymentRepository' => $this->payment_repository,
                 'getRoutes' => $this->routes,
@@ -137,6 +160,22 @@ class BasePaymentMethod extends TestCase
             'cookies' => \Mockery::mock(CookiesHelper::class, [$this->dependencies])->makePartial(),
             'phone' => \Mockery::mock(PhoneHelper::class)->makePartial(),
         ];
+
+        $oney = \Mockery::mock('Oney');
+        $oney
+            ->shouldReceive([
+                'isOneyElligible' => [
+                    'result' => false,
+                    'error_type' => 'invalid_cart',
+                    'error' => 'An error occured',
+                ],
+                'getOperations' => [
+                    'x3_with_fees',
+                    'x3_without_fees',
+                    'x4_with_fees',
+                    'x4_without_fees',
+                ],
+            ]);
 
         $this->validators = [
             'browser' => \Mockery::mock(browserValidator::class)->makePartial(),

@@ -173,14 +173,9 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
             ->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('redirect');
-        $cart_adapter = \Mockery::mock('CardAdapter');
-        $cart_adapter->shouldReceive([
+        $this->cart_adapter->shouldReceive([
             'isGuestCartByCartId' => false,
         ]);
-        $this->plugin
-            ->shouldReceive([
-                'getCart' => $cart_adapter,
-            ]);
         $this->expected_tab['allow_save_card'] = true;
 
         $this->assertSame(

@@ -1,9 +1,7 @@
 <?php
 
-namespace PayPlug\tests\repositories\OneyRepository;
+namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
-use PayPlug\tests\mock\ContextMock;
-use PayPlug\tests\mock\CountryMock;
 use PayPlug\tests\mock\PaymentTabMock;
 
 /**
@@ -14,19 +12,11 @@ use PayPlug\tests\mock\PaymentTabMock;
  *
  * @runTestsInSeparateProcesses
  */
-final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
+final class CheckOneyRequiredFieldsTest extends BaseOneyPaymentMethod
 {
     public function setUp()
     {
         parent::setUp();
-
-        $this->context
-            ->shouldReceive('get')
-            ->andReturn(ContextMock::get())
-        ;
-        $this->country->shouldReceive('getCountry')
-            ->andReturn(CountryMock::get())
-        ;
 
         $this->dependencies->shouldReceive('isValidMobilePhoneNumber')
             ->andReturnUsing(function ($phone_number) {
@@ -39,13 +29,13 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     }
 
     /**
-     * @description test checkOneyRequiredFields
-     *  when $paymentData is empty
+     * @description  test checkOneyRequiredFields
+     * with empty param
      */
     public function testMethodWithEmptyParams()
     {
         $paymentData = null;
-        $response = $this->repo->checkOneyRequiredFields($paymentData);
+        $response = $this->classe->checkOneyRequiredFields($paymentData);
         $this->assertSame(
             ['Please fill in the required fields'],
             $response
@@ -54,12 +44,12 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 
     /**
      * @description test checkOneyRequiredFields
-     * when $paymentData is invalid
+     * with invalid param
      */
     public function testMethodWithInvalidParams()
     {
         $paymentData = 'wrong params';
-        $response = $this->repo->checkOneyRequiredFields($paymentData);
+        $response = $this->classe->checkOneyRequiredFields($paymentData);
         $this->assertSame(
             ['Please fill in the required fields'],
             $response
@@ -67,12 +57,12 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     }
 
     /**
-     * @description  test checkOneyRequiredFields
-     * when $paymentData is valid
+     * @description  test test checkOneyRequiredFields
+     * with valid aram
      */
     public function testWithValidPaymentData()
     {
-        $response = $this->repo->checkOneyRequiredFields($this->tab);
+        $response = $this->classe->checkOneyRequiredFields($this->tab);
         $this->assertTrue(
             empty($response)
         );
@@ -92,29 +82,30 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     }
 
     /**
-     * @description  test checkOneyRequiredFields
-     * with valid data
-     *
      * @dataProvider validPaymentDataProvider
      *
      * @param mixed $parameter
      */
     public function testWithValidDataProvider($parameter)
     {
-        $field = ['shipping-' . $parameter => $this->tab[$parameter]];
-        $this->dependencies->configClass
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => true,
-            ])
-        ;
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->validators['payment']
             ->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                ],
                 'isValidMobilePhoneNumber' => true,
             ]);
-        $response = $this->repo->checkOneyRequiredFields($field);
+        $this->tools_adapter->shouldReceive('tool')
+            ->andReturn(20);
+        $get_country = (object) [];
+        $get_country->iso_code = 'fr';
+        $this->country
+            ->shouldReceive([
+                'getCountry' => $get_country,
+            ]);
+
+        $field = ['shipping-' . $parameter => $this->tab[$parameter]];
+        $response = $this->classe->checkOneyRequiredFields($field);
 
         $this->assertSame(
             [],
@@ -122,7 +113,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
         );
 
         $field = ['billing-' . $parameter => $this->tab[$parameter]];
-        $response = $this->repo->checkOneyRequiredFields($field);
+        $response = $this->classe->checkOneyRequiredFields($field);
 
         $this->assertSame(
             [],
@@ -130,9 +121,6 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
         );
     }
 
-    /**
-     * @return \Generator
-     */
     public function invalidPaymentDataProvider()
     {
         yield ['mobile_phone_number', 'Please enter your mobile phone number.'];
@@ -144,9 +132,8 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     }
 
     /**
-     * @description test checkOneyRequiredFields
-     * with invalid datas
-     *
+     * @description  test checkOneyRequiredFields
+     * with invalid data provider
      * @dataProvider invalidPaymentDataProvider
      *
      * @param mixed $parameter
@@ -154,20 +141,20 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
      */
     public function testWithInvalidDataProvider($parameter, $expected)
     {
-        $field = ['shipping-' . $parameter => null];
-        $this->dependencies->configClass
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => false,
-            ])
-        ;
+        $this->validate_adapter->shouldReceive([
+            'validate' => false,
+        ]);
         $this->validators['payment']
             ->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                ],
                 'isValidMobilePhoneNumber' => false,
             ]);
-        $response = $this->repo->checkOneyRequiredFields($field);
+        $this->country
+            ->shouldReceive([
+                'getCountry' => [],
+            ]);
+
+        $field = ['shipping-' . $parameter => null];
+        $response = $this->classe->checkOneyRequiredFields($field);
 
         $this->assertSame(
             [sprintf($expected, 'shipping')],
@@ -175,7 +162,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
         );
 
         $field = ['billing-' . $parameter => ''];
-        $response = $this->repo->checkOneyRequiredFields($field);
+        $response = $this->classe->checkOneyRequiredFields($field);
 
         $this->assertSame(
             [sprintf($expected, 'billing')],
@@ -185,19 +172,26 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 
     /**
      * @description  test checkOneyRequiredFields
-     * when city name is too long
+     * with too long city
      */
     public function testWithTooLongCity()
     {
+        $this->validate_adapter->shouldReceive([
+                'validate' => true,
+            ]);
+
+        $this->tools_adapter->shouldReceive('tool')
+            ->andReturn(37);
+
         $cityTooLong = 'city too long too long city tooo long';
 
         $this->assertSame(
             ['Your city name is too long (max 32 characters). Please change it to another one or select another payment method.'],
-            $this->repo->checkOneyRequiredFields(['shipping-city' => $cityTooLong])
+            $this->classe->checkOneyRequiredFields(['shipping-city' => $cityTooLong])
         );
         $this->assertSame(
             ['Your city name is too long (max 32 characters). Please change it to another one or select another payment method.'],
-            $this->repo->checkOneyRequiredFields(['billing-city' => $cityTooLong])
+            $this->classe->checkOneyRequiredFields(['billing-city' => $cityTooLong])
         );
     }
 }

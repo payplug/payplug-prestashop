@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\utilities\validators;
 
+use libphonenumberlight;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -1083,6 +1085,56 @@ class paymentValidator
             'result' => true,
             'message' => '',
         ];
+    }
+
+    /**
+     * @description Check if given phone number is valid mobile phone number.
+     *
+     * @param $iso_code
+     * @param false $phone_number
+     *
+     * @return array
+     */
+    public function isValidMobilePhoneNumber($phone_number = '', $iso_code = '')
+    {
+        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $phone_number must be a valid phone number',
+            ];
+        }
+
+        if (!is_string($iso_code) || !$iso_code) {
+            return [
+                'result' => false,
+                'message' => 'Invalid argument given, $iso_code must be a non empty string',
+            ];
+        }
+
+        try {
+            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $parsed = $phone_util->parse($phone_number, $iso_code);
+
+            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
+                return [
+                    'result' => false,
+                    'message' => '$iso_code is wrong',
+                ];
+            }
+
+            $is_mobile = $phone_util->getNumberType($parsed);
+
+            return [
+                    'result' => in_array($is_mobile, [1, 2], true),
+                    'message' => '',
+                ];
+        } catch (libphonenumberlight\NumberParseException $e) {
+            // todo : Add error Log
+            return [
+                'result' => false,
+                'message' => 'Error, the mobile phone number is not valid',
+            ];
+        }
     }
 
     /**

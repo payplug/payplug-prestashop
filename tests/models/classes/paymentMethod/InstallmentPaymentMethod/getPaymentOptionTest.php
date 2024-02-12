@@ -25,6 +25,11 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
     {
         $payment_options = [];
 
+        $this->configuration_adapter
+            ->shouldReceive('get')
+            ->with('PS_TAX')
+            ->andReturn('1');
+
         $this->configuration
             ->shouldReceive('getValue')
             ->with('inst_min_amount')
@@ -40,6 +45,11 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
     public function testWhenInstallmentPaymentMethodIsDisplayed()
     {
         $payment_options = [];
+
+        $this->configuration_adapter
+            ->shouldReceive('get')
+            ->with('PS_TAX')
+            ->andReturn('1');
 
         $this->configuration
             ->shouldReceive('getValue')
