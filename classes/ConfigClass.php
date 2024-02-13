@@ -585,13 +585,18 @@ class ConfigClass
     /**
      * @description Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm.
      *
+     * todo: Deprected method: Use src/models/classe/Country::getIsoCodeByCountryId instead
+     *
      * @param $country_id
      *
      * @return string
      */
     public function getIsoCodeByCountryId($country_id)
     {
-        $iso_code_list = $this->getIsoCodeList();
+        $iso_code_list = $this->dependencies
+            ->getPlugin()
+            ->getCountryClass()
+            ->getIsoCodeList();
         if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
             return '';
         }
@@ -599,7 +604,10 @@ class ConfigClass
             return '';
         }
 
-        $iso_code = $this->dependencies->getPlugin()->getCountryRepository()->getIsoCodeByCountry((int) $country_id);
+        $iso_code = $this->dependencies
+            ->getPlugin()
+            ->getCountryRepository()
+            ->getIsoCodeByCountry((int) $country_id);
         $iso_code = $this->tools->tool('strtoupper', $iso_code);
 
         if (!in_array($iso_code, $iso_code_list, true)) {
@@ -607,27 +615,6 @@ class ConfigClass
         }
 
         return $iso_code;
-    }
-
-    /**
-     * @description Get all country iso-code of ISO 3166-1 alpha-2 norm
-     *
-     * @return array
-     */
-    public function getIsoCodeList()
-    {
-        $country_list_path = _PS_MODULE_DIR_ . $this->dependencies->name . '/lib/iso_3166-1_alpha-2/data.csv';
-        $iso_code_list = [];
-        if (($handle = fopen($country_list_path, 'r')) !== false) {
-            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                $iso_code_list[] = $this->tools->tool('strtoupper', $data[0]);
-            }
-            fclose($handle);
-
-            return $iso_code_list;
-        }
-
-        return [];
     }
 
     /**

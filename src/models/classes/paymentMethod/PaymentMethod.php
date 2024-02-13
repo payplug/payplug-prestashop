@@ -470,7 +470,9 @@ class PaymentMethod
                         ->get('PS_LANG_DEFAULT')
                 );
             $iso_code_list = $this->dependencies
-                ->getHelpers()['country']::getIsoCodeList();
+                ->getPlugin()
+                ->getCountryClass()
+                ->getIsoCodeList();
             if (in_array($this->tools->tool('strtoupper', $default_language->iso_code), $iso_code_list, true)) {
                 $iso_code = $this->tools->tool('strtoupper', $default_language->iso_code);
             } else {
