@@ -1578,8 +1578,8 @@ class OneyPaymentMethod extends PaymentMethod
 
             $oneyLogo = $oney_payment . (!$use_fees ? '_side_' . $iso : '') . ($error ? '_alt' : '') . '.svg';
             $text = $use_fees
-                ? $this > $this->oney_translations['pay_with_fee']
-                : $this > $this->oney_translations['pay_without_fee'];
+                ? $this->oney_translations['pay_with_fee']
+                : $this->oney_translations['pay_without_fee'];
 
             $oneyLabel = $error ? $err_label : sprintf($text, $split);
 
