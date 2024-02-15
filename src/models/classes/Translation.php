@@ -325,7 +325,6 @@ class Translation
             'invalid_amount' => $this->l('payplug.getPaymentOptions.invalidAmount', 'translation'),
             'invalid_carrier' => $this->l('payplug.getPaymentOptions.invalidCarrier', 'translation'),
             'invalid_cart' => $this->l('payplug.getPaymentOptions.invalidCart', 'translation'),
-
         ];
     }
 
@@ -343,7 +342,6 @@ class Translation
             'paid' => $this->l('action.orderState.renderOption.orderStateTypePaid', 'translation'),
             'pending' => $this->l('action.orderState.renderOption.orderStateTypePending', 'translation'),
             'refund' => $this->l('action.orderState.renderOption.orderStateTypeRefund', 'translation'),
-
         ];
     }
 

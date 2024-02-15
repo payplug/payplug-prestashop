@@ -23,8 +23,14 @@
 
 namespace PayPlug\src\models\classes;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class Order
 {
+    public $dependencies;
+
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;

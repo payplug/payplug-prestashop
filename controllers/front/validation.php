@@ -24,6 +24,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PayPlug\classes\DependenciesClass;
+
 class PayplugValidationModuleFrontController extends ModuleFrontController
 {
     public $apiClass;
@@ -48,7 +50,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
     private function setParameters()
     {
-        $this->dependencies = new \PayPlug\classes\DependenciesClass();
+        $this->dependencies = new DependenciesClass();
         $this->plugin = $this->dependencies->getPlugin();
         $this->cart_adapter = $this->plugin->getCart();
         $this->customer_adapter = $this->plugin->getCustomer();
