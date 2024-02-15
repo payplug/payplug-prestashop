@@ -202,6 +202,14 @@ class Translation
                 ],
                 'submit' => $this->l('modal.premium.submit', 'translation'),
             ],
+            'applepay' => [
+                'text' => $this->l('modal.applepay.text', 'translation'),
+                'submit' => $this->l('modal.applepay.submit', 'translation'),
+            ],
+            'error' => [
+                'text' => $this->l('modal.error.text', 'translation'),
+                'submit' => $this->l('modal.error.submit', 'translation'),
+            ],
         ];
     }
 
@@ -449,7 +457,6 @@ class Translation
                 'link' => $this->l('paymentmethods.one_click.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.one_click.call_to_action', 'translation'),
             ],
-
             'installment' => [
                 'title' => $this->l('paymentmethods.installment.title', 'translation'),
                 'descriptions' => [
@@ -501,6 +508,18 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.applepay.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.applepay.call_to_action', 'translation'),
+                'cart' => [
+                    'title' => $this->l('paymentmethods.applepay.cart.title', 'translation'),
+                    'description' => $this->l('paymentmethods.applepay.cart.description', 'translation'),
+                ],
+                'checkout' => [
+                    'title' => $this->l('paymentmethods.applepay.checkout.title', 'translation'),
+                ],
+                'carrier' => [
+                    'title' => $this->l('paymentmethods.applepay.carrier.title', 'translation'),
+                    'alert' => $this->l('paymentmethods.applepay.carrier.alert', 'translation'),
+                    'description' => $this->l('paymentmethods.applepay.carrier.description', 'translation'),
+                ],
             ],
             'bancontact' => [
                 'title' => $this->l('paymentmethods.bancontact.title', 'translation'),

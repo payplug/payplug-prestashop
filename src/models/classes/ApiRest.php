@@ -187,6 +187,8 @@ class ApiRest
             'giropay' => (bool) $payment_methods['giropay'],
             'ideal' => (bool) $payment_methods['ideal'],
             'mybank' => (bool) $payment_methods['mybank'],
+            'applepay_cart' => (bool) $configuration->getValue('applepay_cart'),
+            'applepay_checkout' => (bool) $configuration->getValue('applepay_checkout'),
         ];
     }
 
@@ -530,6 +532,8 @@ class ApiRest
             ->getConfigurationClass();
 
         $default_configuration = [
+            'applepay_cart' => $configuration->getDefault('applepay_cart'),
+            'applepay_checkout' => $configuration->getDefault('applepay_checkout'),
             'bancontact_country' => $configuration->getDefault('bancontact_country'),
             'embedded_mode' => $configuration->getDefault('embedded_mode'),
             'inst_mode' => $configuration->getDefault('inst_mode'),

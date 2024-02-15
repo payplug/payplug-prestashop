@@ -118,6 +118,13 @@ class getPaymentMethodsSectionTest extends BaseApiRest
             ->andReturnUsing(function ($key) use ($feature) {
                 return $feature == $key;
             });
+
+        if ('applepay' == $expected) {
+            $this->carrier_adapter->shouldReceive([
+                'getCarriers' => [],
+            ]);
+        }
+
         $this->dependencies->configClass = $configClass;
         $response = $this->classe->getPaymentMethodsSection([]);
         $payment_methods = [];
