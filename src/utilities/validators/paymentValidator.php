@@ -105,7 +105,7 @@ class paymentValidator
      * @description Check if given resource can save a card
      *
      * @param null $payment
-     * @param null|mixed $resource
+     * @param mixed|null $resource
      *
      * @return bool
      */

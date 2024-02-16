@@ -52,7 +52,7 @@ class RefundAction
      * @param string $pay_mode
      * @param null $inst_id
      *
-     * @return null|array|mixed|string
+     * @return array|mixed|string|null
      */
     public function refundAction($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
     {
@@ -156,7 +156,7 @@ class RefundAction
      * @param $amount
      * @param $metadata
      *
-     * @return null|array
+     * @return array|null
      */
     public function processPaymentRefund($payment_id, $amount, $metadata)
     {
