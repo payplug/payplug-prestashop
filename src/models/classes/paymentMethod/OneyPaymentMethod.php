@@ -37,6 +37,7 @@ class OneyPaymentMethod extends PaymentMethod
     private $cart_adapter;
     private $country;
     private $validators;
+    private $oney;
 
     public function __construct($dependencies)
     {
@@ -685,15 +686,12 @@ class OneyPaymentMethod extends PaymentMethod
      */
     public function getOneyPriceAndPaymentOptions($cart = null, $amount = 0, $country = false)
     {
-        $this->setParameters();
-
         if ($this->validate_adapter->validate('isLoadedObject', $cart)
             && $cart->id_address_invoice
             && $cart->id_address_delivery) {
             $is_valid_cart = $this->isValidOneyCart($cart)['result'];
             $is_valid_addresses = $this->isValidOneyAddresses($cart->id_address_delivery, $cart->id_address_invoice);
             $is_valid_amount = $this->isValidOneyAmount($amount ? $amount : $cart->getOrderTotal(true))['result'];
-
             $is_elligible = $this->validators['payment']
                 ->isOneyElligible($is_valid_cart, $is_valid_amount, $is_valid_addresses);
         } else {
@@ -1538,9 +1536,9 @@ class OneyPaymentMethod extends PaymentMethod
         $is_valid_amount = $this->isValidOneyAmount($cart_amount ? $cart_amount : $this->context->cart->getOrderTotal(true))['result'];
 
         $is_elligible = $this->validators['payment']
-            ->isOneyElligible($is_valid_cart, $is_valid_amount, true);
+            ->isOneyElligible($is_valid_cart, true, $is_valid_amount);
         $error = isset($is_elligible['result']) ? false : $is_elligible['error_type'];
-        $err_label = $this->getErrorLabel($error);
+        $err_label = $this->getErrorLabel($is_elligible['code']);
 
         $optimized = $this->configuration->getValue('oney_optimized') && !$error;
 
@@ -1581,7 +1579,7 @@ class OneyPaymentMethod extends PaymentMethod
                 ? $this->oney_translations['pay_with_fee']
                 : $this->oney_translations['pay_without_fee'];
 
-            $oneyLabel = $error ? $err_label : sprintf($text, $split);
+            $oneyLabel = !$error ? $err_label : sprintf($text, $split);
 
             if ($optimized) {
                 $adapter = $this->dependencies->loadAdapterPresta();
@@ -1824,9 +1822,12 @@ class OneyPaymentMethod extends PaymentMethod
                 $err_label = $this->oney_translations['address_invalid'];
 
                 break;
-            case 'invalid_amount_bottom':
-            case 'invalid_amount_top':
-                $limits = $this->dependencies->getPlugin()->getOney()->getOneyPriceLimit(true);
+            case 'amount':
+                $limits = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('oney')
+                    ->getOneyPriceLimit(true);
                 $err_label = sprintf(
                     $this->oney_translations['invalid_amount'],
                     $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
