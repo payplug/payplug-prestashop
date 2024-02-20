@@ -659,6 +659,7 @@ class PaymentMethod
 
             case 4: // partially refunded
             case 6: // on going
+            case 10: // oney pending
                 $status_class = 'pp_neutral';
 
                 break;
@@ -1031,6 +1032,13 @@ class PaymentMethod
             return [
                 'id_status' => 4,
                 'code' => 'partially_refunded',
+            ];
+        }
+
+        if ((bool) $resource->payment_method['is_pending']) {
+            return [
+                'id_status' => 10,
+                'code' => 'oney_pending',
             ];
         }
 
