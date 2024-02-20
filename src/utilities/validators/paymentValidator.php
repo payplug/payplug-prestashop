@@ -122,7 +122,10 @@ class paymentValidator
             $resource->save_card
                 || (
                     $resource->card->id
-                    && $resource->hosted_payment
+                    && (
+                        $resource->hosted_payment
+                        || 'INTEGRATED_PAYMENT' == $resource->integration
+                    )
                 )
         );
     }
