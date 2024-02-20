@@ -634,17 +634,17 @@ class ApiClass
     /**
      * @description Create Payment from api for given attributes
      *
-     * @param array $atttributes
+     * @param array $attributes
      *
      * @return array
      */
-    public function createPayment($atttributes = [])
+    public function createPayment($attributes = [])
     {
-        if (!$atttributes || !is_array($atttributes)) {
+        if (!$attributes || !is_array($attributes)) {
             return [
                 'code' => null,
                 'result' => false,
-                'message' => 'Wrong $atttributes given',
+                'message' => 'Wrong $attributes given',
             ];
         }
 
@@ -663,7 +663,7 @@ class ApiClass
                 $response = [
                     'code' => 200,
                     'result' => true,
-                    'resource' => Payment::create($atttributes, $this->api),
+                    'resource' => Payment::create($attributes, $this->api),
                 ];
             }
         } catch (\Exception $e) {
