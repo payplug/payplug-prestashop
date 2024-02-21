@@ -154,8 +154,8 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
         $this->validators['payment']
             ->shouldReceive([
                 'isOneyElligible' => [
-                    'error_type' => 'invalid_cart',
-                    'error' => 'An error occured',
+                    'result' => false,
+                    'code' => 'product_quantity',
                 ],
             ]);
 
@@ -260,7 +260,6 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
     public function testWhenCurrentCartIsElligibleAndWithoutFees()
     {
         $payment_options = [];
-
         $this->configuration_adapter
             ->shouldReceive('get')
             ->with('PS_TAX')
@@ -269,12 +268,18 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             ->shouldReceive('get')
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
+        $this->validate_adapter
+            ->shouldReceive([
+                                'validate' => false,
+                            ]);
+        $this->validators['payment']
+            ->shouldReceive([
+                                'isOneyElligible' => [
+                                    'result' => true,
+                                ],
+                            ]);
 
         $this->oney->shouldReceive([
-            'isOneyElligible' => [
-                'result' => true,
-                'error' => '',
-            ],
             'getOperations' => [
                 'x3_with_fees',
                 'x3_without_fees',
@@ -282,6 +287,12 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
                 'x4_without_fees',
             ],
         ]);
+        $this->classe
+            ->shouldReceive(
+                [
+                    'isValidOneyCart' => ['result' => true, 'error' => false],
+                ]
+            );
 
         $this->configuration
             ->shouldReceive('getValue')
@@ -310,11 +321,9 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
                 'getOney' => $this->oney,
             ]);
 
-        $this->classe
-            ->shouldReceive([
-                'isValidOneyAmount' => ['result' => true, 'error' => false],
-            ])
-        ;
+        $this->currency_adapter->shouldReceive([
+                                                   'get' => 1,
+                                               ]);
 
         $expected = [
             'oney_x3_without_fees' => [
@@ -356,7 +365,7 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
                 'type' => 'x3_without_fees',
                 'amount' => 42.42,
                 'iso_code' => 'FR',
-                'err_label' => 'payplug.getPaymentOptions.errorOccurred',
+                'err_label' => '',
             ],
             'oney_x4_without_fees' => [
                 'name' => 'oney',
@@ -397,7 +406,7 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
                 'type' => 'x4_without_fees',
                 'amount' => 42.42,
                 'iso_code' => 'FR',
-                'err_label' => 'payplug.getPaymentOptions.errorOccurred',
+                'err_label' => '',
             ],
         ];
 
@@ -420,12 +429,14 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             ->shouldReceive('get')
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
-
+        $this->validators['payment']
+            ->shouldReceive([
+                                'isOneyElligible' => [
+                                    'result' => true,
+                                    'error' => '',
+                                ],
+                            ]);
         $this->oney->shouldReceive([
-            'isOneyElligible' => [
-                'result' => true,
-                'error' => '',
-            ],
             'getOperations' => [
                 'x3_with_fees',
                 'x3_without_fees',
@@ -507,7 +518,7 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
                 'type' => 'x3_with_fees',
                 'amount' => 42.42,
                 'iso_code' => 'FR',
-                'err_label' => 'payplug.getPaymentOptions.errorOccurred',
+                'err_label' => '',
             ],
             'oney_x4_with_fees' => [
                 'name' => 'oney',
@@ -548,7 +559,7 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
                 'type' => 'x4_with_fees',
                 'amount' => 42.42,
                 'iso_code' => 'FR',
-                'err_label' => 'payplug.getPaymentOptions.errorOccurred',
+                'err_label' => '',
             ],
         ];
 

@@ -21,6 +21,18 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
+        $this->payment_repository
+            ->shouldReceive([
+                                'getByCart' => [
+                                    'id_payplug_payment' => 42,
+                                    'resource_id' => 'pay_azerty1234',
+                                    'method' => 'standard',
+                                    'id_cart' => 42,
+                                    'cart_hash' => 'cart-hash-azerty1234567',
+                                    'schedules' => 'NULL',
+                                    'date_upd' => '1970-01-01 00:00:00',
+                                ],
+                            ]);
         $this->assertFalse($this->classe->isValidResource());
     }
 

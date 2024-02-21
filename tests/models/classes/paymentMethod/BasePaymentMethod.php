@@ -189,6 +189,8 @@ class BasePaymentMethod extends TestCase
                 'getValidators' => $this->validators,
             ]);
 
+        $this->context = MockHelper::createContextMock('PayPlug\src\application\adapter\ContextAdapter');
+
         $this->classe = \Mockery::mock(PaymentMethod::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();

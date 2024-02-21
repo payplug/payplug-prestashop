@@ -913,7 +913,7 @@ class paymentValidator
             return [
                 'result' => false,
                 'code' => 'product_quantity',
-                'message' => 'Oney is not avaible. Reason: An error is return with the products quantity',
+                'message' => 'Oney is not available. Reason: An error is return with the products quantity',
             ];
         }
 

@@ -13,11 +13,10 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
 {
     public function errorMessageDataProvider()
     {
-        yield ['invalid_addresses', 'payplug.getPaymentOptions.invalidAddresses'];
-        yield ['invalid_amount_bottom', 'payplug.getPaymentOptions.invalidAmount'];
-        yield ['invalid_amount_top', 'payplug.getPaymentOptions.invalidAmount'];
-        yield ['invalid_carrier', 'payplug.getPaymentOptions.invalidCarrier'];
-        yield ['invalid_cart', 'payplug.getPaymentOptions.invalidCart'];
+        yield ['address', 'payplug.getPaymentOptions.invalidAddresses'];
+        yield ['amount', 'payplug.getPaymentOptions.invalidAmount'];
+        yield ['carrier', 'payplug.getPaymentOptions.invalidCarrier'];
+        yield ['cart', 'payplug.getPaymentOptions.invalidCart'];
         yield ['default', 'payplug.getPaymentOptions.errorOccurred'];
     }
 
@@ -42,8 +41,9 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
      */
     public function testReturnedMessageForGivenError($error, $message)
     {
-        if (in_array($error, ['invalid_amount_bottom', 'invalid_amount_top'])) {
+        if ('amount' === $error) {
             $oney = \Mockery::mock('Oney');
+            $this->oney = \Mockery::mock('OneyOldRepository');
             $oney
                 ->shouldReceive([
                     'getOneyPriceLimit' => [
@@ -54,6 +54,17 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
             $this->plugin->shouldReceive([
                 'getOney' => $oney,
             ]);
+            $this->validate_adapter
+                ->shouldReceive([
+                                    'validate' => false,
+                                ]);
+            $this->currency_adapter->shouldReceive([
+                                                 'get' => 1,
+                                             ]);
+            $this->configuration_adapter
+                ->shouldReceive('get')
+                ->with('PS_CURRENCY_DEFAULT')
+                ->andReturn('EUR');
         }
         $this->assertSame(
             $message,
