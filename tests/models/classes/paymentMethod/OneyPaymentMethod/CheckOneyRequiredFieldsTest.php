@@ -91,10 +91,13 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyPaymentMethod
         $this->validate_adapter->shouldReceive([
             'validate' => true,
         ]);
-        $this->validators['payment']
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => true,
-            ]);
+
+        $this->validators['payment']->shouldReceive([
+                                                        'isValidMobilePhoneNumber' => [
+                                                            'result' => true,
+                                                            'message' => '',
+                                                        ],
+                                                    ]);
         $this->tools_adapter->shouldReceive('tool')
             ->andReturn(20);
         $get_country = (object) [];

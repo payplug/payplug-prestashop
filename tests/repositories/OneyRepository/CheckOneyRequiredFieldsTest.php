@@ -112,7 +112,10 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
                 'isPhoneNumber' => [
                     'result' => true,
                 ],
-                'isValidMobilePhoneNumber' => true,
+                'isValidMobilePhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
             ]);
         $response = $this->repo->checkOneyRequiredFields($field);
 

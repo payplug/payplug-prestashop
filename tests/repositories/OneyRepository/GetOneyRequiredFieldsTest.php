@@ -266,10 +266,12 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
                 ],
             ]);
 
-        $this->validators['payment']
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => true,
-            ]);
+        $this->validators['payment']->shouldReceive([
+                                                        'isValidMobilePhoneNumber' => [
+                                                            'result' => true,
+                                                            'message' => '',
+                                                        ],
+                                                    ]);
 
         $this->context
             ->shouldReceive('get')

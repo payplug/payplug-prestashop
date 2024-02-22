@@ -410,7 +410,6 @@ class OneyPaymentMethod extends PaymentMethod
                 : $shipping_address->phone,
             'city' => $shipping_address->city,
         ];
-
         foreach ($shipping_data as $key => $data) {
             $errors = $this->checkOneyRequiredFields(['shipping-' . $key => $data]);
 
@@ -603,7 +602,7 @@ class OneyPaymentMethod extends PaymentMethod
                         ->isPhoneNumber($data)['result'];
                     $valid = $is_valid_phone
                         && $this->validators['payment']
-                            ->isValidMobilePhoneNumber($country->iso_code, $data);
+                            ->isValidMobilePhoneNumber($country->iso_code, $data)['result'];
                     if (!$valid) {
                         $errors[] = $this->oney_translations['mobile'];
                     }
