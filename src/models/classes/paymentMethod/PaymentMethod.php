@@ -1035,7 +1035,8 @@ class PaymentMethod
             ];
         }
 
-        if ((bool) $resource->payment_method['is_pending']) {
+        if (isset($resource->payment_method['is_pending'])
+            && (bool) $resource->payment_method['is_pending']) {
             return [
                 'id_status' => 10,
                 'code' => 'oney_pending',
