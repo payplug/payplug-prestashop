@@ -301,7 +301,8 @@ class HookClass
         $this->html = '';
 
         $order = $this->orderAdapter->get((int) $params['id_order']);
-        if (!$this->validate->validate('isLoadedObject', $order)) {
+        if (!$this->validate->validate('isLoadedObject', $order)
+            || $order->module != $this->dependencies->name) {
             return false;
         }
 
