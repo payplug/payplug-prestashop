@@ -154,8 +154,9 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
         $this->validators['payment']
             ->shouldReceive([
                 'isOneyElligible' => [
-                    'error_type' => 'invalid_cart',
-                    'error' => 'An error occured',
+                    'result' => false,
+                    'code' => 'product_quantity',
+
                 ],
             ]);
 
@@ -282,6 +283,13 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
                 'x4_without_fees',
             ],
         ]);
+
+        $this->classe
+            ->shouldReceive(
+                [
+                    'isValidOneyCart' => ['result' => true, 'error' => false],
+                ]
+            );
 
         $this->configuration
             ->shouldReceive('getValue')
@@ -466,6 +474,12 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
                 'isValidOneyAmount' => ['result' => true, 'error' => false],
             ])
         ;
+        $this->classe
+            ->shouldReceive(
+                [
+                    'isValidOneyCart' => ['result' => true, 'error' => false],
+                ]
+            );
 
         $expected = [
             'oney_x3_with_fees' => [
