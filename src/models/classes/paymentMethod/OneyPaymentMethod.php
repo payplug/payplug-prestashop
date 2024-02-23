@@ -1534,11 +1534,15 @@ class OneyPaymentMethod extends PaymentMethod
         $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
 
         $is_valid_cart = $this->isValidOneyCart($this->context->cart)['result'];
-        $is_valid_amount = $this->isValidOneyAmount($cart_amount ? $cart_amount : $this->context->cart->getOrderTotal(true))['result'];
+        $cart_amount = $cart_amount ?: $this->context->cart->getOrderTotal(true);
+        $is_valid_amount = $this->isValidOneyAmount($cart_amount)['result'];
+        $is_valid_addresses = $this->isValidOneyAddresses($this->context->cart->id_address_delivery, $this->context->cart->id_address_invoice);
 
         $is_elligible = $this->validators['payment']
-            ->isOneyElligible($is_valid_cart, $is_valid_amount, true);
-        $error = isset($is_elligible['result']) ? false : $is_elligible['error_type'];
+            ->isOneyElligible($is_valid_cart, $is_valid_addresses, $is_valid_amount);
+
+        $error = isset($is_elligible['result']) && false === $is_elligible['result'] ? $is_elligible['code'] : false;
+
         $err_label = $this->getErrorLabel($error);
 
         $optimized = $this->configuration->getValue('oney_optimized') && !$error;
@@ -1819,13 +1823,12 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         switch ($error) {
-            case 'invalid_addresses':
+            case 'address':
                 $err_label = $this->oney_translations['address_invalid'];
 
                 break;
-            case 'invalid_amount_bottom':
-            case 'invalid_amount_top':
-                $limits = $this->dependencies->getPlugin()->getOney()->getOneyPriceLimit(true);
+            case 'amount':
+                $limits = $this->getOneyPriceLimit(true);
                 $err_label = sprintf(
                     $this->oney_translations['invalid_amount'],
                     $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
@@ -1837,8 +1840,8 @@ class OneyPaymentMethod extends PaymentMethod
                 $err_label = $this->oney_translations['invalid_carrier'];
 
                 break;
-            case 'invalid_cart':
-                $err_label = $this->oney_translations['invalid_cart'];
+            case 'product_quantity':
+            $err_label = $this->oney_translations['invalid_cart'];
 
                 break;
             default:
