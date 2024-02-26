@@ -20,7 +20,12 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_b718adec73e04ce
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca9744094b101499e7f7ce'] = 'Rata ID';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Cliente';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Rata #';
+$_MODULE['<{payplug}prestashop>ajax_05db6d24e779f385e197ae37aaac54de'] = 'La simulazione del tuo piano di finanziamento non è per il momento disponibile. Queste informazioni ti saranno fornite al momento del pagamento.';
+$_MODULE['<{payplug}prestashop>ajax_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Nessun campo è stato completato.';
+$_MODULE['<{payplug}prestashop>ajax_443388128bed099c5199f1220572f96d'] = 'Si è verificato un errore. Riprova tra un attimo.';
+$_MODULE['<{payplug}prestashop>ajax_53e41386744dfc0c2665f7f5c84ab97f'] = 'Le tue informazioni sono state salvate';
 $_MODULE['<{payplug}prestashop>ajax_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
+$_MODULE['<{payplug}prestashop>ajax_f5146f3861c487374c38fb5ec78cda73'] = 'Almeno un campo non è stato completato correttamente.';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Catturare';
 $_MODULE['<{payplug}prestashop>cards_1_6_0b3db27bc15f682e92ff250ebb167d4b'] = 'Torna al tuo conto';

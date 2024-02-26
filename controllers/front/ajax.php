@@ -189,7 +189,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     exit(json_encode([
                         'exception' => $e->getMessage(),
                         'result' => false,
-                        'error' => $this->translate->translate(5), // ('Oney is momentarily unavailable.')
+                        'error' => $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('Oney is momentarily unavailable.', 'ajax'),
                     ]));
                 }
 
@@ -219,7 +222,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     exit(json_encode([
                         'result' => false,
                         'message' => [
-                            $this->translate->translate(1), // 'Empty payment data'
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Empty payment data', 'ajax'),
                         ],
                     ]));
                 }
@@ -234,7 +240,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     exit(json_encode([
                         'result' => false,
                         'message' => [
-                            $this->translate->translate(2), // 'At least one of the fields is not correctly completed.'
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('At least one of the fields is not correctly completed.', 'ajax'),
                         ],
                     ]));
                 }
@@ -245,8 +254,14 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'result' => $result,
                     'message' => [
                         $result ?
-                            $this->translate->translate(3) : // ('Your information has been saved') :
-                            $this->translate->translate(4), // ('An error occurred. Please retry in few seconds.')
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('Your information has been saved', 'ajax') :
+                            $this->dependencies
+                                ->getPlugin()
+                                ->getTranslationClass()
+                                ->l('An error occurred. Please retry in few seconds.', 'ajax'),
                     ],
                 ]));
             } elseif ($tools->tool('getIsset', 'createIP')) {
