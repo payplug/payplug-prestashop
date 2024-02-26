@@ -237,12 +237,24 @@ class OneyPaymentMethod extends PaymentMethod
 
         // Check if oney was elligible then return if not
         $is_valid_cart = $this->isValidOneyCart($this->context->cart)['result'];
-
-        $is_elligible = $this->validators['payment']
-            ->isOneyElligible($is_valid_cart, true, true);
+        $use_taxes = (bool) $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->get('PS_TAX');
+        $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
+        $is_valid_addresses = $this->isValidOneyAddresses($this->context->cart->id_address_delivery, $this->context->cart->id_address_invoice);
+        $is_valid_amount = $this->isValidOneyAmount($cart_amount);
+        $is_elligible = $this->validators['payment']->isOneyElligible(
+            $is_valid_cart,
+            $is_valid_addresses,
+            $is_valid_amount['result']
+        );
 
         if (!$is_elligible['result']) {
-            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$is_elligible['message']]);
+            $error = $is_elligible['code'];
+            $err_label = $this->getErrorLabel($error);
+
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$err_label]);
 
             return [];
         }
@@ -257,7 +269,6 @@ class OneyPaymentMethod extends PaymentMethod
             )) {
             $is_valid_phone = $this->validators['payment']
                 ->isPhoneNumber($payment_tab['billing']['landline_phone_number'])['result'];
-
             if ($is_valid_phone && $this->dependencies
                 ->getHelpers()['phone']::isMobilePhoneNumber(
                     $payment_tab['billing']['country'],
