@@ -613,7 +613,7 @@ class OneyPaymentMethod extends PaymentMethod
                         ->isPhoneNumber($data)['result'];
                     $valid = $is_valid_phone
                         && $this->validators['payment']
-                            ->isValidMobilePhoneNumber($country->iso_code, $data)['result'];
+                            ->isValidMobilePhoneNumber($data, $country->iso_code)['result'];
                     if (!$valid) {
                         $errors[] = $this->oney_translations['mobile'];
                     }
