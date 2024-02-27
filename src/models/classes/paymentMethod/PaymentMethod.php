@@ -659,6 +659,7 @@ class PaymentMethod
 
             case 4: // partially refunded
             case 6: // on going
+            // todo: this case should be treated in OneyPaymentMethod::getResourceDetail()
             case 10: // oney pending
                 $status_class = 'pp_neutral';
 
@@ -1035,6 +1036,7 @@ class PaymentMethod
             ];
         }
 
+        // todo : we should use OneyPaymentMethod::getPaymentStatus() to defined this state
         if (isset($resource->payment_method['is_pending'])
             && (bool) $resource->payment_method['is_pending']) {
             return [

@@ -1852,7 +1852,7 @@ class OneyPaymentMethod extends PaymentMethod
 
                 break;
             case 'product_quantity':
-            $err_label = $this->oney_translations['invalid_cart'];
+                $err_label = $this->oney_translations['invalid_cart'];
 
                 break;
             default:
