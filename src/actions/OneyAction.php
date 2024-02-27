@@ -135,6 +135,7 @@ class OneyAction
             ->getPaymentMethod('oney')
             ->getOneyRequiredFields();
 
+        // todo: we should use smarty adapter instead
         $this->context->smarty->assign([
             'oney_type' => str_replace('oney_required_field_', '', $error),
             'oney_required_fields' => $fields,
