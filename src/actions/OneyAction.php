@@ -93,18 +93,25 @@ class OneyAction
             return false;
         }
 
-        $use_taxes = (bool) $this->configuration_adapter->get('PS_TAX');
-        $amount = $this->context->cart->getOrderTotal($use_taxes);
+        if ('cart' == $this->current_controller) {
+            $use_taxes = (bool) $this->configuration_adapter->get('PS_TAX');
+            $amount = $this->context->cart->getOrderTotal($use_taxes);
+        } else {
+            $quantity_wanted = $this->plugin
+                ->getTools()
+                ->tool('getValue', 'quantity_wanted');
+            $amount = $params['product']['price_amount'] * $quantity_wanted;
+        }
+
         $is_elligible = $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
             ->getPaymentMethod('oney')
             ->isValidOneyAmount($amount);
-        $is_elligible = $is_elligible['result'];
 
         $this->context->getContext()->smarty->assign([
             'env' => 'checkout',
-            'payplug_is_oney_elligible' => $is_elligible,
+            'payplug_is_oney_elligible' => $is_elligible['result'],
             'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
             'iso_code' => $this->plugin
                 ->getTools()
