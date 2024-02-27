@@ -20,7 +20,12 @@ $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_b718adec73e04ce
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_c89e900cc5ca9744094b101499e7f7ce'] = 'ID paiement fractionné';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Client';
 $_MODULE['<{payplug}prestashop>adminpaypluginstallmentcontroller_e6091f4bfdc5f8b7921ac78ca6ed47a0'] = 'Numéro d\'échéance';
+$_MODULE['<{payplug}prestashop>ajax_05db6d24e779f385e197ae37aaac54de'] = 'La simulation de votre échéancier est temporairement indisponible. Vous retrouverez cette information à l\'étape du paiement.';
+$_MODULE['<{payplug}prestashop>ajax_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Aucun champ n\'a été rempli.';
+$_MODULE['<{payplug}prestashop>ajax_443388128bed099c5199f1220572f96d'] = 'Une erreur s\'est produite. Veuillez réessayer dans quelques secondes.';
+$_MODULE['<{payplug}prestashop>ajax_53e41386744dfc0c2665f7f5c84ab97f'] = 'Vos informations ont été sauvegardées';
 $_MODULE['<{payplug}prestashop>ajax_cef5ffe1ea30cca7818c988c27467aed'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
+$_MODULE['<{payplug}prestashop>ajax_f5146f3861c487374c38fb5ec78cda73'] = 'Au moins un champ n\'est pas completé correctement.';
 $_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Déclencher';
 $_MODULE['<{payplug}prestashop>cards_1_6_0b3db27bc15f682e92ff250ebb167d4b'] = 'Retour à Mon Compte';
