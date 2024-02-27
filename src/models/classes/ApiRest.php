@@ -497,9 +497,6 @@ class ApiRest
             return [];
         }
 
-        // todo : replace in appropriate OneyPaymentmethod
-        // 'amounts' => $configuration->getDefault('amounts'),
-
         return $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
@@ -513,7 +510,6 @@ class ApiRest
      * @param mixed $current_configuration
      *
      * @return array
-     * @todo: divide the get of the different payment method in relative class
      */
     public function getPaymentMethodsSection($current_configuration = [])
     {
