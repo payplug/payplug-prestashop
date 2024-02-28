@@ -33,6 +33,8 @@ class SatispayPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'satispay';
+        $this->order_name = 'satispay';
+        $this->refundable = false;
     }
 
     /**
@@ -50,6 +52,7 @@ class SatispayPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();

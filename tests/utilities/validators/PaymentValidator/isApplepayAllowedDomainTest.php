@@ -79,7 +79,7 @@ class isApplepayAllowedDomainTest extends TestCase
         ], $this->validator->isApplepayAllowedDomain($domain, $allowed_domains));
     }
 
-    public function testWhenGivenDomainIsNotInGivenAllowedDomainsArray()
+    public function testWhenGivenDomainIsntInGivenAllowedDomainsArray()
     {
         $domain = 'www.website.com';
         $allowed_domains = [

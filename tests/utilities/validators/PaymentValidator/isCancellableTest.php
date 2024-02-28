@@ -42,7 +42,7 @@ class isCancellableTest extends TestCase
         ], $this->validator->isCancellable($payment_method));
     }
 
-    public function testWhenPaymentMethodIsNotCancellable()
+    public function testWhenPaymentMethodIsntCancellable()
     {
         $payment_method = 'oney';
         $this->assertSame([

@@ -33,6 +33,7 @@ class BancontactPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'bancontact';
+        $this->order_name = 'bancontact';
         $this->cancellable = false;
     }
 
@@ -79,6 +80,7 @@ class BancontactPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();
@@ -93,6 +95,31 @@ class BancontactPaymentMethod extends PaymentMethod
         return $payment_tab;
     }
 
+    // todo: add coverage to this method
+    public function getResourceDetail($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            // todo: add error log
+            return [
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $resource_details = parent::getResourceDetail($resource_id);
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+        $resource_details['type'] = $translation['detail']['method']['bancontact'];
+        unset($resource_details['tds'], $resource_details['card_brand']);
+
+        return $resource_details;
+    }
+
+    // todo: add coverage to this method
     protected function getPaymentOption($payment_options = [])
     {
         if (!is_array($payment_options)) {

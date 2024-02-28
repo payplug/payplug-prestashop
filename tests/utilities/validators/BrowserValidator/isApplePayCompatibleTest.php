@@ -88,7 +88,7 @@ class isApplePayCompatibleTest extends TestCase
      *
      * @param $browser
      */
-    public function testWhenBrowserIsNotSafari($browser)
+    public function testWhenBrowserIsntSafari($browser)
     {
         $this->assertSame(
             [

@@ -16,7 +16,7 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
      *
      * @param mixed $payment_options
      */
-    public function testWhenGivenPaymentOptionsIsNotValidArrayFormat($payment_options)
+    public function testWhenGivenPaymentOptionsIsntValidArrayFormat($payment_options)
     {
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }

@@ -47,12 +47,20 @@ class CardAction
     public function deleteAction($customer_id = 0, $card_id = 0)
     {
         if (!is_int($customer_id) || !$customer_id) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::deleteAction - Invalid argument, given customer id must be non null integer.', 'error');
+
             return false;
         }
 
         if (!is_int($card_id) || !$card_id) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::deleteAction - Invalid argument, given card id must be non null integer.', 'error');
+
             return false;
         }
 
@@ -61,13 +69,21 @@ class CardAction
             ->getCardRepository()
             ->get((int) $card_id);
         if (empty($card)) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::deleteAction - Can\'t get the related card', 'error');
+
             return false;
         }
 
         // Check correspondance between the retrieved customer id and given one
         if ($card['id_customer'] != $customer_id) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::deleteAction - Given customer id does not match', 'error');
+
             return false;
         }
 
@@ -102,7 +118,11 @@ class CardAction
     public function deleteByCustomerAction($customer_id = 0)
     {
         if (!is_int($customer_id) || !$customer_id) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::deleteByCustomerAction - Invalid argument, given customer id must be non null integer.', 'error');
+
             return false;
         }
 
@@ -118,14 +138,22 @@ class CardAction
             ->getAllByCustomer((int) $customer_id, (int) $id_company, (bool) $is_sandbox);
 
         if (empty($cards)) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::deleteByCustomerAction - No card found for given customer.', 'error');
+
             return false;
         }
 
         foreach ($cards as $card) {
             $deleted = $this->deleteAction((int) $customer_id, (int) $card['id_payplug_card']);
             if (!$deleted) {
-                // todo: add log
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('CardAction::deleteByCustomerAction - Can\'t delete card.', 'error');
+
                 return false;
             }
         }
@@ -143,7 +171,11 @@ class CardAction
     public function renderList($active_only = false)
     {
         if (!is_bool($active_only)) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::renderList - Invalid argument, given parameter must be boolean', 'error');
+
             return [];
         }
 
@@ -203,6 +235,11 @@ class CardAction
     public function renderOrderDetail($payment = null)
     {
         if (!is_object($payment) || !$payment) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::renderOrderDetail - Invalid argument, given resource must be object', 'error');
+
             return [];
         }
 
@@ -225,7 +262,11 @@ class CardAction
     public function saveAction($payment = null)
     {
         if (!is_object($payment) || !$payment) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::saveAction - Invalid argument, given resource must be object', 'error');
+
             return false;
         }
 
@@ -241,7 +282,11 @@ class CardAction
             ->exists((string) $payment->card->id, (int) $company_id, $is_sandbox);
 
         if ($exists) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('CardAction::saveAction - No card found for given payment resource.', 'error');
+
             return false;
         }
 

@@ -12,12 +12,14 @@ class BaseOrderStateAction extends TestCase
 {
     use FormatDataProvider;
 
-    public $action;
-    public $dependencies;
-    public $payplug_orderstate_repository;
-    public $plugin;
-    public $toolsAdapter;
-    public $translation;
+    protected $action;
+    protected $dependencies;
+    protected $order_state_adapter;
+    protected $payplug_orderstate_repository;
+    protected $plugin;
+    protected $tools_adapter;
+    protected $translation;
+    protected $validate_adapter;
 
     protected function setUp()
     {
@@ -25,14 +27,18 @@ class BaseOrderStateAction extends TestCase
 
         $this->plugin = \Mockery::mock('Plugin');
 
-        $this->toolsAdapter = \Mockery::mock('ToolsAdapter');
+        $this->order_state_adapter = \Mockery::mock('OrderStateAdapter');
+        $this->tools_adapter = \Mockery::mock('ToolsAdapter');
+        $this->validate_adapter = \Mockery::mock('ValidateAdapter');
 
         $this->payplug_orderstate_repository = \Mockery::mock('PayplugOrderStateRepository');
 
         $this->plugin
             ->shouldReceive([
                 'getPayplugOrderStateRepository' => $this->payplug_orderstate_repository,
-                'getTools' => $this->toolsAdapter,
+                'getOrderStateAdapter' => $this->order_state_adapter,
+                'getTools' => $this->tools_adapter,
+                'getValidate' => $this->validate_adapter,
             ]);
 
         $this->dependencies

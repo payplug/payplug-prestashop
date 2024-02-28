@@ -54,12 +54,9 @@ class QueryAdapter implements QueryInterface
         try {
             $action = 'execute';
 
-            if (false !== stripos(substr($SQLRequest, 0, 10), 'SELECT')) {
+            if (false !== stripos(substr($SQLRequest, 0, 8), 'SELECT')
+                || false !== stripos(substr($SQLRequest, 0, 16), 'SHOW TABLES LIKE')) {
                 $action = 'executeS';
-            }
-
-            if (false !== stripos(substr($SQLRequest, 0, 10), 'SHOW TABLES LIKE')) {
-                $action = 'ExecuteS';
             }
 
             return $this->db->{$action}($SQLRequest);

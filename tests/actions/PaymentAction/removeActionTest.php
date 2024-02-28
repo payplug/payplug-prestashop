@@ -13,12 +13,23 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class removeActionTest extends BasePaymentAction
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->payment_validator
+            ->shouldReceive([
+                'isInstallment' => [
+                    'result' => false,
+                ],
+            ]);
+    }
+
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
      * @param mixed $resource_id
      */
-    public function testWhenGivenResourceIdIsNotValidString($resource_id)
+    public function testWhenGivenResourceIdIsntValidString($resource_id)
     {
         $cancellable = true;
         $this->assertFalse(
@@ -31,7 +42,7 @@ class removeActionTest extends BasePaymentAction
      *
      * @param mixed $cancellable
      */
-    public function testWhenGivenCancellableIsNotValidString($cancellable)
+    public function testWhenGivenCancellableIsntValidString($cancellable)
     {
         $resource_id = 'pay_azerty';
         $this->assertFalse(
@@ -39,7 +50,7 @@ class removeActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenResourceCantBeRetrieve()
+    public function testWhenResourceCantBeRetrieved()
     {
         $resource_id = 'pay_azerty12345';
         $cancellable = true;
@@ -56,7 +67,7 @@ class removeActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenRetrievedResourceCantBeAbort()
+    public function testWhenRetrievedResourceCantBeAborted()
     {
         $resource_id = 'pay_azerty12345';
         $cancellable = true;

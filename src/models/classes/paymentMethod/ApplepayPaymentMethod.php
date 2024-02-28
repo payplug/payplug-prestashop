@@ -33,6 +33,7 @@ class ApplepayPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'applepay';
+        $this->order_name = 'applepay';
         $this->force_resource = true;
     }
 
@@ -51,6 +52,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();
@@ -71,6 +73,29 @@ class ApplepayPaymentMethod extends PaymentMethod
         unset($payment_tab['force_3ds'], $payment_tab['allow_save_card'], $payment_tab['shipping']['delivery_type']);
 
         return $payment_tab;
+    }
+
+    // todo: add coverage to this method
+    public function getResourceDetail($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            // todo: add error log
+            return [
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $resource_details = parent::getResourceDetail($resource_id);
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+        $resource_details['type'] = $translation['detail']['method']['applepay'];
+
+        return $resource_details;
     }
 
     /**

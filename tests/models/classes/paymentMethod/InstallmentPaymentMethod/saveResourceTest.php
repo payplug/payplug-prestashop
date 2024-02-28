@@ -29,7 +29,7 @@ class saveResourceTest extends BaseInstallmentPaymentMethod
      *
      * @param mixed $payment_tab
      */
-    public function testWhenGivenPaymentTabIsNotValidArray($payment_tab)
+    public function testWhenGivenPaymentTabIsntValidArray($payment_tab)
     {
         $this->classe->set('name', 'installment');
         $this->assertSame(

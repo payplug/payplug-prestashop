@@ -171,7 +171,7 @@ class getLoggedSectionTest extends BaseApiRest
      * @param $live_api_key
      * @param $onboarding_oney_completed
      */
-    public function testWhenMerchantIsNotOnboarded($module_name, $live_api_key, $onboarding_oney_completed)
+    public function testWhenMerchantIsntOnboarded($module_name, $live_api_key, $onboarding_oney_completed)
     {
         $current_configuration = [
             'sandbox_mode' => false,

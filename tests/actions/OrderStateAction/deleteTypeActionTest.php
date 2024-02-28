@@ -11,61 +11,37 @@ namespace PayPlug\tests\actions\OrderStateAction;
  */
 class deleteTypeActionTest extends BaseOrderStateAction
 {
-    public function setUp()
-    {
-        parent::setUp();
-    }
-
     /**
-     * @dataProvider invalidArrayFormatDataProvider
+     * @dataProvider invalidIntegerFormatDataProvider
      *
-     * @param mixed $param
+     * @param mixed $id_order_state
      */
-    public function testWhenGivenPaymentIsInvalidArrayFormat($param)
+    public function testWhenGivenPaymentIsInvalidIntegerFormat($id_order_state)
     {
-        $this->assertFalse($this->action->deleteTypeAction($param));
+        $this->assertFalse($this->action->deleteTypeAction($id_order_state));
     }
 
-    public function testWhenWrongIdOrderState()
+    public function testWhenOrderStateTypeCannotBeDelete()
     {
-        $param = [
-            'object' => (object) [
-                'id' => 'test',
-            ],
-        ];
-
-        $this->assertFalse($this->action->deleteTypeAction($param));
-    }
-
-    public function testWhenFunctionReturnFalse()
-    {
-        $param = [
-            'object' => (object) [
-                'id' => 42,
-            ],
-        ];
+        $id_order_state = 42;
 
         $this->payplug_orderstate_repository
             ->shouldReceive([
                 'removeByIdOrderState' => false,
             ]);
 
-        $this->assertFalse($this->action->deleteTypeAction($param));
+        $this->assertFalse($this->action->deleteTypeAction($id_order_state));
     }
 
-    public function testWhenFunctionReturnTrue()
+    public function testWhenOrderStateTypeIsDeleted()
     {
-        $param = [
-            'object' => (object) [
-                'id' => 42,
-            ],
-        ];
+        $id_order_state = 42;
 
         $this->payplug_orderstate_repository
             ->shouldReceive([
                 'removeByIdOrderState' => true,
             ]);
 
-        $this->assertTrue($this->action->deleteTypeAction($param));
+        $this->assertTrue($this->action->deleteTypeAction($id_order_state));
     }
 }

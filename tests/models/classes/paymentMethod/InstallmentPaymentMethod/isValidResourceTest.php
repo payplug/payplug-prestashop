@@ -13,7 +13,7 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class isValidResourceTest extends BaseInstallmentPaymentMethod
 {
-    public function testWhenCartInContextIsNotAValidObject()
+    public function testWhenCartInContextIsntAValidObject()
     {
         $this->context->cart = null;
         $this->validate_adapter
@@ -66,7 +66,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
         $this->assertFalse($this->classe->isValidResource());
     }
 
-    public function testWhenResourceCantBeRetrieve()
+    public function testWhenResourceCantBeRetrieved()
     {
         $this->validate_adapter
             ->shouldReceive('validate')

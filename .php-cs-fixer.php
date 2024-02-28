@@ -40,6 +40,7 @@ return (new PhpCsFixer\Config())
         'phpdoc_align' => ['align' => 'left'],
         'php_unit_internal_class' => false,
         'php_unit_test_class_requires_covers' => false,
+        'phpdoc_types_order' => ['sort_algorithm' => 'alpha', 'null_adjustment' => 'always_last'],
     ])
     ->setFinder($finder)
 ;

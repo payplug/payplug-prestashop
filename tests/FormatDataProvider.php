@@ -37,6 +37,15 @@ trait FormatDataProvider
         yield [42];
     }
 
+    public function invalidNumericFormatDataProvider()
+    {
+        yield [null];
+        yield [['key' => 'value']];
+        yield [true];
+        yield ['lorem ipsum'];
+        yield ['123abc'];
+    }
+
     public function invalidJSONFormatDataProvider()
     {
         yield [''];

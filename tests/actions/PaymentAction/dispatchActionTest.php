@@ -18,7 +18,7 @@ class dispatchActionTest extends BasePaymentAction
      *
      * @param mixed $method
      */
-    public function testWhenGivenMethodsIsNotValidString($method)
+    public function testWhenGivenMethodsIsntValidString($method)
     {
         $this->assertSame(
             [],
@@ -26,7 +26,7 @@ class dispatchActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenGivenMethodsIsNotInExpectedPayment()
+    public function testWhenGivenMethodsIsntInExpectedPayment()
     {
         $method = 'unexpected_method';
         $this->assertSame(

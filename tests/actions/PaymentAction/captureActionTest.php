@@ -9,7 +9,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group action
  * @group payment_action
- * @group dev
  *
  * @runTestsInSeparateProcesses
  */
@@ -20,7 +19,7 @@ class captureActionTest extends BasePaymentAction
      *
      * @param mixed $resource_id
      */
-    public function testWhenGivenResourceIdIsNotValidString($resource_id)
+    public function testWhenGivenResourceIdIsntValidString($resource_id)
     {
         $order_id = 42;
         $this->assertSame(
@@ -37,7 +36,7 @@ class captureActionTest extends BasePaymentAction
      *
      * @param mixed $order_id
      */
-    public function testWhenGivenOrderIdIsNotValidInteger($order_id)
+    public function testWhenGivenOrderIdIsntValidInteger($order_id)
     {
         $resource_id = 'pay_azerty12345';
         $this->assertSame(
@@ -79,13 +78,13 @@ class captureActionTest extends BasePaymentAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Can not capture the payment.',
+                'message' => 'Can\'t capture the payment.',
             ],
             $this->action->captureAction($resource_id, $order_id)
         );
     }
 
-    public function testWhenRelatedOrderIsNotValid()
+    public function testWhenRelatedOrderIsntValid()
     {
         $order_id = 42;
         $resource_id = 'pay_azerty12345';

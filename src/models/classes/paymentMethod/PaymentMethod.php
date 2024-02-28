@@ -37,11 +37,20 @@ class PaymentMethod
     /** @var bool */
     public $force_resource = true;
 
+    /** @var bool */
+    public $refundable;
+
     /** @var object */
     protected $configuration;
 
     /** @var object */
+    protected $configuration_adapter;
+
+    /** @var object */
     protected $context;
+
+    /** @var object */
+    protected $currency_adapter;
 
     /** @var object */
     protected $dependencies;
@@ -64,6 +73,9 @@ class PaymentMethod
     /** @var string */
     protected $name;
 
+    /** @var string */
+    protected $order_name;
+
     /** @var array */
     protected $translation;
 
@@ -77,6 +89,8 @@ class PaymentMethod
     {
         $this->dependencies = $dependencies;
         $this->name = '';
+        $this->order_name = '';
+        $this->refundable = true;
     }
 
     /**
@@ -137,72 +151,6 @@ class PaymentMethod
     }
 
     /**
-     * @description Generate hash for a payment method from the current context
-     *
-     * @return string
-     */
-    public function getPaymentMethodHash()
-    {
-        $this->setParameters();
-        $cartToHash = [];
-        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
-            // todo: add error log
-            return '';
-        }
-
-        $products = $this->context->cart->getProducts();
-        if (!$products) {
-            // todo: add error log
-            return '';
-        }
-
-        foreach ($products as $product) {
-            $product = array_map('json_encode', $product);
-            $cartToHash[] = array_map('strval', $product);
-        }
-
-        // Adding cart informationObjectModel
-        $cartToHash[] = 'Cart $id_address_delivery: ' . $this->context->cart->id_address_delivery;
-        $cartToHash[] = 'Cart $id_address_invoice: ' . $this->context->cart->id_address_invoice;
-        $cartToHash[] = 'Cart $id_currency: ' . $this->context->cart->id_currency;
-        $cartToHash[] = 'Cart $id_customer: ' . $this->context->cart->id_customer;
-        $cartToHash[] = 'Cart $delivery_option: ' . $this->context->cart->delivery_option;
-
-        // Adding cart amount to hash
-        $cartToHash[] = 'Cart amount: ' . (float) $this->context->cart->getOrderTotal(true);
-
-        return hash('sha256', $this->name . json_encode($cartToHash));
-    }
-
-    /**
-     * @description Get payment option availability
-     *
-     * @return array
-     */
-    public function getPaymentOptionsAvailability()
-    {
-        $this->setParameters();
-
-        $available_payment_methods = $this->getAvailablePaymentMethod();
-        if (empty($available_payment_methods)) {
-            return [];
-        }
-
-        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
-        if (empty($payment_methods)) {
-            return [];
-        }
-
-        $options = [];
-        foreach ($available_payment_methods as $available_payment_method) {
-            $options[$available_payment_method] = isset($payment_methods[$available_payment_method])
-                && (bool) $payment_methods[$available_payment_method];
-        }
-
-        return $options;
-    }
-
-    /**
      * @description Get option for given configuration
      *
      * @param array $current_configuration
@@ -220,7 +168,7 @@ class PaymentMethod
         }
 
         if (!isset($this->name) || !$this->name) {
-            $this->logger->addLog('PaymentMethod::getOption: Can not load option the name is missing.');
+            $this->logger->addLog('PaymentMethod::getOption: Can\'t load option the name is missing.');
 
             return [];
         }
@@ -298,6 +246,41 @@ class PaymentMethod
     }
 
     /**
+     * @description Get order tab for given resource
+     *
+     * @param null $resource
+     *
+     * @return array
+     */
+    public function getOrderTab($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
+        }
+
+        $amount = $this->dependencies
+            ->getHelpers()['amount']
+            ->convertAmount($resource->amount, true);
+
+        $state_addons = $resource->is_live ? '' : '_test';
+        $order_state = $this->configuration->getValue('order_state_paid' . $state_addons);
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+
+        return [
+            'order_state' => $order_state,
+            'amount' => $amount,
+            'module_name' => $translation['module_name'][$this->order_name ?: 'default'],
+        ];
+    }
+
+    /**
      * @description Get payment method object for a given name
      *
      * @param string $name
@@ -309,19 +292,85 @@ class PaymentMethod
         $this->setParameters();
 
         if (!is_string($name) || !$name) {
-            $this->logger->addLog('PaymentMethod::getPaymentMethod: Can not load option the name is missing.');
+            $this->logger->addLog('PaymentMethod::getPaymentMethod: Can\'t load option the name is missing.');
 
             return [];
         }
 
         $payment_methods = $this->getAvailablePaymentMethodsObject();
         if (!array_key_exists($name, $payment_methods)) {
-            $this->logger->addLog('PaymentMethod::getPaymentMethod: Can not load option the name is missing.');
+            $this->logger->addLog('PaymentMethod::getPaymentMethod: Can\'t load option the name is missing.');
 
             return [];
         }
 
         return $payment_methods[$name];
+    }
+
+    /**
+     * @description Generate hash for a payment method from the current context
+     *
+     * @return string
+     */
+    public function getPaymentMethodHash()
+    {
+        $this->setParameters();
+        $cartToHash = [];
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
+            // todo: add error log
+            return '';
+        }
+
+        $products = $this->context->cart->getProducts();
+        if (!$products) {
+            // todo: add error log
+            return '';
+        }
+
+        foreach ($products as $product) {
+            $product = array_map('json_encode', $product);
+            $cartToHash[] = array_map('strval', $product);
+        }
+
+        // Adding cart informationObjectModel
+        $cartToHash[] = 'Cart $id_address_delivery: ' . $this->context->cart->id_address_delivery;
+        $cartToHash[] = 'Cart $id_address_invoice: ' . $this->context->cart->id_address_invoice;
+        $cartToHash[] = 'Cart $id_currency: ' . $this->context->cart->id_currency;
+        $cartToHash[] = 'Cart $id_customer: ' . $this->context->cart->id_customer;
+        $cartToHash[] = 'Cart $delivery_option: ' . $this->context->cart->delivery_option;
+
+        // Adding cart amount to hash
+        $cartToHash[] = 'Cart amount: ' . (float) $this->context->cart->getOrderTotal(true);
+
+        return hash('sha256', $this->name . json_encode($cartToHash));
+    }
+
+    /**
+     * @description Get payment option availability
+     *
+     * @return array
+     */
+    public function getPaymentOptionsAvailability()
+    {
+        $this->setParameters();
+
+        $available_payment_methods = $this->getAvailablePaymentMethod();
+        if (empty($available_payment_methods)) {
+            return [];
+        }
+
+        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
+        if (empty($payment_methods)) {
+            return [];
+        }
+
+        $options = [];
+        foreach ($available_payment_methods as $available_payment_method) {
+            $options[$available_payment_method] = isset($payment_methods[$available_payment_method])
+                && (bool) $payment_methods[$available_payment_method];
+        }
+
+        return $options;
     }
 
     /**
@@ -421,7 +470,9 @@ class PaymentMethod
                         ->get('PS_LANG_DEFAULT')
                 );
             $iso_code_list = $this->dependencies
-                ->getHelpers()['country']::getIsoCodeList();
+                ->getPlugin()
+                ->getCountryClass()
+                ->getIsoCodeList();
             if (in_array($this->tools->tool('strtoupper', $default_language->iso_code), $iso_code_list, true)) {
                 $iso_code = $this->tools->tool('strtoupper', $default_language->iso_code);
             } else {
@@ -538,6 +589,173 @@ class PaymentMethod
         ];
     }
 
+    // todo: add coverage to this method
+    public function getResourceDetail($resource_id = '')
+    {
+        $this->setParameters();
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::getResourceDetail - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
+        $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
+        if (!$retrieve['result']) {
+            if ($sandbox) {
+                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
+                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
+            } else {
+                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
+                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
+            }
+        }
+        if (!$retrieve['result']) {
+            $this->logger->addLog('PaymentMethod::getResourceDetail - Cannot retrieve the resource.', 'error');
+
+            return [];
+        }
+
+        $resource = $retrieve['resource'];
+
+        $status = $this->getPaymentStatus($resource);
+        if (empty($status)) {
+            $this->logger->addLog('PaymentMethod::getResourceDetail - Cannot define the resource status', 'error');
+
+            return [];
+        }
+
+        // Define status translation
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+        $pay_status = $translation['detail']['status'][$status['code']];
+
+        // Define class for templating
+        switch ($status['id_status']) {
+            case 1: // not paid
+            case 5: // refunded
+            case 8: // authorized
+            case 11: // abandoned
+                $status_class = 'pp_warning';
+
+                break;
+
+            case 2: // paid
+                $status_class = 'pp_success';
+
+                break;
+
+            case 3: // failed
+            case 7: // cancelled
+            case 9: // authorization expired
+                $status_class = 'pp_error';
+
+                break;
+
+            case 4: // partially refunded
+            case 6: // on going
+                // todo: this case should be treated in OneyPaymentMethod::getResourceDetail()
+            case 10: // oney pending
+                $status_class = 'pp_neutral';
+
+                break;
+
+            default:
+                $status_class = 'pp_other';
+
+                break;
+        }
+
+        // Get card details to order details (views/templates/admin/order/details.tpl)
+        // Mask (last4), exp date...
+        $card_details = [];
+        if (isset($resource->card->last4) && (!empty($resource->card->last4))) {
+            $card_details = $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->renderOrderDetail($resource);
+        }
+
+        // Card brand
+        $card_brand = null;
+        if ($card_details
+            && isset($card_details['brand'])
+            && !empty($card_details['brand'])
+            && ('none' !== $card_details['brand'])) {
+            $card_brand = $translation['detail']['card'] . ' ' . $card_details['brand'];
+        }
+
+        // Card Country
+        $card_country = null;
+        if ($card_details
+            && isset($card_details['country'])
+            && ('none' !== $card_details['country'])) {
+            $card_country = $card_details['country'];
+            $card_brand .= ' (' . $card_details['country'] . ')';
+        }
+
+        // Card mask
+        $card_mask = null;
+        if ($card_details && isset($card_details['last4']) && !empty($card_details['last4'])) {
+            $card_mask = '**** **** **** ' . $card_details['last4'];
+        }
+
+        // Card exp. date
+        $card_date = null;
+        if ($card_details && (isset($card_details['exp_month']) && !empty($card_details['exp_month']))
+            && (isset($card_details['exp_year']) && !empty($card_details['exp_year']))) {
+            $card_date = $card_details['exp_month'] . '/' . $card_details['exp_year'];
+        }
+
+        $type = isset($resource->payment_method, $resource->payment_method['type'])
+            ? $resource->payment_method['type']
+            : '';
+
+        $amount_available = $resource->amount - $resource->amount_refunded;
+        $refund = [
+            'refunded' => $this->dependencies
+                ->getHelpers()['amount']
+                ->convertAmount($resource->amount_refunded, true),
+            'available' => 10 <= $amount_available
+                ? $this->dependencies->getHelpers()['amount']->convertAmount($amount_available, true)
+                : 0,
+            'is_refunded' => (bool) $resource->is_refunded,
+        ];
+        $can_be_refund = $resource->is_paid
+            && !$resource->is_refunded
+            && \time() <= $resource->refundable_until;
+        if (!(bool) $can_be_refund) {
+            $refund['available'] = 0;
+        }
+
+        return [
+            'id' => $resource->id,
+            'status' => $pay_status,
+            'status_code' => $status['code'],
+            'status_class' => $status_class,
+            'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($resource->amount, true),
+            'card_brand' => $card_brand,
+            'card_mask' => $card_mask,
+            'card_date' => $card_date,
+            'card_country' => $card_country,
+            'mode' => $resource->is_live ? $translation['detail']['mode']['live'] : $translation['detail']['mode']['test'],
+            'paid' => (bool) $resource->is_paid,
+            'authorization' => false,
+            'date' => date('d/m/Y', $resource->created_at),
+            'error' => $resource->failure ? '(' . $resource->failure->message . ')' : '',
+            'tds' => null !== $resource->is_3ds ? $translation['detail'][$resource->is_3ds ? 'yes' : 'no'] : false,
+            'type' => $type,
+            'type_code' => $type,
+            'refund' => $refund,
+            'currency' => $resource->currency,
+        ];
+    }
+
     /**
      * @description Generate and return correct resource return url
      *
@@ -628,6 +846,46 @@ class PaymentMethod
         return true;
     }
 
+    // todo: add coverage to this method
+    public function postProcessOrder($resource = null, $order = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return false;
+        }
+
+        if (!is_object($order) || !$order) {
+            // todo: add error log
+            return false;
+        }
+
+        $data = [];
+        $data['metadata'] = $resource->metadata;
+        $data['metadata']['Order'] = $order->id;
+
+        $patchPayment = $this->dependencies->apiClass->patchPayment($resource->id, $data);
+        if (!$patchPayment['result']) {
+            // todo: add error log
+            return false;
+        }
+
+        $create_order_payment = $this->dependencies
+            ->getPlugin()
+            ->getOrderPaymentRepository()
+            ->createOrderPayment([
+                'id_order' => (int) $order->id,
+                'id_payment' => $resource->id,
+            ]);
+        if (!$create_order_payment) {
+            // todo: add error log
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @description Reset the permission from current permission
      *
@@ -690,7 +948,7 @@ class PaymentMethod
 
         $payment = $this->dependencies->apiClass->createPayment($payment_tab);
 
-        // If the payment resource can not be created due to to bad permission, we update the feature activation
+        // If the payment resource can\'t be created due to to bad permission, we update the feature activation
         if (403 == (int) $payment['code']) {
             $cart = $this->dependencies
                 ->getPlugin()
@@ -700,7 +958,7 @@ class PaymentMethod
             $this->resetPaymentMethodFromPermission($permissions);
         }
 
-        // If the payment resource can not be created due to bad credential, we log out the merchand
+        // If the payment resource can\'t be created due to bad credential, we log out the merchand
         if (401 == (int) $payment['code']) {
             $this->dependencies
                 ->getPlugin()
@@ -722,7 +980,7 @@ class PaymentMethod
     public function set($key = '', $value = null)
     {
         if (!is_string($key) || !$key) {
-            $this->logger->addLog('PaymentMethod::getPaymentMethod: Can not load option the name is missing.');
+            $this->logger->addLog('PaymentMethod::getPaymentMethod: Can\'t load option the name is missing.');
 
             return $this;
         }
@@ -735,67 +993,69 @@ class PaymentMethod
         return $this;
     }
 
-    /**
-     * @description Set parameters for usage
-     */
-    protected function setParameters()
+    // todo: add coverage to this method
+    public function getPaymentStatus($resource = null)
     {
-        if (!$this->configuration) {
-            $this->configuration = $this->dependencies
-                ->getPlugin()
-                ->getConfigurationClass();
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
         }
-        if (!$this->context) {
-            $this->context = $this->dependencies
-                ->getPlugin()
-                ->getContext()
-                ->get();
+
+        if ((bool) $resource->failure) {
+            if ('aborted' == $resource->failure->code) {
+                return [
+                    'id_status' => 7,
+                    'code' => 'cancelled',
+                ];
+            } elseif ('timeout' == $resource->failure->code) {
+                return [
+                    'id_status' => 11,
+                    'code' => 'abandoned',
+                ];
+            }
+
+            return [
+                'id_status' => 3,
+                'code' => 'failed',
+            ];
         }
-        if (!$this->iso_code) {
-            $this->iso_code = $this->dependencies
-                ->getPlugin()
-                ->getContext()
-                ->get()->language->iso_code;
+
+        if ((bool) $resource->is_refunded) {
+            return [
+                'id_status' => 5,
+                'code' => 'refunded',
+            ];
         }
-        if (!$this->external_url) {
-            $this->external_url = $this->dependencies
-                ->getPlugin()
-                ->getRoutes()
-                ->getExternalUrl($this->iso_code);
+
+        if (0 < (int) $resource->amount_refunded) {
+            return [
+                'id_status' => 4,
+                'code' => 'partially_refunded',
+            ];
         }
-        if (!$this->img_path) {
-            $this->img_path = $this->dependencies
-                ->getPlugin()
-                ->getConstant()
-                ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/';
+
+        // todo : we should use OneyPaymentMethod::getPaymentStatus() to defined this state
+        if (isset($resource->payment_method['is_pending'])
+            && (bool) $resource->payment_method['is_pending']) {
+            return [
+                'id_status' => 10,
+                'code' => 'oney_pending',
+            ];
         }
-        if (!$this->link) {
-            $this->link = $this->dependencies
-                ->getPlugin()
-                ->getContext()
-                ->get()->link;
+
+        if ((bool) $resource->is_paid) {
+            return [
+                'id_status' => 2,
+                'code' => 'paid',
+            ];
         }
-        if (!$this->logger) {
-            $this->logger = $this->dependencies
-                ->getPlugin()
-                ->getLogger();
-        }
-        if (!$this->tools) {
-            $this->tools = $this->dependencies
-                ->getPlugin()
-                ->getTools();
-        }
-        if (!$this->translation) {
-            $this->translation = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->getPaymentMethodsTranslations();
-        }
-        if (!$this->validate_adapter) {
-            $this->validate_adapter = $this->dependencies
-                ->getPlugin()
-                ->getValidate();
-        }
+
+        return [
+            'id_status' => 1,
+            'code' => 'not_paid',
+        ];
     }
 
     /**
@@ -813,7 +1073,7 @@ class PaymentMethod
 
         $this->setParameters();
         if (!isset($this->name) || !$this->name) {
-            $this->logger->addLog('PaymentMethod::getPaymentOption: Can not load option the name is missing.');
+            $this->logger->addLog('PaymentMethod::getPaymentOption: Can\'t load option the name is missing.');
 
             return [];
         }
@@ -886,5 +1146,78 @@ class PaymentMethod
         ];
 
         return $payment_options;
+    }
+
+    /**
+     * @description Set parameters for usage
+     */
+    protected function setParameters()
+    {
+        if (!$this->configuration) {
+            $this->configuration = $this->dependencies
+                ->getPlugin()
+                ->getConfigurationClass();
+        }
+        if (!$this->configuration_adapter) {
+            $this->configuration_adapter = $this->dependencies
+                ->getPlugin()
+                ->getConfiguration();
+        }
+        if (!$this->context) {
+            $this->context = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get();
+        }
+        if (!$this->currency_adapter) {
+            $this->currency_adapter = $this->dependencies
+                ->getPlugin()
+                ->getCurrency();
+        }
+        if (!$this->iso_code) {
+            $this->iso_code = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get()->language->iso_code;
+        }
+        if (!$this->external_url) {
+            $this->external_url = $this->dependencies
+                ->getPlugin()
+                ->getRoutes()
+                ->getExternalUrl($this->iso_code);
+        }
+        if (!$this->img_path) {
+            $this->img_path = $this->dependencies
+                ->getPlugin()
+                ->getConstant()
+                ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/';
+        }
+        if (!$this->link) {
+            $this->link = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get()->link;
+        }
+        if (!$this->logger) {
+            $this->logger = $this->dependencies
+                ->getPlugin()
+                ->getLogger();
+        }
+        if (!$this->tools) {
+            $this->tools = $this->dependencies
+                ->getPlugin()
+                ->getTools();
+        }
+        if (!$this->translation) {
+            $this->translation = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->getPaymentMethodsTranslations();
+        }
+        if (!$this->validate_adapter) {
+            $this->validate_adapter = $this->dependencies
+                ->getPlugin()
+                ->getValidate();
+        }
     }
 }

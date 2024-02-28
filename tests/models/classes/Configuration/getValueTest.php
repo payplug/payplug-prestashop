@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group unit
  * @group classes
  * @group configuration_classes
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
@@ -23,11 +24,14 @@ class getValueTest extends BaseConfiguration
 
     public function testWhenGivenKeyDoesNotExistsInAllowedConfiguration()
     {
-        $key = 'config_key';
-        $this->assertSame(false, $this->classe->getValue($key));
+        $key = 'native_config_key';
+        $this->configuration->shouldReceive([
+            'get' => 'native_config_value',
+        ]);
+        $this->assertSame('native_config_value', $this->classe->getValue($key));
     }
 
-    public function testWhenConfigurationCanNotBeReturn()
+    public function testWhenConfigurationCantBeReturned()
     {
         $key = 'enable';
         $this->configuration->shouldReceive([

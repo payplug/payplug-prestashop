@@ -13,7 +13,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class getPaymentMethodHashTest extends BasePaymentMethod
 {
-    public function testWhenCartInContextIsNotAValidObject()
+    public function testWhenCartInContextIsntAValidObject()
     {
         $this->validate_adapter
             ->shouldReceive([

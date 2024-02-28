@@ -208,6 +208,129 @@ class Translation
     /**
      * @return array
      */
+    public function getOrderTranslations()
+    {
+        return [
+            'update' => [
+                'invalid_amount_message' => $this->l('order.update.invalid_amount_message', 'translation'),
+            ],
+            'module_name' => [
+                'amex' => $this->l('order.module.amex', 'translation'),
+                'applepay' => $this->l('order.module.applepay', 'translation'),
+                'bancontact' => $this->l('order.module.bancontact', 'translation'),
+                'default' => $this->l('order.module.default', 'translation'),
+                'giropay' => $this->l('order.module.giropay', 'translation'),
+                'ideal' => $this->l('order.module.ideal', 'translation'),
+                'mybank' => $this->l('order.module.mybank', 'translation'),
+                'oney' => [
+                    'default' => $this->l('order.module.oney.default', 'translation'),
+                    'x3_with_fees' => $this->l('order.module.oney.x3_with_fees', 'translation'),
+                    'x3_without_fees' => $this->l('order.module.oney.x3_without_fees', 'translation'),
+                    'x4_with_fees' => $this->l('order.module.oney.x4_with_fees', 'translation'),
+                    'x4_without_fees' => $this->l('order.module.oney.x4_without_fees', 'translation'),
+                ],
+                'satispay' => $this->l('order.module.satispay', 'translation'),
+                'sofort' => $this->l('order.module.sofort', 'translation'),
+            ],
+            'detail' => [
+                'mode' => [
+                    'live' => $this->l('order.detail.mode.live', 'translation'),
+                    'test' => $this->l('order.detail.mode.test', 'translation'),
+                ],
+                'method' => [
+                    'bancontact' => $this->l('order.detail.method.bancontact', 'translation'),
+                    'applepay' => $this->l('order.detail.method.applepay', 'translation'),
+                    'amex' => $this->l('order.detail.method.amex', 'translation'),
+                    'oney' => [
+                        'x3_with_fees' => $this->l('order.detail.method.oney.x3_with_fees', 'translation'),
+                        'x4_with_fees' => $this->l('order.detail.method.oney.x4_with_fees', 'translation'),
+                        'x3_without_fees' => $this->l('order.detail.method.oney.x3_without_fees', 'translation'),
+                        'x4_without_fees' => $this->l('order.detail.method.oney.x4_without_fees', 'translation'),
+                    ],
+                ],
+                'status' => [
+                    'abandoned' => $this->l('order.detail.status.abandoned', 'translation'),
+                    'authorization_expired' => $this->l('order.detail.status.authorization_expired', 'translation'),
+                    'authorized' => $this->l('order.detail.status.authorized', 'translation'),
+                    'cancelled' => $this->l('order.detail.status.cancelled', 'translation'),
+                    'failed' => $this->l('order.detail.status.failed', 'translation'),
+                    'not_paid' => $this->l('order.detail.status.not_paid', 'translation'),
+                    'on_going' => $this->l('order.detail.status.on_going', 'translation'),
+                    'oney_pending' => $this->l('order.detail.status.oney_pending', 'translation'),
+                    'paid' => $this->l('order.detail.status.paid', 'translation'),
+                    'partially_refunded' => $this->l('order.detail.status.partially_refunded', 'translation'),
+                    'refunded' => $this->l('order.detail.status.refunded', 'translation'),
+                    'suspended' => $this->l('order.detail.status.suspended', 'translation'),
+                ],
+                'yes' => $this->l('order.detail.yes', 'translation'),
+                'no' => $this->l('order.detail.no', 'translation'),
+                'card' => $this->l('order.detail.card', 'translation'),
+                'capture' => [
+                    'deferred' => $this->l('order.detail.capture.deferred', 'translation'),
+                    'expiration' => $this->l('order.detail.capture.expiration', 'translation'),
+                    'warning' => $this->l('order.detail.capture.warning', 'translation'),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @description  get oney front office translations
+     *
+     * @return array
+     */
+    public function getOneyTranslations()
+    {
+        return [
+            'required_field' => $this->l('Please fill in the required fields', 'translation'),
+            'mobile' => $this->l('Please enter your mobile phone number.', 'translation'),
+            'shipping_firstname' => $this->l('Please enter your shipping firstname.', 'translation'),
+            'billing_firstname' => $this->l('Please enter your billing firstname.', 'translation'),
+            'shipping_lastname' => $this->l('Please enter your shipping lastname.', 'translation'),
+            'billing_lastname' => $this->l('Please enter your billing lastname.', 'translation'),
+            'shipping_address' => $this->l('Please enter your shipping address.', 'translation'),
+            'billing_address' => $this->l('Please enter your billing address.', 'translation'),
+            'shipping_postcode' => $this->l('Please enter your shipping postcode.', 'translation'),
+            'billing_postcode' => $this->l('Please enter your billing postcode.', 'translation'),
+            'schedules_unavailable' => $this->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'translation'),
+            'shipping_city' => $this->l('Please enter your shipping city.', 'translation'),
+            'billing_city' => $this->l('Please enter your billing city.', 'translation'),
+            'city_name_error' => $this->l('Your city name is too long (max 32 characters).', 'translation'),
+            'city_name_message' => $this->l(
+                ' Please change it to another one or select another payment method.',
+                'translation'
+            ),
+            'percentage' => $this->l('Payment in %sx', 'translation'),
+            'cart_error' => $this->l('The cart is unvalid', 'translation'),
+            'amount_error' => $this->l('oney.isValidOneyAmount.unvalid', 'translation'),
+            'email_error' => $this->l('Your email address is not a valid email', 'translation'),
+            'email_length_char_error' => $this->l(
+                'Your email address is too long and the + character is not valid',
+                'translation'
+            ),
+            'email_message' => $this->l(' please change it to another address (max 100 characters).', 'translation'),
+            'email_char_error' => $this->l(
+                'The + character is not valid. Please change your email address (100 characters max).',
+                'translation'
+            ),
+            'email_length_error' => $this->l(
+                'Your email address is too long. Please change your email address (100 characters max).',
+                'translation'
+            ),
+            'email_invalid' => $this->l('Your email address is not a valid email', 'translation'),
+            'pay_with_fee' => $this->l('payplug.getPaymentOptions.payWithOney', 'translation'),
+            'pay_without_fee' => $this->l('payplug.getPaymentOptions.payWithOneyWithout', 'translation'),
+            'payment_option_error' => $this->l('payplug.getPaymentOptions.errorOccurred', 'translation'),
+            'address_invalid' => $this->l('payplug.getPaymentOptions.invalidAddresses', 'translation'),
+            'invalid_amount' => $this->l('payplug.getPaymentOptions.invalidAmount', 'translation'),
+            'invalid_carrier' => $this->l('payplug.getPaymentOptions.invalidCarrier', 'translation'),
+            'invalid_cart' => $this->l('payplug.getPaymentOptions.invalidCart', 'translation'),
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getOrderStateActionRenderTranslations()
     {
         return [

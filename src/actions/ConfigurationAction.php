@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\actions;
 
+use PayPlug\classes\MyLogPHP;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -39,6 +41,8 @@ class ConfigurationAction
     /**
      * @description check permission for a given payment method
      *
+     * todo: add coverage to this method
+     *
      * @param string $payment_method
      * @param bool $sandbox_mode
      *
@@ -46,7 +50,6 @@ class ConfigurationAction
      */
     public function checkPermissionAction($payment_method = '', $sandbox_mode = null)
     {
-        // todo: add unit tests
         if ((!is_string($payment_method) || !$payment_method)
             || !is_bool($sandbox_mode)) {
             return [
@@ -172,77 +175,144 @@ class ConfigurationAction
     }
 
     /**
-     * @description check merchant is onboarded
+     * @description Process the deactivation of the module
      *
-     * @param $datas
+     * @return bool
+     */
+    public function disableAction()
+    {
+        return (bool) $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->set('enable', 0);
+    }
+
+    /**
+     * @description Process the install of the module
      *
      * @return array
      */
-    public function submitSandboxAction($datas)
+    public function installAction()
     {
-        $translation = $this->dependencies
-            ->getPlugin()
-            ->getTranslationClass()
-            ->getLoggedTranslations();
-        $logger = $this->dependencies->getPlugin()->getLogger();
-        if (!is_object($datas) || !$datas) {
-            $logger->addLog('ConfigurationAction::submitSandboxAction: Invalid parameter given, $datas must be a non empty object.');
+        $txt_log = new MyLogPHP($this->dependencies->getPlugin()->getConstant()->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/log/install-log.csv');
+        $txt_log->info('Starting to install');
+
+        // check requirement
+        $txt_log->info('Check requirement');
+        $report = $this->dependencies->getHelpers()['configuration']->getRequirements();
+        if (!$report['php']['up2date']) {
+            $txt_log->info('Install failed: PHP Requirement.');
 
             return [
-                'success' => false,
-                'data' => [
-                    // todo:  add translation
-                    'message' => 'An error has occurred',
-                ],
+                'result' => false,
+                'message' => 'Install failed: PHP Requirement.',
             ];
         }
-        $email = $datas->payplug_email;
-        $password = $datas->payplug_password;
-        $is_valid_password = $this->dependencies
-            ->getValidators()['account']
-            ->isPassword($password)['result'];
-
-        if (!$is_valid_password) {
-            $logger->addLog('ConfigurationAction::submitSandboxAction: invalid password.');
+        if (!$report['curl']['up2date']) {
+            $txt_log->info('Install failed: cURL Requirement.');
 
             return [
-                'success' => false,
-                'data' => [
-                    'message' => $translation['inactive']['modal']['error'],
-                ],
+                'result' => false,
+                'message' => 'Install failed: cURL Requirement.',
             ];
         }
-
-        $password = base64_decode($datas->payplug_password);
-
-        if (!$this->dependencies->apiClass->login($email, $password)) {
-            $logger->addLog('ConfigurationAction::submitSandboxAction: invalid email and/or password.');
+        if (!$report['openssl']['up2date']) {
+            $txt_log->info('Install failed: OpenSSL Requirement.');
 
             return [
-                'success' => false,
-                'data' => [
-                    // todo: add translation
-                    'message' => $translation['inactive']['modal']['error'],
-                ],
+                'result' => false,
+                'message' => 'Install failed: OpenSSL Requirement.',
             ];
         }
-        $permissions = 'pspaylater' == $this->dependencies->name ? 'onboarding_oney_completed' : 'use_live_mode';
-        if (!$this->checkPermissionAction($permissions, $datas->env)['success']) {
+        $txt_log->info('Check requirement: OK');
+
+        // Check if multishop feature is active then set the context
+        if ($this->dependencies->getPlugin()->getShop()->isFeatureActive()) {
+            $txt_log->info('Set context');
+            $this->dependencies->getPlugin()->getShop()->setContext();
+        }
+
+        // Set payplug config
+        $txt_log->info('Set configuration');
+        if (!$this->dependencies->getPlugin()->getConfigurationClass()->initialize()) {
+            $txt_log->info('Install failed: Set configuration');
+
             return [
-                'success' => false,
-                'data' => [
-                    'still_inactive' => !$this->checkPermissionAction($permissions, $datas->env)['success'],
-                    'message' => '',
-                ],
+                'result' => false,
+                'message' => 'Install failed: Set configuration',
             ];
         }
+        $txt_log->info('Set configuration: OK');
+
+        // Install SQL
+        $txt_log->info('Install SQL');
+        if (!$this->dependencies->getPlugin()->getQueryRepository()->initialize()) {
+            $txt_log->info('Install failed: Install SQL tables.');
+
+            return [
+                'result' => false,
+                'message' => 'Install failed: Install SQL tables.',
+            ];
+        }
+        $txt_log->info('Install SQL: OK');
+
+        // Install order state
+        $txt_log->info('Install order state');
+        if (!$this->installOrderStateAction()) {
+            $txt_log->info('Install failed: Install order state.');
+
+            return [
+                'result' => false,
+                'message' => 'Install failed: Install order state.',
+            ];
+        }
+        $txt_log->info('Install order state: OK');
+
+        // Install order state type
+        $txt_log->info('Install order state type');
+        if (!$this->dependencies->getPlugin()->getOrderStateAction()->installTypeAction()) {
+            $txt_log->info('Install failed: Create order states type.');
+
+            return [
+                'result' => false,
+                'message' => 'Install failed: Create order states type.',
+            ];
+        }
+        $txt_log->info('Install order state type: OK');
+
+        // Install tab
+        $txt_log->info('Install tab');
+        if (!$this->installTabAction()) {
+            $txt_log->info('Install failed: Install Tab.');
+
+            return [
+                'result' => false,
+                'message' => 'Install failed: Install Tab.',
+            ];
+        }
+        $txt_log->info('Install tab: OK');
+
+        // Set hook
+        $txt_log->info('Install hook');
+        if (!$this->installHookAction()) {
+            $txt_log->info('Install failed: Install hook.');
+
+            return [
+                'result' => false,
+                'message' => 'Install failed: Install hook.',
+            ];
+        }
+        $txt_log->info('Install tab: OK');
+
+        // Clean external files
+        $txt_log->info('Files cleaning');
+        $helpers = $this->dependencies->getHelpers();
+        $file_cleaned = $helpers['files']::clean();
+        $txt_log->info('Files cleaning: ' . ($file_cleaned ? 'ok' : 'ko'));
 
         return [
-            'success' => true,
-            'data' => [
-                'still_inactive' => !$this->checkPermissionAction($permissions, $datas->env)['success'],
-                'message' => '',
-            ],
+            'result' => true,
+            'message' => 'Install successful',
         ];
     }
 
@@ -336,12 +406,18 @@ class ConfigurationAction
             $configuration->getValue('live_api_key')
         );
 
-        if ('pspaylater' == $this->dependencies->name) {
-            if ((bool) $permissions['can_use_oney']
-                && (bool) $permissions['onboarding_oney_completed']) {
-                $configuration->set('sandbox_mode', 0);
-            }
-        } elseif ((bool) $configuration->getValue('live_api_key')) {
+        if (empty($permissions)) {
+            $logger->addLog('ConfigurationAction::loginAction: No permissions found for this account');
+
+            return [
+                'success' => false,
+                'data' => [
+                    'message' => $translation['login_error'],
+                ],
+            ];
+        }
+
+        if ((bool) $configuration->getValue('live_api_key')) {
             $configuration->set('sandbox_mode', 0);
         }
 
@@ -350,6 +426,8 @@ class ConfigurationAction
 
     /**
      * @description Process the logout of the merchant
+     *
+     * todo: add coverage to this method
      *
      * @return array
      */
@@ -371,6 +449,8 @@ class ConfigurationAction
 
     /**
      * @description render the module configuration section
+     *
+     * todo: add coverage to this method
      *
      * @return array
      */
@@ -523,14 +603,21 @@ class ConfigurationAction
                     case 'oney_min_amounts':
                     case 'oney_max_amounts':
                         if ((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) {
-                            $oney = $this->dependencies->getPlugin()->getOney();
-                            $limit_oney = $oney->getOneyPriceLimit(false);
+                            $limit_oney = $this->dependencies
+                                ->getPlugin()
+                                ->getPaymentMethodClass()
+                                ->getPaymentMethod('oney')
+                                ->getOneyPriceLimit(false);
                             $amount = $datas->{$config};
                             $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
                             $is_valid_amount = $this->dependencies
                                 ->getValidators()['payment']
                                 ->isAmount((int) $amount_to_cent, $limit_oney);
-                            $formated_amount = $oney->setCustomOneyLimit((int) $amount_to_cent);
+                            $formated_amount = $this->dependencies
+                                ->getPlugin()
+                                ->getPaymentMethodClass()
+                                ->getPaymentMethod('oney')
+                                ->setCustomOneyLimit((int) $amount_to_cent);
 
                             if ($is_valid_amount && !$configuration->set($key, (string) $formated_amount)) {
                                 return [
@@ -628,5 +715,311 @@ class ConfigurationAction
                 'close' => $translation['confirmation']['submit'],
             ],
         ];
+    }
+
+    /**
+     * @description Check merchant is onboarded
+     *
+     * @param $datas
+     *
+     * @return array
+     */
+    public function submitSandboxAction($datas)
+    {
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getLoggedTranslations();
+        $logger = $this->dependencies->getPlugin()->getLogger();
+        if (!is_object($datas) || !$datas) {
+            $logger->addLog('ConfigurationAction::submitSandboxAction: Invalid parameter given, $datas must be a non empty object.');
+
+            return [
+                'success' => false,
+                'data' => [
+                    // todo:  add translation
+                    'message' => 'An error has occurred',
+                ],
+            ];
+        }
+        $email = $datas->payplug_email;
+        $password = $datas->payplug_password;
+        $is_valid_password = $this->dependencies
+            ->getValidators()['account']
+            ->isPassword($password)['result'];
+
+        if (!$is_valid_password) {
+            $logger->addLog('ConfigurationAction::submitSandboxAction: invalid password.');
+
+            return [
+                'success' => false,
+                'data' => [
+                    'message' => $translation['inactive']['modal']['error'],
+                ],
+            ];
+        }
+
+        $password = base64_decode($datas->payplug_password);
+
+        if (!$this->dependencies->apiClass->login($email, $password)) {
+            $logger->addLog('ConfigurationAction::submitSandboxAction: invalid email and/or password.');
+
+            return [
+                'success' => false,
+                'data' => [
+                    // todo: add translation
+                    'message' => $translation['inactive']['modal']['error'],
+                ],
+            ];
+        }
+        $permissions = 'pspaylater' == $this->dependencies->name ? 'onboarding_oney_completed' : 'use_live_mode';
+        if (!$this->checkPermissionAction($permissions, $datas->env)['success']) {
+            return [
+                'success' => false,
+                'data' => [
+                    'still_inactive' => !$this->checkPermissionAction($permissions, $datas->env)['success'],
+                    'message' => '',
+                ],
+            ];
+        }
+
+        return [
+            'success' => true,
+            'data' => [
+                'still_inactive' => !$this->checkPermissionAction($permissions, $datas->env)['success'],
+                'message' => '',
+            ],
+        ];
+    }
+
+    /**
+     * @description Process the uninstall of the module
+     *
+     * @return array
+     */
+    public function uninstallAction()
+    {
+        $txt_log = new MyLogPHP($this->dependencies->getPlugin()->getConstant()->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/log/install-log.csv');
+        $txt_log->info('Starting to uninstall.');
+
+        $txt_log->info('Deleted saved card');
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getCardAction()
+            ->uninstallAction()) {
+            $txt_log->info('Uninstall failed: Unable to delete saved cards.');
+
+            return [
+                'result' => false,
+                'message' => 'Uninstall failed: Unable to delete saved cards.',
+            ];
+        }
+        $txt_log->info('Saved cards successfully deleted.');
+
+        $txt_log->info('Remove module configuration');
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->deleteAll()) {
+            $txt_log->info('Uninstall failed: Can\'t remove module configuration');
+
+            return [
+                'result' => false,
+                'message' => 'Uninstall failed: Can\'t remove module configuration',
+            ];
+        }
+        $txt_log->info('Remove module configuration successful');
+
+        $txt_log->info('Drop module table');
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getQueryRepository()
+            ->uninstall()) {
+            $txt_log->info('Uninstall failed: Drop module table.');
+
+            return [
+                'result' => false,
+                'message' => 'Uninstall failed: Drop module table.',
+            ];
+        }
+        $txt_log->info('Drop module table successful');
+
+        $txt_log->info('uninstall tab');
+        if (!$this->uninstallTabAction()) {
+            $txt_log->info('Uninstall failed: Tab.');
+
+            return [
+                'result' => false,
+                'message' => 'Uninstall failed: Tab.',
+            ];
+        }
+        $txt_log->info('uninstall tab successful');
+
+        $txt_log->info('Uninstall successful.');
+
+        return [
+            'result' => true,
+            'message' => 'Uninstall successful',
+        ];
+    }
+
+    /**
+     * @description Install hook
+     *
+     * todo: move this section in the appropriate files
+     * todo: add coverage to this method
+     *
+     * @return bool
+     */
+    protected function installHookAction()
+    {
+        $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+        $hook_list = $module->getHookList();
+        $hook_install = true;
+        if (!$hook_list) {
+            return $hook_install;
+        }
+        foreach ($hook_list as $hook) {
+            if ($hook_install) {
+                $hook_install = $hook_install && $module->registerHook($hook);
+            }
+        }
+
+        return $hook_install;
+    }
+
+    /**
+     * @description Install order state
+     *
+     * todo: move this section in the validates actions OrderStateAction/OrderStateClass
+     * todo: add coverage to this method
+     *
+     * @return bool
+     */
+    protected function installOrderStateAction()
+    {
+        $order_state = $this->dependencies->getPlugin()->getOrderState();
+        $order_states_list = $this->dependencies->getPlugin()->getConfigurationClass()->order_states;
+        $install_order_state = true;
+
+        foreach ($order_states_list as $key => $state) {
+            if ($install_order_state) {
+                $install_order_state = $install_order_state && $order_state->create($key, $state, true);
+                $install_order_state = $install_order_state && $order_state->create($key, $state, false);
+            }
+        }
+
+        if ($install_order_state) {
+            $install_order_state = $install_order_state && $order_state->removeIdsUnusedByPayPlug();
+        }
+
+        return $install_order_state;
+    }
+
+    /**
+     * @description Install tab
+     *
+     * todo: move this section in the appropriate files
+     *
+     * @return bool
+     */
+    protected function installTabAction()
+    {
+        $installed = true;
+        $tab_adapter = $this->dependencies
+            ->getPlugin()
+            ->getTabAdapter();
+        $module = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
+
+        if (isset($module->adminControllers) && !empty($module->adminControllers)) {
+            foreach ($module->adminControllers as $adminController) {
+                if ($tab_adapter->getIdFromClassName($adminController['className'])) {
+                    continue;
+                }
+
+                $tab = $tab_adapter->get();
+
+                $languages_adatper = $this->dependencies
+                    ->getPlugin()
+                    ->getLanguage();
+
+                if (isset($adminController['name'])) {
+                    foreach ($languages_adatper->getLanguages(false) as $language) {
+                        $id_lang = (int) $language['id_lang'];
+                        $iso_code = $this->dependencies
+                            ->getPlugin()
+                            ->getTools()
+                            ->tool('strtolower', $language['iso_code']);
+                        if (isset($adminController['name'][$iso_code])) {
+                            $tab->name[$id_lang] = $adminController['name'][$iso_code];
+                        } else {
+                            $tab->name[$id_lang] = $adminController['name']['en'];
+                        }
+                    }
+                } else {
+                    $tab->name = array_fill_keys($languages_adatper->getIDs(false), $module->displayName);
+                }
+
+                if (isset($adminController['parent'])) {
+                    if (is_int($adminController['parent'])) {
+                        $tab->id_parent = $adminController['parent'];
+                    } else {
+                        $tab->id_parent = $tab_adapter->getIdFromClassName($adminController['parent']);
+                    }
+                }
+
+                $tab->class_name = $adminController['className'];
+                $tab->active = true;
+                $tab->module = $module->name;
+                $installed = $installed && $tab->add();
+            }
+        }
+
+        return $installed;
+    }
+
+    /**
+     * @description uninstall tab
+     *
+     * todo: move this section in the appropriate files
+     * todo: add coverage to this method
+     *
+     * @return bool
+     */
+    protected function uninstallTabAction()
+    {
+        $flag = true;
+        $tab_adapter = $this->dependencies
+            ->getPlugin()
+            ->getTabAdapter();
+        $module = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
+
+        if (!isset($module->adminControllers) || empty($module->adminControllers)) {
+            return $flag;
+        }
+
+        foreach ($module->adminControllers as $adminController) {
+            if ($idTab = $tab_adapter->getIdFromClassName($adminController['className'])) {
+                $tab = $tab_adapter->get($idTab);
+                if (!$this->dependencies
+                    ->getPlugin()
+                    ->getValidate()
+                    ->validate('isLoadedObject', $tab)) {
+                    $flag = false;
+
+                    continue;
+                }
+                $flag = $flag && $tab->delete();
+                unset($idTab);
+            }
+        }
+
+        return $flag;
     }
 }

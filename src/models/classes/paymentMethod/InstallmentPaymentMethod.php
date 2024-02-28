@@ -48,6 +48,52 @@ class InstallmentPaymentMethod extends PaymentMethod
         return [];
     }
 
+    // todo: add coverage to this method
+    public function getOrderTab($installment = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($installment) || !$installment) {
+            // todo: add error log
+            return [];
+        }
+
+        $amount = 0;
+        $order_state = 0;
+        foreach ($installment->schedule as $schedule) {
+            if (!$amount) {
+                $pay_id = $schedule->payment_ids[0];
+                $retrieve_payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+                if (!$retrieve_payment['result']) {
+                    return [];
+                }
+                $payment = $retrieve_payment['resource'];
+                $state_addons = $installment->is_live ? '' : '_test';
+                if ($this->dependencies->getValidators()['payment']->isDeferred($payment)['result']) {
+                    $order_state = $this->configuration->getValue('order_state_auth' . $state_addons);
+                } else {
+                    $order_state = $this->configuration->getValue('order_state_paid' . $state_addons);
+                }
+            }
+            $amount += (int) $schedule->amount;
+        }
+
+        $amount = $this->dependencies
+            ->getHelpers()['amount']
+            ->convertAmount($amount, true);
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+
+        return [
+            'order_state' => $order_state,
+            'amount' => $amount,
+            'module_name' => $translation['module_name']['default'],
+        ];
+    }
+
     /**
      * @return array
      */
@@ -78,6 +124,120 @@ class InstallmentPaymentMethod extends PaymentMethod
         unset($payment_tab['force_3ds'], $payment_tab['allow_save_card'], $payment_tab['amount']);
 
         return $payment_tab;
+    }
+
+    // todo: add coverage to this method
+    public function getResourceDetail($resource_id = '')
+    {
+        $this->setParameters();
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('InstallmentPaymentMethod::getResourceDetail - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
+        $retrieve = $this->dependencies->apiClass->retrieveInstallment($resource_id);
+        if (!$retrieve['result']) {
+            if ($sandbox) {
+                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
+                $retrieve = $this->dependencies->apiClass->retrieveInstallment($resource_id);
+            } else {
+                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
+                $retrieve = $this->dependencies->apiClass->retrieveInstallment($resource_id);
+            }
+        }
+        if (!$retrieve['result']) {
+            $this->logger->addLog('PaymentMethod::getResourceDetail - Cannot retrieve the resource.', 'error');
+
+            return [];
+        }
+
+        $resource = $retrieve['resource'];
+
+        $payment_list = [];
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+        $status = $this->getPaymentStatus($resource);
+
+        $amount_available = 0;
+        $refund = [
+            'refunded' => 0,
+            'available' => 0,
+            'is_refunded' => false,
+        ];
+        $payment_list = [];
+        $amount = 0;
+        foreach ($resource->schedule as $schedule) {
+            $amount += $schedule->amount;
+            if (!empty($schedule->payment_ids)) {
+                foreach ($schedule->payment_ids as $schedule_id) {
+                    $schedule_retrieve = $this->dependencies->apiClass->retrievePayment($schedule_id);
+                    if (!$schedule_retrieve['result']) {
+                        return false;
+                    }
+                    $schedule_resource = $schedule_retrieve['resource'];
+                    $schedule_detail = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('standard')
+                        ->getResourceDetail($schedule_resource->id);
+                    $refund['refunded'] += $schedule_detail['refund']['refunded'];
+                    $refund['available'] += $schedule_detail['refund']['available'];
+                    $refund['is_refunded'] = (bool) $schedule_resource->is_refunded;
+                    $payment_list[] = $schedule_detail;
+                }
+            } else {
+                $payment_list[] = [
+                    'id' => null,
+                    'status' => $translation['detail']['status'][$status['code']],
+                    'status_class' => $resource->is_active ? 'pp_success' : 'pp_error',
+                    'status_code' => 'incoming',
+                    'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($schedule->amount, true),
+                    'card_brand' => null,
+                    'card_mask' => null,
+                    'tds' => null,
+                    'card_date' => null,
+                    'mode' => null,
+                    'authorization' => null,
+                    'date' => \date('d/m/Y', \strtotime($schedule->date)),
+                ];
+            }
+        }
+
+        $resource_tab = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getByResourceId($resource->id);
+        if (!isset($resource_tab['schedules']) || !$resource_tab['schedules']) {
+            $this->dependencies->installmentClass->addPayplugInstallment($resource);
+        }
+
+        $this->dependencies->installmentClass->updatePayplugInstallment($resource);
+
+        return [
+            'id' => $resource_id,
+            'status' => !$resource->is_active && !$resource->is_fully_paid
+                ? $translation['detail']['status']['suspended']
+                : $translation['detail']['status'][$status['code']],
+            'status_code' => $resource->is_active
+                ? 'ongoing'
+                : ($resource->is_fully_paid ? 'paid' : 'suspended'),
+            'is_active' => $resource->is_active,
+            'is_paid' => $resource->is_fully_paid,
+            'payment_list' => $payment_list,
+            'mode' => $resource->is_live
+                ? $translation['detail']['mode']['live']
+                : $translation['detail']['mode']['test'],
+            'refund' => $refund,
+            'currency' => $resource->currency,
+            'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($amount, true),
+        ];
     }
 
     /**
@@ -176,6 +336,14 @@ class InstallmentPaymentMethod extends PaymentMethod
         return true;
     }
 
+    // todo: add coverage to this method
+    public function postProcessOrder($resource = null, $order = null)
+    {
+        return $this->dependencies
+            ->installmentClass
+            ->addPayplugInstallment($resource->id, $order);
+    }
+
     /**
      * @param array $payment_tab
      *
@@ -208,7 +376,7 @@ class InstallmentPaymentMethod extends PaymentMethod
 
         $payment = $this->dependencies->apiClass->createInstallment($payment_tab);
 
-        // If the payment resource can not be created due to to bad permission, we update the feature activation
+        // If the payment resource can\'t be created due to to bad permission, we update the feature activation
         if (403 == (int) $payment['code']) {
             $this->dependencies
                 ->getPlugin()
@@ -222,7 +390,7 @@ class InstallmentPaymentMethod extends PaymentMethod
             $this->resetPaymentMethodFromPermission($permissions);
         }
 
-        // If the payment resource can not be created due to bad credential, we log out the merchand
+        // If the payment resource can\'t be created due to bad credential, we log out the merchand
         if (401 == (int) $payment['code']) {
             $this->dependencies
                 ->getPlugin()
@@ -235,6 +403,26 @@ class InstallmentPaymentMethod extends PaymentMethod
         }
 
         return $payment;
+    }
+
+    // todo: add coverage to this method
+    public function getPaymentStatus($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
+        }
+
+        if ((bool) $resource->is_active) {
+            return [
+                'id_status' => 6,
+                'code' => 'on_going',
+            ];
+        }
+
+        return parent::getPaymentStatus($resource);
     }
 
     /**

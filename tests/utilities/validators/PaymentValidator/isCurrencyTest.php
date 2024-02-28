@@ -105,7 +105,7 @@ class isCurrencyTest extends TestCase
         ], $this->validator->isCurrency($currency, [$currencies]));
     }
 
-    public function testWhenGivenCurrencyIsNotInGivenCurrenciesArray()
+    public function testWhenGivenCurrencyIsntInGivenCurrenciesArray()
     {
         $currency = 'USD';
         $currencies = [

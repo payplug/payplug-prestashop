@@ -567,7 +567,7 @@ var $document, $window, __moduleName__Module = {
                     }
                 });
 
-                $document.on('submit', 'form', integrated.form.validate);
+                $document.on('submit', '#payment-confirmation form', integrated.form.validate);
             },
             showError: function () {
                 // valide integrated payment form

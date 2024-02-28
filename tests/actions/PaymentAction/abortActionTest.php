@@ -19,7 +19,7 @@ class abortActionTest extends BasePaymentAction
      *
      * @param mixed $resource_id
      */
-    public function testWhenGivenResourceIdIsNotValidString($resource_id)
+    public function testWhenGivenResourceIdIsntValidString($resource_id)
     {
         $order_id = 42;
         $this->assertSame(
@@ -36,7 +36,7 @@ class abortActionTest extends BasePaymentAction
      *
      * @param mixed $order_id
      */
-    public function testWhenGivenOrderIdIsNotValidInteger($order_id)
+    public function testWhenGivenOrderIdIsntValidInteger($order_id)
     {
         $resource_id = 'inst_azerty';
         $this->assertSame(
@@ -78,7 +78,7 @@ class abortActionTest extends BasePaymentAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Can not abort the payment.',
+                'message' => 'Can\'t abort the payment.',
             ],
             $this->action->abortAction($resource_id, $order_id)
         );
@@ -119,13 +119,13 @@ class abortActionTest extends BasePaymentAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Can not retrieve the aborted payment.',
+                'message' => 'Can\'t retrieve the aborted payment.',
             ],
             $this->action->abortAction($resource_id, $order_id)
         );
     }
 
-    public function testWhenRelatedOrderIsNotValid()
+    public function testWhenRelatedOrderIsntValid()
     {
         $order_id = 42;
         $resource_id = 'inst_azerty';
@@ -189,14 +189,20 @@ class abortActionTest extends BasePaymentAction
                 ],
             ]);
 
-        $payment_class = \Mockery::mock('ApiClass');
-        $payment_class
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $payment_method
             ->shouldReceive([
-                'getPaymentStatusByPayment' => 2,
+                'getPaymentStatus' => [
+                    'id_status' => 2,
+                    'code' => 'paid',
+                ],
+            ]);
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
             ]);
 
         $this->dependencies->apiClass = $api_class;
-        $this->dependencies->paymentClass = $payment_class;
 
         $order_state = 42;
         $order_obj = \Mockery::mock('OrderObj');
@@ -275,14 +281,20 @@ class abortActionTest extends BasePaymentAction
                 ],
             ]);
 
-        $payment_class = \Mockery::mock('ApiClass');
-        $payment_class
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $payment_method
             ->shouldReceive([
-                'getPaymentStatusByPayment' => 2,
+                'getPaymentStatus' => [
+                    'id_status' => 2,
+                    'code' => 'paid',
+                ],
+            ]);
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
             ]);
 
         $this->dependencies->apiClass = $api_class;
-        $this->dependencies->paymentClass = $payment_class;
 
         $order_state = 42;
         $order_obj = \Mockery::mock('OrderObj');

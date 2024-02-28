@@ -122,7 +122,13 @@ class PluginEntity
     private $oney;
 
     /** @var object */
+    private $oney_action;
+
+    /** @var object */
     private $order;
+
+    /** @var object */
+    private $order_class;
 
     /** @var object */
     private $orderHistory;
@@ -132,6 +138,9 @@ class PluginEntity
 
     /** @var object */
     private $order_state;
+
+    /** @var object */
+    private $order_action;
 
     /** @var object */
     private $order_state_action;
@@ -152,6 +161,9 @@ class PluginEntity
     private $query_adapter;
 
     /** @var object */
+    private $refund_action;
+
+    /** @var object */
     private $routes;
 
     /** @var object */
@@ -161,7 +173,10 @@ class PluginEntity
     private $sql;
 
     /** @var object */
-    private $tools;
+    private $tab_adapter;
+
+    /** @var object */
+    private $tools_adapter;
 
     /** @var object */
     private $translation;
@@ -578,9 +593,33 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getOneyAction()
+    {
+        return $this->oney_action;
+    }
+
+    /**
+     * @return object
+     */
     public function getOrderRepository()
     {
         return $this->order_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderClass()
+    {
+        return $this->order_class;
+    }
+
+    /**
+     * @return object
+     */
+    public function getOrderAction()
+    {
+        return $this->order_action;
     }
 
     /**
@@ -650,6 +689,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getRefundAction()
+    {
+        return $this->refund_action;
+    }
+
+    /**
+     * @return object
+     */
     public function getPaymentMethodClass()
     {
         return $this->paymentMethod;
@@ -706,9 +753,17 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getTabAdapter()
+    {
+        return $this->tab_adapter;
+    }
+
+    /**
+     * @return object
+     */
     public function getTools()
     {
-        return $this->tools;
+        return $this->tools_adapter;
     }
 
     /**
@@ -1311,6 +1366,22 @@ class PluginEntity
     }
 
     /**
+     * @param object $oneyAction
+     *
+     * @return self
+     */
+    public function setOneyAction($oneyAction)
+    {
+        if (!is_object($oneyAction)) {
+            throw new BadParameterException('Invalid argument, $card must be a OneyRepository');
+        }
+
+        $this->oney_action = $oneyAction;
+
+        return $this;
+    }
+
+    /**
      * @param object $order_repository
      *
      * @return self
@@ -1327,17 +1398,49 @@ class PluginEntity
     }
 
     /**
-     * @param object $orderStateAction
+     * @param object $order_action
      *
      * @return self
      */
-    public function setOrderStateAction($orderStateAction)
+    public function setOrderAction($order_action)
     {
-        if (!is_object($orderStateAction)) {
+        if (!is_object($order_action)) {
+            throw new BadParameterException('Invalid argument, $order_action must be a OrderAction');
+        }
+
+        $this->order_action = $order_action;
+
+        return $this;
+    }
+
+    /**
+     * @param object $refund_action
+     *
+     * @return self
+     */
+    public function setRefundAction($refund_action)
+    {
+        if (!is_object($refund_action)) {
+            throw new BadParameterException('Invalid argument, $refund_action must be a RefundAction');
+        }
+
+        $this->refund_action = $refund_action;
+
+        return $this;
+    }
+
+    /**
+     * @param object $order_state_action
+     *
+     * @return self
+     */
+    public function setOrderStateAction($order_state_action)
+    {
+        if (!is_object($order_state_action)) {
             throw new BadParameterException('Invalid argument, $orderStateAction must be a OrderStateAction');
         }
 
-        $this->order_state_action = $orderStateAction;
+        $this->order_state_action = $order_state_action;
 
         return $this;
     }
@@ -1473,6 +1576,22 @@ class PluginEntity
     }
 
     /**
+     * @param object $order_class
+     *
+     * @return self
+     */
+    public function setOrderClass($order_class)
+    {
+        if (!is_object($order_class)) {
+            throw new BadParameterException('Invalid argument, $paymentMethod must be a PaymentMethod');
+        }
+
+        $this->order_class = $order_class;
+
+        return $this;
+    }
+
+    /**
      * @param object $payment_repository
      *
      * @return self
@@ -1601,18 +1720,29 @@ class PluginEntity
         return $this;
     }
 
+    public function setTabAdapter($tab_adapter)
+    {
+        if (!is_object($tab_adapter)) {
+            throw new BadParameterException('Invalid argument, $tab_adapter must be a TabAdapter');
+        }
+
+        $this->tab_adapter = $tab_adapter;
+
+        return $this;
+    }
+
     /**
-     * @param object $tools
+     * @param object $tools_adapter
      *
      * @return self
      */
-    public function setTools($tools)
+    public function setTools($tools_adapter)
     {
-        if (!is_object($tools)) {
-            throw new BadParameterException('Invalid argument, $tools must be a ToolsAdapter');
+        if (!is_object($tools_adapter)) {
+            throw new BadParameterException('Invalid argument, $tools_adapter must be a ToolsAdapter');
         }
 
-        $this->tools = $tools;
+        $this->tools_adapter = $tools_adapter;
 
         return $this;
     }

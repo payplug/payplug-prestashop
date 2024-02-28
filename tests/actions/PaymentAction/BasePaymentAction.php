@@ -23,6 +23,7 @@ class BasePaymentAction extends TestCase
     protected $logger;
     protected $payment_method_class;
     protected $payment_repository;
+    protected $payment_validator;
     protected $plugin;
     protected $toolsAdapter;
 
@@ -76,9 +77,13 @@ class BasePaymentAction extends TestCase
 
         $this->dependencies->name = 'payplug';
 
+        $this->payment_validator = \Mockery::mock('PaymentValidator');
         $this->dependencies
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
+                'getValidators' => [
+                    'payment' => $this->payment_validator,
+                ],
             ]);
 
         $this->action = \Mockery::mock(PaymentAction::class, [$this->dependencies])->makePartial();

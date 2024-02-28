@@ -29,40 +29,94 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             'getIsoCodeByCountryId' => 'FR',
         ]);
         $this->dependencies->configClass = $configClass;
+
+        $this->oney = \Mockery::mock('OneyOldRepository');
+
+        $cart_adapter = \Mockery::mock('CardAdapter');
+        $cart_adapter->shouldReceive([
+            'isGuestCartByCartId' => false,
+        ]);
+        $cart_adapter->shouldReceive([
+            'nbProducts' => 1001,
+        ]);
+        $this->plugin
+            ->shouldReceive([
+                'getCart' => $cart_adapter,
+            ]);
+
+        $this->validate_adapter
+            ->shouldReceive([
+                'validate' => false,
+            ]);
+
+        $country_adapter = \Mockery::mock('CountryAdapter');
+        $currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $currency_adapter->shouldReceive([
+            'get' => 1,
+        ]);
+
+        $this->plugin->shouldReceive([
+            'getCountry' => $country_adapter,
+            'getCurrency' => $currency_adapter,
+        ]);
+
+        $this->toolsAdapter = \Mockery::mock('ToolsAdapter');
+        $this->toolsAdapter
+            ->shouldReceive([
+                'tool' => 42,
+            ]);
+
+        $this->dependencies->amountCurrencyClass = \Mockery::mock('alias:PayPlug\classes\AmountCurrencyClass');
+        $this->dependencies->amountCurrencyClass
+            ->shouldReceive('convertAmount')
+            ->andReturnUsing(function ($amount, $to_cents = false) {
+                if ($to_cents) {
+                    return (float) ($amount / 100);
+                }
+                $amount = (float) ($amount * 1000);
+                $amount = (float) ($amount / 10);
+
+                return (int) ($this->toolsAdapter->tool('ps_round', $amount));
+            })
+        ;
     }
 
     /**
+     * @description test getPaymentOption
+     * with invalid $payment_options
+     *
      * @dataProvider invalidArrayFormatDataProvider
      *
      * @param mixed $payment_options
      */
-    public function testWhenGivenPaymentOptionsIsNotValidArrayFormat($payment_options)
+    public function testWhenGivenPaymentOptionsIsntValidArrayFormat($payment_options)
     {
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }
 
-    public function testWhenCurrentCartIsNotElligible()
+    public function testWhenCurrentCartIsntElligible()
     {
         $payment_options = [];
 
-        $configuration = \Mockery::mock('Configuration');
-        $configuration
+        $this->configuration_adapter
             ->shouldReceive('get')
             ->with('PS_TAX')
             ->andReturn('1');
+        $this->configuration_adapter
+            ->shouldReceive('get')
+            ->with('PS_CURRENCY_DEFAULT')
+            ->andReturn('EUR');
 
-        $oney = \Mockery::mock('Oney');
-        $oney->shouldReceive([
-            'isOneyElligible' => [
-                'result' => false,
-                'error_type' => 'invalid_cart',
-                'error' => 'An error occured',
-            ],
+        $this->oney->shouldReceive([
             'getOperations' => [
                 'x3_with_fees',
                 'x3_without_fees',
                 'x4_with_fees',
                 'x4_without_fees',
+            ],
+            'isValidOneyCart' => [
+                'result' => false,
+                'error' => true,
             ],
         ]);
 
@@ -74,6 +128,10 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             ->shouldReceive('getValue')
             ->with('oney_fees')
             ->andReturn(true);
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('oney_allowed_countries')
+            ->andReturn(['PL']);
 
         $this->tools_adapter
             ->shouldReceive('tool')
@@ -85,9 +143,28 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
 
         $this->plugin
             ->shouldReceive([
-                'getConfiguration' => $configuration,
-                'getOney' => $oney,
+                'getConfiguration' => $this->configuration_adapter,
+                'getOney' => $this->oney,
+                'getOneyPriceLimit' => [
+                    'min' => 100,
+                    'max' => 3000,
+                ],
             ]);
+
+        $this->validators['payment']
+            ->shouldReceive([
+                'isOneyElligible' => [
+                    'result' => false,
+                    'code' => 'product_quantity',
+
+                ],
+            ]);
+
+        $this->classe
+            ->shouldReceive([
+                'isValidOneyAmount' => ['result' => true, 'error' => false],
+            ])
+        ;
 
         $expected = [
             'oney_x3_with_fees' => [
@@ -177,18 +254,24 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
         $this->assertSame($expected, $this->classe->getPaymentOption($payment_options));
     }
 
+    /**
+     * @description test getPaymentOption
+     * with oney without fees and elligible cart
+     */
     public function testWhenCurrentCartIsElligibleAndWithoutFees()
     {
         $payment_options = [];
 
-        $configuration = \Mockery::mock('Configuration');
-        $configuration
+        $this->configuration_adapter
             ->shouldReceive('get')
             ->with('PS_TAX')
             ->andReturn('1');
+        $this->configuration_adapter
+            ->shouldReceive('get')
+            ->with('PS_CURRENCY_DEFAULT')
+            ->andReturn('EUR');
 
-        $oney = \Mockery::mock('Oney');
-        $oney->shouldReceive([
+        $this->oney->shouldReceive([
             'isOneyElligible' => [
                 'result' => true,
                 'error' => '',
@@ -201,6 +284,13 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             ],
         ]);
 
+        $this->classe
+            ->shouldReceive(
+                [
+                    'isValidOneyCart' => ['result' => true, 'error' => false],
+                ]
+            );
+
         $this->configuration
             ->shouldReceive('getValue')
             ->with('oney_optimized')
@@ -209,6 +299,10 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             ->shouldReceive('getValue')
             ->with('oney_fees')
             ->andReturn(false);
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('oney_allowed_countries')
+            ->andReturn(['FR', 'IT', 'ES', 'NL']);
 
         $this->tools_adapter
             ->shouldReceive('tool')
@@ -220,9 +314,15 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
 
         $this->plugin
             ->shouldReceive([
-                'getConfiguration' => $configuration,
-                'getOney' => $oney,
+                'getConfiguration' => $this->configuration_adapter,
+                'getOney' => $this->oney,
             ]);
+
+        $this->classe
+            ->shouldReceive([
+                'isValidOneyAmount' => ['result' => true, 'error' => false],
+            ])
+        ;
 
         $expected = [
             'oney_x3_without_fees' => [
@@ -312,18 +412,24 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
         $this->assertSame($expected, $this->classe->getPaymentOption($payment_options));
     }
 
+    /**
+     * @description  test getPaymentOption
+     * when oney is with fees and elligible cart
+     */
     public function testWhenCurrentCartIsElligibleAndWithFees()
     {
         $payment_options = [];
 
-        $configuration = \Mockery::mock('Configuration');
-        $configuration
+        $this->configuration_adapter
             ->shouldReceive('get')
             ->with('PS_TAX')
             ->andReturn('1');
+        $this->configuration_adapter
+            ->shouldReceive('get')
+            ->with('PS_CURRENCY_DEFAULT')
+            ->andReturn('EUR');
 
-        $oney = \Mockery::mock('Oney');
-        $oney->shouldReceive([
+        $this->oney->shouldReceive([
             'isOneyElligible' => [
                 'result' => true,
                 'error' => '',
@@ -344,6 +450,10 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             ->shouldReceive('getValue')
             ->with('oney_fees')
             ->andReturn(true);
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('oney_allowed_countries')
+            ->andReturn(['FR', 'IT', 'ES', 'NL']);
 
         $this->tools_adapter
             ->shouldReceive('tool')
@@ -355,9 +465,21 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
 
         $this->plugin
             ->shouldReceive([
-                'getConfiguration' => $configuration,
-                'getOney' => $oney,
+                'getConfiguration' => $this->configuration_adapter,
+                'getOney' => $this->oney,
             ]);
+
+        $this->classe
+            ->shouldReceive([
+                'isValidOneyAmount' => ['result' => true, 'error' => false],
+            ])
+        ;
+        $this->classe
+            ->shouldReceive(
+                [
+                    'isValidOneyCart' => ['result' => true, 'error' => false],
+                ]
+            );
 
         $expected = [
             'oney_x3_with_fees' => [

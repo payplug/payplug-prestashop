@@ -6,9 +6,12 @@ use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
+use PayPlug\src\utilities\helpers\AmountHelper;
+use PayPlug\src\utilities\helpers\ConfigurationHelper;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\moduleValidator;
 use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\mock\AddressMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -16,17 +19,25 @@ class BaseApiRest extends TestCase
 {
     use FormatDataProvider;
 
+    public $address_adapter;
     public $amount_helper;
+    public $assign_adapter;
+    public $carrier_adapter;
+    public $cart_adapter;
     public $classe;
     public $configuration;
     public $configuration_action;
     public $configuration_class;
+    public $configuration_helper;
     public $constant;
+    public $country;
+    public $currency_adapter;
     public $dependencies;
     public $logger;
     public $payment_method;
     public $plugin;
     public $tools_adapter;
+    public $translation;
     public $validate_adapter;
 
     protected function setUp()
@@ -85,14 +96,32 @@ class BaseApiRest extends TestCase
                 return $str;
             });
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
+        $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $this->assign_adapter = \Mockery::mock('AssignAdapter');
+        $this->address_adapter = \Mockery::mock('AddressAdapter');
+        $this->address_adapter->shouldReceive([
+            'get' => AddressMock::get(),
+        ]);
+        $this->assign_adapter->shouldReceive([
+            'assign' => '',
+        ]);
+        $this->carrier_adapter = \Mockery::mock('CarrierAdapter');
+        $this->cart_adapter = \Mockery::mock('CartAdapter');
+        $this->country = \Mockery::mock('Country');
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
+                'getAddress' => $this->address_adapter,
+                'getAssign' => $this->assign_adapter,
+                'getCarrier' => $this->carrier_adapter,
+                'getCart' => $this->cart_adapter,
                 'getConfiguration' => $this->configuration,
                 'getConfigurationAction' => $this->configuration_action,
                 'getConfigurationClass' => $this->configuration_class,
                 'getConstant' => $this->constant,
+                'getCountry' => $this->country,
+                'getCurrency' => $this->currency_adapter,
                 'getLogger' => $this->logger,
                 'getPaymentMethodClass' => $this->payment_method,
                 'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),
@@ -102,11 +131,15 @@ class BaseApiRest extends TestCase
             ]);
 
         $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();
+        $this->configuration_helper = \Mockery::mock(ConfigurationHelper::class)->makePartial();
         $this->dependencies
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
                 'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
-                'getHelpers' => ['amount' => $this->amount_helper],
+                'getHelpers' => [
+                    'amount' => $this->amount_helper,
+                    'configuration' => $this->configuration_helper,
+                ],
             ]);
 
         $this->classe = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();

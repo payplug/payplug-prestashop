@@ -39,7 +39,7 @@ final class GetFieldsRequiredCardTest extends TestCase
         );
     }
 
-    public function testFieldsRequiredIsNotEmpty()
+    public function testFieldsRequiredIsntEmpty()
     {
         $this->assertFalse(
             empty($this->card->getFieldsRequired())

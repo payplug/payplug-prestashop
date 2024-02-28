@@ -18,7 +18,7 @@ class resetPaymentMethodFromPermissionTest extends BasePaymentMethod
      *
      * @param mixed $permissions
      */
-    public function testWhenGivenPermissionIsNotValidArray($permissions)
+    public function testWhenGivenPermissionIsntValidArray($permissions)
     {
         $this->assertFalse($this->classe->resetPaymentMethodFromPermission($permissions));
     }

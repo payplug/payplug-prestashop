@@ -17,6 +17,7 @@ class BaseCardAction extends TestCase
     public $card_validator;
     public $configuration_class;
     public $dependencies;
+    public $logger;
     public $plugin;
 
     protected function setUp()
@@ -29,12 +30,19 @@ class BaseCardAction extends TestCase
                 'get' => ContextMock::get(),
             ]);
 
+        $this->logger = \Mockery::mock('Logger');
+        $this->logger
+            ->shouldReceive([
+                'addLog' => true,
+            ]);
+
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
                 'getCardRepository' => $this->card_repository,
                 'getConfigurationClass' => $this->configuration_class,
                 'getContext' => $this->context,
+                'getLogger' => $this->logger,
             ]);
 
         $this->card_validator = \Mockery::mock('CardValidator');

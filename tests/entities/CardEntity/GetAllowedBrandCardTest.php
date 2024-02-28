@@ -39,7 +39,7 @@ final class GetAllowedBrandCardTest extends TestCase
         );
     }
 
-    public function testAllowedBrandIsNotEmpty()
+    public function testAllowedBrandIsntEmpty()
     {
         $this->assertFalse(
             empty($this->card->getAllowedBrand())

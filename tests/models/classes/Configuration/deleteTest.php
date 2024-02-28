@@ -27,13 +27,13 @@ class deleteTest extends BaseConfiguration
     {
         $key = 'config_key';
         $value = 'value';
-        $this->classe->configuration = [
+        $this->classe->configurations = [
             'feature' => [],
         ];
         $this->assertFalse($this->classe->delete($key, $value));
     }
 
-    public function testWhenConfigurationCanNotBeDeleted()
+    public function testWhenConfigurationCantBeDeleted()
     {
         $key = 'enable';
         $this->configuration->shouldReceive([

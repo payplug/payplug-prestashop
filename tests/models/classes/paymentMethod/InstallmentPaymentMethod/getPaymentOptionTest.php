@@ -16,7 +16,7 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
      *
      * @param mixed $payment_options
      */
-    public function testWhenGivenPaymentOptionsIsNotValidArrayFormat($payment_options)
+    public function testWhenGivenPaymentOptionsIsntValidArrayFormat($payment_options)
     {
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }
@@ -24,6 +24,11 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
     public function testWhenAmountIsTooLow()
     {
         $payment_options = [];
+
+        $this->configuration_adapter
+            ->shouldReceive('get')
+            ->with('PS_TAX')
+            ->andReturn('1');
 
         $this->configuration
             ->shouldReceive('getValue')
@@ -40,6 +45,11 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
     public function testWhenInstallmentPaymentMethodIsDisplayed()
     {
         $payment_options = [];
+
+        $this->configuration_adapter
+            ->shouldReceive('get')
+            ->with('PS_TAX')
+            ->andReturn('1');
 
         $this->configuration
             ->shouldReceive('getValue')

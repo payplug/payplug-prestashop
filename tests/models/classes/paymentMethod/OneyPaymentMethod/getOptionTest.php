@@ -16,7 +16,7 @@ class getOptionTest extends BaseOneyPaymentMethod
      *
      * @param mixed $current_configuration
      */
-    public function testWhenGivenConfigurationIsNotValidArrayFormat($current_configuration)
+    public function testWhenGivenConfigurationIsntValidArrayFormat($current_configuration)
     {
         $this->assertSame([], $this->classe->getOption($current_configuration));
     }
@@ -156,7 +156,7 @@ class getOptionTest extends BaseOneyPaymentMethod
         $this->assertSame($expected, $this->classe->getOption($current_configuration));
     }
 
-    public function testWhenOneyCtaIsNotAllowed()
+    public function testWhenOneyCtaIsntAllowed()
     {
         $current_configuration = [];
 

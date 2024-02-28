@@ -102,7 +102,26 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     public function getPaymentStatusById($id_status)
     {
-        return $this->dependencies->paymentClass->getPaymentStatusById($id_status);
+        $status = [
+            1 => 'not_paid',
+            2 => 'paid',
+            3 => 'failed',
+            4 => 'partially_refunded',
+            5 => 'refunded',
+            6 => 'on_going',
+            7 => 'cancelled',
+            8 => 'authorized',
+            9 => 'authorization_expired',
+            10 => 'oney_pending',
+            11 => 'abandoned',
+        ];
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getOrderTranslations();
+
+        return $translation['detail']['status'][$status[$id_status]];
     }
 
     // Impossible to write this function in camelCase, Presta 1.6 & 1.7 need it as is

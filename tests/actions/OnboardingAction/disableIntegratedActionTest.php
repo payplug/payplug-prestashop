@@ -24,7 +24,7 @@ class disableIntegratedActionTest extends BaseOnboardingAction
      *
      * @param mixed $json
      */
-    public function testWhenGetOnboardingStateGettedIsNotValidArray($json)
+    public function testWhenGetOnboardingStateGettedIsntValidArray($json)
     {
         $this->configurationClass->shouldReceive([
             'getValue' => $json,

@@ -39,7 +39,7 @@ final class GetFieldsSizeCardTest extends TestCase
         );
     }
 
-    public function testFieldsSizeIsNotEmpty()
+    public function testFieldsSizeIsntEmpty()
     {
         $this->assertFalse(
             empty($this->card->getFieldsSize())

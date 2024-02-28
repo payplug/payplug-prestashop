@@ -18,7 +18,7 @@ class getOptionTest extends BasePaymentMethod
      *
      * @param mixed $configuration
      */
-    public function testWhenGivenConfigurationIsNotValidArray($configuration)
+    public function testWhenGivenConfigurationIsntValidArray($configuration)
     {
         $this->assertSame([], $this->classe->getOption($configuration));
     }

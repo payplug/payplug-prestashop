@@ -18,7 +18,7 @@ class getPaymentTabTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getPaymentTab());
     }
 
-    public function testWhenCartInContextIsNotAValidObject()
+    public function testWhenCartInContextIsntAValidObject()
     {
         $this->classe->set('name', 'standard');
         $this->context->cart = null;
@@ -30,7 +30,7 @@ class getPaymentTabTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getPaymentTab());
     }
 
-    public function testWhenCustomerInContextIsNotAValidObject()
+    public function testWhenCustomerInContextIsntAValidObject()
     {
         $this->classe->set('name', 'standard');
         $this->context->customer = null;
@@ -42,7 +42,7 @@ class getPaymentTabTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getPaymentTab());
     }
 
-    public function testWhenCurrencyInContextIsNotAValidObject()
+    public function testWhenCurrencyInContextIsntAValidObject()
     {
         $this->classe->set('name', 'standard');
         $this->context->currency = null;
@@ -54,7 +54,7 @@ class getPaymentTabTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getPaymentTab());
     }
 
-    public function testWhenCurrentCurrencyIsoCodeIsNotSupported()
+    public function testWhenCurrentCurrencyIsoCodeIsntSupported()
     {
         $this->classe->set('name', 'standard');
         $this->validate_adapter
@@ -69,7 +69,7 @@ class getPaymentTabTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getPaymentTab());
     }
 
-    public function testWhenCartIsNotValidAmount()
+    public function testWhenCartIsntValidAmount()
     {
         $this->classe->set('name', 'standard');
         $this->validate_adapter

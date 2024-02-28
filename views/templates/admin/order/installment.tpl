@@ -21,10 +21,10 @@
 *}
 
 <div>
-    <p class="{if $inst_paid}ppinstsucces{else}{if $inst_aborted}ppinsterror{else}ppwarning{/if}{/if}">
+    <p class="{if $installment.is_paid}ppinstsucces{else}{if !$installment.is_active}ppinsterror{else}ppwarning{/if}{/if}">
         {l s='This order is subjected to an installment plan, whose status is' mod='payplug'}
-        <span class="pp_inst_status" data-e2e-payment-details="inst_status" data-e2e-payment-details-inst-state="{$inst_status_code|escape:'htmlall':'UTF-8'}">{$inst_status|escape:'htmlall':'UTF-8'}</span></p>
-    <p>{l s='Payment schedule ID' mod='payplug'} : <span data-e2e-payment-details="inst_id">{$inst_id|escape:'htmlall':'UTF-8'}</span></p>
+        <span class="pp_inst_status" data-e2e-payment-details="inst_status" data-e2e-payment-details-inst-state="{$installment.status_code|escape:'htmlall':'UTF-8'}">{$installment.status|escape:'htmlall':'UTF-8'}</span></p>
+    <p>{l s='Payment schedule ID' mod='payplug'} : <span data-e2e-payment-details="inst_id">{$installment.id|escape:'htmlall':'UTF-8'}</span></p>
 </div>
 <div class="table-responsive half-width">
     <table class="table">
@@ -37,11 +37,15 @@
         </tr>
         </thead>
         <tbody>
-        {foreach $payment_list_new as $k=>$payment}
+        {foreach $installment.payment_list as $k=>$payment}
             <tr class="pp_fixed_height">
                 <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="date">{$payment['date']|escape:'htmlall':'UTF-8'}</td>
                 <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="amount">{displayPrice price=$payment['amount']}</td>
-                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="state" data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}-state="{$payment['status_code']|escape:'htmlall':'UTF-8'}" class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">{$payment['status']|escape:'htmlall':'UTF-8'}</td>
+                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="state"
+                    data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}-state="{$payment['status_code']|escape:'htmlall':'UTF-8'}"
+                    class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">
+                    {$payment['status']|escape:'htmlall':'UTF-8'}
+                </td>
                 <td class="actions">
                     {if isset($payment['id'])}
                         <button class="btn btn-default open_payment_information" data-payment="{$k|escape:'htmlall':'UTF-8'}">
@@ -61,12 +65,12 @@
         {/foreach}
         </tbody>
     </table>
-    {if !$inst_paid}
-        {if $inst_aborted}
+    {if !$installment.is_paid}
+        {if !$installment.is_active}
             <input class="{$module_name|escape:'htmlall':'UTF-8'}Button -disabled" type="submit" name="{$module_name|escape:'htmlall':'UTF-8'}SubmitAbort" value="{l s='Aborted' mod='payplug'}" disabled="disabled" />
-        {elseif $inst_can_be_aborted}
+        {else}
             <input type="hidden" name="admin_ajax_url" value="{$admin_ajax_url|escape:'htmlall':'UTF-8'}" />
-            <input type="hidden" name="inst_id" value="{$inst_id|escape:'htmlall':'UTF-8'}" />
+            <input type="hidden" name="inst_id" value="{$installment.id|escape:'htmlall':'UTF-8'}" />
             <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
             <input class="{$module_name|escape:'htmlall':'UTF-8'}Button -green" type="submit" name="{$module_name|escape:'htmlall':'UTF-8'}SubmitAbort" value="{l s='Abort' mod='payplug'}"/>
         {/if}

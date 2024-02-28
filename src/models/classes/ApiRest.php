@@ -31,7 +31,6 @@ class ApiRest
 {
     private $dependencies;
     private $helpers;
-    private $tools;
     private $validators;
 
     public function __construct($dependencies)
@@ -226,7 +225,7 @@ class ApiRest
     }
 
     /**
-     * @description  build header section of the json file
+     * @description build header section of the json file
      *
      * @param mixed $current_configuration
      *
@@ -498,9 +497,6 @@ class ApiRest
             return [];
         }
 
-        // todo : replace in appropriate OneyPaymentmethod
-        // 'amounts' => $configuration->getDefault('amounts'),
-
         return $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
@@ -514,7 +510,6 @@ class ApiRest
      * @param mixed $current_configuration
      *
      * @return array
-     * @todo: divide the get of the different payment method in relative class
      */
     public function getPaymentMethodsSection($current_configuration = [])
     {
@@ -591,7 +586,9 @@ class ApiRest
             ->getTranslationClass()
             ->getRequirementsTranslations();
 
-        $requirements_reports = $this->dependencies->configClass->getReportRequirements();
+        $requirements_reports = $this->dependencies
+            ->getHelpers()['configuration']
+            ->getRequirements();
 
         $is_requirements_checked = $this->validators['module']->isAllRequirementsChecked(
             $requirements_reports

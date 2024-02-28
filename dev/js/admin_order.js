@@ -162,8 +162,7 @@ var $document, $window, __moduleName__Module = {
                     refund: 1,
                     amount: $('input[name=pp_amount2refund]').val(),
                     id_customer: $('input:hidden[name=id_customer]').val(),
-                    pay_id: $('input:hidden[name=pay_id]').val(),
-                    inst_id: $('input:hidden[name=inst_id]').val(),
+                    resource_id: $('input:hidden[name=resource_id]').val(),
                     id_order: $('input:hidden[name=id_order]').val(),
                     pay_mode: $('input:hidden[name=pay_mode]').val()
                 };

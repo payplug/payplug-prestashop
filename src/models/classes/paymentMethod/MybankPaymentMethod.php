@@ -33,6 +33,8 @@ class MybankPaymentMethod extends PaymentMethod
     {
         parent::__construct($dependencies);
         $this->name = 'mybank';
+        $this->order_name = 'mybank';
+        $this->refundable = false;
     }
 
     /**
@@ -50,6 +52,7 @@ class MybankPaymentMethod extends PaymentMethod
         return $option;
     }
 
+    // todo: add coverage to this method
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();

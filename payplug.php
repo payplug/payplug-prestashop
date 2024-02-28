@@ -22,7 +22,6 @@
  */
 // Check if prestashop Context
 use PayPlug\classes\DependenciesClass;
-use PayPlug\classes\MyLogPHP;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -55,7 +54,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '4.6.2';
+        $this->version = '4.7.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -100,7 +99,13 @@ class Payplug extends PaymentModule
     public function disable($force_all = false)
     {
         if ($this->module) {
-            return parent::disable($force_all) && $this->payplug_dependencies->getDependency('configClass')->disable();
+            $dependencies = new DependenciesClass();
+
+            return parent::disable($force_all)
+                && $dependencies
+                    ->getPlugin()
+                    ->getConfigurationAction()
+                    ->disableAction();
         }
     }
 
@@ -112,7 +117,11 @@ class Payplug extends PaymentModule
     public function getContent()
     {
         if (!$this->isValidInstallation()) {
-            $this->install(true);
+            $dependencies = new DependenciesClass();
+            $dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->installAction();
         }
         $controllerName = 'AdminPayplug';
 
@@ -222,10 +231,15 @@ class Payplug extends PaymentModule
         if ($this->module) {
             $dependencies = new DependenciesClass();
 
+            $type = $dependencies
+                ->getPlugin()
+                ->getTools()
+                ->tool('getValue', 'order_state_type');
+
             return $dependencies
                 ->getPlugin()
                 ->getOrderStateAction()
-                ->addTypeAction($params);
+                ->saveTypeAction((int) $params['object']->id, $type);
         }
     }
 
@@ -241,10 +255,15 @@ class Payplug extends PaymentModule
         if ($this->module) {
             $dependencies = new DependenciesClass();
 
+            $type = $dependencies
+                ->getPlugin()
+                ->getTools()
+                ->tool('getValue', 'order_state_type');
+
             return $dependencies
                 ->getPlugin()
                 ->getOrderStateAction()
-                ->updateTypeAction($params);
+                ->saveTypeAction((int) $params['object']->id, $type);
         }
     }
 
@@ -368,7 +387,12 @@ class Payplug extends PaymentModule
         if ($this->module) {
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_cart_cta')) {
-                return $this->payplug_dependencies->hookClass->displayExpressCheckout();
+                $dependencies = new DependenciesClass();
+
+                return $dependencies
+                    ->getPlugin()
+                    ->getOneyAction()
+                    ->renderCTA();
             }
         }
     }
@@ -383,7 +407,12 @@ class Payplug extends PaymentModule
         if ($this->module) {
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_product_cta')) {
-                return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
+                $dependencies = new DependenciesClass();
+
+                return $dependencies
+                    ->getPlugin()
+                    ->getOneyAction()
+                    ->renderCTA($params);
             }
         }
     }
@@ -422,7 +451,25 @@ class Payplug extends PaymentModule
     public function hookPaymentOptions()
     {
         if ($this->module) {
-            return $this->payplug_dependencies->hookClass->paymentOptions();
+            $dependencies = new DependenciesClass();
+            $context = $dependencies->getPlugin()->getContext()->get();
+
+            if (!$dependencies->configClass->isAllowed()) {
+                return false;
+            }
+
+            $context->smarty->assign([
+                'api_url' => $dependencies->apiClass->getApiUrl(),
+            ]);
+
+            // Données sous forme de tableau
+            $payment_options = $dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentOptionCollection();
+
+            // Transforme tableau en object
+            return $dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);
         }
     }
 
@@ -447,49 +494,28 @@ class Payplug extends PaymentModule
      *
      * @see Module::install()
      */
-    public function install($soft_install = false)
+    public function install()
     {
-        if ($this->module) {
-            $log = new MyLogPHP(_PS_MODULE_DIR_ . $this->name . '/log/install-log.csv');
-            $log->info('Payplug::install');
-            $flag = true;
+        $flag = parent::install();
 
-            // Use for update module is not fully installed
-            if (!$soft_install) {
-                $log->info('Start update module is not fully installed');
-                $this->payplug_dependencies = null;
-                $flag = $flag && parent::install();
-                $this->setDependencies();
-                $log->info('End update module: ' . ($flag ? 'ok' : 'ko'));
+        if ($this->module && $flag) {
+            $dependencies = new DependenciesClass();
+            $installation = $dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->installAction();
+
+            if (!$installation['result']) {
+                $this->errors[] = $dependencies
+                    ->getPlugin()
+                    ->getTools()
+                    ->tool('displayError', $installation['message']);
+                $this->uninstall();
             }
-
-            // Install configuration
-            if ($flag) {
-                $log->info('Start Install configuration');
-                $flag = $flag && $this->payplug_dependencies->getDependency('install')->install();
-                $log->info('End Install configuration: ' . ($flag ? 'ok' : 'ko'));
-            }
-
-            // Install hook
-            if ($flag) {
-                $log->info('Start install module hook');
-                $hook_list = $this->getHookList();
-                foreach ($hook_list as $hook) {
-                    $flag = $flag && $this->registerHook($hook);
-                }
-                $log->info('End install module hook: ' . ($flag ? 'ok' : 'ko'));
-            }
-
-            // Clean external files
-            $log->info('Start files cleaning');
-            $helpers = $this->module->getHelpers();
-            $flag = $flag && $helpers['files']::clean();
-            $log->info('End files cleaning: ' . ($flag ? 'ok' : 'ko'));
-
-            return $flag;
+            $flag = $flag && $installation['result'];
         }
 
-        return parent::install();
+        return $flag;
     }
 
     /**
@@ -555,7 +581,14 @@ class Payplug extends PaymentModule
     public function uninstall()
     {
         if ($this->module) {
-            return parent::uninstall() && $this->payplug_dependencies->getDependency('install')->uninstall();
+            $dependencies = new DependenciesClass();
+            $uninstall = $dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->uninstallAction();
+            if (!$uninstall['result']) {
+                return false;
+            }
         }
 
         return parent::uninstall();
@@ -564,7 +597,7 @@ class Payplug extends PaymentModule
     /**
      * @description Get the module hook list from current Prestashop version
      */
-    private function getHookList()
+    public function getHookList()
     {
         return [
             'actionAdminControllerSetMedia',

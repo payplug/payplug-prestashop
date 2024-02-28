@@ -29,7 +29,7 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
         $this->assertSame([], $this->classe->getReturnUrl());
     }
 
-    public function testWhenTheResourceCantBeRetrieve()
+    public function testWhenTheResourceCantBeRetrieved()
     {
         $this->classe->set('name', 'standard');
         $this->payment_repository

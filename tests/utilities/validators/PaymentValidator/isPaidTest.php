@@ -56,7 +56,7 @@ class isPaidTest extends TestCase
         ], $this->validator->isPaid($payment));
     }
 
-    public function testWhenPaymentIsNotPaid()
+    public function testWhenPaymentIsntPaid()
     {
         $parameters = [
             'is_paid' => false,

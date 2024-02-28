@@ -24,7 +24,7 @@ class getOptionCollectionTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getOptionCollection());
     }
 
-    public function testWhenAvailablePaymentMethodIsNotValidFeature()
+    public function testWhenAvailablePaymentMethodIsntValidFeature()
     {
         $this->classe->shouldReceive([
             'getAvailablePaymentMethod' => [
@@ -46,7 +46,7 @@ class getOptionCollectionTest extends BasePaymentMethod
      *
      * @param mixed $payment_method
      */
-    public function testWhenPaymentMethodGettedIsNotAnObject($payment_method)
+    public function testWhenPaymentMethodGettedIsntAnObject($payment_method)
     {
         $this->classe->shouldReceive([
             'getAvailablePaymentMethod' => [

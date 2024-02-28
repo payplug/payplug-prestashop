@@ -62,14 +62,17 @@ class PrestashopAdapter17
             && (bool) $payment_methods['applepay']) {
             \Media::addJsDef(
                 [
-                    $this->dependencies->name . '_transaction_error_message' => $this->paymentClass->displayPaymentErrors(
-                        [
+                    $this->dependencies->name . '_transaction_error_message' => $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentAction()
+                        ->renderPaymentErrors(
+                            [
                             $this->dependencies
                                 ->getPlugin()
                                 ->getTranslationClass()
                                 ->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopadapter17'),
                         ]
-                    ),
+                        ),
                 ]
             );
 
@@ -77,6 +80,13 @@ class PrestashopAdapter17
         }
     }
 
+    /**
+     * @description get the payment options
+     *
+     * @param $payment_options
+     *
+     * @return array
+     */
     public function displayPaymentOption($payment_options)
     {
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
@@ -110,20 +120,27 @@ class PrestashopAdapter17
             // load oney schedule on e page loading
             if ('oney' == $payment_method && $payment_option['is_optimized']) {
                 try {
-                    $payment_schedule = $this->oney->getOneyPaymentOptionsList(
-                        $payment_option['amount'],
-                        $payment_option['iso_code']
-                    );
+                    $payment_schedule = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('oney')
+                        ->getOneyPaymentOptionsList(
+                            $payment_option['amount'],
+                            $payment_option['iso_code']
+                        );
                 } catch (\Exception $e) {
                     // todo: set a permanent log
                     $payment_schedule = false;
                 }
 
                 if ($payment_schedule) {
-                    $schedules = $this->oney->displayOneySchedule(
-                        $payment_schedule[$payment_option['type']],
-                        $payment_option['amount']
-                    );
+                    $schedules = $this->dependencies
+                        ->getPlugin()
+                        ->getOneyAction()
+                        ->renderSchedule(
+                            $payment_schedule[$payment_option['type']],
+                            $payment_option['amount']
+                        );
                     $payment_option['additionalInformation'] = $schedules;
                 }
             }
@@ -228,69 +245,6 @@ class PrestashopAdapter17
         $payment_options['standard'] = $integrated;
 
         return $payment_options;
-    }
-
-    // todo: set \Tab install process in a adapter
-    public function installTab()
-    {
-        $installed = true;
-
-        if (isset($this->module->adminControllers) && !empty($this->module->adminControllers)) {
-            foreach ($this->module->adminControllers as $adminController) {
-                if (\Tab::getIdFromClassName($adminController['className'])) {
-                    continue;
-                }
-
-                $tab = new \Tab();
-
-                if (isset($adminController['name'])) {
-                    foreach (\Language::getLanguages(false) as $language) {
-                        $id_lang = (int) $language['id_lang'];
-                        $iso_code = \Tools::strtolower($language['iso_code']);
-                        if (isset($adminController['name'][$iso_code])) {
-                            $tab->name[$id_lang] = $adminController['name'][$iso_code];
-                        } else {
-                            $tab->name[$id_lang] = $adminController['name']['en'];
-                        }
-                    }
-                } else {
-                    $tab->name = array_fill_keys(\Language::getIDs(false), $this->module->displayName);
-                }
-
-                if (isset($adminController['parent'])) {
-                    if (is_int($adminController['parent'])) {
-                        $tab->id_parent = $adminController['parent'];
-                    } else {
-                        $tab->id_parent = \Tab::getIdFromClassName($adminController['parent']);
-                    }
-                }
-
-                $tab->class_name = $adminController['className'];
-                $tab->active = true;
-                $tab->module = $this->module->name;
-                $installed = $installed && $tab->add();
-            }
-        }
-
-        return $installed;
-    }
-
-    // todo: set \Tab uninstall process in a adapter
-    public function uninstallTab()
-    {
-        $flag = true;
-
-        if (isset($this->module->adminControllers) && !empty($this->module->adminControllers)) {
-            foreach ($this->module->adminControllers as $adminController) {
-                if ($idTab = \Tab::getIdFromClassName($adminController['className'])) {
-                    $tab = new \Tab($idTab);
-                    $flag = $flag && $tab->delete();
-                    unset($idTab);
-                }
-            }
-        }
-
-        return $flag;
     }
 
     /**

@@ -229,7 +229,6 @@ class ConfigClass
     private $country;
     private $dependencies;
     private $img_lang;
-    private $install;
     private $media;
     private $module;
     private $oney;
@@ -249,7 +248,6 @@ class ConfigClass
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
-        $this->install = $this->dependencies->getPlugin()->getInstall();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
@@ -275,11 +273,6 @@ class ConfigClass
     public function getImgLang()
     {
         return $this->img_lang;
-    }
-
-    public function getPaymentStatus()
-    {
-        return $this->payment_status;
     }
 
     /**
@@ -411,7 +404,9 @@ class ConfigClass
     public function checkState()
     {
         $state = $this->validators['module']->isAllRequirementsChecked(
-            $this->getReportRequirements()
+            $this->dependencies
+                ->getHelpers()['configuration']
+                ->getRequirements()
         );
 
         return $state['result'];
@@ -590,13 +585,18 @@ class ConfigClass
     /**
      * @description Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm.
      *
+     * todo: Deprected method: Use src/models/classe/Country::getIsoCodeByCountryId instead
+     *
      * @param $country_id
      *
      * @return string
      */
     public function getIsoCodeByCountryId($country_id)
     {
-        $iso_code_list = $this->getIsoCodeList();
+        $iso_code_list = $this->dependencies
+            ->getPlugin()
+            ->getCountryClass()
+            ->getIsoCodeList();
         if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
             return '';
         }
@@ -604,7 +604,10 @@ class ConfigClass
             return '';
         }
 
-        $iso_code = $this->dependencies->getPlugin()->getCountryRepository()->getIsoCodeByCountry((int) $country_id);
+        $iso_code = $this->dependencies
+            ->getPlugin()
+            ->getCountryRepository()
+            ->getIsoCodeByCountry((int) $country_id);
         $iso_code = $this->tools->tool('strtoupper', $iso_code);
 
         if (!in_array($iso_code, $iso_code_list, true)) {
@@ -612,27 +615,6 @@ class ConfigClass
         }
 
         return $iso_code;
-    }
-
-    /**
-     * @description Get all country iso-code of ISO 3166-1 alpha-2 norm
-     *
-     * @return array
-     */
-    public function getIsoCodeList()
-    {
-        $country_list_path = _PS_MODULE_DIR_ . $this->dependencies->name . '/lib/iso_3166-1_alpha-2/data.csv';
-        $iso_code_list = [];
-        if (($handle = fopen($country_list_path, 'r')) !== false) {
-            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                $iso_code_list[] = $this->tools->tool('strtoupper', $data[0]);
-            }
-            fclose($handle);
-
-            return $iso_code_list;
-        }
-
-        return [];
     }
 
     /**
@@ -778,7 +760,7 @@ class ConfigClass
      */
     public function logout()
     {
-        $this->install->setConfig();
+        $this->dependencies->getPlugin()->getConfigurationClass()->initialize();
         $this->configuration->set('enable', 0);
         $this->configurationAdapter->loadConfiguration();
     }
@@ -819,52 +801,5 @@ class ConfigClass
                 ->getTranslationClass()
                 ->l('payplug.setConfigurationProperties.configureModule', 'configclass');
         }
-
-        $this->payment_status = [
-            1 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.notPaid', 'configclass'),
-            2 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.paid', 'configclass'),
-            3 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.failed', 'configclass'),
-            4 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.partiallyRefunded', 'configclass'),
-            5 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.refunded', 'configclass'),
-            6 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.onGoing', 'configclass'),
-            7 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.cancelled', 'configclass'),
-            8 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.authorized', 'configclass'),
-            9 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.authorizationExpired', 'configclass'),
-            10 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.oneyPending', 'configclass'),
-            11 => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('payplug.setConfigurationProperties.abandoned', 'configclass'),
-        ];
     }
 }

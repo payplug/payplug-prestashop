@@ -114,7 +114,7 @@ class loginActionTest extends BaseConfigurationAction
         );
     }
 
-    public function testWhenPasswordIsNotValidPassword()
+    public function testWhenPasswordIsntValidPassword()
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_login';

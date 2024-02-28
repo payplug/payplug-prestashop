@@ -39,7 +39,7 @@ final class GetFieldsValidateTest extends TestCase
         );
     }
 
-    public function testFieldsValidateIsNotEmpty()
+    public function testFieldsValidateIsntEmpty()
     {
         $this->assertFalse(
             empty($this->card->getFieldsValidate())

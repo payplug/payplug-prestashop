@@ -2,6 +2,7 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
+use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
 
@@ -15,6 +16,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
  */
 final class GetOneySimulationsTest extends BaseOneyRepository
 {
+    use FormatDataProvider;
     protected $oneyMock;
 
     protected $amount = [
@@ -35,16 +37,69 @@ final class GetOneySimulationsTest extends BaseOneyRepository
         // Method setup
         $this->oneyMock = MockHelper::createMockFactory('alias:Payplug\OneySimulation');
 
-        $this->logger->shouldReceive([
-            'setProcess' => $this->logger,
-        ]);
-
         $this->simulations = OneySimulationsMock::get()[$this->operation];
+    }
+
+    /**
+     * @dataProvider invalidIntegerFormatDataProvider
+     *
+     * @param mixed $amount
+     */
+    public function testWhenGivenPaymentIsInvalidIntegerFormat($amount)
+    {
+        $country = 'fr';
+        $operation = [];
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'error' => '$amount is not a valid int',
+            ],
+            $this->repo->getOneySimulations($amount, $country, $operation)
+        );
+    }
+
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $country
+     */
+    public function testWhenGivenPaymentIsInvalidStringFormat($country)
+    {
+        $amount = 500;
+        $operation = [];
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'error' => '$country is not a valid string',
+            ],
+            $this->repo->getOneySimulations($amount, $country, $operation)
+        );
+    }
+
+    /**
+     * @dataProvider invalidArrayFormatDataProvider
+     *
+     * @param mixed $operation
+     */
+    public function testWhenGivenPaymentIsInvalidArrayFormat($operation)
+    {
+        $amount = 500;
+        $country = 'fr';
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'error' => '$operation is not a valid array',
+            ],
+            $this->repo->getOneySimulations($amount, $country, $operation)
+        );
     }
 
     public function testWithoutInvalidCacheKey()
     {
-        $this->cache
+        $this->cacheAdapter
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => false,
@@ -64,7 +119,7 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWithExistingCache()
     {
-        $this->cache
+        $this->cacheAdapter
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
@@ -88,7 +143,7 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWithExceptionThrowed()
     {
-        $this->cache
+        $this->cacheAdapter
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
@@ -100,6 +155,9 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 ],
             ])
         ;
+
+        $apiClass = \Mockery::mock('apiClass');
+        $this->dependencies->apiClass = $apiClass;
 
         $this->dependencies->apiClass->shouldReceive([
             'getOneySimulations' => [
@@ -122,7 +180,7 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWithSimulationReturningError()
     {
-        $this->cache
+        $this->cacheAdapter
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
@@ -134,6 +192,9 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 ],
             ])
         ;
+
+        $apiClass = \Mockery::mock('apiClass');
+        $this->dependencies->apiClass = $apiClass;
 
         $this->dependencies->apiClass->shouldReceive([
             'getOneySimulations' => [
@@ -157,7 +218,7 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWhenSimulationCantBeCached()
     {
-        $this->cache
+        $this->cacheAdapter
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
@@ -170,6 +231,9 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 'setCache' => false,
             ])
         ;
+
+        $apiClass = \Mockery::mock('apiClass');
+        $this->dependencies->apiClass = $apiClass;
 
         $this->dependencies->apiClass->shouldReceive([
             'getOneySimulations' => [
@@ -193,7 +257,7 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWhenSimulationCached()
     {
-        $this->cache
+        $this->cacheAdapter
             ->shouldReceive([
                 'setCacheKey' => [
                     'result' => $this->cacheKey,
@@ -206,6 +270,9 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 'setCache' => true,
             ])
         ;
+
+        $apiClass = \Mockery::mock('apiClass');
+        $this->dependencies->apiClass = $apiClass;
 
         $this->dependencies->apiClass->shouldReceive([
             'getOneySimulations' => [

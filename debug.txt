@@ -1,0 +1,1 @@
+26) PayPlug\tests\models\classes\Configuration\getValueTest::testWhenGivenKeyDoesNotExistsInAllowedConfiguration

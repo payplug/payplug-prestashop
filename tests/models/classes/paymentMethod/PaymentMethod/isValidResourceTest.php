@@ -14,7 +14,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class isValidResourceTest extends BasePaymentMethod
 {
-    public function testWhenCartInContextIsNotAValidObject()
+    public function testWhenCartInContextIsntAValidObject()
     {
         $this->context->cart = null;
         $this->validate_adapter
@@ -67,7 +67,7 @@ class isValidResourceTest extends BasePaymentMethod
         $this->assertFalse($this->classe->isValidResource());
     }
 
-    public function testWhenResourceCantBeRetrieve()
+    public function testWhenResourceCantBeRetrieved()
     {
         $this->validate_adapter
             ->shouldReceive('validate')

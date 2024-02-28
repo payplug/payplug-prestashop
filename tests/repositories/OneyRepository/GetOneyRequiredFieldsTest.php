@@ -259,10 +259,31 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
         $contextWithoutCustomer = ContextMock::get();
         $contextWithoutCustomer->customer = null;
 
+        $this->validators['payment']->shouldReceive([
+                'isPhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
+
+        $this->validators['payment']->shouldReceive([
+                                                        'isValidMobilePhoneNumber' => [
+                                                            'result' => true,
+                                                            'message' => '',
+                                                        ],
+                                                    ]);
+
         $this->context
             ->shouldReceive('get')
             ->andReturn($contextWithoutCustomer)
         ;
+
+        $this->validators['payment']->shouldReceive([
+                'isOneyEmail' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
 
         $this->assertSame([], $this->repo->getOneyRequiredFields());
     }
