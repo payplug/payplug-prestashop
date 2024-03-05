@@ -437,6 +437,10 @@ class OrderAction
             ->getPaymentMethodClass()
             ->getPaymentMethod($payment_tab['method']);
 
+        if (empty($payment_method)) {
+            return [];
+        }
+
         // Check order state history
         $undefined_history_states = $this->dependencies->orderClass->getUndefinedOrderHistory((int) $order->id);
         if (!empty($undefined_history_states)) {
