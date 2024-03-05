@@ -311,6 +311,10 @@ class HookClass
             ->getOrderAction()
             ->renderDetail((int) $order->id);
 
+        if (empty($order_detail)) {
+            return false;
+        }
+
         $this->assign->assign($order_detail);
 
         $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/order/order.tpl');
