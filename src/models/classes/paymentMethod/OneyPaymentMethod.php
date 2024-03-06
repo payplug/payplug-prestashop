@@ -355,6 +355,10 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $resource_details = parent::getResourceDetail($resource_id);
+        if (empty($resource_details)) {
+            return $resource_details;
+        }
+
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslationClass()
