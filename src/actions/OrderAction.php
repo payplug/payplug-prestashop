@@ -453,6 +453,10 @@ class OrderAction
 
         // Get payment detail section
         $resource_detail = $payment_method->getResourceDetail($payment_tab['resource_id']);
+        if (empty($resource_detail)) {
+            return [];
+        }
+
         $state_addons = 'live' == strtolower($resource_detail['mode']) ? '' : '_test';
         if ('installment' == $payment_tab['method']) {
             $order_details['installment'] = $resource_detail;
