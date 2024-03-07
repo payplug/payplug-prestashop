@@ -29,6 +29,8 @@ if (!defined('_PS_VERSION_')) {
 
 class ApplepayPaymentMethod extends PaymentMethod
 {
+    private $paymentSource;
+
     public function __construct($dependencies)
     {
         parent::__construct($dependencies);
@@ -106,6 +108,7 @@ class ApplepayPaymentMethod extends PaymentMethod
                 ])),
             ],
         ];
+        $payment_tab['metadata']['applepay_workflow'] = $this->getPaymentSource();
         unset($payment_tab['force_3ds'], $payment_tab['allow_save_card'], $payment_tab['shipping']['delivery_type']);
 
         return $payment_tab;
@@ -136,6 +139,11 @@ class ApplepayPaymentMethod extends PaymentMethod
         $resource_details['type'] = $translation['detail']['method']['applepay'];
 
         return $resource_details;
+    }
+
+    public function setPaymentSource($source)
+    {
+        $this->paymentSource = $source;
     }
 
     /**
@@ -214,4 +222,29 @@ class ApplepayPaymentMethod extends PaymentMethod
 
         return $carriers;
     }
+
+    private function getPaymentSource()
+    {
+        // Utilisation de la variable de classe pour récupérer la source du paiement
+        return isset($this->paymentSource) ? $this->paymentSource : 'unknown';
+    }
+
+//    private function getSource()
+//    {
+//        // Par exemple, en utilisant les cookies, les paramètres d'URL ou d'autres mécanismes de suivi.
+//
+//        if (isset($_SESSION['payment_source'])) {
+//            if ('cart' == $_SESSION['payment_source']) {
+//                return 'shopping-cart';
+//            }
+//            if ('product' == $_SESSION['payment_source']) {
+//                return 'product';
+//            }
+//            if ('checkout' == $_SESSION['payment_source']) {
+//                return 'checkout';
+//            }
+//
+//            return 'unknown';
+//        }
+//    }
 }
