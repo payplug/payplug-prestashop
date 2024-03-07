@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Next Version
+- Feature :
+  - [PRE-2159](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2370): Add applepay checkout button on cart page
+
 ## Version 4.7.1
 - Bugfix :
   - [SMP-2328](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2367): Fix payment method in database
