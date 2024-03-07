@@ -11,11 +11,6 @@ namespace PayPlug\tests\actions\OneyAction;
  */
 class renderCTATest extends BaseOneyAction
 {
-    public function setup()
-    {
-        parent::setUp();
-    }
-
     /**
      * @description test rendering oney CTA
      */
