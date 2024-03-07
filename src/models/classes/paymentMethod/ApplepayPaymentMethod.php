@@ -46,8 +46,44 @@ class ApplepayPaymentMethod extends PaymentMethod
      */
     public function getOption($current_configuration = [])
     {
+        $this->setParameters();
+
         $option = parent::getOption($current_configuration);
         $option['available_test_mode'] = false;
+
+        $id_lang = $this->context->language->id;
+        $carriers = $this->getAvailableCarriers((int) $id_lang);
+
+        $option['options'] = [
+            [
+                'type' => 'payment_option',
+                'sub_type' => 'switch',
+                'name' => 'applepay_checkout',
+                'title' => $this->translation[$this->name]['checkout']['title'],
+                'checked' => $current_configuration['applepay_checkout'],
+            ],
+            [
+                'type' => 'payment_option',
+                'sub_type' => 'switch',
+                'name' => 'applepay_cart',
+                'title' => $this->translation[$this->name]['cart']['title'],
+                'descriptions' => [
+                    'live' => [
+                        'description' => $this->translation[$this->name]['cart']['description'],
+                    ],
+                    'sandbox' => [
+                        'description' => $this->translation[$this->name]['cart']['description'],
+                    ],
+                ],
+                'checked' => $current_configuration['applepay_cart'],
+                'carriers' => empty($carriers) ? [] : [
+                    'title' => $this->translation[$this->name]['carrier']['title'],
+                    'alert' => $this->translation[$this->name]['carrier']['alert'],
+                    'description' => $this->translation[$this->name]['carrier']['description'],
+                    'carriers_list' => $carriers,
+                ],
+            ],
+        ];
 
         return $option;
     }
@@ -111,6 +147,8 @@ class ApplepayPaymentMethod extends PaymentMethod
      */
     protected function getPaymentOption($payment_options = [])
     {
+        $this->setParameters();
+
         if (!is_array($payment_options)) {
             return [];
         }
@@ -132,5 +170,48 @@ class ApplepayPaymentMethod extends PaymentMethod
         $payment_options[$this->name]['additionalInformation'] = $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
 
         return $payment_options;
+    }
+
+    /**
+     * @description Get all enable carrier from the merchand configuration from a given id lang
+     *
+     * @param int $id_lang
+     *
+     * @return array
+     */
+    protected function getAvailableCarriers($id_lang = 0)
+    {
+        $this->setParameters();
+
+        $carriers = [];
+
+        if (!is_int($id_lang) || !$id_lang) {
+            return $carriers;
+        }
+
+        $shop_carriers = $this->dependencies
+            ->getPlugin()
+            ->getCarrier()
+            ->getCarriers($id_lang, true);
+
+        if (empty($shop_carriers)) {
+            return $carriers;
+        }
+
+        $applepay_carriers = json_decode($this->configuration->getValue('applepay_carriers'), true);
+        if (!is_array($applepay_carriers)) {
+            return $carriers;
+        }
+
+        foreach ($shop_carriers as $carrier) {
+            $checked = in_array($carrier['id_carrier'], $applepay_carriers);
+            $carriers[] = [
+                'id_carrier' => $carrier['id_carrier'],
+                'name' => $carrier['name'],
+                'checked' => $checked,
+            ];
+        }
+
+        return $carriers;
     }
 }
