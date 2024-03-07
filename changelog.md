@@ -1,5 +1,10 @@
 # Payplug module changelog
 
+## Version 4.7.1
+- Bugfix :
+  - [SMP-2328](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2367): Fix payment method in database
+  - [PRE-2222](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2368): Fix order detail display
+
 ## Version 4.7.0
 - Refactoring :
   - [PRE-1985](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2309): Add action Order

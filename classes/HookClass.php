@@ -303,13 +303,17 @@ class HookClass
         $order = $this->orderAdapter->get((int) $params['id_order']);
         if (!$this->validate->validate('isLoadedObject', $order)
             || $order->module != $this->dependencies->name) {
-            return false;
+            return $this->html;
         }
 
         $order_detail = $this->dependencies
             ->getPlugin()
             ->getOrderAction()
             ->renderDetail((int) $order->id);
+
+        if (empty($order_detail)) {
+            return $this->html;
+        }
 
         $this->assign->assign($order_detail);
 

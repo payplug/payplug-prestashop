@@ -437,6 +437,10 @@ class OrderAction
             ->getPaymentMethodClass()
             ->getPaymentMethod($payment_tab['method']);
 
+        if (empty($payment_method)) {
+            return [];
+        }
+
         // Check order state history
         $undefined_history_states = $this->dependencies->orderClass->getUndefinedOrderHistory((int) $order->id);
         if (!empty($undefined_history_states)) {
@@ -449,6 +453,10 @@ class OrderAction
 
         // Get payment detail section
         $resource_detail = $payment_method->getResourceDetail($payment_tab['resource_id']);
+        if (empty($resource_detail)) {
+            return [];
+        }
+
         $state_addons = 'live' == strtolower($resource_detail['mode']) ? '' : '_test';
         if ('installment' == $payment_tab['method']) {
             $order_details['installment'] = $resource_detail;
