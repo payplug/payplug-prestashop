@@ -29,6 +29,7 @@ if (!defined('_PS_VERSION_')) {
 
 use PayPlug\classes\MyLogPHP;
 use PayPlug\src\actions\CardAction;
+use PayPlug\src\actions\CartAction;
 use PayPlug\src\actions\ConfigurationAction;
 use PayPlug\src\actions\MerchantTelemetryAction;
 use PayPlug\src\actions\OnboardingAction;
@@ -89,6 +90,7 @@ class PluginInit extends BaseClass
 
     // Actions
     private $card_action;
+    private $cart_action;
     private $configuration_action;
     private $onboarding_action;
     private $oney_action;
@@ -229,6 +231,7 @@ class PluginInit extends BaseClass
         // Set actions
         $this->plugin
             ->setCardAction($this->card_action)
+            ->setCartAction($this->cart_action)
             ->setConfigurationAction($this->configuration_action)
             ->setMerchantTelemetryAction($this->merchant_telemetry_action)
             ->setOnboardingAction($this->onboarding_action)
@@ -272,6 +275,7 @@ class PluginInit extends BaseClass
     private function setActions()
     {
         $this->card_action = new CardAction($this->dependencies);
+        $this->cart_action = new CartAction($this->dependencies);
         $this->configuration_action = new ConfigurationAction($this->dependencies);
         $this->merchant_telemetry_action = new MerchantTelemetryAction($this->dependencies);
         $this->onboarding_action = new OnboardingAction($this->dependencies);

@@ -164,6 +164,9 @@ class PluginEntity
     private $refund_action;
 
     /** @var object */
+    private $cart_action;
+
+    /** @var object */
     private $routes;
 
     /** @var object */
@@ -724,6 +727,14 @@ class PluginEntity
     public function getSql()
     {
         return $this->sql;
+    }
+
+    /**
+     * @return object
+     */
+    public function getCartAction()
+    {
+        return $this->cart_action;
     }
 
     /**
@@ -1668,6 +1679,22 @@ class PluginEntity
         }
 
         $this->sql = $sql;
+
+        return $this;
+    }
+
+    /**
+     * @param object $CartAction
+     *
+     * @return self
+     */
+    public function setCartAction($CartAction)
+    {
+        if (!is_object($CartAction)) {
+            throw new BadParameterException('Invalid argument, $cart must be a CartAction');
+        }
+
+        $this->cart_action = $CartAction;
 
         return $this;
     }
