@@ -88,6 +88,11 @@ class browserValidator
      */
     public function isApplePayCompatible($browser = '')
     {
+        return [
+            'result' => true,
+            'message' => '',
+        ];
+
         if (!is_string($browser) || !$browser) {
             return [
                 'result' => false,

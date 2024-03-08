@@ -409,7 +409,7 @@ var $document, $window, __moduleName__Module = {
                         $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
                         console.log('Waiting for Integrated payment form to load');
                         ipCDNCountdown++;
-                        setTimeout(function(){
+                        setTimeout(function () {
                             integrated.form.set();
                         }, 1000);
                     }
@@ -634,6 +634,177 @@ var $document, $window, __moduleName__Module = {
             }
         },
     },
+    applepay: {
+        props: {
+            identifier: '__moduleName__ApplePay',
+            query: null,
+            workflow: 'checkout',
+            session: null,
+            datas: null,
+        },
+        set: function (key, value) {
+            this.props[key] = value;
+        },
+        init: function () {
+            $('apple-pay-button').click(function () {
+                __moduleName__Module.applepay.trigger();
+            });
+        },
+        trigger: function () {
+            let {applepay} = __moduleName__Module,
+                {workflow} = applepay.props;
+
+            if (!workflow) {
+                return;
+            }
+
+            if (applepay.props.session != null) {
+                return;
+            }
+
+            if (applepay.props.query != null) {
+                applepay.props.query.abort();
+                applepay.props.query = null;
+            }
+
+            let applepay_datas;
+            applepay.props.query = $.ajax({
+                method: "POST",
+                url: applePayPaymentRequestAjaxURL,
+                async: false,
+                data: {
+                    workflow: workflow
+                },
+                success: function (result) {
+                    applepay_datas = JSON.parse(result);
+                },
+                error: function() {
+                    __moduleName__Module.applepay.error();
+                }
+            });
+
+            console.log(applepay_datas);
+
+            applepay.create(applepay_datas);
+        },
+        create: function (data) {
+            let {applepay} = __moduleName__Module,
+                {workflow} = applepay.props;
+
+            if (!workflow) {
+                return;
+            }
+
+            // Define ApplePayPaymentRequest
+            let request = data.applePayPaymentRequest;
+
+            // Create ApplePaySession
+            applepay.props.session = new ApplePaySession(3, request);
+
+            if (applepay.props.query != null) {
+                applepay.props.query.abort();
+                applepay.props.query = null;
+            }
+
+            applepay.props.query = $.ajax({
+                method: "POST",
+                url: applePayMerchantSessionAjaxURL,
+                data: {
+                    workflow: workflow,
+                    method: 'applepay',
+                    id_cart: applePayIdCart
+                },
+                beforeSend: function () {
+                    $('#apple-pay-button').css('pointer-events', 'none');
+                },
+                success: function (result) {
+                    var datas = JSON.parse(result);
+                    if (!datas.result) {
+                        console.log(datas.error_message);
+                        return __moduleName__Module.applepay.error();
+                    }
+
+                    applepay.props.datas = datas;
+                    applepay.props.session.onvalidatemerchant = applepay.session.validatemerchant;
+                    applepay.props.session.onshippingmethodselected = applepay.session.shippingmethodselected;
+                    applepay.props.session.onshippingcontactselected = applepay.session.shippingcontactselected;
+                    applepay.props.session.onpaymentauthorized = applepay.session.paymentauthorized;
+                    applepay.props.session.oncancel = applepay.session.cancel;
+                    applepay.props.session.begin();
+                },
+                error: function() {
+                    __moduleName__Module.applepay.error();
+                }
+            });
+        },
+        session: {
+            validatemerchant: async () => {
+                let {applepay} = __moduleName__Module,
+                    {datas, session} = applepay.props;
+                try {
+                    session.completeMerchantValidation(datas.apiResponse.merchant_session);
+                } catch (err) {
+                    console.log(err);
+                }
+            },
+            shippingmethodselected: () => {
+                let {applepay} = __moduleName__Module,
+                    {session} = applepay.props;
+                // Define ApplePayShippingMethodUpdate based on the selected shipping method.
+                // No updates or errors are needed, pass an empty object.
+                const update = {};
+                session.completeShippingMethodSelection(update);
+            },
+            shippingcontactselected: () => {
+                let {applepay} = __moduleName__Module,
+                    {session} = applepay.props;
+                // Define ApplePayShippingContactUpdate based on the selected shipping contact.
+                const update = {};
+                session.completeShippingContactSelection(update);
+            },
+            paymentauthorized: (event) => {
+                let {applepay} = __moduleName__Module,
+                    {session, datas} = applepay.props;
+                // Define ApplePayPaymentAuthorizationResult
+                $.ajax({
+                    method: "POST",
+                    url: payplug_ajax_url,
+                    data: {
+                        _ajax: 1,
+                        token: event.payment.token,
+                        pay_id: datas.idPayment,
+                        cart_id: datas.idCart,
+                        patchPayment: 1
+                    },
+                    success: function (json) {
+                        var result = JSON.parse(json);
+
+                        if (!datas.result) {
+                            session.completePayment({"status": ApplePaySession.STATUS_FAILURE});
+                            return __moduleName__Module.applepay.error();
+                        }
+
+                        session.completePayment({"status": ApplePaySession.STATUS_SUCCESS});
+                        window.location.replace(result.return_url);
+                    },
+                    error: function() {
+                        __moduleName__Module.applepay.error();
+                    }
+                })
+            },
+            cancel: () => {
+                __moduleName__Module.applepay.error();
+                console.log('payment cancel');
+            }
+        },
+        error: function () {
+            let {applepay} = __moduleName__Module;
+            $('#apple-pay-button').css('pointer-events', 'auto');
+            applepay.props.session = null;
+            applepay.props.datas = null;
+            __moduleName__Module.popup.set(payplug_transaction_error_message);
+        }
+    },
     card: {
         props: {
             identifier: '__moduleName__Card',
@@ -674,7 +845,6 @@ var $document, $window, __moduleName__Module = {
                     pc: id_card
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert('error CALL DELETE CARD');
                     console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
