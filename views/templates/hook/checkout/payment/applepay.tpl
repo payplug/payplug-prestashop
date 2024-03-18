@@ -24,31 +24,37 @@
 {else}
     {assign var=iso_code value='en'}
 {/if}
-<div class="row">
+{if !isset($applepay_workflow) || !$applepay_workflow}
+    {assign var=applepay_workflow value='checkout'}
+{/if}
+<div class="row {$module_name|escape:'htmlall':'UTF-8'}ApplePay_wrapper -{$applepay_workflow}">
     <div class="col-xs-12">
-        <apple-pay-button buttonstyle="black" type="pay" locale="{$iso_code|escape:'htmlall':'UTF-8'}" id="apple-pay-button"></apple-pay-button>
+        <apple-pay-button buttonstyle="black" type="pay" locale="{$iso_code|escape:'htmlall':'UTF-8'}" id="apple-pay-button" class="{$module_name|escape:'htmlall':'UTF-8'}ApplePay_button"></apple-pay-button>
         <p class="{$module_name|escape:'htmlall':'UTF-8'}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
 </div>
+
 <script type="text/javascript">
     {literal}
-        var loadApplePaySDK = function() {
-            if (typeof window['payplug_utilities'] != 'undefined') {
-                window['payplug_utilities'].loadScript('https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js', function() {
-                    if(typeof window['payplugModule'] != 'undefined') {
-                        window['payplugModuleApplePay'].init();
-                    } else {
-                        console.log('Type of payplugModule : ' + typeof window['payplugModule']);
-                    }
-                });
-            } else {
-                console.log('Type of payplug_utilities : ' + typeof window['payplug_utilities']);
-            }
-        }
-        if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplugModule'] != 'undefined') {
-            loadApplePaySDK();
+    var loadApplePay = function() {
+        if (typeof window['payplug_utilities'] != 'undefined') {
+            console.log('Loading script: {/literal}{$applepay_js_url|escape:'javascript':'UTF-8'}{literal}');
+            window['payplug_utilities'].loadScript('{/literal}{$applepay_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
+                if(typeof window['payplugModule'] != 'undefined') {
+                    window['payplugModule'].applepay.set('workflow', '{/literal}{$applepay_workflow|escape:'htmlall':'UTF-8'}{literal}');
+                    window['payplugModule'].applepay.init();
+                } else {
+                    console.log('Type of payplugModule : ' + typeof window['payplugModule']);
+                }
+            });
         } else {
-            window.addEventListener("load", loadApplePaySDK);
+            console.log('Type of payplug_utilities : ' + typeof window['payplug_utilities']);
         }
+    }
+    if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplugModule'] != 'undefined') {
+        loadApplePay();
+    } else {
+        window.addEventListener("load", loadApplePay);
+    }
     {/literal}
 </script>

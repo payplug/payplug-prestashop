@@ -11,197 +11,114 @@ namespace PayPlug\tests\actions\CartAction;
  */
 class renderApplePayCartCheckoutTest extends BaseCartAction
 {
-    /**
-     * @description  test when browser is not safari
-     */
+    private $payment_method_class;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $browser = \Mockery::mock('Browser');
+        $browser
+            ->shouldReceive([
+            'getName' => 'browser',
+        ]);
+        $this->payment_method_class = \Mockery::mock('PaymentMethodClass');
+        $this->plugin
+            ->shouldReceive([
+            'getBrowser' => $browser,
+            'getPaymentMethodClass' => $this->payment_method_class,
+        ]);
+    }
+
     public function testWhenApplePayCartWhenBrowserIsNotSafari()
     {
-        $browser = \Mockery::mock('Browser');
-        $browser->shouldReceive(
-            [
-                'getName' => 'browser',
-            ]
-        );
-        $this->plugin->shouldReceive(
-            [
-                'getBrowser' => $browser,
-            ]
-        );
-        $this->browser_validator->shouldReceive(
-            [
-                'isApplePayCompatible' => [
-                    'result' => false,
-                    'message' => 'This browser is not applepay compatible.',
-                ],
-            ]
-        );
+        $this->browser_validator
+            ->shouldReceive([
+            'isApplePayCompatible' => [
+                'result' => false,
+                'message' => 'This browser is not applepay compatible.',
+            ],
+        ]);
 
         $this->assertFalse($this->action->renderApplePayCartCheckout());
     }
 
-    /**
-     * @description  test when returned carriers list is not compatible
-     */
-    public function testWithNoCompatibleCarriersproducts()
+    public function testWhenNoAvailableCarriersFound()
     {
-        $browser = \Mockery::mock('Browser');
-        $browser->shouldReceive(
-            [
-                'getName' => 'browser',
-            ]
-        );
-        $this->plugin->shouldReceive(
-            [
-                'getBrowser' => $browser,
-            ]
-        );
-        $this->browser_validator->shouldReceive(
-            [
-                'isApplePayCompatible' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]
-        );
-
-        $this->context->cart
-            ->shouldReceive(
-                [
-                    'getDeliveryOptionList' => [
-                        7 => [
-                            '1,' => [
-                                'carrier_list' => [
-                                    7 => [
-                                        'price_with_tax' => 0,
-                                        'price_without_tax' => 0,
-                                        'package_list' => [0],
-                                        'product_list' => [
-                                            0 => [/* items */],
-                                        ],
-                                    ],
-                                ],
-                                'is_best_price' => true,
-                                'is_best_grade' => true,
-                                'unique_carrier' => true,
-                                'total_price_with_tax' => 0,
-                                'total_price_without_tax' => 0,
-                                'is_free' => true,
-                                'position' => 0,
-                            ],
-                        ],
-                    ],
-                ]
-            );
-
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('applepay_carriers')
-            ->andReturn(' {"0":1,"1":2,"2":3}');
-
+        $this->browser_validator->shouldReceive([
+            'isApplePayCompatible' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $payment_method
+            ->shouldReceive([
+                'getCarriersList' => [],
+            ]);
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
+            ]);
         $this->assertFalse($this->action->renderApplePayCartCheckout());
     }
 
-    /**
-     * @description test when returned carriers list is empty.
-     */
-    public function testWithEmptyCarriersList()
+    public function testWhenTemplateIsReturn()
     {
-        $browser = \Mockery::mock('Browser');
-        $browser->shouldReceive(
-            [
-                'getName' => 'browser',
-            ]
-        );
-        $this->plugin->shouldReceive(
-            [
-                'getBrowser' => $browser,
-            ]
-        );
-        $this->browser_validator->shouldReceive(
-            [
-                'isApplePayCompatible' => [
-                    'result' => true,
-                    'message' => '',
+        $this->browser_validator->shouldReceive([
+            'isApplePayCompatible' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
+        $payment_method = \Mockery::mock('PaymentMethod');
+        $carrier_list = [
+            42,
+        ];
+        $payment_method
+            ->shouldReceive([
+                'getCarriersList' => $carrier_list,
+            ]);
+        $this->payment_method_class
+            ->shouldReceive([
+                'getPaymentMethod' => $payment_method,
+            ]);
+
+        $routes = \Mockery::mock('Routes');
+        $routes
+            ->shouldReceive([
+                'getSourceUrl' => [
+                    'applepay' => 'source_url',
                 ],
-            ]
-        );
+            ]);
+        $assign = \Mockery::mock('Assign');
+        $assign
+            ->shouldReceive([
+                'assign' => true,
+            ]);
+        $media = \Mockery::mock('Media');
+        $media
+            ->shouldReceive([
+                'addJsDef' => true,
+            ]);
+        $link = \Mockery::mock('Link');
+        $link
+            ->shouldReceive([
+                'getModuleLink' => '',
+            ]);
+        $this->context->link = $link;
 
-        $this->context->cart
-            ->shouldReceive(
-                [
-                    'getDeliveryOptionList' => [],
+        $this->plugin
+            ->shouldReceive([
+                'getRoutes' => $routes,
+                'getAssign' => $assign,
+                'getMedia' => $media,
+            ]);
 
-                ]
-            );
+        $this->configClass
+            ->shouldReceive([
+                'fetchTemplate' => 'applepay_template',
+            ]);
 
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('applepay_carriers')
-            ->andReturn(' {"0":1,"1":2,"2":3}');
-
-        $this->assertFalse($this->action->renderApplePayCartCheckout());
-    }
-
-    /**
-     * @description test when the cart contains one carrier with a value of 0
-     */
-    public function checkIfCartContentIsNotSuitableToAnyCarrier()
-    {
-        $browser = \Mockery::mock('Browser');
-        $browser->shouldReceive(
-            [
-                'getName' => 'browser',
-            ]
-        );
-        $this->plugin->shouldReceive(
-            [
-                'getBrowser' => $browser,
-            ]
-        );
-        $this->browser_validator->shouldReceive(
-            [
-                'isApplePayCompatible' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]
-        );
-
-        $this->context->cart
-            ->shouldReceive(
-                [
-                    'getDeliveryOptionList' => [
-                        7 => [
-                            '0' => [
-                                'carrier_list' => [
-                                    0 => [
-                                        'price_with_tax' => 0,
-                                        'price_without_tax' => 0,
-                                        'package_list' => [0],
-                                        'product_list' => [
-                                            0 => [/* items */],
-                                        ],
-                                    ],
-                                ],
-                                'is_best_price' => true,
-                                'is_best_grade' => true,
-                                'unique_carrier' => true,
-                                'total_price_with_tax' => 0,
-                                'total_price_without_tax' => 0,
-                                'is_free' => true,
-                                'position' => 0,
-                            ],
-                        ],
-                    ],
-
-                ]
-            );
-
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('applepay_carriers')
-            ->andReturn(' {"0":1,"1":2,"2":3}');
-
-        $this->assertFalse($this->action->renderApplePayCartCheckout());
+        $this->assertSame('applepay_template', $this->action->renderApplePayCartCheckout());
     }
 }

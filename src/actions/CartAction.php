@@ -26,6 +26,7 @@ namespace PayPlug\src\actions;
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
 class CartAction
 {
     private $dependencies;
@@ -73,40 +74,44 @@ class CartAction
 
         $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
         $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
+
         // If browser is not safari, no appelpay on cart page
         if (!$isApplePayCompatible['result']) {
             return false;
         }
 
-        // Get allowed carriers from configuration table and check if it's filled by the merchant
-        $allowed_carriers = json_decode($this->configuration->getValue('applepay_carriers'), true) ?: [];
-
-        if (!is_array($allowed_carriers) && empty($allowed_carriers)) {
+        // Get Carrier list
+        $carriers_list = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod('applepay')
+            ->getCarriersList();
+        if (empty($carriers_list)) {
             return false;
         }
 
-        $delivery_options = $this->context->cart->getDeliveryOptionList();
-        // Extract carrier IDs from delivery options
-        $carrier_ids = [];
+        $applepay_js_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getSourceUrl()['applepay'];
 
-        foreach ($delivery_options as $id_address => $address_options) {
-            foreach ($address_options as $option_key => $option_data) {
-                $carrier_list = $option_data['carrier_list'];
+        $this->dependencies
+            ->getPlugin()
+            ->getAssign()
+            ->assign([
+                'applepay_js_url' => $applepay_js_url,
+                'applepay_workflow' => 'shopping-cart',
+            ]);
 
-                foreach ($carrier_list as $carrier_id => $carrier_data) {
-                    // Check if the content of the cart is not suitable for any carrier.
-                    if (0 == $carrier_id) {
-                        return false;
-                    }
-
-                    $carrier_ids[] = $carrier_id;
-                }
-            }
-        }
-
-        if (empty(array_intersect($carrier_ids, $allowed_carriers))) {
-            return false;
-        }
+        $this->dependencies
+            ->getPlugin()
+            ->getMedia()
+            ->addJsDef([
+                'applePayPaymentRequestAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypaymentrequest', [], true),
+                'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
+                'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
+                'applePayIdCart' => $this->context->cart->id,
+            ]);
 
         return $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
     }

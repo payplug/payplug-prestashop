@@ -520,6 +520,12 @@ class Translation
                     'alert' => $this->l('paymentmethods.applepay.carrier.alert', 'translation'),
                     'description' => $this->l('paymentmethods.applepay.carrier.description', 'translation'),
                 ],
+                'modal' => [
+                    'subtotal' => $this->l('paymentmethods.applepay.modal.subtotal', 'translation'),
+                    'tva' => $this->l('paymentmethods.applepay.modal.tva', 'translation'),
+                    'delivery_cost' => $this->l('paymentmethods.applepay.modal.delivery_cost', 'translation'),
+                    'discount' => $this->l('paymentmethods.applepay.modal.discount', 'translation'),
+                ],
             ],
             'bancontact' => [
                 'title' => $this->l('paymentmethods.bancontact.title', 'translation'),

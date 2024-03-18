@@ -4,6 +4,7 @@
 - Feature :
   - [PRE-2159](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2370): Add applepay checkout button on cart page
   - [PRE-2157](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2374): Add applepay checkout configuration
+  - [PRE-2160](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2379): Show applepay checkout modal
 
 ## Version 4.7.2
 - Bugfix :

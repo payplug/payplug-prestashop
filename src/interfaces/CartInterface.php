@@ -38,4 +38,12 @@ interface CartInterface
     public function nbProducts($cart);
 
     public function isGuestCartByCartId($idCart);
+
+    public function getOrderTotal($id_cart, $with_tax, $id_carrier);
+
+    public function getOrderTotalWithoutShipping($id_cart, $with_tax);
+
+    public function getOrderTotalDiscount($id_cart, $with_tax, $id_carrier);
+
+    public function getDeliveryOptionList($id_cart);
 }

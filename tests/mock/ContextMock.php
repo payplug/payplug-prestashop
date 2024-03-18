@@ -8,6 +8,7 @@ class ContextMock
     {
         $context = new \stdClass();
         $context->cart = CartMock::get();
+        $context->country = CountryMock::get();
         $context->customer = CustomerMock::get();
         $context->currency = CurrencyMock::get();
         $context->language = LanguageMock::get();

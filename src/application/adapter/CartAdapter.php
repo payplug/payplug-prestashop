@@ -84,4 +84,63 @@ class CartAdapter implements CartInterface
 
         return $cart::isGuestCartByCartId($idCart);
     }
+
+    public function getOrderTotal($id_cart = 0, $with_tax = true, $id_carrier = null)
+    {
+        if (!is_int($id_cart) || !$id_cart) {
+            return 0;
+        }
+
+        if (!is_bool($with_tax)) {
+            return 0;
+        }
+
+        if (!is_int($id_carrier)) {
+            return 0;
+        }
+        $cart = new \Cart((int) $id_cart);
+
+        return $cart->getOrderTotal($with_tax, \Cart::BOTH, null, $id_carrier);
+    }
+
+    public function getOrderTotalWithoutShipping($id_cart = 0, $with_tax = true)
+    {
+        if (!is_int($id_cart) || !$id_cart) {
+            return 0;
+        }
+
+        if (!is_bool($with_tax)) {
+            return 0;
+        }
+
+        $cart = new \Cart((int) $id_cart);
+
+        return $cart->getOrderTotal($with_tax, \Cart::BOTH_WITHOUT_SHIPPING);
+    }
+
+    public function getOrderTotalDiscount($id_cart = 0, $with_tax = true, $id_carrier = null)
+    {
+        if (!is_int($id_cart) || !$id_cart) {
+            return 0;
+        }
+
+        if (!is_bool($with_tax)) {
+            return 0;
+        }
+
+        $cart = new \Cart((int) $id_cart);
+
+        return $cart->getOrderTotal($with_tax, \Cart::ONLY_DISCOUNTS, null, $id_carrier);
+    }
+
+    public function getDeliveryOptionList($id_cart = 0)
+    {
+        if (!is_int($id_cart)) {
+            return [];
+        }
+
+        $cart = new \Cart((int) $id_cart);
+
+        return $cart->getDeliveryOptionList();
+    }
 }

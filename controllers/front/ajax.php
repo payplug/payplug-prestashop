@@ -40,7 +40,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $paymentClass;
     private $plugin;
     private $productAdapter;
-    private $toolsAdapter;
+    private $tools_adapter;
     private $translate;
     private $validators;
 
@@ -70,9 +70,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
-        $this->toolsAdapter = $this->plugin->getTools();
+        $this->tools_adapter = $this->plugin->getTools();
 
-        if (1 == $this->toolsAdapter->tool('getValue', '_ajax')) {
+        if (1 == $this->tools_adapter->tool('getValue', '_ajax')) {
             $this->configurationAdapter = $this->plugin->getConfiguration();
             $this->configurationClass = $this->plugin->getConfigurationClass();
             $this->contextAdapter = $this->plugin->getContext(); // get ContextAdapter Repository object
@@ -80,8 +80,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $this->productAdapter = $this->plugin->getProduct();
             $this->translate = $this->plugin->getTranslate();
             $context = $this->contextAdapter->get(); // get the method
-            $tools = $this->toolsAdapter;
+            $tools = $this->tools_adapter;
 
+            // todo: Create a ajaxDispatcher to avoid this "infinite" list of condition
             if ($tools->tool('getIsset', 'pc')) {
                 if (1 == (int) $tools->tool('getValue', 'delete')) {
                     $cookie = $context->cookie;
@@ -470,6 +471,40 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 exit(json_encode([
                     'result' => true,
                     'message' => $message, // adapter error
+                ]));
+            } elseif ($tools->tool('getIsset', 'applepayUpdate')) {
+                $request = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('applepay')
+                    ->getRequest();
+
+                exit(json_encode([
+                    'result' => true,
+                    'request' => $request,
+                ]));
+            } elseif ($tools->tool('getIsset', 'applepayCancel')) {
+                // Check payment id correspondance between the given one and the one from the DB
+                $payment = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentRepository()
+                    ->getByCart((int) $context->cart->id);
+
+                if (empty($payment)) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => 'No payment id for given cart id',
+                    ]));
+                }
+
+                $aborted = $this->dependencies
+                    ->getPlugin()
+                    ->getApiService()
+                    ->abortApplePayPayment($payment['resource_id']);
+
+                exit(json_encode([
+                    'result' => $aborted['result'],
+                    'message' => isset($aborted['message']) ? $aborted['message'] : '',
                 ]));
             }
         }

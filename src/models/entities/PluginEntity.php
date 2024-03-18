@@ -47,6 +47,9 @@ class PluginEntity
     private $assign;
 
     /** @var object */
+    private $api_service;
+
+    /** @var object */
     private $browser;
 
     /** @var object */
@@ -351,6 +354,14 @@ class PluginEntity
     public function getAssign()
     {
         return $this->assign;
+    }
+
+    /**
+     * @return object
+     */
+    public function getApiService()
+    {
+        return $this->api_service;
     }
 
     /**
@@ -881,6 +892,23 @@ class PluginEntity
         }
 
         $this->assign = $assign;
+
+        return $this;
+    }
+
+    /**
+     * @param object $browser
+     * @param mixed $api_service
+     *
+     * @return self
+     */
+    public function setApiService($api_service)
+    {
+        if (!is_object($api_service)) {
+            throw new BadParameterException('Invalid argument, $api_service must be a Services/API');
+        }
+
+        $this->api_service = $api_service;
 
         return $this;
     }

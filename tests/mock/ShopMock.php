@@ -9,6 +9,7 @@ class ShopMock
         $shop = new \stdClass();
 
         $shop->id = 1;
+        $shop->name = 'my mock';
         $shop->domain_ssl = 'my-mock.com';
 
         return $shop;

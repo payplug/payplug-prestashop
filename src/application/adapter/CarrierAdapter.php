@@ -45,13 +45,17 @@ class CarrierAdapter implements CarrierInterface
         $this->carrier = new \Carrier();
     }
 
-    public function get($id_carrier = false)
+    public function get($id_carrier = false, $id_lang = 0)
     {
         if (!is_int($id_carrier)) {
             $id_carrier = false;
         }
 
-        return new \Carrier($id_carrier);
+        if (!is_int($id_lang)) {
+            $id_lang = false;
+        }
+
+        return new \Carrier($id_carrier, $id_lang);
     }
 
     public function getDefaultDelay()
