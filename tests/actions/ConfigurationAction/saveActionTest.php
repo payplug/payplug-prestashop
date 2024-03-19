@@ -103,6 +103,7 @@ class saveActionTest extends BaseConfigurationAction
                     'title' => null,
                     'msg' => 'modal.applepay.text',
                     'close' => 'modal.applepay.submit',
+                    'class' => '-error',
                 ],
             ],
             $this->action->saveAction($datas)

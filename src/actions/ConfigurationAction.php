@@ -559,6 +559,7 @@ class ConfigurationAction
                     'title' => null,
                     'msg' => $translation['applepay']['text'],
                     'close' => $translation['applepay']['submit'],
+                    'class' => '-error',
                 ],
             ];
         }
