@@ -379,6 +379,10 @@ class ApplepayPaymentMethod extends PaymentMethod
             return [];
         }
 
+        if (!(bool) $this->configuration->getValue('applepay_checkout')) {
+            return $payment_options;
+        }
+
         $payment_options = parent::getPaymentOption($payment_options);
 
         if (!isset($payment_options[$this->name])) {

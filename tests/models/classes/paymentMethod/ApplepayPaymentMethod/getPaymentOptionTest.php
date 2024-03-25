@@ -41,6 +41,10 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('applepay_checkout')
+            ->andReturn(true);
 
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }
@@ -65,6 +69,10 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('applepay_checkout')
+            ->andReturn(true);
 
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([

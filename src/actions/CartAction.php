@@ -49,9 +49,12 @@ class CartAction
     {
         $this->setParameters();
 
-        if (!(bool) $this->configuration->getValue('applepay_cart') && !((bool) $this->configuration->getValue(
-            'applepay_checkout'
-        )) && $this->configuration->getValue('sandbox_mode')) {
+        $payment_methods = $this->configuration->getValue('payment_methods');
+        $payment_methods = json_decode($payment_methods, true);
+
+        if (!(bool) $this->configuration->getValue('applepay_cart')
+            || (!(bool) $payment_methods['applepay'])
+            || (bool) $this->configuration->getValue('sandbox_mode')) {
             return false;
         }
 

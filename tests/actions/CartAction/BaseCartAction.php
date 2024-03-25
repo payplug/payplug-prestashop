@@ -17,6 +17,7 @@ class BaseCartAction extends TestCase
     protected $context;
     protected $context_adapter;
     protected $dependencies;
+    protected $dispatcher;
     protected $browser_validator;
     protected $plugin;
     protected $toolsAdapter;
@@ -51,7 +52,6 @@ class BaseCartAction extends TestCase
                                 'getCart' => $this->cartAdapter,
                                 'getContext' => $this->context_adapter,
                                 'getConfigurationClass' => $this->configuration,
-
                             ]);
 
         $this->dependencies->name = 'payplug';
