@@ -13,48 +13,78 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class getPaymentMethodHashTest extends BasePaymentMethod
 {
-    public function testWhenCartInContextIsntAValidObject()
+    /**
+     * @dataProvider invalidArrayFormatDataProvider
+     *
+     * @param mixed $payment_tab
+     */
+    public function testWhenGivenPaymentTabIsntValidObject($payment_tab)
     {
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => false,
-            ]);
-        $this->assertSame('', $this->classe->getPaymentMethodHash());
+        $this->assertSame('', $this->classe->getPaymentMethodHash($payment_tab));
     }
 
-    public function testWhenNoProductsFoundRelatedToTheCart()
+    public function testWhenGivenPaymentTabIsntEmpty()
     {
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->context->cart->shouldReceive([
-            'getProducts' => [],
-        ]);
-
-        $this->assertSame('', $this->classe->getPaymentMethodHash());
+        $this->assertSame('', $this->classe->getPaymentMethodHash([]));
     }
 
     public function testWhenHashIsReturned()
     {
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->context->cart->shouldReceive([
-            'getProducts' => [
-                [
-                    'id_product' => 42,
-                    'key' => 'value',
-                ],
+        $payment_tab = [
+            'is_live' => true,
+            'amount' => 42042,
+            'hosted_payment' => [
+                'payment_url' => 'payment_url',
+                'return_url' => 'return_url',
+                'cancel_url' => 'cancel_url',
             ],
-            'getOrderTotal' => 42,
-        ]);
-
-        $expected_hash = 'aa60dde2cf8ca2e27594856c95de692f538003608287bdd73e8d59488c5a45ca';
+            'notification' => [
+                'url' => 'url',
+                'response_code' => null,
+            ],
+            'metadata' => [
+                'ID Client' => 4,
+                'ID Cart' => 17,
+                'Website' => 'website',
+            ],
+            'billing' => [
+                'title' => null,
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'address1' => '1 rue de paris',
+                'address2' => null,
+                'company_name' => 'Cedric PayPlug',
+                'postcode' => '75000',
+                'city' => 'Paris',
+                'state' => null,
+                'country' => 'FR',
+                'email' => 'jdoe@payplug.com',
+                'mobile_phone_number' => null,
+                'landline_phone_number' => '+336123456789',
+                'language' => 'fr',
+            ],
+            'shipping' => [
+                'title' => null,
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'address1' => '1 rue de paris',
+                'address2' => null,
+                'company_name' => 'Cedric PayPlug',
+                'postcode' => '75000',
+                'city' => 'Paris',
+                'state' => null,
+                'country' => 'FR',
+                'email' => 'jdoe@payplug.com',
+                'mobile_phone_number' => null,
+                'landline_phone_number' => '+336123456789',
+                'language' => 'fr',
+                'delivery_type' => 'BILLING',
+            ],
+        ];
+        $expected_hash = hash('sha256', json_encode($payment_tab));
         $this->assertSame(
             $expected_hash,
-            $this->classe->getPaymentMethodHash()
+            $this->classe->getPaymentMethodHash($payment_tab)
         );
     }
 }
