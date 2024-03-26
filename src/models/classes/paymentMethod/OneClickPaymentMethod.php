@@ -34,6 +34,7 @@ class OneClickPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'one_click';
         $this->cancellable = false;
+        $this->force_resource = true;
     }
 
     /**
