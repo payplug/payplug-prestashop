@@ -35,7 +35,7 @@ class PaymentMethod
     public $cancellable = true;
 
     /** @var bool */
-    public $force_resource = true;
+    public $force_resource = false;
 
     /** @var bool */
     public $refundable;

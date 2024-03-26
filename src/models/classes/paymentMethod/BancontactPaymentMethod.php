@@ -35,6 +35,7 @@ class BancontactPaymentMethod extends PaymentMethod
         $this->name = 'bancontact';
         $this->order_name = 'bancontact';
         $this->cancellable = false;
+        $this->force_resource = true;
     }
 
     /**
