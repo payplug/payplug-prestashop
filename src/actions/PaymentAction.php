@@ -385,7 +385,7 @@ class PaymentAction
         }
 
         // Generate the hash and create payment in database
-        $payment_hash = $payment_method->getPaymentMethodHash();
+        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab);
         $parameters = [
             'resource_id' => $resource['resource']->id,
             'method' => $method,
@@ -591,7 +591,7 @@ class PaymentAction
             ->getPaymentMethod($stored_resource['method']);
 
         // Check if hash is valid then if not, return the createAction
-        $payment_hash = $payment_method->getPaymentMethodHash();
+        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab);
         if ($stored_resource['cart_hash'] != $payment_hash) {
             return $this->createAction($stored_resource['method'], $payment_tab);
         }

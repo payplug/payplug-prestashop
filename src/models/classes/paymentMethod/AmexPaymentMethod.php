@@ -35,6 +35,7 @@ class AmexPaymentMethod extends PaymentMethod
         $this->name = 'amex';
         $this->order_name = 'amex';
         $this->cancellable = false;
+        $this->force_resource = true;
     }
 
     /**

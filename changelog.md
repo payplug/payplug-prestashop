@@ -1,5 +1,10 @@
 # Payplug module changelog
 
+## Version 4.7.2
+- Bugfix :
+  - [SMP-2375](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2384): Align cart hash with payment tab generation to avoid multiple creation
+  - [SMP-2375](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2387): Fix payment method default props to force the resource creation on checkout validation
+  
 ## Version 4.7.1
 - Bugfix :
   - [SMP-2328](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2367): Fix payment method in database

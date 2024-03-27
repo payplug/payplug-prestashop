@@ -35,7 +35,7 @@ class PaymentMethod
     public $cancellable = true;
 
     /** @var bool */
-    public $force_resource = true;
+    public $force_resource = false;
 
     /** @var bool */
     public $refundable;
@@ -310,39 +310,18 @@ class PaymentMethod
     /**
      * @description Generate hash for a payment method from the current context
      *
+     * @param mixed $payment_tab
+     *
      * @return string
      */
-    public function getPaymentMethodHash()
+    public function getPaymentMethodHash($payment_tab = [])
     {
-        $this->setParameters();
-        $cartToHash = [];
-        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
+        if (!is_array($payment_tab) || empty($payment_tab)) {
             // todo: add error log
             return '';
         }
 
-        $products = $this->context->cart->getProducts();
-        if (!$products) {
-            // todo: add error log
-            return '';
-        }
-
-        foreach ($products as $product) {
-            $product = array_map('json_encode', $product);
-            $cartToHash[] = array_map('strval', $product);
-        }
-
-        // Adding cart informationObjectModel
-        $cartToHash[] = 'Cart $id_address_delivery: ' . $this->context->cart->id_address_delivery;
-        $cartToHash[] = 'Cart $id_address_invoice: ' . $this->context->cart->id_address_invoice;
-        $cartToHash[] = 'Cart $id_currency: ' . $this->context->cart->id_currency;
-        $cartToHash[] = 'Cart $id_customer: ' . $this->context->cart->id_customer;
-        $cartToHash[] = 'Cart $delivery_option: ' . $this->context->cart->delivery_option;
-
-        // Adding cart amount to hash
-        $cartToHash[] = 'Cart amount: ' . (float) $this->context->cart->getOrderTotal(true);
-
-        return hash('sha256', $this->name . json_encode($cartToHash));
+        return hash('sha256', $this->name . json_encode($payment_tab));
     }
 
     /**
