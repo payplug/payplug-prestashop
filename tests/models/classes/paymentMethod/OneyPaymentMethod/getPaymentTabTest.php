@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group oney_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */
@@ -64,6 +65,18 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         $this->expected_tab = [
             'amount' => 4242,
             'currency' => 'EUR',
+            'notification_url' => 'link',
+            'force_3ds' => false,
+            'hosted_payment' => [
+                'return_url' => 'link',
+                'cancel_url' => 'link',
+            ],
+            'metadata' => [
+                'ID Client' => 1,
+                'ID Cart' => 1,
+                'Website' => true,
+            ],
+            'allow_save_card' => false,
             'shipping' => [
                 'title' => null,
                 'first_name' => 'Ipsum',
@@ -95,18 +108,6 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
                 'country' => 'fr',
                 'language' => 'fr',
             ],
-            'notification_url' => 'link',
-            'force_3ds' => false,
-            'hosted_payment' => [
-                'return_url' => 'link',
-                'cancel_url' => 'link',
-            ],
-            'metadata' => [
-                'ID Client' => 1,
-                'ID Cart' => 1,
-                'Website' => true,
-            ],
-            'allow_save_card' => false,
         ];
 
         $this->oney = \Mockery::mock('OneyOldRepository');

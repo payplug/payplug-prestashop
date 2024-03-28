@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\InstallmentPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group installment_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */

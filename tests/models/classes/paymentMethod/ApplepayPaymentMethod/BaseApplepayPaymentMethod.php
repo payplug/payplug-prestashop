@@ -7,6 +7,8 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 class BaseApplepayPaymentMethod extends BasePaymentMethod
 {
+    protected $country_adapter;
+
     protected function setUp()
     {
         parent::setUp();

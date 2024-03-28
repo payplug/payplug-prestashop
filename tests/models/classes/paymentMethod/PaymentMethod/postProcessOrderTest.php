@@ -41,14 +41,19 @@ class postProcessOrderTest extends BasePaymentMethod
     {
         $order = OrderMock::get();
         $resource = PaymentMock::getStandard();
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
+
+        $patch_payment = \Mockery::mock('PatchPayment');
+        $patch_payment
             ->shouldReceive([
                 'patchPayment' => [
                     'result' => false,
                 ],
             ]);
-        $this->dependencies->apiClass = $apiClass;
+
+        $this->plugin
+            ->shouldReceive([
+                'getApiService' => $patch_payment,
+            ]);
 
         $this->assertFalse($this->classe->postProcessOrder($resource, $order));
     }
@@ -57,15 +62,15 @@ class postProcessOrderTest extends BasePaymentMethod
     {
         $order = OrderMock::get();
         $resource = PaymentMock::getStandard();
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
+
+        $patch_payment = \Mockery::mock('PatchPayment');
+        $patch_payment
             ->shouldReceive([
                 'patchPayment' => [
                     'result' => true,
                     'resource' => $resource,
                 ],
             ]);
-        $this->dependencies->apiClass = $apiClass;
 
         $order_payment_repository = \Mockery::mock('OrderPaymentRepository');
         $order_payment_repository
@@ -75,6 +80,7 @@ class postProcessOrderTest extends BasePaymentMethod
         $this->plugin
             ->shouldReceive([
                 'getOrderPaymentRepository' => $order_payment_repository,
+                'getApiService' => $patch_payment,
             ]);
 
         $this->assertFalse($this->classe->postProcessOrder($resource, $order));
@@ -84,15 +90,15 @@ class postProcessOrderTest extends BasePaymentMethod
     {
         $order = OrderMock::get();
         $resource = PaymentMock::getStandard();
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
+
+        $patch_payment = \Mockery::mock('PatchPayment');
+        $patch_payment
             ->shouldReceive([
                 'patchPayment' => [
                     'result' => true,
                     'resource' => $resource,
                 ],
             ]);
-        $this->dependencies->apiClass = $apiClass;
 
         $order_payment_repository = \Mockery::mock('OrderPaymentRepository');
         $order_payment_repository
@@ -102,6 +108,7 @@ class postProcessOrderTest extends BasePaymentMethod
         $this->plugin
             ->shouldReceive([
                 'getOrderPaymentRepository' => $order_payment_repository,
+                'getApiService' => $patch_payment,
             ]);
 
         $this->assertTrue($this->classe->postProcessOrder($resource, $order));

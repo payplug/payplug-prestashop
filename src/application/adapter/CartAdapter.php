@@ -143,4 +143,16 @@ class CartAdapter implements CartInterface
 
         return $cart->getDeliveryOptionList();
     }
+
+    /**
+     * @description  update the cart
+     *
+     * @param $cart
+     *
+     * @return mixed
+     */
+    public function update($cart)
+    {
+        return $cart->update();
+    }
 }

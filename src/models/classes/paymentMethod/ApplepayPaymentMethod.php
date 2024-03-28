@@ -133,6 +133,8 @@ class ApplepayPaymentMethod extends PaymentMethod
     // todo: add coverage to this method
     public function getPaymentTab()
     {
+        $this->setParameters();
+
         $payment_tab = parent::getPaymentTab();
 
         if (empty($payment_tab)) {
@@ -156,6 +158,32 @@ class ApplepayPaymentMethod extends PaymentMethod
                 ])),
             ],
         ];
+
+        if (!isset($payment_tab['shipping']) || empty($payment_tab['shipping'])) {
+            $payment_tab['shipping'] = [
+                'title' => null,
+                'first_name' => 'apple_pay_first_name',
+                'last_name' => 'apple_pay_last_name',
+                'address1' => null,
+                'address2' => null,
+                'company_name' => null,
+                'postcode' => null,
+                'city' => null,
+                'state' => null,
+                'country' => null,
+                'email' => 'noreply@' . $this->context->shop->domain_ssl,
+                'mobile_phone_number' => null,
+                'landline_phone_number' => null,
+                'language' => $this->context->language->iso_code,
+            ];
+        } else {
+            unset($payment_tab['shipping']['delivery_type']);
+        }
+
+        if (!isset($payment_tab['billing']) || empty($payment_tab['billing'])) {
+            $payment_tab['billing'] = $payment_tab['shipping'];
+        }
+
         unset($payment_tab['force_3ds'], $payment_tab['allow_save_card'], $payment_tab['shipping']['delivery_type']);
 
         return $payment_tab;
@@ -258,6 +286,44 @@ class ApplepayPaymentMethod extends PaymentMethod
         $resource_details['type'] = $translation['detail']['method']['applepay'];
 
         return $resource_details;
+    }
+
+    /**
+     * @description  hydrate $cart_data array
+     *
+     * @param $address_data
+     * @param null $shipping_email
+     * @param false $is_billing
+     *
+     * @return array
+     */
+    public function prepareAddressData($address_data = [], $shipping_email = '', $is_billing = false)
+    {
+        $this->setParameters();
+        if (empty($address_data) || !$address_data) {
+            return [];
+        }
+        $prepared_data = [
+            'first_name' => $address_data['givenName'],
+            'last_name' => $address_data['familyName'],
+            'address1' => $address_data['addressLines'][0],
+            'postcode' => $address_data['postalCode'],
+            'city' => $address_data['locality'],
+            'country' => $address_data['countryCode'],
+            'language' => $this->tools->tool('strtolower', $address_data['countryCode']),
+            'email' => (!empty($shipping_email)) ? $shipping_email : $address_data['emailAddress'],
+
+        ];
+
+        // Include mobile_phone_number only if it's for shipping
+        if (!$is_billing) {
+            $prepared_data['mobile_phone_number'] = $this->dependencies->configClass->formatPhoneNumber(
+                $address_data['phoneNumber'],
+                $this->country_adapter->getByIso($address_data['countryCode'])
+            );
+        }
+
+        return $prepared_data;
     }
 
     /**

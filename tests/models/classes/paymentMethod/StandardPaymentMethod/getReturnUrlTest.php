@@ -8,6 +8,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group standard_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */

@@ -1,0 +1,95 @@
+<?php
+
+namespace PayPlug\src\models\classes;
+
+class Address
+{
+    /** @var object */
+    protected $address_adapter;
+
+    public function __construct($dependencies)
+    {
+        $this->dependencies = $dependencies;
+    }
+
+    /**
+     *  @description  check if address exists, if not create it in DB
+     *
+     * @param array $user_address
+     * @param int $customer_id
+     * @param array $customer_addresses
+     *
+     * @return mixed|null
+     */
+    public function checkAndSaveAddress($user_address = [], $customer_id = 0, $customer_addresses = [])
+    {
+        if (!is_array($user_address) || empty($user_address)) {
+            return 0;
+        }
+
+        if (!is_array($customer_addresses)) {
+            return 0;
+        }
+
+        if (!is_int($customer_id) || !$customer_id) {
+            return 0;
+        }
+        $this->setParameters();
+        $existing_address_id = 0;
+
+        // Hash the user address
+        $user_address_hash = hash('sha256', json_encode($user_address));
+
+        if (!empty($customer_addresses)) {
+            foreach ($customer_addresses as $address) {
+                $customer_address_hash = hash(
+                    'sha256',
+                    json_encode(
+                        [
+                            'firstname' => $address['firstname'],
+                            'lastname' => $address['lastname'],
+                            'address1' => $address['address1'],
+                            'postcode' => $address['postcode'],
+                            'city' => $address['city'],
+                            'id_country' => (int) $address['id_country'],
+                        ]
+                    )
+                );
+
+                // If the address exists, set the existing address ID
+                if ($customer_address_hash === $user_address_hash) {
+                    $existing_address_id = $address['id_address'];
+
+                    break;
+                }
+            }
+        }
+
+        // Save the address if it doesn't exist
+        if (!$existing_address_id) {
+            $address = $this->address_adapter->get();
+            $address->firstname = $user_address['firstname'];
+            $address->lastname = $user_address['lastname'];
+            $address->id_country = $user_address['id_country'];
+            $address->address1 = $user_address['address1'];
+            $address->postcode = $user_address['postcode'];
+            $address->city = $user_address['city'];
+            $address->alias = 'Apple Pay Address';
+            $address->id_customer = $customer_id;
+            $this->address_adapter->saveAddress($address);
+            $existing_address_id = $address->id;
+        }
+
+        return $existing_address_id;
+    }
+
+    /**
+     * @description Set parameters for usage
+     */
+    protected function setParameters()
+    {
+        if (!$this->address_adapter) {
+            $this->address_adapter = $this->dependencies->getPlugin()->getAddress();
+        }
+    }
+}

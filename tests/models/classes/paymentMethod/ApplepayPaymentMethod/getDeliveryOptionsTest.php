@@ -8,6 +8,7 @@ use PayPlug\tests\mock\CarrierMock;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group applepay_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */

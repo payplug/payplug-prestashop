@@ -57,7 +57,7 @@ class API
      *
      * @param mixed $resource_id
      */
-    public function abortApplePayPayment($resource_id = false)
+    public function abortPayment($resource_id = false)
     {
         if (!$resource_id || !is_string($resource_id)) {
             return [
@@ -81,10 +81,65 @@ class API
             } else {
                 $response = [
                     'result' => true,
-                    'resource' => Payment::abortApplePay($resource_id, $this->api),
+                    'resource' => Payment::abort($resource_id, $this->api),
                     'code' => 200,
                 ];
             }
+        } catch (\Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int) $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Create Payment from api for given data
+     *
+     * @param false $resource_id
+     * @param array $data
+     * @param mixed $page
+     *
+     * @return array
+     */
+    public function patchPayment($resource_id = false, $data = [])
+    {
+        if (!$resource_id || !is_string($resource_id)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $resource_id given',
+            ];
+        }
+
+        if (!$data || !is_array($data)) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Wrong $data given',
+            ];
+        }
+
+        $retrieve = $this->retrievePayment($resource_id);
+        if (!$retrieve['result']) {
+            return [
+                'code' => null,
+                'result' => false,
+                'message' => 'Can\'t patch the payment: ' . $retrieve['message'],
+            ];
+        }
+
+        $payment = $retrieve['resource'];
+
+        try {
+            $response = [
+                'result' => true,
+                'resource' => $payment->update($data),
+                'code' => 200,
+            ];
         } catch (\Exception $e) {
             $response = [
                 'result' => false,

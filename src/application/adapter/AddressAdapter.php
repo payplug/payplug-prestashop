@@ -31,6 +31,13 @@ use PayPlug\src\interfaces\AddressInterface;
 
 class AddressAdapter implements AddressInterface
 {
+    private $address;
+
+    public function __construct()
+    {
+        $this->address = new \Address();
+    }
+
     public function get($idAddress = false)
     {
         if (!is_int($idAddress)) {
@@ -38,5 +45,29 @@ class AddressAdapter implements AddressInterface
         }
 
         return new \Address($idAddress);
+    }
+
+    public function getZoneById($idAddress = false)
+    {
+        if (!is_int($idAddress)) {
+            $idAddress = false;
+        }
+
+        $address = $this->address;
+
+        return $address::getZoneById($idAddress);
+    }
+
+    /**
+     * @description adapter to save address object
+     * in ps_address
+     *
+     * @param $address
+     *
+     * @return mixed
+     */
+    public function saveAddress($address)
+    {
+        return $address->save();
     }
 }

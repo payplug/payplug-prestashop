@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneClickPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group oneclick_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */

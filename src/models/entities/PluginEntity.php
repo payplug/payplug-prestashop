@@ -34,6 +34,7 @@ class PluginEntity
     /** @var object */
     private $address;
 
+    private $address_class;
     /** @var object */
     private $apiClass;
 
@@ -330,6 +331,14 @@ class PluginEntity
     public function getAddress()
     {
         return $this->address;
+    }
+
+    /**
+     * @return object
+     */
+    public function getAddressClass()
+    {
+        return $this->address_class;
     }
 
     /**
@@ -832,6 +841,22 @@ class PluginEntity
         }
 
         $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * @param object $address_class
+     *
+     * @return self
+     */
+    public function setAddressClass($address_class)
+    {
+        if (!is_object($address_class)) {
+            throw new BadParameterException('Invalid argument, $address must be an Address Class');
+        }
+
+        $this->address_class = $address_class;
 
         return $this;
     }

@@ -64,6 +64,7 @@ use PayPlug\src\application\adapter\TabAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
+use PayPlug\src\models\classes\Address;
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\Country;
@@ -146,6 +147,7 @@ class PluginInit extends BaseClass
     private $validate_adapter;
 
     // Model classes
+    private $address_class;
     private $api_rest_class;
     private $country_class;
     private $configuration_class;
@@ -247,6 +249,7 @@ class PluginInit extends BaseClass
 
         // Set models/classes
         $this->plugin
+            ->setAddressClass($this->address_class)
             ->setApiRestClass($this->api_rest_class)
             ->setConfigurationClass($this->configuration_class)
             ->setCountryClass($this->country_class)
@@ -385,6 +388,7 @@ class PluginInit extends BaseClass
 
     private function setClasses()
     {
+        $this->address_class = new Address($this->dependencies);
         $this->api_rest_class = new ApiRest($this->dependencies);
         $this->configuration_class = new Configuration($this->dependencies);
         $this->country_class = new Country($this->dependencies);

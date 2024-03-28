@@ -34,6 +34,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $configurationAdapter;
     private $configurationClass;
     private $contextAdapter;
+    private $country;
     private $logger;
     private $oney;
     private $dependencies;
@@ -43,6 +44,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     private $tools_adapter;
     private $translate;
     private $validators;
+    private $address_class;
 
     /**
      * @description
@@ -71,16 +73,19 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
         $this->tools_adapter = $this->plugin->getTools();
+        $this->country = $this->dependencies->getPlugin()->getCountry();
 
         if (1 == $this->tools_adapter->tool('getValue', '_ajax')) {
             $this->configurationAdapter = $this->plugin->getConfiguration();
             $this->configurationClass = $this->plugin->getConfigurationClass();
+
             $this->contextAdapter = $this->plugin->getContext(); // get ContextAdapter Repository object
             $this->oney = $this->plugin->getOney();
             $this->productAdapter = $this->plugin->getProduct();
             $this->translate = $this->plugin->getTranslate();
             $context = $this->contextAdapter->get(); // get the method
             $tools = $this->tools_adapter;
+            $this->address_class = $this->plugin->getAddressClass();
 
             // todo: Create a ajaxDispatcher to avoid this "infinite" list of condition
             if ($tools->tool('getIsset', 'pc')) {
@@ -366,17 +371,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'message' => 'Success',
                 ]));
             } elseif ($tools->tool('getIsset', 'patchPayment')) {
+                $cart = $this->plugin->getCart()->get((int) $context->cart->id);
                 $resource_id = $tools->tool('getValue', 'pay_id');
-                $cartId = (int) $tools->tool('getValue', 'cart_id');
                 $token = $tools->tool('getValue', 'token');
-
-                // Check if cart id is valid
-                if (!$cartId || (int) $context->cart->id != $cartId) {
-                    exit(json_encode([
-                        'result' => false,
-                        'message' => 'Invalid cart id given',
-                    ]));
-                }
 
                 // Check if payment id is valid
                 if (!$resource_id) {
@@ -419,7 +416,141 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'payment_token' => $token,
                     ],
                 ];
-                $patchPayment = $this->apiClass->patchPayment($resource_id, $data);
+
+                $address_adapter = $this->plugin->getAddress();
+                $carrier_in_range = $cart->isCarrierInRange(
+                    $cart->id_carrier,
+                    $address_adapter->getZoneById((int) $cart->id_address_delivery)
+                );
+                if (!$carrier_in_range) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => 'Invalid carrier/address',
+                    ]));
+                }
+
+                $workflow = $tools->tool('getValue', 'workflow');
+                if ('checkout' != $workflow) {
+                    $request = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getPaymentMethod('applepay')
+                        ->getRequest();
+
+                    $user = $tools->tool('getValue', 'user');
+                    $cart_data = [
+                        'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($request['total']['amount']),
+                        'billing' => $this->dependencies
+                            ->getPlugin()
+                            ->getPaymentMethodClass()
+                            ->getPaymentMethod('applepay')
+                            ->prepareAddressData($user['billing'], $user['shipping']['emailAddress'], true),
+                        'shipping' => $this->dependencies
+                            ->getPlugin()
+                            ->getPaymentMethodClass()
+                            ->getPaymentMethod('applepay')
+                            ->prepareAddressData($user['shipping']),
+                    ];
+
+                    if (empty($cart_data['billing']) || empty($cart_data['shipping'])) {
+                        exit(json_encode([
+                                             'result' => false,
+                                             'message' => 'Invalid $user datas',
+                                         ]));
+                    }
+
+                    $customer_adapter = $this->plugin->getCustomer();
+                    $cart_adapter = $this->dependencies
+                        ->getPlugin()
+                        ->getCart();
+                    $user_shipping_address = [
+                        'firstname' => $cart_data['shipping']['first_name'],
+                        'lastname' => $cart_data['shipping']['last_name'],
+                        'address1' => $cart_data['shipping']['address1'],
+                        'postcode' => $cart_data['shipping']['postcode'],
+                        'city' => $cart_data['shipping']['city'],
+                        'id_country' => $this->country->getByIso($cart_data['shipping']['country']),
+                    ];
+
+                    $user_billing_address = [
+                        'firstname' => $cart_data['billing']['first_name'],
+                        'lastname' => $cart_data['billing']['last_name'],
+                        'address1' => $cart_data['billing']['address1'],
+                        'postcode' => $cart_data['billing']['postcode'],
+                        'city' => $cart_data['billing']['city'],
+                        'id_country' => $this->country->getByIso($cart_data['billing']['country']),
+                    ];
+                    if ($customer_adapter->isLogged($context->customer)) {
+                        // Prepare shipping and billing addresses data
+                        // Check if the addresses already exist for the customer
+                        $customer_addresses = $customer_adapter->getAddresses(
+                            $context->customer->id,
+                            $context->language->id
+                        );
+                        // Check and save the shipping address
+                        $existing_shipping_address = $this->address_class
+                            ->checkAndSaveAddress($user_shipping_address, $context->customer->id, $customer_addresses);
+
+                        // Check and save the billing address if it's different from the shipping address
+                        if ($user_shipping_address != $user_billing_address) {
+                            $existing_billing_address = $this->address_class
+                                ->checkAndSaveAddress($user_billing_address, $context->customer->id, $customer_addresses);
+                        } else {
+                            // Use the same address for billing
+                            $existing_billing_address = $existing_shipping_address;
+                        }
+
+                        // Update cart with address IDs
+                        $cart->id_address_invoice = $existing_billing_address;
+                        $cart->id_address_delivery = $existing_shipping_address;
+                        $cart->id_customer = (int) $cart->id_customer;
+                    } else {
+                        // create guest user
+                        $customer = $customer_adapter->get((int) $cart->id_customer);
+                        $customer->is_guest = true;
+                        $customer->firstname = $cart_data['shipping']['first_name'];
+                        $customer->lastname = $cart_data['shipping']['last_name'];
+                        $customer->email = $cart_data['shipping']['email'];
+                        $customer->passwd = $tools->tool('passwdGen', 32);
+                        $customer_adapter->add($customer);
+                        $cart->id_customer = (int) $customer->id;
+                        // Create shipping address
+                        $shipping_address_id = $this->address_class
+                            ->checkAndSaveAddress(
+                                $user_shipping_address,
+                                (int) $customer->id,
+                                []
+                            );
+
+                        // Check if shipping address is different than billing address
+                        if (hash('sha256', json_encode($user_shipping_address)) != hash('sha256', json_encode($user_billing_address))) {
+
+                            // Create billing address
+                            $billing_address_id = $this->address_class
+                                ->checkAndSaveAddress(
+                                    $user_billing_address,
+                                    (int) $customer->id,
+                                    []
+                                );
+                        } else {
+                            // Use the same address for billing
+                            $billing_address_id = $shipping_address_id;
+                        }
+
+                        // Update cart with address IDs
+                        $cart->id_address_invoice = $billing_address_id;
+                        $cart->id_address_delivery = $shipping_address_id;
+                    }
+
+                    $cart_adapter->update($cart);
+                    $data['apple_pay'] = array_merge($data['apple_pay'], $cart_data);
+                    $data['apple_pay'] = array_merge($data['apple_pay'], $cart_data);
+                }
+
+                $patchPayment = $this->dependencies
+                    ->getPlugin()
+                    ->getApiService()
+                    ->patchPayment($resource_id, $data);
 
                 if (!$patchPayment['result']) {
                     exit(json_encode([
@@ -437,8 +568,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'message' => $payment->failure->message,
                     ]));
                 }
-
-                // ... or if is paid
+                // ... or if is not  paid
                 if (!$payment->is_paid) {
                     exit(json_encode([
                         'result' => false,
@@ -500,7 +630,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $aborted = $this->dependencies
                     ->getPlugin()
                     ->getApiService()
-                    ->abortApplePayPayment($payment['resource_id']);
+                    ->abortPayment($payment['resource_id']);
 
                 exit(json_encode([
                     'result' => $aborted['result'],

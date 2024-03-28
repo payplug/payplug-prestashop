@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\AmexPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group amex_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */

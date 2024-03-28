@@ -8,6 +8,7 @@ use PayPlug\tests\mock\ContextMock;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group oneclick_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */
@@ -72,6 +73,18 @@ class getPaymentTabTest extends BaseOneClickPaymentMethod
 
         $expected_tab = [
             'currency' => 'EUR',
+            'notification_url' => 'link',
+            'force_3ds' => false,
+            'hosted_payment' => [
+                'return_url' => 'link',
+                'cancel_url' => 'link',
+            ],
+            'metadata' => [
+                'ID Client' => 1,
+                'ID Cart' => 1,
+                'Website' => 'shop domain ssl',
+            ],
+            'allow_save_card' => false,
             'shipping' => [
                 'title' => null,
                 'first_name' => 'Ipsum',
@@ -103,18 +116,6 @@ class getPaymentTabTest extends BaseOneClickPaymentMethod
                 'country' => 'fr',
                 'language' => 'fr',
             ],
-            'notification_url' => 'link',
-            'force_3ds' => false,
-            'hosted_payment' => [
-                'return_url' => 'link',
-                'cancel_url' => 'link',
-            ],
-            'metadata' => [
-                'ID Client' => 1,
-                'ID Cart' => 1,
-                'Website' => 'shop domain ssl',
-            ],
-            'allow_save_card' => false,
             'initiator' => 'PAYER',
             'authorized_amount' => 4242,
             'payment_method' => 'card_azerty12345',

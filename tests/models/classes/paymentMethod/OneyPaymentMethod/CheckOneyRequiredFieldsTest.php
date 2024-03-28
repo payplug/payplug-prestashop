@@ -6,9 +6,10 @@ use PayPlug\tests\mock\PaymentTabMock;
 
 /**
  * @group unit
- * @group old_repository
- * @group oney
- * @group oney_repository
+ * @group classes
+ * @group payment_method_classes
+ * @group oney_payment_method_classes
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
@@ -102,7 +103,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyPaymentMethod
             ->andReturn(20);
         $get_country = (object) [];
         $get_country->iso_code = 'fr';
-        $this->country
+        $this->country_adapter
             ->shouldReceive([
                 'getCountry' => $get_country,
             ]);
@@ -154,7 +155,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyPaymentMethod
                     'message' => '$iso_code is wrong',
                 ],
             ]);
-        $this->country
+        $this->country_adapter
             ->shouldReceive([
                 'getCountry' => [],
             ]);
