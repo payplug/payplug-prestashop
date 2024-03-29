@@ -34,7 +34,7 @@ function upgrade_module_4_8_0($object)
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'));
     $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CARRIERS', '[]');
     $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CART', 0);
-    $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CHECKOUT', $payment_methods['applepay']);
+    $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CHECKOUT', $payment_methods->applepay);
 
     $logger->addLog('End upgrade script 4.8.0, result: ' . ($flag ? 'ok' : 'ko'));
 

@@ -93,6 +93,7 @@ class saveActionTest extends BaseConfigurationAction
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
+        $datas->enable_applepay = true;
         $datas->enable_applepay_cart = true;
         $datas->applepay_carriers = [];
 
