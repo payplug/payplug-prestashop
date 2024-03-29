@@ -552,7 +552,8 @@ class ConfigurationAction
         }
 
         if (empty($datas->applepay_carriers)
-            && true === $datas->enable_applepay_cart) {
+            && true === $datas->enable_applepay_cart
+            && true === $datas->enable_applepay) {
             return [
                 'success' => false,
                 'data' => [
