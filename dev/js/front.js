@@ -567,7 +567,7 @@ var $document, $window, __moduleName__Module = {
                     }
                 });
 
-                $document.on('submit', '#payment-confirmation form', integrated.form.validate);
+                $document.on('submit', 'form', integrated.form.validate);
             },
             showError: function () {
                 // valide integrated payment form
@@ -621,6 +621,10 @@ var $document, $window, __moduleName__Module = {
                 var integrated = __moduleName__Module.integrated,
                     payment_option_id = integrated.props.paymentOptionId,
                     isIntegrated = payment_option_id == $('input[name="payment-option"]:checked').attr('id');
+
+                if (!$('#payment-confirmation:visible').length) {
+                    return;
+                }
 
                 if (typeof event != 'undefined' && isIntegrated) {
                     event.preventDefault();
