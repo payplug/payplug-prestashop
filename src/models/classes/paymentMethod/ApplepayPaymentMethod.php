@@ -312,7 +312,6 @@ class ApplepayPaymentMethod extends PaymentMethod
             'country' => $address_data['countryCode'],
             'language' => $this->tools->tool('strtolower', $address_data['countryCode']),
             'email' => (!empty($shipping_email)) ? $shipping_email : $address_data['emailAddress'],
-
         ];
 
         // Include mobile_phone_number only if it's for shipping

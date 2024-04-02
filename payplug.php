@@ -390,7 +390,7 @@ class Payplug extends PaymentModule
             $dependencies = new DependenciesClass();
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_cart_cta')) {
-                //TODO: this function should be splitted renderCartCTA and renderProductCTA
+                // TODO: this function should be splitted renderCartCTA and renderProductCTA
                 $oneyCTA = $dependencies
                     ->getPlugin()
                     ->getOneyAction()

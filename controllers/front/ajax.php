@@ -524,7 +524,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
                         // Check if shipping address is different than billing address
                         if (hash('sha256', json_encode($user_shipping_address)) != hash('sha256', json_encode($user_billing_address))) {
-
                             // Create billing address
                             $billing_address_id = $this->address_class
                                 ->checkAndSaveAddress(
