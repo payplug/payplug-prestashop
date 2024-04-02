@@ -474,6 +474,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->assign([
                 'applepay_js_url' => $applepay_js_url,
                 'applepay_workflow' => 'checkout',
+                'iso_lang' => $this->context->language->iso_code,
             ]);
 
         $payment_options[$this->name]['additionalInformation'] = $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
