@@ -104,6 +104,7 @@ class CartAction
             ->assign([
                 'applepay_js_url' => $applepay_js_url,
                 'applepay_workflow' => 'shopping-cart',
+                'iso_lang' => $this->context->language->iso_code,
             ]);
 
         $this->dependencies
