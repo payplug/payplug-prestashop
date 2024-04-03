@@ -508,17 +508,17 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.applepay.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.applepay.call_to_action', 'translation'),
-                'cart' => [
-                    'title' => $this->l('paymentmethods.applepay.cart.title', 'translation'),
-                    'description' => $this->l('paymentmethods.applepay.cart.description', 'translation'),
-                ],
-                'checkout' => [
-                    'title' => $this->l('paymentmethods.applepay.checkout.title', 'translation'),
+                'display' => [
+                    'title' => $this->l('paymentmethods.applepay.display.title', 'translation'),
+                    'cart' => $this->l('paymentmethods.applepay.display.cart', 'translation'),
+                    'checkout' => $this->l('paymentmethods.applepay.display.checkout', 'translation'),
+                    'product' => $this->l('paymentmethods.applepay.display.product', 'translation'),
                 ],
                 'carrier' => [
                     'title' => $this->l('paymentmethods.applepay.carrier.title', 'translation'),
                     'alert' => $this->l('paymentmethods.applepay.carrier.alert', 'translation'),
                     'description' => $this->l('paymentmethods.applepay.carrier.description', 'translation'),
+                    'instructions' => $this->l('paymentmethods.applepay.carrier.instructions', 'translation'),
                 ],
                 'modal' => [
                     'subtotal' => $this->l('paymentmethods.applepay.modal.subtotal', 'translation'),

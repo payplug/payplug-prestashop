@@ -551,9 +551,9 @@ class ConfigurationAction
             ];
         }
 
-        if (empty($datas->applepay_carriers)
-            && true === $datas->enable_applepay_cart
-            && true === $datas->enable_applepay) {
+        $applepay_display = $datas->payplug_applepay_display;
+        $need_carrier = (bool) $applepay_display->cart || (bool) $applepay_display->product;
+        if (empty($datas->applepay_carriers) && $need_carrier) {
             return [
                 'success' => false,
                 'data' => [
@@ -563,11 +563,6 @@ class ConfigurationAction
                     'class' => '-error',
                 ],
             ];
-        }
-
-        if (!empty($datas->applepay_carriers)
-            && true === $datas->enable_applepay_cart) {
-            $datas->payplug_applepay_carriers = json_encode($datas->applepay_carriers);
         }
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
@@ -586,8 +581,7 @@ class ConfigurationAction
             'oney_custom_max_amounts' => 'oney_max_amounts',
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'payplug_applepay_carriers',
-            'applepay_checkout' => 'enable_applepay_checkout',
-            'applepay_cart' => 'enable_applepay_cart',
+            'applepay_display' => 'payplug_applepay_display',
         ];
 
         foreach ($configuration_keys as $key => $config) {
@@ -656,8 +650,21 @@ class ConfigurationAction
                         }
 
                         break;
-                    case 'payplug_bancontact_country':
+                    case 'enable_bancontact_country':
                         if ((bool) $datas->enable_bancontact && !$configuration->set($key, (int) $value)) {
+                            return [
+                                'success' => false,
+                                'data' => [
+                                    // todo: add translation
+                                    'message' => 'An error has occurred while register ' . $config,
+                                ],
+                            ];
+                        }
+
+                        break;
+                    case 'payplug_applepay_carriers':
+                    case 'payplug_applepay_display':
+                        if ((bool) $datas->enable_applepay && !$configuration->set($key, json_encode($value))) {
                             return [
                                 'success' => false,
                                 'data' => [

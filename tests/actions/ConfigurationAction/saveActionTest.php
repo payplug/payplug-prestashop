@@ -93,8 +93,8 @@ class saveActionTest extends BaseConfigurationAction
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
-        $datas->enable_applepay = true;
-        $datas->enable_applepay_cart = true;
+        $datas->payplug_applepay_display = new \stdClass();
+        $datas->payplug_applepay_display->cart = true;
         $datas->applepay_carriers = [];
 
         $this->assertSame(
@@ -115,8 +115,10 @@ class saveActionTest extends BaseConfigurationAction
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
+        $datas->enable_applepay = true;
         $datas->applepay_carriers = ['1', '2', '4'];
-        $datas->enable_applepay_cart = true;
+        $datas->payplug_applepay_display = new \stdClass();
+        $datas->payplug_applepay_display->cart = true;
         $datas->enable_standard = 1;
 
         $this->configuration->shouldReceive([
@@ -127,7 +129,7 @@ class saveActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'An error has occurred while register payplug_applepay_carriers',
+                    'message' => 'An error has occurred while register payplug_applepay_display',
                 ],
             ],
             $this->action->saveAction($datas)
@@ -138,8 +140,10 @@ class saveActionTest extends BaseConfigurationAction
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
+        $datas->enable_applepay = true;
         $datas->applepay_carriers = ['1', '2', '4'];
-        $datas->enable_applepay_cart = true;
+        $datas->payplug_applepay_display = new \stdClass();
+        $datas->payplug_applepay_display->cart = true;
         $datas->payplug_standard = 1;
 
         $this->configuration->shouldReceive([

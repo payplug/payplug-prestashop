@@ -95,33 +95,39 @@ class ApplepayPaymentMethod extends PaymentMethod
 
         $id_lang = $this->context->language->id;
         $carriers = $this->getAvailableCarriers((int) $id_lang);
-
+        $display = json_decode($current_configuration['applepay_display'], true);
         $option['options'] = [
             [
                 'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'applepay_checkout',
-                'title' => $this->translation[$this->name]['checkout']['title'],
-                'checked' => $current_configuration['applepay_checkout'],
-            ],
-            [
-                'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'applepay_cart',
-                'title' => $this->translation[$this->name]['cart']['title'],
-                'descriptions' => [
-                    'live' => [
-                        'description' => $this->translation[$this->name]['cart']['description'],
+                'sub_type' => 'IOptions',
+                'name' => 'applepay_display',
+                'title' => $this->translation[$this->name]['display']['title'],
+                'multiple' => true,
+                'options' => [
+                    [
+                        'name' => 'applepay_display',
+                        'label' => $this->translation[$this->name]['display']['checkout'],
+                        'value' => 'checkout',
+                        'checked' => (bool) $display['checkout'],
                     ],
-                    'sandbox' => [
-                        'description' => $this->translation[$this->name]['cart']['description'],
+                    [
+                        'name' => 'applepay_display',
+                        'label' => $this->translation[$this->name]['display']['cart'],
+                        'value' => 'cart',
+                        'checked' => (bool) $display['cart'],
+                    ],
+                    [
+                        'name' => 'applepay_display',
+                        'label' => $this->translation[$this->name]['display']['product'],
+                        'value' => 'product',
+                        'checked' => (bool) $display['product'],
                     ],
                 ],
-                'checked' => $current_configuration['applepay_cart'],
                 'carriers' => empty($carriers) ? [] : [
                     'title' => $this->translation[$this->name]['carrier']['title'],
                     'alert' => $this->translation[$this->name]['carrier']['alert'],
                     'description' => $this->translation[$this->name]['carrier']['description'],
+                    'instructions' => $this->translation[$this->name]['carrier']['instructions'],
                     'carriers_list' => $carriers,
                 ],
             ],
@@ -449,7 +455,8 @@ class ApplepayPaymentMethod extends PaymentMethod
             return [];
         }
 
-        if (!(bool) $this->configuration->getValue('applepay_checkout')) {
+        $applepay_display = json_decode($this->configuration->getValue('applepay_display'), true);
+        if (!(bool) $applepay_display['checkout']) {
             return $payment_options;
         }
 

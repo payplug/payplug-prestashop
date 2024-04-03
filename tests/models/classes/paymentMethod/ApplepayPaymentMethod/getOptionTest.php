@@ -19,31 +19,35 @@ class getOptionTest extends BaseApplepayPaymentMethod
                 'getAvailableCarriers' => [],
             ]);
         $configuration = [
-            'applepay_cart' => true,
-            'applepay_checkout' => true,
+            'applepay_display' => '{"checkout":true,"cart":false,"product":false}',
         ];
         $expected = [
             [
                 'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'applepay_checkout',
-                'title' => 'paymentmethods.applepay.checkout.title',
-                'checked' => true,
-            ],
-            [
-                'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'applepay_cart',
-                'title' => 'paymentmethods.applepay.cart.title',
-                'descriptions' => [
-                    'live' => [
-                        'description' => 'paymentmethods.applepay.cart.description',
+                'sub_type' => 'IOptions',
+                'name' => 'applepay_display',
+                'title' => 'paymentmethods.applepay.display.title',
+                'multiple' => true,
+                'options' => [
+                    [
+                        'name' => 'applepay_display',
+                        'label' => 'paymentmethods.applepay.display.checkout',
+                        'value' => 'checkout',
+                        'checked' => true,
                     ],
-                    'sandbox' => [
-                        'description' => 'paymentmethods.applepay.cart.description',
+                    [
+                        'name' => 'applepay_display',
+                        'label' => 'paymentmethods.applepay.display.cart',
+                        'value' => 'cart',
+                        'checked' => false,
+                    ],
+                    [
+                        'name' => 'applepay_display',
+                        'label' => 'paymentmethods.applepay.display.product',
+                        'value' => 'product',
+                        'checked' => false,
                     ],
                 ],
-                'checked' => true,
                 'carriers' => [],
             ],
         ];
@@ -53,7 +57,7 @@ class getOptionTest extends BaseApplepayPaymentMethod
         );
     }
 
-    public function testWhenNoCarrierReturn()
+    public function testWhenCarrierIsReturned()
     {
         $carriers = [
             [
@@ -67,36 +71,41 @@ class getOptionTest extends BaseApplepayPaymentMethod
                 'getAvailableCarriers' => $carriers,
             ]);
         $configuration = [
-            'applepay_cart' => true,
-            'applepay_checkout' => true,
+            'applepay_display' => '{"checkout":true,"cart":false,"product":false}',
         ];
 
         $expected = [
             [
                 'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'applepay_checkout',
-                'title' => 'paymentmethods.applepay.checkout.title',
-                'checked' => true,
-            ],
-            [
-                'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'applepay_cart',
-                'title' => 'paymentmethods.applepay.cart.title',
-                'descriptions' => [
-                    'live' => [
-                        'description' => 'paymentmethods.applepay.cart.description',
+                'sub_type' => 'IOptions',
+                'name' => 'applepay_display',
+                'title' => 'paymentmethods.applepay.display.title',
+                'multiple' => true,
+                'options' => [
+                    [
+                        'name' => 'applepay_display',
+                        'label' => 'paymentmethods.applepay.display.checkout',
+                        'value' => 'checkout',
+                        'checked' => true,
                     ],
-                    'sandbox' => [
-                        'description' => 'paymentmethods.applepay.cart.description',
+                    [
+                        'name' => 'applepay_display',
+                        'label' => 'paymentmethods.applepay.display.cart',
+                        'value' => 'cart',
+                        'checked' => false,
+                    ],
+                    [
+                        'name' => 'applepay_display',
+                        'label' => 'paymentmethods.applepay.display.product',
+                        'value' => 'product',
+                        'checked' => false,
                     ],
                 ],
-                'checked' => true,
                 'carriers' => [
                     'title' => 'paymentmethods.applepay.carrier.title',
                     'alert' => 'paymentmethods.applepay.carrier.alert',
                     'description' => 'paymentmethods.applepay.carrier.description',
+                    'instructions' => 'paymentmethods.applepay.carrier.instructions',
                     'carriers_list' => $carriers,
                 ],
             ],

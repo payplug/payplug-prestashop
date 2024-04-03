@@ -51,8 +51,9 @@ class CartAction
 
         $payment_methods = $this->configuration->getValue('payment_methods');
         $payment_methods = json_decode($payment_methods, true);
+        $applepay_display = json_decode($this->configuration->getValue('applepay_display'), true);
 
-        if (!(bool) $this->configuration->getValue('applepay_cart')
+        if (!(bool) $applepay_display['cart']
             || (!(bool) $payment_methods['applepay'])
             || (bool) $this->configuration->getValue('sandbox_mode')) {
             return false;
@@ -127,9 +128,7 @@ class CartAction
     {
         $this->plugin = $this->plugin ?: $this->dependencies
             ->getPlugin();
-        $this->context = $this->plugin->getContext()->get();
-        $this->configuration = $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass();
+        $this->context = $this->context ?: $this->plugin->getContext()->get();
+        $this->configuration = $this->configuration ?: $this->plugin->getConfigurationClass();
     }
 }
