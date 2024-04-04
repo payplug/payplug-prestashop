@@ -511,7 +511,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         $customer->firstname = $cart_data['shipping']['first_name'];
                         $customer->lastname = $cart_data['shipping']['last_name'];
                         $customer->email = $cart_data['shipping']['email'];
-                        $customer->passwd = $tools->tool('passwdGen', 32);
+                        $customer->passwd = $tools->tool('passwdGen', 32, 'ALPHANUMERIC');
                         $customer_adapter->add($customer);
                         $cart->id_customer = (int) $customer->id;
                         // Create shipping address
