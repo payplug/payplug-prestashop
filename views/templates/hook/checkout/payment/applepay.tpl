@@ -27,7 +27,7 @@
 {if !isset($applepay_workflow) || !$applepay_workflow}
     {assign var=applepay_workflow value='checkout'}
 {/if}
-<div class="row {$module_name|escape:'htmlall':'UTF-8'}ApplePay_wrapper -{$applepay_workflow}">
+<div class="row {$module_name|escape:'htmlall':'UTF-8'}ApplePay_wrapper -{$applepay_workflow|escape:'htmlall':'UTF-8'}">
     <div class="col-xs-12">
         <apple-pay-button buttonstyle="black" type="pay" locale="{$iso_code|escape:'htmlall':'UTF-8'}" id="apple-pay-button" class="{$module_name|escape:'htmlall':'UTF-8'}ApplePay_button"></apple-pay-button>
         <p class="{$module_name|escape:'htmlall':'UTF-8'}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
