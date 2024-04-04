@@ -115,6 +115,24 @@ class getRequestTest extends BaseApplepayPaymentMethod
             ->shouldReceive([
                 'getOrderTotal' => 42,
             ]);
+        $this->classe
+            ->shouldReceive([
+                'getDeliveryOptions' => [
+                    [
+                        'identifier' => '42',
+                        'label' => 'carrier label',
+                        'detail' => 'carrier detail',
+                        'amount' => 42,
+                    ],
+                ],
+                'getLinesItems' => [
+                    [
+                        'label' => 'line item',
+                        'type' => 'final',
+                        'amount' => 42,
+                    ],
+                ],
+            ]);
 
         $expected = [
             'countryCode' => 'FR',
