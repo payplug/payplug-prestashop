@@ -843,7 +843,8 @@ var $document, $window, __moduleName__Module = {
                         },
                         carrier: carrier,
                         pay_id: applepay.props.datas.idPayment,
-                        patchPayment: 1
+                        patchPayment: 1,
+                        workflow: applepay.props.workflow,
                     },
                     success: function (json) {
                         var result = JSON.parse(json);

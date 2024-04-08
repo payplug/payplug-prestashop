@@ -87,6 +87,7 @@ class BasePaymentMethod extends TestCase
         $this->context->cart->id = 1;
         $this->context->cart->id_address_delivery = 42;
         $this->context->cart->id_address_invoice = 42;
+        $this->context->cart->id_carrier = 1;
         $this->context->cart->id_currency = 42;
         $this->context->cart->id_customer = 42;
         $this->context->cart->delivery_option = '';

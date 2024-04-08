@@ -204,13 +204,18 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->getCurrency()
             ->get((int) $this->context->cart->id_currency);
 
-        $carrier = $this->tools->tool('getValue', 'carrier');
+        $workflow = $this->tools->tool('getValue', 'workflow');
+        if ('checkout' != $workflow) {
+            $carrier = $this->tools->tool('getValue', 'carrier');
 
-        $delivery_options = $this->getDeliveryOptions();
-        if ($carrier) {
-            $id_carrier = (int) $carrier['identifier'];
+            $delivery_options = $this->getDeliveryOptions();
+            if ($carrier) {
+                $id_carrier = (int) $carrier['identifier'];
+            } else {
+                $id_carrier = $delivery_options[0]['identifier'];
+            }
         } else {
-            $id_carrier = $delivery_options[0]['identifier'];
+            $id_carrier = (int) $this->context->cart->id_carrier;
         }
 
         $applePayPaymentRequest = [
@@ -238,7 +243,6 @@ class ApplepayPaymentMethod extends PaymentMethod
             ])),
         ];
 
-        $workflow = $this->tools->tool('getValue', 'workflow');
         if ('checkout' != $workflow) {
             if (!empty($delivery_options)) {
                 $additionalPaymentRequestDatas['shippingMethods'] = $delivery_options;
