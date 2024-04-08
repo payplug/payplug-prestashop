@@ -31,6 +31,7 @@ if (!defined('_PS_VERSION_')) {
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
     private $apiClass;
+    private $cart_adapter;
     private $configurationAdapter;
     private $configurationClass;
     private $contextAdapter;
@@ -72,6 +73,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
+        $this->cart_adapter = $this->plugin->getCart();
         $this->tools_adapter = $this->plugin->getTools();
         $this->country = $this->dependencies->getPlugin()->getCountry();
 
@@ -371,7 +373,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'message' => 'Success',
                 ]));
             } elseif ($tools->tool('getIsset', 'patchPayment')) {
-                $cart = $this->plugin->getCart()->get((int) $context->cart->id);
+                $cart = $this->cart_adapter->get((int) $context->cart->id);
                 $resource_id = $tools->tool('getValue', 'pay_id');
                 $token = $tools->tool('getValue', 'token');
 
@@ -418,19 +420,17 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 ];
 
                 $address_adapter = $this->plugin->getAddress();
-                $carrier_in_range = $cart->isCarrierInRange(
-                    $cart->id_carrier,
-                    $address_adapter->getZoneById((int) $cart->id_address_delivery)
-                );
-                if (!$carrier_in_range) {
-                    exit(json_encode([
-                        'result' => false,
-                        'message' => 'Invalid carrier/address',
-                    ]));
-                }
 
                 $workflow = $tools->tool('getValue', 'workflow');
                 if ('checkout' != $workflow) {
+                    $applepay_carrier = $tools->tool('getValue', 'carrier');
+                    if (!is_array($applepay_carrier) || empty($applepay_carrier)) {
+                        exit(json_encode([
+                            'result' => false,
+                            'message' => 'Invalid given carrier',
+                        ]));
+                    }
+
                     $request = $this->dependencies
                         ->getPlugin()
                         ->getPaymentMethodClass()
@@ -460,9 +460,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     }
 
                     $customer_adapter = $this->plugin->getCustomer();
-                    $cart_adapter = $this->dependencies
-                        ->getPlugin()
-                        ->getCart();
                     $user_shipping_address = [
                         'firstname' => $cart_data['shipping']['first_name'],
                         'lastname' => $cart_data['shipping']['last_name'],
@@ -471,7 +468,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'city' => $cart_data['shipping']['city'],
                         'id_country' => $this->country->getByIso($cart_data['shipping']['country']),
                     ];
-
                     $user_billing_address = [
                         'firstname' => $cart_data['billing']['first_name'],
                         'lastname' => $cart_data['billing']['last_name'],
@@ -480,6 +476,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'city' => $cart_data['billing']['city'],
                         'id_country' => $this->country->getByIso($cart_data['billing']['country']),
                     ];
+
+                    // Save the current address delivery to update cart product
+                    $current_address_delivery = (int) $cart->id_address_delivery;
+
                     if ($customer_adapter->isLogged($context->customer)) {
                         // Prepare shipping and billing addresses data
                         // Check if the addresses already exist for the customer
@@ -541,7 +541,29 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         $cart->id_address_delivery = $shipping_address_id;
                     }
 
-                    $cart_adapter->update($cart);
+                    // Set selected carrier in cart
+                    $carrier = $this->plugin->getCarrier()->get((int) $applepay_carrier['identifier']);
+                    $carrier_in_range = $cart->isCarrierInRange(
+                        (int) $carrier->id,
+                        $address_adapter->getZoneById((int) $cart->id_address_delivery)
+                    );
+                    if (!$carrier_in_range) {
+                        exit(json_encode([
+                            'result' => false,
+                            'message' => 'Given carrier is not available for this delivery address',
+                        ]));
+                    }
+                    $cart->id_carrier = $carrier->id;
+                    $delivery_option = [
+                        (int) $cart->id_address_delivery => (string) $carrier->id . ',',
+                    ];
+                    $cart->delivery_option = json_encode($delivery_option);
+
+                    // then update the cart
+                    $this->cart_adapter->update($cart);
+
+                    $cart->updateDeliveryAddressId((int) $current_address_delivery, (int) $cart->id_address_delivery);
+
                     $data['apple_pay'] = array_merge($data['apple_pay'], $cart_data);
                     $data['apple_pay'] = array_merge($data['apple_pay'], $cart_data);
                 }
