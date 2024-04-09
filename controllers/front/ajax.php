@@ -562,7 +562,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     // then update the cart
                     $this->cart_adapter->update($cart);
 
-                    $cart->updateDeliveryAddressId((int) $current_address_delivery, (int) $cart->id_address_delivery);
+                    $cart->updateAddressId((int) $current_address_delivery, (int) $cart->id_address_delivery);
 
                     $data['apple_pay'] = array_merge($data['apple_pay'], $cart_data);
                     $data['apple_pay'] = array_merge($data['apple_pay'], $cart_data);
