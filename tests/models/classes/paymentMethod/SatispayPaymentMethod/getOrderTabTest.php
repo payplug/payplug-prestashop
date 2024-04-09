@@ -1,9 +1,8 @@
 <?php
 
-namespace PayPlug\tests\models\classes\paymentMethod\PaymentMethod;
+namespace PayPlug\tests\models\classes\paymentMethod\SatispayPaymentMethod;
 
 use PayPlug\tests\mock\PaymentMock;
-use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
@@ -12,8 +11,13 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  *
  * @runTestsInSeparateProcesses
  */
-class getOrderTabTest extends BasePaymentMethod
+class getOrderTabTest extends BaseSatispayPaymentMethod
 {
+    public function setUp()
+    {
+        parent::setUp();
+    }
+
     /**
      * @dataProvider invalidObjectFormatDataProvider
      *
@@ -24,36 +28,46 @@ class getOrderTabTest extends BasePaymentMethod
         $this->assertSame([], $this->classe->getOrderTab($resource));
     }
 
-    public function testWhenTabIsReturn()
+    /**
+     * @description test the behavior of the getOrderTab()
+     * method when the order state is marked as pending
+     */
+    public function testWhenOrderStateIsPending()
     {
-        $resource = PaymentMock::getStandard();
-
+        $this->classe->set('name', 'satispay');
+        $resource = PaymentMock::getSatispay();
         $this->configuration
             ->shouldReceive('getValue')
             ->with('order_state_pending')
             ->andReturn('6');
-        $expected = [
-            'order_state' => '6',
-            'amount' => 313.2,
-            'module_name' => 'order.module.default',
-        ];
+        $expected = [];
+
         $this->assertSame($expected, $this->classe->getOrderTab($resource));
     }
 
-    public function testWhenTabIsPaidReturn()
+    /**
+     * @description test the behavior of the getOrderTab()
+     * method when the order state is marked as paid.
+     */
+    public function testWhenOrderStateIsPaid()
     {
-        $resource = PaymentMock::getStandard();
+        $this->classe->set('name', 'satispay');
+        $resource = PaymentMock::getSatispay();
         $resource->is_paid = true;
         $this->configuration
             ->shouldReceive('getValue')
             ->with('order_state_paid')
             ->andReturn('2');
-
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('order_state_pending')
+            ->andReturn('6');
         $expected = [
             'order_state' => '2',
             'amount' => 313.2,
-            'module_name' => 'order.module.default',
+            'module_name' => 'order.module.satispay',
         ];
+
         $this->assertSame($expected, $this->classe->getOrderTab($resource));
     }
 }

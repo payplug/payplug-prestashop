@@ -66,4 +66,35 @@ class SatispayPaymentMethod extends PaymentMethod
 
         return $payment_tab;
     }
+
+    /**
+     * @description override getOrderTab
+     *  If the order state matches the configured pending state,
+     * it logs a message indicating an abandoned order
+     * and returns an empty array.
+     *
+     * @param null $resource
+     *
+     * @return array
+     */
+    public function getOrderTab($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            $this->logger->addLog('$resource must be a non-empty object');
+
+            return [];
+        }
+        $order_tab = parent::getOrderTab($resource);
+        $order_state_pending = $this->configuration->getValue('order_state_pending');
+
+        if ($order_state_pending == $order_tab['order_state']) {
+            $this->logger->addLog('this is an abandoned statispay order, it will not be be created ');
+
+            return [];
+        }
+
+        return $order_tab;
+    }
 }
