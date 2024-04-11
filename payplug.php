@@ -386,6 +386,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayExpressCheckout()
     {
+        $oneyCTA = '';
         if ($this->module) {
             $dependencies = new DependenciesClass();
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
