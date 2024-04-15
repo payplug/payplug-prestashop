@@ -657,8 +657,18 @@ var $document, $window, __moduleName__Module = {
             this.props[key] = value;
         },
         init: function () {
-            $('apple-pay-button').click(function () {
-                __moduleName__Module.applepay.trigger();
+            let {applepay} = __moduleName__Module,
+                {workflow} = applepay.props;
+
+            $('apple-pay-button, #payment-confirmation button').click(function (event) {
+                let payment_method_id = $('.js-current-step .custom-radio input[type="radio"]:checked').attr('id'),
+                    payment_method = $('#pay-with-'+payment_method_id+'-form input[name="method"]').val();
+
+                if ('applepay' == payment_method || 'checkout' == workflow) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    applepay.trigger();
+                }
             });
         },
         trigger: function () {
@@ -1444,6 +1454,5 @@ $(document).ready(function () {
     $window = $(window);
     __moduleName__Module.init();
 });
-
 
 window['__moduleName__Module'] = __moduleName__Module;
