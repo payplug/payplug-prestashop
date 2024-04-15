@@ -513,6 +513,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         $customer->email = $cart_data['shipping']['email'];
                         $customer->passwd = $tools->tool('passwdGen', 32, 'ALPHANUMERIC');
                         $customer_adapter->add($customer);
+
+                        // Update context customer
+                        $context->cookie->__set('id_customer', (int) $customer->id);
+
                         $cart->id_customer = (int) $customer->id;
                         // Create shipping address
                         $shipping_address_id = $this->address_class
