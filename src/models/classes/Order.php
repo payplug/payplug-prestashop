@@ -172,17 +172,6 @@ class Order
             return false;
         }
 
-        $order->current_state = $order_history->id_order_state;
-
-        if (!$order->update()) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('Order::updateOrderState - Can\'t update order.', 'error');
-
-            return false;
-        }
-
         return true;
     }
 

@@ -66,38 +66,6 @@ class updateOrderStateTest extends BaseOrder
         $this->assertFalse($this->classe->updateOrderState($order, $new_order_state));
     }
 
-    public function testWhenOrderCannotBeUpdated()
-    {
-        $order_history = \Mockery::mock('OrderHistory');
-        $order_history->id_order_state = 42;
-        $order_history
-            ->shouldReceive([
-                'changeIdOrderState' => true,
-                'save' => true,
-            ]);
-        $order_history_adapter = \Mockery::mock('OrderHistoryAdapter');
-        $order_history_adapter
-            ->shouldReceive([
-                'get' => $order_history,
-            ]);
-
-        $order = \Mockery::mock('Order');
-        $order->id = 1;
-        $order->current_state = 42;
-        $order
-            ->shouldReceive([
-                'update' => false,
-            ]);
-
-        $this->plugin
-            ->shouldReceive([
-                'getOrderHistory' => $order_history_adapter,
-            ]);
-
-        $new_order_state = 1;
-        $this->assertFalse($this->classe->updateOrderState($order, $new_order_state));
-    }
-
     public function testWhenOrderIsUpdated()
     {
         $order_history = \Mockery::mock('OrderHistory');
@@ -116,10 +84,6 @@ class updateOrderStateTest extends BaseOrder
         $order = \Mockery::mock('Order');
         $order->id = 1;
         $order->current_state = 42;
-        $order
-            ->shouldReceive([
-                'update' => true,
-            ]);
 
         $this->plugin
             ->shouldReceive([
