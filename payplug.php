@@ -54,7 +54,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '4.7.2';
+        $this->version = '4.8.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -380,20 +380,29 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description hook applepay and oney on cart page
+     *
      * @return mixed
      */
     public function hookDisplayExpressCheckout()
     {
+        $oneyCTA = '';
         if ($this->module) {
+            $dependencies = new DependenciesClass();
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_cart_cta')) {
-                $dependencies = new DependenciesClass();
-
-                return $dependencies
+                // TODO: this function should be splitted renderCartCTA and renderProductCTA
+                $oneyCTA = $dependencies
                     ->getPlugin()
                     ->getOneyAction()
                     ->renderCTA();
             }
+            $paymentCTA = $dependencies
+                ->getPlugin()
+                ->getCartAction()
+                ->renderPaymentCTA();
+
+            return $paymentCTA . $oneyCTA;
         }
     }
 

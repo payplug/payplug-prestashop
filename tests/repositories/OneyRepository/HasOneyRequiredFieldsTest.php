@@ -74,12 +74,6 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingMobilePhone()
     {
-        $this->dependencies->configClass
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => 3500,
-            ])
-        ;
-
         $this->repo
             ->shouldReceive([
                 'isValidOneyEmail' => [
@@ -155,11 +149,13 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
                 ],
             ])
         ;
-        $this->dependencies->configClass
+        $this->validators['payment']
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => true,
-            ])
-        ;
+                'isValidMobilePhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
 
         $payment_data = [
             'shipping' => [

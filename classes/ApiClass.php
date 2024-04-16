@@ -678,60 +678,6 @@ class ApiClass
     }
 
     /**
-     * @description Create Payment from api for given data
-     *
-     * @param false $pay_id
-     * @param array $data
-     *
-     * @return array
-     */
-    public function patchPayment($pay_id = false, $data = [])
-    {
-        if (!$pay_id || !is_string($pay_id)) {
-            return [
-                'code' => null,
-                'result' => false,
-                'message' => 'Wrong $pay_id given',
-            ];
-        }
-
-        if (!$data || !is_array($data)) {
-            return [
-                'code' => null,
-                'result' => false,
-                'message' => 'Wrong $data given',
-            ];
-        }
-
-        $retrieve = $this->retrievePayment($pay_id);
-        if (!$retrieve['result']) {
-            return [
-                'code' => null,
-                'result' => false,
-                'message' => 'Can\'t patch the payment: ' . $retrieve['message'],
-            ];
-        }
-
-        $payment = $retrieve['resource'];
-
-        try {
-            $response = [
-                'result' => true,
-                'resource' => $payment->update($data),
-                'code' => 200,
-            ];
-        } catch (\Exception $e) {
-            $response = [
-                'result' => false,
-                'code' => (int) $e->getCode(),
-                'message' => $e->getMessage(),
-            ];
-        }
-
-        return $response;
-    }
-
-    /**
      * @description Refund Payment from api
      *
      * @param false $pay_id

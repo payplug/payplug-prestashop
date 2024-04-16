@@ -42,6 +42,24 @@ class Configuration
             'defaultValue' => '{}',
             'setConf' => 1,
         ],
+        'applepay_carriers' => [
+            'type' => 'string',
+            'name' => 'APPLEPAY_CARRIERS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
+        'applepay_cart' => [
+            'type' => 'integer',
+            'name' => 'APPLEPAY_CART',
+            'defaultValue' => 1,
+            'setConf' => 1,
+        ],
+        'applepay_checkout' => [
+            'type' => 'integer',
+            'name' => 'APPLEPAY_CHECKOUT',
+            'defaultValue' => 1,
+            'setConf' => 1,
+        ],
         'bancontact_country' => [
             'type' => 'integer',
             'name' => 'BANCONTACT_COUNTRY',

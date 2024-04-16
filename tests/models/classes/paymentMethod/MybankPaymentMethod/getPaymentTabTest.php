@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\MybankPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group mybank_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */
@@ -53,6 +54,16 @@ class getPaymentTabTest extends BaseMybankPaymentMethod
         $expected_tab = [
             'amount' => 4242,
             'currency' => 'EUR',
+            'notification_url' => 'link',
+            'hosted_payment' => [
+                'return_url' => 'link',
+                'cancel_url' => 'link',
+            ],
+            'metadata' => [
+                'ID Client' => 1,
+                'ID Cart' => 1,
+                'Website' => 'shop domain ssl',
+            ],
             'shipping' => [
                 'title' => null,
                 'first_name' => 'Ipsum',
@@ -83,16 +94,6 @@ class getPaymentTabTest extends BaseMybankPaymentMethod
                 'city' => 'Paris',
                 'country' => 'fr',
                 'language' => 'fr',
-            ],
-            'notification_url' => 'link',
-            'hosted_payment' => [
-                'return_url' => 'link',
-                'cancel_url' => 'link',
-            ],
-            'metadata' => [
-                'ID Client' => 1,
-                'ID Cart' => 1,
-                'Website' => 'shop domain ssl',
             ],
             'payment_method' => 'mybank',
         ];

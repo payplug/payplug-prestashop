@@ -29,6 +29,7 @@ if (!defined('_PS_VERSION_')) {
 
 use PayPlug\classes\MyLogPHP;
 use PayPlug\src\actions\CardAction;
+use PayPlug\src\actions\CartAction;
 use PayPlug\src\actions\ConfigurationAction;
 use PayPlug\src\actions\MerchantTelemetryAction;
 use PayPlug\src\actions\OnboardingAction;
@@ -63,6 +64,7 @@ use PayPlug\src\application\adapter\TabAdapter;
 use PayPlug\src\application\adapter\ToolsAdapter;
 use PayPlug\src\application\adapter\TranslationAdapter;
 use PayPlug\src\application\adapter\ValidateAdapter;
+use PayPlug\src\models\classes\Address;
 use PayPlug\src\models\classes\ApiRest;
 use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\Country;
@@ -79,6 +81,7 @@ use PayPlug\src\repositories\LoggerRepository;
 use PayPlug\src\repositories\OrderStateRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
+use PayPlug\src\utilities\services\API;
 use PayPlug\src\utilities\services\Browser;
 use PayPlug\src\utilities\services\MerchantTelemetry;
 use PayPlug\src\utilities\services\Routes;
@@ -89,6 +92,7 @@ class PluginInit extends BaseClass
 
     // Actions
     private $card_action;
+    private $cart_action;
     private $configuration_action;
     private $onboarding_action;
     private $oney_action;
@@ -143,6 +147,7 @@ class PluginInit extends BaseClass
     private $validate_adapter;
 
     // Model classes
+    private $address_class;
     private $api_rest_class;
     private $country_class;
     private $configuration_class;
@@ -166,6 +171,7 @@ class PluginInit extends BaseClass
     private $shop_repository;
 
     // Utilities services
+    private $api;
     private $browser;
     private $routes;
     private $merchant_telemetry;
@@ -185,6 +191,7 @@ class PluginInit extends BaseClass
         $this->plugin
             ->setApiClass($this->apiClass)
             ->setApiVersion('2019-08-06')
+            ->setApiService($this->api)
             ->setBrowser($this->browser)
             ->setCache($this->cache)
             ->setMerchantTelemetry($this->merchant_telemetry)
@@ -229,6 +236,7 @@ class PluginInit extends BaseClass
         // Set actions
         $this->plugin
             ->setCardAction($this->card_action)
+            ->setCartAction($this->cart_action)
             ->setConfigurationAction($this->configuration_action)
             ->setMerchantTelemetryAction($this->merchant_telemetry_action)
             ->setOnboardingAction($this->onboarding_action)
@@ -241,6 +249,7 @@ class PluginInit extends BaseClass
 
         // Set models/classes
         $this->plugin
+            ->setAddressClass($this->address_class)
             ->setApiRestClass($this->api_rest_class)
             ->setConfigurationClass($this->configuration_class)
             ->setCountryClass($this->country_class)
@@ -272,6 +281,7 @@ class PluginInit extends BaseClass
     private function setActions()
     {
         $this->card_action = new CardAction($this->dependencies);
+        $this->cart_action = new CartAction($this->dependencies);
         $this->configuration_action = new ConfigurationAction($this->dependencies);
         $this->merchant_telemetry_action = new MerchantTelemetryAction($this->dependencies);
         $this->onboarding_action = new OnboardingAction($this->dependencies);
@@ -378,6 +388,7 @@ class PluginInit extends BaseClass
 
     private function setClasses()
     {
+        $this->address_class = new Address($this->dependencies);
         $this->api_rest_class = new ApiRest($this->dependencies);
         $this->configuration_class = new Configuration($this->dependencies);
         $this->country_class = new Country($this->dependencies);
@@ -408,6 +419,7 @@ class PluginInit extends BaseClass
 
     private function setServices()
     {
+        $this->api = new API($this->dependencies);
         $this->browser = new Browser();
         $this->routes = new Routes();
         $this->merchant_telemetry = new MerchantTelemetry();

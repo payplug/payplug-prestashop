@@ -47,7 +47,9 @@ class saveActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'An error has occurred',
+                    'title' => null,
+                    'msg' => 'modal.error.text',
+                    'close' => 'modal.error.submit',
                 ],
             ],
             $this->action->saveAction($datas)
@@ -61,7 +63,9 @@ class saveActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'An error has occurred',
+                    'title' => null,
+                    'msg' => 'modal.error.text',
+                    'close' => 'modal.error.submit',
                 ],
             ],
             $this->action->saveAction($datas)
@@ -76,7 +80,31 @@ class saveActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'An error has occurred',
+                    'title' => null,
+                    'msg' => 'modal.error.text',
+                    'close' => 'modal.error.submit',
+                ],
+            ],
+            $this->action->saveAction($datas)
+        );
+    }
+
+    public function testWhenApplepayCarriersIsEmpty()
+    {
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->enable_applepay = true;
+        $datas->enable_applepay_cart = true;
+        $datas->applepay_carriers = [];
+
+        $this->assertSame(
+            [
+                'success' => false,
+                'data' => [
+                    'title' => null,
+                    'msg' => 'modal.applepay.text',
+                    'close' => 'modal.applepay.submit',
+                    'class' => '-error',
                 ],
             ],
             $this->action->saveAction($datas)
@@ -87,6 +115,8 @@ class saveActionTest extends BaseConfigurationAction
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
+        $datas->applepay_carriers = ['1', '2', '4'];
+        $datas->enable_applepay_cart = true;
         $datas->enable_standard = 1;
 
         $this->configuration->shouldReceive([
@@ -97,7 +127,7 @@ class saveActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'An error has occurred while register enable_standard',
+                    'message' => 'An error has occurred while register payplug_applepay_carriers',
                 ],
             ],
             $this->action->saveAction($datas)
@@ -108,6 +138,8 @@ class saveActionTest extends BaseConfigurationAction
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
+        $datas->applepay_carriers = ['1', '2', '4'];
+        $datas->enable_applepay_cart = true;
         $datas->payplug_standard = 1;
 
         $this->configuration->shouldReceive([

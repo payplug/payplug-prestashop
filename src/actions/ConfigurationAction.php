@@ -531,8 +531,9 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // todo: add translation
-                    'message' => 'An error has occurred',
+                    'title' => null,
+                    'msg' => $translation['error']['text'],
+                    'close' => $translation['error']['submit'],
                 ],
             ];
         }
@@ -543,11 +544,32 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // todo: add translation
-                    'message' => 'An error has occurred',
+                    'title' => null,
+                    'msg' => $translation['error']['text'],
+                    'close' => $translation['error']['submit'],
                 ],
             ];
         }
+
+        if (empty($datas->applepay_carriers)
+            && true === $datas->enable_applepay_cart
+            && true === $datas->enable_applepay) {
+            return [
+                'success' => false,
+                'data' => [
+                    'title' => null,
+                    'msg' => $translation['applepay']['text'],
+                    'close' => $translation['applepay']['submit'],
+                    'class' => '-error',
+                ],
+            ];
+        }
+
+        if (!empty($datas->applepay_carriers)
+            && true === $datas->enable_applepay_cart) {
+            $datas->payplug_applepay_carriers = json_encode($datas->applepay_carriers);
+        }
+
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $configuration_keys = [
             'deferred_state' => 'payplug_deferred_state',
@@ -563,6 +585,9 @@ class ConfigurationAction
             'oney_custom_min_amounts' => 'oney_min_amounts',
             'oney_custom_max_amounts' => 'oney_max_amounts',
             'bancontact_country' => 'enable_bancontact_country',
+            'applepay_carriers' => 'payplug_applepay_carriers',
+            'applepay_checkout' => 'enable_applepay_checkout',
+            'applepay_cart' => 'enable_applepay_cart',
         ];
 
         foreach ($configuration_keys as $key => $config) {
@@ -767,7 +792,6 @@ class ConfigurationAction
             return [
                 'success' => false,
                 'data' => [
-                    // todo: add translation
                     'message' => $translation['inactive']['modal']['error'],
                 ],
             ];

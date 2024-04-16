@@ -6,9 +6,10 @@ use PayPlug\tests\mock\PaymentTabMock;
 
 /**
  * @group unit
- * @group old_repository
- * @group oney
- * @group oney_repository
+ * @group classes
+ * @group payment_method_classes
+ * @group oney_payment_method_classes
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
@@ -91,18 +92,18 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyPaymentMethod
         $this->validate_adapter->shouldReceive([
             'validate' => true,
         ]);
-
-        $this->validators['payment']->shouldReceive([
-                                                        'isValidMobilePhoneNumber' => [
-                                                            'result' => true,
-                                                            'message' => '',
-                                                        ],
-                                                    ]);
+        $this->validators['payment']
+            ->shouldReceive([
+                'isValidMobilePhoneNumber' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
         $this->tools_adapter->shouldReceive('tool')
             ->andReturn(20);
         $get_country = (object) [];
         $get_country->iso_code = 'fr';
-        $this->country
+        $this->country_adapter
             ->shouldReceive([
                 'getCountry' => $get_country,
             ]);
@@ -149,9 +150,12 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyPaymentMethod
         ]);
         $this->validators['payment']
             ->shouldReceive([
-                'isValidMobilePhoneNumber' => false,
+                'isValidMobilePhoneNumber' => [
+                    'result' => false,
+                    'message' => '$iso_code is wrong',
+                ],
             ]);
-        $this->country
+        $this->country_adapter
             ->shouldReceive([
                 'getCountry' => [],
             ]);

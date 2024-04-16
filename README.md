@@ -11,7 +11,7 @@ Plugin UI Library
 ---------
 
 The plugin ui library use to display the admin configuration is display Vue.Js.  
-To run the library on locola there is few requirement. 
+To run the library on local there is few requirement. 
 
 ### Update the vue.config.js file
 

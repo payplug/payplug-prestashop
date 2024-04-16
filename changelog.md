@@ -1,5 +1,15 @@
 # Payplug module changelog
 
+## Version 4.8.0
+- Feature :
+  - [PRE-2159](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2370): Add applepay checkout button on cart page
+  - [PRE-2157](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2374): Add applepay checkout configuration
+  - [PRE-2160](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2379): Show applepay checkout modal
+  - [PRE-2161](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2389): Pay with ApplePay on cart
+
+- Bugfix :
+  - [SMP-2422](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2392): Fix integrated payment retry when failure occured
+
 ## Version 4.7.2
 - Bugfix :
   - [SMP-2375](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2384): Align cart hash with payment tab generation to avoid multiple creation
@@ -18,8 +28,8 @@
   - [PRE-2100](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2337): Add install method for configuration action
 
 - Bugfix :
-  - [PRE-2215](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2343): Fix checkout continue steps when IP form is shown
-  - [PRE-2280](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2346): Fix call to the method to get valid iso country list
+  - [SMP-2215](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2343): Fix checkout continue steps when IP form is shown
+  - [SMP-2280](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2346): Fix call to the method to get valid iso country list
 
 ## Version 4.6.2
 - Improvment :

@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\GiropayPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group giropay_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */

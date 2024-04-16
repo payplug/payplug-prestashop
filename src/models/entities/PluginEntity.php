@@ -34,6 +34,7 @@ class PluginEntity
     /** @var object */
     private $address;
 
+    private $address_class;
     /** @var object */
     private $apiClass;
 
@@ -45,6 +46,9 @@ class PluginEntity
 
     /** @var object */
     private $assign;
+
+    /** @var object */
+    private $api_service;
 
     /** @var object */
     private $browser;
@@ -162,6 +166,9 @@ class PluginEntity
 
     /** @var object */
     private $refund_action;
+
+    /** @var object */
+    private $cart_action;
 
     /** @var object */
     private $routes;
@@ -329,6 +336,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getAddressClass()
+    {
+        return $this->address_class;
+    }
+
+    /**
+     * @return object
+     */
     public function getApiRestClass()
     {
         return $this->api_rest;
@@ -348,6 +363,14 @@ class PluginEntity
     public function getAssign()
     {
         return $this->assign;
+    }
+
+    /**
+     * @return object
+     */
+    public function getApiService()
+    {
+        return $this->api_service;
     }
 
     /**
@@ -729,6 +752,14 @@ class PluginEntity
     /**
      * @return object
      */
+    public function getCartAction()
+    {
+        return $this->cart_action;
+    }
+
+    /**
+     * @return object
+     */
     public function getRoutes()
     {
         return $this->routes;
@@ -815,6 +846,22 @@ class PluginEntity
     }
 
     /**
+     * @param object $address_class
+     *
+     * @return self
+     */
+    public function setAddressClass($address_class)
+    {
+        if (!is_object($address_class)) {
+            throw new BadParameterException('Invalid argument, $address must be an Address Class');
+        }
+
+        $this->address_class = $address_class;
+
+        return $this;
+    }
+
+    /**
      * @param object $apiClass
      *
      * @return PluginEntity
@@ -870,6 +917,23 @@ class PluginEntity
         }
 
         $this->assign = $assign;
+
+        return $this;
+    }
+
+    /**
+     * @param object $browser
+     * @param mixed $api_service
+     *
+     * @return self
+     */
+    public function setApiService($api_service)
+    {
+        if (!is_object($api_service)) {
+            throw new BadParameterException('Invalid argument, $api_service must be a Services/API');
+        }
+
+        $this->api_service = $api_service;
 
         return $this;
     }
@@ -1668,6 +1732,22 @@ class PluginEntity
         }
 
         $this->sql = $sql;
+
+        return $this;
+    }
+
+    /**
+     * @param object $CartAction
+     *
+     * @return self
+     */
+    public function setCartAction($CartAction)
+    {
+        if (!is_object($CartAction)) {
+            throw new BadParameterException('Invalid argument, $cart must be a CartAction');
+        }
+
+        $this->cart_action = $CartAction;
 
         return $this;
     }

@@ -29,13 +29,13 @@ if (!defined('_PS_VERSION_')) {
 
 class OneyPaymentMethod extends PaymentMethod
 {
+    protected $country;
     private $oney_allowed_iso_codes = ['FR', 'IT', 'ES', 'NL'];
     private $oney_translations;
     private $assign_adapter;
     private $address_adapter;
     private $carrier_adapter;
     private $cart_adapter;
-    private $country;
     private $validators;
 
     public function __construct($dependencies)

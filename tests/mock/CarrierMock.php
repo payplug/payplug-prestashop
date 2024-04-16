@@ -11,49 +11,13 @@ class CarrierMock
 
     public static function get()
     {
-        $cart = new \stdClass();
-        $cart->id = 1;
-        $cart->name = 'Carrier name';
-        $cart->date_add = '2021-01-01 00:00:00';
-        $cart->date_upd = '2021-01-01 00:00:00';
+        $carrier = new \stdClass();
+        $carrier->id = 1;
+        $carrier->name = 'Carrier name';
+        $carrier->date_add = '2021-01-01 00:00:00';
+        $carrier->date_upd = '2021-01-01 00:00:00';
+        $carrier->delay = 'fast or not';
 
-        return $cart;
-    }
-
-    public static function getProducts()
-    {
-        return [
-            [
-                'id_product' => 1,
-                'cart_quantity' => 1,
-                'name' => 'Pull imprimé colibri',
-                'manufacturer_name' => 'Studio Design',
-                'price_wt' => 34.464,
-                'attributes' => 'Size : S',
-            ],
-            [
-                'id_product' => 2,
-                'cart_quantity' => 2,
-                'name' => 'T-shirt imprimé colibri',
-                'manufacturer_name' => 'Studio Design',
-                'price_wt' => 22.944,
-                'attributes' => 'Size : S- Color : White',
-            ],
-            [
-                'id_product' => 3,
-                'cart_quantity' => 3,
-                'name' => 'Mug The adventure begins',
-                'manufacturer_name' => 'Studio Design',
-                'price_wt' => 14.28,
-            ],
-            [
-                'id_product' => 4,
-                'cart_quantity' => 4,
-                'name' => 'Coussin ours brun',
-                'manufacturer_name' => 'Studio Design',
-                'price_wt' => 22.68,
-                'attributes' => 'Color : White',
-            ],
-        ];
+        return $carrier;
     }
 }

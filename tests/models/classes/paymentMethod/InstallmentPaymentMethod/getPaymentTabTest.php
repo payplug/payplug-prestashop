@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\InstallmentPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group installment_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */
@@ -66,6 +67,16 @@ class getPaymentTabTest extends BaseInstallmentPaymentMethod
         $expected_tab = [
             'amount' => 4242,
             'currency' => 'EUR',
+            'notification_url' => 'link',
+            'hosted_payment' => [
+                'return_url' => 'link',
+                'cancel_url' => 'link',
+            ],
+            'metadata' => [
+                'ID Client' => 1,
+                'ID Cart' => 1,
+                'Website' => 'shop domain ssl',
+            ],
             'shipping' => [
                 'title' => null,
                 'first_name' => 'Ipsum',
@@ -96,16 +107,6 @@ class getPaymentTabTest extends BaseInstallmentPaymentMethod
                 'city' => 'Paris',
                 'country' => 'fr',
                 'language' => 'fr',
-            ],
-            'notification_url' => 'link',
-            'hosted_payment' => [
-                'return_url' => 'link',
-                'cancel_url' => 'link',
-            ],
-            'metadata' => [
-                'ID Client' => 1,
-                'ID Cart' => 1,
-                'Website' => 'shop domain ssl',
             ],
             'schedule' => [
                 [

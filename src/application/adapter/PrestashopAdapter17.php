@@ -75,8 +75,6 @@ class PrestashopAdapter17
                         ),
                 ]
             );
-
-            $this->context->controller->addJS($views_path . 'js/applepay-v' . $this->dependencies->version . '.js');
         }
     }
 

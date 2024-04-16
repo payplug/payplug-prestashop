@@ -32,7 +32,7 @@ class BasePaymentMethod extends TestCase
     protected $configuration_adapter;
     protected $constant;
     protected $context;
-    protected $country;
+    protected $country_adapter;
     protected $context_adapter;
     protected $currency_adapter;
     protected $dependencies;
@@ -87,6 +87,7 @@ class BasePaymentMethod extends TestCase
         $this->context->cart->id = 1;
         $this->context->cart->id_address_delivery = 42;
         $this->context->cart->id_address_invoice = 42;
+        $this->context->cart->id_carrier = 1;
         $this->context->cart->id_currency = 42;
         $this->context->cart->id_customer = 42;
         $this->context->cart->delivery_option = '';
@@ -128,7 +129,7 @@ class BasePaymentMethod extends TestCase
         $this->card_repository = \Mockery::mock('CardRepository');
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
-        $this->country = \Mockery::mock('Country');
+        $this->country_adapter = \Mockery::mock('Country');
         $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
         $this->carrier_adapter = \Mockery::mock('CarrierAdapter');
         $this->cart_adapter = \Mockery::mock('CartAdapter');
@@ -145,7 +146,7 @@ class BasePaymentMethod extends TestCase
                 'getConfigurationClass' => $this->configuration,
                 'getConstant' => $this->constant,
                 'getContext' => $this->context_adapter,
-                'getCountry' => $this->country,
+                'getCountry' => $this->country_adapter,
                 'getCurrency' => $this->currency_adapter,
                 'getLogger' => $this->logger,
                 'getPaymentRepository' => $this->payment_repository,

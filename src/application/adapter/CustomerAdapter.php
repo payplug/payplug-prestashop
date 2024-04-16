@@ -35,4 +35,43 @@ class CustomerAdapter implements CustomerInterface
     {
         return new \Customer($idCustomer);
     }
+
+    public function isLogged($customer)
+    {
+        return $customer->isLogged();
+    }
+
+    /**
+     * @description  get customer's list of address
+     *
+     * @param $customer_id
+     * @param int $id_lang
+     *
+     * @return mixed
+     */
+    public function getAddresses($customer_id = 0, $id_lang = 0)
+    {
+        if (!is_int($customer_id) || !$customer_id) {
+            return [];
+        }
+        if (!is_int($id_lang) || !$id_lang) {
+            return [];
+        }
+        $customer = new \Customer($customer_id);
+
+        return $customer->getAddresses($id_lang);
+    }
+
+    /**
+     * @description adapter to add customer object
+     * in DB
+     *
+     * @param $customer
+     *
+     * @return bool
+     */
+    public function add($customer)
+    {
+        return $customer->add();
+    }
 }

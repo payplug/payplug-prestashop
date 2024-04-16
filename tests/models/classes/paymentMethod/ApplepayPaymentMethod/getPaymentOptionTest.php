@@ -6,6 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group applepay_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */
@@ -41,6 +42,10 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('applepay_checkout')
+            ->andReturn(true);
 
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }
@@ -65,6 +70,10 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('applepay_checkout')
+            ->andReturn(true);
 
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
