@@ -108,7 +108,7 @@ class Order
                 && 0 >= $order_detail['product_quantity_in_stock']) {
                 return [
                     'result' => true,
-                    'status' => 'oos_paid',
+                    'status' => 'outofstock_paid',
                 ];
             }
         }
@@ -142,7 +142,7 @@ class Order
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
-                ->addLog('Order::updateOrderState - Invalid argument, $new_order_state must be non null integer.', 'error');
+                ->addLog('Order::updateOrderState - Invalid argument, $new_order_state must be non null integer. Given: ' . json_encode($new_order_state), 'error');
 
             return false;
         }

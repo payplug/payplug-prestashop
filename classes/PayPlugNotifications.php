@@ -182,7 +182,7 @@ class PayPlugNotifications
                 ->getOrderAction()
                 ->updateAction($this->resource->id);
             if (!$order_update['result']) {
-                $this->exitProcess('An error while order creation: ' . $order_update['message'], 500);
+                $this->exitProcess('An error while order update: ' . $order_update['message'], 500);
             }
             $this->exitProcess('Order updated: ' . $order_update['message']);
         } else {
@@ -195,7 +195,7 @@ class PayPlugNotifications
                 ->getOrderAction()
                 ->createAction($resource_id);
             if (!$order_create['result']) {
-                $this->exitProcess('An error while order creation.');
+                $this->exitProcess('An error while order creation: ' . $order_create['message'], 500);
             }
             $this->exitProcess('Order created.');
         }
@@ -228,67 +228,6 @@ class PayPlugNotifications
         header($_SERVER['SERVER_PROTOCOL'] . ' ' . $http_code . ' ' . $str, true, $http_code);
 
         exit;
-    }
-
-    /**
-     * @descrition Get the new order state we should attribute to
-     *
-     * @return array
-     */
-    private function getNewOrderState()
-    {
-        $this->logger->addLog('Notification: getNewOrderState');
-        // Check if order is refused by oney
-        if ($this->is_oney && $this->validators['payment']->isFailed($this->payment)['result']) {
-            $this->logger->addLog('NewOrderState: cancelled');
-
-            return [
-                'valid' => false,
-                'status' => 'cancelled',
-            ];
-        }
-
-        // CHeck if payment capture is expired
-        if ($this->is_deferred && ($this->payment->authorization->expires_at - time()) <= 0) {
-            $this->logger->addLog('NewOrderState: expired');
-
-            return [
-                'valid' => false,
-                'status' => 'expired',
-            ];
-        }
-
-        // Check if payment has failure
-        if ($this->validators['payment']->isFailed($this->payment)['result']) {
-            $this->logger->addLog('NewOrderState: error');
-
-            return [
-                'valid' => false,
-                'status' => 'error',
-            ];
-        }
-
-        // Paid but one or multiple products out of stock
-        $this->order = $this->orderAdapter->get((int) $this->orderAdapter->getOrderByCartId($this->cart->id));
-        $order_details = $this->order->getOrderDetailList();
-        foreach ($order_details as $order_detail) {
-            if ($this->configAdapter->get('PS_STOCK_MANAGEMENT')
-                && ($order_detail['product_quantity_in_stock'] <= 0)) {
-                $this->logger->addLog('NewOrderState: oos_paid');
-
-                return [
-                    'valid' => true,
-                    'status' => 'oos_paid',
-                ];
-            }
-        }
-
-        $this->logger->addLog('NewOrderState: paid');
-
-        return [
-            'valid' => true,
-            'status' => 'paid',
-        ];
     }
 
     /**
@@ -606,7 +545,7 @@ class PayPlugNotifications
             'error' => $this->configuration->getValue('order_state_error' . $state_addons),
             'expired' => $this->configuration->getValue('order_state_exp' . $state_addons),
             'oney' => $this->configuration->getValue('order_state_oney_pg' . $state_addons),
-            'oos_paid' => $this->configAdapter->get('PS_OS_OUTOFSTOCK_PAID'),
+            'outofstock_paid' => $this->configAdapter->get('PS_OS_OUTOFSTOCK_PAID'),
             'paid' => $this->configuration->getValue('order_state_paid' . $state_addons),
             'pending' => $this->configuration->getValue('order_state_pending' . $state_addons),
             'refund' => $this->configuration->getValue('order_state_refund' . $state_addons),
