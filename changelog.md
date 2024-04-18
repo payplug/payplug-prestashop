@@ -1,10 +1,14 @@
 # Payplug module changelog
 
+## Version 4.8.1
+- Bugfix :
+  - [PRE-2301](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2419): Fix applepay trigger on shopping-cart
+
 ## Version 4.8.0
 - Feature :
-  - [PRE-2159](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2370): Add applepay checkout button on cart page
-  - [PRE-2157](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2374): Add applepay checkout configuration
-  - [PRE-2160](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2379): Show applepay checkout modal
+  - [PRE-2159](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2370): Add applepay shopping-cart button on cart page
+  - [PRE-2157](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2374): Add applepay shopping-cart configuration
+  - [PRE-2160](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2379): Show applepay shopping-cart modal
   - [PRE-2161](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2389): Pay with ApplePay on cart
 
 - Bugfix :

@@ -664,7 +664,7 @@ var $document, $window, __moduleName__Module = {
                 let payment_method_id = $('.js-current-step .custom-radio input[type="radio"]:checked').attr('id'),
                     payment_method = $('#pay-with-'+payment_method_id+'-form input[name="method"]').val();
 
-                if ('applepay' == payment_method || 'checkout' == workflow) {
+                if ('applepay' == payment_method || 'checkout' != workflow) {
                     event.preventDefault();
                     event.stopPropagation();
                     applepay.trigger();
