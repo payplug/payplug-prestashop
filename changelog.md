@@ -18,7 +18,9 @@
   - [PRE-2161](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2389): Pay with ApplePay on cart
 
 - Bugfix :
-  - [SMP-2422](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2392): Fix integrated payment retry when failure occured
+  - [SMP-2422](https://git.payplug.com/plugins/p-restashop_v2_1.7/-/merge_requests/2392): Fix integrated payment retry when failure occured
+  - [SMP-2341](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2393): Fix ApplePay button translation
+  
 
 ## Version 4.7.2
 - Bugfix :
