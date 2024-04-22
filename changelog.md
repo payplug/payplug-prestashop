@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Next version
+- Bugfix :
+  - [SMP-2489](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2427): Rename hookHeader for Prestashop 1.7 and 8
+  
 ## Version 4.8.2
 - Bugfix :
   - [SMP-2232](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2408): Fix satispay abandoned order bug
