@@ -41,6 +41,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
     private $plugin;
     private $tools_adapter;
     private $payplugLock;
+    private $lock_id;
 
     public function postProcess()
     {
@@ -90,38 +91,33 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
         $cart_id = (int) $this->tools_adapter->tool('getValue', 'cartid');
         if (!$cart_id) {
-            $this->logger->addLog('No Cart ID.', 'error');
             $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$error_message]);
-            $this->tools_adapter->tool('redirect', $redirect_url_error);
+            $this->exitProcess($redirect_url_error, 'No Cart ID.');
         }
         $this->logger->addLog('Cart ID : ' . (int) $cart_id);
 
         $ps = (int) $this->tools_adapter->tool('getValue', 'ps');
         if (!is_int($ps) || !in_array($ps, [1, 2])) {
-            $this->logger->addLog('No Cart ID.', 'error');
             $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$error_message]);
-            $this->tools_adapter->tool('redirect', $redirect_url_error);
+            $this->exitProcess($redirect_url_error, 'Invalid argument ps given');
         }
         if (2 == $ps) {
-            $this->logger->addLog('Order has been cancelled on PayPlug page');
-            $this->tools_adapter->tool('redirect', $cancel_url);
+            $this->exitProcess($cancel_url, 'Order has been cancelled on PayPlug page');
         }
 
         // Check if valid cart
         $cart = $this->cart_adapter->get((int) $cart_id);
         if (!$this->validate_adapter->validate('isLoadedObject', $cart)) {
-            $this->logger->addLog('Cart cannot be loaded.', 'error');
             $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$error_message]);
-            $this->tools_adapter->tool('redirect', $redirect_url_error);
+            $this->exitProcess($redirect_url_error, 'Cart cannot be loaded.');
         }
         $this->logger->addLog('Cart loaded.', 'error');
 
         // Check if valid cart
         $customer = $this->customer_adapter->get((int) $cart->id_customer);
         if (!$this->validate_adapter->validate('isLoadedObject', $customer)) {
-            $this->logger->addLog('Customer cannot be loaded.', 'error');
             $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$error_message]);
-            $this->tools_adapter->tool('redirect', $redirect_url_error);
+            $this->exitProcess($redirect_url_error, 'Customer cannot be loaded.');
         }
 
         // Create lock
@@ -142,6 +138,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 }
                 if ($this->payplugLock->createLockG2($cart->id, 'validation')) {
                     $this->logger->addLog('Lock created');
+                    $this->lock_id = (int) $cart->id;
 
                     break;
                 }
@@ -151,25 +148,13 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         // Check if order already exist
         $id_order = $this->order_adapter->getOrderByCartId((int) $cart->id);
         if ($id_order) {
-            $delete_lock = $this->dependencies
-                ->getPlugin()
-                ->getLockRepository()
-                ->deleteLock((int) $cart->id);
-            if (!$delete_lock) {
-                $this->logger->addLog('Lock cannot be deleted.', 'error');
-            } else {
-                $this->logger->addLog('Lock deleted.', 'debug');
-            }
-
             $link_redirect = $this->context->link->getPageLink('order-confirmation', true, $this->context->language->id, [
                 'id_cart' => $cart->id,
                 'id_module' => $this->moduleInstance->id,
                 'id_order' => $id_order,
                 'key' => $customer->secure_key,
             ]);
-            $this->logger->addLog('Redirecting to order-confirmation page');
-
-            $this->tools_adapter->tool('redirect', $link_redirect);
+            $this->exitProcess($link_redirect, 'Redirecting to order-confirmation page');
         }
 
         $payment_tab = $this->dependencies
@@ -187,17 +172,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                     ->getTranslationClass()
                     ->l('The transaction was not completed and your card was not charged.', 'validation'),
             ]);
-            $this->tools_adapter->tool('redirect', $redirect_url_error);
-        }
-
-        $delete_lock = $this->dependencies
-            ->getPlugin()
-            ->getLockRepository()
-            ->deleteLock((int) $cart->id);
-        if (!$delete_lock) {
-            $this->logger->addLog('Lock cannot be deleted.', 'error');
-        } else {
-            $this->logger->addLog('Lock deleted.', 'debug');
+            $this->exitProcess($redirect_url_error, $order_create['message']);
         }
 
         $link_redirect = $this->context->link->getPageLink('order-confirmation', true, $this->context->language->id, [
@@ -206,8 +181,26 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             'id_order' => $order_create['id_order'],
             'key' => $customer->secure_key,
         ]);
-        $this->logger->addLog('Redirecting to order-confirmation page');
 
-        $this->tools_adapter->tool('redirect', $link_redirect);
+        $this->exitProcess($link_redirect, 'Redirecting to order-confirmation page');
+    }
+
+    private function exitProcess($url = '', $message = '')
+    {
+        if (is_string($message) && $message) {
+            $this->logger->addLog($message);
+        }
+        if ($this->lock_id) {
+            $delete_lock = $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteLock((int) $this->lock_id);
+            if (!$delete_lock) {
+                $this->logger->addLog('Lock cannot be deleted.', 'error');
+            } else {
+                $this->logger->addLog('Lock deleted.', 'debug');
+            }
+        }
+        $this->tools_adapter->tool('redirect', $url);
     }
 }
