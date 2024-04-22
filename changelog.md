@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Next version
+- Bugfix :
+  - [PRE-2428](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2425): Fix lock gesture on validation script
+
 ## Version 4.8.2
 - Bugfix :
   - [SMP-2232](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2408): Fix satispay abandoned order bug
