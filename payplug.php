@@ -431,7 +431,7 @@ class Payplug extends PaymentModule
      *
      * @return mixed
      */
-    public function hookHeader($params)
+    public function hookDisplayHeader($params)
     {
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->displayHeader($params);
@@ -628,7 +628,7 @@ class Payplug extends PaymentModule
             'displayExpressCheckout',
             'displayProductPriceBlock',
             'displayAdminStatusesForm',
-            'header',
+            'displayHeader',
             'payment',
             'paymentReturn',
             'paymentOptions',
