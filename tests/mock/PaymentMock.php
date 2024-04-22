@@ -258,6 +258,23 @@ class PaymentMock
         return Payment::fromAttributes(self::$payment_parameters['oneclick']);
     }
 
+    /**
+     * @description  get Satispay resource
+     *
+     * @param array $parameters
+     *
+     * @return Payment
+     */
+    public static function getSatispay($parameters = [])
+    {
+        $resource = self::getDefault($parameters);
+        $resource['payment_method'] = [
+            'type' => 'Satispay',
+        ];
+
+        return Payment::fromAttributes($resource);
+    }
+
     public static function getOney($parameters = [])
     {
         $resource = self::getDefault($parameters);

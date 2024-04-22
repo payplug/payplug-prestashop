@@ -9,7 +9,6 @@ use PayPlug\tests\mock\PaymentTabMock;
  * @group classes
  * @group payment_method_classes
  * @group oney_payment_method_classes
- * @group debug
  *
  * @runTestsInSeparateProcesses
  */

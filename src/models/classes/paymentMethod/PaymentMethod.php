@@ -269,7 +269,8 @@ class PaymentMethod
             ->convertAmount($resource->amount, true);
 
         $state_addons = $resource->is_live ? '' : '_test';
-        $order_state = $this->configuration->getValue('order_state_paid' . $state_addons);
+        $state = (bool) $resource->is_paid ? 'order_state_paid' : 'order_state_pending';
+        $order_state = $this->configuration->getValue($state . $state_addons);
 
         $translation = $this->dependencies
             ->getPlugin()

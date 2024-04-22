@@ -1,5 +1,11 @@
 # Payplug module changelog
 
+## Version 4.8.2
+- Bugfix :
+  - [SMP-2232](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2408): Fix satispay abandoned order bug
+  - [SMP-2464](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2415): Fix order object saving on order history update
+  - [SMP-2418](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2416): Fix order gesture when no stock available
+
 ## Version 4.8.1
 - Bugfix :
   - [PRE-2301](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2419): Fix applepay trigger on shopping-cart
@@ -12,7 +18,9 @@
   - [PRE-2161](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2389): Pay with ApplePay on cart
 
 - Bugfix :
-  - [SMP-2422](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2392): Fix integrated payment retry when failure occured
+  - [SMP-2422](https://git.payplug.com/plugins/p-restashop_v2_1.7/-/merge_requests/2392): Fix integrated payment retry when failure occured
+  - [SMP-2341](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2393): Fix ApplePay button translation
+  
 
 ## Version 4.7.2
 - Bugfix :

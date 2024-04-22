@@ -340,7 +340,7 @@ class OrderAction
             if (!$this->plugin
                 ->getOrderClass()
                 ->updateOrderState($order, (int) $order_states[$new_order_state['status']])) {
-                $this->logger->addLog('OrderAction::updateAction - Can\'t update order state', 'error');
+                $this->logger->addLog('OrderAction::updateAction - Can\'t update order state for given state: ' . $new_order_state['status'], 'error');
 
                 return [
                     'result' => false,

@@ -137,7 +137,7 @@ class getOrderStateFromResourceTest extends BaseOrder
         $this->assertSame(
             [
                 'result' => true,
-                'status' => 'oos_paid',
+                'status' => 'outofstock_paid',
             ],
             $this->classe->getOrderStateFromResource($resource)
         );
