@@ -44,8 +44,8 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ->andReturn('{}');
         $this->configuration
             ->shouldReceive('getValue')
-            ->with('applepay_checkout')
-            ->andReturn(true);
+            ->with('applepay_display')
+            ->andReturn('{"checkout":true,"cart":false,"product":false}');
 
         $this->assertSame([], $this->classe->getPaymentOption($payment_options));
     }
@@ -72,8 +72,8 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ->andReturn('{}');
         $this->configuration
             ->shouldReceive('getValue')
-            ->with('applepay_checkout')
-            ->andReturn(true);
+            ->with('applepay_display')
+            ->andReturn('{"checkout":true,"cart":false,"product":false}');
 
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([

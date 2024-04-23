@@ -181,14 +181,13 @@ class ApiRest
             'bancontact' => (bool) $payment_methods['bancontact'],
             'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
             'applepay' => (bool) $payment_methods['applepay'],
+            'applepay_display' => $configuration->getValue('applepay_display'),
             'amex' => (bool) $payment_methods['amex'],
             'satispay' => (bool) $payment_methods['satispay'],
             'sofort' => (bool) $payment_methods['sofort'],
             'giropay' => (bool) $payment_methods['giropay'],
             'ideal' => (bool) $payment_methods['ideal'],
             'mybank' => (bool) $payment_methods['mybank'],
-            'applepay_cart' => (bool) $configuration->getValue('applepay_cart'),
-            'applepay_checkout' => (bool) $configuration->getValue('applepay_checkout'),
         ];
     }
 
@@ -532,8 +531,7 @@ class ApiRest
             ->getConfigurationClass();
 
         $default_configuration = [
-            'applepay_cart' => $configuration->getDefault('applepay_cart'),
-            'applepay_checkout' => $configuration->getDefault('applepay_checkout'),
+            'applepay_display' => $configuration->getDefault('applepay_display'),
             'bancontact_country' => $configuration->getDefault('bancontact_country'),
             'embedded_mode' => $configuration->getDefault('embedded_mode'),
             'inst_mode' => $configuration->getDefault('inst_mode'),
