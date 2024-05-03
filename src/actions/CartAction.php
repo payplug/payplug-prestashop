@@ -122,6 +122,63 @@ class CartAction
     }
 
     /**
+     * @description Render the Apple Pay button based on cart contents and allowed carriers.
+     *
+     * This function checks if Apple Pay is compatible, analyzes the cart contents, and
+     * compares it with the allowed carriers. If at least one common carrier is found,
+     * it returns the Apple Pay button template; otherwise, it returns false. If the cart
+     * contains at least one carrier with a value of 0, it returns false.
+     *
+     * @return false|string
+     */
+    public function renderApplePayProductCheckout()
+    {
+        $this->setParameters();
+
+        $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
+        $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
+
+        // If browser is not safari, no appelpay on cart page
+//        if (!$isApplePayCompatible['result']) {
+//            return false;
+//        }
+
+        // Get Carrier list
+//        $carriers_list = $this->dependencies
+//            ->getPlugin()
+//            ->getPaymentMethodClass()
+//            ->getPaymentMethod('applepay')
+//            ->getCarriersList();
+//        if (empty($carriers_list)) {
+//            return false;
+//        }
+
+        $applepay_js_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getSourceUrl()['applepay'];
+
+        $this->dependencies
+            ->getPlugin()
+            ->getAssign()
+            ->assign([
+                         'applepay_js_url' => $applepay_js_url,
+                         'applepay_workflow' => 'product',
+                         'iso_lang' => $this->context->language->iso_code,
+                     ]);
+
+        $this->dependencies
+            ->getPlugin()
+            ->getMedia()
+            ->addJsDef([
+                           'applePayPaymentRequestAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypaymentrequest', [], true),
+                           'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
+                           'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
+                       ]);
+        return $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
+    }
+
+    /**
      * @description Set needed object from dependencies
      */
     private function setParameters()

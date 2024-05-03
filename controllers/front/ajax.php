@@ -477,7 +477,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         'id_country' => $this->country->getByIso($cart_data['billing']['country']),
                     ];
 
-                    // Save the current address delivery to update cart product
+                    if ('shopping_cart' != $workflow) {
+                       var_dump($cart);
+                    }
+                        // Save the current address delivery to update cart product
                     $current_address_delivery = (int) $cart->id_address_delivery;
 
                     if ($customer_adapter->isLogged($context->customer)) {

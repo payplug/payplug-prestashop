@@ -413,16 +413,22 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayProductPriceBlock($params)
     {
+        $oneyCTA = '';
         if ($this->module) {
+            $dependencies = new DependenciesClass();
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_product_cta')) {
-                $dependencies = new DependenciesClass();
-
-                return $dependencies
+                $oneyCTA = $dependencies
                     ->getPlugin()
                     ->getOneyAction()
                     ->renderCTA($params);
             }
+            $paymentCTA = $dependencies
+                ->getPlugin()
+                ->getCartAction()
+                ->renderApplePayProductCheckout();
+
+            return $paymentCTA . $oneyCTA;
         }
     }
 
