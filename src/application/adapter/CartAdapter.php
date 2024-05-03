@@ -145,6 +145,31 @@ class CartAdapter implements CartInterface
     }
 
     /**
+     * @description check if given cart
+     * has already products
+     *
+     * @param $cart
+     *
+     * @return mixed
+     */
+    public function hasProducts($cart)
+    {
+        return $cart->hasProducts();
+    }
+
+    /**
+     * @description  delete cart
+     *
+     * @param $cart
+     *
+     * @return mixed
+     */
+    public function delete($cart)
+    {
+        return $cart->delete();
+    }
+
+    /**
      * @description  update the cart
      *
      * @param $cart
@@ -154,5 +179,18 @@ class CartAdapter implements CartInterface
     public function update($cart)
     {
         return $cart->update();
+    }
+
+    /**
+     * @description  add products
+     * to cart
+     *
+     * @param $cart
+     *
+     * @return mixed
+     */
+    public function updateQty($cart)
+    {
+        return $cart->updateQty();
     }
 }

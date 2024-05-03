@@ -478,9 +478,27 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ];
 
                     if ('shopping_cart' != $workflow) {
-                       var_dump($cart);
+                        // if cart is non empty in product page, we should empty it
+                        if ($this->cart_adapter->hasProducts($cart)) {
+                            $this->cart_adapter->delete($cart);
+                            $cart = $this->cart_adapter->get((int) $context->cart->id);
+
+                            if ($id_product = (int) $tools->tool('getValue', 'id_product')) {
+                                $group = $tools->tool('getValue', 'group');
+                                $id_product_attribute = $group ?
+                                    (int) $this->productAdapter->getIdProductAttributeByIdAttributes(
+                                        $id_product,
+                                        $group
+                                    ) :
+                                    0;
+                                $quantity = (int) $tools->tool('getValue', 'qty');
+                                // add products to cart
+                                $cart->updateQty($quantity, $id_product, $id_product_attribute);
+                                $this->cart_adapter->update($cart);
+                            }
+                        }
                     }
-                        // Save the current address delivery to update cart product
+                    // Save the current address delivery to update cart product
                     $current_address_delivery = (int) $cart->id_address_delivery;
 
                     if ($customer_adapter->isLogged($context->customer)) {

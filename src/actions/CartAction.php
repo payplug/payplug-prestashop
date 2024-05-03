@@ -139,19 +139,19 @@ class CartAction
         $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
 
         // If browser is not safari, no appelpay on cart page
-//        if (!$isApplePayCompatible['result']) {
-//            return false;
-//        }
+        if (!$isApplePayCompatible['result']) {
+            return false;
+        }
 
         // Get Carrier list
-//        $carriers_list = $this->dependencies
-//            ->getPlugin()
-//            ->getPaymentMethodClass()
-//            ->getPaymentMethod('applepay')
-//            ->getCarriersList();
-//        if (empty($carriers_list)) {
-//            return false;
-//        }
+        $carriers_list = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod('applepay')
+            ->getCarriersList();
+        if (empty($carriers_list)) {
+            return false;
+        }
 
         $applepay_js_url = $this->dependencies
             ->getPlugin()
@@ -175,6 +175,7 @@ class CartAction
                            'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
                            'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
                        ]);
+
         return $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
     }
 
