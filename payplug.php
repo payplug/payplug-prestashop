@@ -379,6 +379,16 @@ class Payplug extends PaymentModule
         }
     }
 
+    public function hookDisplayProductAdditionalInfo()
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->dependencies
+                ->getPlugin()
+                ->getCartAction()
+                ->renderPaymentCTA();
+        }
+    }
+
     /**
      * @description hook applepay and oney on cart page
      *
@@ -626,6 +636,7 @@ class Payplug extends PaymentModule
             'displayBackOfficeFooter',
             'displayBeforeShoppingCartBlock',
             'displayExpressCheckout',
+            'displayProductAdditionalInfo',
             'displayProductPriceBlock',
             'displayAdminStatusesForm',
             'displayHeader',

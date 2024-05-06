@@ -211,6 +211,24 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->get((int) $this->context->cart->id_currency);
 
         $workflow = $this->tools->tool('getValue', 'workflow');
+
+        if ('product' == $workflow) {
+            $products = $this->context->cart->getProducts();
+            if (!empty($products)) {
+                foreach ($products as $product) {
+                    $this->context->cart->deleteProduct(
+                        $product['id_product'],
+                        $product['id_product_attribute'],
+                        $product['id_customization'],
+                        $product['id_address_delivery']
+                    );
+                }
+            }
+
+            // add product to cart
+            $this->context->cart->updateQty(1, $id_product);
+        }
+
         if ('checkout' != $workflow) {
             $carrier = $this->tools->tool('getValue', 'carrier');
 
