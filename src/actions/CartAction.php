@@ -30,6 +30,7 @@ if (!defined('_PS_VERSION_')) {
 class CartAction
 {
     private $dependencies;
+    private $dispatcher;
     private $plugin;
     private $configuration;
     private $context;
@@ -53,8 +54,10 @@ class CartAction
         $payment_methods = json_decode($payment_methods, true);
         $applepay_display = json_decode($this->configuration->getValue('applepay_display'), true);
 
-        if (!(bool) $applepay_display['cart']
-            || (!(bool) $payment_methods['applepay'])
+        if (null === $applepay_display
+            || (!(bool) $applepay_display['cart'] && 'cart' == $this->dispatcher->getInstance()->getController())
+            || (!(bool) $applepay_display['product'] && 'product' == $this->dispatcher->getInstance()->getController())
+            || !(bool) $payment_methods['applepay']
             || (bool) $this->configuration->getValue('sandbox_mode')) {
             return false;
         }
@@ -90,7 +93,8 @@ class CartAction
             ->getPaymentMethodClass()
             ->getPaymentMethod('applepay')
             ->getCarriersList();
-        if (empty($carriers_list)) {
+        if (empty($carriers_list)
+            && 'product' != $this->dispatcher->getInstance()->getController()) {
             return false;
         }
 
@@ -99,12 +103,18 @@ class CartAction
             ->getRoutes()
             ->getSourceUrl()['applepay'];
 
+        if ('cart' == $this->dispatcher->getInstance()->getController()) {
+            $applepay_workflow = 'shopping-cart';
+        } else {
+            $applepay_workflow = 'product';
+        }
+
         $this->dependencies
             ->getPlugin()
             ->getAssign()
             ->assign([
                 'applepay_js_url' => $applepay_js_url,
-                'applepay_workflow' => 'shopping-cart',
+                'applepay_workflow' => $applepay_workflow,
                 'iso_lang' => $this->context->language->iso_code,
             ]);
 
@@ -130,5 +140,6 @@ class CartAction
             ->getPlugin();
         $this->context = $this->context ?: $this->plugin->getContext()->get();
         $this->configuration = $this->configuration ?: $this->plugin->getConfigurationClass();
+        $this->dispatcher = $this->dependencies->getPlugin()->getDispatcher();
     }
 }
