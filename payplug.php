@@ -379,6 +379,16 @@ class Payplug extends PaymentModule
         }
     }
 
+    public function hookDisplayProductAdditionalInfo()
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->dependencies
+                ->getPlugin()
+                ->getCartAction()
+                ->renderPaymentCTA();
+        }
+    }
+
     /**
      * @description  display applepay button on product page
      *
