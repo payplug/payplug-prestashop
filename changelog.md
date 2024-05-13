@@ -7,6 +7,9 @@
 - Bugfix :
   - [PRE-2428](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2425): Fix lock gesture on validation script
   - [SMP-2070](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2426): Fix confirmation modal translation
+  - 
+- Improvment :
+  - [PRE-2078](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2431): Remove PSPL in CI
 
 ## Version 4.8.3
 - Bugfix :
