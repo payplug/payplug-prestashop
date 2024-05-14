@@ -3,6 +3,7 @@
 ## Next version
 - Bugfix :
   - [SMP-2489](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2427): Rename hookHeader for Prestashop 1.7 and 8
+  - [SMP-2531](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2432): Fix IPN charge peak
   - [SMP-2592](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2436): Fix regression on order creation when resource has failure
   - [SMP-2553](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2433): Fix carriers get to configure applepay checkout
   
