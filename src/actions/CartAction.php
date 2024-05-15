@@ -49,20 +49,24 @@ class CartAction
     public function renderPaymentCTA()
     {
         $this->setParameters();
-
         $payment_methods = $this->configuration->getValue('payment_methods');
         $payment_methods = json_decode($payment_methods, true);
         $applepay_display = json_decode($this->configuration->getValue('applepay_display'), true);
+        $is_sandbox_mode = (bool) $this->configuration->getValue('sandbox_mode');
+        $controller = $this->dispatcher->getInstance()->getController();
 
-        if (null === $applepay_display
-            || (!(bool) $applepay_display['cart'] && 'cart' == $this->dispatcher->getInstance()->getController())
-            || (!(bool) $applepay_display['product'] && 'product' == $this->dispatcher->getInstance()->getController())
-            || !(bool) $payment_methods['applepay']
-            || (bool) $this->configuration->getValue('sandbox_mode')) {
+        // Validate if Apple Pay button should be displayed
+        if (
+            null === $applepay_display
+            || $is_sandbox_mode
+            || !isset($payment_methods['applepay']) || !$payment_methods['applepay']
+            || (!(bool) $applepay_display['cart'] && 'cart' === $controller)
+            || (!(bool) $applepay_display['product'] && 'product' === $controller)
+        ) {
             return false;
         }
 
-        return $this->renderApplepayCartCheckout();
+        return $this->renderApplepayCheckout();
     }
 
     /**
@@ -73,9 +77,12 @@ class CartAction
      * it returns the Apple Pay button template; otherwise, it returns false. If the cart
      * contains at least one carrier with a value of 0, it returns false.
      *
+     * The function handles rendering for both the cart and product pages by determining
+     * the current controller and setting the workflow accordingly.
+     *
      * @return false|string
      */
-    public function renderApplePayCartCheckout()
+    public function renderApplePayCheckout()
     {
         $this->setParameters();
 
@@ -93,8 +100,9 @@ class CartAction
             ->getPaymentMethodClass()
             ->getPaymentMethod('applepay')
             ->getCarriersList();
+        $controller = $this->dispatcher->getInstance()->getController();
         if (empty($carriers_list)
-            && 'product' != $this->dispatcher->getInstance()->getController()) {
+            && 'product' != $controller) {
             return false;
         }
 
@@ -103,30 +111,27 @@ class CartAction
             ->getRoutes()
             ->getSourceUrl()['applepay'];
 
-        if ('cart' == $this->dispatcher->getInstance()->getController()) {
-            $applepay_workflow = 'shopping-cart';
-        } else {
-            $applepay_workflow = 'product';
-        }
+        $controller = $this->dispatcher->getInstance()->getController();
+        $applepay_workflow = 'cart' === $controller ? 'shopping-cart' : 'product';
 
         $this->dependencies
             ->getPlugin()
             ->getAssign()
             ->assign([
-                'applepay_js_url' => $applepay_js_url,
-                'applepay_workflow' => $applepay_workflow,
-                'iso_lang' => $this->context->language->iso_code,
-            ]);
+                         'applepay_js_url' => $applepay_js_url,
+                         'applepay_workflow' => $applepay_workflow,
+                         'iso_lang' => $this->context->language->iso_code,
+                     ]);
 
         $this->dependencies
             ->getPlugin()
             ->getMedia()
             ->addJsDef([
-                'applePayPaymentRequestAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypaymentrequest', [], true),
-                'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
-                'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
-                'applePayIdCart' => $this->context->cart->id,
-            ]);
+                           'applePayPaymentRequestAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'applepaypaymentrequest', [], true),
+                           'applePayMerchantSessionAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
+                           'applePayPaymentAjaxURL' => $this->context->link->getModuleLink($this->dependencies->name, 'validation', [], true),
+                           'applePayIdCart' => $this->context->cart->id,
+                       ]);
 
         return $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
     }

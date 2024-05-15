@@ -70,4 +70,22 @@ class AddressAdapter implements AddressInterface
     {
         return $address->save();
     }
+
+    /**
+     * @description retrieve the id of the first address
+     * for a given customer
+     *
+     * @param int $id_customer
+     *
+     * @return int
+     */
+    public function getFirstCustomerAddressId($id_customer = 0)
+    {
+        if (!is_int($id_customer)) {
+            return 0;
+        }
+        $address = $this->address;
+
+        return $address::getFirstCustomerAddressId($id_customer);
+    }
 }
