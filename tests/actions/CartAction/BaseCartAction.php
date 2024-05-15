@@ -18,6 +18,7 @@ class BaseCartAction extends TestCase
     protected $context_adapter;
     protected $dependencies;
     protected $dispatcher;
+    protected $instance;
     protected $browser_validator;
     protected $plugin;
     protected $toolsAdapter;
@@ -46,12 +47,21 @@ class BaseCartAction extends TestCase
             ->shouldReceive([
                                 'get' => $this->context,
                             ]);
+        $this->dispatcher = \Mockery::mock('Dispatcher');
+        $this->instance = \Mockery::mock('Instance');
+        $this->controller = \Mockery::mock('Controller');
 
+        $this->dispatcher
+            ->shouldReceive([
+                                'getInstance' => $this->instance,
+                                'getController' => $this->controller,
+                            ]);
         $this->plugin
             ->shouldReceive([
                                 'getCart' => $this->cartAdapter,
                                 'getContext' => $this->context_adapter,
                                 'getConfigurationClass' => $this->configuration,
+                                'getDispatcher' => $this->dispatcher,
                             ]);
 
         $this->dependencies->name = 'payplug';

@@ -63,6 +63,9 @@ class PluginEntity
     private $cart;
 
     /** @var object */
+    private $cart_rule;
+
+    /** @var object */
     private $carrier;
 
     /** @var object */
@@ -427,6 +430,14 @@ class PluginEntity
     public function getCart()
     {
         return $this->cart;
+    }
+
+    /**
+     * @return object
+     */
+    public function getCartRule()
+    {
+        return $this->cart_rule;
     }
 
     /**
@@ -1030,6 +1041,22 @@ class PluginEntity
         }
 
         $this->cart = $cart;
+
+        return $this;
+    }
+
+    /**
+     * @param object $cart_rule
+     *
+     * @return self
+     */
+    public function setCartRule($cart_rule)
+    {
+        if (!is_object($cart_rule)) {
+            throw new BadParameterException('Invalid argument, $cart_rule must be CartRuleAdapter');
+        }
+
+        $this->cart_rule = $cart_rule;
 
         return $this;
     }

@@ -155,4 +155,98 @@ class CartAdapter implements CartInterface
     {
         return $cart->update();
     }
+
+    /**
+     * @description  update product quantity
+     * related to a given cart
+     * to cart
+     *
+     * @param $cart
+     * @param mixed $id_cart
+     * @param mixed $quantity
+     * @param mixed $id_product
+     * @param mixed $id_lang
+     * @param mixed $id_currency
+     *
+     * @return mixed
+     */
+    public function updateQty($id_cart = 0, $quantity = 0, $id_product = 0, $id_lang = 0, $id_currency = 0)
+    {
+        if (!is_int($id_cart)) {
+            return [];
+        }
+        if (!is_int($quantity)) {
+            return [];
+        }
+        if (!is_int($id_product)) {
+            return [];
+        }
+        $cart = new \Cart($id_cart);
+
+        return $cart->updateQty($quantity, $id_product);
+    }
+
+    /**
+     * @description  update the address id in the cart
+     *
+     * @param int $id_cart
+     * @param int $current_address_delivery
+     * @param int $id_address_delivery
+     *
+     * @return array
+     */
+    public function updateAddressId($id_cart = 0, $current_address_delivery = 0, $id_address_delivery = 0)
+    {
+        if (!is_int($id_cart)) {
+            return [];
+        }
+        if (!is_int($current_address_delivery)) {
+            return [];
+        }
+
+        if (!is_int($id_address_delivery)) {
+            return [];
+        }
+        $cart = new \Cart((int) $id_cart);
+
+        return $cart->updateAddressId($current_address_delivery, $id_address_delivery);
+    }
+
+    /**
+     * @description Creates a new cart for the given context
+     *
+     * @param $context
+     * @param int $id_customer_address
+     *
+     * @return \Cart|false
+     */
+    public function createNewCart($context, $id_customer_address = 0)
+    {
+        if (!is_object($context)) {
+            return false;
+        }
+
+        if (!is_int($id_customer_address)) {
+            return false;
+        }
+        $cart = new \Cart();
+        $cart->id_lang = (int) $context->cookie->id_lang;
+        $cart->id_currency = (int) $context->cookie->id_currency;
+        $cart->id_guest = (int) $context->cookie->id_guest;
+        $cart->id_shop_group = (int) $context->shop->id_shop_group;
+        $cart->id_shop = (int) $context->shop->id;
+
+        if ($context->cookie->id_customer) {
+            $cart->id_customer = (int) $context->cookie->id_customer;
+            $cart->id_address_delivery = $id_customer_address;
+            $cart->id_address_invoice = $id_customer_address;
+        } else {
+            $cart->id_address_delivery = 0;
+            $cart->id_address_invoice = 0;
+        }
+
+        $cart->add();
+
+        return $cart;
+    }
 }

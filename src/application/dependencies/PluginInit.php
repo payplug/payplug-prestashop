@@ -42,6 +42,7 @@ use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
 use PayPlug\src\application\adapter\CarrierAdapter;
 use PayPlug\src\application\adapter\CartAdapter;
+use PayPlug\src\application\adapter\CartRuleAdapter;
 use PayPlug\src\application\adapter\ConfigurationAdapter;
 use PayPlug\src\application\adapter\ConstantAdapter;
 use PayPlug\src\application\adapter\ContextAdapter;
@@ -123,6 +124,7 @@ class PluginInit extends BaseClass
     private $assign_adapter;
     private $carrier_adapter;
     private $cart_adapter;
+    private $cart_rule_adapter;
     private $configuration_adapter;
     private $constant_adapter;
     private $context_adapter;
@@ -209,6 +211,7 @@ class PluginInit extends BaseClass
             ->setAssign($this->assign_adapter)
             ->setCarrier($this->carrier_adapter)
             ->setCart($this->cart_adapter)
+            ->setCartRule($this->cart_rule_adapter)
             ->setConfiguration($this->configuration_adapter)
             ->setConstant($this->constant_adapter)
             ->setContext($this->context_adapter)
@@ -362,6 +365,7 @@ class PluginInit extends BaseClass
         $this->assign_adapter = new AssignAdapter();
         $this->carrier_adapter = new CarrierAdapter();
         $this->cart_adapter = new CartAdapter();
+        $this->cart_rule_adapter = new CartRuleAdapter();
         $this->configuration_adapter = new ConfigurationAdapter();
         $this->constant_adapter = new ConstantAdapter();
         $this->context_adapter = new ContextAdapter();
