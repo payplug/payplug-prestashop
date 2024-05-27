@@ -68,10 +68,10 @@ class CarrierAdapter implements CarrierInterface
         return $this->default_delivery_type;
     }
 
-    public function getCarriers($id_lang, $active = false, $delete = false, $id_zone = false, $ids_group = null, $modules_filters = 1)
+    public function getAllActiveCarriers($id_lang)
     {
         $carrier = $this->carrier;
 
-        return $carrier::getCarriers($id_lang, $active, $delete, $id_zone, $ids_group, $modules_filters);
+        return $carrier::getCarriers($id_lang, false, false, false, null, $carrier::ALL_CARRIERS);
     }
 }
