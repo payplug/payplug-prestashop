@@ -552,14 +552,29 @@ class ConfigurationAction
         }
 
         $applepay_display = $datas->payplug_applepay_display;
+        if ($datas->enable_applepay
+            && !(bool) $applepay_display->cart
+            && !(bool) $applepay_display->product
+            && !(bool) $applepay_display->checkout) {
+            return [
+                'success' => false,
+                'data' => [
+                    'title' => null,
+                    'msg' => $translation['applepay']['display']['text'],
+                    'close' => $translation['applepay']['display']['submit'],
+                    'class' => '-error',
+                ],
+            ];
+        }
+
         $need_carrier = (bool) $applepay_display->cart || (bool) $applepay_display->product;
         if (empty($datas->applepay_carriers) && $need_carrier) {
             return [
                 'success' => false,
                 'data' => [
                     'title' => null,
-                    'msg' => $translation['applepay']['text'],
-                    'close' => $translation['applepay']['submit'],
+                    'msg' => $translation['applepay']['carrier']['text'],
+                    'close' => $translation['applepay']['carrier']['submit'],
                     'class' => '-error',
                 ],
             ];
@@ -580,7 +595,7 @@ class ConfigurationAction
             'oney_custom_min_amounts' => 'oney_min_amounts',
             'oney_custom_max_amounts' => 'oney_max_amounts',
             'bancontact_country' => 'enable_bancontact_country',
-            'applepay_carriers' => 'payplug_applepay_carriers',
+            'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'payplug_applepay_display',
         ];
 
@@ -662,7 +677,7 @@ class ConfigurationAction
                         }
 
                         break;
-                    case 'payplug_applepay_carriers':
+                    case 'applepay_carriers':
                     case 'payplug_applepay_display':
                         if ((bool) $datas->enable_applepay && !$configuration->set($key, json_encode($value))) {
                             return [

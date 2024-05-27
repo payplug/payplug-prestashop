@@ -203,8 +203,14 @@ class Translation
                 'submit' => $this->l('modal.premium.submit', 'translation'),
             ],
             'applepay' => [
-                'text' => $this->l('modal.applepay.text', 'translation'),
-                'submit' => $this->l('modal.applepay.submit', 'translation'),
+                'display' => [
+                    'text' => $this->l('modal.applepay.display.text', 'translation'),
+                    'submit' => $this->l('modal.applepay.display.submit', 'translation'),
+                ],
+                'carrier' => [
+                    'text' => $this->l('modal.applepay.carrier.text', 'translation'),
+                    'submit' => $this->l('modal.applepay.carrier.submit', 'translation'),
+                ],
             ],
             'error' => [
                 'text' => $this->l('modal.error.text', 'translation'),
