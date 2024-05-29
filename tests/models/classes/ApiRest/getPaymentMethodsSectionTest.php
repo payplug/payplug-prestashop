@@ -121,7 +121,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
 
         if ('applepay' == $expected) {
             $this->carrier_adapter->shouldReceive([
-                'getCarriers' => [],
+                'getAllActiveCarriers' => [],
             ]);
         }
 
