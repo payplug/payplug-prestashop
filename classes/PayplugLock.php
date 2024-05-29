@@ -67,11 +67,7 @@ class PayplugLock
 
             $lock_repository = $this->dependencies->getPlugin()->getLockRepository();
             while (!empty($lock_repository->getByCartId((int) $id_cart)) && ($time < $last_check)) {
-                if (function_exists('usleep')) {
-                    usleep($loop_time * 1000000);
-                } else {
-                    $this->usleep($loop_time * 1000);
-                }
+                sleep((int) $loop_time);
 
                 // If lock take too much time, end the process
                 if ($time > $end_of_life) {
@@ -133,20 +129,5 @@ class PayplugLock
         }
 
         return $lock['id_order'];
-    }
-
-    /**
-     * Sleep time.
-     *
-     * @param int $seconds
-     */
-    private function usleep($seconds)
-    {
-        $start = microtime();
-
-        do {
-            // Wait !
-            $current = microtime();
-        } while (($current - $start) < $seconds);
     }
 }
