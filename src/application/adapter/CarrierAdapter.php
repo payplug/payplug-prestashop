@@ -72,6 +72,6 @@ class CarrierAdapter implements CarrierInterface
     {
         $carrier = $this->carrier;
 
-        return $carrier::getCarriers($id_lang, false, false, false, null, $carrier::ALL_CARRIERS);
+        return $carrier::getCarriers($id_lang, true, false, false, null, $carrier::ALL_CARRIERS);
     }
 }
