@@ -41,6 +41,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
     private $plugin;
     private $tools_adapter;
     private $payplugLock;
+    private $validate_adapter;
 
     public function postProcess()
     {

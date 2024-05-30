@@ -186,6 +186,11 @@ class PayPlugNotifications
             }
             $this->exitProcess('Order updated: ' . $order_update['message']);
         } else {
+            if (isset($this->resource->failure) && null !== $this->resource->failure) {
+                $this->logger->addLog('The payment has failed due to failure in resource.');
+                $this->exitProcess('No treatment because payment has failed.');
+            }
+
             $resource_id = isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id
                 ? $this->resource->installment_plan_id
                 : $this->resource->id;
