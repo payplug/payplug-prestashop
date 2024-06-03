@@ -27,7 +27,7 @@ class getAvailableCarriersTest extends BaseApplepayPaymentMethod
         $id_lang = 42;
         $this->carrier_adapter
             ->shouldReceive([
-                'getCarriers' => [],
+                'getAllActiveCarriers' => [],
             ]);
         $this->assertSame([], $this->classe->getAvailableCarriers($id_lang));
     }
@@ -37,7 +37,7 @@ class getAvailableCarriersTest extends BaseApplepayPaymentMethod
         $id_lang = 42;
         $this->carrier_adapter
             ->shouldReceive([
-                'getCarriers' => [
+                'getAllActiveCarriers' => [
                     [
                         'id_carrier' => 42,
                         'name' => 'carrier',
@@ -64,7 +64,7 @@ class getAvailableCarriersTest extends BaseApplepayPaymentMethod
         $id_lang = 42;
         $this->carrier_adapter
             ->shouldReceive([
-                'getCarriers' => [
+                'getAllActiveCarriers' => [
                     [
                         'id_carrier' => 42,
                         'name' => 'carrier',

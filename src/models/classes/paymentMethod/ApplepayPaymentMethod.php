@@ -506,7 +506,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $shop_carriers = $this->dependencies
             ->getPlugin()
             ->getCarrier()
-            ->getCarriers($id_lang, true);
+            ->getAllActiveCarriers($id_lang);
 
         if (empty($shop_carriers)) {
             return $carriers;
