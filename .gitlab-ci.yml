@@ -14,7 +14,7 @@ stages:
   - releasy-release
 
 php cs fixer:
-  image: composer:1.9
+  image: composer:1.10
   stage: check php
   rules:
     - if: '$CI_COMMIT_BRANCH
@@ -60,7 +60,7 @@ coverage test:
     - vendor/bin/phpunit tests --bootstrap tests/bootstrap.php --coverage-text --colors=never
 
 check module translations:
-  image: composer:1.9
+  image: composer:1.10
   stage: translations
   rules:
     - if: '$CI_COMMIT_BRANCH
@@ -112,7 +112,7 @@ assets:
     expire_in: 1 day
 
 build zip release:
-  image: composer:1.9
+  image: composer:1.10
   stage: build
   rules:
     - if: '$CI_COMMIT_BRANCH
