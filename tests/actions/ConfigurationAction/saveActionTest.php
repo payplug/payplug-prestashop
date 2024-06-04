@@ -89,10 +89,36 @@ class saveActionTest extends BaseConfigurationAction
         );
     }
 
+    public function testWhenNoApplepayDisplayIsSelected()
+    {
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->enable_applepay = true;
+        $datas->payplug_applepay_display = new \stdClass();
+        $datas->payplug_applepay_display->cart = false;
+        $datas->payplug_applepay_display->checkout = false;
+        $datas->payplug_applepay_display->product = false;
+        $datas->applepay_carriers = [];
+
+        $this->assertSame(
+            [
+                'success' => false,
+                'data' => [
+                    'title' => null,
+                    'msg' => 'modal.applepay.display.text',
+                    'close' => 'modal.applepay.display.submit',
+                    'class' => '-error',
+                ],
+            ],
+            $this->action->saveAction($datas)
+        );
+    }
+
     public function testWhenApplepayCarriersIsEmpty()
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
+        $datas->enable_applepay = true;
         $datas->payplug_applepay_display = new \stdClass();
         $datas->payplug_applepay_display->cart = true;
         $datas->applepay_carriers = [];
@@ -102,8 +128,8 @@ class saveActionTest extends BaseConfigurationAction
                 'success' => false,
                 'data' => [
                     'title' => null,
-                    'msg' => 'modal.applepay.text',
-                    'close' => 'modal.applepay.submit',
+                    'msg' => 'modal.applepay.carrier.text',
+                    'close' => 'modal.applepay.carrier.submit',
                     'class' => '-error',
                 ],
             ],
@@ -111,6 +137,9 @@ class saveActionTest extends BaseConfigurationAction
         );
     }
 
+    /**
+     * @group debug
+     */
     public function testWhenConfigurationCannotBeUpdate()
     {
         $datas = new \stdClass();
@@ -129,7 +158,7 @@ class saveActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'An error has occurred while register payplug_applepay_display',
+                    'message' => 'An error has occurred while register applepay_carriers',
                 ],
             ],
             $this->action->saveAction($datas)
