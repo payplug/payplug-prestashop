@@ -10,7 +10,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
  * @group oney
  * @group format_oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class FormatOneyResourceTest extends BaseOneyRepository
 {

@@ -10,12 +10,13 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
-final class GetOneyPriceLimitTest extends BaseOneyRepository
+final class GetCustomOneyPriceLimitTest extends BaseOneyRepository
 {
     private $currencyMock;
     private $amounts;
+    private $badAmounts;
 
     public function setUp()
     {
@@ -28,8 +29,12 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
         ;
 
         $this->amounts = [
-            'min' => 10000,
-            'max' => 300000,
+            'min' => 100,
+            'max' => 3000,
+        ];
+        $this->badAmounts = [
+            'min' => 10,
+            'max' => 300,
         ];
 
         $this->configuration
@@ -40,6 +45,10 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
                         return '{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:99","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"ideal":{"min":"EUR:99","max":"EUR:2000000"},"mybank":{"min":"EUR:99","max":"EUR:2000000"},"satispay":{"min":"EUR:99","max":"EUR:2000000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}';
                     case 'countries':
                         return '{"oney_x3_with_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x4_with_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x3_without_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x4_without_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"giropay":["DE"],"ideal":["NL"],"mybank":["IT"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"],"sofort":["AT","BE","DE","ES","IT","NL"]}';
+                    case 'oney_custom_max_amounts':
+                        return 'EUR:300000';
+                    case 'oney_custom_min_amounts':
+                        return 'EUR:10000';
                     default:
                         return $this->configuration->getDefault($key);
                 }
@@ -56,15 +65,30 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
             ]);
     }
 
-    public function testWithCurrencyObject()
+    public function testCustomLimitWithCurrencyObject()
     {
         $this->currency->shouldReceive('get')
             ->andReturn($this->currencyMock)
         ;
 
         $this->assertSame(
-            $this->amounts,
-            $this->repo->getOneyPriceLimit(false, $this->currencyMock)
+            [
+                'min' => 10000,
+                'max' => 300000,
+            ],
+            $this->repo->getOneyPriceLimit(true, $this->currencyMock)
+        );
+    }
+
+    public function atestCustomLimitWithNotValidLimits()
+    {
+        $this->currency->shouldReceive('get')
+            ->andReturn($this->currencyMock)
+        ;
+
+        $this->assertNotSame(
+            $this->badAmounts,
+            $this->repo->getOneyPriceLimit(true, $this->currencyMock)
         );
     }
 
@@ -82,7 +106,7 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
      *
      * @param mixed $data
      */
-    public function testWithValidDataProvider($data)
+    public function atestCustomLimitWithValidDataProvider($data)
     {
         $this->currency->shouldReceive('get')
             ->andReturn($this->currencyMock)
@@ -90,11 +114,11 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
 
         $this->assertSame(
             $this->amounts,
-            $this->repo->getOneyPriceLimit(false, $data)
+            $this->repo->getOneyPriceLimit(true, $data)
         );
     }
 
-    public function testWithNoCurrencyFound()
+    public function atestWithNoCurrencyFound()
     {
         $this->currency->shouldReceive('get')
             ->andReturn(false)
@@ -105,7 +129,7 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
                 'min' => false,
                 'max' => false,
             ],
-            $this->repo->getOneyPriceLimit(null)
+            $this->repo->getOneyPriceLimit(true, null)
         );
     }
 }

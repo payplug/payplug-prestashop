@@ -9,7 +9,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group classes
  * @group payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getOrderTabTest extends BaseSatispayPaymentMethod
 {

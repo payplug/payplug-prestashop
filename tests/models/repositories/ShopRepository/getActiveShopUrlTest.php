@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\ShopRepository;
  * @group repository
  * @group shop_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getActiveShopUrlTest extends BaseShopRepository
 {

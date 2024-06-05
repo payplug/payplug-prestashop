@@ -12,7 +12,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class GetOneySimulationsTest extends BaseOneyRepository
 {

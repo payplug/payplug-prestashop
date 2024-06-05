@@ -7,7 +7,7 @@ namespace PayPlug\tests\actions\OneyAction;
  * @group action
  * @group oney_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class renderScheduleTest extends BaseOneyAction
 {

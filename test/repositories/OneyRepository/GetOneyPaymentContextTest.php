@@ -12,7 +12,7 @@ use PayPlug\tests\mock\ContextMock;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class GetOneyPaymentContextTest extends BaseOneyRepository
 {

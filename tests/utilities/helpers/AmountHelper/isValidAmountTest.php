@@ -8,10 +8,10 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @group unit
- * @group action
+ * @group helper
  * @group amount_helper
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class validateAmountTest extends TestCase
 {

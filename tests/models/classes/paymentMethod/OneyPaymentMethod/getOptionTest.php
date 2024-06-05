@@ -8,7 +8,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
  * @group payment_method_classes
  * @group oney_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getOptionTest extends BaseOneyPaymentMethod
 {

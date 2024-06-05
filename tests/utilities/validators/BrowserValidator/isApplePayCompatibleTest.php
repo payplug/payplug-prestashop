@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  * @group validator
  * @group module_validator
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class isApplePayCompatibleTest extends TestCase
 {

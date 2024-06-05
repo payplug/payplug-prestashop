@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\CacheRepository;
  * @group repository
  * @group lock_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class deleteCacheTest extends BaseCacheRepository
 {

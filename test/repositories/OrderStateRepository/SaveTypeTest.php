@@ -8,7 +8,7 @@ namespace PayPlug\tests\repositories\OrderStateRepository;
  * @group order_state
  * @group order_state_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class SaveTypeTest extends BaseOrderStateRepository
 {

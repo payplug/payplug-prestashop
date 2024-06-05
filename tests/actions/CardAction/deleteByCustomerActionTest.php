@@ -7,7 +7,7 @@ namespace PayPlug\tests\actions\CardAction;
  * @group action
  * @group card_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class deleteByCustomerActionTest extends BaseCardAction
 {

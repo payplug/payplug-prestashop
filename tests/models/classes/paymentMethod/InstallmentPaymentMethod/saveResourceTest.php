@@ -10,7 +10,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group payment_method_classes
  * @group installment_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class saveResourceTest extends BaseInstallmentPaymentMethod
 {

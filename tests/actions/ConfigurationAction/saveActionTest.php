@@ -7,7 +7,7 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  * @group action
  * @group configuration_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class saveActionTest extends BaseConfigurationAction
 {
@@ -137,9 +137,6 @@ class saveActionTest extends BaseConfigurationAction
         );
     }
 
-    /**
-     * @group debug
-     */
     public function testWhenConfigurationCannotBeUpdate()
     {
         $datas = new \stdClass();

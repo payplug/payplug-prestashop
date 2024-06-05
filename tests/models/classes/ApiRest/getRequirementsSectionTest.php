@@ -8,8 +8,9 @@ use PayPlug\src\utilities\validators\moduleValidator;
  * @group unit
  * @group classes
  * @group apirest_classes
+ * @group debug
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getRequirementsSectionTest extends BaseApiRest
 {
@@ -58,7 +59,7 @@ class getRequirementsSectionTest extends BaseApiRest
     /**
      * @description test requirements status if curl is well installed
      */
-    public function testIfCurlRequirementIseChecked()
+    public function testIfCurlRequirementIsChecked()
     {
         $report = [
             'php' => [

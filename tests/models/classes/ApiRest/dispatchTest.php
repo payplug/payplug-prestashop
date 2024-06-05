@@ -9,7 +9,7 @@ use PayPlug\src\models\classes\ApiRest;
  * @group classes
  * @group apirest_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class dispatchTest extends BaseApiRest
 {

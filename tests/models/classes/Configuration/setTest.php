@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group classes
  * @group configuration_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class setTest extends BaseConfiguration
 {

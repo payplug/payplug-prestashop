@@ -9,7 +9,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group repository
  * @group card_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class setTest extends BaseCardRepository
 {

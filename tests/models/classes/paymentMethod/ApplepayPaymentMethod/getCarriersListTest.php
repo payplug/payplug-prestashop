@@ -8,7 +8,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
  * @group payment_method_classes
  * @group applepay_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getCarriersListTest extends BaseApplepayPaymentMethod
 {

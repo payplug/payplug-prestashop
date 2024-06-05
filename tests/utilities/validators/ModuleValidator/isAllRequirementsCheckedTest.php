@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @group validator
  * @group module_validator
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class isAllRequirementsCheckedTest extends TestCase
 {

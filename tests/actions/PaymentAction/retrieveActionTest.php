@@ -7,7 +7,7 @@ namespace PayPlug\tests\actions\PaymentAction;
  * @group action
  * @group payment_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class retrieveActionTest extends BasePaymentAction
 {

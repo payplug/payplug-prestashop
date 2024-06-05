@@ -7,7 +7,6 @@ use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\utilities\helpers\AmountHelper;
-use PayPlug\src\utilities\helpers\ConfigurationHelper;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\moduleValidator;
 use PayPlug\tests\FormatDataProvider;
@@ -131,7 +130,7 @@ class BaseApiRest extends TestCase
             ]);
 
         $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();
-        $this->configuration_helper = \Mockery::mock(ConfigurationHelper::class)->makePartial();
+        $this->configuration_helper = \Mockery::mock('ConfigurationHelper');
         $this->dependencies
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
