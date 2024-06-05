@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\LockRepository;
  * @group repository
  * @group lock_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class deleteLockTest extends BaseLockRepository
 {

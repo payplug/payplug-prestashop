@@ -10,7 +10,7 @@ use PayPlug\tests\FormatDataProvider;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class GetOneyCountryTest extends BaseOneyRepository
 {

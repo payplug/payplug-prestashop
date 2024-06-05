@@ -10,7 +10,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group action
  * @group payment_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class captureActionTest extends BasePaymentAction
 {

@@ -7,7 +7,7 @@ namespace PayPlug\tests\actions\MerchantTelemetryAction;
  * @group action
  * @group merchant_telemetry_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class sendActionTest extends BaseMerchantTelemetryAction
 {

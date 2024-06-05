@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @group validator
  * @group logger_validator
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class isAccountLinkedToPsAccountTest extends TestCase
 {

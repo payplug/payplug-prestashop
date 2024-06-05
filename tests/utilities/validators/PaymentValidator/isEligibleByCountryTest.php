@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @group action
  * @group amount_helper
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class isEligibleByCountryTest extends TestCase
 {

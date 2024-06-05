@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\OrderPaymentRepository;
  * @group repository
  * @group order_payment_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class createOrderPaymentTest extends BaseOrderPaymentRepository
 {

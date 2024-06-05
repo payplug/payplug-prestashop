@@ -8,7 +8,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\AmexPaymentMethod;
  * @group payment_method_classes
  * @group amex_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getOptionTest extends BaseAmexPaymentMethod
 {

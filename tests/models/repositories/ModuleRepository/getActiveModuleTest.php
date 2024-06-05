@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\ModuleRepository;
  * @group repository
  * @group module_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getActiveModuleTest extends BaseModuleRepository
 {

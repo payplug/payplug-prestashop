@@ -9,7 +9,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group action
  * @group refund_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class processPaymentRefundTest extends BaseRefundAction
 {

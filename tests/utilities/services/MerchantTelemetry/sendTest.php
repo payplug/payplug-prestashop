@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  * @group service
  * @group merchant_telemetry_service
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class sendTest extends TestCase
 {

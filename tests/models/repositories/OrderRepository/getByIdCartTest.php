@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\OrderRepository;
  * @group repository
  * @group order_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getByIdCartTest extends BaseOrderRepository
 {

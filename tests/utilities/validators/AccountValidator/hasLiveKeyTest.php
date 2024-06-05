@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @group validator
  * @group account_validator
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class hasLiveKeyTest extends TestCase
 {

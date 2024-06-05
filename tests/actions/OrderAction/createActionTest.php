@@ -12,7 +12,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group action
  * @group order_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class createActionTest extends BaseOrderAction
 {

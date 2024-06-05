@@ -8,7 +8,7 @@ namespace PayPlug\tests\repositories\CacheRepository;
  * @group cache
  * @group cache_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class SetCacheKeyTest extends BaseCacheRepository
 {

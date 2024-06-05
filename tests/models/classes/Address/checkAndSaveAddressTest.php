@@ -9,7 +9,7 @@ use PayPlug\tests\mock\AddressMock;
  * @group classes
  * @group address_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class checkAndSaveAddressTest extends BaseAddress
 {

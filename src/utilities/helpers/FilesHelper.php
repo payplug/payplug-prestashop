@@ -34,7 +34,7 @@ class FilesHelper
     /**
      * @description
      */
-    public static function clean()
+    public function clean()
     {
         $dependencies = new DependenciesClass();
         $logger = $dependencies->getPlugin()->getLogger();

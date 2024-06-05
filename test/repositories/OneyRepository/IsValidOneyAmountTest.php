@@ -8,7 +8,7 @@ namespace PayPlug\tests\repositories\OneyRepository;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class IsValidOneyAmountTest extends BaseOneyRepository
 {

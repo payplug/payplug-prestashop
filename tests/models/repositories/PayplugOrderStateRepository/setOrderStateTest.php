@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\PayplugOrderStateRepository;
  * @group repository
  * @group payplug_order_state_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class setOrderStateTest extends BasePayplugOrderStateRepository
 {

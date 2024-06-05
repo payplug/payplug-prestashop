@@ -10,7 +10,7 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group payment_method_classes
  * @group applepay_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getRequestTest extends BaseApplepayPaymentMethod
 {

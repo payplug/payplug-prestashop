@@ -9,7 +9,7 @@ use PayPlug\tests\mock\CartMock;
  * @group action
  * @group payment_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class dispatchActionTest extends BasePaymentAction
 {

@@ -10,7 +10,7 @@
 // * @group action
 // * @group cart_action
 // *
-// * @runTestsInSeparateProcesses
+// * @dontrunTestsInSeparateProcesses
 // */
 //class renderPaymentCtaTest extends BaseCartAction
 //{

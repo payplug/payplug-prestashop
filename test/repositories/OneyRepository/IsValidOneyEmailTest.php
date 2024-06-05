@@ -10,7 +10,7 @@ use PayPlug\src\utilities\validators\accountValidator;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class IsValidOneyEmailTest extends BaseOneyRepository
 {

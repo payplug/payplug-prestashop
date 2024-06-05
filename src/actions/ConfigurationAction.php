@@ -306,8 +306,7 @@ class ConfigurationAction
 
         // Clean external files
         $txt_log->info('Files cleaning');
-        $helpers = $this->dependencies->getHelpers();
-        $file_cleaned = $helpers['files']::clean();
+        $file_cleaned = $this->dependencies->getHelpers()['files']->clean();
         $txt_log->info('Files cleaning: ' . ($file_cleaned ? 'ok' : 'ko'));
 
         return [

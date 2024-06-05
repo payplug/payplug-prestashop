@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @group helper
  * @group user_helper
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class isLoggedTest extends TestCase
 {

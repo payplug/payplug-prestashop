@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  * @group repository
  * @group logger_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class deleteFromDateTest extends BaseLoggerRepository
 {

@@ -7,7 +7,7 @@ namespace PayPlug\tests\actions\OnboardingAction;
  * @group action
  * @group onboarding_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class enableIntegratedActionTest extends BaseOnboardingAction
 {
