@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @group service
  * @group routes_service
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getExternalUrlTest extends TestCase
 {

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @group validator
  * @group payment_validator
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class isCurrencyTest extends TestCase
 {

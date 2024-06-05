@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\CountryRepository;
  * @group repository
  * @group country_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getIsoCodeByCountryTest extends BaseCountryRepository
 {

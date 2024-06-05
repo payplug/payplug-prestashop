@@ -565,8 +565,7 @@ class Payplug extends PaymentModule
     {
         if ($this->module) {
             $this->payplug_dependencies->getDependency('install')->checkOrderStates();
-            $helpers = $this->module->getHelpers();
-            $helpers['files']::clean();
+            $this->dependencies->getHelpers()['files']->clean();
 
             // Call getAccount method to update countries and amounts configurations from merchant account
             $this->module->apiClass->getAccountPermissions();

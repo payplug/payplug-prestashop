@@ -10,7 +10,7 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class GetCustomOneyPriceLimitTest extends BaseOneyRepository
 {

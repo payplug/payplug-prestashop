@@ -9,7 +9,7 @@ use PayPlug\tests\mock\OrderMock;
  * @group action
  * @group order_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class renderDetailTest extends BaseOrderAction
 {

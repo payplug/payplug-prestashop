@@ -8,7 +8,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\BancontactPaymentMethod;
  * @group payment_method_classes
  * @group bancontact_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getPaymentTabTest extends BaseBancontactPaymentMethod
 {

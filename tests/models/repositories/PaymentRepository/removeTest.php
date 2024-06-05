@@ -7,7 +7,7 @@ namespace PayPlug\tests\models\repositories\PaymentRepository;
  * @group repository
  * @group payment_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class removeTest extends BasePaymentRepository
 {

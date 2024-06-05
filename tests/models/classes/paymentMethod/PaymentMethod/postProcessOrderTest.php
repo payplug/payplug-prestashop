@@ -11,7 +11,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  * @group classes
  * @group payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class postProcessOrderTest extends BasePaymentMethod
 {

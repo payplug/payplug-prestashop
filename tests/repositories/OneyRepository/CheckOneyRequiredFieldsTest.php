@@ -12,7 +12,7 @@ use PayPlug\tests\mock\PaymentTabMock;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
 {

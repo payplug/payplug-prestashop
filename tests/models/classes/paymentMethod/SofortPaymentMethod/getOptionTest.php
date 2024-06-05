@@ -8,7 +8,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\SofortPaymentMethod;
  * @group payment_method_classes
  * @group sofort_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getOptionTest extends BaseSofortPaymentMethod
 {

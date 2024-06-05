@@ -10,7 +10,7 @@ use PayPlug\tests\mock\CartMock;
  * @group oney
  * @group oney_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class IsValidOneyCartTest extends BaseOneyRepository
 {

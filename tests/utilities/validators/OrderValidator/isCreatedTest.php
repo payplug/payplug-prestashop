@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  * @group validator
  * @group order_validator
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class isCreatedTest extends TestCase
 {

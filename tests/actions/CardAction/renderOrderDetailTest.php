@@ -9,7 +9,7 @@ use PayPlug\tests\mock\PaymentMock;
  * @group action
  * @group card_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class renderOrderDetailTest extends BaseCardAction
 {

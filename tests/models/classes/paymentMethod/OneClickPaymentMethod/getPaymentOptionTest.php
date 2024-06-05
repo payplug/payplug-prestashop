@@ -8,7 +8,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneClickPaymentMethod;
  * @group payment_method_classes
  * @group oneclick_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getPaymentOptionTest extends BaseOneClickPaymentMethod
 {

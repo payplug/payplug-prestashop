@@ -8,7 +8,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\SatispayPaymentMethod;
  * @group payment_method_classes
  * @group satispay_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getOptionTest extends BaseSatispayPaymentMethod
 {

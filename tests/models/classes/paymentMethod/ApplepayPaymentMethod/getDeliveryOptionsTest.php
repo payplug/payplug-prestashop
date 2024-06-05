@@ -10,7 +10,7 @@ use PayPlug\tests\mock\CarrierMock;
  * @group payment_method_classes
  * @group applepay_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
 {

@@ -7,7 +7,7 @@ namespace PayPlug\tests\actions\OrderStateAction;
  * @group action
  * @group order_state_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class saveTypeActionTest extends BaseOrderStateAction
 {

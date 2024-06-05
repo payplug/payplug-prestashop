@@ -10,7 +10,7 @@ use PayPlug\tests\mock\OrderStateMock;
  * @group order_state
  * @group order_state_repository
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 final class CreateTest extends BaseOrderStateRepository
 {

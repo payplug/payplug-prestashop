@@ -9,7 +9,7 @@ use PayPlug\classes\MyLogPHP;
  * @group action
  * @group configuration_action
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class installActionTest extends BaseConfigurationAction
 {

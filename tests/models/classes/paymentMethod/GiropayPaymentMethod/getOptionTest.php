@@ -8,7 +8,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\GiropayPaymentMethod;
  * @group payment_method_classes
  * @group giropay_payment_method_classes
  *
- * @runTestsInSeparateProcesses
+ * @dontrunTestsInSeparateProcesses
  */
 class getOptionTest extends BaseGiropayPaymentMethod
 {
