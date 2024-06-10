@@ -661,6 +661,7 @@ var $document, $window, __moduleName__Module = {
                 {workflow} = applepay.props;
 
             $('apple-pay-button, #payment-confirmation button').click(function (event) {
+                $(this).fadeOut(10).fadeIn(10);
                 let payment_method_id = $('.js-current-step .custom-radio input[type="radio"]:checked').attr('id'),
                     payment_method = $('#pay-with-'+payment_method_id+'-form input[name="method"]').val();
 
