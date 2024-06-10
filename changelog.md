@@ -10,6 +10,7 @@
   - 
 - Improvment :
   - [PRE-2078](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2431): Remove PSPL in CI
+  - [PRE-2289](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2440): Add blink on ApplePay button when clicking it
 
 ## Version 4.8.3
 - Bugfix :
