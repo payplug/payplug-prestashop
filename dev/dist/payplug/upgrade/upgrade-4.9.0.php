@@ -42,6 +42,10 @@ function upgrade_module_4_9_0($object)
     $flag = $flag && Configuration::deleteByName('PAYPLUG_APPLEPAY_CART');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_APPLEPAY_CHECKOUT');
 
+    if (!$object->registerHook('displayProductAdditionalInfo')) {
+        $flag = false;
+    }
+
     $logger->addLog('End upgrade script 4.9.0, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;

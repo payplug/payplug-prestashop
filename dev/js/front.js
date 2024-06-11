@@ -688,15 +688,22 @@ var $document, $window, __moduleName__Module = {
                 applepay.props.query.abort();
                 applepay.props.query = null;
             }
+            let data = {
+                workflow: workflow,
+            }
 
+            // Check if it's on the product page and add product-related data
+            if (workflow === 'product' && $('#product_page_product_id').length && $('#quantity_wanted').length) {
+                data.id_product = $('#product_page_product_id').val();
+                data.quantity = $('#quantity_wanted').val();
+                data.empty_cart= true;
+            }
             let applepay_datas;
             applepay.props.query = $.ajax({
                 method: "POST",
                 url: applePayPaymentRequestAjaxURL,
                 async: false,
-                data: {
-                    workflow: workflow
-                },
+                data: data,
                 success: function (result) {
                     applepay_datas = JSON.parse(result);
                 },
