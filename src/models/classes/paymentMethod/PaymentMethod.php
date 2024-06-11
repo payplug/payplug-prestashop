@@ -457,9 +457,8 @@ class PaymentMethod
             'allow_save_card' => false,
         ];
 
-        // Set addresses if user is logged and has delivery/billing addresses
+        // Set addresses if user is logged and at least has delivery address
         if ((bool) $valid_customer
-            && (bool) $this->context->cart->id_address_invoice
             && (bool) $this->context->cart->id_address_delivery) {
             $billing_address = $this->dependencies
                 ->getPlugin()
