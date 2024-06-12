@@ -568,7 +568,7 @@ class ConfigurationAction
         }
 
         $need_carrier = (bool) $applepay_display->cart || (bool) $applepay_display->product;
-        if (empty($datas->applepay_carriers) && $need_carrier) {
+        if ($datas->enable_applepay && empty($datas->applepay_carriers) && $need_carrier) {
             return [
                 'success' => false,
                 'data' => [
