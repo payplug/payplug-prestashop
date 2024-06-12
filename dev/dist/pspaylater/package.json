@@ -20,7 +20,7 @@
   "author": "payplug",
   "license": "ISC",
   "devDependencies": {
-    "css-loader": "^6.5.1",
+    "css-loader": "^7.0.0",
     "css-minimizer-webpack-plugin": "^4.0.0",
     "less": "^4.1.2",
     "less-loader": "^11.0.0",
