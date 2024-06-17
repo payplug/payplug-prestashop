@@ -1010,14 +1010,6 @@ class ApiClass
             }
         }
 
-        // Do not allow Spain or Belgium on Payplug
-        if (in_array($configuration['oney_allowed_countries'], ['ES', 'BE'])
-            && 'payplug' == $this->dependencies->name) {
-            $permissions['can_use_oney'] = false;
-        }
-
-        // Update globale configuration from account response
-
         // Format amount, country and currency before update
         $configuration['amounts'] = json_encode($configuration['amounts']);
         $configuration['countries'] = json_encode($configuration['countries']);

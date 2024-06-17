@@ -414,8 +414,15 @@ class Payplug extends PaymentModule
     public function hookDisplayProductPriceBlock($params)
     {
         if ($this->module) {
+            $oney_allowed_countries = $this->payplug_dependencies->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('oney')
+                ->oney_allowed_countries;
+
             $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
-            if ((bool) $configuration->getValue('oney_product_cta')) {
+            if ((bool) $configuration->getValue('oney_product_cta')
+                && in_array($configuration->getValue('company_iso'), $oney_allowed_countries)) {
                 $dependencies = new DependenciesClass();
 
                 return $dependencies

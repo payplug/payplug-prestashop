@@ -29,7 +29,14 @@ if (!defined('_PS_VERSION_')) {
 
 class OneyPaymentMethod extends PaymentMethod
 {
+    public $oney_allowed_countries = ['FR', 'IT'];
     protected $country;
+    private $available_oney_payments = [
+        'x3_with_fees',
+        'x3_without_fees',
+        'x4_with_fees',
+        'x4_without_fees'
+    ];
     private $oney_allowed_iso_codes = ['FR', 'IT', 'ES', 'NL'];
     private $oney_translations;
     private $assign_adapter;
@@ -98,19 +105,13 @@ class OneyPaymentMethod extends PaymentMethod
             $advanced_options[] = $schedules;
         }
 
-        $can_use_cta = !in_array(
-            $this->configuration->getValue('oney_allowed_countries'),
-            ['ES', 'BE']
-        );
-        if ($can_use_cta) {
-            $product = $this->getProductCallToAction((bool) $current_configuration['oney_product_animation']);
-            if ($product) {
-                $advanced_options[] = $product;
-            }
-            $cart = $this->getCartCallToAction((bool) $current_configuration['oney_cart_animation']);
-            if ($cart) {
-                $advanced_options[] = $cart;
-            }
+        $product = $this->getProductCallToAction((bool) $current_configuration['oney_product_animation']);
+        if ($product) {
+            $advanced_options[] = $product;
+        }
+        $cart = $this->getCartCallToAction((bool) $current_configuration['oney_cart_animation']);
+        if ($cart) {
+            $advanced_options[] = $cart;
         }
 
         return [
@@ -832,8 +833,7 @@ class OneyPaymentMethod extends PaymentMethod
         }
         $country = $this->tools->tool('strtoupper', $country);
 
-        $available_oney_payments = $this->getOperations();
-        $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
+        $oney_simulations = $this->getOneySimulations($amount, $country, $this->available_oney_payments);
         if (!$oney_simulations['result']) {
             return $payment_list;
         }
@@ -870,7 +870,7 @@ class OneyPaymentMethod extends PaymentMethod
      */
     public function formatOneyResource($operation = false, $resource = [], $total_amount = false)
     {
-        if (!in_array($operation, $this->getOperations()) || !$operation) {
+        if (!in_array($operation, $this->available_oney_payments) || !$operation) {
             return false;
         }
         if (!is_array($resource) || empty($resource)) {
@@ -1041,29 +1041,6 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         return $iso_country;
-    }
-
-    public function getOperations()
-    {
-        $this->setParameters();
-
-        $options = [
-            'x3_with_fees',
-            'x3_without_fees',
-            'x4_with_fees',
-            'x4_without_fees',
-        ];
-
-        $oney_allowed_countries = $this->configuration->getValue('oney_allowed_countries');
-        if ('payplug' != $this->dependencies->name
-            && $this->validators['payment']->isAllowedCountry($oney_allowed_countries, 'BE')['result']) {
-            $options = [
-                'x3_with_fees',
-                'x3_without_fees',
-            ];
-        }
-
-        return $options;
     }
 
     /**
@@ -1542,6 +1519,10 @@ class OneyPaymentMethod extends PaymentMethod
 
         $this->setParameters();
 
+        if (!in_array($this->configuration->getValue('company_iso'), $this->oney_allowed_countries)) {
+            return $payment_options;
+        }
+
         $use_taxes = (bool) $this->dependencies
             ->getPlugin()
             ->getConfiguration()
@@ -1576,9 +1557,7 @@ class OneyPaymentMethod extends PaymentMethod
             $iso = $this->configuration->getValue('company_iso');
         }
 
-        $available_oney_payments = $this->getOperations();
-
-        foreach ($available_oney_payments as $oney_payment) {
+        foreach ($this->available_oney_payments as $oney_payment) {
             $with_fees = false !== (bool) strpos($oney_payment, 'with_fees');
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 continue;
