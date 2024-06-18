@@ -444,7 +444,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             ->getPlugin()
                             ->getPaymentMethodClass()
                             ->getPaymentMethod('applepay')
-                            ->prepareAddressData($user['billing'], $user['shipping']['emailAddress'], true),
+                            ->prepareAddressData($user['billing'], $user['shipping']['emailAddress']),
                         'shipping' => $this->dependencies
                             ->getPlugin()
                             ->getPaymentMethodClass()
