@@ -104,7 +104,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'language' => 'fr',
             'email' => 'john@example.com',
         ];
-        $prepared_data = $this->classe->prepareAddressData($this->address_data, null, true);
+        $prepared_data = $this->classe->prepareAddressData($this->address_data, null);
         $this->assertEquals($expected_data, $prepared_data);
         $this->assertArrayNotHasKey('mobile_phone_number', $prepared_data);
     }
