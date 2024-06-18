@@ -1,39 +1,175 @@
+# Adaptation of the Gitlab CI/CD pipeline for the PayPlug Prestashop module
 include:
-  - project: 'payplug/releasy'
-    file: '/templates/main.gitlab-ci.yml'
+  - project: "dalenys/protected/cicd/live"
+    ref: "gitlab-ci-template"
+    file:
+      ## generic pipeline template
+      - "ci/ci.gitlab-ci.yml"
+      # Prepare version using semantic-release
+      - "setup/setup-version-semantic-release-templating-job.gitlab-ci.yml"
 
-stages:
-  - check php
-  - check-php-version
-  - coverage and tests
-  - releasy-review
-  - translations
-  - assets
-  - build
-  - run_test
-  - releasy-release
-
-php cs fixer:
-  image: composer:1.9
-  stage: check php
+# Override the default value from
+# https://gitlab.com/dalenys/public/cicd-pipelines/gitlab-ci-template/-/blob/ebb84efb5593e73c45d9481cdfec23779d2c0eb9/src/ci/workflow-job.gitlab-ci.yml#L1-2
+workflow:
   rules:
-    - if: '$CI_COMMIT_BRANCH
-      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
+    # Template project, content might not be valid yet
+    - if: $CI_PROJECT_NAMESPACE =~ /.*project-templates$/
+      when: never
+    # Draft mode
+    - if: $CI_MERGE_REQUEST_ID && $CI_MERGE_REQUEST_TITLE =~ /^draft:/i
+      variables:
+        CI_MERGE_REQUEST_DRAFT: "true" # https://gitlab.com/gitlab-org/gitlab/-/issues/275981
+    # Default branches, MR + master
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "develop" # Added for the project to manage the develop branch
+    # Cleanup scenario
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "master" && $CLEANUP_BRANCH
+
+# Override check_project_integrity to remove .gitlab-ci.yml check
+check_project_integrity:
+  image: ${DALENYS_GITLAB_DOCKER_REGISTRY}/ci-job-basic:latest
+  tags:
+    - docker-gitlab-runner
+  stage: setup
+  interruptible: true
   script:
+    - !reference [.log_utils, script]
+    - !reference [.validate_branchName, script]
+    - !reference [.validate_targetBranchName, script]
+    - !reference [.validate_mergeRequestTitle, script]
+    - !reference [.validate_readme_filled, script]
+    - !reference [.validate_replacePlaceHolder_removed, script]
+    - !reference [.validate_codeowners_existence, script]
+  rules:
+    - if: $CI_MERGE_REQUEST_DRAFT
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master" && $CLEANUP_BRANCH
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master" || $CI_MERGE_REQUEST_ID
+
+# Override validate_jira_status to remove component validation
+# TODO: remove this override when the component validation is fixed
+validate_jira_status:
+  script:
+    - !reference [.git_utils, script]
+    - !reference [.jira_api_utils, script]
+    - set -a
+    - JIRA_TICKET=$(grep -E -o '^[A-Z][0-9A-Z]+-[0-9]+' <<< ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME})
+    - read_jira_data "issue/${JIRA_TICKET}?fields=issuetype,status,components,customfield_10179,assignee"
+      JIRA_ERRORS=.errors
+      JIRA_ERROR_MESSAGES=.errorMessages//empty
+      JIRA_TYPE_ID=.fields.issuetype.id
+      JIRA_TYPE_NAME=.fields.issuetype.name
+      JIRA_STATUS_ID=.fields.status.id
+      JIRA_STATUS_NAME=.fields.status.name
+      JIRA_COMPONENTS=.fields.components
+      JIRA_SQUAD=.fields.customfield_10179.value//empty
+      JIRA_ASSIGNEE=.fields.assignee//empty
+    - !reference [.validate_jira_valid_status, script]
+    - !reference [.validate_jira_commits, script]
+    - !reference [.update_gitlab_mr, script]
+    - !reference [.update_jira_assignee, script]
+    - transition_jira_dev_status "in_progress" "${JIRA_TICKET}"
+  rules:
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"
+      when: never
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "develop"
+      when: never
+    - if: $CI_MERGE_REQUEST_ID
+
+.validate_branchName:
+  script: |
+    # Check branch name
+    if [[ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" =~ ^[A-Z][0-9A-Z]+-[0-9]+-?[-0-9A-Za-z]*$ || "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" = "master" || "$CI_COMMIT_BRANCH" = "master" || "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" = "develop" || "$CI_COMMIT_BRANCH" = "develop" ]]; then
+      echo "branch name OK"
+    else
+      echo_error "branch name must match '^[A-Z][0-9A-Z]+-[0-9]+-?[-0-9A-Za-z]*$' ex: CORP-1234 or CORP-1234-my-change"
+      false
+    fi
+
+.validate_targetBranchName:
+  script: |
+    # Check target branch
+    if [[ "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-${CI_COMMIT_BRANCH}}" =~ (master|develop) ]]; then
+      echo "the branch is correctly set to be merged to master or develop"
+    elif [[ "$FINALIZE_PROJECT_INTEGRITY_CHECK" == "true" && "$CI_JOB_STAGE" != "finalize" ]]; then
+      # make sure the previous condition is still aligned with 'finally_check_project_integrity'
+      echo_warning "The branch must always be merged to master or develop"
+    else
+      echo_error "The branch must always be merged to master or develop"
+      false
+    fi
+
+finally_check_project_integrity:
+  extends: check_project_integrity
+  stage: finalize
+  rules:
+    - if: $CI_MERGE_REQUEST_ID && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "master" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "develop"
+  when: manual # it is better to have the pipeline marked as "blocked" rather than "failed"
+  allow_failure: false # we intend to always block the pipeline
+
+.define_artefact_version: &define_artefact_version |
+  export ARTIFACT_VERSION=$(cat dev/dist/payplug/composer.json | grep -o '"version": "[^"]*' | grep --color=no -o '[^"]*$')
+
+setup_version:
+  before_script:
+    - *define_artefact_version
+    - export TAG_NAME=${ARTIFACT_VERSION}
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_MERGE_REQUEST_ID
+
+# --- CI/CD pipeline ---
+
+.inject_artefact_version: &inject_artefact_version |
+  echo "Injecting version in artefact"
+  set -a
+  source ./variables.artifact
+  echo "ARTIFACT_VERSION: ${ARTIFACT_VERSION}"
+  echo "ARTIFACT_VERSION_JS: ${ARTIFACT_VERSION_JS}"
+  # ARTEFACT_VERSION is set by the setup_version job
+  echo "Injecting version in payplug.php"
+  sed -i -e 's/$this->version = '\''0.0.0'\'';/$this->version = '\'''${ARTIFACT_VERSION}''\'';/g' ./payplug.php
+  echo "Injecting version in composer.json"
+  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION}'",/g' ./dev/dist/payplug/composer.json
+  echo "Injecting version in package.json"
+  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION_JS}'",/g' ./dev/dist/payplug/package.json
+  echo "Injecting version in package-lock.json"
+  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION_JS}'",/g' ./dev/dist/payplug/package-lock.json
+
+setup_vendor:
+  image: docker.io/composer:1.9
+  stage: setup
+  needs:
+    - setup_version
+  tags:
+    - general-retail-amd64
+  script:
+    - *inject_artefact_version
     - ./dev/ci/dist_files.sh -b payplug
     - composer install
-    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
   artifacts:
     paths:
       - vendor
 
-check php version:
-  image: php:8.2-rc-fpm
-  stage: check-php-version
-  rules:
-    - if: '$CI_COMMIT_BRANCH
-      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
+linter:
+  image: docker.io/composer:1.9
+  stage: pre_build
+  tags:
+    - general-retail-amd64
   script:
+    - *inject_artefact_version
+    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
+
+check_php_version:
+  image: docker.io/php:8.0-alpine
+  stage: pre_build
+  tags:
+    - general-retail-amd64
+  script:
+    - *inject_artefact_version
     - >
       RED='\033[0;31m';
       ORANGE='\033[0;33m';
@@ -44,30 +180,30 @@ check php version:
   allow_failure:
     exit_codes: 126
 
-coverage test:
-  image: php:7.2.1
-  stage: coverage and tests
-  rules:
-    - if: '$CI_COMMIT_BRANCH
-      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
+test_php_unit:
+  image: docker.io/php:7.2.1
+  stage: pre_build
+  tags:
+    - general-retail-amd64
   coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
   before_script:
-    - pecl install xdebug-3.1.6
+    - *inject_artefact_version
+    - pecl install xdebug-3.1.0
     - docker-php-ext-enable xdebug
   script:
     - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
     - echo 'error_reporting=22527' > /usr/local/etc/php/conf.d/ci.ini
-    - vendor/bin/phpunit tests --bootstrap tests/bootstrap.php --coverage-text --colors=never
+    - ls -l ./vendor/bin
+    - ./vendor/bin/phpunit --coverage-text --colors=never
 
-check module translations:
-  image: composer:1.9
-  stage: translations
-  rules:
-    - if: '$CI_COMMIT_BRANCH
-      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
+build_translations:
+  image: docker.io/composer:1.9
+  stage: build
+  tags:
+    - general-retail-amd64
   script:
+    - *inject_artefact_version
     - ./dev/ci/dist_files.sh -b payplug
-    - composer install
     - >
       RED='\033[0;31m';
       ORANGE='\033[0;33m';
@@ -79,16 +215,15 @@ check module translations:
     exit_codes: 126
   artifacts:
     paths:
-      - dev/dist/pspaylater/translations.csv
       - dev/dist/payplug/translations.csv
 
-assets:
-  image: node:16
-  stage: assets
-  rules:
-    - if: '$CI_COMMIT_BRANCH
-      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
+build_static_assets:
+  image: docker.io/node:16
+  stage: build
+  tags:
+    - general-retail-amd64
   before_script:
+    - *inject_artefact_version
     - ./dev/ci/dist_files.sh -b payplug
     - npm --version
     - npm init -y
@@ -111,13 +246,13 @@ assets:
       - views/build/*
     expire_in: 1 day
 
-build zip release:
-  image: composer:1.9
-  stage: build
-  rules:
-    - if: '$CI_COMMIT_BRANCH
-      || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
+package_and_publish:
+  image: docker.io/composer:1.9
+  stage: publish
+  tags:
+    - general-retail-amd64
   before_script:
+    - *inject_artefact_version
     - ./dev/ci/dist_files.sh -b payplug
     - rm -rf ./vendor
     - composer install --no-dev
@@ -128,15 +263,81 @@ build zip release:
     - ./dev/ci/update_year.sh
     - php ./dev/ci/import-translations.php
   script:
+    - *inject_artefact_version
     - shopt -s extglob
-    - ./dev/ci/build.sh -n payplug -c $CI_COMMIT_REF_NAME
-  after_script:
-    - if [ ! -f "payplug_$CI_COMMIT_REF_NAME.zip" ] || [ ! -f "payplug_qa_$CI_COMMIT_REF_NAME.zip" ]; then
-      echo "ZIP files were not created. Failing the job.";
-      exit 1;
-      fi
-
+    - ./dev/ci/build.sh -n payplug -c ${ARTIFACT_VERSION}
   artifacts:
     paths:
-      - payplug_$CI_COMMIT_REF_NAME.zip
-      - payplug_qa_$CI_COMMIT_REF_NAME.zip
+      - payplug_*.zip
+      - payplug_qa_*.zip
+
+run_test:
+  image: docker.io/composer:1.9
+  stage: post_publish
+  tags:
+    - general-retail-amd64
+  rules:
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /smokes/
+        || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
+      when: always
+    - when: never
+  script:
+    - echo $CI_MERGE_REQUEST_LABELS
+    - echo "The smoke test label is defined. The functional tests will be triggered"
+    - curl -s
+      -X POST
+      -F token=$CI_JOB_TOKEN
+      -F ref=master
+      -F "variables[PS_SOURCE_BRANCH]=${CI_COMMIT_REF_NAME}"
+      -F "variables[STAGES_TO_RUN]=smoke_presta_16, smoke_presta_17"
+      https://git.payplug.com/api/v4/projects/41/trigger/pipeline
+
+scan_sonar:
+  image:
+    name: docker.io/sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  stage: build
+  needs:
+    - job: test_php_unit
+      optional: true
+  variables:
+    # FORCE SONAR TO USE THIS PATH
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0" # Tells git to fetch all the branches of the project, required by the analysis task
+  before_script:
+    - !reference [.log_utils, script]
+  script:
+    - export SONAR_PROJECT_KEY="${CI_PROJECT_PATH_SLUG}-${CI_PROJECT_NAME}"
+    - |
+      export SONAR_PROJECT_NAME="${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}: ${CI_PROJECT_NAME}"
+    - |
+      for dir in application src public vendors library configs config; do
+        if [[ -d "$CI_PROJECT_DIR/$dir" ]]; then
+          SONAR_SOURCE_FOLDER="${SONAR_SOURCE_FOLDER:+$SONAR_SOURCE_FOLDER,}$CI_PROJECT_DIR/$dir"
+        fi
+      done
+    - |
+      [[ -d "$CI_PROJECT_DIR/tests" ]] && SONAR_TEST_FOLDER="$CI_PROJECT_DIR/tests"
+    - echo "source folders ${SONAR_SOURCE_FOLDER}"
+    - |
+      sonar-scanner \
+        -Dsonar.organization="${SONAR_ORGANIZATION}" \
+        -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
+        -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
+        ${SONAR_SOURCE_FOLDER:+-Dsonar.sources="$SONAR_SOURCE_FOLDER"} \
+        ${SONAR_TEST_FOLDER:+-Dsonar.tests="$SONAR_TEST_FOLDER"} \
+        -Dsonar.php.tests.reportPath="$CI_PROJECT_DIR/report/junit-tests.xml" \
+        -Dsonar.php.coverage.reportPaths="$CI_PROJECT_DIR/report/coverage.xml" \
+        -Dsonar.host.url="https://sonarcloud.io" || (echo_error "if the error is \"Could not find a default branch to fall back on\", you should consider to execute a pipeline on branch master with CREATE_SONAR_PROJECT set to true" && false)
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master" && $SONAR_TOKEN
+    - if: $CI_COMMIT_BRANCH == "develop" && $SONAR_TOKEN
+    - if: $CI_MERGE_REQUEST_ID && $SONAR_TOKEN
+  allow_failure: true
+
+variables:
+  VERSION_FORMAT: "php"
+  SEMANTIC_BRANCHES: "master_and_develop"
+  SONAR_SOURCE_FOLDER: "src"
+  SONAR_TEST_FOLDER: "tests"
+  SONAR_ENABLED: "true"
