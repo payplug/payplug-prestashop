@@ -36,4 +36,6 @@ interface CarrierInterface
     public function getDefaultDeliveryType();
 
     public function getAllActiveCarriers($id_lang);
+
+    public function getMaxDeliveryPriceByWeight();
 }

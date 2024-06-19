@@ -74,4 +74,11 @@ class CarrierAdapter implements CarrierInterface
 
         return $carrier::getCarriers($id_lang, true, false, false, null, $carrier::ALL_CARRIERS);
     }
+
+    public function getMaxDeliveryPriceByWeight()
+    {
+        $carrier = $this->carrier;
+
+        return $carrier->getMaxDeliveryPriceByWeight();
+    }
 }

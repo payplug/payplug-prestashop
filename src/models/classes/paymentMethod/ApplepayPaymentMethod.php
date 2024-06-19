@@ -39,6 +39,44 @@ class ApplepayPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @description Retrieves the list of compatible carriers for a given product.
+     *
+     * @param $product_id
+     * @param $carriers_list
+     *
+     * @return array
+     */
+    public function getCompatibleCarriersForProduct($product_id, $carriers_list)
+    {
+        $this->setParameters();
+        $compatible_carriers = [];
+        $product_adapter = $this->dependencies
+            ->getPlugin()
+            ->getProduct();
+        $carrier_adapter = $this->dependencies
+            ->getPlugin()
+            ->getCarrier();
+        $product = $product_adapter->get((int) $product_id);
+
+        foreach ($carriers_list as $id_carrier) {
+            $carrier = $carrier_adapter->get((int) $id_carrier);
+            if (!$this->validate_adapter->validate('isLoadedObject', $carrier)) {
+                continue;
+            }
+            // check weights
+            $max_weight = $carrier->getMaxDeliveryPriceByWeight();
+            $product_weight = $product->weight;
+            if (false !== $max_weight && $product_weight > $max_weight) {
+                continue;
+            }
+            // TODO: check country zone
+            $compatible_carriers[] = $carrier;
+        }
+
+        return $compatible_carriers;
+    }
+
+    /**
      * @description Get the available carrier carrier list for the current Cart
      *
      * @return array

@@ -100,12 +100,25 @@ class CartAction
             ->getPaymentMethodClass()
             ->getPaymentMethod('applepay')
             ->getCarriersList();
+
         $controller = $this->dispatcher->getInstance()->getController();
         if (empty($carriers_list)
             && 'product' != $controller) {
             return false;
         }
-
+        if ('product' == $controller) {
+            $id_product = (int) $this->dependencies
+                ->getPlugin()
+                ->getTools()->tool('getValue', 'id_product');
+            $compatible_carriers = $this->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('applepay')
+                ->getCompatibleCarriersForProduct($id_product, $carriers_list);
+            if (empty($compatible_carriers)) {
+                return false;
+            }
+        }
         $applepay_js_url = $this->dependencies
             ->getPlugin()
             ->getRoutes()
