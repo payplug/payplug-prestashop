@@ -27,6 +27,7 @@ class BasePaymentMethod extends TestCase
     protected $card_repository;
     protected $carrier_adapter;
     protected $cart_adapter;
+    protected $cart_rule_adapter;
     protected $classe;
     protected $configuration;
     protected $configuration_adapter;
@@ -95,6 +96,8 @@ class BasePaymentMethod extends TestCase
             ->shouldReceive([
                 'getOrderTotal' => 42.42,
             ]);
+        $this->context->cookie = \Mockery::mock('Cookie');
+        $this->context->cookie->id_customer = 1;
 
         $link = \Mockery::mock('Link');
         $link->shouldReceive([
@@ -133,6 +136,7 @@ class BasePaymentMethod extends TestCase
         $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
         $this->carrier_adapter = \Mockery::mock('CarrierAdapter');
         $this->cart_adapter = \Mockery::mock('CartAdapter');
+        $this->cart_rule_adapter = \Mockery::mock('CartRuleAdapter');
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
@@ -142,6 +146,7 @@ class BasePaymentMethod extends TestCase
                 'getCardRepository' => $this->card_repository,
                 'getCarrier' => $this->carrier_adapter,
                 'getCart' => $this->cart_adapter,
+                'getCartRule' => $this->cart_rule_adapter,
                 'getConfiguration' => $this->configuration_adapter,
                 'getConfigurationClass' => $this->configuration,
                 'getConstant' => $this->constant,
