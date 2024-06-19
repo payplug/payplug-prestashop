@@ -1,6 +1,22 @@
 # Payplug module changelog
 
 ## Next version
+- Feature :
+  - [PRE-2280](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2424): Upgrade apple pay configuration display and add apple pay product display
+  - [PRE-2281](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2430): Display applepay button on product page
+  - [PRE-2282](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2430): Display appelpay popup on product page
+  - [PRE-2283](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2430): Pay with applepay on product page
+  - [PRE-2441](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2288): Set corner radius to applepay button on shopping cart and product page
+
+- Bugfix :
+  - [PRE-2428](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2425): Fix lock gesture on validation script
+  - [SMP-2070](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2426): Fix confirmation modal translation
+
+- Improvment :
+  - [PRE-2078](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2431): Remove PSPL in CI
+  - [PRE-2289](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2440): Add blink on ApplePay button when clicking it
+
+## Version 4.8.3
 - Bugfix :
   - [SMP-2489](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2427): Rename hookHeader for Prestashop 1.7 and 8
   - [SMP-2531](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2432): Fix IPN charge peak

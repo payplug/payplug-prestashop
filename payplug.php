@@ -54,7 +54,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '4.8.3';
+        $this->version = '4.9.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -380,6 +380,21 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description  display applepay button on product page
+     *
+     * @return mixed
+     */
+    public function hookDisplayProductAdditionalInfo()
+    {
+        if ($this->module) {
+            return $this->payplug_dependencies->dependencies
+                ->getPlugin()
+                ->getCartAction()
+                ->renderPaymentCTA();
+        }
+    }
+
+    /**
      * @description hook applepay and oney on cart page
      *
      * @return mixed
@@ -626,6 +641,7 @@ class Payplug extends PaymentModule
             'displayBackOfficeFooter',
             'displayBeforeShoppingCartBlock',
             'displayExpressCheckout',
+            'displayProductAdditionalInfo',
             'displayProductPriceBlock',
             'displayAdminStatusesForm',
             'displayHeader',

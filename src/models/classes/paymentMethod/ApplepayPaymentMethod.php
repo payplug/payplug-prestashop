@@ -95,33 +95,39 @@ class ApplepayPaymentMethod extends PaymentMethod
 
         $id_lang = $this->context->language->id;
         $carriers = $this->getAvailableCarriers((int) $id_lang);
-
+        $display = json_decode($current_configuration['applepay_display'], true);
         $option['options'] = [
             [
                 'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'applepay_checkout',
-                'title' => $this->translation[$this->name]['checkout']['title'],
-                'checked' => $current_configuration['applepay_checkout'],
-            ],
-            [
-                'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'applepay_cart',
-                'title' => $this->translation[$this->name]['cart']['title'],
-                'descriptions' => [
-                    'live' => [
-                        'description' => $this->translation[$this->name]['cart']['description'],
+                'sub_type' => 'IOptions',
+                'name' => 'applepay_display',
+                'title' => $this->translation[$this->name]['display']['title'],
+                'multiple' => true,
+                'options' => [
+                    [
+                        'name' => 'applepay_display',
+                        'label' => $this->translation[$this->name]['display']['checkout'],
+                        'value' => 'checkout',
+                        'checked' => (bool) $display['checkout'],
                     ],
-                    'sandbox' => [
-                        'description' => $this->translation[$this->name]['cart']['description'],
+                    [
+                        'name' => 'applepay_display',
+                        'label' => $this->translation[$this->name]['display']['cart'],
+                        'value' => 'cart',
+                        'checked' => (bool) $display['cart'],
+                    ],
+                    [
+                        'name' => 'applepay_display',
+                        'label' => $this->translation[$this->name]['display']['product'],
+                        'value' => 'product',
+                        'checked' => (bool) $display['product'],
                     ],
                 ],
-                'checked' => $current_configuration['applepay_cart'],
                 'carriers' => empty($carriers) ? [] : [
                     'title' => $this->translation[$this->name]['carrier']['title'],
                     'alert' => $this->translation[$this->name]['carrier']['alert'],
                     'description' => $this->translation[$this->name]['carrier']['description'],
+                    'instructions' => $this->translation[$this->name]['carrier']['instructions'],
                     'carriers_list' => $carriers,
                 ],
             ],
@@ -205,6 +211,30 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->get((int) $this->context->cart->id_currency);
 
         $workflow = $this->tools->tool('getValue', 'workflow');
+        $this->cart_adapter = $this->dependencies->getPlugin()->getCart();
+        $cart_rule_adapter = $this->dependencies->getPlugin()->getCartRule();
+        $address_adapter = $this->dependencies->getPlugin()->getAddress();
+        // Check if this an appelpay 'product' shopping page
+        // check empty_cart this double check since we go through this condition twice on js side
+        if ('product' === $workflow && true === (bool) $this->tools->tool('getValue', 'empty_cart')) {
+            $id_customer_id = (int) $address_adapter->getFirstCustomerAddressId((int) $this->context->cookie->id_customer);
+            // Create a new cart and add it to the context
+            $this->context->cart = $this->cart_adapter->createNewCart($this->context, $id_customer_id);
+            $cart_rule_adapter->autoAddToCart($this->context);
+
+            // Update the cookie with the new cart ID
+            $this->context->cookie->id_cart = $this->context->cart->id;
+            $this->context->cookie->write();
+
+            $id_product = (int) $this->tools->tool('getValue', 'id_product');
+            $quantity = (int) $this->tools->tool('getValue', 'quantity');
+            // add product to cart
+            $this->cart_adapter->updateQty((int) $this->context->cart->id, $quantity, $id_product);
+            $current_address_delivery = (int) $this->context->cart->id_address_delivery;
+            $this->cart_adapter->update($this->context->cart);
+            $this->cart_adapter->updateAddressId((int) $this->context->cart->id, $current_address_delivery, (int) $this->context->cart->id_address_delivery);
+        }
+
         if ('checkout' != $workflow) {
             $carrier = $this->tools->tool('getValue', 'carrier');
 
@@ -449,7 +479,8 @@ class ApplepayPaymentMethod extends PaymentMethod
             return [];
         }
 
-        if (!(bool) $this->configuration->getValue('applepay_checkout')) {
+        $applepay_display = json_decode($this->configuration->getValue('applepay_display'), true);
+        if (!(bool) $applepay_display['checkout']) {
             return $payment_options;
         }
 

@@ -48,16 +48,10 @@ class Configuration
             'defaultValue' => '{}',
             'setConf' => 1,
         ],
-        'applepay_cart' => [
-            'type' => 'integer',
-            'name' => 'APPLEPAY_CART',
-            'defaultValue' => 1,
-            'setConf' => 1,
-        ],
-        'applepay_checkout' => [
-            'type' => 'integer',
-            'name' => 'APPLEPAY_CHECKOUT',
-            'defaultValue' => 1,
+        'applepay_display' => [
+            'type' => 'string',
+            'name' => 'APPLEPAY_DISPLAY',
+            'defaultValue' => '{"cart":true,"checkout":true,"product":true}',
             'setConf' => 1,
         ],
         'bancontact_country' => [
