@@ -328,11 +328,10 @@ class ApplepayPaymentMethod extends PaymentMethod
      *
      * @param $address_data
      * @param null $shipping_email
-     * @param false $is_billing
      *
      * @return array
      */
-    public function prepareAddressData($address_data = [], $shipping_email = '', $is_billing = false)
+    public function prepareAddressData($address_data = [], $shipping_email = '')
     {
         $this->setParameters();
         if (empty($address_data) || !$address_data) {
@@ -346,11 +345,10 @@ class ApplepayPaymentMethod extends PaymentMethod
             'city' => $address_data['locality'],
             'country' => $address_data['countryCode'],
             'language' => $this->tools->tool('strtolower', $address_data['countryCode']),
-            'email' => (!empty($shipping_email)) ? $shipping_email : $address_data['emailAddress'],
+            'email' => !empty($shipping_email) ? $shipping_email : $address_data['emailAddress'],
         ];
 
-        // Include mobile_phone_number only if it's for shipping
-        if (!$is_billing) {
+        if (isset($address_data['phoneNumber'])) {
             $prepared_data['mobile_phone_number'] = $this->dependencies->configClass->formatPhoneNumber(
                 $address_data['phoneNumber'],
                 $this->country_adapter->getByIso($address_data['countryCode'])
