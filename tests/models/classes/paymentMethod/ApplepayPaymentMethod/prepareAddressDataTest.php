@@ -6,7 +6,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
- * @groupe applepay_payment_method_classes
+ * @group applepay_payment_method_classes
  *
  * @runTestsInSeparateProcesses
  */

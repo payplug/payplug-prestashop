@@ -793,7 +793,7 @@ class paymentValidator
 
         return [
             'result' => true,
-            'message' => '',
+            'message' => $payment->failure->message,
         ];
     }
 

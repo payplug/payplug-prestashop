@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.2
+- Bugfix :
+  - [PRE-2492](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2450): Retrieve previous cart on applepay modal cancel
+
 ## Version 4.9.1
 - Bugfix :
   - [PRE-2495](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2451): Fix applepay phone number
