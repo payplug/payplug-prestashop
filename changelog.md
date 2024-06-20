@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.3
+- Bugfix :
+  - [PRE-2498](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2452): Set language use from current context in applepay cart/product
+
 ## Version 4.9.2
 - Bugfix :
   - [PRE-2492](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2450): Retrieve previous cart on applepay modal cancel

@@ -502,9 +502,11 @@ class ApplepayPaymentMethod extends PaymentMethod
     public function prepareAddressData($address_data = [], $shipping_email = '')
     {
         $this->setParameters();
+
         if (empty($address_data) || !$address_data) {
             return [];
         }
+
         $prepared_data = [
             'first_name' => $address_data['givenName'],
             'last_name' => $address_data['familyName'],
@@ -512,7 +514,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             'postcode' => $address_data['postalCode'],
             'city' => $address_data['locality'],
             'country' => $address_data['countryCode'],
-            'language' => $this->tools->tool('strtolower', $address_data['countryCode']),
+            'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
             'email' => !empty($shipping_email) ? $shipping_email : $address_data['emailAddress'],
         ];
 
