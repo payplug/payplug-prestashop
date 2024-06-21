@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.4
+- Bugfix :
+  - [PRE-2500](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2453): Fix sandbox switch on only available in live mode features
+
 ## Version 4.9.3
 - Bugfix :
   - [PRE-2498](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2452): Set language use from current context in applepay cart/product

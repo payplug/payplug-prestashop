@@ -524,6 +524,8 @@ class Translation
                     'title' => $this->l('paymentmethods.applepay.carrier.title', 'translation'),
                     'alert' => $this->l('paymentmethods.applepay.carrier.alert', 'translation'),
                     'description' => $this->l('paymentmethods.applepay.carrier.description', 'translation'),
+                    'description_bold' => $this->l('paymentmethods.applepay.carrier.description_bold', 'translation'),
+                    'description_warning' => $this->l('paymentmethods.applepay.carrier.description_warning', 'translation'),
                     'instructions' => $this->l('paymentmethods.applepay.carrier.instructions', 'translation'),
                 ],
                 'modal' => [
