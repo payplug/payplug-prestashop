@@ -150,6 +150,10 @@ class ApplepayPaymentMethod extends PaymentMethod
         $id_lang = $this->context->language->id;
         $carriers = $this->getAvailableCarriers((int) $id_lang);
         $display = json_decode($current_configuration['applepay_display'], true);
+        $img_path = $this->dependencies
+            ->getPlugin()
+            ->getConstant()
+            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/applepay/';
         $option['options'] = [
             [
                 'type' => 'payment_option',
@@ -159,28 +163,38 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'multiple' => true,
                 'options' => [
                     [
-                        'name' => 'applepay_display',
-                        'label' => $this->translation[$this->name]['display']['checkout'],
-                        'value' => 'checkout',
+                        'name' => 'applepay_checkout',
+                        'image_url' => $img_path . 'checkoutCta.jpg',
+                        'title' => $this->translation[$this->name]['display']['checkout'],
+                        'switch' => true,
                         'checked' => (bool) $display['checkout'],
                     ],
                     [
-                        'name' => 'applepay_display',
-                        'label' => $this->translation[$this->name]['display']['cart'],
-                        'value' => 'cart',
+                        'name' => 'applepay_cart',
+                        'image_url' => $img_path . 'cartCta.jpg',
+                        'title' => $this->translation[$this->name]['display']['cart'],
+                        'switch' => true,
                         'checked' => (bool) $display['cart'],
                     ],
                     [
-                        'name' => 'applepay_display',
-                        'label' => $this->translation[$this->name]['display']['product'],
-                        'value' => 'product',
+                        'name' => 'applepay_product',
+                        'image_url' => $img_path . 'productCta.jpg',
+                        'title' => $this->translation[$this->name]['display']['product'],
+                        'switch' => true,
                         'checked' => (bool) $display['product'],
                     ],
                 ],
                 'carriers' => empty($carriers) ? [] : [
                     'title' => $this->translation[$this->name]['carrier']['title'],
                     'alert' => $this->translation[$this->name]['carrier']['alert'],
-                    'description' => $this->translation[$this->name]['carrier']['description'],
+                    'descriptions' => [
+                        'live' => [
+                            'description' => $this->translation[$this->name]['carrier']['description'],
+                            'description_bold' => $this->translation[$this->name]['carrier']['description_bold'],
+                            'description_warning' => $this->translation[$this->name]['carrier']['description_warning'],
+                        ],
+                        'sandbox' => [],
+                    ],
                     'instructions' => $this->translation[$this->name]['carrier']['instructions'],
                     'carriers_list' => $carriers,
                 ],
