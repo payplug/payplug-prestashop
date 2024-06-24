@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.6
+- Bugfix :
+  - [PRE-2520](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2455): Set feature flag on applepay product feature
+
 ## Version 4.9.5
 - Bugfix :
   - [PRE-2491](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2454): Fix oney with or without fees configurations

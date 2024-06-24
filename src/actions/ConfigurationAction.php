@@ -548,10 +548,14 @@ class ConfigurationAction
         }
 
         if (isset($datas->enable_applepay)) {
+            $applepay_cart = isset($datas->enable_applepay_cart) && (bool) $datas->enable_applepay_cart;
+            $applepay_product = isset($datas->enable_applepay_product) && (bool) $datas->enable_applepay_product;
+            $applepay_checkout = isset($datas->enable_applepay_checkout) && (bool) $datas->enable_applepay_checkout;
+
             if ($datas->enable_applepay
-                && !(bool) $datas->enable_applepay_cart
-                && !(bool) $datas->enable_applepay_product
-                && !(bool) $datas->enable_applepay_checkout) {
+                && !(bool) $applepay_cart
+                && !(bool) $applepay_product
+                && !(bool) $applepay_checkout) {
                 return [
                     'success' => false,
                     'data' => [
@@ -563,7 +567,7 @@ class ConfigurationAction
                 ];
             }
 
-            $need_carrier = $datas->enable_applepay && ((bool) $datas->enable_applepay_cart || (bool) $datas->enable_applepay_product);
+            $need_carrier = $datas->enable_applepay && ((bool) $applepay_cart || (bool) $applepay_product);
             if ($datas->enable_applepay && empty($datas->applepay_carriers) && $need_carrier) {
                 return [
                     'success' => false,
@@ -676,9 +680,9 @@ class ConfigurationAction
                         break;
                     case 'enable_applepay':
                         $applepay_display = [
-                            'checkout' => (bool) $datas->enable_applepay_checkout,
-                            'cart' => (bool) $datas->enable_applepay_cart,
-                            'product' => (bool) $datas->enable_applepay_product,
+                            'cart' => (bool) $applepay_cart,
+                            'checkout' => (bool) $applepay_checkout,
+                            'product' => (bool) $applepay_product,
                         ];
                         if ((bool) $datas->enable_applepay && !$configuration->set($key, json_encode($applepay_display))) {
                             return [
