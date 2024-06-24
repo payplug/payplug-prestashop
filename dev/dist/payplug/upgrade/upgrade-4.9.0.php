@@ -35,7 +35,7 @@ function upgrade_module_4_9_0($object)
     $applepay_display = [
         'cart' => Configuration::get('PAYPLUG_APPLEPAY_CART'),
         'checkout' => Configuration::get('PAYPLUG_APPLEPAY_CHECKOUT'),
-        'product' => !(bool) $payment_methods['applepay'],
+        'product' => false,
     ];
     $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_DISPLAY', json_encode($applepay_display));
 

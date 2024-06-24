@@ -51,7 +51,7 @@ class Configuration
         'applepay_display' => [
             'type' => 'string',
             'name' => 'APPLEPAY_DISPLAY',
-            'defaultValue' => '{"cart":true,"checkout":true,"product":true}',
+            'defaultValue' => '{"cart":true,"checkout":true,"product":false}',
             'setConf' => 1,
         ],
         'bancontact_country' => [
