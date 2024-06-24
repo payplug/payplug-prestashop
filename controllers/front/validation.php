@@ -180,7 +180,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             ->getPlugin()
             ->getOrder()
             ->get((int) $order_create['id_order']);
-        exit(dump($order));
         $link_redirect = $this->context->link->getPageLink('order-confirmation', true, $this->context->language->id, [
             'id_cart' => $cart->id,
             'id_module' => $this->moduleInstance->id,
