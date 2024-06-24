@@ -16,6 +16,7 @@ vendor/
 views/css/*.css
 views/css/*.map
 views/js/*.js
+views/js/*.js.map
 views/img/*.svg
 views/img/*.png
 views/img/*.jpg

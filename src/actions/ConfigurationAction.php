@@ -547,32 +547,34 @@ class ConfigurationAction
             ];
         }
 
-        if ($datas->enable_applepay
-            && !(bool) $datas->enable_applepay_cart
-            && !(bool) $datas->enable_applepay_product
-            && !(bool) $datas->enable_applepay_checkout) {
-            return [
-                'success' => false,
-                'data' => [
-                    'title' => null,
-                    'msg' => $translation['applepay']['display']['text'],
-                    'close' => $translation['applepay']['display']['submit'],
-                    'class' => '-error',
-                ],
-            ];
-        }
+        if (isset($datas->enable_applepay)) {
+            if ($datas->enable_applepay
+                && !(bool) $datas->enable_applepay_cart
+                && !(bool) $datas->enable_applepay_product
+                && !(bool) $datas->enable_applepay_checkout) {
+                return [
+                    'success' => false,
+                    'data' => [
+                        'title' => null,
+                        'msg' => $translation['applepay']['display']['text'],
+                        'close' => $translation['applepay']['display']['submit'],
+                        'class' => '-error',
+                    ],
+                ];
+            }
 
-        $need_carrier = $datas->enable_applepay && ((bool) $datas->enable_applepay_cart || (bool) $datas->enable_applepay_product);
-        if ($datas->enable_applepay && empty($datas->applepay_carriers) && $need_carrier) {
-            return [
-                'success' => false,
-                'data' => [
-                    'title' => null,
-                    'msg' => $translation['applepay']['carrier']['text'],
-                    'close' => $translation['applepay']['carrier']['submit'],
-                    'class' => '-error',
-                ],
-            ];
+            $need_carrier = $datas->enable_applepay && ((bool) $datas->enable_applepay_cart || (bool) $datas->enable_applepay_product);
+            if ($datas->enable_applepay && empty($datas->applepay_carriers) && $need_carrier) {
+                return [
+                    'success' => false,
+                    'data' => [
+                        'title' => null,
+                        'msg' => $translation['applepay']['carrier']['text'],
+                        'close' => $translation['applepay']['carrier']['submit'],
+                        'class' => '-error',
+                    ],
+                ];
+            }
         }
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
