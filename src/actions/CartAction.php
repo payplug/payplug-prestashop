@@ -106,6 +106,20 @@ class CartAction
             return false;
         }
 
+        if ('product' == $controller) {
+            $id_product = (int) $this->dependencies
+                ->getPlugin()
+                ->getTools()->tool('getValue', 'id_product');
+            $has_compatible_carriers = $this->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('applepay')
+                ->hasCompatibleCarriersForProduct($id_product, $carriers_list);
+            if (!$has_compatible_carriers) {
+                return false;
+            }
+        }
+
         $applepay_js_url = $this->dependencies
             ->getPlugin()
             ->getRoutes()
