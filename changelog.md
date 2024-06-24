@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.5
+- Bugfix :
+  - [PRE-2491](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2454): Fix oney with or without fees configurations
+  
 ## Version 4.9.4
 - Bugfix :
   - [PRE-2500](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2453): Fix sandbox switch on only available in live mode features
