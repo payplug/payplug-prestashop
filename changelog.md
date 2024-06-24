@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.8
+- Bugfix :
+  - [PRE-2497](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2457): Do not display ApplePay button on product page if carrier not allowed
+
 ## Version 4.9.6
 - Bugfix :
   - [PRE-2520](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2455): Set feature flag on applepay product feature
