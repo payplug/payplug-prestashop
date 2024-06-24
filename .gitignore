@@ -17,6 +17,8 @@ views/css/*.css
 views/css/*.map
 views/js/*.js
 views/img/*.svg
+views/img/*.png
+views/img/*.jpg
 views/img/admin/img/
 dev/ci/translations.csv
 dev/css/less/include.less

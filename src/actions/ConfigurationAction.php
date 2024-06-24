@@ -477,15 +477,11 @@ class ConfigurationAction
                 'header' => $header,
                 'login' => $api_rest->getLoginSection(),
                 'logged' => $logged_section,
+                'payment_methods' => $api_rest->getPaymentMethodsSection($current_configuration),
                 'payment_paylater' => $api_rest->getPaylaterSection($current_configuration),
                 'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
             ];
-
-            // Add payment_methods section if module is payplug
-            if ('payplug' == $this->dependencies->name) {
-                $datas['payment_methods'] = $api_rest->getPaymentMethodsSection($current_configuration);
-            }
         } else {
             $datas = [
                 'settings' => $api_rest->getSettingsSection(),
@@ -551,11 +547,10 @@ class ConfigurationAction
             ];
         }
 
-        $applepay_display = $datas->payplug_applepay_display;
         if ($datas->enable_applepay
-            && !(bool) $applepay_display->cart
-            && !(bool) $applepay_display->product
-            && !(bool) $applepay_display->checkout) {
+            && !(bool) $datas->enable_applepay_cart
+            && !(bool) $datas->enable_applepay_product
+            && !(bool) $datas->enable_applepay_checkout) {
             return [
                 'success' => false,
                 'data' => [
@@ -567,7 +562,7 @@ class ConfigurationAction
             ];
         }
 
-        $need_carrier = (bool) $applepay_display->cart || (bool) $applepay_display->product;
+        $need_carrier = $datas->enable_applepay && ((bool) $datas->enable_applepay_cart || (bool) $datas->enable_applepay_product);
         if ($datas->enable_applepay && empty($datas->applepay_carriers) && $need_carrier) {
             return [
                 'success' => false,
@@ -596,7 +591,7 @@ class ConfigurationAction
             'oney_custom_max_amounts' => 'oney_max_amounts',
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
-            'applepay_display' => 'payplug_applepay_display',
+            'applepay_display' => 'enable_applepay',
         ];
 
         foreach ($configuration_keys as $key => $config) {
@@ -677,8 +672,24 @@ class ConfigurationAction
                         }
 
                         break;
+                    case 'enable_applepay':
+                        $applepay_display = [
+                            'checkout' => (bool) $datas->enable_applepay_checkout,
+                            'cart' => (bool) $datas->enable_applepay_cart,
+                            'product' => (bool) $datas->enable_applepay_product,
+                        ];
+                        if ((bool) $datas->enable_applepay && !$configuration->set($key, json_encode($applepay_display))) {
+                            return [
+                                'success' => false,
+                                'data' => [
+                                    // todo: add translation
+                                    'message' => 'An error has occurred while register applepay display',
+                                ],
+                            ];
+                        }
+
+                        break;
                     case 'applepay_carriers':
-                    case 'payplug_applepay_display':
                         if ((bool) $datas->enable_applepay && !$configuration->set($key, json_encode($value))) {
                             return [
                                 'success' => false,
