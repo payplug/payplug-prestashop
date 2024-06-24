@@ -272,7 +272,6 @@ class ApplepayPaymentMethod extends PaymentMethod
         ];
 
         $cart_data = $this->getCartData($workflow, $carrier, $user);
-
         if (!$cart_data['result']) {
             return $cart_data;
         }
@@ -764,7 +763,7 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'message' => 'Invalid given $workflow',
             ];
         }
-        if ('checkout' != $workflow) {
+        if ('checkout' == $workflow) {
             return [
                 'result' => true,
                 'data' => [],
@@ -806,6 +805,10 @@ class ApplepayPaymentMethod extends PaymentMethod
             ];
         }
 
+        $cart_adapter = $this->dependencies
+            ->getPlugin()
+            ->getCart();
+        $cart = $cart_adapter->get((int) $this->context->cart->id);
         $customer_adapter = $this->dependencies
             ->getPlugin()
             ->getCustomer();
@@ -826,12 +829,11 @@ class ApplepayPaymentMethod extends PaymentMethod
             'id_country' => $this->country_adapter->getByIso($cart_data['billing']['country']),
         ];
 
-        $cart = $this->context->cart;
-
         // Save the current address delivery to update cart product
         $current_address_delivery = (int) $cart->id_address_delivery;
 
-        if ($customer_adapter->isLogged($this->context->customer)) {
+        $customer = $customer_adapter->get((int) $cart->id_customer);
+        if ($customer_adapter->isLogged($customer)) {
             // Prepare shipping and billing addresses data
             // Check if the addresses already exist for the customer
             $customer_addresses = $customer_adapter->getAddresses(
@@ -858,19 +860,19 @@ class ApplepayPaymentMethod extends PaymentMethod
             // Update cart with address IDs
             $cart->id_address_invoice = $existing_billing_address;
             $cart->id_address_delivery = $existing_shipping_address;
-            $cart->id_customer = (int) $cart->id_customer;
         } else {
             // create guest user
-            $customer = $customer_adapter->get((int) $cart->id_customer);
             $customer->is_guest = true;
             $customer->firstname = $cart_data['shipping']['first_name'];
             $customer->lastname = $cart_data['shipping']['last_name'];
             $customer->email = $cart_data['shipping']['email'];
             $customer->passwd = $this->tools->tool('passwdGen', 32, 'ALPHANUMERIC');
-            $customer_adapter->add($customer);
-
-            // Update context customer
-            $this->context->cookie->__set('id_customer', (int) $customer->id);
+            if (!$customer_adapter->add($customer)) {
+                return [
+                    'result' => false,
+                    'message' => 'Guest customer can\'t be created',
+                ];
+            }
 
             $cart->id_customer = (int) $customer->id;
             // Create shipping address
@@ -922,6 +924,7 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'message' => 'Given carrier is not available for this delivery address',
             ];
         }
+
         $cart->id_carrier = $carrier->id;
         $delivery_option = [
             (int) $cart->id_address_delivery => (string) $carrier->id . ',',
@@ -929,12 +932,16 @@ class ApplepayPaymentMethod extends PaymentMethod
         $cart->delivery_option = json_encode($delivery_option);
 
         // then update the cart
-        $this->dependencies
-            ->getPlugin()
-            ->getCart()
-            ->update($cart);
+        $update = $cart_adapter->update($cart);
+        if (!(bool) $update) {
+            return [
+                'result' => false,
+                'message' => 'Cart can\'t be update',
+            ];
+        }
 
-        $cart->updateAddressId((int) $current_address_delivery, (int) $cart->id_address_delivery);
+        $cart = $cart_adapter->get((int) $cart->id);
+        $cart_adapter->updateAddressId((int) $cart->id, (int) $current_address_delivery, (int) $cart->id_address_delivery);
 
         return [
             'result' => true,
