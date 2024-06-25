@@ -38,6 +38,15 @@ class ProductAdapter implements ProductInterface
         }
     }
 
+    public function get($id_product = false)
+    {
+        if (!is_int($id_product)) {
+            $id_product = false;
+        }
+
+        return new \Product($id_product);
+    }
+
     /**
      * @description  get Id product by Attributes depending on the prestashop version
      *

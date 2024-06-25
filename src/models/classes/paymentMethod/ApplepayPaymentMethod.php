@@ -93,6 +93,44 @@ class ApplepayPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @description Retrieves the list of compatible carriers for a given product.
+     *
+     * @param $product_id
+     * @param $carriers_list
+     *
+     * @return array
+     */
+    public function hasCompatibleCarriersForProduct($product_id)
+    {
+        $this->setParameters();
+        $product_adapter = $this->dependencies
+            ->getPlugin()
+            ->getProduct();
+        $product = $product_adapter->get((int) $product_id);
+        $carriers_list = $product->getCarriers();
+
+        $available_carriers = $this->dependencies
+            ->getPlugin()
+            ->getCarrier()
+            ->getAllActiveCarriers($this->context->language->id);
+        $is_compatible = false;
+
+        if (empty($carriers_list)) {
+            $carriers_list = $available_carriers;
+        }
+
+        foreach ($carriers_list as $carrier) {
+            if (in_array($carrier['id_carrier'], json_decode($this->configuration->getValue('applepay_carriers'), true))) {
+                $is_compatible = true;
+
+                break;
+            }
+        }
+
+        return $is_compatible;
+    }
+
+    /**
      * @description Get the available carrier carrier list for the current Cart
      *
      * @return array
