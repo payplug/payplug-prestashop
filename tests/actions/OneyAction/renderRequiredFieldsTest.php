@@ -27,11 +27,11 @@ class renderRequiredFieldsTest extends BaseOneyAction
     public function testWhenGivenParamIsInvalidStringFormat($param)
     {
         $controller = $this->instance->shouldReceive([
-                                                         'getController' => 'product',
-                                                     ]);
+            'getController' => 'product',
+        ]);
         $this->dispatcher->shouldReceive([
-                                             'getInstance' => $controller,
-                                         ]);
+            'getInstance' => $controller,
+        ]);
         $this->assertSame(
             [],
             $this->action->renderRequiredFields($param)

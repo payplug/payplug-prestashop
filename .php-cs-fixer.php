@@ -33,7 +33,7 @@ return (new PhpCsFixer\Config())
         'phpdoc_separation' => true,
         'no_superfluous_elseif' => false,
         'multiline_whitespace_before_semicolons' => false,
-        'array_indentation' => false,
+        'array_indentation' => true,
         'phpdoc_order' => true,
         'phpdoc_trim' => true,
         'single_line_comment_style' => true,

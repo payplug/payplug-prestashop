@@ -64,14 +64,14 @@ class submitSandboxActionTest extends BaseConfigurationAction
         $account = \Mockery::mock('Account');
         $account
             ->shouldReceive([
-                                'isPassword' => ['result' => false],
-                            ]);
+                'isPassword' => ['result' => false],
+            ]);
         $this->dependencies
             ->shouldReceive([
-                                'getValidators' => [
-                                    'account' => $account,
-                                ],
-                            ]);
+                'getValidators' => [
+                    'account' => $account,
+                ],
+            ]);
 
         $this->assertSame(
             [
@@ -97,21 +97,21 @@ class submitSandboxActionTest extends BaseConfigurationAction
         $account = \Mockery::mock('Account');
         $account
             ->shouldReceive([
-                                'isPassword' => [
-                                    'result' => true,
-                                ],
-                            ]);
+                'isPassword' => [
+                    'result' => true,
+                ],
+            ]);
         $this->dependencies
             ->shouldReceive([
-                                'getValidators' => [
-                                    'account' => $account,
-                                ],
-                            ]);
+                'getValidators' => [
+                    'account' => $account,
+                ],
+            ]);
 
         $this->dependencies->apiClass = \Mockery::mock();
         $this->dependencies->apiClass->shouldReceive([
-                                                         'login' => false,
-                                                     ]);
+            'login' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -138,28 +138,28 @@ class submitSandboxActionTest extends BaseConfigurationAction
         $account = \Mockery::mock('Account');
         $account
             ->shouldReceive([
-                                'isPassword' => [
-                                    'result' => true,
-                                ],
-                            ]);
+                'isPassword' => [
+                    'result' => true,
+                ],
+            ]);
         $this->dependencies
             ->shouldReceive([
-                                'getValidators' => [
-                                    'account' => $account,
-                                ],
-                            ]);
+                'getValidators' => [
+                    'account' => $account,
+                ],
+            ]);
 
         $this->dependencies->apiClass = \Mockery::mock();
         $this->dependencies->apiClass->shouldReceive([
-                                                         'login' => true,
-                                                     ]);
+            'login' => true,
+        ]);
 
         $this->action->shouldReceive([
-                                         'checkPermissionAction' => [
-                                             'success' => true,
-                                             'data' => [],
-                                         ],
-                                     ]);
+            'checkPermissionAction' => [
+                'success' => true,
+                'data' => [],
+            ],
+        ]);
         $this->assertSame(
             [
                 'success' => true,
@@ -186,28 +186,28 @@ class submitSandboxActionTest extends BaseConfigurationAction
         $account = \Mockery::mock('Account');
         $account
             ->shouldReceive([
-                                'isPassword' => [
-                                    'result' => true,
-                                ],
-                            ]);
+                'isPassword' => [
+                    'result' => true,
+                ],
+            ]);
         $this->dependencies
             ->shouldReceive([
-                                'getValidators' => [
-                                    'account' => $account,
-                                ],
-                            ]);
+                'getValidators' => [
+                    'account' => $account,
+                ],
+            ]);
 
         $this->dependencies->apiClass = \Mockery::mock();
         $this->dependencies->apiClass->shouldReceive([
-                                                         'login' => true,
-                                                     ]);
+            'login' => true,
+        ]);
 
         $this->action->shouldReceive([
-                                         'checkPermissionAction' => [
-                                             'success' => false,
-                                             'data' => [],
-                                         ],
-                                     ]);
+            'checkPermissionAction' => [
+                'success' => false,
+                'data' => [],
+            ],
+        ]);
         $this->assertSame(
             [
                 'success' => false,

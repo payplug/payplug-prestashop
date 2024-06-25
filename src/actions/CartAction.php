@@ -131,10 +131,10 @@ class CartAction
             ->getPlugin()
             ->getAssign()
             ->assign([
-                         'applepay_js_url' => $applepay_js_url,
-                         'applepay_workflow' => $applepay_workflow,
-                         'iso_lang' => $this->context->language->iso_code,
-                     ]);
+                'applepay_js_url' => $applepay_js_url,
+                'applepay_workflow' => $applepay_workflow,
+                'iso_lang' => $this->context->language->iso_code,
+            ]);
 
         $this->dependencies
             ->getPlugin()

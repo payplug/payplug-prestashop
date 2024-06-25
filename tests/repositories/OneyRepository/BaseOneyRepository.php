@@ -58,11 +58,11 @@ class BaseOneyRepository extends RepositoryBase
         ];
         $this->amount_helper = \Mockery::mock('AmountHelper');
         $this->amount_helper->shouldReceive([
-                'formatOneyAmount' => [
-                    'result' => 10,
-                    'message' => '$amount is formatted',
-                ],
-            ]);
+            'formatOneyAmount' => [
+                'result' => 10,
+                'message' => '$amount is formatted',
+            ],
+        ]);
 
         $this->address_adapter = \Mockery::mock('AddressAdapter');
         $this->address_adapter->shouldReceive([

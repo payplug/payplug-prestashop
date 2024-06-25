@@ -162,8 +162,8 @@ class getRequestTest extends BaseApplepayPaymentMethod
     {
         $this->currency_adapter
             ->shouldReceive([
-                                'get' => CurrencyMock::get(),
-                            ]);
+                'get' => CurrencyMock::get(),
+            ]);
 
         $this->address_adapter
             ->shouldReceive('getFirstCustomerAddressId')
@@ -216,22 +216,22 @@ class getRequestTest extends BaseApplepayPaymentMethod
         $this->classe
             ->shouldReceive('getDeliveryOptions')
             ->andReturn([
-                            [
-                                'identifier' => '42',
-                                'label' => 'carrier label',
-                                'detail' => 'carrier detail',
-                                'amount' => 42,
-                            ],
-                        ]);
+                [
+                    'identifier' => '42',
+                    'label' => 'carrier label',
+                    'detail' => 'carrier detail',
+                    'amount' => 42,
+                ],
+            ]);
         $this->classe
             ->shouldReceive('getLinesItems')
             ->andReturn([
-                            [
-                                'label' => 'line item',
-                                'type' => 'final',
-                                'amount' => 42,
-                            ],
-                        ]);
+                [
+                    'label' => 'line item',
+                    'type' => 'final',
+                    'amount' => 42,
+                ],
+            ]);
 
         $this->context->cookie
             ->shouldReceive(['write' => true]);

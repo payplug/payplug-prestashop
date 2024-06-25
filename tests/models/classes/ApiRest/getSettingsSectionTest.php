@@ -62,8 +62,8 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
-                                        'checkPsAccount' => true,
-                                    ]);
+            'checkPsAccount' => true,
+        ]);
         $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => '',
@@ -81,8 +81,8 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
-                                        'checkPsAccount' => true,
-                                    ]);
+            'checkPsAccount' => true,
+        ]);
         $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'logged' => true,
@@ -103,8 +103,8 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
-                                        'checkPsAccount' => true,
-                                    ]);
+            'checkPsAccount' => true,
+        ]);
         $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
@@ -122,8 +122,8 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
-                                        'checkPsAccount' => true,
-                                    ]);
+            'checkPsAccount' => true,
+        ]);
         $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
@@ -148,8 +148,8 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
-                                        'checkPsAccount' => false,
-                                    ]);
+            'checkPsAccount' => false,
+        ]);
         $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
@@ -170,8 +170,8 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
-                                        'checkPsAccount' => true,
-                                    ]);
+            'checkPsAccount' => true,
+        ]);
         $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => 'unit.test@payplug.com',

@@ -21,8 +21,8 @@ class checkAndSaveAddressTest extends BaseAddress
 
         $this->address_adapter
             ->shouldReceive([
-              'get' => AddressMock::get(),
-       ]);
+                'get' => AddressMock::get(),
+            ]);
 
         $this->user_address = [
             'firstname' => 'John',

@@ -41,8 +41,8 @@ class BaseRefundAction extends TestCase
         $this->logger = \Mockery::mock('Logger');
         $this->logger
             ->shouldReceive([
-                                'addLog' => true,
-                            ]);
+                'addLog' => true,
+            ]);
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
         $this->translation
             ->shouldReceive('l')
@@ -55,9 +55,9 @@ class BaseRefundAction extends TestCase
         $this->plugin
             ->shouldReceive([
 
-                                'getLogger' => $this->logger,
-                                'getTools' => $this->toolsAdapter,
+                'getLogger' => $this->logger,
+                'getTools' => $this->toolsAdapter,
 
-                            ]);
+            ]);
     }
 }

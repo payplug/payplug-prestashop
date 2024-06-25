@@ -57,15 +57,15 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
         }
         $this->validate_adapter
             ->shouldReceive([
-                                'validate' => false,
-                            ]);
+                'validate' => false,
+            ]);
         $this->configuration_adapter
             ->shouldReceive('get')
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
         $this->currency_adapter->shouldReceive([
-                                                   'get' => 1,
-                                               ]);
+            'get' => 1,
+        ]);
 
         $this->assertSame(
             $message,

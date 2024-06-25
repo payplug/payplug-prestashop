@@ -26,13 +26,13 @@ class BaseAddress extends TestCase
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin
             ->shouldReceive([
-                                'getAddress' => $this->address_adapter,
-                                'getCustomer' => $this->customer_adapter,
+                'getAddress' => $this->address_adapter,
+                'getCustomer' => $this->customer_adapter,
             ]);
         $this->dependencies
             ->shouldReceive([
-                                'getPlugin' => $this->plugin,
-        ]);
+                'getPlugin' => $this->plugin,
+            ]);
         $this->classe = \Mockery::mock(Address::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();

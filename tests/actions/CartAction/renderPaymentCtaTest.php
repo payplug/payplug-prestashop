@@ -24,9 +24,9 @@ class renderPaymentCtaTest extends BaseCartAction
         $this->payment_method_class = \Mockery::mock('PaymentMethodClass');
 
         $this->plugin->shouldReceive([
-             'getBrowser' => $browser,
-             'getPaymentMethodClass' => $this->payment_method_class,
-         ]);
+            'getBrowser' => $browser,
+            'getPaymentMethodClass' => $this->payment_method_class,
+        ]);
 
         $this->browser_validator->shouldReceive([
             'isApplePayCompatible' => [
@@ -134,10 +134,10 @@ class renderPaymentCtaTest extends BaseCartAction
         $this->context->link = $link;
 
         $this->plugin->shouldReceive([
-             'getRoutes' => $routes,
-             'getAssign' => $assign,
-             'getMedia' => $media,
-         ]);
+            'getRoutes' => $routes,
+            'getAssign' => $assign,
+            'getMedia' => $media,
+        ]);
         $this->configClass->shouldReceive('fetchTemplate')->andReturn($template);
     }
 }

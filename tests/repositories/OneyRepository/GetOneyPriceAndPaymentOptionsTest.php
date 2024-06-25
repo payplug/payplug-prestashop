@@ -88,11 +88,11 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isOneyElligible' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isOneyElligible' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->assertSame(
             $this->repo->getOneyPriceAndPaymentOptions($cart, $amount, $country),
@@ -114,11 +114,11 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isOneyElligible' => [
-                    'result' => false,
-                    'message' => '',
-                ],
-            ]);
+            'isOneyElligible' => [
+                'result' => false,
+                'message' => '',
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -159,11 +159,11 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isOneyElligible' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isOneyElligible' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->assertSame(
             [

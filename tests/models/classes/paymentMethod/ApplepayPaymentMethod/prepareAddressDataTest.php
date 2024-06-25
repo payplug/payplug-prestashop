@@ -69,7 +69,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
         $this->dependencies->configClass = $config_class;
 
         $this->country_adapter->shouldReceive([
-               'getByIso' => 1,
+            'getByIso' => 1,
         ]);
 
         $this->assertEquals($expected_data, $this->classe->prepareAddressData($this->address_data));
@@ -92,8 +92,8 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
         $this->dependencies->configClass = $config_class;
 
         $this->country_adapter->shouldReceive([
-                                          'getByIso' => 1,
-                                      ]);
+            'getByIso' => 1,
+        ]);
         $expected_data = [
             'first_name' => 'John',
             'last_name' => 'Doe',

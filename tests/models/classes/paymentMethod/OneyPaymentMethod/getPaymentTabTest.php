@@ -129,11 +129,11 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
     {
         $this->classe
             ->shouldReceive([
-                                'getOneyPriceLimit' => [
-                                    'min' => 100,
-                                    'max' => 3000,
-                                ],
-                            ]);
+                'getOneyPriceLimit' => [
+                    'min' => 100,
+                    'max' => 3000,
+                ],
+            ]);
 
         $this->validators['payment']
             ->shouldReceive([
@@ -158,8 +158,8 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
         $this->currency_adapter->shouldReceive([
-                                                   'get' => 1,
-                                               ]);
+            'get' => 1,
+        ]);
         $this->assertSame(
             [],
             $this->classe->getPaymentTab()
@@ -210,8 +210,8 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
             ->andReturn('EUR');
 
         $this->currency_adapter->shouldReceive([
-                                                   'get' => 1,
-                                               ]);
+            'get' => 1,
+        ]);
         $this->assertSame(
             [],
             $this->classe->getPaymentTab()
@@ -224,10 +224,10 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
             ->shouldReceive([
                 'hasOneyRequiredFields' => false,
                 'getOneyPaymentContext' => [],
-                                'getOneyPriceLimit' => [
-                                    'min' => 100,
-                                    'max' => 3000,
-                                ],
+                'getOneyPriceLimit' => [
+                    'min' => 100,
+                    'max' => 3000,
+                ],
             ]);
 
         $this->validators['payment']
@@ -266,8 +266,8 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
         $this->currency_adapter->shouldReceive([
-                                                   'get' => 1,
-                                               ]);
+            'get' => 1,
+        ]);
 
         $this->configuration_adapter
             ->shouldReceive('get')

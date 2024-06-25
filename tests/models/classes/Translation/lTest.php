@@ -48,12 +48,12 @@ class lTest extends BaseTranslation
         $translation = 'transation';
         $transation_adapter
             ->shouldReceive([
-            'trans' => $translation,
-        ]);
+                'trans' => $translation,
+            ]);
 
         $this->plugin
             ->shouldReceive([
-               'getTranslationAdapter' => $transation_adapter,
+                'getTranslationAdapter' => $transation_adapter,
             ]);
 
         $this->assertSame(
@@ -70,11 +70,11 @@ class lTest extends BaseTranslation
         $transation_adapter = \Mockery::mock('TranslationAdapter');
         $transation_adapter
             ->shouldReceive([
-            'trans' => $string,
-        ]);
+                'trans' => $string,
+            ]);
         $this->plugin
             ->shouldReceive([
-               'getTranslationAdapter' => $transation_adapter,
+                'getTranslationAdapter' => $transation_adapter,
             ]);
 
         $translation = 'default transation';
