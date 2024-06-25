@@ -29,14 +29,12 @@
 {/if}
 <div class="row {$module_name|escape:'htmlall':'UTF-8'}ApplePay_wrapper -{$applepay_workflow|escape:'htmlall':'UTF-8'}">
     <div class="col-xs-12">
-        {if 'checkout' != $applepay_workflow}
-            <style>
-                apple-pay-button {
-                    --apple-pay-button-height: 36px;
-                    --apple-pay-button-border-radius: 0px;
-                }
-            </style>
-        {/if}
+        <style>
+            apple-pay-button {
+                --apple-pay-button-height: 36px;
+                --apple-pay-button-border-radius: 0px;
+            }
+        </style>
         <apple-pay-button buttonstyle="black" type="pay" locale="{$iso_code|escape:'htmlall':'UTF-8'}" id="apple-pay-button" class="{$module_name|escape:'htmlall':'UTF-8'}ApplePay_button"></apple-pay-button>
         <p class="{$module_name|escape:'htmlall':'UTF-8'}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
     </div>
