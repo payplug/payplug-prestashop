@@ -108,22 +108,37 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->getProduct();
         $product = $product_adapter->get((int) $product_id);
         $carriers_list = $product->getCarriers();
-
         $available_carriers = $this->dependencies
             ->getPlugin()
             ->getCarrier()
             ->getAllActiveCarriers($this->context->language->id);
-        $is_compatible = false;
 
         if (empty($carriers_list)) {
             $carriers_list = $available_carriers;
         }
 
+        $is_compatible = false;
         foreach ($carriers_list as $carrier) {
-            if (in_array($carrier['id_carrier'], json_decode($this->configuration->getValue('applepay_carriers'), true))) {
-                $is_compatible = true;
-
-                break;
+            if (!$is_compatible) {
+                $carrier_sizes = [
+                    'width' => (float) $carrier['max_width'],
+                    'height' => (float) $carrier['max_height'],
+                    'depth' => (float) $carrier['max_depth'],
+                    'weight' => (float) $carrier['max_weight'],
+                ];
+                $product_sizes = [
+                    'width' => (float) $product->width,
+                    'height' => (float) $product->height,
+                    'depth' => (float) $product->depth,
+                    'weight' => (float) $product->weight,
+                ];
+                if (($carrier_sizes['width'] > 0 && $carrier_sizes['width'] < $product_sizes['width'])
+                    || ($carrier_sizes['height'] > 0 && $carrier_sizes['height'] < $product_sizes['height'])
+                    || ($carrier_sizes['depth'] > 0 && $carrier_sizes['depth'] < $product_sizes['depth'])
+                    || ($carrier_sizes['weight'] > 0 && $carrier_sizes['weight'] < $product_sizes['weight'])) {
+                    continue;
+                }
+                $is_compatible = in_array($carrier['id_carrier'], json_decode($this->configuration->getValue('applepay_carriers'), true));
             }
         }
 
