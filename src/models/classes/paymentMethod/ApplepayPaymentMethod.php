@@ -334,6 +334,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         if ($validate_payment['result']) {
             return $validate_payment;
         }
+
         // ... or if is not  paid
         if (!$payment->is_paid) {
             return [
@@ -433,6 +434,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $cart_adapter = $this->dependencies->getPlugin()->getCart();
         $cart_rule_adapter = $this->dependencies->getPlugin()->getCartRule();
         $address_adapter = $this->dependencies->getPlugin()->getAddress();
+
         // Check if this an appelpay 'product' shopping page
         // check empty_cart this double check since we go through this condition twice on js side
         if ('product' === $workflow && true === (bool) $this->tools->tool('getValue', 'empty_cart')) {
@@ -456,11 +458,35 @@ class ApplepayPaymentMethod extends PaymentMethod
             $current_address_delivery = (int) $this->context->cart->id_address_delivery;
             $cart_adapter->update($this->context->cart);
             $cart_adapter->updateAddressId((int) $this->context->cart->id, $current_address_delivery, (int) $this->context->cart->id_address_delivery);
+
+            // Reload cart in context after update
+            $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
         }
 
         if ('checkout' != $workflow) {
-            $carrier = $this->tools->tool('getValue', 'carrier');
+            $address = $this->tools->tool('getValue', 'address');
+            if ($address) {
+                $formated_address = [
+                    'firstname' => 'applepay firstname',
+                    'lastname' => 'applepay lastname',
+                    'address1' => 'applepay address1',
+                    'postcode' => $address['postalCode'],
+                    'city' => $address['locality'],
+                    'id_country' => $this->dependencies
+                        ->getPlugin()
+                        ->getCountry()
+                        ->getByIso($address['countryCode']),
+                ];
+                $new_address_id = $this->dependencies
+                    ->getPlugin()
+                    ->getAddressClass()
+                    ->checkAndSaveAddress($formated_address);
+                $current_delivery_id = $this->context->cart->id_address_delivery;
+                $current_invoice_id = $this->context->cart->id_address_invoice;
+                $cart_adapter->updateAddresses($this->context->cart, $new_address_id, $new_address_id);
+            }
 
+            $carrier = $this->tools->tool('getValue', 'carrier');
             $delivery_options = $this->getDeliveryOptions();
             if ($carrier) {
                 $id_carrier = (int) $carrier['identifier'];
@@ -470,6 +496,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         } else {
             $id_carrier = (int) $this->context->cart->id_carrier;
         }
+        $this->context->cart->id_carrier = $id_carrier;
 
         $applePayPaymentRequest = [
             'countryCode' => $this->context->country->iso_code,
@@ -514,6 +541,10 @@ class ApplepayPaymentMethod extends PaymentMethod
 
             $lineItems = $this->getLinesItems($carrier ? [$carrier] : $delivery_options);
             $additionalPaymentRequestDatas['lineItems'] = $lineItems;
+
+            if (isset($current_delivery_id, $current_invoice_id)) {
+                $cart_adapter->updateAddresses($this->context->cart, $current_delivery_id, $current_invoice_id);
+            }
         }
 
         return array_merge($applePayPaymentRequest, $additionalPaymentRequestDatas);
@@ -820,10 +851,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             ];
         }
 
-        $request = $this->getRequest();
-
         $cart_data = [
-            'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($request['total']['amount']),
             'billing' => $this->dependencies
                 ->getPlugin()
                 ->getPaymentMethodClass()
@@ -867,9 +895,6 @@ class ApplepayPaymentMethod extends PaymentMethod
             'id_country' => $this->country_adapter->getByIso($cart_data['billing']['country']),
         ];
 
-        // Save the current address delivery to update cart product
-        $current_address_delivery = (int) $cart->id_address_delivery;
-
         $customer = $customer_adapter->get((int) $cart->id_customer);
         if ($customer_adapter->isLogged($customer)) {
             // Prepare shipping and billing addresses data
@@ -896,8 +921,8 @@ class ApplepayPaymentMethod extends PaymentMethod
             }
 
             // Update cart with address IDs
-            $cart->id_address_invoice = $existing_billing_address;
-            $cart->id_address_delivery = $existing_shipping_address;
+            $id_address_invoice = $existing_billing_address;
+            $id_address_delivery = $existing_shipping_address;
         } else {
             // create guest user
             $customer->is_guest = true;
@@ -917,11 +942,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             $shipping_address_id = $this->dependencies
                 ->getPlugin()
                 ->getAddressClass()
-                ->checkAndSaveAddress(
-                    $user_shipping_address,
-                    (int) $customer->id,
-                    []
-                );
+                ->checkAndSaveAddress($user_shipping_address, (int) $customer->id);
 
             // Check if shipping address is different than billing address
             if (hash('sha256', json_encode($user_shipping_address)) != hash('sha256', json_encode($user_billing_address))) {
@@ -940,8 +961,8 @@ class ApplepayPaymentMethod extends PaymentMethod
             }
 
             // Update cart with address IDs
-            $cart->id_address_invoice = $billing_address_id;
-            $cart->id_address_delivery = $shipping_address_id;
+            $id_address_invoice = $billing_address_id;
+            $id_address_delivery = $shipping_address_id;
         }
 
         // Set selected carrier in cart
@@ -963,23 +984,12 @@ class ApplepayPaymentMethod extends PaymentMethod
             ];
         }
 
-        $cart->id_carrier = $carrier->id;
-        $delivery_option = [
-            (int) $cart->id_address_delivery => (string) $carrier->id . ',',
-        ];
-        $cart->delivery_option = json_encode($delivery_option);
-
         // then update the cart
-        $update = $cart_adapter->update($cart);
-        if (!(bool) $update) {
-            return [
-                'result' => false,
-                'message' => 'Cart can\'t be update',
-            ];
-        }
+        $cart_adapter->updateAddresses($cart, $id_address_delivery, $id_address_invoice);
 
-        $cart = $cart_adapter->get((int) $cart->id);
-        $cart_adapter->updateAddressId((int) $cart->id, (int) $current_address_delivery, (int) $cart->id_address_delivery);
+        // then get the new amount for the request
+        $request = $this->getRequest();
+        $cart_data['amount'] = $this->dependencies->getHelpers()['amount']->convertAmount($request['total']['amount']);
 
         return [
             'result' => true,
