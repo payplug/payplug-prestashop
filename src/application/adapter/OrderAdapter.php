@@ -41,14 +41,18 @@ class OrderAdapter implements OrderInterface
     }
 
     /**
-     * @deprecated since 1.7.1.0 Use getIdByCartId() instead
+     * @description Get Order for a given cart
      *
-     * @param int $idCart
+     * @param int $id_cart
      *
      * @return mixed
      */
-    public function getOrderByCartId($idCart = 0)
+    public function getIdByCartId($id_cart = 0)
     {
-        return \Order::getOrderByCartId($idCart);
+        if (method_exists('Order', 'getIdByCartId')) {
+            return \Order::getIdByCartId($id_cart);
+        }
+
+        return \Order::getOrderByCartId($id_cart);
     }
 }
