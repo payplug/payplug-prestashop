@@ -30,4 +30,12 @@ if (!defined('_PS_VERSION_')) {
 interface AddressInterface
 {
     public function get($idAddress);
+
+    public function getZoneById($idAddress);
+
+    public function saveAddress($address);
+
+    public function delete($address);
+
+    public function getFirstCustomerAddressId($id_customer);
 }
