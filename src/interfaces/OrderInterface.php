@@ -31,5 +31,5 @@ interface OrderInterface
 {
     public function get($idOrder);
 
-    public function getOrderByCartId($idCart);
+    public function getIdByCartId($idCart);
 }

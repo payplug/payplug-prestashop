@@ -57,7 +57,7 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
 
             // Check if order exists
             $cart = $this->cartAdapter->get((int) (int) $this->toolsAdapter->tool('getValue', 'id_cart'));
-            $order = $this->orderAdapter->get((int) $this->orderAdapter->getOrderByCartId((int) $cart->id));
+            $order = $this->orderAdapter->get((int) $this->orderAdapter->getIdByCartId((int) $cart->id));
             $order_exists = $this->dependenciesClass
                 ->getValidators()['order']
                 ->isCreated($order, (int) $cart->id);
