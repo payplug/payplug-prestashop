@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.13
+- Bugfix :
+  - [PRE-2495](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2463): Add phone number to guest address for ApplePay
+
 ## Version 4.9.12
 - Bugfix :
   - [PRE-2522](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2461):  Fix lock usage in notification script to prevent overload peak

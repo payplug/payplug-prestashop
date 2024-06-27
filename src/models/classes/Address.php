@@ -99,7 +99,7 @@ class Address
             $address->address1 = $user_address['address1'];
             $address->postcode = $user_address['postcode'];
             $address->city = $user_address['city'];
-            $address->phone_mobile = isset($user_address['mobile_phone_number']) ? $user_address['mobile_phone_number'] : '';
+            $address->phone_mobile = isset($user_address['phone_mobile']) ? $user_address['phone_mobile'] : '';
             $address->alias = 'Apple Pay Address';
             $address->id_customer = $customer_id;
             $this->address_adapter->saveAddress($address);

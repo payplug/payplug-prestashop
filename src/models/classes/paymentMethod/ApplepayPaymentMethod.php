@@ -893,6 +893,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $customer_adapter = $this->dependencies
             ->getPlugin()
             ->getCustomer();
+
         $user_shipping_address = [
             'firstname' => $cart_data['shipping']['first_name'],
             'lastname' => $cart_data['shipping']['last_name'],
@@ -900,6 +901,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             'postcode' => $cart_data['shipping']['postcode'],
             'city' => $cart_data['shipping']['city'],
             'id_country' => $this->country_adapter->getByIso($cart_data['shipping']['country']),
+            'phone_mobile' => $cart_data['shipping']['mobile_phone_number'],
         ];
         $user_billing_address = [
             'firstname' => $cart_data['billing']['first_name'],
