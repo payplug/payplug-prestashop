@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.12
+- Bugfix :
+  - [PRE-2522](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2461):  Fix lock usage in notification script to prevent overload peak
+
 ## Version 4.9.10
 - Bugfix :
   - [PRE-2525](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2459): Fix price display on address change

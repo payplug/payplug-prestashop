@@ -171,7 +171,7 @@ class PayPlugNotifications
     private function dispatchPayment()
     {
         $this->logger->addLog('Notification: dispatchPayment');
-        $id_order = $this->orderAdapter->getOrderByCartId($this->cart->id);
+        $id_order = $this->orderAdapter->getIdByCartId($this->cart->id);
         if ($id_order) {
             if (isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id) {
                 $this->exitProcess('No need to update a installment plan schedule.');
@@ -369,7 +369,7 @@ class PayPlugNotifications
                 $this->exitProcess('Cart cannot be loaded.', 500);
             }
 
-            $id_order = (int) $this->orderAdapter->getOrderByCartId((int) $cart_id);
+            $id_order = (int) $this->orderAdapter->getIdByCartId((int) $cart_id);
             $this->order = $this->orderAdapter->get((int) $id_order);
             $this->logger->addLog('Order ID : ' . $this->order->id);
             if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
@@ -523,17 +523,11 @@ class PayPlugNotifications
     private function setLock()
     {
         $this->logger->addLog('Notification: setLock');
-        do {
-            $cart_lock = $this->payplugLock->createLockG2($this->cart->id, 'ipn');
-            if (!$cart_lock) {
-                $checkReturn = $this->payplugLock->check($this->cart->id);
-                if ('stop ipn' == $checkReturn) {
-                    $this->exitProcess('Lock cannot be created.', 500);
-                }
-            } else {
-                $this->lock_key = $this->cart->id;
-            }
-        } while (!$cart_lock);
+        $cart_lock = $this->payplugLock->createLockG2($this->cart->id, 'ipn');
+        if (!$cart_lock) {
+            $this->exitProcess('Lock cannot be created.', 500);
+        }
+        $this->lock_key = $this->cart->id;
         $this->logger->addLog('Lock created');
     }
 

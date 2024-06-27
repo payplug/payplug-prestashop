@@ -125,6 +125,11 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         $cart_lock = false;
         $datetime1 = date_create(date('Y-m-d H:i:s'));
         $this->logger->addLog('Check lock');
+
+        // Before creating the lock, we wait one second to be sure that notification is priority
+        sleep(1);
+
+        // then we check/create the lock
         do {
             $cart_lock = $this->payplugLock->check($cart->id);
             if (!$cart_lock) {
@@ -147,7 +152,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         } while (!$cart_lock);
 
         // Check if order already exist
-        $id_order = $this->order_adapter->getOrderByCartId((int) $cart->id);
+        $id_order = $this->order_adapter->getIdByCartId((int) $cart->id);
         if ($id_order) {
             $link_redirect = $this->context->link->getPageLink('order-confirmation', true, $this->context->language->id, [
                 'id_cart' => $cart->id,

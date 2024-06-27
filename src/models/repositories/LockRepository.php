@@ -118,12 +118,16 @@ class LockRepository extends QueryRepository
             return [];
         }
 
-        $result = $this
-            ->select()
-            ->fields('*')
-            ->from($this->table_name)
-            ->where('`id_cart` = ' . (int) $cart_id)
-            ->build('unique_row');
+        try {
+            $result = $this
+                ->select()
+                ->fields('*')
+                ->from($this->table_name)
+                ->where('`id_cart` = ' . (int) $cart_id)
+                ->build('unique_row');
+        } catch (Exception $exception) {
+            return [];
+        }
 
         return $result ?: [];
     }
