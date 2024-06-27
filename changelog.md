@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.10
+- Bugfix :
+  - [PRE-2525](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2459): Fix price display on address change
+
 ## Version 4.9.8
 - Bugfix :
   - [PRE-2497](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2457): Do not display ApplePay button on product page if carrier not allowed

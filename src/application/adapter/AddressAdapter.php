@@ -71,6 +71,11 @@ class AddressAdapter implements AddressInterface
         return $address->save();
     }
 
+    public function delete($address)
+    {
+        return $address->delete();
+    }
+
     /**
      * @description retrieve the id of the first address
      * for a given customer

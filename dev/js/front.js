@@ -646,6 +646,13 @@ var $document, $window, __moduleName__Module = {
             session: null,
             datas: null,
             request: null,
+            address: {
+                locality: null,
+                country: null,
+                postalCode: null,
+                administrativeArea: null,
+                countryCode: null
+            },
             carrier: {
                 amount: null,
                 detail: null,
@@ -776,6 +783,7 @@ var $document, $window, __moduleName__Module = {
         },
         update: function() {
             let {applepay} = __moduleName__Module,
+                {workflow, carrier, address} = applepay.props,
                 request = null;
 
             if (applepay.props.query != null) {
@@ -790,8 +798,9 @@ var $document, $window, __moduleName__Module = {
                 data: {
                     _ajax: 1,
                     applepayUpdate: 1,
-                    workflow: applepay.props.workflow,
-                    carrier: applepay.props.carrier,
+                    workflow: workflow,
+                    carrier: carrier,
+                    address: address,
                 },
                 success: function (datas) {
                     if (!datas.result) {
@@ -821,9 +830,18 @@ var $document, $window, __moduleName__Module = {
                     {session} = applepay.props,
                     {shippingContact} = event;
 
+                applepay.props.address = {
+                    locality: shippingContact.locality,
+                    country: shippingContact.country,
+                    postalCode: shippingContact.postalCode,
+                    administrativeArea: shippingContact.administrativeArea,
+                    countryCode: shippingContact.countryCode,
+                };
+
+                const request = applepay.update();
                 const update = {
-                    'newTotal' : applepay.props.request.total,
-                    'newLineItems' : applepay.props.request.lineItems,
+                    'newTotal' : request.total,
+                    'newLineItems' : request.lineItems,
                 };
 
                 session.completeShippingContactSelection(update);

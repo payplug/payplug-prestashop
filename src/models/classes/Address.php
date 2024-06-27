@@ -56,7 +56,7 @@ class Address
             return 0;
         }
 
-        if (!is_int($customer_id) || !$customer_id) {
+        if (!is_int($customer_id)) {
             return 0;
         }
         $this->setParameters();

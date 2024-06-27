@@ -156,6 +156,26 @@ class CartAdapter implements CartInterface
         return $cart->update();
     }
 
+    public function updateAddresses($cart, $id_delivery = 0, $id_invoice = 0)
+    {
+        $current_delivery = $cart->id_address_delivery;
+
+        $cart->id_address_delivery = $id_delivery;
+        $cart->id_address_invoice = $id_invoice;
+        $cart->delivery_option = json_encode([
+            (int) $id_delivery => (string) $cart->id_carrier . ',',
+        ]);
+        $this->update($cart);
+
+        $cart = $this->get((int) $cart->id);
+
+        $this->updateAddressId(
+            (int) $cart->id,
+            (int) $current_delivery,
+            (int) $cart->id_address_delivery
+        );
+    }
+
     /**
      * @description  update product quantity
      * related to a given cart
