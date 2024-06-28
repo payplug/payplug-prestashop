@@ -74,4 +74,16 @@ class CarrierAdapter implements CarrierInterface
 
         return $carrier::getCarriers($id_lang, true, false, false, null, $carrier::ALL_CARRIERS);
     }
+
+    public function checkCarrierZone($id_carrier = 0, $id_zone = 0)
+    {
+        if (!is_int($id_carrier) || !$id_carrier) {
+            return 0;
+        }
+        if (!is_int($id_zone) || !$id_zone) {
+            return 0;
+        }
+
+        return $this->carrier->checkCarrierZone($id_carrier, $id_zone);
+    }
 }

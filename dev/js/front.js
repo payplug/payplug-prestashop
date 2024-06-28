@@ -842,6 +842,7 @@ var $document, $window, __moduleName__Module = {
                 const update = {
                     'newTotal' : request.total,
                     'newLineItems' : request.lineItems,
+                    'newShippingMethods' : request.shippingMethods,
                 };
 
                 session.completeShippingContactSelection(update);

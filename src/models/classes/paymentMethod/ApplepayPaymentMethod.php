@@ -325,6 +325,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         ];
 
         $cart_data = $this->getCartData($workflow, $carrier, $user);
+
         if (!$cart_data['result']) {
             return $cart_data;
         }
@@ -987,14 +988,22 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->getPlugin()
             ->getCarrier()
             ->get((int) $carrier['identifier']);
-        $carrier_in_range = $cart->isCarrierInRange(
+        $id_zone = $this->dependencies
+            ->getPlugin()
+            ->getAddress()
+            ->getZoneById((int) $id_address_delivery);
+        $carrier_in_range = $cart_adapter->isCarrierInRange(
             (int) $carrier->id,
-            $this->dependencies
-                ->getPlugin()
-                ->getAddress()
-                ->getZoneById((int) $cart->id_address_delivery)
+            (int) $id_zone
         );
-        if (!$carrier_in_range) {
+        $carrier_in_zone = $this->dependencies
+            ->getPlugin()
+            ->getCarrier()
+            ->checkCarrierZone(
+                (int) $carrier->id,
+                (int) $id_zone
+            );
+        if (!(bool) $carrier_in_range || !(bool) $carrier_in_zone) {
             return [
                 'result' => false,
                 'message' => 'Given carrier is not available for this delivery address',
