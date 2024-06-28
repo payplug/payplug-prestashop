@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.16
+- Bugfix :
+  - [SMP-2681](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2466): Fix missing applepay metadatas
+
 ## Version 4.9.15
 - Bugfix :
   - [PRE-2498](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2467): Fix applepay with inactive country
