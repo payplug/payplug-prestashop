@@ -387,9 +387,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             return [];
         }
 
-        $payment_tab['metadata'] = [
-            'applepay_workflow' => $workflow,
-        ];
+        $payment_tab['metadata']['applepay_workflow'] = $workflow;
         $payment_tab['payment_method'] = 'apple_pay';
         $payment_tab['payment_context'] = [
             'apple_pay' => [
