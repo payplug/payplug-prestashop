@@ -269,4 +269,17 @@ class CartAdapter implements CartInterface
 
         return $cart;
     }
+
+    public function isCarrierInRange($id_carrier = 0, $id_zone = 0)
+    {
+        if (!is_int($id_carrier) || !$id_carrier) {
+            return false;
+        }
+        if (!is_int($id_zone) || !$id_zone) {
+            return false;
+        }
+        $cart = new \Cart();
+
+        return $cart->isCarrierInRange($id_carrier, $id_zone);
+    }
 }
