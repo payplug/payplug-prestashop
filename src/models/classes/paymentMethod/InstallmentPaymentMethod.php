@@ -336,12 +336,20 @@ class InstallmentPaymentMethod extends PaymentMethod
         return true;
     }
 
-    // todo: add coverage to this method
-    public function postProcessOrder($resource = null, $order = null)
+    /**
+     * @desccription Post process order
+     * todo: add coverage to this method
+     *
+     * @param null $resource
+     * @param int $id_order
+     *
+     * @return bool
+     */
+    public function postProcessOrder($resource = null, $id_order = 0)
     {
         return $this->dependencies
             ->installmentClass
-            ->addPayplugInstallment($resource->id, $order);
+            ->addPayplugInstallment($resource->id);
     }
 
     /**

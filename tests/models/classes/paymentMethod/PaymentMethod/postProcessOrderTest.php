@@ -2,7 +2,6 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\PaymentMethod;
 
-use PayPlug\tests\mock\OrderMock;
 use PayPlug\tests\mock\PaymentMock;
 use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
@@ -22,24 +21,24 @@ class postProcessOrderTest extends BasePaymentMethod
      */
     public function testWhenGivenResourceIsntValidObject($resource)
     {
-        $order = OrderMock::get();
-        $this->assertFalse($this->classe->postProcessOrder($resource, $order));
+        $id_order = 42;
+        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
     }
 
     /**
-     * @dataProvider invalidObjectFormatDataProvider
+     * @dataProvider invalidIntegerFormatDataProvider
      *
-     * @param mixed $order
+     * @param mixed $id_order
      */
-    public function testWhenGivenOrderIsntValidObject($order)
+    public function testWhenGivenOrderIsntValidInterger($id_order)
     {
         $resource = PaymentMock::getStandard();
-        $this->assertFalse($this->classe->postProcessOrder($resource, $order));
+        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
     }
 
     public function testWhenResourceCannotBePatched()
     {
-        $order = OrderMock::get();
+        $id_order = 42;
         $resource = PaymentMock::getStandard();
 
         $patch_payment = \Mockery::mock('PatchPayment');
@@ -55,12 +54,12 @@ class postProcessOrderTest extends BasePaymentMethod
                 'getApiService' => $patch_payment,
             ]);
 
-        $this->assertFalse($this->classe->postProcessOrder($resource, $order));
+        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
     }
 
     public function testWhenOrderPaymentCannotBeCreate()
     {
-        $order = OrderMock::get();
+        $id_order = 42;
         $resource = PaymentMock::getStandard();
 
         $patch_payment = \Mockery::mock('PatchPayment');
@@ -83,12 +82,12 @@ class postProcessOrderTest extends BasePaymentMethod
                 'getApiService' => $patch_payment,
             ]);
 
-        $this->assertFalse($this->classe->postProcessOrder($resource, $order));
+        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
     }
 
     public function testWhenOrderIsPostProcessed()
     {
-        $order = OrderMock::get();
+        $id_order = 42;
         $resource = PaymentMock::getStandard();
 
         $patch_payment = \Mockery::mock('PatchPayment');
@@ -111,6 +110,6 @@ class postProcessOrderTest extends BasePaymentMethod
                 'getApiService' => $patch_payment,
             ]);
 
-        $this->assertTrue($this->classe->postProcessOrder($resource, $order));
+        $this->assertTrue($this->classe->postProcessOrder($resource, $id_order));
     }
 }

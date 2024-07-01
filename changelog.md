@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.23
+- Bugfix :
+  - [SMP-2710](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2468): Patch payment resource in order process update if order id is missing
+  
 ## Version 4.9.21
 - Bugfix :
   - [PRE-2539](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2472): fix php unit and coverage test
