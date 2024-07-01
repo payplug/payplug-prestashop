@@ -54,4 +54,16 @@ class CountryAdapter implements CountryInterface
     {
         return \Country::getNameById($param1, $param2);
     }
+
+    /**
+     * @param $idCountry
+     *
+     * @return bool
+     */
+    public function isCountryActiveByCountryId($idCountry)
+    {
+        $country = new \Country($idCountry);
+
+        return (bool) $country->active;
+    }
 }
