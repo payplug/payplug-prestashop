@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.14
+- Bugfix :
+  - [PRE-2525](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2464): Update carrier list when address is selected
+
 ## Version 4.9.13
 - Bugfix :
   - [PRE-2495](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2463): Add phone number to guest address for ApplePay

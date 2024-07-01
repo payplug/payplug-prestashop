@@ -46,4 +46,6 @@ interface CartInterface
     public function getOrderTotalDiscount($id_cart, $with_tax, $id_carrier);
 
     public function getDeliveryOptionList($id_cart);
+
+    public function isCarrierInRange($id_carrier, $id_zone);
 }
