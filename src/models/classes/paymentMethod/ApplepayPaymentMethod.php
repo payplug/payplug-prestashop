@@ -378,7 +378,6 @@ class ApplepayPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         $payment_tab = parent::getPaymentTab();
-
         if (empty($payment_tab)) {
             return $payment_tab;
         }
@@ -912,6 +911,14 @@ class ApplepayPaymentMethod extends PaymentMethod
             'city' => $cart_data['billing']['city'],
             'id_country' => $this->country_adapter->getByIso($cart_data['billing']['country']),
         ];
+        // check if country if active on merchant's shop
+        $is_active = $this->country_adapter->isCountryActiveByCountryId($user_shipping_address['id_country']);
+        if (!$is_active) {
+            return [
+                'result' => false,
+                'message' => 'The delivery address country is not active on the shop',
+            ];
+        }
 
         $customer = $customer_adapter->get((int) $cart->id_customer);
         if ($customer_adapter->isLogged($customer)) {
