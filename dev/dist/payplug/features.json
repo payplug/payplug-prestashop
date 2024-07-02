@@ -2,7 +2,6 @@
     "features": [
         "feature_amex",
         "feature_applepay",
-        "feature_applepay_product",
         "feature_bancontact",
         "feature_deferred",
         "feature_giropay",

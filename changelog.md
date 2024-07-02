@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.19
+- Bugfix :
+  - [PRE-2520](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2471): Disabled apple pay product from feature json
+
 ## Version 4.9.18
 - Bugfix :
   - [PRE-2535](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2470): Fix order confirmation redirection when order exists
