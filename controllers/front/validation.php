@@ -154,11 +154,15 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         // Check if order already exist
         $id_order = $this->order_adapter->getIdByCartId((int) $cart->id);
         if ($id_order) {
+            $order = $this->dependencies
+                ->getPlugin()
+                ->getOrder()
+                ->get((int) $id_order);
             $link_redirect = $this->context->link->getPageLink('order-confirmation', true, $this->context->language->id, [
                 'id_cart' => $cart->id,
                 'id_module' => $this->moduleInstance->id,
                 'id_order' => $id_order,
-                'key' => $customer->secure_key,
+                'key' => $order->secure_key,
             ]);
             $this->exitProcess($link_redirect, 'Redirecting to order-confirmation page');
         }

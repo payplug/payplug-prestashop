@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.18
+- Bugfix :
+  - [PRE-2535](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2470): Fix order confirmation redirection when order exists
+
 ## Version 4.9.17
 - Bugfix :
   - [SMP-2558](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2469): Allow resource creation when no invoice address selected
