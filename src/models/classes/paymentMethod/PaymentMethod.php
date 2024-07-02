@@ -460,7 +460,6 @@ class PaymentMethod
 
         // Set addresses if user is logged and has delivery/billing addresses
         if ((bool) $valid_customer
-            && (bool) $this->context->cart->id_address_invoice
             && (bool) $this->context->cart->id_address_delivery) {
             $billing_address = $this->dependencies
                 ->getPlugin()
