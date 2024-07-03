@@ -62,14 +62,16 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             ->andReturnUsing(function ($method, $param) {
                 return strtolower($param);
             });
+
         $config_class = \Mockery::mock('ConfigClass');
-
-        $config_class->shouldReceive('formatPhoneNumber')->andReturn('1234567890');
-
+        $config_class->shouldReceive([
+            'formatPhoneNumber' => '1234567890',
+            'getIsoFromLanguageCode' => 'fr',
+        ]);
         $this->dependencies->configClass = $config_class;
 
         $this->country_adapter->shouldReceive([
-               'getByIso' => 1,
+            'getByIso' => 1,
         ]);
 
         $this->assertEquals($expected_data, $this->classe->prepareAddressData($this->address_data));
@@ -85,15 +87,18 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             ->andReturnUsing(function ($method, $param) {
                 return strtolower($param);
             });
+
         $config_class = \Mockery::mock('ConfigClass');
-
-        $config_class->shouldReceive('formatPhoneNumber')->andReturn('0657789067');
-
+        $config_class->shouldReceive([
+            'formatPhoneNumber' => '0657789067',
+            'getIsoFromLanguageCode' => 'fr',
+        ]);
         $this->dependencies->configClass = $config_class;
 
-        $this->country_adapter->shouldReceive([
-                                          'getByIso' => 1,
-                                      ]);
+        $this->country_adapter
+            ->shouldReceive([
+                'getByIso' => 1,
+            ]);
         $expected_data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
@@ -103,9 +108,8 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'country' => 'FR',
             'language' => 'fr',
             'email' => 'john@example.com',
+            'mobile_phone_number' => '0657789067',
         ];
-        $prepared_data = $this->classe->prepareAddressData($this->address_data, null);
-        $this->assertEquals($expected_data, $prepared_data);
-        $this->assertArrayNotHasKey('mobile_phone_number', $prepared_data);
+        $this->assertEquals($expected_data, $this->classe->prepareAddressData($this->address_data));
     }
 }

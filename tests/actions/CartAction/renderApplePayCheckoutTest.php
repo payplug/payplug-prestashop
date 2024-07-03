@@ -12,6 +12,11 @@ namespace PayPlug\tests\actions\CartAction;
 class renderApplePayCheckoutTest extends BaseCartAction
 {
     private $payment_method_class;
+    private $payment_method;
+    private $routes;
+    private $assign;
+    private $media;
+    private $link;
 
     public function setUp()
     {
@@ -19,118 +24,115 @@ class renderApplePayCheckoutTest extends BaseCartAction
         $browser = \Mockery::mock('Browser');
         $browser
             ->shouldReceive([
-            'getName' => 'browser',
-        ]);
+                'getName' => 'browser',
+            ]);
         $this->payment_method_class = \Mockery::mock('PaymentMethodClass');
+        $this->payment_method = \Mockery::mock('PaymentMethod');
+        $this->routes = \Mockery::mock('Routes');
+        $this->assign = \Mockery::mock('Assign');
+        $this->media = \Mockery::mock('Media');
+        $this->link = \Mockery::mock('Link');
         $this->plugin
             ->shouldReceive([
-            'getBrowser' => $browser,
-            'getPaymentMethodClass' => $this->payment_method_class,
-        ]);
+                'getRoutes' => $this->routes,
+                'getAssign' => $this->assign,
+                'getMedia' => $this->media,
+                'getBrowser' => $browser,
+                'getPaymentMethodClass' => $this->payment_method_class,
+            ]);
     }
 
     public function testWhenApplePayCartWhenBrowserIsNotSafari()
     {
         $this->browser_validator
             ->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => false,
-                'message' => 'This browser is not applepay compatible.',
-            ],
-        ]);
-
+                'isApplePayCompatible' => [
+                    'result' => false,
+                    'message' => 'This browser is not applepay compatible.',
+                ],
+            ]);
         $this->assertFalse($this->action->renderApplePayCheckout());
     }
 
     public function testWhenNoAvailableCarriersFound()
     {
-        $this->browser_validator->shouldReceive([
+        $this->browser_validator
+            ->shouldReceive([
             'isApplePayCompatible' => [
                 'result' => true,
                 'message' => '',
             ],
         ]);
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
+        $this->payment_method
             ->shouldReceive([
                 'getCarriersList' => [],
             ]);
         $this->payment_method_class
             ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
+                'getPaymentMethod' => $this->payment_method,
             ]);
-        $controller = $this->instance->shouldReceive([
-                                                         'getController' => 'cart',
-                                                     ]);
-        $this->dispatcher->shouldReceive([
-                                             'getInstance' => $controller,
-                                         ]);
+        $controller = $this->instance
+            ->shouldReceive([
+            'getController' => 'cart',
+        ]);
+        $this->dispatcher
+            ->shouldReceive([
+            'getInstance' => $controller,
+        ]);
         $this->assertFalse($this->action->renderApplePayCheckout());
     }
 
     public function testWhenTemplateIsReturn()
     {
-        $this->browser_validator->shouldReceive([
+        $this->browser_validator
+            ->shouldReceive([
             'isApplePayCompatible' => [
                 'result' => true,
                 'message' => '',
             ],
         ]);
-        $controller = $this->instance->shouldReceive([
-                                                         'getController' => 'cart',
-                                                     ]);
-        $this->dispatcher->shouldReceive([
-                                             'getInstance' => $controller,
-                                         ]);
-        $payment_method = \Mockery::mock('PaymentMethod');
+        $controller = $this->instance
+            ->shouldReceive([
+            'getController' => 'cart',
+        ]);
+        $this->dispatcher
+            ->shouldReceive([
+            'getInstance' => $controller,
+        ]);
         $carrier_list = [
             42,
         ];
-        $payment_method
+        $this->payment_method
             ->shouldReceive([
-                'getCarriersList' => $carrier_list,
-            ]);
+            'getCarriersList' => $carrier_list,
+        ]);
         $this->payment_method_class
             ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-
-        $routes = \Mockery::mock('Routes');
-        $routes
+            'getPaymentMethod' => $this->payment_method,
+        ]);
+        $this->routes
             ->shouldReceive([
-                'getSourceUrl' => [
-                    'applepay' => 'source_url',
-                ],
-            ]);
-        $assign = \Mockery::mock('Assign');
-        $assign
+            'getSourceUrl' => [
+                'applepay' => 'source_url',
+            ],
+        ]);
+        $this->assign
             ->shouldReceive([
-                'assign' => true,
-            ]);
-        $media = \Mockery::mock('Media');
-        $media
+            'assign' => true,
+        ]);
+        $this->media
             ->shouldReceive([
-                'addJsDef' => true,
-            ]);
-        $link = \Mockery::mock('Link');
-        $link
+            'addJsDef' => true,
+        ]);
+        $this->link
             ->shouldReceive([
-                'getModuleLink' => '',
-            ]);
-        $this->context->link = $link;
-
-        $this->plugin
-            ->shouldReceive([
-                'getRoutes' => $routes,
-                'getAssign' => $assign,
-                'getMedia' => $media,
-            ]);
-
+            'getModuleLink' => '',
+        ]);
+        $this->context->link = $this->link;
         $this->configClass
             ->shouldReceive([
-                'fetchTemplate' => 'applepay_template',
-            ]);
-
+            'fetchTemplate' => 'applepay_template',
+        ]);
         $this->assertSame('applepay_template', $this->action->renderApplePayCheckout());
     }
 
@@ -140,7 +142,8 @@ class renderApplePayCheckoutTest extends BaseCartAction
     public function testWhenTemplateIsReturnForProduct()
     {
         // Mock the browser compatibility check
-        $this->browser_validator->shouldReceive([
+        $this->browser_validator
+            ->shouldReceive([
             'isApplePayCompatible' => [
                 'result' => true,
                 'message' => '',
@@ -148,55 +151,52 @@ class renderApplePayCheckoutTest extends BaseCartAction
         ]);
 
         // Mock the controller to return 'product'
-        $controller = $this->instance->shouldReceive([
-                                                         'getController' => 'product',
-                                                     ]);
-        $this->dispatcher->shouldReceive([
-                                             'getInstance' => $controller,
-                                         ]);
-
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $carrier_list = [42];
-        $payment_method
+        $controller = $this->instance
             ->shouldReceive([
-                                'getCarriersList' => $carrier_list,
-                            ]);
+            'getController' => 'product',
+        ]);
+        $this->dispatcher
+            ->shouldReceive([
+            'getInstance' => $controller,
+        ]);
+
+        $carrier_list = [42];
+        $this->payment_method
+            ->shouldReceive([
+            'getCarriersList' => $carrier_list,
+            'hasCompatibleCarriersForProduct' => $carrier_list,
+        ]);
         $this->payment_method_class
             ->shouldReceive([
-                                'getPaymentMethod' => $payment_method,
-                            ]);
-
-        $routes = \Mockery::mock('Routes');
-        $routes
+            'getPaymentMethod' => $this->payment_method,
+        ]);
+        $this->routes
             ->shouldReceive([
-                                'getSourceUrl' => [
-                                    'applepay' => 'source_url',
-                                ],
-                            ]);
-        $assign = \Mockery::mock('Assign');
-        $assign->shouldReceive([
-                                   'assign' => true,
-                               ]);
-        $media = \Mockery::mock('Media');
-        $media->shouldReceive([
-                                  'addJsDef' => true,
-                              ]);
-        $link = \Mockery::mock('Link');
-        $link->shouldReceive([
-                                 'getModuleLink' => '',
-                             ]);
-        $this->context->link = $link;
-
-        $this->plugin
+            'getSourceUrl' => [
+                'applepay' => 'source_url',
+            ],
+        ]);
+        $this->assign
             ->shouldReceive([
-                                'getRoutes' => $routes,
-                                'getAssign' => $assign,
-                                'getMedia' => $media,
-                            ]);
+            'assign' => true,
+        ]);
+        $this->media
+            ->shouldReceive([
+            'addJsDef' => true,
+        ]);
+        $this->link
+            ->shouldReceive([
+            'getModuleLink' => '',
+        ]);
+        $this->context->link = $this->link;
+        $this->tools_adapter
+            ->shouldReceive('tool')
+            ->with('getValue', 'id_product')
+            ->andReturn('42');
         $this->configClass
             ->shouldReceive([
-                                'fetchTemplate' => 'applepay_template',
-                            ]);
+            'fetchTemplate' => 'applepay_template',
+        ]);
 
         // Assert that the method returns the expected template
         $this->assertSame('applepay_template', $this->action->renderApplePayCheckout());

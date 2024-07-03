@@ -30,27 +30,29 @@ class getOptionTest extends BaseApplepayPaymentMethod
                 'multiple' => true,
                 'options' => [
                     [
-                        'name' => 'applepay_display',
-                        'label' => 'paymentmethods.applepay.display.checkout',
-                        'value' => 'checkout',
+                        'name' => 'applepay_checkout',
+                        'image_url' => 'modules/payplug/views/img/applepay/checkoutCta.jpg',
+                        'title' => 'paymentmethods.applepay.display.checkout',
+                        'switch' => true,
                         'checked' => true,
                     ],
                     [
-                        'name' => 'applepay_display',
-                        'label' => 'paymentmethods.applepay.display.cart',
-                        'value' => 'cart',
-                        'checked' => false,
-                    ],
-                    [
-                        'name' => 'applepay_display',
-                        'label' => 'paymentmethods.applepay.display.product',
-                        'value' => 'product',
+                        'name' => 'applepay_cart',
+                        'image_url' => 'modules/payplug/views/img/applepay/cartCta.jpg',
+                        'title' => 'paymentmethods.applepay.display.cart',
+                        'switch' => true,
                         'checked' => false,
                     ],
                 ],
                 'carriers' => [],
             ],
         ];
+        $configClass = \Mockery::mock('Config');
+        $configClass
+            ->shouldReceive([
+                'isValidFeature' => true,
+            ]);
+        $this->dependencies->configClass = $configClass;
         $this->assertSame(
             $expected,
             $this->classe->getOption($configuration)['options']
@@ -83,33 +85,43 @@ class getOptionTest extends BaseApplepayPaymentMethod
                 'multiple' => true,
                 'options' => [
                     [
-                        'name' => 'applepay_display',
-                        'label' => 'paymentmethods.applepay.display.checkout',
-                        'value' => 'checkout',
+                        'name' => 'applepay_checkout',
+                        'image_url' => 'modules/payplug/views/img/applepay/checkoutCta.jpg',
+                        'title' => 'paymentmethods.applepay.display.checkout',
+                        'switch' => true,
                         'checked' => true,
                     ],
                     [
-                        'name' => 'applepay_display',
-                        'label' => 'paymentmethods.applepay.display.cart',
-                        'value' => 'cart',
-                        'checked' => false,
-                    ],
-                    [
-                        'name' => 'applepay_display',
-                        'label' => 'paymentmethods.applepay.display.product',
-                        'value' => 'product',
+                        'name' => 'applepay_cart',
+                        'image_url' => 'modules/payplug/views/img/applepay/cartCta.jpg',
+                        'title' => 'paymentmethods.applepay.display.cart',
+                        'switch' => true,
                         'checked' => false,
                     ],
                 ],
                 'carriers' => [
                     'title' => 'paymentmethods.applepay.carrier.title',
                     'alert' => 'paymentmethods.applepay.carrier.alert',
-                    'description' => 'paymentmethods.applepay.carrier.description',
+                    'descriptions' => [
+                        'live' => [
+                            'description' => 'paymentmethods.applepay.carrier.description',
+                            'description_bold' => 'paymentmethods.applepay.carrier.description_bold',
+                            'description_warning' => 'paymentmethods.applepay.carrier.description_warning',
+                        ],
+                        'sandbox' => [],
+                    ],
                     'instructions' => 'paymentmethods.applepay.carrier.instructions',
                     'carriers_list' => $carriers,
                 ],
             ],
         ];
+
+        $configClass = \Mockery::mock('Config');
+        $configClass
+            ->shouldReceive([
+                'isValidFeature' => true,
+            ]);
+        $this->dependencies->configClass = $configClass;
         $this->assertSame(
             $expected,
             $this->classe->getOption($configuration)['options']

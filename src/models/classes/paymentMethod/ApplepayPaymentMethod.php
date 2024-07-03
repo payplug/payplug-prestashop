@@ -348,7 +348,10 @@ class ApplepayPaymentMethod extends PaymentMethod
         // Check if payment has failure...
         $validate_payment = $this->dependencies->getValidators()['payment']->isFailed($payment);
         if ($validate_payment['result']) {
-            return $validate_payment;
+            return [
+                'result' => false,
+                'message' => $validate_payment['message'],
+            ];
         }
 
         // ... or if is not  paid

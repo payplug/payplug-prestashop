@@ -108,7 +108,7 @@ class isFailedTest extends TestCase
 
         $this->assertSame([
             'result' => true,
-            'message' => '',
+            'message' => 'error message timeout',
         ], $this->validator->isFailed($payment));
     }
 }

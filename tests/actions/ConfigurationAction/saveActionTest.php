@@ -94,10 +94,9 @@ class saveActionTest extends BaseConfigurationAction
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
         $datas->enable_applepay = true;
-        $datas->enable_applepay_display = new \stdClass();
-        $datas->enable_applepay_display->cart = false;
-        $datas->enable_applepay_display->checkout = false;
-        $datas->enable_applepay_display->product = false;
+        $datas->enable_applepay_cart = false;
+        $datas->enable_applepay_checkout = false;
+        $datas->enable_applepay_product = false;
         $datas->applepay_carriers = [];
 
         $this->assertSame(
@@ -119,8 +118,7 @@ class saveActionTest extends BaseConfigurationAction
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
         $datas->enable_applepay = true;
-        $datas->enable_applepay_display = new \stdClass();
-        $datas->enable_applepay_display->cart = true;
+        $datas->enable_applepay_cart = true;
         $datas->applepay_carriers = [];
 
         $this->assertSame(
@@ -137,17 +135,13 @@ class saveActionTest extends BaseConfigurationAction
         );
     }
 
-    /**
-     * @group debug
-     */
     public function testWhenConfigurationCannotBeUpdate()
     {
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
         $datas->enable_applepay = true;
         $datas->applepay_carriers = ['1', '2', '4'];
-        $datas->enable_applepay_display = new \stdClass();
-        $datas->enable_applepay_display->cart = true;
+        $datas->enable_applepay_cart = true;
         $datas->enable_standard = 1;
 
         $this->configuration->shouldReceive([
@@ -171,8 +165,7 @@ class saveActionTest extends BaseConfigurationAction
         $datas->action = 'payplug_save_data';
         $datas->enable_applepay = true;
         $datas->applepay_carriers = ['1', '2', '4'];
-        $datas->enable_applepay_display = new \stdClass();
-        $datas->enable_applepay_display->cart = true;
+        $datas->enable_applepay_cart = true;
         $datas->payplug_standard = 1;
 
         $this->configuration->shouldReceive([
