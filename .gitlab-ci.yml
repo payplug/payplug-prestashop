@@ -194,7 +194,7 @@ test_php_unit:
     - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
     - echo 'error_reporting=22527' > /usr/local/etc/php/conf.d/ci.ini
     - ls -l ./vendor/bin
-    - ./vendor/bin/phpunit --coverage-text --colors=never -d memory_limit=-1
+    - ./vendor/bin/phpunit tests --bootstrap tests/bootstrap.php  --coverage-text --colors=never -d memory_limit=-1
 
 build_translations:
   image: docker.io/composer:1.9
