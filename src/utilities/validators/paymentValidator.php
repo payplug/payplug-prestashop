@@ -1128,9 +1128,9 @@ class paymentValidator
             $is_mobile = $phone_util->getNumberType($parsed);
 
             return [
-                    'result' => in_array($is_mobile, [1, 2], true),
-                    'message' => '',
-                ];
+                'result' => in_array($is_mobile, [1, 2], true),
+                'message' => '',
+            ];
         } catch (libphonenumberlight\NumberParseException $e) {
             // todo : Add error Log
             return [

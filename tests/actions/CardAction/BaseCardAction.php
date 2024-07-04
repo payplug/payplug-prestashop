@@ -54,7 +54,7 @@ class BaseCardAction extends TestCase
             ->shouldReceive([
                 'getPlugin' => $this->plugin,
                 'getValidators' => [
-                  'card' => $this->card_validator,
+                    'card' => $this->card_validator,
                 ],
             ]);
 

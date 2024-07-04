@@ -75,8 +75,8 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     public function testGetValidSplit()
     {
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 3.50,
-            ]);
+            'convertAmount' => 3.50,
+        ]);
 
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = 3;
@@ -93,8 +93,8 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     public function testGetValidTitle()
     {
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 3.50,
-            ]);
+            'convertAmount' => 3.50,
+        ]);
 
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = 'Payment in 3x';
@@ -111,8 +111,8 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     public function testGetValidTotalCost()
     {
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 3.50,
-            ]);
+            'convertAmount' => 3.50,
+        ]);
 
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
@@ -132,8 +132,8 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     public function testGetValidDownPaymentAmount()
     {
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 83.92,
-            ]);
+            'convertAmount' => 83.92,
+        ]);
 
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
@@ -153,8 +153,8 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     public function testGetValidInstallments()
     {
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 80.42,
-            ]);
+            'convertAmount' => 80.42,
+        ]);
 
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
 
@@ -202,8 +202,8 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     public function testGetValidTotalAmountWithEmptyValue()
     {
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 1.75,
-            ]);
+            'convertAmount' => 1.75,
+        ]);
 
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, $total_amount = false);
         $expected_value = [
@@ -223,8 +223,8 @@ final class FormatOneyResourceTest extends BaseOneyRepository
     public function testGetValidTotalAmount()
     {
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 2.25,
-            ]);
+            'convertAmount' => 2.25,
+        ]);
 
         $response = $this->repo->formatOneyResource($this->operation, $this->resource, 100);
         $expected_value = [

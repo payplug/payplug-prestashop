@@ -52,8 +52,8 @@ class BasePaymentAction extends TestCase
         $this->context = \Mockery::mock('Context');
         $this->context
             ->shouldReceive([
-            'get' => ContextMock::get(),
-        ]);
+                'get' => ContextMock::get(),
+            ]);
 
         $this->logger = \Mockery::mock('Logger');
         $this->logger

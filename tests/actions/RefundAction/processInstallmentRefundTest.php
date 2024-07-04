@@ -28,32 +28,32 @@ class processInstallmentRefundTest extends BaseRefundAction
         $this->dependencies->apiClass
             ->shouldReceive(
                 [
-                            'initializeApi' => true,
-                        ]
+                    'initializeApi' => true,
+                ]
             );
 
         $this->dependencies->apiClass
             ->shouldReceive(
                 [
-                            'retrieveInstallment' => [
-                                'result' => false,
-                            ],
-                            'refundPayment' => [
-                                'result' => true,
+                    'retrieveInstallment' => [
+                        'result' => false,
+                    ],
+                    'refundPayment' => [
+                        'result' => true,
 
-                            ],
-                        ]
+                    ],
+                ]
             );
         $this->dependencies->installmentClass
             ->shouldReceive([
-                                        'updatePayplugInstallment' => true,
-                                        ]);
+                'updatePayplugInstallment' => true,
+            ]);
 
         $this->payment_validator
             ->shouldReceive([
-                                        'canBeRefund' => [
-                                            'result' => true,
-                                        ], ]);
+                'canBeRefund' => [
+                    'result' => true,
+                ], ]);
 
         $result = $this->action->processInstallmentRefund($inst_id, $amount, $metadata);
         $this->assertSame(
@@ -71,47 +71,47 @@ class processInstallmentRefundTest extends BaseRefundAction
         $inst_id = 'inst_5jjL5sWDZ5pkSty6eNjPtU';
         $amount = 100;
         $metadata = [
-        'ID Client' => 4,
-        'reason' => 'Refunded with Prestashop',
-    ];
+            'ID Client' => 4,
+            'reason' => 'Refunded with Prestashop',
+        ];
         $this->dependencies->apiClass
             ->shouldReceive(
                 [
-                'initializeApi' => true,
-            ]
+                    'initializeApi' => true,
+                ]
             );
 
         $this->dependencies->apiClass
             ->shouldReceive(
                 ['retrievePayment' => [
-                            'result' => true,
-                            'resource' => PaymentMock::getStandard(),
-                        ],
-                            'retrieveInstallment' => [
-                                'result' => true,
-                                'resource' => PaymentMock::getInstallment(),
-                            ],
-                            'refundPayment' => [
-                                'result' => true,
+                    'result' => true,
+                    'resource' => PaymentMock::getStandard(),
+                ],
+                    'retrieveInstallment' => [
+                        'result' => true,
+                        'resource' => PaymentMock::getInstallment(),
+                    ],
+                    'refundPayment' => [
+                        'result' => true,
 
-                            ],
-                        ]
+                    ],
+                ]
             );
         $this->dependencies->installmentClass
             ->shouldReceive([
-                            'updatePayplugInstallment' => true,
-                        ]);
+                'updatePayplugInstallment' => true,
+            ]);
 
         $this->payment_validator
             ->shouldReceive([
-                            'canBeRefund' => [
-                                'result' => false,
-                            ], ]);
+                'canBeRefund' => [
+                    'result' => false,
+                ], ]);
         $this->payment_validator
             ->shouldReceive([
-                                        'canBeRefund' => [
-                                            'result' => true,
-                                        ], ]);
+                'canBeRefund' => [
+                    'result' => true,
+                ], ]);
 
         $result = $this->action->processInstallmentRefund($inst_id, $amount, $metadata);
         $this->assertSame(

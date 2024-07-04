@@ -125,7 +125,7 @@ class canBeRefundTest extends TestCase
     {
         $this->assertSame(
             ['result' => true,
-                              'message' => 'payment can be refund.', ],
+                'message' => 'payment can be refund.', ],
             $this->paymentValidator->canBeRefund($pay_id, $data, $truly_refundable_amount, $total_amount)
         );
     }

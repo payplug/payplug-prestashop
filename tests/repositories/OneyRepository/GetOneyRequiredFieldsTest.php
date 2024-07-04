@@ -260,11 +260,11 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
         $contextWithoutCustomer->customer = null;
 
         $this->validators['payment']->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isPhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->validators['payment']
             ->shouldReceive([
@@ -280,11 +280,11 @@ final class GetOneyRequiredFieldsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isOneyEmail' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isOneyEmail' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->assertSame([], $this->repo->getOneyRequiredFields());
     }

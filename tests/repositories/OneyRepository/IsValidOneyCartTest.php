@@ -48,11 +48,11 @@ final class IsValidOneyCartTest extends BaseOneyRepository
         $cart = CartMock::get();
 
         $this->validators['payment']->shouldReceive([
-                'isValidProductQuantity' => [
-                    'result' => false,
-                    'message' => 'The given quantity given exceed the limit',
-                ],
-            ]);
+            'isValidProductQuantity' => [
+                'result' => false,
+                'message' => 'The given quantity given exceed the limit',
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -74,11 +74,11 @@ final class IsValidOneyCartTest extends BaseOneyRepository
         $cart = CartMock::get();
 
         $this->validators['payment']->shouldReceive([
-                'isValidProductQuantity' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isValidProductQuantity' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->assertSame(
             [

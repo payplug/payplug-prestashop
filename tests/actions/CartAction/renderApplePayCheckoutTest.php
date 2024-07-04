@@ -58,11 +58,11 @@ class renderApplePayCheckoutTest extends BaseCartAction
     {
         $this->browser_validator
             ->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => true,
-                'message' => '',
-            ],
-        ]);
+                'isApplePayCompatible' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
         $this->payment_method
             ->shouldReceive([
                 'getCarriersList' => [],
@@ -73,12 +73,12 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ]);
         $controller = $this->instance
             ->shouldReceive([
-            'getController' => 'cart',
-        ]);
+                'getController' => 'cart',
+            ]);
         $this->dispatcher
             ->shouldReceive([
-            'getInstance' => $controller,
-        ]);
+                'getInstance' => $controller,
+            ]);
         $this->assertFalse($this->action->renderApplePayCheckout());
     }
 
@@ -86,53 +86,53 @@ class renderApplePayCheckoutTest extends BaseCartAction
     {
         $this->browser_validator
             ->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => true,
-                'message' => '',
-            ],
-        ]);
+                'isApplePayCompatible' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
         $controller = $this->instance
             ->shouldReceive([
-            'getController' => 'cart',
-        ]);
+                'getController' => 'cart',
+            ]);
         $this->dispatcher
             ->shouldReceive([
-            'getInstance' => $controller,
-        ]);
+                'getInstance' => $controller,
+            ]);
         $carrier_list = [
             42,
         ];
         $this->payment_method
             ->shouldReceive([
-            'getCarriersList' => $carrier_list,
-        ]);
+                'getCarriersList' => $carrier_list,
+            ]);
         $this->payment_method_class
             ->shouldReceive([
-            'getPaymentMethod' => $this->payment_method,
-        ]);
+                'getPaymentMethod' => $this->payment_method,
+            ]);
         $this->routes
             ->shouldReceive([
-            'getSourceUrl' => [
-                'applepay' => 'source_url',
-            ],
-        ]);
+                'getSourceUrl' => [
+                    'applepay' => 'source_url',
+                ],
+            ]);
         $this->assign
             ->shouldReceive([
-            'assign' => true,
-        ]);
+                'assign' => true,
+            ]);
         $this->media
             ->shouldReceive([
-            'addJsDef' => true,
-        ]);
+                'addJsDef' => true,
+            ]);
         $this->link
             ->shouldReceive([
-            'getModuleLink' => '',
-        ]);
+                'getModuleLink' => '',
+            ]);
         $this->context->link = $this->link;
         $this->configClass
             ->shouldReceive([
-            'fetchTemplate' => 'applepay_template',
-        ]);
+                'fetchTemplate' => 'applepay_template',
+            ]);
         $this->assertSame('applepay_template', $this->action->renderApplePayCheckout());
     }
 
@@ -144,50 +144,50 @@ class renderApplePayCheckoutTest extends BaseCartAction
         // Mock the browser compatibility check
         $this->browser_validator
             ->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => true,
-                'message' => '',
-            ],
-        ]);
+                'isApplePayCompatible' => [
+                    'result' => true,
+                    'message' => '',
+                ],
+            ]);
 
         // Mock the controller to return 'product'
         $controller = $this->instance
             ->shouldReceive([
-            'getController' => 'product',
-        ]);
+                'getController' => 'product',
+            ]);
         $this->dispatcher
             ->shouldReceive([
-            'getInstance' => $controller,
-        ]);
+                'getInstance' => $controller,
+            ]);
 
         $carrier_list = [42];
         $this->payment_method
             ->shouldReceive([
-            'getCarriersList' => $carrier_list,
-            'hasCompatibleCarriersForProduct' => $carrier_list,
-        ]);
+                'getCarriersList' => $carrier_list,
+                'hasCompatibleCarriersForProduct' => $carrier_list,
+            ]);
         $this->payment_method_class
             ->shouldReceive([
-            'getPaymentMethod' => $this->payment_method,
-        ]);
+                'getPaymentMethod' => $this->payment_method,
+            ]);
         $this->routes
             ->shouldReceive([
-            'getSourceUrl' => [
-                'applepay' => 'source_url',
-            ],
-        ]);
+                'getSourceUrl' => [
+                    'applepay' => 'source_url',
+                ],
+            ]);
         $this->assign
             ->shouldReceive([
-            'assign' => true,
-        ]);
+                'assign' => true,
+            ]);
         $this->media
             ->shouldReceive([
-            'addJsDef' => true,
-        ]);
+                'addJsDef' => true,
+            ]);
         $this->link
             ->shouldReceive([
-            'getModuleLink' => '',
-        ]);
+                'getModuleLink' => '',
+            ]);
         $this->context->link = $this->link;
         $this->tools_adapter
             ->shouldReceive('tool')
@@ -195,8 +195,8 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn('42');
         $this->configClass
             ->shouldReceive([
-            'fetchTemplate' => 'applepay_template',
-        ]);
+                'fetchTemplate' => 'applepay_template',
+            ]);
 
         // Assert that the method returns the expected template
         $this->assertSame('applepay_template', $this->action->renderApplePayCheckout());

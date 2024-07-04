@@ -28,8 +28,8 @@ class BaseCartAction extends TestCase
         $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->configuration
             ->shouldReceive([
-                                'get' => true,
-                            ]);
+                'get' => true,
+            ]);
 
         $this->plugin = \Mockery::mock('Plugin');
 
@@ -45,8 +45,8 @@ class BaseCartAction extends TestCase
 
         $this->context_adapter
             ->shouldReceive([
-                                'get' => $this->context,
-                            ]);
+                'get' => $this->context,
+            ]);
         $this->dispatcher = \Mockery::mock('Dispatcher');
         $this->instance = \Mockery::mock('Instance');
         $this->controller = \Mockery::mock('Controller');
@@ -55,9 +55,9 @@ class BaseCartAction extends TestCase
 
         $this->dispatcher
             ->shouldReceive([
-                                'getInstance' => $this->instance,
-                                'getController' => $this->controller,
-                            ]);
+                'getInstance' => $this->instance,
+                'getController' => $this->controller,
+            ]);
         $this->plugin
             ->shouldReceive([
                 'getCart' => $this->cartAdapter,
@@ -72,11 +72,11 @@ class BaseCartAction extends TestCase
         $this->browser_validator = \Mockery::mock('BrowserValidator');
         $this->dependencies
             ->shouldReceive([
-                                'getPlugin' => $this->plugin,
-                                'getValidators' => [
-                                    'browser' => $this->browser_validator,
-                                ],
-                            ]);
+                'getPlugin' => $this->plugin,
+                'getValidators' => [
+                    'browser' => $this->browser_validator,
+                ],
+            ]);
 
         $this->action = \Mockery::mock(CartAction::class, [$this->dependencies])->makePartial();
     }

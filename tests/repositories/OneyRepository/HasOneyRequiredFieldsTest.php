@@ -83,18 +83,18 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => false,
-                    'message' => '',
-                ],
-            ]);
+            'isPhoneNumber' => [
+                'result' => false,
+                'message' => '',
+            ],
+        ]);
 
         $this->validators['payment']->shouldReceive([
-                'isValidMobilePhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isValidMobilePhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->tools->shouldReceive([
             'tool' => 15,
@@ -125,18 +125,18 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isPhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->validators['payment']->shouldReceive([
-                'isValidMobilePhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isValidMobilePhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->tools->shouldReceive([
             'tool' => 45,
@@ -183,18 +183,18 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isPhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->validators['payment']->shouldReceive([
-                'isValidMobilePhoneNumber' => [
-                    'result' => false,
-                    'message' => '',
-                ],
-            ]);
+            'isValidMobilePhoneNumber' => [
+                'result' => false,
+                'message' => '',
+            ],
+        ]);
 
         $this->tools->shouldReceive([
             'tool' => 15,
@@ -231,18 +231,18 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isPhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->validators['payment']->shouldReceive([
-                'isValidMobilePhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isValidMobilePhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->tools->shouldReceive([
             'tool' => 45,
@@ -279,18 +279,18 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
         ;
 
         $this->validators['payment']->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isPhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->validators['payment']->shouldReceive([
-                'isValidMobilePhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+            'isValidMobilePhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $this->tools->shouldReceive([
             'tool' => 15,

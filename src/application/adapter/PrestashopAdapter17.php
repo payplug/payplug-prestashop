@@ -67,11 +67,11 @@ class PrestashopAdapter17
                         ->getPaymentAction()
                         ->renderPaymentErrors(
                             [
-                            $this->dependencies
-                                ->getPlugin()
-                                ->getTranslationClass()
-                                ->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopadapter17'),
-                        ]
+                                $this->dependencies
+                                    ->getPlugin()
+                                    ->getTranslationClass()
+                                    ->l('payplug.prestashopspecific17.transactionNotCompleted', 'prestashopadapter17'),
+                            ]
                         ),
                 ]
             );
