@@ -23,6 +23,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
 const fs = require('fs');
 
@@ -36,9 +37,9 @@ const jsMoleculesFolder = 'js/components/molecules';
 const dirJsFinalPath = 'views/js/';
 const dirViewsFinalPath = 'views/';
 
-const congifuration = require('./composer.json');
-const moduleVersion = congifuration.version;
-const moduleName = congifuration.moduleName;
+const configuration = require('./composer.json');
+const moduleVersion = configuration.version;
+const moduleName = configuration.moduleName;
 
 let entryFiles = {};
 
@@ -115,11 +116,21 @@ const loaders = [
     },
 ];
 const optimization = {
+    minimize: true,
     minimizer: [
-    new CssMinimizerPlugin(), // todo: uncomment for prod compilation
-    //new TerserPlugin(),
+        new CssMinimizerPlugin(), // todo: uncomment for prod compilation
+        new TerserPlugin({
+            parallel: 8,
+        }),
     ],
-    //minimize: true,
+    splitChunks: {
+        // include all types of chunks
+        chunks: 'all',
+        maxInitialRequests: 30,
+    },
+    runtimeChunk: true,
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
 };
 const plugins = [
     new RemoveEmptyScriptsPlugin(),
@@ -137,10 +148,16 @@ const plugins = [
     }])
 ];
 module.exports = {
+    cache: {
+        type: 'filesystem',
+        memoryCacheUnaffected: true,
+        maxMemoryGenerations: Infinity,
+        store: 'pack',
+    },
     mode: 'production',
     entry: entryFiles,
     output: {
-        path: path.resolve(__dirname, dir_path)
+        path: path.resolve(__dirname, dir_path),
     },
     module: {
         rules: [
@@ -151,6 +168,8 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
+                include: path.resolve(__dirname, jsViewsFolder),
+                loader: 'babel-loader',
             }
         ],
     },
