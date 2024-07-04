@@ -27,11 +27,11 @@ class renderScheduleTest extends BaseOneyAction
     public function testWhenGivenOneyPaymentIsInvalidArrayFormat($oney_payment)
     {
         $controller = $this->instance->shouldReceive([
-                                                         'getController' => 'product',
-                                                     ]);
+            'getController' => 'product',
+        ]);
         $this->dispatcher->shouldReceive([
-                                             'getInstance' => $controller,
-                                         ]);
+            'getInstance' => $controller,
+        ]);
         $amount = 147.20;
 
         $this->assertSame(
@@ -50,11 +50,11 @@ class renderScheduleTest extends BaseOneyAction
     public function testWhenGivenAmountIsInvalidFloatFormat($amount)
     {
         $controller = $this->instance->shouldReceive([
-                                                         'getController' => 'product',
-                                                     ]);
+            'getController' => 'product',
+        ]);
         $this->dispatcher->shouldReceive([
-                                             'getInstance' => $controller,
-                                         ]);
+            'getInstance' => $controller,
+        ]);
         $oney_payment = [];
 
         $this->assertSame(

@@ -42,8 +42,8 @@ class disableIntegratedActionTest extends BaseOnboardingAction
     public function testWhenIntegratedPaymentisNotSet()
     {
         $this->configurationClass->shouldReceive([
-                                                     'getValue' => '{}',
-                                                 ]);
+            'getValue' => '{}',
+        ]);
 
         $this->assertSame(
             [

@@ -54,11 +54,11 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             ]);
 
         $this->validators['payment']->shouldReceive([
-                'isAmount' => [
-                    'result' => false,
-                    'message' => '',
-                ],
-            ]);
+            'isAmount' => [
+                'result' => false,
+                'message' => '',
+            ],
+        ]);
 
         $this->dependencies
             ->shouldReceive([
@@ -99,11 +99,11 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             ]);
 
         $this->validators['payment']->shouldReceive([
-                'isAmount' => [
-                    'result' => false,
-                    'message' => '',
-                ],
-            ]);
+            'isAmount' => [
+                'result' => false,
+                'message' => '',
+            ],
+        ]);
 
         $this->dependencies
             ->shouldReceive([
@@ -147,11 +147,11 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             ]);
 
         $this->validators['payment']->shouldReceive([
-                'isAmount' => [
-                    'result' => true,
-                    'code' => '',
-                ],
-            ]);
+            'isAmount' => [
+                'result' => true,
+                'code' => '',
+            ],
+        ]);
 
         $this->dependencies
             ->shouldReceive([

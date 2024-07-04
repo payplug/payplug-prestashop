@@ -183,8 +183,8 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyPaymentMethod
     public function testWithTooLongCity()
     {
         $this->validate_adapter->shouldReceive([
-                'validate' => true,
-            ]);
+            'validate' => true,
+        ]);
 
         $this->tools_adapter->shouldReceive('tool')
             ->andReturn(37);

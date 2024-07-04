@@ -398,7 +398,6 @@ class PaymentMethod
             return [];
         }
         if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
-
             // todo: add error log
             return [];
         }

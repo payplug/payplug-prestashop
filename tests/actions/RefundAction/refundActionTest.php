@@ -35,20 +35,20 @@ class refundActionTest extends BaseRefundAction
             });
         $this->dependencies->apiClass
             ->shouldReceive([
-                                'initializeApi' => true, ]);
+                'initializeApi' => true, ]);
         $this->dependencies->apiClass
             ->shouldReceive([
-                                'retrievePayment' => [
-                                    'result' => true,
-                                    'resource' => PaymentMock::getStandard([
-                                                                               'is_paid' => true,
-                                                                               'metadata' => ['Order' => 42],
-                                                                           ]),
-                                ],
+                'retrievePayment' => [
+                    'result' => true,
+                    'resource' => PaymentMock::getStandard([
+                        'is_paid' => true,
+                        'metadata' => ['Order' => 42],
+                    ]),
+                ],
                 'refundPayment' => ['result' => true,
 
                 ],
-                            ]);
+            ]);
 
         $result = $this->action->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
         $this->assertSame(
@@ -81,20 +81,20 @@ class refundActionTest extends BaseRefundAction
             });
         $this->dependencies->apiClass
             ->shouldReceive([
-                                'initializeApi' => true, ]);
+                'initializeApi' => true, ]);
         $this->dependencies->apiClass
             ->shouldReceive([
-                                'retrievePayment' => [
-                                    'result' => true,
-                                    'resource' => PaymentMock::getStandard([
-                                                                               'is_paid' => true,
-                                                                               'metadata' => ['Order' => 42],
-                                                                           ]),
-                                ],
-                                'refundPayment' => ['result' => false,
+                'retrievePayment' => [
+                    'result' => true,
+                    'resource' => PaymentMock::getStandard([
+                        'is_paid' => true,
+                        'metadata' => ['Order' => 42],
+                    ]),
+                ],
+                'refundPayment' => ['result' => false,
 
-                                ],
-                            ]);
+                ],
+            ]);
 
         $result = $this->action->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
 
@@ -127,20 +127,20 @@ class refundActionTest extends BaseRefundAction
             });
         $this->dependencies->apiClass
             ->shouldReceive([
-                                'initializeApi' => true, ]);
+                'initializeApi' => true, ]);
         $this->dependencies->apiClass
             ->shouldReceive([
-                                'retrievePayment' => [
-                                    'result' => true,
-                                    'resource' => PaymentMock::getStandard([
-                                                                               'is_paid' => true,
-                                                                               'metadata' => ['Order' => 42],
-                                                                           ]),
-                                ],
-                                'refundPayment' => ['result' => false,
+                'retrievePayment' => [
+                    'result' => true,
+                    'resource' => PaymentMock::getStandard([
+                        'is_paid' => true,
+                        'metadata' => ['Order' => 42],
+                    ]),
+                ],
+                'refundPayment' => ['result' => false,
 
-                                ],
-                            ]);
+                ],
+            ]);
 
         $result = $this->action->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
 
@@ -175,20 +175,20 @@ class refundActionTest extends BaseRefundAction
             });
         $this->dependencies->apiClass
             ->shouldReceive([
-                                'initializeApi' => true, ]);
+                'initializeApi' => true, ]);
         $this->dependencies->apiClass
             ->shouldReceive([
-                                'retrievePayment' => [
-                                    'result' => true,
-                                    'resource' => PaymentMock::getStandard([
-                                                                               'is_paid' => true,
-                                                                               'metadata' => ['Order' => 42],
-                                                                           ]),
-                                ],
-                                'refundPayment' => ['result' => false,
+                'retrievePayment' => [
+                    'result' => true,
+                    'resource' => PaymentMock::getStandard([
+                        'is_paid' => true,
+                        'metadata' => ['Order' => 42],
+                    ]),
+                ],
+                'refundPayment' => ['result' => false,
 
-                                ],
-                            ]);
+                ],
+            ]);
 
         $result = $this->action->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
 

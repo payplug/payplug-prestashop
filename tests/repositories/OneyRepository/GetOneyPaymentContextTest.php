@@ -51,8 +51,8 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
         ]);
 
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 3446,
-            ]);
+            'convertAmount' => 3446,
+        ]);
 
         $this->assertSame(
             [
@@ -114,8 +114,8 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
         ]);
 
         $this->amount_helper->shouldReceive([
-                'convertAmount' => 2268,
-            ]);
+            'convertAmount' => 2268,
+        ]);
 
         $this->assertSame(
             [
