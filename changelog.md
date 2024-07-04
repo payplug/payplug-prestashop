@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.21
+- Bugfix :
+  - [PRE-2539](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2472): fix php unit and coverage test
+
 ## Version 4.9.20
 - Bugfix :
   - [PRE-2540](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2473): Fix unit tests
