@@ -86,8 +86,13 @@ class CartAction
     {
         $this->setParameters();
 
-        $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
-        $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
+        $browser = $this->dependencies
+            ->getPlugin()
+            ->getBrowser()
+            ->getName();
+        $isApplePayCompatible = $this->dependencies
+            ->getValidators()['browser']
+            ->isApplePayCompatible($browser);
 
         // If browser is not safari, no appelpay on cart page
         if (!$isApplePayCompatible['result']) {
@@ -101,14 +106,17 @@ class CartAction
             ->getPaymentMethod('applepay')
             ->getCarriersList();
 
-        $controller = $this->dispatcher->getInstance()->getController();
+        $controller = $this->dispatcher
+            ->getInstance()
+            ->getController();
         if (empty($carriers_list) && 'product' != $controller) {
             return false;
         }
         if ('product' == $controller) {
             $id_product = (int) $this->dependencies
                 ->getPlugin()
-                ->getTools()->tool('getValue', 'id_product');
+                ->getTools()
+                ->tool('getValue', 'id_product');
             $has_compatible_carriers = $this->dependencies
                 ->getPlugin()
                 ->getPaymentMethodClass()
@@ -124,7 +132,9 @@ class CartAction
             ->getRoutes()
             ->getSourceUrl()['applepay'];
 
-        $controller = $this->dispatcher->getInstance()->getController();
+        $controller = $this->dispatcher
+            ->getInstance()
+            ->getController();
         $applepay_workflow = 'cart' === $controller ? 'shopping-cart' : 'product';
 
         $this->dependencies
@@ -146,7 +156,8 @@ class CartAction
                 'applePayIdCart' => $this->context->cart->id,
             ]);
 
-        return $this->dependencies->configClass->fetchTemplate('checkout/payment/applepay.tpl');
+        return $this->dependencies->configClass
+            ->fetchTemplate('checkout/payment/applepay.tpl');
     }
 
     /**

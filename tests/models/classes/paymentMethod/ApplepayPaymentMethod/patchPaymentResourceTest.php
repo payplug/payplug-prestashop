@@ -178,7 +178,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
         $this->validators['payment']
             ->shouldReceive([
                 'isFailed' => [
-                    'result' => false,
+                    'result' => true,
                     'message' => 'Resource has failure',
                 ],
             ]);
@@ -208,7 +208,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
         $this->validators['payment']
             ->shouldReceive([
                 'isFailed' => [
-                    'result' => true,
+                    'result' => false,
                     'message' => '',
                 ],
             ]);
@@ -238,7 +238,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
         $this->validators['payment']
             ->shouldReceive([
                 'isFailed' => [
-                    'result' => true,
+                    'result' => false,
                     'message' => '',
                 ],
             ]);

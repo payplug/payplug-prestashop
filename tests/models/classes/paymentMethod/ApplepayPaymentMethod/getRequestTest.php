@@ -22,6 +22,10 @@ class getRequestTest extends BaseApplepayPaymentMethod
             ]);
         $this->tools_adapter
             ->shouldReceive('tool')
+            ->with('getValue', 'address')
+            ->andReturn(false);
+        $this->tools_adapter
+            ->shouldReceive('tool')
             ->with('getValue', 'carrier')
             ->andReturn(false);
         $this->tools_adapter
@@ -170,8 +174,10 @@ class getRequestTest extends BaseApplepayPaymentMethod
             ->andReturn(1);
 
         $this->cart_adapter
-            ->shouldReceive('createNewCart')
-            ->andReturn((object) ['id' => 1, 'id_address_delivery' => 42, 'id_address_invoice' => 42]);
+            ->shouldReceive([
+                'createNewCart' => (object) ['id' => 1, 'id_address_delivery' => 42, 'id_address_invoice' => 42],
+                'get' => (object) ['id' => 1, 'id_address_delivery' => 42, 'id_address_invoice' => 42],
+            ]);
         $this->cart_rule_adapter
             ->shouldReceive('autoAddToCart');
 
@@ -179,6 +185,10 @@ class getRequestTest extends BaseApplepayPaymentMethod
             ->shouldReceive('tool')
             ->with('getValue', 'quantity')
             ->andReturn(2);
+        $this->tools_adapter
+            ->shouldReceive('tool')
+            ->with('getValue', 'address')
+            ->andReturn(false);
         $this->cart_adapter
             ->shouldReceive('updateQty')
             ->with(1, 2, 123);

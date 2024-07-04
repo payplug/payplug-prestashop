@@ -21,7 +21,7 @@ class BaseCartAction extends TestCase
     protected $instance;
     protected $browser_validator;
     protected $plugin;
-    protected $toolsAdapter;
+    protected $tools_adapter;
 
     protected function setUp()
     {
@@ -51,6 +51,8 @@ class BaseCartAction extends TestCase
         $this->instance = \Mockery::mock('Instance');
         $this->controller = \Mockery::mock('Controller');
 
+        $this->tools_adapter = \Mockery::mock('ToolsAdapter');
+
         $this->dispatcher
             ->shouldReceive([
                                 'getInstance' => $this->instance,
@@ -58,11 +60,12 @@ class BaseCartAction extends TestCase
                             ]);
         $this->plugin
             ->shouldReceive([
-                                'getCart' => $this->cartAdapter,
-                                'getContext' => $this->context_adapter,
-                                'getConfigurationClass' => $this->configuration,
-                                'getDispatcher' => $this->dispatcher,
-                            ]);
+                'getCart' => $this->cartAdapter,
+                'getContext' => $this->context_adapter,
+                'getConfigurationClass' => $this->configuration,
+                'getDispatcher' => $this->dispatcher,
+                'getTools' => $this->tools_adapter,
+            ]);
 
         $this->dependencies->name = 'payplug';
 
