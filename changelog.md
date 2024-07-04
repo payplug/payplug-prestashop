@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.26
+- Feature :
+  - [SMP-2686](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2476): Adapt appelpay pay button call to custom theme
+
 ## Version 4.9.25
 - Feature :
   - [SMP-2675](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2475): Improve dependancies loader with controllers black list
