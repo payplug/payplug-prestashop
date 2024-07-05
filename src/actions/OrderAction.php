@@ -198,7 +198,7 @@ class OrderAction
         }
 
         // Post process
-        $post_process = $payment_method->postProcessOrder($resource, $order);
+        $post_process = $payment_method->postProcessOrder($resource, (int) $order->id);
         if (!$post_process) {
             $this->logger->addLog('OrderAction::createAction - Can\'t post process the order', 'error');
         }
@@ -290,8 +290,30 @@ class OrderAction
             ];
         }
 
+        $id_order = isset($resource->metadata['Order']) ? (int) $resource->metadata['Order'] : 0;
+
+        // if no order getted from the payment metadatas, get the one from the database
+        if (!$id_order) {
+            $id_order = $this->dependencies
+                ->getPlugin()
+                ->getOrder()
+                ->getIdByCartId((int) $payment_tab['id_cart']);
+            $payment_method = $this->plugin
+                ->getPaymentMethodClass()
+                ->getPaymentMethod($payment_tab['method']);
+            $post_process = $payment_method->postProcessOrder($resource, (int) $id_order);
+            if (!$post_process) {
+                $this->logger->addLog('OrderAction::updateAction - Payment cannot be patched', 'error');
+
+                return [
+                    'result' => false,
+                    'message' => 'Order cannot be loaded',
+                ];
+            }
+        }
+
         $order = $this->order
-            ->get((int) $resource->metadata['Order']);
+            ->get((int) $id_order);
         if (!$this->dependencies
             ->getPlugin()
             ->getValidate()
@@ -301,6 +323,16 @@ class OrderAction
             return [
                 'result' => false,
                 'message' => 'Order cannot be loaded',
+            ];
+        }
+
+        // Check if the retrieve order is related to this module
+        if ($this->dependencies->name != $order->module) {
+            $this->logger->addLog('OrderAction::updateAction - This order isn\'t related with the module ' . $this->dependencies->name, 'error');
+
+            return [
+                'result' => true,
+                'message' => 'This order isn\'t related with the module ' . $this->dependencies->name,
             ];
         }
 

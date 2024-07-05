@@ -500,6 +500,7 @@ class createActionTest extends BaseOrderAction
             ]);
 
         $order = \Mockery::mock('Order');
+        $order->id = 42;
         $order
             ->shouldReceive([
                 'getOrderPayments' => [],

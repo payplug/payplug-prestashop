@@ -834,7 +834,7 @@ class PaymentMethod
     }
 
     // todo: add coverage to this method
-    public function postProcessOrder($resource = null, $order = null)
+    public function postProcessOrder($resource = null, $id_order = 0)
     {
         $this->setParameters();
 
@@ -843,14 +843,14 @@ class PaymentMethod
             return false;
         }
 
-        if (!is_object($order) || !$order) {
+        if (!is_int($id_order) || !$id_order) {
             // todo: add error log
             return false;
         }
 
         $data = [];
         $data['metadata'] = $resource->metadata;
-        $data['metadata']['Order'] = $order->id;
+        $data['metadata']['Order'] = (int) $id_order;
 
         $patchPayment = $this->dependencies
             ->getPlugin()
@@ -865,7 +865,7 @@ class PaymentMethod
             ->getPlugin()
             ->getOrderPaymentRepository()
             ->createOrderPayment([
-                'id_order' => (int) $order->id,
+                'id_order' => (int) $id_order,
                 'id_payment' => $resource->id,
             ]);
         if (!$create_order_payment) {
