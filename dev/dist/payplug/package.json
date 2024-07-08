@@ -1,6 +1,6 @@
 {
   "name": "payplug",
-  "version": "4.9.24",
+  "version": "4.9.25",
   "description": "======================================== Prestashop paiement module using Payplug ========================================",
   "private": true,
   "directories": {

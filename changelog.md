@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.25
+- Feature :
+  - [SMP-2675](https://git.payplug.com/plugins/prestashop_v2_1.7/-/merge_requests/2475): Improve dependancies loader with controllers black list
+
 ## Version 4.9.24
 - Bugfix :
   - [SMP-2634](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2477):  Fix double resource creation for one click and amex payment
