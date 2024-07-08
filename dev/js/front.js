@@ -669,7 +669,7 @@ var $document, $window, __moduleName__Module = {
 
             $('apple-pay-button, #payment-confirmation button').click(function (event) {
                 $(this).fadeOut(10).fadeIn(10);
-                let payment_method_id = $('.js-current-step .custom-radio input[type="radio"]:checked').attr('id'),
+                let payment_method_id = $('input[name="payment-option"]:checked').attr('id'),
                     payment_method = $('#pay-with-'+payment_method_id+'-form input[name="method"]').val();
 
                 if ('applepay' == payment_method || 'checkout' != workflow) {
