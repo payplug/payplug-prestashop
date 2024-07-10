@@ -160,7 +160,6 @@ class ApplepayPaymentMethod extends PaymentMethod
         if (!is_array($allowed_carriers) || empty($allowed_carriers)) {
             return $carriers_list;
         }
-
         $delivery_options = $this->dependencies
             ->getPlugin()
             ->getCart()
@@ -500,10 +499,14 @@ class ApplepayPaymentMethod extends PaymentMethod
                 $current_delivery_id = $this->context->cart->id_address_delivery;
                 $current_invoice_id = $this->context->cart->id_address_invoice;
                 $cart_adapter->updateAddresses($this->context->cart, $new_address_id, $new_address_id);
+                $this->context->country->iso_code = $formated_address['id_country'];
             }
-
+            $country_id = isset($formated_address) ? $formated_address['id_country'] : $this->dependencies
+                ->getPlugin()
+                ->getCountry()
+                ->getByIso($this->context->country->iso_code);
+            $delivery_options = $this->getDeliveryOptions($country_id);
             $carrier = $this->tools->tool('getValue', 'carrier');
-            $delivery_options = $this->getDeliveryOptions();
             if ($carrier) {
                 $id_carrier = (int) $carrier['identifier'];
             } else {
@@ -513,9 +516,8 @@ class ApplepayPaymentMethod extends PaymentMethod
             $id_carrier = (int) $this->context->cart->id_carrier;
         }
         $this->context->cart->id_carrier = $id_carrier;
-
         $applePayPaymentRequest = [
-            'countryCode' => $this->context->country->iso_code,
+            'countryCode' => isset($formated_address) ? $address['countryCode'] : $this->context->country->iso_code,
             'currencyCode' => $currency->iso_code,
             'merchantCapabilities' => [
                 'supports3DS',
@@ -633,9 +635,11 @@ class ApplepayPaymentMethod extends PaymentMethod
     /**
      * @description Get delivery options for the applepay request
      *
+     * @param mixed $country_id
+     *
      * @return array
      */
-    protected function getDeliveryOptions()
+    protected function getDeliveryOptions($country_id)
     {
         $this->setParameters();
         $carriers_list = $this->getCarriersList();
@@ -645,6 +649,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             return $shipping_methods;
         }
 
+        $country = $this->country_adapter->get($country_id);
         $carrier_adapter = $this->dependencies
             ->getPlugin()
             ->getCarrier();
@@ -654,12 +659,11 @@ class ApplepayPaymentMethod extends PaymentMethod
             if (!$this->validate_adapter->validate('isLoadedObject', $carrier)) {
                 continue;
             }
-
             $shipping_methods[] = [
                 'identifier' => $carrier->id,
                 'label' => $carrier->name,
                 'detail' => $carrier->delay,
-                'amount' => $this->context->cart->getPackageShippingCost($carrier->id),
+                'amount' => $this->context->cart->getPackageShippingCost($carrier->id, true, $country),
             ];
         }
 
