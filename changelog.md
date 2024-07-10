@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.27
+- Feature :
+  - [SMP-2673](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2479): Fix carrier taxes display on appelpay
+
 ## Version 4.9.26
 - Feature :
   - [SMP-2686](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2476): Adapt appelpay pay button call to custom theme

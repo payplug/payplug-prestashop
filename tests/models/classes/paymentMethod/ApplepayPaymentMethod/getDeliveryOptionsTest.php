@@ -2,8 +2,6 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
-use PayPlug\tests\mock\CarrierMock;
-
 /**
  * @group unit
  * @group classes
@@ -31,10 +29,6 @@ class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
                     42,
                 ],
             ]);
-        $this->carrier_adapter
-            ->shouldReceive([
-                'get' => CarrierMock::get(),
-            ]);
         $this->validate_adapter
             ->shouldReceive([
                 'validate' => false,
@@ -50,10 +44,6 @@ class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
                     42,
                 ],
             ]);
-        $this->carrier_adapter
-            ->shouldReceive([
-                'get' => CarrierMock::get(),
-            ]);
         $this->validate_adapter
             ->shouldReceive([
                 'validate' => true,
@@ -64,6 +54,7 @@ class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
             ->shouldReceive([
                 'getPackageShippingCost' => 42,
             ]);
+        $cart->id_address_delivery = 1;
         $this->context->cart = $cart;
 
         $carriers = [
