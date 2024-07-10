@@ -500,6 +500,8 @@ class ApplepayPaymentMethod extends PaymentMethod
                 $current_delivery_id = $this->context->cart->id_address_delivery;
                 $current_invoice_id = $this->context->cart->id_address_invoice;
                 $cart_adapter->updateAddresses($this->context->cart, $new_address_id, $new_address_id);
+                // update context iun order to update carrier information, taxes ...
+                $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
             }
 
             $carrier = $this->tools->tool('getValue', 'carrier');
@@ -558,8 +560,14 @@ class ApplepayPaymentMethod extends PaymentMethod
             $lineItems = $this->getLinesItems($carrier ? [$carrier] : $delivery_options);
             $additionalPaymentRequestDatas['lineItems'] = $lineItems;
 
-            if (isset($current_delivery_id, $current_invoice_id)) {
+            // delete newly created address
+            if (isset($new_address_id)) {
                 $cart_adapter->updateAddresses($this->context->cart, $current_delivery_id, $current_invoice_id);
+                $tmp_address = $address_adapter->get((int) $new_address_id);
+                if (!$tmp_address->id_customer) {
+                    $address_adapter->delete($tmp_address);
+                }
+                $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
             }
         }
 
@@ -649,6 +657,11 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->getPlugin()
             ->getCarrier();
 
+        $address = $this->dependencies
+            ->getPlugin()
+            ->getAddress()
+            ->get((int) $this->context->cart->id_address_delivery);
+        $this->context->country = $this->country_adapter->get((int) $address->id_country);
         foreach ($carriers_list as $id_carrier) {
             $carrier = $carrier_adapter->get((int) $id_carrier);
             if (!$this->validate_adapter->validate('isLoadedObject', $carrier)) {
