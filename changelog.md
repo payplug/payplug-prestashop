@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.28
+- Feature :
+  - [SMP-2787](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2480): Hide apple pay button when order guest are disabled in configuration
+
 ## Version 4.9.27
 - Feature :
   - [SMP-2673](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2479): Fix carrier taxes display on appelpay

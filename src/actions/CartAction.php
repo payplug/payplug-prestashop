@@ -86,6 +86,17 @@ class CartAction
     {
         $this->setParameters();
 
+        // if customer is not logged and the shop is configured to refuse guest order then return false
+        $guest_checkout_enabled = $this->plugin
+            ->getConfigurationClass()
+            ->getValue('PS_GUEST_CHECKOUT_ENABLED');
+        $customer = $this->plugin
+            ->getCustomer()
+            ->get((int) $this->context->customer->id);
+        if (!(bool) $guest_checkout_enabled && !(bool) $customer->logged) {
+            return false;
+        }
+
         $browser = $this->dependencies
             ->getPlugin()
             ->getBrowser()
