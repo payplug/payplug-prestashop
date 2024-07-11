@@ -352,7 +352,7 @@ trigger_release:
     project: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
     branch: master
   rules:
-      - if: $CI_COMMIT_BRANCH == "master" && $RUN_FOR_RELEASE == "false"
+      - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "trigger"
 
 variables:
   VERSION_FORMAT: "php"
