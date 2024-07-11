@@ -5,8 +5,6 @@ include:
     file:
       ## generic pipeline template
       - "ci/ci.gitlab-ci.yml"
-      # Prepare version using semantic-release
-      - "setup/setup-version-semantic-release-templating-job.gitlab-ci.yml"
 
 # Override the default value from
 # https://gitlab.com/dalenys/public/cicd-pipelines/gitlab-ci-template/-/blob/ebb84efb5593e73c45d9481cdfec23779d2c0eb9/src/ci/workflow-job.gitlab-ci.yml#L1-2
