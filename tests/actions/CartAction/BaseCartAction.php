@@ -16,6 +16,7 @@ class BaseCartAction extends TestCase
     protected $configuration;
     protected $context;
     protected $context_adapter;
+    protected $customer_adapter;
     protected $dependencies;
     protected $dispatcher;
     protected $instance;
@@ -43,6 +44,8 @@ class BaseCartAction extends TestCase
         $this->context->cart = \Mockery::mock('Cart');
         $this->context->cart->id = 1;
 
+        $this->customer_adapter = \Mockery::mock('Customer');
+
         $this->context_adapter
             ->shouldReceive([
                 'get' => $this->context,
@@ -62,6 +65,7 @@ class BaseCartAction extends TestCase
             ->shouldReceive([
                 'getCart' => $this->cartAdapter,
                 'getContext' => $this->context_adapter,
+                'getCustomer' => $this->customer_adapter,
                 'getConfigurationClass' => $this->configuration,
                 'getDispatcher' => $this->dispatcher,
                 'getTools' => $this->tools_adapter,

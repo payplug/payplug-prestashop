@@ -34,16 +34,38 @@ class renderApplePayCheckoutTest extends BaseCartAction
         $this->link = \Mockery::mock('Link');
         $this->plugin
             ->shouldReceive([
-                'getRoutes' => $this->routes,
                 'getAssign' => $this->assign,
-                'getMedia' => $this->media,
                 'getBrowser' => $browser,
+                'getMedia' => $this->media,
                 'getPaymentMethodClass' => $this->payment_method_class,
+                'getRoutes' => $this->routes,
             ]);
+    }
+
+    public function testWhenConfigurationDoesNotAllowGuestOrder()
+    {
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('PS_GUEST_CHECKOUT_ENABLED')
+            ->andReturn(false);
+        $this->customer_adapter
+            ->shouldReceive([
+                'get' => (object) ['id' => 42, 'logged' => false],
+            ]);
+
+        $this->assertFalse($this->action->renderApplePayCheckout());
     }
 
     public function testWhenApplePayCartWhenBrowserIsNotSafari()
     {
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('PS_GUEST_CHECKOUT_ENABLED')
+            ->andReturn(false);
+        $this->customer_adapter
+            ->shouldReceive([
+                'get' => (object) ['id' => 42, 'logged' => true],
+            ]);
         $this->browser_validator
             ->shouldReceive([
                 'isApplePayCompatible' => [
@@ -56,6 +78,14 @@ class renderApplePayCheckoutTest extends BaseCartAction
 
     public function testWhenNoAvailableCarriersFound()
     {
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('PS_GUEST_CHECKOUT_ENABLED')
+            ->andReturn(false);
+        $this->customer_adapter
+            ->shouldReceive([
+                'get' => (object) ['id' => 42, 'logged' => true],
+            ]);
         $this->browser_validator
             ->shouldReceive([
                 'isApplePayCompatible' => [
@@ -84,6 +114,14 @@ class renderApplePayCheckoutTest extends BaseCartAction
 
     public function testWhenTemplateIsReturn()
     {
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('PS_GUEST_CHECKOUT_ENABLED')
+            ->andReturn(false);
+        $this->customer_adapter
+            ->shouldReceive([
+                'get' => (object) ['id' => 42, 'logged' => true],
+            ]);
         $this->browser_validator
             ->shouldReceive([
                 'isApplePayCompatible' => [
@@ -141,6 +179,14 @@ class renderApplePayCheckoutTest extends BaseCartAction
      */
     public function testWhenTemplateIsReturnForProduct()
     {
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('PS_GUEST_CHECKOUT_ENABLED')
+            ->andReturn(false);
+        $this->customer_adapter
+            ->shouldReceive([
+                'get' => (object) ['id' => 42, 'logged' => true],
+            ]);
         // Mock the browser compatibility check
         $this->browser_validator
             ->shouldReceive([
