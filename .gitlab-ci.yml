@@ -349,8 +349,8 @@ trigger_release:
   variables:
     RUN_FOR_RELEASE: "true"
   trigger:
-    project: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
-    branch: master
+    include:
+      - local: .gitlab-ci.yml
   rules:
       - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "trigger"
 
