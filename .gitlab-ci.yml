@@ -5,8 +5,6 @@ include:
     file:
       ## generic pipeline template
       - "ci/ci.gitlab-ci.yml"
-      # Prepare version using semantic-release
-      - "setup/setup-version-semantic-release-templating-job.gitlab-ci.yml"
 
 # Override the default value from
 # https://gitlab.com/dalenys/public/cicd-pipelines/gitlab-ci-template/-/blob/ebb84efb5593e73c45d9481cdfec23779d2c0eb9/src/ci/workflow-job.gitlab-ci.yml#L1-2
@@ -341,9 +339,24 @@ scan_sonar:
     - if: $CI_MERGE_REQUEST_ID && $SONAR_TOKEN
   allow_failure: true
 
+tag_repository:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master" && $RUN_FOR_RELEASE == "true"
+
+trigger_release:
+  stage: finalize
+  when: manual
+  variables:
+    RUN_FOR_RELEASE: "true"
+  trigger:
+    include: .gitlab-ci.yml
+  rules:
+      - if: $CI_COMMIT_BRANCH == "master" && $RUN_FOR_RELEASE == "false"
+
 variables:
   VERSION_FORMAT: "php"
   SEMANTIC_BRANCHES: "master_and_develop"
   SONAR_SOURCE_FOLDER: "src"
   SONAR_TEST_FOLDER: "tests"
   SONAR_ENABLED: "true"
+  RUN_FOR_RELEASE: "false"
