@@ -656,12 +656,14 @@ class ApplepayPaymentMethod extends PaymentMethod
         $carrier_adapter = $this->dependencies
             ->getPlugin()
             ->getCarrier();
+        if ($this->context->cart->id_address_delivery) {
+            $address = $this->dependencies
+                ->getPlugin()
+                ->getAddress()
+                ->get((int) $this->context->cart->id_address_delivery);
+            $this->context->country = $this->country_adapter->get((int) $address->id_country);
+        }
 
-        $address = $this->dependencies
-            ->getPlugin()
-            ->getAddress()
-            ->get((int) $this->context->cart->id_address_delivery);
-        $this->context->country = $this->country_adapter->get((int) $address->id_country);
         foreach ($carriers_list as $id_carrier) {
             $carrier = $carrier_adapter->get((int) $id_carrier);
             if (!$this->validate_adapter->validate('isLoadedObject', $carrier)) {
