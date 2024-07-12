@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.31
+- Feature :
+  - [SMP-2545](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2486): Fix applepay bug with guest account
+
 ## Version 4.9.28
 - Feature :
   - [SMP-2787](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2480): Hide apple pay button when order guest are disabled in configuration
