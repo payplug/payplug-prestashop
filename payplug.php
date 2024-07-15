@@ -398,21 +398,6 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description  display applepay button on product page
-     *
-     * @return mixed
-     */
-    public function hookDisplayProductAdditionalInfo()
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->dependencies
-                ->getPlugin()
-                ->getCartAction()
-                ->renderPaymentCTA();
-        }
-    }
-
-    /**
      * @description hook applepay and oney on cart page
      *
      * @return mixed
