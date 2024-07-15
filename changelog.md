@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.34
+- Bugfix :
+  - [SMP-2736](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2488): Fix remove order state when installing Payplug module
+
 ## Version 4.9.33
 - Bugfix :
   - [SMP-2787](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2489): Fix the customer login check for guest creation during Apple Pay checkout
