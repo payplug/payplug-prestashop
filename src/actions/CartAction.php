@@ -93,7 +93,7 @@ class CartAction
         $customer = $this->plugin
             ->getCustomer()
             ->get((int) $this->context->customer->id);
-        if (!(bool) $guest_checkout_enabled && !(bool) $customer->logged) {
+        if (!(bool) $guest_checkout_enabled && !(bool) $customer->id) {
             return false;
         }
 

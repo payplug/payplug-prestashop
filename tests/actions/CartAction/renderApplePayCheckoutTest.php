@@ -50,7 +50,7 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn(false);
         $this->customer_adapter
             ->shouldReceive([
-                'get' => (object) ['id' => 42, 'logged' => false],
+                'get' => (object) ['id' => false],
             ]);
 
         $this->assertFalse($this->action->renderApplePayCheckout());
@@ -64,7 +64,7 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn(false);
         $this->customer_adapter
             ->shouldReceive([
-                'get' => (object) ['id' => 42, 'logged' => true],
+                'get' => (object) ['id' => 42],
             ]);
         $this->browser_validator
             ->shouldReceive([
@@ -84,7 +84,7 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn(false);
         $this->customer_adapter
             ->shouldReceive([
-                'get' => (object) ['id' => 42, 'logged' => true],
+                'get' => (object) ['id' => 42],
             ]);
         $this->browser_validator
             ->shouldReceive([
@@ -120,7 +120,7 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn(false);
         $this->customer_adapter
             ->shouldReceive([
-                'get' => (object) ['id' => 42, 'logged' => true],
+                'get' => (object) ['id' => 42],
             ]);
         $this->browser_validator
             ->shouldReceive([
@@ -185,7 +185,7 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn(false);
         $this->customer_adapter
             ->shouldReceive([
-                'get' => (object) ['id' => 42, 'logged' => true],
+                'get' => (object) ['id' => 42],
             ]);
         // Mock the browser compatibility check
         $this->browser_validator
