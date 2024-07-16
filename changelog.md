@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.9.33
+- Bugfix :
+  - [SMP-2787](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2489): Fix the customer login check for guest creation during Apple Pay checkout
+
 ## Version 4.9.32
 - Bugfix :
   - [SMP-2787](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2487): Fix applepay button display for logged user and fix security vulnerabilities
