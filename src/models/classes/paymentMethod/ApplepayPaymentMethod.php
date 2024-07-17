@@ -935,9 +935,8 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'message' => 'The delivery address country is not active on the shop',
             ];
         }
-
         $customer = $customer_adapter->get((int) $cart->id_customer);
-        if ($customer_adapter->isLogged($customer)) {
+        if ($this->context->customer->isLogged()) {
             // Prepare shipping and billing addresses data
             // Check if the addresses already exist for the customer
             $customer_addresses = $customer_adapter->getAddresses(
