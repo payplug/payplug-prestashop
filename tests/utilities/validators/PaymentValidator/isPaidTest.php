@@ -40,7 +40,7 @@ class isPaidTest extends TestCase
     {
         $this->assertSame([
             'result' => false,
-            'message' => 'Invalid argument given, $payment must be a non empty object',
+            'message' => 'Invalid argument given, $payment must be a non null object',
         ], $this->validator->isPaid($payment));
     }
 

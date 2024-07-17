@@ -512,6 +512,8 @@ class ConfigClass
     /**
      * @description Check if given phone number is valid mobile phone number.
      *
+     * @deprecated Use paymentValidator::isValidMobilePhoneNumber() insteed
+     *
      * @param $iso_code
      * @param false $phone_number
      *
@@ -535,7 +537,8 @@ class ConfigClass
 
             return in_array($is_mobile, [1, 2], true);
         } catch (libphonenumberlight\NumberParseException $e) {
-            // todo : Add error Log
+            $this->logger->addLog('ConfigClass::isValidMobilePhoneNumber() - Exception thrown: ' . $e->getMessage());
+
             return false;
         }
     }
@@ -571,13 +574,15 @@ class ConfigClass
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             if (!$phone_util->isValidNumber($parsed)) {
-                // todo: add log
+                $this->logger->addLog('ConfigClass::formatPhoneNumber() - Invalid phone number for the country given');
+
                 return '';
             }
 
             return $phone_util->format($parsed, libphonenumberlight\PhoneNumberFormat::E164);
         } catch (libphonenumberlight\NumberParseException $e) {
-            // todo: add log
+            $this->logger->addLog('ConfigClass::formatPhoneNumber() - Exception thrown: ' . $e->getMessage());
+
             return '';
         }
     }

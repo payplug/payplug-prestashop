@@ -484,7 +484,7 @@ class paymentValidator
         if (!is_object($payment) || !$payment) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument given, $payment must be a non empty object',
+                'message' => 'Invalid argument given, $payment must be a non null object',
             ];
         }
 
@@ -706,7 +706,7 @@ class paymentValidator
         if (empty($payment) || !is_object($payment)) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument, $payment must be a non empty object.',
+                'message' => 'Invalid argument, $payment must be a non null object.',
             ];
         }
 
@@ -749,7 +749,7 @@ class paymentValidator
         if (!is_object($payment) || !$payment) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument given, $payment must be a non empty object',
+                'message' => 'Invalid argument given, $payment must be a non null object',
             ];
         }
 
@@ -990,7 +990,7 @@ class paymentValidator
         if (!is_object($payment) || !$payment) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument given, $payment must be a non empty object',
+                'message' => 'Invalid argument given, $payment must be a non null object',
             ];
         }
 
@@ -1026,7 +1026,7 @@ class paymentValidator
         if (!is_object($payment) || !$payment) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument given, $payment must be a non empty object',
+                'message' => 'Invalid argument given, $payment must be a non null object',
             ];
         }
 

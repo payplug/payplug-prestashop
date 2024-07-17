@@ -179,7 +179,8 @@ class OneyPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_object($resource) || !$resource) {
-            // todo: add error log
+            $this->logger->addLog('OneyPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
+
             return [];
         }
 
@@ -347,7 +348,8 @@ class OneyPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_string($resource_id) || !$resource_id) {
-            // todo: add error log
+            $this->logger->addLog('OneyPaymentMethod::getResourceDetail() - Invalid argument given, $resource_id must be a non empty string.');
+
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $resource_id must be a non empty string.',
@@ -377,7 +379,8 @@ class OneyPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_object($resource) || !$resource) {
-            // todo: add error log
+            $this->logger->addLog('OneyPaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
+
             return [];
         }
 

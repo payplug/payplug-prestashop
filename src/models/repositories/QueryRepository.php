@@ -570,8 +570,11 @@ class QueryRepository
         try {
             $result = $this->dependencies->getPlugin()->getQueryAdapter()->query($sql);
         } catch (\Exception $e) {
-            // todo: add log
-            // $this->logger->addLog('QueryRepository::build() - Exception thrown: ' . $e->getMessage());
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('QueryRepository::build() - Exception thrown: ' . $e->getMessage());
+
             return false;
         }
 
