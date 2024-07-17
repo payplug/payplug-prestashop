@@ -50,12 +50,20 @@ class OrderStateAction
     public function saveTypeAction($id_order_state = 0, $type = '')
     {
         if (!is_int($id_order_state) || !$id_order_state) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OrderStateAction::saveTypeAction() - Invalid argument given, $id_order_state must be a non null integer.');
+
             return false;
         }
 
         if (!is_string($type) || !$type) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OrderStateAction::saveTypeAction() - Invalid argument given, $type must be a non empty string.');
+
             return false;
         }
 
@@ -68,7 +76,11 @@ class OrderStateAction
             ->getPlugin()
             ->getValidate()
             ->validate('isLoadedObject', $order_state)) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OrderStateAction::saveTypeAction() - Retrieve OrderState object is not valid');
+
             return false;
         }
 
@@ -107,7 +119,11 @@ class OrderStateAction
     public function deleteTypeAction($id_order_state = 0)
     {
         if (!is_int($id_order_state) || !$id_order_state) {
-            // todo: add log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OrderStateAction::deleteTypeAction() - Invalid argument given, $id_order_state must be a non null integer.');
+
             return false;
         }
 

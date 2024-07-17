@@ -33,10 +33,16 @@ class BaseOrderStateAction extends TestCase
 
         $this->payplug_orderstate_repository = \Mockery::mock('PayplugOrderStateRepository');
 
+        $logger = \Mockery::mock('Logger');
+        $logger
+            ->shouldReceive([
+                'addLog' => true,
+            ]);
         $this->plugin
             ->shouldReceive([
                 'getPayplugOrderStateRepository' => $this->payplug_orderstate_repository,
                 'getOrderStateAdapter' => $this->order_state_adapter,
+                'getLogger' => $logger,
                 'getTools' => $this->tools_adapter,
                 'getValidate' => $this->validate_adapter,
             ]);

@@ -54,7 +54,8 @@ class OneClickPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_object($resource) || !$resource) {
-            // todo: add error log
+            $this->logger->addLog('OneClickPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
+
             return [];
         }
 
@@ -148,7 +149,8 @@ class OneClickPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_string($resource_id) || !$resource_id) {
-            // todo: add error log
+            $this->logger->addLog('OneClickPaymentMethod::getResourceDetail() - Invalid argument given, $resource_id must be a non empty string.');
+
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $resource_id must be a non empty string.',
@@ -167,7 +169,8 @@ class OneClickPaymentMethod extends PaymentMethod
             }
         }
         if (!$retrieve['result']) {
-            // todo: add error log
+            $this->logger->addLog('OneClickPaymentMethod::getResourceDetail() - Payment resource can\'t be retrieved for given resource id.');
+
             return [];
         }
         $resource = $retrieve['resource'];
@@ -220,7 +223,8 @@ class OneClickPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_object($resource) || !$resource) {
-            // todo: add error log
+            $this->logger->addLog('OneClickPaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
+
             return [];
         }
 

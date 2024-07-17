@@ -42,7 +42,7 @@ class orderValidator
         if (!is_object($order) || !$order) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument given, $order must be a non empty object',
+                'message' => 'Invalid argument given, $order must be a non null object',
             ];
         }
         if (!is_int($id_cart) || !$id_cart) {

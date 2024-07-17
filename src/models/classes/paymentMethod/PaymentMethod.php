@@ -260,7 +260,8 @@ class PaymentMethod
         $this->setParameters();
 
         if (!is_object($resource) || !$resource) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
+
             return [];
         }
 
@@ -321,7 +322,11 @@ class PaymentMethod
     public function getPaymentMethodHash($payment_tab = [])
     {
         if (!is_array($payment_tab) || empty($payment_tab)) {
-            // todo: add error log
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('PaymentMethod::getPaymentMethodHash() - Invalid argument given, $payment_tab must be a non empty array.');
+
             return '';
         }
 
@@ -394,12 +399,13 @@ class PaymentMethod
         $this->setParameters();
 
         if (!isset($this->name) || !$this->name) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Invalid object prop, $name must be a non empty string.');
+
             return [];
         }
         if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Cart object must be a valid object.');
 
-            // todo: add error log
             return [];
         }
 
@@ -407,13 +413,15 @@ class PaymentMethod
 
         // Check currency
         if (!$this->validate_adapter->validate('isLoadedObject', $this->context->currency)) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Currency object must be a valid object.');
+
             return [];
         }
 
         $supported_currencies = explode(';', $this->configuration->getValue('currencies'));
         if (!in_array($this->context->currency->iso_code, $supported_currencies, true)) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Currency object is not supported.');
+
             return [];
         }
 
@@ -425,7 +433,8 @@ class PaymentMethod
             ->getHelpers()['amount']
             ->validateAmount($price_limit, (float) $cart_amount);
         if (!$is_valid_amount['result']) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
+
             return [];
         }
 
@@ -602,7 +611,7 @@ class PaymentMethod
             }
         }
         if (!$retrieve['result']) {
-            $this->logger->addLog('PaymentMethod::getResourceDetail - Cannot retrieve the resource.', 'error');
+            $this->logger->addLog('PaymentMethod::getResourceDetail - Payment resource can\'t be retrieved.', 'error');
 
             return [];
         }
@@ -753,7 +762,8 @@ class PaymentMethod
     {
         $this->setParameters();
         if (!isset($this->name) || !$this->name) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getReturnUrl() - Context Cart object must be a valid object.');
+
             return [];
         }
 
@@ -762,13 +772,15 @@ class PaymentMethod
             ->getPaymentRepository()
             ->getByCart((int) $this->context->cart->id);
         if (!$resource_stored) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getReturnUrl() - No stored resource retrieve for current context cart id.');
+
             return [];
         }
 
         $resource = $this->dependencies->apiClass->retrievePayment($resource_stored['resource_id']);
         if (!$resource['result']) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getReturnUrl() - Payment resource can\'t be retrieved for stored resource id.');
+
             return [];
         }
 
@@ -794,7 +806,8 @@ class PaymentMethod
         $this->setParameters();
 
         if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
-            // todo: Add error log
+            $this->logger->addLog('PaymentMethod::isValidResource() - Context Cart object must be a valid object.');
+
             return false;
         }
         $id_cart = (int) $this->context->cart->id;
@@ -805,7 +818,8 @@ class PaymentMethod
             ->getPaymentRepository()
             ->getByCart((int) $id_cart);
         if (empty($stored_resource)) {
-            // todo: Add error log
+            $this->logger->addLog('PaymentMethod::isValidResource() - No stored resource retrieve for current context cart id.');
+
             return false;
         }
 
@@ -814,20 +828,23 @@ class PaymentMethod
             ->getValidators()['payment']
             ->isTimeoutCachedPayment($stored_resource['date_upd'])['result'];
         if (!$is_expired) {
-            // todo: Add error log
+            $this->logger->addLog('PaymentMethod::isValidResource() - Current resource is expired.');
+
             return false;
         }
 
         // Get the resource from API
         $retrieved_resource = $this->dependencies->apiClass->retrievePayment($stored_resource['resource_id']);
         if (!$retrieved_resource['result']) {
-            // todo: Add error log
+            $this->logger->addLog('PaymentMethod::isValidResource() - Payment resource can\'t be retrieved for stored resource id.');
+
             return false;
         }
 
         // Check if retrieved resource has failure
         if (isset($retrieved_resource['resource']->failure->code) && $retrieved_resource['resource']->failure->code) {
-            // todo: Add error log
+            $this->logger->addLog('PaymentMethod::isValidResource() - Retrieved Payment has failure');
+
             return false;
         }
 
@@ -840,12 +857,14 @@ class PaymentMethod
         $this->setParameters();
 
         if (!is_object($resource) || !$resource) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::postProcessOrder() - Invalid argument given, $resource must be a non null object.');
+
             return false;
         }
 
         if (!is_int($id_order) || !$id_order) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::postProcessOrder() - Invalid argument given, $id_order must be a non null integer.');
+
             return false;
         }
 
@@ -869,7 +888,8 @@ class PaymentMethod
             ->getApiService()
             ->patchPayment($resource->id, $data);
         if (!$patchPayment['result']) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::postProcessOrder() - Payment resource can not be patch for given datas');
+
             return false;
         }
 
@@ -881,7 +901,8 @@ class PaymentMethod
                 'id_payment' => $resource->id,
             ]);
         if (!$create_order_payment) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::postProcessOrder() - Order Payment can not be create.');
+
             return false;
         }
 
@@ -1001,7 +1022,8 @@ class PaymentMethod
         $this->setParameters();
 
         if (!is_object($resource) || !$resource) {
-            // todo: add error log
+            $this->logger->addLog('PaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
+
             return [];
         }
 

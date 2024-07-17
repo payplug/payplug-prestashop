@@ -42,7 +42,7 @@ class isCreatedTest extends TestCase
         $id_cart = 42;
         $this->assertSame([
             'result' => false,
-            'message' => 'Invalid argument given, $order must be a non empty object',
+            'message' => 'Invalid argument given, $order must be a non null object',
         ], $this->validator->isCreated($order, $id_cart));
     }
 
