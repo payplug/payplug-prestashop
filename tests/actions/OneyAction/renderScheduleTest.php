@@ -11,11 +11,6 @@ namespace PayPlug\tests\actions\OneyAction;
  */
 class renderScheduleTest extends BaseOneyAction
 {
-    public function setup()
-    {
-        parent::setUp();
-    }
-
     /**
      * @description  test invalid $oney_payment param
      * in renderSchedule

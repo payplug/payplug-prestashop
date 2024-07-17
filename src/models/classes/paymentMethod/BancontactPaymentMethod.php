@@ -102,7 +102,8 @@ class BancontactPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_string($resource_id) || !$resource_id) {
-            // todo: add error log
+            $this->logger->addLog('BancontactPaymentMethod::getResourceDetail() - Invalid argument given, $resource_id must be a non empty string.');
+
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $resource_id must be a non empty string.',

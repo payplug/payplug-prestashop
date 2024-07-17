@@ -70,7 +70,7 @@ class moduleValidator
         if (!is_object($module) || !$module) {
             return [
                 'result' => false,
-                'message' => 'Invalid parameters given, $module must be an non empty object',
+                'message' => 'Invalid parameters given, $module must be an non null object',
             ];
         }
 

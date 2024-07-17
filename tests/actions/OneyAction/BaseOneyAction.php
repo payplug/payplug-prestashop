@@ -64,12 +64,18 @@ class BaseOneyAction extends TestCase
                 'getPaymentMethod' => $this->payment_method,
             ]);
 
+        $logger = \Mockery::mock('Logger');
+        $logger
+            ->shouldReceive([
+                'addLog' => true,
+            ]);
         $this->plugin
             ->shouldReceive([
                 'getConfiguration' => $this->configuration,
                 'getConfigurationClass' => $this->configuration_class,
                 'getContext' => $this->context_adapter,
                 'getDispatcher' => $this->dispatcher,
+                'getLogger' => $logger,
                 'getPaymentMethodClass' => $this->payment_method_class,
                 'getTools' => $this->toolsAdapter,
                 'getInstance' => $this->instance,

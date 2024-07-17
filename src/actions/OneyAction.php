@@ -132,7 +132,10 @@ class OneyAction
     {
         $this->setParameters();
         if (!is_string($error) || !$error) {
-            // todo: add log
+            $this->plugin
+                ->getLogger()
+                ->addLog('OneyAction::renderRequiredFields() - Invalid argument given, $error must be a non empty string.');
+
             return [];
         }
 
@@ -166,12 +169,18 @@ class OneyAction
     {
         $this->setParameters();
         if (!is_array($oney_payment) || !$oney_payment) {
-            // todo: add log
+            $this->plugin
+                ->getLogger()
+                ->addLog('OneyAction::renderRequiredFields() - Invalid argument given, $oney_payment must be a non empty array.');
+
             return false;
         }
 
         if (!is_float($amount) || !$amount) {
-            // todo: add log
+            $this->plugin
+                ->getLogger()
+                ->addLog('OneyAction::renderRequiredFields() - Invalid argument given, $amount must be a non null float.');
+
             return false;
         }
 
