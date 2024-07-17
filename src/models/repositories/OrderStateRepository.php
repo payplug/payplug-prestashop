@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class OrderStateRepository extends QueryRepository
+class OrderStateRepository extends EntityRepository
 {
     /**
      * @description Get all order states for a given module name

@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class LockRepository extends QueryRepository
+class LockRepository extends EntityRepository
 {
     private $fields = [
         'id_cart' => 'integer',

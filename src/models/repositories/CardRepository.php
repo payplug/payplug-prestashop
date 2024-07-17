@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class CardRepository extends QueryRepository
+class CardRepository extends EntityRepository
 {
     private $fields = [
         'id_customer' => 'integer',

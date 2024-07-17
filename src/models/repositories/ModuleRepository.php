@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class ModuleRepository extends QueryRepository
+class ModuleRepository extends EntityRepository
 {
     public function __construct($prefix = '', $dependencies = null)
     {
