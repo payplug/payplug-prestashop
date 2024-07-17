@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class LoggerRepository extends QueryRepository
+class LoggerRepository extends EntityRepository
 {
     private $fields = [
         'process' => 'string',

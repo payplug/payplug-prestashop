@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class CountryRepository extends QueryRepository
+class CountryRepository extends EntityRepository
 {
     public function __construct($prefix = '', $dependencies = null)
     {
