@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class ShopRepository extends QueryRepository
+class ShopRepository extends EntityRepository
 {
     /**
      * @description Get all domains use by the merchant
