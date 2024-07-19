@@ -3,6 +3,7 @@
 ## Version 4.10.0
 - Refactoring :
   - [PRE-2511](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2491): Set EntityRepository
+  - [PRE-2515](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2492): Set Logger entity
 
 ## Version 4.9.33
 - Bugfix :

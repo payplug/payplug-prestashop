@@ -11,9 +11,24 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class getAllLogTest extends BaseLoggerRepository
 {
+    public function testWhenNoEntityNameDefined()
+    {
+        $this->repository->entity_name = '';
+        $this->assertSame([], $this->repository->getAllLog());
+    }
+
+    public function testWhenEntityObjectCantBeGetted()
+    {
+        $this->repository->shouldReceive([
+            'getEntityObject' => null,
+        ]);
+        $this->assertSame([], $this->repository->getAllLog());
+    }
+
     public function testWhenNoLogsIsReturnForGivenCustomer()
     {
         $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
             'select' => $this->repository,
             'fields' => $this->repository,
             'from' => $this->repository,
@@ -40,6 +55,7 @@ class getAllLogTest extends BaseLoggerRepository
             ],
         ];
         $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
             'select' => $this->repository,
             'fields' => $this->repository,
             'from' => $this->repository,

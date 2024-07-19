@@ -11,6 +11,14 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class deleteFromDateTest extends BaseLoggerRepository
 {
+    private $date;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->date = date('Y-m-d H:i:s');
+    }
+
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -21,33 +29,43 @@ class deleteFromDateTest extends BaseLoggerRepository
         $this->assertFalse($this->repository->deleteFromDate($date));
     }
 
+    public function testWhenNoEntityNameDefined()
+    {
+        $this->repository->entity_name = '';
+        $this->assertFalse($this->repository->deleteFromDate($this->date));
+    }
+
+    public function testWhenEntityObjectCantBeGetted()
+    {
+        $this->repository->shouldReceive([
+            'getEntityObject' => null,
+        ]);
+        $this->assertFalse($this->repository->deleteFromDate($this->date));
+    }
+
     public function testWhenNoResultIsGivenByTheQuery()
     {
-        $date = date('Y-m-d H:i:s');
-        $this
-            ->repository
-            ->shouldReceive([
-                'delete' => $this->repository,
-                'from' => $this->repository,
-                'where' => $this->repository,
-                'build' => false,
-            ]);
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'delete' => $this->repository,
+            'from' => $this->repository,
+            'where' => $this->repository,
+            'build' => false,
+        ]);
 
-        $this->assertFalse($this->repository->deleteFromDate($date));
+        $this->assertFalse($this->repository->deleteFromDate($this->date));
     }
 
     public function testWhenExpectedResultIsGivenByTheQuery()
     {
-        $date = date('Y-m-d H:i:s');
-        $this
-            ->repository
-            ->shouldReceive([
-                'delete' => $this->repository,
-                'from' => $this->repository,
-                'where' => $this->repository,
-                'build' => true,
-            ]);
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'delete' => $this->repository,
+            'from' => $this->repository,
+            'where' => $this->repository,
+            'build' => true,
+        ]);
 
-        $this->assertTrue($this->repository->deleteFromDate($date));
+        $this->assertTrue($this->repository->deleteFromDate($this->date));
     }
 }
