@@ -41,25 +41,28 @@ class LoggerEntity
     private $date_upd;
 
     /** @var array */
-    private $definition;
+    private $definition = [
+        'table' => 'payplug_logger',
+        'primary' => 'id_payplug_logger',
+        'fields' => [
+            'process' => ['type' => 'string', 'required' => true],
+            'content' => ['type' => 'string', 'required' => true],
+            'date_add' => ['type' => 'string'],
+            'date_upd' => ['type' => 'string'],
+        ],
+    ];
 
     /** @var string */
     private $id;
 
     /** @var int */
-    private $limit_number;
+    private $limit_number = 4000;
 
     /** @var string */
-    private $limitDate;
+    private $limitDate = 'P1M';
 
     /** @var string */
     private $process;
-
-    /** @var string */
-    private $table;
-
-    /** @var string */
-    private $type;
 
     /**
      * @return string
@@ -123,22 +126,6 @@ class LoggerEntity
     public function getProcess()
     {
         return $this->process;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTable()
-    {
-        return $this->table;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -265,38 +252,6 @@ class LoggerEntity
         }
 
         $this->process = $process;
-
-        return $this;
-    }
-
-    /**
-     * @param $table
-     *
-     * @return $this
-     */
-    public function setTable($table)
-    {
-        if (!is_string($table)) {
-            throw new BadParameterException('Invalid argument, $table must be a string');
-        }
-
-        $this->table = $table;
-
-        return $this;
-    }
-
-    /**
-     * @param $type
-     *
-     * @return $this
-     */
-    public function setType($type)
-    {
-        if (!is_string($type)) {
-            throw new BadParameterException('Invalid argument, $type must be a string');
-        }
-
-        $this->type = $type;
 
         return $this;
     }

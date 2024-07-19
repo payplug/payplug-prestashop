@@ -11,43 +11,61 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class deleteFromIdTest extends BaseLoggerRepository
 {
+    private $last_id;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->last_id = 42;
+    }
+
     /**
      * @dataProvider invalidIntegerFormatDataProvider
      *
-     * @param mixed $id_logger
+     * @param mixed $last_id
      */
-    public function testWhenGivenIdLoggerIsInvalidIntegerFormat($id_logger)
+    public function testWhenGivenIdLoggerIsInvalidIntegerFormat($last_id)
     {
-        $this->assertFalse($this->repository->deleteFromId($id_logger));
+        $this->assertFalse($this->repository->deleteFromId($last_id));
+    }
+
+    public function testWhenNoEntityNameDefined()
+    {
+        $this->repository->entity_name = '';
+        $this->assertFalse($this->repository->deleteFromId($this->last_id));
+    }
+
+    public function testWhenEntityObjectCantBeGetted()
+    {
+        $this->repository->shouldReceive([
+            'getEntityObject' => null,
+        ]);
+        $this->assertFalse($this->repository->deleteFromId($this->last_id));
     }
 
     public function testWhenNoResultIsGivenByTheQuery()
     {
-        $id_logger = 42;
-        $this
-            ->repository
-            ->shouldReceive([
-                'delete' => $this->repository,
-                'from' => $this->repository,
-                'where' => $this->repository,
-                'build' => false,
-            ]);
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'delete' => $this->repository,
+            'from' => $this->repository,
+            'where' => $this->repository,
+            'build' => false,
+        ]);
 
-        $this->assertFalse($this->repository->deleteFromId($id_logger));
+        $this->assertFalse($this->repository->deleteFromId($this->last_id));
     }
 
     public function testWhenExpectedResultIsGivenByTheQuery()
     {
-        $id_logger = 42;
-        $this
-            ->repository
-            ->shouldReceive([
-                'delete' => $this->repository,
-                'from' => $this->repository,
-                'where' => $this->repository,
-                'build' => true,
-            ]);
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'delete' => $this->repository,
+            'from' => $this->repository,
+            'where' => $this->repository,
+            'build' => true,
+        ]);
 
-        $this->assertTrue($this->repository->deleteFromId($id_logger));
+        $this->assertTrue($this->repository->deleteFromId($this->last_id));
     }
 }
