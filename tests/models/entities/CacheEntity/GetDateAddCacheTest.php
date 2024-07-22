@@ -1,23 +1,14 @@
 <?php
 
-use PayPlug\src\models\entities\CacheEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CacheEntity;
 
 /**
  * @group entity
  * @group cache
  * @group cache_entity
  */
-final class GetDateAddCacheTest extends TestCase
+final class GetDateAddCacheTest extends BaseCacheEntity
 {
-    protected $cache;
-
-    protected function setUp()
-    {
-        $this->cache = new CacheEntity();
-        $this->cache->setDateAdd('2021-12-31 23:59:42');
-    }
-
     public function testReturnDateAdd()
     {
         $this->assertSame(

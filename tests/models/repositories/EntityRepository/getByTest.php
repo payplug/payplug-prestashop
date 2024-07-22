@@ -129,7 +129,7 @@ class getByTest extends BaseEntityRepository
             ->andReturn($this->repository);
 
         $this->repository->shouldReceive('build')
-            ->with('unique_value')
+            ->with('unique_row')
             ->andReturn(['entity_data']);
 
         $expected_result = ['entity_data'];
