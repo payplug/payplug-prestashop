@@ -27,6 +27,7 @@ class getByKeyTest extends BaseCacheRepository
         $this
             ->repository
             ->shouldReceive([
+                'getEntityObject' => $this->entity,
                 'select' => $this->repository,
                 'fields' => $this->repository,
                 'from' => $this->repository,
@@ -52,6 +53,7 @@ class getByKeyTest extends BaseCacheRepository
         $this
             ->repository
             ->shouldReceive([
+                'getEntityObject' => $this->entity,
                 'select' => $this->repository,
                 'fields' => $this->repository,
                 'from' => $this->repository,

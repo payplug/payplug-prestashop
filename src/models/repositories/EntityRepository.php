@@ -125,7 +125,7 @@ class EntityRepository extends QueryRepository
                 return [];
         }
 
-        $result = $this->build('unique_value');
+        $result = $this->build('unique_row');
 
         return $result ?: [];
     }

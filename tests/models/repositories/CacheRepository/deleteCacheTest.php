@@ -11,6 +11,11 @@ namespace PayPlug\tests\models\repositories\CacheRepository;
  */
 class deleteCacheTest extends BaseCacheRepository
 {
+    public function setUp()
+    {
+        parent::setUp();
+    }
+
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -27,6 +32,7 @@ class deleteCacheTest extends BaseCacheRepository
         $this
             ->repository
             ->shouldReceive([
+                'getEntityObject' => $this->entity,
                 'delete' => $this->repository,
                 'from' => $this->repository,
                 'where' => $this->repository,
@@ -42,6 +48,7 @@ class deleteCacheTest extends BaseCacheRepository
         $this
             ->repository
             ->shouldReceive([
+                'getEntityObject' => $this->entity,
                 'delete' => $this->repository,
                 'from' => $this->repository,
                 'where' => $this->repository,
