@@ -81,7 +81,7 @@ class CacheRepository extends BaseClass
             $create_cache = $this->dependencies
                 ->getPlugin()
                 ->getCacheRepository()
-                ->createCache($parameters);
+                ->createEntity($parameters);
 
             return (bool) $create_cache;
         }

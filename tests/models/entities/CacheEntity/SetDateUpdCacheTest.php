@@ -1,30 +1,22 @@
 <?php
 
+namespace PayPlug\tests\models\entities\CacheEntity;
+
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\CacheEntity;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
  * @group cache
  * @group cache_entity
  */
-final class SetDateAddCacheTest extends TestCase
+final class SetDateUpdCacheTest extends BaseCacheEntity
 {
-    protected $cache;
-
-    protected function setUp()
+    public function testUpdateDateUpd()
     {
-        $this->cache = new CacheEntity();
-        $this->cache->setDateAdd('2021-12-31 23:59:42');
-    }
-
-    public function testUpdateDateAdd()
-    {
-        $this->cache->setDateAdd('1920-12-31 23:59:42');
         $this->assertSame(
-            '1920-12-31 23:59:42',
-            $this->cache->getDateAdd()
+            '2021-12-31 23:59:42',
+            $this->cache->getDateUpd()
         );
     }
 
@@ -32,20 +24,24 @@ final class SetDateAddCacheTest extends TestCase
     {
         $this->assertInstanceOf(
             CacheEntity::class,
-            $this->cache->setDateAdd('1920-12-31 23:59:42')
+            $this->cache->setDateUpd('1920-12-31 23:59:42')
         );
     }
 
     /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $date_upd
      * @group entity_exception
      * @group cache_exception
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString()
+    public function testThrowExceptionWhenNotAString($date_upd)
     {
+        $this->expectExceptionMessage('Invalid argument, $date_upd must be at format: \'Y-m-d h:m:s\'');
         $this->expectException(BadParameterException::class);
-        $this->cache->setDateAdd(42);
+        $this->cache->setDateUpd($date_upd);
     }
 
     /**
@@ -56,7 +52,8 @@ final class SetDateAddCacheTest extends TestCase
      */
     public function testThrowExceptionWhenNotWellFormatted()
     {
+        $this->expectExceptionMessage('Invalid argument, $date_upd must be at format: \'Y-m-d h:m:s\'');
         $this->expectException(BadParameterException::class);
-        $this->cache->setDateAdd('1er Janvier 1970');
+        $this->cache->setDateUpd('1er Janvier 1970');
     }
 }

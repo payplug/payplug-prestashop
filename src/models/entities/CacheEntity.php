@@ -44,7 +44,16 @@ class CacheEntity
     private $date_upd;
 
     /** @var array */
-    private $definition;
+    private static $definition = [
+        'table' => 'payplug_cache',
+        'primary' => 'id_payplug_cache',
+        'fields' => [
+            'cache_key' => ['type' => 'string', 'required' => true],
+            'cache_value' => ['type' => 'string', 'required' => true],
+            'date_add' => ['type' => 'string'],
+            'date_upd' => ['type' => 'string'],
+        ],
+    ];
 
     /** @var string */
     private $id_payplug_cache;
@@ -89,7 +98,7 @@ class CacheEntity
      */
     public function getDefinition()
     {
-        return $this->definition;
+        return self::$definition;
     }
 
     /**
@@ -168,22 +177,6 @@ class CacheEntity
         }
 
         $this->date_upd = $date_upd;
-
-        return $this;
-    }
-
-    /**
-     * @param $definition
-     *
-     * @return $this
-     */
-    public function setDefinition($definition)
-    {
-        if (!is_array($definition)) {
-            throw new BadParameterException('Invalid argument, $definition must be an array');
-        }
-
-        $this->definition = $definition;
 
         return $this;
     }
