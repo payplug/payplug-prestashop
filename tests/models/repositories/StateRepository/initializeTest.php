@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPlug\tests\models\repositories\PayplugOrderStateRepository;
+namespace PayPlug\tests\models\repositories\StateRepository;
 
 /**
  * @group unit
@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\repositories\PayplugOrderStateRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class initializeTest extends BasePayplugOrderStateRepository
+class initializeTest extends BaseStateRepository
 {
     /**
      * @dataProvider invalidStringFormatDataProvider

@@ -31,7 +31,7 @@ class BaseOrderStateAction extends TestCase
         $this->tools_adapter = \Mockery::mock('ToolsAdapter');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
 
-        $this->payplug_orderstate_repository = \Mockery::mock('PayplugOrderStateRepository');
+        $this->payplug_orderstate_repository = \Mockery::mock('StateRepository');
 
         $logger = \Mockery::mock('Logger');
         $logger
@@ -40,7 +40,7 @@ class BaseOrderStateAction extends TestCase
             ]);
         $this->plugin
             ->shouldReceive([
-                'getPayplugOrderStateRepository' => $this->payplug_orderstate_repository,
+                'getStateRepository' => $this->payplug_orderstate_repository,
                 'getOrderStateAdapter' => $this->order_state_adapter,
                 'getLogger' => $logger,
                 'getTools' => $this->tools_adapter,
