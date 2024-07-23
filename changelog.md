@@ -1,6 +1,9 @@
 # Payplug module changelog
 
-## Version 4.9.34
+## Version 4.10.0
+- Improvment :
+  - [PRE-2551](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2496): Add order reference to payment resource
+
 - Bugfix :
   - [SMP-2736](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2488): Fix remove order state when installing Payplug module
   - [PRE-2547](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2495): Remove conflictual required in ajax & improve Product method usage
