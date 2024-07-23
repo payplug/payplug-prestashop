@@ -93,8 +93,8 @@ class saveTypeActionTest extends BaseOrderStateAction
             ]);
         $this->payplug_orderstate_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => false,
-                'setOrderState' => false,
+                'getBy' => [],
+                'createEntity' => false,
             ]);
 
         $this->assertFalse($this->action->saveTypeAction($id_order_state, $type));
@@ -117,8 +117,8 @@ class saveTypeActionTest extends BaseOrderStateAction
             ]);
         $this->payplug_orderstate_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => false,
-                'setOrderState' => true,
+                'getBy' => [],
+                'createEntity' => true,
             ]);
 
         $this->assertTrue($this->action->saveTypeAction($id_order_state, $type));
@@ -141,8 +141,11 @@ class saveTypeActionTest extends BaseOrderStateAction
             ]);
         $this->payplug_orderstate_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => 42,
-                'updateByOderState' => false,
+                'getBy' => [
+                    'id_payplug_order_state' => 42,
+                    'type' => 'paid',
+                ],
+                'updateEntity' => false,
             ]);
 
         $this->assertFalse($this->action->saveTypeAction($id_order_state, $type));
@@ -165,8 +168,11 @@ class saveTypeActionTest extends BaseOrderStateAction
             ]);
         $this->payplug_orderstate_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => 42,
-                'updateByOderState' => true,
+                'getBy' => [
+                    'id_payplug_order_state' => 42,
+                    'type' => 'paid',
+                ],
+                'updateEntity' => true,
             ]);
 
         $this->assertTrue($this->action->saveTypeAction($id_order_state, $type));
