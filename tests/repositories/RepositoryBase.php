@@ -44,6 +44,7 @@ class RepositoryBase extends TestCase
     protected $language;
     protected $media;
     protected $product;
+    protected $order_state_adapter;
     protected $shop;
     protected $tools;
     protected $translate;

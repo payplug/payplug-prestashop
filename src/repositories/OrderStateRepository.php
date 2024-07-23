@@ -231,9 +231,38 @@ class OrderStateRepository extends BaseClass
             ->getPlugin()
             ->getOrderStateRepository()
             ->getIdsUsedByPayPlug();
+
+        if (empty($payplug_os_id_list)) {
+            return $deleted;
+        }
+
         foreach ($payplug_os_id_list as $payplug_os_id) {
-            if (!in_array($payplug_os_id, $used_os_id_list) && !in_array($payplug_os_id, $used_order_os_id_list)) {
-                $os = new OrderStateAdapter($payplug_os_id);
+            $first_os = false;
+            $second_os = false;
+
+            if (!empty($used_os_id_list)) {
+                foreach ($used_os_id_list as $used_os_id) {
+                    if ($used_os_id['value'] == $payplug_os_id['id_order_state']) {
+                        $first_os = true;
+                    }
+
+                    break;
+                }
+            }
+
+            if (!empty($used_order_os_id_list)) {
+                foreach ($used_order_os_id_list as $used_order_os_id) {
+                    if ($used_order_os_id == $payplug_os_id['id_order_state']) {
+                        $second_os = true;
+                    }
+
+                    break;
+                }
+            }
+
+            if (false === $first_os && false === $second_os) {
+                //$os = new OrderStateAdapter($payplug_os_id['id_order_state']);
+                $os = $this->order_state_adapter->get($payplug_os_id['id_order_state']);
                 $deleted = $deleted && $os->softDelete();
             }
         }
