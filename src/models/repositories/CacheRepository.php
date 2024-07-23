@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class CacheRepository extends QueryRepository
+class CacheRepository extends EntityRepository
 {
     private $fields = [
         'cache_key' => 'string',

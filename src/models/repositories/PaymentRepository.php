@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class PaymentRepository extends QueryRepository
+class PaymentRepository extends EntityRepository
 {
     private $fields = [
         'resource_id' => 'string',

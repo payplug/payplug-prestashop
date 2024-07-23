@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class OrderPaymentRepository extends QueryRepository
+class OrderPaymentRepository extends EntityRepository
 {
     private $fields = [
         'id_order' => 'integer',
