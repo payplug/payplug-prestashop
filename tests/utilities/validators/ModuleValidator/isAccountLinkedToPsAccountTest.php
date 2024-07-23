@@ -38,7 +38,7 @@ class isAccountLinkedToPsAccountTest extends TestCase
     {
         $this->assertSame([
             'result' => false,
-            'message' => 'Invalid parameters given, $module must be an non empty object',
+            'message' => 'Invalid parameters given, $module must be an non null object',
         ], $this->validator->isAccountLinkedToPsAccount($module));
     }
 

@@ -332,7 +332,7 @@ class ConfigurationAction
         $logger = $this->dependencies->getPlugin()->getLogger();
 
         if (!is_object($datas) || !$datas) {
-            $logger->addLog('ConfigurationAction::loginAction: Invalid parameter given, $datas must be a non empty object.');
+            $logger->addLog('ConfigurationAction::loginAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
                 'success' => false,
@@ -522,7 +522,7 @@ class ConfigurationAction
         $logger = $this->dependencies->getPlugin()->getLogger();
 
         if (!is_object($datas) || !$datas) {
-            $logger->addLog('ConfigurationAction::saveAction: Invalid parameter given, $datas must be a non empty object.');
+            $logger->addLog('ConfigurationAction::saveAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
                 'success' => false,
@@ -796,7 +796,7 @@ class ConfigurationAction
             ->getLoggedTranslations();
         $logger = $this->dependencies->getPlugin()->getLogger();
         if (!is_object($datas) || !$datas) {
-            $logger->addLog('ConfigurationAction::submitSandboxAction: Invalid parameter given, $datas must be a non empty object.');
+            $logger->addLog('ConfigurationAction::submitSandboxAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
                 'success' => false,
