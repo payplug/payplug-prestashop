@@ -3,6 +3,7 @@
 ## Version 4.9.34
 - Bugfix :
   - [SMP-2736](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2488): Fix remove order state when installing Payplug module
+  - [PRE-2547](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2495): Remove conflictual required in ajax & improve Product method usage
 
 ## Version 4.9.33
 - Bugfix :

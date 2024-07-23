@@ -65,8 +65,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             exit;
         }
 
-        require_once _PS_ROOT_DIR_ . '/config/config.inc.php';
-
         $this->dependencies = new PayPlug\classes\DependenciesClass();
         $this->validators = $this->dependencies->getValidators();
         $this->apiClass = $this->dependencies->apiClass;
