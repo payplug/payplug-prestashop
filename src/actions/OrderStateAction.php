@@ -88,21 +88,31 @@ class OrderStateAction
             return $this->deleteTypeAction((int) $id_order_state);
         }
 
-        $payplug_order_state = $this->dependencies
+        $order_state = $this->dependencies
             ->getPlugin()
-            ->getPayplugOrderStateRepository()
-            ->getTypeByIdOrderState((int) $id_order_state);
+            ->getStateRepository()
+            ->getBy('id_order_state', (int) $id_order_state);
 
-        if (empty($payplug_order_state)) {
+        $current_date = date('Y-m-d H:i:s');
+        if (empty($order_state)) {
+            $fields = [
+                'id_order_state' => $id_order_state,
+                'type' => $type,
+                'date_add' => $current_date,
+                'date_upd' => $current_date,
+            ];
             $result = (bool) $this->dependencies
                 ->getPlugin()
-                ->getPayplugOrderStateRepository()
-                ->setOrderState($id_order_state, $type);
+                ->getStateRepository()
+                ->createEntity($fields);
         } else {
             $result = (bool) $this->dependencies
                 ->getPlugin()
-                ->getPayplugOrderStateRepository()
-                ->updateByOderState((int) $id_order_state, $type);
+                ->getStateRepository()
+                ->updateEntity($order_state['id_payplug_order_state'], [
+                    'type' => $type,
+                    'date_upd' => $current_date,
+                ]);
         }
 
         return $result;
@@ -129,8 +139,8 @@ class OrderStateAction
 
         return (bool) $this->dependencies
             ->getPlugin()
-            ->getPayplugOrderStateRepository()
-            ->removeByIdOrderState((int) $id_order_state);
+            ->getStateRepository()
+            ->deleteBy('id_order_state', (int) $id_order_state);
     }
 
     /**
@@ -150,10 +160,11 @@ class OrderStateAction
 
         $tools = $this->dependencies->getPlugin()->getTools();
         $id_order_state = $tools->tool('getValue', 'id_order_state');
-        $current_order_state_type = $this->dependencies
+
+        $order_state = $this->dependencies
             ->getPlugin()
-            ->getPayplugOrderStateRepository()
-            ->getTypeByIdOrderState((int) $id_order_state);
+            ->getStateRepository()
+            ->getBy('id_order_state', (int) $id_order_state);
 
         $context = $this->dependencies->getPlugin()->getContext()->get();
         $payplug_order_state_url = $this->dependencies
@@ -163,7 +174,7 @@ class OrderStateAction
 
         $context->getContext()->smarty->assign([
             'payplug_order_state_url' => $payplug_order_state_url,
-            'current_order_state_type' => $current_order_state_type,
+            'current_order_state_type' => $order_state['type'],
             'order_state_types' => $types,
         ]);
 

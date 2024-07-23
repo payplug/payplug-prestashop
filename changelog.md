@@ -4,6 +4,7 @@
 - Refactoring :
   - [PRE-2511](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2491): Set EntityRepository
   - [PRE-2515](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2492): Set Logger entity
+  - [PRE-2517](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2494): Set State Entity
   - [PRE-2512](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2493): Set CacheEntity
 
 ## Version 4.9.33
