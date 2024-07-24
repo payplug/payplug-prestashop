@@ -2,6 +2,7 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\PaymentMethod;
 
+use PayPlug\tests\mock\OrderMock;
 use PayPlug\tests\mock\PaymentMock;
 use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
@@ -9,11 +10,26 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
 class postProcessOrderTest extends BasePaymentMethod
 {
+    private $order_adapter;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->order_adapter = \Mockery::mock('OrderAdapter');
+        $this->order_adapter->shouldReceive([
+            'get' => OrderMock::get(),
+        ]);
+        $this->plugin->shouldReceive([
+            'getOrder' => $this->order_adapter,
+        ]);
+    }
+
     /**
      * @dataProvider invalidObjectFormatDataProvider
      *
@@ -36,10 +52,25 @@ class postProcessOrderTest extends BasePaymentMethod
         $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
     }
 
+    public function testWhenRelativeOrderCantBeRetrieved()
+    {
+        $id_order = 42;
+        $resource = PaymentMock::getStandard();
+        $this->validate_adapter
+            ->shouldReceive([
+                'validate' => false,
+            ]);
+        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
+    }
+
     public function testWhenResourceCannotBePatched()
     {
         $id_order = 42;
         $resource = PaymentMock::getStandard();
+        $this->validate_adapter
+            ->shouldReceive([
+                'validate' => true,
+            ]);
 
         $patch_payment = \Mockery::mock('PatchPayment');
         $patch_payment
@@ -61,6 +92,10 @@ class postProcessOrderTest extends BasePaymentMethod
     {
         $id_order = 42;
         $resource = PaymentMock::getStandard();
+        $this->validate_adapter
+            ->shouldReceive([
+                'validate' => true,
+            ]);
 
         $patch_payment = \Mockery::mock('PatchPayment');
         $patch_payment
@@ -89,6 +124,10 @@ class postProcessOrderTest extends BasePaymentMethod
     {
         $id_order = 42;
         $resource = PaymentMock::getStandard();
+        $this->validate_adapter
+            ->shouldReceive([
+                'validate' => true,
+            ]);
 
         $patch_payment = \Mockery::mock('PatchPayment');
         $patch_payment

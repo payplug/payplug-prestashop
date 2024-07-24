@@ -848,9 +848,20 @@ class PaymentMethod
             return false;
         }
 
+        $order = $this->dependencies
+            ->getPlugin()
+            ->getOrder()
+            ->get((int) $id_order);
+        if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
+            $this->logger->addLog('PaymentMethod::postProcessOrder() - Retrieve Order object is not valid');
+
+            return false;
+        }
+
         $data = [];
         $data['metadata'] = $resource->metadata;
-        $data['metadata']['Order'] = (int) $id_order;
+        $data['metadata']['Order'] = (int) $order->id;
+        $data['metadata']['OrderRef'] = $order->reference;
 
         $patchPayment = $this->dependencies
             ->getPlugin()
