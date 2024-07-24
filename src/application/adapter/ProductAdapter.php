@@ -57,10 +57,10 @@ class ProductAdapter implements ProductInterface
     {
         if (version_compare(_PS_VERSION_, '1.7.3.1', '<')) {
             // @deprecated since 1.7.3.1 Use getIdProductAttributeByIdAttributes() instead
-            return \Product::getIdProductAttributesByIdAttributes($idProduct, $group);
+            return \Product::getIdProductAttributesByIdAttributes($idProduct, $group, true);
         }
 
-        return \Product::getIdProductAttributeByIdAttributes($idProduct, $group);
+        return \Product::getIdProductAttributeByIdAttributes($idProduct, $group, true);
     }
 
     public function getPriceStatic(
