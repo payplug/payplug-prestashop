@@ -978,6 +978,14 @@ class ApplepayPaymentMethod extends PaymentMethod
             }
 
             $cart->id_customer = (int) $customer->id;
+
+            // Set customer in context...
+            $this->context->customer = $customer;
+
+            // then update the cookie with the new customer ID
+            $this->context->cookie->id_customer = (int) $customer->id;
+            $this->context->cookie->write();
+
             // Create shipping address
             $shipping_address_id = $this->dependencies
                 ->getPlugin()
