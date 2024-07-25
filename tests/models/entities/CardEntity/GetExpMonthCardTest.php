@@ -1,35 +1,34 @@
 <?php
 
-use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CardEntity;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class GetExpMonthCardTest extends TestCase
+final class GetExpMonthCardTest extends BaseCardEntity
 {
     protected $card;
 
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setExpMonth('1');
+        parent::setUp();
+        $this->entity->setExpMonth('1');
     }
 
     public function testReturnExpMonth()
     {
         $this->assertSame(
             '1',
-            $this->card->getExpMonth()
+            $this->entity->getExpMonth()
         );
     }
 
     public function testExpMonthIsAnInt()
     {
         $this->assertTrue(
-            is_string($this->card->getExpMonth())
+            is_string($this->entity->getExpMonth())
         );
     }
 }

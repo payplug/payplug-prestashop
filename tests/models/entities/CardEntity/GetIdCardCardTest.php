@@ -1,35 +1,32 @@
 <?php
 
-use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CardEntity;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class GetIdCardCardTest extends TestCase
+final class GetIdCardCardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+        parent::setUp();
+        $this->entity->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     }
 
     public function testReturnIdCard()
     {
         $this->assertSame(
             'card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-            $this->card->getIdCard()
+            $this->entity->getIdCard()
         );
     }
 
     public function testIdCardIsAString()
     {
         $this->assertTrue(
-            is_string($this->card->getIdCard())
+            is_string($this->entity->getIdCard())
         );
     }
 
@@ -37,7 +34,7 @@ final class GetIdCardCardTest extends TestCase
     {
         $this->assertRegExp(
             '/card_[a-z0-9]{32}/',
-            $this->card->getIdCard()
+            $this->entity->getIdCard()
         );
     }
 }

@@ -1,35 +1,32 @@
 <?php
 
-use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CardEntity;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class GetLast4CardTest extends TestCase
+final class GetLast4CardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setLast4('4242');
+        parent::setUp();
+        $this->entity->setLast4('4242');
     }
 
     public function testReturnLast4()
     {
         $this->assertSame(
             '4242',
-            $this->card->getLast4()
+            $this->entity->getLast4()
         );
     }
 
     public function testLast4IsAnInt()
     {
         $this->assertTrue(
-            is_string($this->card->getLast4())
+            is_string($this->entity->getLast4())
         );
     }
 }

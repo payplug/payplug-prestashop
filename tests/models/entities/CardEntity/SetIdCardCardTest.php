@@ -1,30 +1,29 @@
 <?php
 
+namespace PayPlug\tests\models\entities\CardEntity;
+
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class SetIdCardCardTest extends TestCase
+final class SetIdCardCardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+        parent::setUp();
+        $this->entity->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     }
 
     public function testUpdateIdCard()
     {
-        $this->card->setIdCard('card_azertyuiop1234567890qsdfghjklm12');
+        $this->entity->setIdCard('card_azertyuiop1234567890qsdfghjklm12');
         $this->assertSame(
             'card_azertyuiop1234567890qsdfghjklm12',
-            $this->card->getIdCard()
+            $this->entity->getIdCard()
         );
     }
 
@@ -32,7 +31,7 @@ final class SetIdCardCardTest extends TestCase
     {
         $this->assertInstanceOf(
             CardEntity::class,
-            $this->card->setIdCard('card_azertyuiop1234567890qsdfghjklm12')
+            $this->entity->setIdCard('card_azertyuiop1234567890qsdfghjklm12')
         );
     }
 
@@ -45,7 +44,7 @@ final class SetIdCardCardTest extends TestCase
     public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setIdCard(42);
+        $this->entity->setIdCard(42);
     }
 
     /**
@@ -57,6 +56,6 @@ final class SetIdCardCardTest extends TestCase
     public function testThrowExceptionWhenNotWellFormatted()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setIdCard('Kart_AZERT&é"');
+        $this->entity->setIdCard('Kart_AZERT&é"');
     }
 }

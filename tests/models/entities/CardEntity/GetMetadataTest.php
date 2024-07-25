@@ -1,28 +1,26 @@
 <?php
 
-use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CardEntity;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class GetMetadataTest extends TestCase
+final class GetMetadataTest extends BaseCardEntity
 {
-    protected $card;
     protected $metadata;
 
     protected function setUp()
     {
-        $this->card = new CardEntity();
+        parent::setUp();
         $metadata = [
             'key1' => 'value1',
             'key2' => 'value2',
             'key3' => 3,
         ];
         $this->metadata = json_encode($metadata);
-        $this->card->setMetadata(
+        $this->entity->setMetadata(
             $this->metadata
         );
     }
@@ -31,20 +29,20 @@ final class GetMetadataTest extends TestCase
     {
         $this->assertSame(
             $this->metadata,
-            $this->card->getMetadata()
+            $this->entity->getMetadata()
         );
     }
 
     public function testMetadataIsAnInt()
     {
         $this->assertTrue(
-            is_string($this->card->getMetadata())
+            is_string($this->entity->getMetadata())
         );
     }
 
     public function testMetadataIsAnJsonEncode()
     {
-        $metadata = json_decode($this->card->getMetadata(), true);
+        $metadata = json_decode($this->entity->getMetadata(), true);
         $this->assertTrue(
             is_array($metadata)
         );

@@ -62,6 +62,7 @@ class existsTest extends BaseCardRepository
         $company_id = 42;
         $is_sandbox = true;
         $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
             'select' => $this->repository,
             'fields' => $this->repository,
             'from' => $this->repository,
@@ -95,6 +96,7 @@ class existsTest extends BaseCardRepository
         ];
 
         $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
             'select' => $this->repository,
             'fields' => $this->repository,
             'from' => $this->repository,

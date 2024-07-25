@@ -1,30 +1,29 @@
 <?php
 
+namespace PayPlug\tests\models\entities\CardEntity;
+
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class SetMetadataCardTest extends TestCase
+final class SetCountryCardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setMetadata('metadata');
+        parent::setUp();
+        $this->entity->setCountry('country_name');
     }
 
-    public function testUpdateMetadata()
+    public function testUpdateCountry()
     {
-        $this->card->setMetadata('new_metadata');
+        $this->entity->setCountry('new_country_name');
         $this->assertSame(
-            'new_metadata',
-            $this->card->getMetadata()
+            'new_country_name',
+            $this->entity->getCountry()
         );
     }
 
@@ -32,7 +31,7 @@ final class SetMetadataCardTest extends TestCase
     {
         $this->assertInstanceOf(
             CardEntity::class,
-            $this->card->setMetadata('metadata')
+            $this->entity->setCountry('country_name')
         );
     }
 
@@ -45,6 +44,6 @@ final class SetMetadataCardTest extends TestCase
     public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setMetadata(42);
+        $this->entity->setCountry(42);
     }
 }

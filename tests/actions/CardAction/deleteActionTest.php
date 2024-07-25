@@ -39,7 +39,7 @@ class deleteActionTest extends BaseCardAction
         $customer_id = 4242;
         $this->card_repository
             ->shouldReceive([
-                'get' => [],
+                'getEntity' => [],
             ]);
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
@@ -50,7 +50,7 @@ class deleteActionTest extends BaseCardAction
         $customer_id = 4242;
         $this->card_repository
             ->shouldReceive([
-                'get' => [
+                'getEntity' => [
                     'id_customer' => 42,
                 ],
             ]);
@@ -63,7 +63,7 @@ class deleteActionTest extends BaseCardAction
         $customer_id = 4242;
         $this->card_repository
             ->shouldReceive([
-                'get' => [
+                'getEntity' => [
                     'id_customer' => $customer_id,
                     'id_card' => 'card_azerty',
                     'exp_month' => date('m'),
@@ -97,13 +97,13 @@ class deleteActionTest extends BaseCardAction
         $customer_id = 4242;
         $this->card_repository
             ->shouldReceive([
-                'get' => [
+                'getEntity' => [
                     'id_customer' => $customer_id,
                     'id_card' => 'card_azerty',
                     'exp_month' => date('m'),
                     'exp_year' => date('Y'),
                 ],
-                'remove' => false,
+                'deleteEntity' => false,
             ]);
         $this->card_validator
             ->shouldReceive([
@@ -131,13 +131,13 @@ class deleteActionTest extends BaseCardAction
         $customer_id = 4242;
         $this->card_repository
             ->shouldReceive([
-                'get' => [
+                'getEntity' => [
                     'id_customer' => $customer_id,
                     'id_card' => 'card_azerty',
                     'exp_month' => date('m'),
                     'exp_year' => date('Y'),
                 ],
-                'remove' => false,
+                'deleteEntity' => false,
             ]);
         $this->card_validator
             ->shouldReceive([
@@ -165,12 +165,12 @@ class deleteActionTest extends BaseCardAction
         $customer_id = 4242;
         $this->card_repository
             ->shouldReceive([
-                'get' => [
+                'getEntity' => [
                     'id_customer' => $customer_id,
                     'exp_month' => date('m'),
                     'exp_year' => date('Y'),
                 ],
-                'remove' => false,
+                'deleteEntity' => false,
             ]);
         $this->card_validator
             ->shouldReceive([
@@ -187,12 +187,12 @@ class deleteActionTest extends BaseCardAction
         $customer_id = 4242;
         $this->card_repository
             ->shouldReceive([
-                'get' => [
+                'getEntity' => [
                     'id_customer' => $customer_id,
                     'exp_month' => date('m'),
                     'exp_year' => date('Y'),
                 ],
-                'remove' => false,
+                'deleteEntity' => false,
             ]);
         $this->card_validator
             ->shouldReceive([

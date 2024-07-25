@@ -1,30 +1,29 @@
 <?php
 
+namespace PayPlug\tests\models\entities\CardEntity;
+
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class SetTableCardTest extends TestCase
+final class SetBrandCardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setTable('test_table');
+        parent::setUp();
+        $this->entity->setBrand('brand_name');
     }
 
-    public function testUpdatePaymentTable()
+    public function testUpdateBrand()
     {
-        $this->card->setTable('another_table');
+        $this->entity->setBrand('new_brand_name');
         $this->assertSame(
-            'another_table',
-            $this->card->getTable()
+            'new_brand_name',
+            $this->entity->getBrand()
         );
     }
 
@@ -32,7 +31,7 @@ final class SetTableCardTest extends TestCase
     {
         $this->assertInstanceOf(
             CardEntity::class,
-            $this->card->setTable('another_table')
+            $this->entity->setBrand('brand_name')
         );
     }
 
@@ -45,6 +44,6 @@ final class SetTableCardTest extends TestCase
     public function testThrowExceptionWhenNotAString()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setTable(42);
+        $this->entity->setBrand(42);
     }
 }
