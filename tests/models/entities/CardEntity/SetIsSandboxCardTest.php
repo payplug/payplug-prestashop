@@ -1,30 +1,29 @@
 <?php
 
+namespace PayPlug\tests\models\entities\CardEntity;
+
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class SetIsSandboxTest extends TestCase
+final class SetIsSandboxTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setIsSandbox(true);
+        parent::setUp();
+        $this->entity->setIsSandbox(true);
     }
 
     public function testUpdateIsSandbox()
     {
-        $this->card->setIsSandbox(false);
+        $this->entity->setIsSandbox(false);
         $this->assertSame(
             false,
-            $this->card->getIsSandbox()
+            $this->entity->getIsSandbox()
         );
     }
 
@@ -32,7 +31,7 @@ final class SetIsSandboxTest extends TestCase
     {
         $this->assertInstanceOf(
             CardEntity::class,
-            $this->card->setIsSandbox(false)
+            $this->entity->setIsSandbox(false)
         );
     }
 
@@ -45,6 +44,6 @@ final class SetIsSandboxTest extends TestCase
     public function testThrowExceptionWhenNotABool()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setIsSandbox('test');
+        $this->entity->setIsSandbox('test');
     }
 }

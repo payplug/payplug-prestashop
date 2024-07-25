@@ -1,35 +1,32 @@
 <?php
 
-use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CardEntity;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class IsSandboxCardTest extends TestCase
+final class IsSandboxCardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setIsSandbox(true);
+        parent::setUp();
+        $this->entity->setIsSandbox(true);
     }
 
     public function testReturnIsSandbox()
     {
         $this->assertSame(
             true,
-            $this->card->getIsSandbox()
+            $this->entity->getIsSandbox()
         );
     }
 
     public function testSandboxIsABool()
     {
         $this->assertTrue(
-            is_bool($this->card->getIsSandbox())
+            is_bool($this->entity->getIsSandbox())
         );
     }
 }

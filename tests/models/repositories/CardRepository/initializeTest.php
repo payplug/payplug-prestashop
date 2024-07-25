@@ -27,6 +27,7 @@ class initializeTest extends BaseCardRepository
         $this
             ->repository
             ->shouldReceive([
+                'getEntityObject' => $this->entity,
                 'create' => $this->repository,
                 'table' => $this->repository,
                 'fields' => $this->repository,
@@ -42,6 +43,7 @@ class initializeTest extends BaseCardRepository
         $this
             ->repository
             ->shouldReceive([
+                'getEntityObject' => $this->entity,
                 'create' => $this->repository,
                 'table' => $this->repository,
                 'fields' => $this->repository,

@@ -1,35 +1,32 @@
 <?php
 
-use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CardEntity;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class GetCountryCardTest extends TestCase
+final class GetCountryCardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setCountry('ISO');
+        parent::setUp();
+        $this->entity->setCountry('ISO');
     }
 
     public function testReturnCountry()
     {
         $this->assertSame(
             'ISO',
-            $this->card->getCountry()
+            $this->entity->getCountry()
         );
     }
 
     public function testCountryIsAnInt()
     {
         $this->assertTrue(
-            is_string($this->card->getCountry())
+            is_string($this->entity->getCountry())
         );
     }
 }

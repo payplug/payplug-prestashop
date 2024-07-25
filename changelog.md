@@ -4,7 +4,8 @@
 - Refactoring :
   - [PRE-2511](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2491): Set EntityRepository
   - [PRE-2515](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2492): Set Logger entity
-  - [PRE-2512](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2493): Set CacheEntity
+  - [PRE-2512](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2493): Set Cache Entity
+  - [PRE-2513](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2504#33023b65d30d515d31d5fa14963aac57cfa5f529): Set Card Entity
 
 ## Version 4.9.33
 - Bugfix :

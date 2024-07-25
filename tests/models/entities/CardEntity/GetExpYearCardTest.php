@@ -1,35 +1,32 @@
 <?php
 
-use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CardEntity;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class GetExpYearCardTest extends TestCase
+final class GetExpYearCardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setExpYear('2021');
+        parent::setUp();
+        $this->entity->setExpYear('2021');
     }
 
     public function testReturnExpYear()
     {
         $this->assertSame(
             '2021',
-            $this->card->getExpYear()
+            $this->entity->getExpYear()
         );
     }
 
     public function testExpYearIsAnInt()
     {
         $this->assertTrue(
-            is_string($this->card->getExpYear())
+            is_string($this->entity->getExpYear())
         );
     }
 }

@@ -1,35 +1,34 @@
 <?php
 
-use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CardEntity;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class GetBrandCardTest extends TestCase
+final class GetBrandCardTest extends BaseCardEntity
 {
     protected $card;
 
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setBrand('brand');
+        parent::setUp();
+        $this->entity->setBrand('brand');
     }
 
     public function testReturnBrand()
     {
         $this->assertSame(
             'brand',
-            $this->card->getBrand()
+            $this->entity->getBrand()
         );
     }
 
     public function testBrandIsAnInt()
     {
         $this->assertTrue(
-            is_string($this->card->getBrand())
+            is_string($this->entity->getBrand())
         );
     }
 }

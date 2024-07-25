@@ -64,10 +64,15 @@ class CardAction
             return false;
         }
 
+//        $card = $this->dependencies
+//            ->getPlugin()
+//            ->getCardRepository()
+//            ->get((int) $card_id);
         $card = $this->dependencies
             ->getPlugin()
             ->getCardRepository()
-            ->get((int) $card_id);
+            ->getEntity((int) $card_id);
+
         if (empty($card)) {
             $this->dependencies
                 ->getPlugin()
@@ -105,7 +110,7 @@ class CardAction
         return (bool) $this->dependencies
             ->getPlugin()
             ->getCardRepository()
-            ->remove((int) $card_id);
+            ->deleteEntity((int) $card_id);
     }
 
     /**
@@ -195,7 +200,6 @@ class CardAction
             ->getPlugin()
             ->getCardRepository()
             ->getAllByCustomer((int) $customer->id, (int) $id_company, (bool) $is_sandbox);
-
         if (empty($cards)) {
             return [];
         }
@@ -306,7 +310,7 @@ class CardAction
         return (bool) $this->dependencies
             ->getPlugin()
             ->getCardRepository()
-            ->createCard($parameters);
+            ->createEntity($parameters);
     }
 
     /**

@@ -85,7 +85,7 @@ class OneClickPaymentMethod extends PaymentMethod
         $card = $this->dependencies
             ->getPlugin()
             ->getCardRepository()
-            ->get((int) $id_cart);
+            ->getEntity((int) $id_cart);
 
         if (empty($card)) {
             return [];

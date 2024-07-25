@@ -29,74 +29,11 @@ if (!defined('_PS_VERSION_')) {
 
 class CardRepository extends EntityRepository
 {
-    private $fields = [
-        'id_customer' => 'integer',
-        'id_company' => 'integer',
-        'is_sandbox' => 'bool',
-        'id_card' => 'string',
-        'last4' => 'string',
-        'exp_month' => 'string',
-        'exp_year' => 'string',
-        'brand' => 'string',
-        'country' => 'string',
-        'metadata' => 'string',
-    ];
-
     public function __construct($prefix = '', $dependencies = null)
     {
         parent::__construct($prefix, $dependencies);
         $this->table_name = $this->prefix . $this->dependencies->name . '_card';
-    }
-
-    /**
-     * @description Register a card from the api
-     *
-     * @param null $card
-     * @param int $customer_id
-     * @param int $company_id
-     * @param false $is_sandbox
-     * @param mixed $parameters
-     *
-     * @return bool
-     */
-    public function createCard($parameters = [])
-    {
-        if (!is_array($parameters) || empty($parameters)) {
-            return false;
-        }
-
-        $this
-            ->insert()
-            ->into($this->table_name);
-
-        foreach ($parameters as $key => $value) {
-            if (array_key_exists($key, $this->fields)) {
-                switch ($this->fields[$key]) {
-                    case 'string':
-                        if (is_string($value) && $value) {
-                            $this->fields($key)->values($this->escape($value));
-                        }
-
-                        break;
-                    case 'integer':
-                        if (is_int($value)) {
-                            $this->fields($key)->values((int) $value);
-                        }
-
-                        break;
-                    case 'bool':
-                        if (is_bool($value)) {
-                            $this->fields($key)->values($value ? 1 : 0);
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        return (bool) $this->build();
+        $this->entity_name = 'CardEntity';
     }
 
     /**
@@ -121,56 +58,22 @@ class CardRepository extends EntityRepository
         if (!is_bool($is_sandbox)) {
             return false;
         }
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
 
         $result = $this
             ->select()
             ->fields('id_card')
-            ->from($this->table_name)
+            ->from($this->getTableName($definition['table']))
             ->where('id_card = "' . $this->escape($payment_id) . '"')
             ->where('id_company = ' . (int) $company_id)
             ->where('is_sandbox = ' . ((bool) $is_sandbox ? 1 : 0))
             ->build('unique_value');
 
         return (bool) $result;
-    }
-
-    /**
-     * @description Get a card from a given id
-     *
-     * @param int $id_payplug_card
-     *
-     * @return array
-     */
-    public function get($id_payplug_card = 0)
-    {
-        if (!is_int($id_payplug_card) || !$id_payplug_card) {
-            return [];
-        }
-
-        $result = $this
-            ->select()
-            ->fields('*')
-            ->from($this->table_name)
-            ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
-            ->build('unique_row');
-
-        return $result ?: [];
-    }
-
-    /**
-     * @description Get all registered cards
-     *
-     * @return array
-     */
-    public function getAll()
-    {
-        $result = $this
-            ->select()
-            ->fields('*')
-            ->from($this->table_name)
-            ->build();
-
-        return $result ?: [];
     }
 
     /**
@@ -193,13 +96,21 @@ class CardRepository extends EntityRepository
         if (!is_bool($is_sandbox)) {
             return [];
         }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return [];
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return [];
+        }
+        $definition = $entity->getDefinition();
 
         $this
             ->select()
             ->fields('*')
-            ->from($this->table_name)
+            ->from($this->getTableName($definition['table']))
             ->where('`id_customer` = ' . (int) $id_customer);
-
         if (null !== $id_company) {
             $this->where('`id_company` = ' . (int) $id_company);
         }
@@ -225,10 +136,19 @@ class CardRepository extends EntityRepository
         if (!is_string($engine) || !$engine) {
             return false;
         }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
 
         $this
             ->create()
-            ->table($this->table_name)
+            ->table($this->getTableName($definition['table']))
             ->fields('`id_payplug_card` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_customer` int(11) UNSIGNED NOT NULL')
             ->fields('`id_company` int(11) UNSIGNED NOT NULL')
@@ -245,27 +165,7 @@ class CardRepository extends EntityRepository
         return $this->build();
     }
 
-    /**
-     * @description Delete a card from a given id
-     *
-     * @param int $id_payplug_card
-     *
-     * @return bool
-     */
-    public function remove($id_payplug_card = 0)
-    {
-        if (!is_int($id_payplug_card) || !$id_payplug_card) {
-            return false;
-        }
-
-        $result = $this
-            ->delete()
-            ->from($this->table_name)
-            ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
-            ->build();
-
-        return (bool) $result;
-    }
+    //TODO: to be deleted
 
     /**
      * @description Insert a new card in the database
@@ -294,6 +194,15 @@ class CardRepository extends EntityRepository
         if (!is_bool($is_sandbox)) {
             return false;
         }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
 
         $fields = [
             'id',
@@ -312,7 +221,7 @@ class CardRepository extends EntityRepository
 
         $result = $this
             ->insert()
-            ->into($this->table_name)
+            ->into($this->getTableName($definition['table']))
             ->fields('id_customer')->values((int) $customer_id)
             ->fields('id_company')->values((int) $company_id)
             ->fields('is_sandbox')->values((bool) $is_sandbox ? 1 : 0)
