@@ -196,7 +196,7 @@ class LoggerRepository extends BaseClass
             $logs = $this->dependencies
                 ->getPlugin()
                 ->LoggerRepository()
-                ->getAllLog();
+                ->getAll();
         } catch (Exception $exception) {
             return false;
         }
@@ -205,7 +205,7 @@ class LoggerRepository extends BaseClass
             return $this->dependencies
                 ->getPlugin()
                 ->LoggerRepository()
-                ->getAllLog();
+                ->getAll();
         }
 
         $limit_date = $this->loggerEntity->getLimitDate();
