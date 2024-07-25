@@ -11,22 +11,6 @@ namespace PayPlug\tests\models\repositories\EntityRepository;
  */
 class getEntityTest extends BaseEntityRepository
 {
-    private $entity;
-    private $entity_id;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->entity_id = 42;
-        $this->entity = \Mockery::mock('EntityObject');
-        $this->entity->shouldReceive([
-            'getDefinition' => [
-                'table' => 'table',
-                'primary' => 'primary',
-            ],
-        ]);
-    }
-
     /**
      * Test case for handling invalid integer format for $entity_id.
      *

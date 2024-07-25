@@ -11,32 +11,6 @@ namespace PayPlug\tests\models\repositories\EntityRepository;
  */
 class createEntityTest extends BaseEntityRepository
 {
-    private $entity;
-    private $entity_id;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->entity_id = 42;
-        $this->entity_fields = [
-            'key_1' => 'value_1',
-            'key_2' => 42,
-            'key_3' => true,
-        ];
-        $this->entity = \Mockery::mock('EntityObject');
-        $this->entity->shouldReceive([
-            'getDefinition' => [
-                'table' => 'table',
-                'primary' => 'primary',
-                'fields' => [
-                    'key_1' => ['type' => 'string', 'required' => true],
-                    'key_2' => ['type' => 'integer'],
-                    'key_3' => ['type' => 'boolean'],
-                ],
-            ],
-        ]);
-    }
-
     /**
      * @dataProvider invalidArrayFormatDataProvider
      *

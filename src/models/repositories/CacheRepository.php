@@ -44,24 +44,6 @@ class CacheRepository extends EntityRepository
     }
 
     /**
-     * @description Get cache saved from a given key
-     *
-     * @param string $cache_key
-     *
-     * @return array
-     */
-    public function getByKey($cache_key = '')
-    {
-        if (!is_string($cache_key) || !$cache_key) {
-            return [];
-        }
-
-        $result = $this->getBy('cache_key', $cache_key);
-
-        return $result ?: [];
-    }
-
-    /**
      * @description Delete the cache for a given key
      *
      * @param string $cache_key

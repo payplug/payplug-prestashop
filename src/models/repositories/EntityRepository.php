@@ -35,102 +35,6 @@ class EntityRepository extends QueryRepository
     public $entity_name = '';
 
     /**
-     * @description Get an entity from database for given identifier.
-     *
-     * @param int $id
-     *
-     * @return array
-     */
-    protected function getEntity($id = 0)
-    {
-        if (!is_int($id) || !$id) {
-            return [];
-        }
-
-        if (!is_string($this->entity_name) || !$this->entity_name) {
-            return [];
-        }
-
-        $entity = $this->getEntityObject($this->entity_name);
-        if (!$entity) {
-            return [];
-        }
-
-        $definition = $entity->getDefinition();
-        if (!is_array($definition) || !isset($definition['table'])) {
-            return [];
-        }
-        $result = $this
-            ->select()
-            ->fields('*')
-            ->from($this->getTableName($definition['table']))
-            ->where('`' . $definition['primary'] . '`=' . (int) $id)
-            ->build('unique_value');
-
-        return $result ?: [];
-    }
-
-    /**
-     * @description Get an entity from database or collection for given key and value.
-     *
-     * @param string $key
-     * @param null $value
-     *
-     * @return array
-     */
-    protected function getBy($key = '', $value = null)
-    {
-        if (!is_string($key) || !$key) {
-            return [];
-        }
-        if (is_null($value)) {
-            return [];
-        }
-        if (!is_string($this->entity_name) || !$this->entity_name) {
-            return [];
-        }
-
-        $entity = $this->getEntityObject($this->entity_name);
-        if (!$entity) {
-            return [];
-        }
-
-        $definition = $entity->getDefinition();
-        if (!is_array($definition) || !isset($definition['table'])) {
-            return [];
-        }
-
-        $this
-            ->select()
-            ->fields('*')
-            ->from($this->getTableName($definition['table']));
-
-        // check $value type
-        switch (true) {
-            case is_string($value):
-                if ('' !== $value) {
-                    $this->where('`' . $key . '` = "' . $this->escape($value) . '"');
-                }
-
-                break;
-            case is_int($value):
-                $this->where('`' . $key . '` = ' . (int) $value);
-
-                break;
-            case is_bool($value):
-                $this->where('`' . $key . '` = ' . ($value ? 1 : 0));
-
-                break;
-            default:
-                return [];
-        }
-
-        $result = $this->build('unique_row');
-
-        return $result ?: [];
-    }
-
-    /**
      * @description Insert an entity in the database.
      *
      * @param array $fields
@@ -228,6 +132,366 @@ class EntityRepository extends QueryRepository
     }
 
     /**
+     * @description Delete all entities from database.
+     *
+     * @return bool
+     */
+    protected function deleteAll()
+    {
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+
+        $definition = $entity->getDefinition();
+
+        $result = $this
+            ->truncate()
+            ->table($this->getTableName($definition['table']));
+
+        return $result->build() ?: false;
+    }
+
+    /**
+     * @description Delete entities from database for given key and value.
+     *
+     * @param string $key
+     * @param null $value
+     *
+     * @return array
+     */
+    protected function deleteBy($key = '', $value = null)
+    {
+        if (!is_string($key) || !$key) {
+            return false;
+        }
+        if (is_null($value)) {
+            return false;
+        }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+
+        $definition = $entity->getDefinition();
+        if (!isset($definition['fields']) || !array_key_exists($key, $definition['fields'])) {
+            return false;
+        }
+
+        $this
+            ->delete()
+            ->from($this->getTableName($definition['table']));
+
+        // check $value type
+        if (!$this->formatWhereFromType($key, $value)) {
+            return false;
+        }
+
+        return (bool) $this->build();
+    }
+
+    /**
+     * @description Delete an entity in the database.
+     *
+     * @param int $id
+     *
+     * @return bool
+     */
+    protected function deleteEntity($id = 0)
+    {
+        if (!is_int($id) || !$id) {
+            return false;
+        }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+
+        $definition = $entity->getDefinition();
+
+        $result = $this
+            ->delete()
+            ->from($this->getTableName($definition['table']))
+            ->where('`' . $definition['primary'] . '` = ' . (int) $id)
+            ->build();
+
+        return $result ?: false;
+    }
+
+    /**
+     * @description Get an collection from database for given key and value.
+     *
+     * @return array
+     */
+    protected function getAll()
+    {
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return [];
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return [];
+        }
+
+        $definition = $entity->getDefinition();
+        if (!is_array($definition) || !isset($definition['table'])) {
+            return [];
+        }
+
+        $this
+            ->select()
+            ->fields('*')
+            ->from($this->getTableName($definition['table']));
+
+        return $this->build() ?: [];
+    }
+
+    /**
+     * @description Get an collection from database for given key and value.
+     *
+     * @param string $key
+     * @param null $value
+     *
+     * @return array
+     */
+    protected function getAllBy($key = '', $value = null)
+    {
+        if (!is_string($key) || !$key) {
+            return [];
+        }
+        if (is_null($value)) {
+            return [];
+        }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return [];
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return [];
+        }
+
+        $definition = $entity->getDefinition();
+        if (!isset($definition['fields']) || !array_key_exists($key, $definition['fields'])) {
+            return [];
+        }
+
+        $this
+            ->select()
+            ->fields('*')
+            ->from($this->getTableName($definition['table']));
+
+        // check $value type
+        if (!$this->formatWhereFromType($key, $value)) {
+            return [];
+        }
+
+        return $this->build() ?: [];
+    }
+
+    /**
+     * @description Get an entity from database for given key and value.
+     *
+     * @param string $key
+     * @param null $value
+     *
+     * @return array
+     */
+    protected function getBy($key = '', $value = null)
+    {
+        if (!is_string($key) || !$key) {
+            return [];
+        }
+        if (is_null($value)) {
+            return [];
+        }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return [];
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return [];
+        }
+
+        $definition = $entity->getDefinition();
+        if (!isset($definition['fields']) || !array_key_exists($key, $definition['fields'])) {
+            return [];
+        }
+
+        $this
+            ->select()
+            ->fields('*')
+            ->from($this->getTableName($definition['table']));
+
+        // check $value type
+        if (!$this->formatWhereFromType($key, $value)) {
+            return [];
+        }
+
+        $result = $this->build('unique_row');
+
+        return $result ?: [];
+    }
+
+    /**
+     * @description Get an entity from database for given identifier.
+     *
+     * @param int $id
+     *
+     * @return array
+     */
+    protected function getEntity($id = 0)
+    {
+        if (!is_int($id) || !$id) {
+            return [];
+        }
+
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return [];
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return [];
+        }
+
+        $definition = $entity->getDefinition();
+        if (!is_array($definition) || !isset($definition['table'])) {
+            return [];
+        }
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->getTableName($definition['table']))
+            ->where('`' . $definition['primary'] . '`=' . (int) $id)
+            ->build('unique_value');
+
+        return $result ?: [];
+    }
+
+    /**
+     * @description Get Entity Object for a given class name.
+     *
+     * @param string $class_name
+     *
+     * @return ReflectionClass|null
+     */
+    protected function getEntityObject($class_name = '')
+    {
+        if (!is_string($class_name) || !$class_name) {
+            return null;
+        }
+
+        $path = 'PayPlug\src\models\entities\\' . $class_name;
+
+        if (!class_exists($path)) {
+            return null;
+        }
+
+        return new ReflectionClass($path);
+    }
+
+    protected function getTableName($table = '')
+    {
+        if (!is_string($table) || !$table) {
+            return '';
+        }
+        $constant_adapter = new ReflectionClass('PayPlug\src\application\adapter\ConstantAdapter');
+
+        return $constant_adapter->get('_DB_PREFIX_') . $table;
+    }
+
+    /**
+     * @description Update an entity in the database for a given key
+     *
+     * @param string $key
+     * @param null $value
+     * @param array $fields
+     *
+     * @return bool
+     */
+    protected function updateBy($key = '', $value = null, $fields = [])
+    {
+        if (!is_string($key) || !$key) {
+            return false;
+        }
+        if (is_null($value)) {
+            return false;
+        }
+        if (!is_array($fields) || empty($fields)) {
+            return false;
+        }
+
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+
+        $definition = $entity->getDefinition();
+        if (!isset($definition['fields']) || !array_key_exists($key, $definition['fields'])) {
+            return false;
+        }
+
+        $this
+            ->update()
+            ->table($this->getTableName($definition['table']));
+
+        foreach ($fields as $key => $value) {
+            if (array_key_exists($key, $definition['fields'])) {
+                switch ($definition['fields'][$key]['type']) {
+                    case 'string':
+                        if (is_string($value) && $value) {
+                            $this->set($key . ' = "' . $this->escape($value) . '"');
+                        }
+
+                        break;
+                    case 'integer':
+                        if (is_int($value)) {
+                            $this->set($key . ' = ' . (int) $value);
+                        }
+
+                        break;
+                    case 'boolean':
+                        if (is_bool($value)) {
+                            $this->set($key . ' = ' . ($value ? 1 : 0));
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        // check $value type
+        if (!$this->formatWhereFromType($key, $value)) {
+            return false;
+        }
+
+        $result = $this->build();
+
+        return $result ?: false;
+    }
+
+    /**
      * @description Update an entity in the database
      *
      * @param array $fields
@@ -290,67 +554,34 @@ class EntityRepository extends QueryRepository
         return (bool) $this->build();
     }
 
-    /**
-     * @description Delete an entity in the database.
-     *
-     * @param int $id
-     *
-     * @return bool
-     */
-    protected function deleteEntity($id = 0)
+    private function formatWhereFromType($key = '', $value = null)
     {
-        if (!is_int($id) || !$id) {
+        if (!is_string($key) || !$key) {
             return false;
         }
-        if (!is_string($this->entity_name) || !$this->entity_name) {
+        if (is_null($value)) {
             return false;
         }
 
-        $entity = $this->getEntityObject($this->entity_name);
-        if (!$entity) {
-            return false;
+        switch (true) {
+            case is_string($value):
+                if ('' !== $value) {
+                    $this->where('`' . $key . '` = "' . $this->escape($value) . '"');
+                }
+
+                break;
+            case is_int($value):
+                $this->where('`' . $key . '` = ' . (int) $value);
+
+                break;
+            case is_bool($value):
+                $this->where('`' . $key . '` = ' . ($value ? 1 : 0));
+
+                break;
+            default:
+                return false;
         }
 
-        $definition = $entity->getDefinition();
-
-        $result = $this
-            ->delete()
-            ->from($this->getTableName($definition['table']))
-            ->where('`' . $definition['primary'] . '` = ' . (int) $id)
-            ->build();
-
-        return $result ?: false;
-    }
-
-    /**
-     * @description Get Entity Object for a given class name.
-     *
-     * @param string $class_name
-     *
-     * @return ReflectionClass|null
-     */
-    protected function getEntityObject($class_name = '')
-    {
-        if (!is_string($class_name) || !$class_name) {
-            return null;
-        }
-
-        $path = 'PayPlug\src\models\entities\\' . $class_name;
-
-        if (!class_exists($path)) {
-            return null;
-        }
-
-        return new ReflectionClass($path);
-    }
-
-    protected function getTableName($table = '')
-    {
-        if (!is_string($table) || !$table) {
-            return '';
-        }
-        $constant_adapter = new ReflectionClass('PayPlug\src\application\adapter\ConstantAdapter');
-
-        return $constant_adapter->get('_DB_PREFIX_') . $table;
+        return true;
     }
 }
