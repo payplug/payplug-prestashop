@@ -23,5 +23,13 @@ class BaseCardRepository extends BaseRepository
             ->andReturnUsing(function ($value) {
                 return $value;
             });
+
+        $this->entity = \Mockery::mock('EntityObject');
+        $this->entity->shouldReceive([
+            'getDefinition' => [
+                'table' => 'table',
+                'primary' => 'primary',
+            ],
+        ]);
     }
 }

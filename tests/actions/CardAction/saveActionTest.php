@@ -50,7 +50,7 @@ class saveActionTest extends BaseCardAction
         $this->card_repository
             ->shouldReceive([
                 'exists' => false,
-                'createCard' => false,
+                'createEntity' => false,
             ]);
         $this->assertFalse($this->action->saveAction($this->payment));
     }
@@ -60,7 +60,7 @@ class saveActionTest extends BaseCardAction
         $this->card_repository
             ->shouldReceive([
                 'exists' => false,
-                'createCard' => true,
+                'createEntity' => true,
             ]);
         $this->assertTrue($this->action->saveAction($this->payment));
     }

@@ -65,7 +65,7 @@ class getPaymentTabTest extends BaseOneClickPaymentMethod
 
         $this->card_repository
             ->shouldReceive([
-                'get' => [
+                'getEntity' => [
                     'id_customer' => ContextMock::get()->customer->id,
                     'id_card' => 'card_azerty12345',
                 ],

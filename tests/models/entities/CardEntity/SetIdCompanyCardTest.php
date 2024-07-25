@@ -1,30 +1,29 @@
 <?php
 
+namespace PayPlug\tests\models\entities\CardEntity;
+
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\CardEntity;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
  * @group card
  * @group card_entity
  */
-final class SetExpYearCardTest extends TestCase
+final class SetIdCompanyCardTest extends BaseCardEntity
 {
-    protected $card;
-
     protected function setUp()
     {
-        $this->card = new CardEntity();
-        $this->card->setExpYear('expiration');
+        parent::setUp();
+        $this->entity->setIdCompany(42);
     }
 
-    public function testUpdateExpYear()
+    public function testUpdateIdCompany()
     {
-        $this->card->setExpYear('new_expiration');
+        $this->entity->setIdCompany(777);
         $this->assertSame(
-            'new_expiration',
-            $this->card->getExpYear()
+            777,
+            $this->entity->getIdCompany()
         );
     }
 
@@ -32,7 +31,7 @@ final class SetExpYearCardTest extends TestCase
     {
         $this->assertInstanceOf(
             CardEntity::class,
-            $this->card->setExpYear('expiration')
+            $this->entity->setIdCompany(777)
         );
     }
 
@@ -42,9 +41,9 @@ final class SetExpYearCardTest extends TestCase
      * @group card_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString()
+    public function testThrowExceptionWhenNotAnInt()
     {
         $this->expectException(BadParameterException::class);
-        $this->card->setExpYear(42);
+        $this->entity->setIdCompany('test');
     }
 }
