@@ -170,7 +170,7 @@ class CacheRepository extends BaseClass
             $this->dependencies
                 ->getPlugin()
                 ->getCacheRepository()
-                ->deleteCache($cache_key);
+                ->deleteBy('cache_key', $cache_key);
 
             return [
                 'result' => false,
@@ -195,7 +195,7 @@ class CacheRepository extends BaseClass
         $truncate = $this->dependencies
             ->getPlugin()
             ->getCacheRepository()
-            ->flushCache();
+            ->deleteAll();
 
         if (!$truncate) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';

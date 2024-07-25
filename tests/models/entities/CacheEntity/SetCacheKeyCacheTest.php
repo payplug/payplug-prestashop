@@ -2,6 +2,7 @@
 
 namespace PayPlug\tests\models\entities\CacheEntity;
 
+use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\CacheEntity;
 
 /**
@@ -26,5 +27,19 @@ final class SetCacheKeyCacheTest extends BaseCacheEntity
             CacheEntity::class,
             $this->cache->setCacheKey('another_key')
         );
+    }
+
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param $cache_key
+     */
+    public function testThrowExceptionWhenNotAString($cache_key)
+    {
+        try {
+            $this->cache->setCacheKey($cache_key);
+        } catch (BadParameterException $e) {
+            $this->assertSame('Invalid argument, $cache_key must be a string.', $e->getMessage());
+        }
     }
 }

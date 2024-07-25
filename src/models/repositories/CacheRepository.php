@@ -44,37 +44,6 @@ class CacheRepository extends EntityRepository
     }
 
     /**
-     * @description Delete the cache for a given key
-     *
-     * @param string $cache_key
-     *
-     * @return bool
-     */
-    public function deleteCache($cache_key = '')
-    {
-        if (!is_string($cache_key) || !$cache_key) {
-            return false;
-        }
-        if (!is_string($this->entity_name) || !$this->entity_name) {
-            return false;
-        }
-
-        $entity = $this->getEntityObject($this->entity_name);
-        if (!$entity) {
-            return false;
-        }
-        $definition = $entity->getDefinition();
-
-        $result = $this
-            ->delete()
-            ->from($this->getTableName($definition['table']))
-            ->where('`cache_key` = \'' . $this->escape($cache_key) . '\'')
-            ->build();
-
-        return $result ?: false;
-    }
-
-    /**
      * @desccription delete cache by its identifier
      *
      * @param $id_payplug_cache
@@ -85,31 +54,6 @@ class CacheRepository extends EntityRepository
     {
         $result = $this
             ->deleteEntity($id_payplug_cache);
-
-        return $result ?: false;
-    }
-
-    // todo: add coverage to this method
-
-    /**
-     * @desccription flush cash
-     *
-     * @return CacheRepository|false
-     */
-    public function flushCache()
-    {
-        if (!is_string($this->entity_name) || !$this->entity_name) {
-            return false;
-        }
-        $entity = $this->getEntityObject($this->entity_name);
-        if (!$entity) {
-            return false;
-        }
-        $definition = $entity->getDefinition();
-
-        $result = $this
-            ->truncate()
-            ->table($this->getTableName($definition['table']));
 
         return $result ?: false;
     }
