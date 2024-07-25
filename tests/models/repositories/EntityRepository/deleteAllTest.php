@@ -9,21 +9,11 @@ namespace PayPlug\tests\models\repositories\EntityRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class deleteEntityTest extends BaseEntityRepository
+class deleteAllTest extends BaseEntityRepository
 {
-    /**
-     * @dataProvider invalidIntegerFormatDataProvider
-     *
-     * @param mixed $entity_id
-     */
-    public function testWhenGivenIdIsInvalidIntegerFormat($entity_id)
-    {
-        $this->assertFalse($this->repository->deleteEntity($entity_id));
-    }
-
     public function testWhenNoEntityNameDefined()
     {
-        $this->assertFalse($this->repository->deleteEntity($this->entity_id));
+        $this->assertFalse($this->repository->deleteAll());
     }
 
     public function testWhenEntityObjectCantBeGetted()
@@ -32,7 +22,7 @@ class deleteEntityTest extends BaseEntityRepository
         $this->repository->shouldReceive([
             'getEntityObject' => null,
         ]);
-        $this->assertFalse($this->repository->deleteEntity($this->entity_id));
+        $this->assertFalse($this->repository->deleteAll());
     }
 
     public function testWhenEntityObjectCantBeDeleted()
@@ -40,13 +30,12 @@ class deleteEntityTest extends BaseEntityRepository
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([
             'getEntityObject' => $this->entity,
-            'delete' => $this->repository,
-            'from' => $this->repository,
-            'where' => $this->repository,
+            'truncate' => $this->repository,
+            'table' => $this->repository,
             'build' => false,
         ]);
 
-        $this->assertFalse($this->repository->deleteEntity($this->entity_id));
+        $this->assertFalse($this->repository->deleteAll());
     }
 
     public function testWhenEntityObjectIsDeleted()
@@ -54,12 +43,11 @@ class deleteEntityTest extends BaseEntityRepository
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([
             'getEntityObject' => $this->entity,
-            'delete' => $this->repository,
-            'from' => $this->repository,
-            'where' => $this->repository,
+            'truncate' => $this->repository,
+            'table' => $this->repository,
             'build' => true,
         ]);
 
-        $this->assertTrue($this->repository->deleteEntity($this->entity_id));
+        $this->assertTrue($this->repository->deleteAll());
     }
 }

@@ -9,16 +9,26 @@ namespace PayPlug\tests\models\repositories\EntityRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class updateEntityTest extends BaseEntityRepository
+class updateByTest extends BaseEntityRepository
 {
     /**
-     * @dataProvider invalidIntegerFormatDataProvider
+     * @dataProvider invalidStringFormatDataProvider
      *
-     * @param mixed $entity_id
+     * @param mixed $entity_key
      */
-    public function testWhenGivenIdIsInvalidIntegerFormat($entity_id)
+    public function testWhenGivenKeyIsInvalidIntegerFormat($entity_key)
     {
-        $this->assertFalse($this->repository->updateEntity($entity_id, $this->entity_fields));
+        $this->assertFalse($this->repository->updateBy($entity_key, $this->entity_value, $this->entity_fields));
+    }
+
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $entity_value
+     */
+    public function testWhenGivenValueIsInvalidIntegerFormat($entity_value)
+    {
+        $this->assertFalse($this->repository->updateBy($this->entity_key, $entity_value, $this->entity_fields));
     }
 
     /**
@@ -28,12 +38,12 @@ class updateEntityTest extends BaseEntityRepository
      */
     public function testWhenGivenFieldsIsInvalidArrayFormat($entity_fields)
     {
-        $this->assertFalse($this->repository->updateEntity($this->entity_id, $entity_fields));
+        $this->assertFalse($this->repository->updateBy($this->entity_key, $this->entity_value, $entity_fields));
     }
 
     public function testWhenNoEntityNameDefined()
     {
-        $this->assertFalse($this->repository->updateEntity($this->entity_id, $this->entity_fields));
+        $this->assertFalse($this->repository->updateBy($this->entity_key, $this->entity_value, $this->entity_fields));
     }
 
     public function testWhenEntityObjectCantBeGetted()
@@ -42,7 +52,7 @@ class updateEntityTest extends BaseEntityRepository
         $this->repository->shouldReceive([
             'getEntityObject' => null,
         ]);
-        $this->assertFalse($this->repository->updateEntity($this->entity_id, $this->entity_fields));
+        $this->assertFalse($this->repository->updateBy($this->entity_key, $this->entity_value, $this->entity_fields));
     }
 
     public function testWhenEntityObjectCantBeUpdated()
@@ -57,12 +67,13 @@ class updateEntityTest extends BaseEntityRepository
             'build' => false,
         ]);
 
-        $this->assertFalse($this->repository->updateEntity($this->entity_id, $this->entity_fields));
+        $this->assertFalse($this->repository->updateBy($this->entity_key, $this->entity_value, $this->entity_fields));
     }
 
     public function testWhenEntityObjectIsUpdated()
     {
         $this->repository->entity_name = 'EntityObject';
+
         $this->repository->shouldReceive([
             'getEntityObject' => $this->entity,
             'update' => $this->repository,
@@ -72,6 +83,6 @@ class updateEntityTest extends BaseEntityRepository
             'build' => true,
         ]);
 
-        $this->assertTrue($this->repository->updateEntity($this->entity_id, $this->entity_fields));
+        $this->assertTrue($this->repository->updateBy($this->entity_key, $this->entity_value, $this->entity_fields));
     }
 }

@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\repositories\EntityRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getByTest extends BaseEntityRepository
+class deleteByTest extends BaseEntityRepository
 {
     /**
      * @dataProvider invalidStringFormatDataProvider
@@ -18,7 +18,7 @@ class getByTest extends BaseEntityRepository
      */
     public function testWhenGivenKeyIsInvalidIntegerFormat($entity_key)
     {
-        $this->assertSame([], $this->repository->getBy($entity_key, $this->entity_value));
+        $this->assertFalse($this->repository->deleteBy($entity_key, $this->entity_value));
     }
 
     /**
@@ -28,12 +28,12 @@ class getByTest extends BaseEntityRepository
      */
     public function testWhenGivenValueIsInvalidIntegerFormat($entity_value)
     {
-        $this->assertSame([], $this->repository->getBy($this->entity_key, $entity_value));
+        $this->assertFalse($this->repository->deleteBy($this->entity_key, $entity_value));
     }
 
     public function testWhenNoEntityNameDefined()
     {
-        $this->assertSame([], $this->repository->getBy($this->entity_key, $this->entity_value));
+        $this->assertFalse($this->repository->deleteBy($this->entity_key, $this->entity_value));
     }
 
     public function testWhenEntityObjectCantBeGetted()
@@ -42,49 +42,34 @@ class getByTest extends BaseEntityRepository
         $this->repository->shouldReceive([
             'getEntityObject' => null,
         ]);
-        $this->assertSame([], $this->repository->getBy($this->entity_key, $this->entity_value));
+        $this->assertFalse($this->repository->deleteBy($this->entity_key, $this->entity_value));
     }
 
-    public function testWhenGivenKeyIsNotAllowed()
-    {
-        $this->repository->entity_name = 'EntityObject';
-        $entity_key = 'wrong_key';
-        $this->repository->shouldReceive([
-            'getEntityObject' => $this->entity,
-        ]);
-        $this->assertSame([], $this->repository->getBy($entity_key, $this->entity_value));
-    }
-
-    public function testWhenEntityCantBeGetted()
+    public function testWhenEntityObjectCantBeDeleted()
     {
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([
             'getEntityObject' => $this->entity,
-            'select' => $this->repository,
-            'fields' => $this->repository,
+            'delete' => $this->repository,
             'from' => $this->repository,
             'where' => $this->repository,
             'build' => false,
         ]);
 
-        $this->assertSame([], $this->repository->getBy($this->entity_key, $this->entity_value));
+        $this->assertFalse($this->repository->deleteBy($this->entity_key, $this->entity_value));
     }
 
-    public function testWhenEntityIsGetted()
+    public function testWhenEntityObjectIsDeleted()
     {
         $this->repository->entity_name = 'EntityObject';
-        $entity = [
-            'key' => 'value',
-        ];
         $this->repository->shouldReceive([
             'getEntityObject' => $this->entity,
-            'select' => $this->repository,
-            'fields' => $this->repository,
+            'delete' => $this->repository,
             'from' => $this->repository,
             'where' => $this->repository,
-            'build' => $entity,
+            'build' => true,
         ]);
 
-        $this->assertSame($entity, $this->repository->getBy($this->entity_key, $this->entity_value));
+        $this->assertTrue($this->repository->deleteBy($this->entity_key, $this->entity_value));
     }
 }

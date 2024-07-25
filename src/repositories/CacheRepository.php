@@ -152,7 +152,7 @@ class CacheRepository extends BaseClass
         $cache = $this->dependencies
             ->getPlugin()
             ->getCacheRepository()
-            ->getByKey($cache_key);
+            ->getBy('cache_key', $cache_key);
 
         if (empty($cache)) {
             return [

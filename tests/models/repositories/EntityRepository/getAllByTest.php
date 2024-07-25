@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\repositories\EntityRepository;
  *
  * @runTestsInSeparateProcesses
  */
-class getByTest extends BaseEntityRepository
+class getAllByTest extends BaseEntityRepository
 {
     /**
      * @dataProvider invalidStringFormatDataProvider
@@ -18,7 +18,7 @@ class getByTest extends BaseEntityRepository
      */
     public function testWhenGivenKeyIsInvalidIntegerFormat($entity_key)
     {
-        $this->assertSame([], $this->repository->getBy($entity_key, $this->entity_value));
+        $this->assertSame([], $this->repository->getAllBy($entity_key, $this->entity_value));
     }
 
     /**
@@ -28,12 +28,12 @@ class getByTest extends BaseEntityRepository
      */
     public function testWhenGivenValueIsInvalidIntegerFormat($entity_value)
     {
-        $this->assertSame([], $this->repository->getBy($this->entity_key, $entity_value));
+        $this->assertSame([], $this->repository->getAllBy($this->entity_key, $entity_value));
     }
 
     public function testWhenNoEntityNameDefined()
     {
-        $this->assertSame([], $this->repository->getBy($this->entity_key, $this->entity_value));
+        $this->assertSame([], $this->repository->getAllBy($this->entity_key, $this->entity_value));
     }
 
     public function testWhenEntityObjectCantBeGetted()
@@ -42,7 +42,7 @@ class getByTest extends BaseEntityRepository
         $this->repository->shouldReceive([
             'getEntityObject' => null,
         ]);
-        $this->assertSame([], $this->repository->getBy($this->entity_key, $this->entity_value));
+        $this->assertSame([], $this->repository->getAllBy($this->entity_key, $this->entity_value));
     }
 
     public function testWhenGivenKeyIsNotAllowed()
@@ -52,10 +52,10 @@ class getByTest extends BaseEntityRepository
         $this->repository->shouldReceive([
             'getEntityObject' => $this->entity,
         ]);
-        $this->assertSame([], $this->repository->getBy($entity_key, $this->entity_value));
+        $this->assertSame([], $this->repository->getAllBy($entity_key, $this->entity_value));
     }
 
-    public function testWhenEntityCantBeGetted()
+    public function testWhenEntityCollectionCantBeGetted()
     {
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([
@@ -67,14 +67,16 @@ class getByTest extends BaseEntityRepository
             'build' => false,
         ]);
 
-        $this->assertSame([], $this->repository->getBy($this->entity_key, $this->entity_value));
+        $this->assertSame([], $this->repository->getAllBy($this->entity_key, $this->entity_value));
     }
 
-    public function testWhenEntityIsGetted()
+    public function testWhenEntityCollectionIsGetted()
     {
         $this->repository->entity_name = 'EntityObject';
-        $entity = [
-            'key' => 'value',
+        $collection = [
+            [
+                'key' => 'value',
+            ],
         ];
         $this->repository->shouldReceive([
             'getEntityObject' => $this->entity,
@@ -82,9 +84,9 @@ class getByTest extends BaseEntityRepository
             'fields' => $this->repository,
             'from' => $this->repository,
             'where' => $this->repository,
-            'build' => $entity,
+            'build' => $collection,
         ]);
 
-        $this->assertSame($entity, $this->repository->getBy($this->entity_key, $this->entity_value));
+        $this->assertSame($collection, $this->repository->getAllBy($this->entity_key, $this->entity_value));
     }
 }
