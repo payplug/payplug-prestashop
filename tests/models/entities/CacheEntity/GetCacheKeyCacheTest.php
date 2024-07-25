@@ -1,23 +1,14 @@
 <?php
 
-use PayPlug\src\models\entities\CacheEntity;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\models\entities\CacheEntity;
 
 /**
  * @group entity
  * @group cache
  * @group cache_entity
  */
-final class GetCacheKeyCacheTest extends TestCase
+final class GetCacheKeyCacheTest extends BaseCacheEntity
 {
-    protected $cache;
-
-    protected function setUp()
-    {
-        $this->cache = new CacheEntity();
-        $this->cache->setCacheKey('test_key');
-    }
-
     public function testReturnCacheKey()
     {
         $this->assertSame(

@@ -40,53 +40,7 @@ class CacheRepository extends EntityRepository
     {
         parent::__construct($prefix, $dependencies);
         $this->table_name = $this->prefix . $this->dependencies->name . '_cache';
-    }
-
-    /**
-     * @description Create a cache from given parameters
-     *
-     * @param array $parameters
-     *
-     * @return bool
-     */
-    public function createCache($parameters = [])
-    {
-        if (!is_array($parameters) || empty($parameters)) {
-            return false;
-        }
-
-        $this
-            ->insert()
-            ->into($this->table_name);
-
-        foreach ($parameters as $key => $value) {
-            if (array_key_exists($key, $this->fields)) {
-                switch ($this->fields[$key]) {
-                    case 'string':
-                        if (is_string($value) && $value) {
-                            $this->fields($key)->values($this->escape($value));
-                        }
-
-                        break;
-                    case 'integer':
-                        if (is_int($value)) {
-                            $this->fields($key)->values((int) $value);
-                        }
-
-                        break;
-                    case 'bool':
-                        if (is_bool($value)) {
-                            $this->fields($key)->values($value ? 1 : 0);
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        return (bool) $this->build();
+        $this->entity_name = 'CacheEntity';
     }
 
     /**
@@ -102,12 +56,7 @@ class CacheRepository extends EntityRepository
             return [];
         }
 
-        $result = $this
-            ->select()
-            ->fields('*')
-            ->from($this->table_name)
-            ->where('`cache_key` = "' . $this->escape($cache_key) . '"')
-            ->build('unique_row');
+        $result = $this->getBy('cache_key', $cache_key);
 
         return $result ?: [];
     }
@@ -124,24 +73,63 @@ class CacheRepository extends EntityRepository
         if (!is_string($cache_key) || !$cache_key) {
             return false;
         }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
 
         $result = $this
             ->delete()
-            ->from($this->table_name)
+            ->from($this->getTableName($definition['table']))
             ->where('`cache_key` = \'' . $this->escape($cache_key) . '\'')
             ->build();
 
         return $result ?: false;
     }
 
-    // todo: add coverage to this method
-    public function flushCache()
+    /**
+     * @desccription delete cache by its identifier
+     *
+     * @param $id_payplug_cache
+     *
+     * @return bool
+     */
+    public function deleteCacheByID($id_payplug_cache = 0)
     {
         $result = $this
-            ->truncate()
-            ->table($this->table_name);
+            ->deleteEntity($id_payplug_cache);
 
-        return (bool) $result;
+        return $result ?: false;
+    }
+
+    // todo: add coverage to this method
+
+    /**
+     * @desccription flush cash
+     *
+     * @return CacheRepository|false
+     */
+    public function flushCache()
+    {
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
+
+        $result = $this
+            ->truncate()
+            ->table($this->getTableName($definition['table']));
+
+        return $result ?: false;
     }
 
     /**
@@ -156,10 +144,19 @@ class CacheRepository extends EntityRepository
         if (!is_string($engine) || !$engine) {
             return false;
         }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
 
         $this
             ->create()
-            ->table($this->table_name)
+            ->table($this->getTableName($definition['table']))
             ->fields('`id_payplug_cache` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`cache_key` VARCHAR(255) NOT NULL')
             ->fields('`cache_value` TEXT NOT NULL')

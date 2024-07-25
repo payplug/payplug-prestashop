@@ -1,21 +1,20 @@
 <?php
 
+namespace PayPlug\tests\models\entities\CacheEntity;
+
 use PayPlug\src\exceptions\BadParameterException;
 use PayPlug\src\models\entities\CacheEntity;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group entity
  * @group cache
  * @group cache_entity
  */
-final class SetTableCacheTest extends TestCase
+final class SetTableCacheTest extends BaseCacheEntity
 {
-    protected $cache;
-
     protected function setUp()
     {
-        $this->cache = new CacheEntity();
+        parent::setUp();
         $this->cache->setTable('test_table');
     }
 
@@ -37,14 +36,18 @@ final class SetTableCacheTest extends TestCase
     }
 
     /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $table
      * @group entity_exception
      * @group cache_exception
      * @group cache_entity_exception
      * @group exception
      */
-    public function testThrowExceptionWhenNotAString()
+    public function testThrowExceptionWhenNotAString($table)
     {
+        $this->expectExceptionMessage('Invalid argument, $table must be a string');
         $this->expectException(BadParameterException::class);
-        $this->cache->setTable(42);
+        $this->cache->setTable($table);
     }
 }
