@@ -769,7 +769,7 @@ class PaymentMethod
         $resource_stored = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $this->context->cart->id);
+            ->getBy('id_cart', (int) $this->context->cart->id);
         if (!$resource_stored) {
             $this->logger->addLog('PaymentMethod::getReturnUrl() - No stored resource retrieve for current context cart id.');
 
@@ -815,7 +815,7 @@ class PaymentMethod
         $stored_resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $id_cart);
+            ->getBy('id_cart', (int) $id_cart);
         if (empty($stored_resource)) {
             $this->logger->addLog('PaymentMethod::isValidResource() - No stored resource retrieve for current context cart id.');
 

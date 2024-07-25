@@ -51,7 +51,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $this->context->cart->id);
+            ->getBy('id_cart', (int) $this->context->cart->id);
 
         if (empty($payment)) {
             return [
@@ -305,7 +305,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByResourceId($resource_id);
+            ->getBy('resource_id', $resource_id);
 
         if (empty($payment)) {
             return [

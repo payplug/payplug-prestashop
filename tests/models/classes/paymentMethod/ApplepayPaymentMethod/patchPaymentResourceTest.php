@@ -94,7 +94,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
     {
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [],
+                'getBy' => [],
             ]);
         $this->assertSame([
             'result' => false,
@@ -107,7 +107,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
         $resource_id = 'pay_azerty';
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => $this->payment_database_mock,
+                'getBy' => $this->payment_database_mock,
             ]);
         $this->assertSame([
             'result' => false,
@@ -119,7 +119,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
     {
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => $this->payment_database_mock,
+                'getBy' => $this->payment_database_mock,
             ]);
         $this->classe
             ->shouldReceive([
@@ -138,7 +138,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
     {
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => $this->payment_database_mock,
+                'getBy' => $this->payment_database_mock,
             ]);
         $this->classe
             ->shouldReceive([
@@ -162,7 +162,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
     {
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => $this->payment_database_mock,
+                'getBy' => $this->payment_database_mock,
             ]);
         $this->classe
             ->shouldReceive([
@@ -192,7 +192,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
     {
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => $this->payment_database_mock,
+                'getBy' => $this->payment_database_mock,
             ]);
         $this->classe
             ->shouldReceive([
@@ -222,7 +222,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
     {
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => $this->payment_database_mock,
+                'getBy' => $this->payment_database_mock,
             ]);
         $this->classe
             ->shouldReceive([

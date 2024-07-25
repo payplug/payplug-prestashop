@@ -214,7 +214,7 @@ class InstallmentPaymentMethod extends PaymentMethod
         $resource_tab = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByResourceId($resource->id);
+            ->getBy('resource_id', $resource->id);
         if (!isset($resource_tab['schedules']) || !$resource_tab['schedules']) {
             $this->dependencies->installmentClass->addPayplugInstallment($resource);
         }
@@ -257,7 +257,7 @@ class InstallmentPaymentMethod extends PaymentMethod
         $resource_stored = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $this->context->cart->id);
+            ->getBy('id_cart', (int) $this->context->cart->id);
         if (!$resource_stored) {
             $this->logger->addLog('InstallmentPaymentMethod::getReturnUrl() - No stored resource retrieve for current context cart id.');
 
@@ -307,7 +307,7 @@ class InstallmentPaymentMethod extends PaymentMethod
         $stored_resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $id_cart);
+            ->getBy('id_cart', (int) $id_cart);
         if (empty($stored_resource)) {
             $this->logger->addLog('InstallmentPaymentMethod::isValidResource() - No stored resource retrieve for current context cart id.');
 

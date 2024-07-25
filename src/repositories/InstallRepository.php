@@ -53,9 +53,6 @@ class InstallRepository extends BaseClass
     /** @var object OrderStateRepository */
     protected $order_state;
 
-    /** @var object OrderStateRepository */
-    protected $order_state_entity;
-
     /** @var object */
     protected $order_state_adapter;
 
@@ -66,42 +63,14 @@ class InstallRepository extends BaseClass
     protected $shop;
 
     /** @var object */
-    protected $sql;
-
-    /** @var object */
     protected $tools;
 
     /** @var object */
     protected $validate;
 
-    public function __construct(
-        $configuration,
-        $constant,
-        $context,
-        $dependencies,
-        $order_state,
-        $order_state_entity,
-        $order_state_adapter,
-        $query,
-        $shop,
-        $sql,
-        $tools,
-        $validate,
-        $myLogPhp
-    ) {
-        $this->configuration = $configuration;
-        $this->constant = $constant;
-        $this->context = $context;
+    public function __construct($dependencies)
+    {
         $this->dependencies = $dependencies;
-        $this->order_state = $order_state;
-        $this->order_state_entity = $order_state_entity;
-        $this->order_state_adapter = $order_state_adapter;
-        $this->query = $query;
-        $this->shop = $shop;
-        $this->sql = $sql;
-        $this->tools = $tools;
-        $this->validate = $validate;
-        $this->log = $myLogPhp;
     }
 
     /**
@@ -109,7 +78,9 @@ class InstallRepository extends BaseClass
      */
     public function checkOrderStates()
     {
-        $order_states_list = $this->dependencies->getPlugin()->getConfigurationClass()->order_states;
+        $this->loadDependencies();
+
+        $order_states_list = $this->configuration->order_states;
 
         foreach ($order_states_list as $key => $state) {
             // Check live OrderState
@@ -141,22 +112,41 @@ class InstallRepository extends BaseClass
      */
     public function setConfig()
     {
-        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $this->loadDependencies();
 
-        if ($configuration->configurations) {
-            foreach ($configuration->configurations as $key => $config) {
+        if ($this->configuration->configurations) {
+            foreach ($this->configuration->configurations as $key => $config) {
                 if ($config['setConf']) {
                     if ('payment_methods' == $key && 'pspaylater' == $this->dependencies->name) {
                         $payment_method = json_decode($config['defaultValue'], true);
                         $payment_method['oney'] = true;
-                        $configuration->set('payment_methods', json_encode($payment_method));
+                        $this->configuration->set('payment_methods', json_encode($payment_method));
                     } else {
-                        $configuration->set($key, $config['defaultValue']);
+                        $this->configuration->set($key, $config['defaultValue']);
                     }
                 }
             }
         }
 
         return true;
+    }
+
+    private function loadDependencies()
+    {
+        $this->configuration = $this->configuration ?: $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+        $this->order_state = $this->order_state ?: $this->dependencies
+            ->getPlugin()
+            ->getOrderState();
+        $this->order_state_adapter = $this->order_state_adapter ?: $this->dependencies
+            ->getPlugin()
+            ->getOrderStateAdapter();
+        $this->tools = $this->tools ?: $this->dependencies
+            ->getPlugin()
+            ->getTools();
+        $this->validate = $this->validate ?: $this->dependencies
+            ->getPlugin()
+            ->getValidate();
     }
 }

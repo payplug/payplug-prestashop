@@ -64,7 +64,7 @@ class OrderAction
         // Get the payment from database
         $payment_tab = $this->plugin
             ->getPaymentRepository()
-            ->getByResourceId($resource_id);
+            ->getBy('resource_id', $resource_id);
         if (empty($payment_tab)) {
             $this->logger->addLog('OrderAction::createAction - Can\'t retrieve resource from database', 'error');
 
@@ -261,7 +261,7 @@ class OrderAction
         // Get the payment from database
         $payment_tab = $this->plugin
             ->getPaymentRepository()
-            ->getByResourceId($resource_id);
+            ->getBy('resource_id', $resource_id);
         if (empty($payment_tab)) {
             $this->logger->addLog('OrderAction::updateAction - Can\'t retrieve resource from database', 'error');
 
@@ -458,7 +458,7 @@ class OrderAction
         $payment_tab = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $order->id_cart);
+            ->getBy('id_cart', (int) $order->id_cart);
         if (empty($payment_tab)) {
             return $order_details;
         }

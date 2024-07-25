@@ -308,7 +308,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $payment = $this->dependencies
                     ->getPlugin()
                     ->getPaymentRepository()
-                    ->getByCart((int) $cart_id);
+                    ->getBy('id_cart', (int) $cart_id);
 
                 if (empty($payment)) {
                     exit(json_encode([

@@ -141,7 +141,7 @@ class LoggerRepository extends BaseClass
             return false;
         }
 
-        $this->loggerEntity->setId($id_logger);
+        $this->loggerEntity->setId((int) $id_logger);
     }
 
     /**

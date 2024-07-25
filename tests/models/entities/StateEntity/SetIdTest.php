@@ -34,7 +34,7 @@ final class setIdTest extends BaseStateEntity
      *
      * @param mixed $id
      */
-    public function testThrowExceptionWhenNotAInteger($id)
+    public function testThrowExceptionWhenNotAnInteger($id)
     {
         $this->expectException(BadParameterException::class);
         $this->entity->setId($id);

@@ -29,17 +29,9 @@ if (!defined('_PS_VERSION_')) {
 
 class LoggerRepository extends EntityRepository
 {
-    private $fields = [
-        'process' => 'string',
-        'content' => 'string',
-        'date_add' => 'string',
-        'date_upd' => 'string',
-    ];
-
     public function __construct($prefix = '', $dependencies = null)
     {
         parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . $this->dependencies->name . '_logger';
         $this->entity_name = 'LoggerEntity';
     }
 

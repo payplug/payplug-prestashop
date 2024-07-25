@@ -170,7 +170,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         $payment_tab = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $cart_id);
+            ->getBy('id_cart', (int) $cart_id);
         $order_create = $this->dependencies
             ->getPlugin()
             ->getOrderAction()

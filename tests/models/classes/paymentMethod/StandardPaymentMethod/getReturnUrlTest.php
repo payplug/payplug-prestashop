@@ -25,7 +25,7 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
         $this->classe->set('name', 'standard');
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
+                'getBy' => [],
             ]);
         $this->assertSame([], $this->classe->getReturnUrl());
     }
@@ -35,7 +35,7 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
         $this->classe->set('name', 'standard');
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -61,7 +61,7 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
         $this->classe->set('name', 'standard');
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -105,7 +105,7 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
         $this->classe->set('name', 'standard');
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',

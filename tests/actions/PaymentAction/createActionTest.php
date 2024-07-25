@@ -60,7 +60,7 @@ class createActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -102,7 +102,7 @@ class createActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
+                'getBy' => [],
             ]);
 
         $payment_method = \Mockery::mock('PaymentMethod');
@@ -137,8 +137,8 @@ class createActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
-                'createPayment' => false,
+                'getBy' => [],
+                'createEntity' => false,
             ]);
 
         $payment_method = \Mockery::mock('PaymentMethod');
@@ -177,8 +177,8 @@ class createActionTest extends BasePaymentAction
         ];
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
-                'createPayment' => $resource,
+                'getBy' => [],
+                'createEntity' => $resource,
             ]);
 
         $payment_method = \Mockery::mock('PaymentMethod');
@@ -216,8 +216,8 @@ class createActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
-                'createPayment' => $resource,
+                'getBy' => [],
+                'createEntity' => $resource,
             ]);
 
         $payment_method = \Mockery::mock('PaymentMethod');

@@ -25,7 +25,7 @@ final class getIdOrderStateTest extends BaseStateEntity
         );
     }
 
-    public function testIdIsAString()
+    public function testIdIsAnInteger()
     {
         $this->assertTrue(
             is_int($this->entity->getIdOrderState())

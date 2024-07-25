@@ -97,7 +97,7 @@ class InstallmentClass
         $resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByResourceId($installment->id);
+            ->getBy('resource_id', $installment->id);
 
         $schedules = json_decode($resource['schedules'], true);
         foreach ($schedules as &$schedule) {
@@ -111,7 +111,7 @@ class InstallmentClass
         return $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->updateByResourceId($installment->id, [
+            ->updateBy('resource_id', $installment->id, [
                 'schedules' => json_encode($schedules),
             ]);
     }
@@ -137,7 +137,7 @@ class InstallmentClass
         $resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByResourceId($installment->id);
+            ->getBy('resource_id', $installment->id);
 
         if (!empty($resource) && !empty($resource['schedules'])) {
             return $this->updatePayplugInstallment($installment);
@@ -182,7 +182,7 @@ class InstallmentClass
         return $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->updateByResourceId($installment->id, [
+            ->updateBy('resource_id', $installment->id, [
                 'schedules' => json_encode($schedules),
             ]);
     }

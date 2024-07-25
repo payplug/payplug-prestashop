@@ -124,7 +124,7 @@ class dispatchActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
+                'getBy' => [],
             ]);
 
         $this->action
@@ -168,7 +168,7 @@ class dispatchActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
+                'getBy' => [],
             ]);
 
         $this->action
@@ -213,7 +213,7 @@ class dispatchActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -266,7 +266,7 @@ class dispatchActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',

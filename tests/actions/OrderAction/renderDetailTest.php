@@ -87,7 +87,7 @@ class renderDetailTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
+                'getBy' => [],
             ]);
         $this->validate_adapter
             ->shouldReceive([
@@ -149,7 +149,7 @@ class renderDetailTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => $payment,
+                'getBy' => $payment,
             ]);
         $this->payment_method_class
             ->shouldReceive([

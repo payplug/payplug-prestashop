@@ -34,7 +34,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             });
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
+                'getBy' => [],
             ]);
         $this->assertFalse($this->classe->isValidResource());
     }
@@ -48,7 +48,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             });
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'inst_azerty1234',
                     'method' => 'installment',
@@ -76,7 +76,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             });
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'inst_azerty1234',
                     'method' => 'installment',
@@ -114,7 +114,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             });
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'inst_azerty1234',
                     'method' => 'installment',
@@ -162,7 +162,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             });
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'inst_azerty1234',
                     'method' => 'installment',

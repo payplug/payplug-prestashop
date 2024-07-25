@@ -97,7 +97,7 @@ class LoggerEntity
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getId()
     {

@@ -5,7 +5,7 @@ namespace PayPlug\tests\models\repositories\StateRepository;
 /**
  * @group unit
  * @group repository
- * @group payplug_order_state_repository
+ * @group state_repository
  *
  * @runTestsInSeparateProcesses
  */
