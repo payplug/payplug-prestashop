@@ -130,6 +130,7 @@ class OrderStateRepository extends QueryRepository
             ->fields('os.id_order_state')
             ->from($this->prefix . 'order_state', 'os')
             ->where('os.module_name = \'' . $this->escape($module_name) . '\'')
+            ->where('os.deleted = 0')
             ->build()
         ;
 

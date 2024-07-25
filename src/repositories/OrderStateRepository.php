@@ -27,7 +27,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PayPlug\src\application\adapter\OrderStateAdapter;
 use PayPlug\src\application\dependencies\BaseClass;
 
 class OrderStateRepository extends BaseClass
@@ -244,9 +243,9 @@ class OrderStateRepository extends BaseClass
                 foreach ($used_os_id_list as $used_os_id) {
                     if ($used_os_id['value'] == $payplug_os_id['id_order_state']) {
                         $first_os = true;
-                    }
 
-                    break;
+                        break;
+                    }
                 }
             }
 
@@ -254,14 +253,13 @@ class OrderStateRepository extends BaseClass
                 foreach ($used_order_os_id_list as $used_order_os_id) {
                     if ($used_order_os_id == $payplug_os_id['id_order_state']) {
                         $second_os = true;
-                    }
 
-                    break;
+                        break;
+                    }
                 }
             }
 
             if (false === $first_os && false === $second_os) {
-                //$os = new OrderStateAdapter($payplug_os_id['id_order_state']);
                 $os = $this->order_state_adapter->get($payplug_os_id['id_order_state']);
                 $deleted = $deleted && $os->softDelete();
             }
