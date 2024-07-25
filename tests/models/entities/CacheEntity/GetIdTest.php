@@ -7,18 +7,18 @@ namespace PayPlug\tests\models\entities\CacheEntity;
  * @group cache
  * @group cache_entity
  */
-final class GetIdPayPlugCacheCacheTest extends BaseCacheEntity
+final class GetIdTest extends BaseCacheEntity
 {
     protected function setUp()
     {
         parent::setUp();
-        $this->cache->setIdPayPlugCache('test_id');
+        $this->cache->setId(123);
     }
 
-    public function testCacheIdIsAString()
+    public function testCacheIdIsAnInteger()
     {
         $this->assertTrue(
-            is_string($this->cache->getIdPayPlugCache())
+            is_int($this->cache->getId())
         );
     }
 }
