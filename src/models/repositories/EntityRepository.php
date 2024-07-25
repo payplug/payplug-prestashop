@@ -544,6 +544,13 @@ class EntityRepository extends QueryRepository
         return new ReflectionClass($path);
     }
 
+    /**
+     * @description Get the table name with prefix.
+     *
+     * @param string $table
+     *
+     * @return string
+     */
     protected function getTableName($table = '')
     {
         if (!is_string($table) || !$table) {
@@ -554,6 +561,14 @@ class EntityRepository extends QueryRepository
         return $constant_adapter->get('_DB_PREFIX_') . $table;
     }
 
+    /**
+     * @description Format where request from the value type
+     *
+     * @param string $key
+     * @param null $value
+     *
+     * @return bool
+     */
     private function formatWhereFromType($key = '', $value = null)
     {
         if (!is_string($key) || !$key) {
