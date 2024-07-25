@@ -104,52 +104,6 @@ class LoggerRepository extends EntityRepository
     }
 
     /**
-     * @description Flush the log table.
-     *
-     * @return bool
-     */
-    public function flushLog()
-    {
-        if (!is_string($this->entity_name) || !$this->entity_name) {
-            return false;
-        }
-        $entity = $this->getEntityObject($this->entity_name);
-        if (!$entity) {
-            return false;
-        }
-        $definition = $entity->getDefinition();
-        $result = $this
-            ->truncate()
-            ->table($this->getTableName($definition['table']));
-
-        return $result ?: false;
-    }
-
-    /**
-     * @description Get all log from table.
-     *
-     * @return array
-     */
-    public function getAllLog()
-    {
-        if (!is_string($this->entity_name) || !$this->entity_name) {
-            return [];
-        }
-        $entity = $this->getEntityObject($this->entity_name);
-        if (!$entity) {
-            return [];
-        }
-        $definition = $entity->getDefinition();
-        $result = $this
-            ->select()
-            ->fields('*')
-            ->from($this->getTableName($definition['table']))
-            ->build();
-
-        return $result ?: [];
-    }
-
-    /**
      * @description Get last log from a given limit.
      *
      * @param int $limit
