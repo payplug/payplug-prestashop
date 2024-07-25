@@ -73,8 +73,6 @@ use PayPlug\src\models\classes\Order;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
-use PayPlug\src\models\entities\OneyEntity;
-use PayPlug\src\models\entities\OrderStateEntity;
 use PayPlug\src\models\entities\PluginEntity;
 use PayPlug\src\repositories\CacheRepository;
 use PayPlug\src\repositories\InstallRepository;
@@ -298,9 +296,7 @@ class PluginInit extends BaseClass
     private function setEntities()
     {
         $this->cacheEntity = new CacheEntity();
-        $this->oneyEntity = new OneyEntity();
         $this->plugin = new PluginEntity();
-        $this->order_state_entity = new OrderStateEntity();
     }
 
     private function setOldRepositories()
@@ -348,7 +344,6 @@ class PluginInit extends BaseClass
             $this->context_adapter,
             $this->dependencies,
             $this->order_state,
-            $this->order_state_entity,
             $this->order_state_adapter,
             $this->query_repository,
             $this->shop_adapter,

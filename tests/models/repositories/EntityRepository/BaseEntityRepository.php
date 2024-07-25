@@ -44,7 +44,7 @@ class BaseEntityRepository extends BaseRepository
                 'table' => 'table',
                 'primary' => 'primary',
                 'fields' => [
-                    'key_1' => ['type' => 'string'],
+                    'key_1' => ['type' => 'string', 'required' => true],
                     'key_2' => ['type' => 'integer'],
                     'key_3' => ['type' => 'boolean'],
                 ],

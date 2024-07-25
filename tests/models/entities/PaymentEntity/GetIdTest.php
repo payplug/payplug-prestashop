@@ -1,20 +1,17 @@
 <?php
 
-namespace PayPlug\tests\models\entities\LoggerEntity;
+namespace PayPlug\tests\models\entities\PaymentEntity;
 
 /**
  * @group entity
- * @group logger
- * @group logger_entity
+ * @group payment
+ * @group payment_entity
  */
-final class GetIdTest extends BaseLoggerEntity
+final class GetIdTest extends BasePaymentEntity
 {
-    private $id;
-
     public function setUp()
     {
         parent::setUp();
-        $this->id = 42;
         $this->entity->setId($this->id);
     }
 

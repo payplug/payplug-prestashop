@@ -25,7 +25,7 @@ class getReturnUrlTest extends BaseInstallmentPaymentMethod
         $this->classe->set('name', 'installment');
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [],
+                'getBy' => [],
             ]);
         $this->assertSame([], $this->classe->getReturnUrl());
     }
@@ -35,7 +35,7 @@ class getReturnUrlTest extends BaseInstallmentPaymentMethod
         $this->classe->set('name', 'installment');
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'inst_azerty1234',
                     'method' => 'installment',
@@ -61,7 +61,7 @@ class getReturnUrlTest extends BaseInstallmentPaymentMethod
         $this->classe->set('name', 'installment');
         $this->payment_repository
             ->shouldReceive([
-                'getByCart' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'inst_azerty1234',
                     'method' => 'installment',

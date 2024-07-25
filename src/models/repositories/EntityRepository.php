@@ -62,7 +62,7 @@ class EntityRepository extends QueryRepository
         // Check if all required fields are correctly given
         $has_error = false;
         foreach ($definition['fields'] as $name => $field) {
-            if ((isset($field['required']) && !(bool) $field['required']) || $has_error) {
+            if ((!isset($field['required']) || !(bool) $field['required']) || $has_error) {
                 continue;
             }
 
@@ -536,12 +536,11 @@ class EntityRepository extends QueryRepository
         }
 
         $path = 'PayPlug\src\models\entities\\' . $class_name;
-
         if (!class_exists($path)) {
             return null;
         }
 
-        return new ReflectionClass($path);
+        return new $path();
     }
 
     /**
@@ -556,7 +555,8 @@ class EntityRepository extends QueryRepository
         if (!is_string($table) || !$table) {
             return '';
         }
-        $constant_adapter = new ReflectionClass('PayPlug\src\application\adapter\ConstantAdapter');
+        $constant_class = 'PayPlug\src\application\adapter\ConstantAdapter';
+        $constant_adapter = new $constant_class();
 
         return $constant_adapter->get('_DB_PREFIX_') . $table;
     }

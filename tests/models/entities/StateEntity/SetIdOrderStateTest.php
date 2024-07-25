@@ -34,7 +34,7 @@ final class setIdOrderStateTest extends BaseStateEntity
      *
      * @param mixed $id_order_state
      */
-    public function testThrowExceptionWhenNotAInteger($id_order_state)
+    public function testThrowExceptionWhenNotAnInteger($id_order_state)
     {
         $this->expectException(BadParameterException::class);
         $this->entity->setIdOrderState($id_order_state);
