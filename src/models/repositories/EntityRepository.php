@@ -41,7 +41,7 @@ class EntityRepository extends QueryRepository
      *
      * @return int
      */
-    protected function createEntity($fields = [])
+    public function createEntity($fields = [])
     {
         if (!is_array($fields) || empty($fields)) {
             return 0;
@@ -136,7 +136,7 @@ class EntityRepository extends QueryRepository
      *
      * @return bool
      */
-    protected function deleteAll()
+    public function deleteAll()
     {
         if (!is_string($this->entity_name) || !$this->entity_name) {
             return false;
@@ -164,7 +164,7 @@ class EntityRepository extends QueryRepository
      *
      * @return array
      */
-    protected function deleteBy($key = '', $value = null)
+    public function deleteBy($key = '', $value = null)
     {
         if (!is_string($key) || !$key) {
             return false;
@@ -205,7 +205,7 @@ class EntityRepository extends QueryRepository
      *
      * @return bool
      */
-    protected function deleteEntity($id = 0)
+    public function deleteEntity($id = 0)
     {
         if (!is_int($id) || !$id) {
             return false;
@@ -235,7 +235,7 @@ class EntityRepository extends QueryRepository
      *
      * @return array
      */
-    protected function getAll()
+    public function getAll()
     {
         if (!is_string($this->entity_name) || !$this->entity_name) {
             return [];
@@ -267,7 +267,7 @@ class EntityRepository extends QueryRepository
      *
      * @return array
      */
-    protected function getAllBy($key = '', $value = null)
+    public function getAllBy($key = '', $value = null)
     {
         if (!is_string($key) || !$key) {
             return [];
@@ -310,7 +310,7 @@ class EntityRepository extends QueryRepository
      *
      * @return array
      */
-    protected function getBy($key = '', $value = null)
+    public function getBy($key = '', $value = null)
     {
         if (!is_string($key) || !$key) {
             return [];
@@ -354,7 +354,7 @@ class EntityRepository extends QueryRepository
      *
      * @return array
      */
-    protected function getEntity($id = 0)
+    public function getEntity($id = 0)
     {
         if (!is_int($id) || !$id) {
             return [];
@@ -384,38 +384,6 @@ class EntityRepository extends QueryRepository
     }
 
     /**
-     * @description Get Entity Object for a given class name.
-     *
-     * @param string $class_name
-     *
-     * @return ReflectionClass|null
-     */
-    protected function getEntityObject($class_name = '')
-    {
-        if (!is_string($class_name) || !$class_name) {
-            return null;
-        }
-
-        $path = 'PayPlug\src\models\entities\\' . $class_name;
-
-        if (!class_exists($path)) {
-            return null;
-        }
-
-        return new ReflectionClass($path);
-    }
-
-    protected function getTableName($table = '')
-    {
-        if (!is_string($table) || !$table) {
-            return '';
-        }
-        $constant_adapter = new ReflectionClass('PayPlug\src\application\adapter\ConstantAdapter');
-
-        return $constant_adapter->get('_DB_PREFIX_') . $table;
-    }
-
-    /**
      * @description Update an entity in the database for a given key
      *
      * @param string $key
@@ -424,7 +392,7 @@ class EntityRepository extends QueryRepository
      *
      * @return bool
      */
-    protected function updateBy($key = '', $value = null, $fields = [])
+    public function updateBy($key = '', $value = null, $fields = [])
     {
         if (!is_string($key) || !$key) {
             return false;
@@ -499,7 +467,7 @@ class EntityRepository extends QueryRepository
      *
      * @return bool
      */
-    protected function updateEntity($id = 0, $fields = [])
+    public function updateEntity($id = 0, $fields = [])
     {
         if (!is_int($id) || !$id) {
             return false;
@@ -552,6 +520,38 @@ class EntityRepository extends QueryRepository
         $this->where('`' . $definition['primary'] . '` = ' . (int) $id);
 
         return (bool) $this->build();
+    }
+
+    /**
+     * @description Get Entity Object for a given class name.
+     *
+     * @param string $class_name
+     *
+     * @return ReflectionClass|null
+     */
+    protected function getEntityObject($class_name = '')
+    {
+        if (!is_string($class_name) || !$class_name) {
+            return null;
+        }
+
+        $path = 'PayPlug\src\models\entities\\' . $class_name;
+
+        if (!class_exists($path)) {
+            return null;
+        }
+
+        return new ReflectionClass($path);
+    }
+
+    protected function getTableName($table = '')
+    {
+        if (!is_string($table) || !$table) {
+            return '';
+        }
+        $constant_adapter = new ReflectionClass('PayPlug\src\application\adapter\ConstantAdapter');
+
+        return $constant_adapter->get('_DB_PREFIX_') . $table;
     }
 
     private function formatWhereFromType($key = '', $value = null)
