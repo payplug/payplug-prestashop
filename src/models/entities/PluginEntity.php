@@ -675,7 +675,7 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getPayplugOrderStateRepository()
+    public function getStateRepository()
     {
         return $this->payplug_order_state_repository;
     }
@@ -1557,10 +1557,10 @@ class PluginEntity
      *
      * @return self
      */
-    public function setPayplugOrderStateRepository($payplug_order_state_repository)
+    public function setStateRepository($payplug_order_state_repository)
     {
         if (!is_object($payplug_order_state_repository)) {
-            throw new BadParameterException('Invalid argument, $payplug_order_state_repository must be an PayplugOrderStateRepository');
+            throw new BadParameterException('Invalid argument, $payplug_order_state_repository must be an StateRepository');
         }
 
         $this->payplug_order_state_repository = $payplug_order_state_repository;

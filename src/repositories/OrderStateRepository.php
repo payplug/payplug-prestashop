@@ -251,21 +251,32 @@ class OrderStateRepository extends BaseClass
             return false;
         }
 
-        $exists = $this->dependencies
+        $order_state = $this->dependencies
             ->getPlugin()
-            ->getPayplugOrderStateRepository()
-            ->getTypeByIdOrderState($id_order_state);
+            ->getStateRepository()
+            ->getBy('id_order_state', (int) $id_order_state);
 
-        if ($exists) {
-            return $this->dependencies
+        $current_date = date('Y-m-d H:i:s');
+        if (empty($order_state)) {
+            $fields = [
+                'id_order_state' => $id_order_state,
+                'type' => $type,
+                'date_add' => $current_date,
+                'date_upd' => $current_date,
+            ];
+
+            return (bool) $this->dependencies
                 ->getPlugin()
-                ->getPayplugOrderStateRepository()
-                ->updateByOderState($id_order_state, $type);
+                ->getStateRepository()
+                ->createEntity($fields);
         }
 
-        return $this->dependencies
+        return (bool) $this->dependencies
             ->getPlugin()
-            ->getPayplugOrderStateRepository()
-            ->setOrderState($id_order_state, $type);
+            ->getStateRepository()
+            ->updateEntity($order_state['id_payplug_order_state'], [
+                'type' => $type,
+                'date_upd' => $current_date,
+            ]);
     }
 }

@@ -336,16 +336,24 @@ class OrderAction
             ];
         }
 
-        $type = $this->plugin
-            ->getPayplugOrderStateRepository()
-            ->getTypeByIdOrderState((int) $order->current_state);
-        $type = $type ?: 'undefined';
+        $order_state = $this->dependencies
+            ->getPlugin()
+            ->getStateRepository()
+            ->getBy('id_order_state', (int) $order->current_state);
+        $type = !empty($order_state) ? $order_state['type'] : 'undefined';
 
         if ('undefined' == $type) {
+            $current_date = date('Y-m-d H:i:s');
+            $fields = [
+                'id_order_state' => $order->current_state,
+                'type' => $type,
+                'date_add' => $current_date,
+                'date_upd' => $current_date,
+            ];
             $this->dependencies
                 ->getPlugin()
-                ->getPayplugOrderStateRepository()
-                ->setOrderState((int) $order->current_state, $type);
+                ->getStateRepository()
+                ->createEntity($fields);
         }
 
         $no_action_state = ['cancelled', 'error', 'expired', 'nothing', 'paid', 'refund', 'undefined'];

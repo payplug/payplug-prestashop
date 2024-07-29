@@ -59,8 +59,11 @@ final class SaveTypeTest extends BaseOrderStateRepository
     {
         $this->payplug_order_state_repository
             ->shouldReceive([
-                'updateByOderState' => true,
-                'getTypeByIdOrderState' => $this->type,
+                'updateEntity' => true,
+                'getBy' => [
+                    'id_payplug_order_state' => 42,
+                    'type' => $this->type,
+                ],
             ]);
 
         $this->assertSame(
@@ -73,9 +76,8 @@ final class SaveTypeTest extends BaseOrderStateRepository
     {
         $this->payplug_order_state_repository
             ->shouldReceive([
-                'setOrderState' => true,
-                'updateByOderState' => true,
-                'getTypeByIdOrderState' => $this->type,
+                'createEntity' => true,
+                'getBy' => [],
             ]);
 
         $this->assertSame(
