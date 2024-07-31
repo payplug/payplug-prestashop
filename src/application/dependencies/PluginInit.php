@@ -165,7 +165,6 @@ class PluginInit extends BaseClass
     private $module_repository;
     private $order_repository;
     private $order_state_repository;
-    private $order_payment_repository;
     private $payment_repository;
     private $payplug_order_state_repository;
     private $query_repository;
@@ -271,7 +270,6 @@ class PluginInit extends BaseClass
             ->setModuleRepository($this->module_repository)
             ->setOrderRepository($this->order_repository)
             ->setOrderStateRepository($this->order_state_repository)
-            ->setOrderPaymentRepository($this->order_payment_repository)
             ->setPaymentRepository($this->payment_repository)
             ->setStateRepository($this->payplug_order_state_repository)
             ->setQueryRepository($this->query_repository)
@@ -399,7 +397,6 @@ class PluginInit extends BaseClass
         $this->module_repository = new \PayPlug\src\models\repositories\ModuleRepository($this->dependencies);
         $this->order_repository = new \PayPlug\src\models\repositories\OrderRepository($this->dependencies);
         $this->order_state_repository = new \PayPlug\src\models\repositories\OrderStateRepository($this->dependencies);
-        $this->order_payment_repository = new \PayPlug\src\models\repositories\OrderPaymentRepository($this->dependencies);
         $this->payment_repository = new \PayPlug\src\models\repositories\PaymentRepository($this->dependencies);
         $this->payplug_order_state_repository = new \PayPlug\src\models\repositories\StateRepository($this->dependencies);
         $this->query_repository = new \PayPlug\src\models\repositories\QueryRepository($this->dependencies);

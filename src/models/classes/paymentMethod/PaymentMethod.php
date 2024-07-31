@@ -893,19 +893,6 @@ class PaymentMethod
             return false;
         }
 
-        $create_order_payment = $this->dependencies
-            ->getPlugin()
-            ->getOrderPaymentRepository()
-            ->createOrderPayment([
-                'id_order' => (int) $id_order,
-                'id_payment' => $resource->id,
-            ]);
-        if (!$create_order_payment) {
-            $this->logger->addLog('PaymentMethod::postProcessOrder() - Order Payment can not be create.');
-
-            return false;
-        }
-
         return true;
     }
 

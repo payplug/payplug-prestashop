@@ -7,6 +7,7 @@
   - [PRE-2517](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2494): Set State Entity
   - [PRE-2512](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2493): Set CacheEntity
   - [PRE-2518](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2502): Set Payment Entity
+  - [PRE-2516](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2502): Clean Order Payment repository
 
 ## Version 4.10.0
 - Improvment :
