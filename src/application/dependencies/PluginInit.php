@@ -339,18 +339,7 @@ class PluginInit extends BaseClass
         );
 
         $this->install = new InstallRepository(
-            $this->configuration_class,
-            $this->constant_adapter,
-            $this->context_adapter,
-            $this->dependencies,
-            $this->order_state,
-            $this->order_state_adapter,
-            $this->query_repository,
-            $this->shop_adapter,
-            $this->sql,
-            $this->tools_adapter,
-            $this->validate_adapter,
-            $this->myLogPhp
+            $this->dependencies
         );
     }
 
