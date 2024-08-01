@@ -29,9 +29,9 @@ if (!defined('_PS_VERSION_')) {
 
 class StateRepository extends EntityRepository
 {
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
+        parent::__construct($dependencies);
         $this->entity_name = 'StateEntity';
     }
 
@@ -47,10 +47,17 @@ class StateRepository extends EntityRepository
         if (!is_string($engine) || !$engine) {
             return false;
         }
-
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
         $this
             ->create()
-            ->table($this->table_name)
+            ->table($this->getTableName($definition['table']))
             ->fields('`id_payplug_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_order_state` INT(11) UNSIGNED NOT NULL')
             ->fields('`type` VARCHAR(64) NOT NULL')

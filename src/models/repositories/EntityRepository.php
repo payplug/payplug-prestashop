@@ -384,6 +384,29 @@ class EntityRepository extends QueryRepository
     }
 
     /**
+     * @description initialize database
+     *
+     * @return bool
+     */
+    public function initialize()
+    {
+        $flag = true;
+        $repositories = $this->getChildRepositories();
+
+        $constant_class = 'PayPlug\src\application\adapter\ConstantAdapter';
+        $constant_adapter = new $constant_class();
+        $engine = $constant_adapter->get('_MYSQL_ENGINE_') ?: 'InnoDB';
+
+        foreach ($repositories as $repository) {
+            if ($flag) {
+                $flag = $flag && $repository->initialize($engine);
+            }
+        }
+
+        return $flag;
+    }
+
+    /**
      * @description Update an entity in the database for a given key
      *
      * @param string $key
@@ -523,6 +546,49 @@ class EntityRepository extends QueryRepository
     }
 
     /**
+     * @description uninstall database
+     *
+     * @return bool
+     */
+    public function uninstall()
+    {
+        $flag = true;
+        $repositories = $this->getChildRepositories();
+        foreach ($repositories as $repository) {
+            if (!$flag) {
+                continue;
+            }
+
+            if ($repository->table_name) {
+                $table_name = $repository->table_name;
+            } else {
+                $entity = $this->getEntityObject($repository->entity_name);
+                if (!$entity) {
+                    continue;
+                }
+                $definition = $entity->getDefinition();
+                $table_name = $definition['table'];
+            }
+
+            $table_name = $this->getTableName($table_name);
+            $exists = $this->ifExists()
+                ->table($table_name)
+                ->build();
+
+            if (!$exists) {
+                continue;
+            }
+
+            $flag = $flag && $this
+                ->drop()
+                ->table($table_name)
+                ->build();
+        }
+
+        return $flag;
+    }
+
+    /**
      * @description Get Entity Object for a given class name.
      *
      * @param string $class_name
@@ -598,5 +664,31 @@ class EntityRepository extends QueryRepository
         }
 
         return true;
+    }
+
+    /**
+     * @description get Child Repositories
+     *
+     * @return array
+     */
+    private function getChildRepositories()
+    {
+        $repositories = [];
+
+        $query = get_class($this);
+
+        foreach (get_declared_classes() as $repository) {
+            if (is_subclass_of($repository, $query)) {
+                $repository_class = new $repository($this->dependencies);
+                if ($repository_class->entity_name) {
+                    $repositories[] = $repository_class;
+                }
+                if ($repository_class->table_name && false !== strpos($repository_class->table_name, $this->dependencies->name)) {
+                    $repositories[] = $repository_class;
+                }
+            }
+        }
+
+        return $repositories;
     }
 }

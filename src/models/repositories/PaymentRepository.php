@@ -29,9 +29,9 @@ if (!defined('_PS_VERSION_')) {
 
 class PaymentRepository extends EntityRepository
 {
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
+        parent::__construct($dependencies);
         $this->entity_name = 'PaymentEntity';
     }
 
@@ -77,10 +77,17 @@ class PaymentRepository extends EntityRepository
         if (!is_string($engine) || !$engine) {
             return false;
         }
-
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
         $this
             ->create()
-            ->table($this->table_name)
+            ->table($this->getTableName($definition['table']))
             ->fields('`id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`resource_id` VARCHAR(255) NULL')
             ->fields('`method` VARCHAR(255) NULL')

@@ -246,7 +246,8 @@ class ConfigurationAction
 
         // Install SQL
         $txt_log->info('Install SQL');
-        if (!$this->dependencies->getPlugin()->getQueryRepository()->initialize()) {
+
+        if (!$this->dependencies->getPlugin()->getEntityRepository()->initialize()) {
             $txt_log->info('Install failed: Install SQL tables.');
 
             return [
@@ -961,7 +962,7 @@ class ConfigurationAction
         $txt_log->info('Drop module table');
         if (!$this->dependencies
             ->getPlugin()
-            ->getQueryRepository()
+            ->getEntityRepository()
             ->uninstall()) {
             $txt_log->info('Uninstall failed: Drop module table.');
 

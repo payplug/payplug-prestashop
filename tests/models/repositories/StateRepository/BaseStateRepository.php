@@ -10,7 +10,7 @@ class BaseStateRepository extends BaseRepository
     protected function setUp()
     {
         parent::setUp();
-        $this->repository = \Mockery::mock(StateRepository::class, ['prefix', $this->dependencies])
+        $this->repository = \Mockery::mock(StateRepository::class, [$this->dependencies])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
         $this->repository

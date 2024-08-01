@@ -96,7 +96,7 @@ class OrderStateAction
         $current_date = date('Y-m-d H:i:s');
         if (empty($order_state)) {
             $fields = [
-                'id_order_state' => $id_order_state,
+                'id_order_state' => (int) $id_order_state,
                 'type' => $type,
                 'date_add' => $current_date,
                 'date_upd' => $current_date,
