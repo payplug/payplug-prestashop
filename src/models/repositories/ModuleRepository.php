@@ -29,10 +29,10 @@ if (!defined('_PS_VERSION_')) {
 
 class ModuleRepository extends EntityRepository
 {
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . 'module';
+        parent::__construct($dependencies);
+        $this->table_name = 'module';
     }
 
     /**
@@ -45,7 +45,7 @@ class ModuleRepository extends EntityRepository
         $result = $this
             ->select()
             ->fields('name, version')
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('active = 1')
             ->build();
 

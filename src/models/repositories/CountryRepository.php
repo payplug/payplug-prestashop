@@ -29,10 +29,10 @@ if (!defined('_PS_VERSION_')) {
 
 class CountryRepository extends EntityRepository
 {
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . 'country';
+        parent::__construct($dependencies);
+        $this->table_name = 'country';
     }
 
     /**
@@ -51,7 +51,7 @@ class CountryRepository extends EntityRepository
         $result = $this
             ->select()
             ->fields('iso_code')
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('id_country = ' . (int) $id_country)
             ->build('unique_value');
 

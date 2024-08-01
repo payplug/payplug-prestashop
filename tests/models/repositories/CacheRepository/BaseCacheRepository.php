@@ -10,7 +10,7 @@ class BaseCacheRepository extends BaseRepository
     protected function setUp()
     {
         parent::setUp();
-        $this->repository = \Mockery::mock(CacheRepository::class, ['prefix', $this->dependencies])
+        $this->repository = \Mockery::mock(CacheRepository::class, [$this->dependencies])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
 

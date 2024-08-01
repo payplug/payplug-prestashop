@@ -17,7 +17,7 @@ class installActionTest extends BaseConfigurationAction
     private $constant;
     private $files_helper;
     private $order_state_action;
-    private $query_repository;
+    private $entity_repository;
 
     public function setUp()
     {
@@ -35,7 +35,7 @@ class installActionTest extends BaseConfigurationAction
             ->with('_PS_MODULE_DIR_')
             ->andReturn('module_path');
 
-        $this->query_repository = \Mockery::mock('QueryRepository');
+        $this->entity_repository = \Mockery::mock('EntityRepository');
 
         $shop = \Mockery::mock('Shop');
         $shop->shouldReceive([
@@ -49,7 +49,7 @@ class installActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'getConstant' => $this->constant,
                 'getOrderStateAction' => $this->order_state_action,
-                'getQueryRepository' => $this->query_repository,
+                'getEntityRepository' => $this->entity_repository,
                 'getShop' => $shop,
             ]);
 
@@ -192,7 +192,7 @@ class installActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'initialize' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'initialize' => false,
             ]);
@@ -226,7 +226,7 @@ class installActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'initialize' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'initialize' => true,
             ]);
@@ -264,7 +264,7 @@ class installActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'initialize' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'initialize' => true,
             ]);
@@ -306,7 +306,7 @@ class installActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'initialize' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'initialize' => true,
             ]);
@@ -349,7 +349,7 @@ class installActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'initialize' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'initialize' => true,
             ]);
@@ -393,7 +393,7 @@ class installActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'initialize' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'initialize' => true,
             ]);

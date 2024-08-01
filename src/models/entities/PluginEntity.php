@@ -35,6 +35,7 @@ class PluginEntity
     private $address;
 
     private $address_class;
+
     /** @var object */
     private $apiClass;
 
@@ -97,6 +98,9 @@ class PluginEntity
 
     /** @var object */
     private $dispatcher;
+
+    /** @var object */
+    private $entity_repository;
 
     /** @var object */
     private $install;
@@ -526,6 +530,14 @@ class PluginEntity
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * @return object
+     */
+    public function getEntityRepository()
+    {
+        return $this->entity_repository;
     }
 
     /**
@@ -1247,6 +1259,22 @@ class PluginEntity
         }
 
         $this->dispatcher = $dispatcher;
+
+        return $this;
+    }
+
+    /**
+     * @param object $entity_repository
+     *
+     * @return self
+     */
+    public function setEntityRepository($entity_repository)
+    {
+        if (!is_object($entity_repository)) {
+            throw new BadParameterException('Invalid argument, $entity_repository must be an EntityRepository');
+        }
+
+        $this->entity_repository = $entity_repository;
 
         return $this;
     }

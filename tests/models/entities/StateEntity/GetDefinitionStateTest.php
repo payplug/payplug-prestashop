@@ -18,7 +18,7 @@ final class GetDefinitionStateTest extends BaseStateEntity
             'table' => 'payplug_order_state',
             'primary' => 'id_payplug_order_state',
             'fields' => [
-                'id_order_state' => ['type' => 'int', 'required' => true],
+                'id_order_state' => ['type' => 'integer', 'required' => true],
                 'type' => ['type' => 'string', 'required' => true],
                 'date_add' => ['type' => 'string'],
                 'date_upd' => ['type' => 'string'],

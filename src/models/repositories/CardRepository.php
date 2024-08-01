@@ -42,10 +42,10 @@ class CardRepository extends EntityRepository
         'metadata' => 'string',
     ];
 
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . $this->dependencies->name . '_card';
+        parent::__construct($dependencies);
+        $this->table_name = $this->dependencies->name . '_card';
     }
 
     /**
@@ -67,7 +67,7 @@ class CardRepository extends EntityRepository
 
         $this
             ->insert()
-            ->into($this->table_name);
+            ->into($this->getTableName($this->table_name));
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -125,7 +125,7 @@ class CardRepository extends EntityRepository
         $result = $this
             ->select()
             ->fields('id_card')
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('id_card = "' . $this->escape($payment_id) . '"')
             ->where('id_company = ' . (int) $company_id)
             ->where('is_sandbox = ' . ((bool) $is_sandbox ? 1 : 0))
@@ -150,7 +150,7 @@ class CardRepository extends EntityRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
             ->build('unique_row');
 
@@ -167,7 +167,7 @@ class CardRepository extends EntityRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->build();
 
         return $result ?: [];
@@ -197,7 +197,7 @@ class CardRepository extends EntityRepository
         $this
             ->select()
             ->fields('*')
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('`id_customer` = ' . (int) $id_customer);
 
         if (null !== $id_company) {
@@ -228,7 +228,7 @@ class CardRepository extends EntityRepository
 
         $this
             ->create()
-            ->table($this->table_name)
+            ->table($this->getTableName($this->table_name))
             ->fields('`id_payplug_card` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_customer` int(11) UNSIGNED NOT NULL')
             ->fields('`id_company` int(11) UNSIGNED NOT NULL')
@@ -260,7 +260,7 @@ class CardRepository extends EntityRepository
 
         $result = $this
             ->delete()
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('`id_payplug_card` = ' . (int) $id_payplug_card)
             ->build();
 
@@ -312,7 +312,7 @@ class CardRepository extends EntityRepository
 
         $result = $this
             ->insert()
-            ->into($this->table_name)
+            ->into($this->getTableName($this->table_name))
             ->fields('id_customer')->values((int) $customer_id)
             ->fields('id_company')->values((int) $company_id)
             ->fields('is_sandbox')->values((bool) $is_sandbox ? 1 : 0)

@@ -15,7 +15,7 @@ class uninstallActionTest extends BaseConfigurationAction
 {
     private $card_action;
     private $constant;
-    private $query_repository;
+    private $entity_repository;
 
     public function setUp()
     {
@@ -35,13 +35,13 @@ class uninstallActionTest extends BaseConfigurationAction
             ->with('_PS_MODULE_DIR_')
             ->andReturn('module_path');
 
-        $this->query_repository = \Mockery::mock('QueryRepository');
+        $this->entity_repository = \Mockery::mock('EntityRepository');
 
         $this->plugin
             ->shouldReceive([
                 'getCardAction' => $this->card_action,
                 'getConstant' => $this->constant,
-                'getQueryRepository' => $this->query_repository,
+                'getEntityRepository' => $this->entity_repository,
             ]);
     }
 
@@ -91,7 +91,7 @@ class uninstallActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'deleteAll' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'uninstall' => false,
             ]);
@@ -115,7 +115,7 @@ class uninstallActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'deleteAll' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'uninstall' => true,
             ]);
@@ -143,7 +143,7 @@ class uninstallActionTest extends BaseConfigurationAction
             ->shouldReceive([
                 'deleteAll' => true,
             ]);
-        $this->query_repository
+        $this->entity_repository
             ->shouldReceive([
                 'uninstall' => true,
             ]);
