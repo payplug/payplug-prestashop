@@ -13,7 +13,7 @@ class BaseLoggerRepository extends BaseRepository
     protected function setUp()
     {
         parent::setUp();
-        $this->repository = \Mockery::mock(LoggerRepository::class, ['prefix', $this->dependencies])
+        $this->repository = \Mockery::mock(LoggerRepository::class, [$this->dependencies])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
         $this->repository

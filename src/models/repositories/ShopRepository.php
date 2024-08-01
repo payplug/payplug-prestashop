@@ -39,7 +39,7 @@ class ShopRepository extends EntityRepository
         $result = $this
             ->select()
             ->fields('`domain` as `url`, `main` as `default`')
-            ->from($this->prefix . 'shop_url')
+            ->from($this->getTableName('shop_url'))
             ->where('active = 1')
             ->build();
 

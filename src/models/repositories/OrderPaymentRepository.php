@@ -34,10 +34,10 @@ class OrderPaymentRepository extends EntityRepository
         'id_payment' => 'string',
     ];
 
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . $this->dependencies->name . '_order_payment';
+        parent::__construct($dependencies);
+        $this->table_name = $this->dependencies->name . '_order_payment';
     }
 
     /**
@@ -55,7 +55,7 @@ class OrderPaymentRepository extends EntityRepository
 
         $this
             ->insert()
-            ->into($this->table_name);
+            ->into($this->getTableName($this->table_name));
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -103,7 +103,7 @@ class OrderPaymentRepository extends EntityRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('`id_order` = ' . (int) $order_id)
             ->build();
 
@@ -125,7 +125,7 @@ class OrderPaymentRepository extends EntityRepository
 
         $this
             ->create()
-            ->table($this->table_name)
+            ->table($this->getTableName($this->table_name))
             ->fields('`id_payplug_order_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_order` INT(11) UNSIGNED NOT NULL')
             ->fields('`id_payment` VARCHAR(255) NOT NULL')

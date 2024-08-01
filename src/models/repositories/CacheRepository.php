@@ -29,17 +29,9 @@ if (!defined('_PS_VERSION_')) {
 
 class CacheRepository extends EntityRepository
 {
-    private $fields = [
-        'cache_key' => 'string',
-        'cache_value' => 'string',
-        'date_add' => 'string',
-        'date_upd' => 'string',
-    ];
-
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . $this->dependencies->name . '_cache';
+        parent::__construct($dependencies);
         $this->entity_name = 'CacheEntity';
     }
 
@@ -73,13 +65,11 @@ class CacheRepository extends EntityRepository
         if (!is_string($this->entity_name) || !$this->entity_name) {
             return false;
         }
-
         $entity = $this->getEntityObject($this->entity_name);
         if (!$entity) {
             return false;
         }
         $definition = $entity->getDefinition();
-
         $this
             ->create()
             ->table($this->getTableName($definition['table']))
