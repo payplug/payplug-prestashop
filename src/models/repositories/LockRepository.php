@@ -39,48 +39,7 @@ class LockRepository extends EntityRepository
     public function __construct($dependencies = null)
     {
         parent::__construct($dependencies);
-        $this->table_name = $this->dependencies->name . '_lock';
-    }
-
-    /**
-     * @description Create a lock from given parameters
-     *
-     * @param array $parameters
-     *
-     * @return bool
-     */
-    public function createLock($parameters = [])
-    {
-        if (!is_array($parameters) || empty($parameters)) {
-            return false;
-        }
-
-        $this
-            ->insert()
-            ->into($this->getTableName($this->table_name));
-
-        foreach ($parameters as $key => $value) {
-            if (array_key_exists($key, $this->fields)) {
-                switch ($this->fields[$key]) {
-                    case 'string':
-                        if (is_string($value) && $value) {
-                            $this->fields($key)->values($this->escape($value));
-                        }
-
-                        break;
-                    case 'integer':
-                        if (is_int($value)) {
-                            $this->fields($key)->values((int) $value);
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        return (bool) $this->build();
+        $this->entity_name = 'LockEntity';
     }
 
     /**
