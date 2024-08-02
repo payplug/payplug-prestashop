@@ -445,24 +445,24 @@ class EntityRepository extends QueryRepository
             ->update()
             ->table($this->getTableName($definition['table']));
 
-        foreach ($fields as $key => $value) {
-            if (array_key_exists($key, $definition['fields'])) {
-                switch ($definition['fields'][$key]['type']) {
+        foreach ($fields as $field_key => $field_value) {
+            if (array_key_exists($field_key, $definition['fields'])) {
+                switch ($definition['fields'][$field_key]['type']) {
                     case 'string':
-                        if (is_string($value) && $value) {
-                            $this->set($key . ' = "' . $this->escape($value) . '"');
+                        if (is_string($field_value) && $field_value) {
+                            $this->set($field_key . ' = "' . $this->escape($field_value) . '"');
                         }
 
                         break;
                     case 'integer':
-                        if (is_int($value)) {
-                            $this->set($key . ' = ' . (int) $value);
+                        if (is_int($field_value)) {
+                            $this->set($field_key . ' = ' . (int) $field_value);
                         }
 
                         break;
                     case 'boolean':
-                        if (is_bool($value)) {
-                            $this->set($key . ' = ' . ($value ? 1 : 0));
+                        if (is_bool($field_value)) {
+                            $this->set($field_key . ' = ' . ($field_value ? 1 : 0));
                         }
 
                         break;

@@ -43,19 +43,14 @@ class InstallmentClass
     /**
      * @description update the id_payplug_installment
      *
-     * @param $installment
+     * @param string $installment
      *
      * @return bool
      */
-    public function updatePayplugInstallment($installment)
+    public function updatePayplugInstallment($installment = null)
     {
-        if (!is_object($installment)) {
-            $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
-            if (!$installment['result']) {
-                return false;
-            }
-
-            $installment = $installment['resource'];
+        if (!is_object($installment) || !$installment) {
+            return false;
         }
 
         if (!isset($installment->schedule)) {
@@ -99,6 +94,10 @@ class InstallmentClass
             ->getPaymentRepository()
             ->getBy('resource_id', $installment->id);
 
+        if (empty($resource['schedules'])) {
+            return false;
+        }
+
         $schedules = json_decode($resource['schedules'], true);
         foreach ($schedules as &$schedule) {
             $step = $schedule['step'];
@@ -119,19 +118,14 @@ class InstallmentClass
     /**
      * @description insert installment payment in the database
      *
-     * @param $installment
+     * @param object $installment
      *
      * @return bool
      */
-    public function addPayplugInstallment($installment)
+    public function addPayplugInstallment($installment = null)
     {
-        if (!is_object($installment)) {
-            $installment = $this->dependencies->apiClass->retrieveInstallment($installment);
-            if (!$installment['result']) {
-                return false;
-            }
-
-            $installment = $installment['resource'];
+        if (!is_object($installment) || !$installment) {
+            return false;
         }
 
         $resource = $this->dependencies
