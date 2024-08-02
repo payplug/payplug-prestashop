@@ -307,7 +307,7 @@ class RefundClass
                     $delete_lock = $this->dependencies
                         ->getPlugin()
                         ->getLockRepository()
-                        ->deleteLock((int) $order->id_cart);
+                        ->deleteBy('id_cart', (int) $order->id_cart);
                     if (!$delete_lock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {
@@ -370,7 +370,7 @@ class RefundClass
                     $delete_lock = $this->dependencies
                         ->getPlugin()
                         ->getLockRepository()
-                        ->deleteLock((int) $order->id_cart);
+                        ->deleteBy('id_cart', (int) $order->id_cart);
                     if (!$delete_lock) {
                         $this->logger->addLog('Lock cannot be deleted.', 'error');
                     } else {

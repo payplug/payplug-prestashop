@@ -208,7 +208,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             $delete_lock = $this->dependencies
                 ->getPlugin()
                 ->getLockRepository()
-                ->deleteLock((int) $this->lock_id);
+                ->deleteBy('id_cart', (int) $this->lock_id);
             if (!$delete_lock) {
                 $this->logger->addLog('Lock cannot be deleted.', 'error');
             } else {

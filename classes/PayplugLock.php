@@ -55,7 +55,7 @@ class PayplugLock
         $lock_exists = $this->dependencies
             ->getPlugin()
             ->getLockRepository()
-            ->getByCartId((int) $id_cart);
+            ->getBy('id_cart', (int) $id_cart);
 
         if ($lock_exists) {
             // Then define the expiration
@@ -66,7 +66,7 @@ class PayplugLock
             $time = new \DateTime('now');
 
             $lock_repository = $this->dependencies->getPlugin()->getLockRepository();
-            while (!empty($lock_repository->getByCartId((int) $id_cart)) && ($time < $last_check)) {
+            while (!empty($lock_repository->getBy('id_cart', (int) $id_cart)) && ($time < $last_check)) {
                 sleep((int) $loop_time);
 
                 // If lock take too much time, end the process
@@ -75,7 +75,7 @@ class PayplugLock
                         $this->dependencies
                             ->getPlugin()
                             ->getLockRepository()
-                            ->deleteLock((int) $id_cart);
+                            ->deleteBy('id_cart', (int) $id_cart);
                     } else {
                         return 'stop ipn';
                     }
@@ -93,7 +93,7 @@ class PayplugLock
         $lock_exists = $this->dependencies
             ->getPlugin()
             ->getLockRepository()
-            ->getByCartId((int) $id_cart);
+            ->getBy('id_cart', (int) $id_cart);
 
         if (!empty($lock_exists)) {
             $date_add = new \DateTime($lock_exists['date_add']);
@@ -101,7 +101,7 @@ class PayplugLock
                 $this->dependencies
                     ->getPlugin()
                     ->getLockRepository()
-                    ->deleteLock((int) $id_cart);
+                    ->deleteBy('id_cart', (int) $id_cart);
             }
         }
 
@@ -123,7 +123,7 @@ class PayplugLock
         $lock = $this->dependencies
             ->getPlugin()
             ->getLockRepository()
-            ->getByCartId((int) $id_cart);
+            ->getBy('id_cart', (int) $id_cart);
         if (empty($lock)) {
             return false;
         }

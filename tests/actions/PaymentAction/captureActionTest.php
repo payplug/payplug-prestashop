@@ -238,7 +238,7 @@ class captureActionTest extends BasePaymentAction
         $lock = \Mockery::mock('Lock');
         $lock
             ->shouldReceive([
-                'deleteLock' => true,
+                'deleteBy' => true,
             ]);
 
         $this->plugin

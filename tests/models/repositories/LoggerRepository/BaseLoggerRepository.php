@@ -27,12 +27,16 @@ class BaseLoggerRepository extends BaseRepository
                 return $value;
             });
 
-        $this->entity_id = 42;
-        $this->entity = \Mockery::mock('EntityObject');
         $this->entity->shouldReceive([
             'getDefinition' => [
-                'table' => 'table',
-                'primary' => 'primary',
+                'table' => 'payplug_logger',
+                'primary' => 'id_payplug_logger',
+                'fields' => [
+                    'process' => ['type' => 'string', 'required' => true],
+                    'content' => ['type' => 'string', 'required' => true],
+                    'date_add' => ['type' => 'string'],
+                    'date_upd' => ['type' => 'string'],
+                ],
             ],
         ]);
     }
