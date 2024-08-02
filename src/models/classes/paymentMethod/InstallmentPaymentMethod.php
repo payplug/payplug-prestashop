@@ -215,6 +215,7 @@ class InstallmentPaymentMethod extends PaymentMethod
             ->getPlugin()
             ->getPaymentRepository()
             ->getBy('resource_id', $resource->id);
+
         if (!isset($resource_tab['schedules']) || !$resource_tab['schedules']) {
             $this->dependencies->installmentClass->addPayplugInstallment($resource);
         }
@@ -358,7 +359,7 @@ class InstallmentPaymentMethod extends PaymentMethod
     {
         return $this->dependencies
             ->installmentClass
-            ->addPayplugInstallment($resource->id);
+            ->addPayplugInstallment($resource);
     }
 
     /**

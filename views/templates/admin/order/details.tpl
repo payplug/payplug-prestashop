@@ -72,7 +72,6 @@
                 {$payment.card_brand|escape:'htmlall':'UTF-8'}
             </span>
         </li>
-
     {/if}
     {if isset($payment.card_mask) && $payment.card_mask}
         <li>
