@@ -1,10 +1,9 @@
 # Payplug module changelog
-## Next Version
+
+## Version 4.11.1
 - Bugfix :
   - [SMP-2786](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2518): Fix Appelpay carrier display description
 
-
-## Next Version
 - Refactoring :
   - [PRE-2511](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2491): Set EntityRepository
   - [PRE-2515](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2492): Set Logger entity
@@ -13,7 +12,6 @@
   - [PRE-2518](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2502): Set Payment Entity
   - [PRE-2516](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2502): Clean Order Payment repository
   - [PRE-2513](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2504): Set Card Entity
-
 
 ## Version 4.11.0
 - Feature :
