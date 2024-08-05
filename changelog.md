@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.10.1
+- Bugfix :
+  - [SMP-2870](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2511): Remove my-account from excluded controllers to restore saved card section
+  
 ## Version 4.10.0
 - Improvment :
   - [PRE-2551](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2496): Add order reference to payment resource
