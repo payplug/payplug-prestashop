@@ -89,7 +89,9 @@ class setTest extends BaseCardRepository
         $customer_id = 4242;
         $company_id = 4242;
         $is_sandbox = true;
-
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+        ]);
         $this->assertSame(
             false,
             $this->repository->set($card, $customer_id, $company_id, $is_sandbox)
@@ -103,6 +105,7 @@ class setTest extends BaseCardRepository
         $is_sandbox = true;
 
         $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
             'insert' => $this->repository,
             'into' => $this->repository,
             'fields' => $this->repository,
@@ -122,6 +125,7 @@ class setTest extends BaseCardRepository
         $is_sandbox = true;
 
         $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
             'insert' => $this->repository,
             'into' => $this->repository,
             'fields' => $this->repository,

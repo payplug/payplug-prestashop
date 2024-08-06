@@ -63,6 +63,7 @@ class getAllByCustomerTest extends BaseCardRepository
         $is_sandbox = true;
 
         $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
             'select' => $this->repository,
             'fields' => $this->repository,
             'from' => $this->repository,
@@ -97,6 +98,7 @@ class getAllByCustomerTest extends BaseCardRepository
         ];
 
         $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
             'select' => $this->repository,
             'fields' => $this->repository,
             'from' => $this->repository,
