@@ -194,7 +194,6 @@ class Translation
                     'applepay' => $this->l('modal.premium.feature.applepay', 'translation'),
                     'bancontact' => $this->l('modal.premium.feature.bancontact', 'translation'),
                     'integrated' => $this->l('modal.premium.feature.integrated', 'translation'),
-                    'giropay' => $this->l('modal.premium.feature.giropay', 'translation'),
                     'ideal' => $this->l('modal.premium.feature.ideal', 'translation'),
                     'mybank' => $this->l('modal.premium.feature.mybank', 'translation'),
                     'satispay' => $this->l('modal.premium.feature.satispay', 'translation'),
@@ -233,7 +232,6 @@ class Translation
                 'applepay' => $this->l('order.module.applepay', 'translation'),
                 'bancontact' => $this->l('order.module.bancontact', 'translation'),
                 'default' => $this->l('order.module.default', 'translation'),
-                'giropay' => $this->l('order.module.giropay', 'translation'),
                 'ideal' => $this->l('order.module.ideal', 'translation'),
                 'mybank' => $this->l('order.module.mybank', 'translation'),
                 'oney' => [
@@ -565,15 +563,6 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.sofort.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.sofort.call_to_action', 'translation'),
-            ],
-            'giropay' => [
-                'title' => $this->l('paymentmethods.giropay.title', 'translation'),
-                'descriptions' => [
-                    'live' => $this->l('paymentmethods.giropay.descriptions.live', 'translation'),
-                    'sandbox' => $this->l('paymentmethods.giropay.descriptions.sandbox', 'translation'),
-                ],
-                'link' => $this->l('paymentmethods.giropay.link', 'translation'),
-                'call_to_action' => $this->l('paymentmethods.giropay.call_to_action', 'translation'),
             ],
             'ideal' => [
                 'title' => $this->l('paymentmethods.ideal.title', 'translation'),

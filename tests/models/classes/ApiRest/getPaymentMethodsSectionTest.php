@@ -73,7 +73,6 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         yield ['feature_bancontact', 'bancontact'];
         yield ['feature_satispay', 'satispay'];
         yield ['feature_sofort', 'sofort'];
-        yield ['feature_giropay', 'giropay'];
         yield ['feature_ideal', 'ideal'];
         yield ['feature_mybank', 'mybank'];
     }

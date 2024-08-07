@@ -124,7 +124,6 @@ class PaymentMethod
             'bancontact',
             'satispay',
             'mybank',
-            'giropay',
             'sofort',
             'ideal',
             'oney',

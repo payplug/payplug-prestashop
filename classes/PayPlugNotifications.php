@@ -47,7 +47,6 @@ class PayPlugNotifications
     public $is_applepay = false;
     public $is_bancontact = false;
     public $is_deferred = false;
-    public $is_giropay = false;
     public $is_ideal = false;
     public $is_installment = false;
     public $is_mybank = false;
@@ -614,12 +613,6 @@ class PayPlugNotifications
             $this->is_amex = 'american_express' == $this->payment->payment_method['type'];
         }
         $this->logger->addLog('Notification: is_amex ' . ($this->is_amex ? 'ok' : 'nok'));
-
-        // Define if payment is giropay resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_giropay = 'giropay' == $this->payment->payment_method['type'];
-        }
-        $this->logger->addLog('Notification: is_giropay ' . ($this->is_giropay ? 'ok' : 'nok'));
 
         // Define if payment is ideal resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {

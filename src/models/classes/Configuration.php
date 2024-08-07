@@ -285,7 +285,7 @@ class Configuration
         'payment_methods' => [
             'type' => 'string',
             'name' => 'PAYMENT_METHODS',
-            'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"giropay":false,"installment":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"sofort":false,"standard":true}',
+            'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"installment":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"sofort":false,"standard":true}',
             'setConf' => 1,
         ],
         'sandbox_mode' => [
