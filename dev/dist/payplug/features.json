@@ -4,7 +4,6 @@
         "feature_applepay",
         "feature_bancontact",
         "feature_deferred",
-        "feature_giropay",
         "feature_ideal",
         "feature_installment",
         "feature_integrated",

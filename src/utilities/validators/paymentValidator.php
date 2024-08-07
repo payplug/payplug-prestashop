@@ -570,11 +570,6 @@ class paymentValidator
         $payment_methods_amount = json_decode($payment_methods_amount);
 
         switch ($payment_method) {
-            case 'giropay':
-                $payment = 'giropay';
-
-                break;
-
             case 'ideal':
                 $payment = 'ideal';
 
@@ -655,11 +650,6 @@ class paymentValidator
         $payment_methods_countries = json_decode($payment_methods_countries);
 
         switch ($payment_method) {
-            case 'giropay':
-                $payment = 'giropay';
-
-                break;
-
             case 'ideal':
                 $payment = 'ideal';
 

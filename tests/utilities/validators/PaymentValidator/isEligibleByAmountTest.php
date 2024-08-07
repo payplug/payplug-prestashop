@@ -3,99 +3,114 @@
 namespace PayPlug\tests\utilities\validators\PaymentValidator;
 
 use PayPlug\src\utilities\validators\paymentValidator;
+use PayPlug\tests\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group unit
- * @group action
- * @group amount_helper
+ * @group validator
+ * @group payment_validator
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
 class isEligibleByAmountTest extends TestCase
 {
+    use FormatDataProvider;
+
     protected $validator;
+    protected $amount;
+    protected $payment_method;
+    protected $payment_methods_amount;
 
     protected function setUp()
     {
         $this->validator = new paymentValidator();
+        $this->amount = 4200;
+        $this->payment_method = 'default';
+        $this->payment_methods_amount = '{"default":{"min":"EUR:100","max":"EUR:1000000"}}';
     }
 
     /**
-     * @description invalid isEligibleByAmount params provider
-     *
-     * @return \Generator
-     */
-    public function invalidIsEligibleByAmountDataProvider()
-    {
-        yield [null, 'giropay', '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '$amount must be a int type'];
-        yield ['test', 'giropay', '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '$amount must be a int type'];
-        yield [['key' => 'value'], 'giropay', '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '$amount must be a int type'];
-        yield [false, 'giropay', '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '$amount must be a int type'];
-
-        yield [4242, null, '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '$payment_method must be a string type'];
-        yield [4242, 42, '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '$payment_method must be a string type'];
-        yield [4242, ['key' => 'value'], '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '$payment_method must be a string type'];
-        yield [4242, false, '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '$payment_method must be a string type'];
-
-        yield [4242, 'giropay', null, '$payment_methods_amount must be a string type'];
-        yield [4242, 'giropay', 42, '$payment_methods_amount must be a string type'];
-        yield [4242, 'giropay', ['key' => 'value'], '$payment_methods_amount must be a string type'];
-        yield [4242, 'giropay', false, '$payment_methods_amount must be a string type'];
-
-        yield [50, 'giropay', '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '50 is not eligible for giropay'];
-        yield [5000000, 'giropay', '{"giropay":{"min":"EUR:100","max":"EUR:1000000"}}', '5000000 is not eligible for giropay'];
-    }
-
-    /**
-     * @description valid isEligibleByAmount params provider
-     *
-     * @return \Generator
-     */
-    public function validIsEligibleByAmountDataProvider()
-    {
-        yield [4242, 'applepay', '{"default":{"min":"EUR:99","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"oney":{"min":"EUR:10000","max":"EUR:300000"}}', '4242 is eligible for applepay'];
-    }
-
-    /**
-     * @description  test isEligibleByAmount with invalid data provider
-     *
-     * @dataProvider invalidIsEligibleByAmountDataProvider
+     * @dataProvider invalidIntegerFormatDataProvider
      *
      * @param $amount
-     * @param $payment_method
-     * @param $payment_methods_amount
-     * @param $errorMsg
      */
-    public function testIsEligibleByAmountWithInvalidDataProvider($amount, $payment_method, $payment_methods_amount, $errorMsg)
+    public function testWhenGivenAmountIsInvalidIntegerFormat($amount)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'message' => $errorMsg,
+                'message' => '$amount must be a int type',
             ],
-            $this->validator->isEligibleByAmount($amount, $payment_method, $payment_methods_amount)
+            $this->validator->isEligibleByAmount($amount, $this->payment_method, $this->payment_methods_amount)
         );
     }
 
     /**
-     * @description  test isEligibleByAmount with invalid data provider
+     * @dataProvider invalidStringFormatDataProvider
      *
-     * @dataProvider validIsEligibleByAmountDataProvider
-     *
-     * @param $amount
      * @param $payment_method
-     * @param $payment_methods_amount
-     * @param $message
      */
-    public function testIsEligibleByAmountWithValidDataProvider($amount, $payment_method, $payment_methods_amount, $message)
+    public function testWhenGivenPaymentMethodIsInvalidStringFormat($payment_method)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => '$payment_method must be a string type',
+            ],
+            $this->validator->isEligibleByAmount($this->amount, $payment_method, $this->payment_methods_amount)
+        );
+    }
+
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param $payment_methods_amount
+     */
+    public function testWhenGivenPaymentMethodAmountIsInvalidStringFormat($payment_methods_amount)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => '$payment_methods_amount must be a string type',
+            ],
+            $this->validator->isEligibleByAmount($this->amount, $this->payment_method, $payment_methods_amount)
+        );
+    }
+
+    public function testWhenGivenAmountIsToLow()
+    {
+        $amount = 50;
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => $amount . ' is not eligible for ' . $this->payment_method,
+            ],
+            $this->validator->isEligibleByAmount($amount, $this->payment_method, $this->payment_methods_amount)
+        );
+    }
+
+    public function testWhenGivenAmountIsToHight()
+    {
+        $amount = 5000000;
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => $amount . ' is not eligible for ' . $this->payment_method,
+            ],
+            $this->validator->isEligibleByAmount($amount, $this->payment_method, $this->payment_methods_amount)
+        );
+    }
+
+    public function testWhenGivenAmountIsElligible()
     {
         $this->assertSame(
             [
                 'result' => true,
-                'message' => $message,
+                'message' => $this->amount . ' is eligible for ' . $this->payment_method,
             ],
-            $this->validator->isEligibleByAmount($amount, $payment_method, $payment_methods_amount)
+            $this->validator->isEligibleByAmount($this->amount, $this->payment_method, $this->payment_methods_amount)
         );
     }
 }

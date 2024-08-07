@@ -80,7 +80,6 @@ class ApiRest
             case 'satispay_permissions':
             case 'mybank_permissions':
             case 'sofort_permissions':
-            case 'giropay_permissions':
             case 'ideal_permissions':
                 $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $payment_method = str_replace('_permissions', '', $action);
@@ -185,7 +184,6 @@ class ApiRest
             'amex' => (bool) $payment_methods['amex'],
             'satispay' => (bool) $payment_methods['satispay'],
             'sofort' => (bool) $payment_methods['sofort'],
-            'giropay' => (bool) $payment_methods['giropay'],
             'ideal' => (bool) $payment_methods['ideal'],
             'mybank' => (bool) $payment_methods['mybank'],
         ];

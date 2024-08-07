@@ -33,7 +33,6 @@ class PaymentAction
         'amex',
         'applepay',
         'bancontact',
-        'giropay',
         'ideal',
         'installment',
         'mybank',

@@ -72,7 +72,6 @@ class ConfigurationAction
             'applepay' => 'can_use_apple_pay',
             'bancontact' => 'can_use_bancontact',
             'deferred' => 'can_create_deferred_payment',
-            'giropay' => 'can_use_giropay',
             'ideal' => 'can_use_ideal',
             'installment' => 'can_create_installment_plan',
             'integrated' => 'can_use_integrated_payments',
@@ -119,7 +118,6 @@ class ConfigurationAction
         switch ($payment_method) {
             case 'american_express':
             case 'bancontact':
-            case 'giropay':
             case 'ideal':
             case 'mybank':
             case 'satispay':
@@ -743,7 +741,6 @@ class ConfigurationAction
             'applepay' => 'enable_applepay',
             'bancontact' => 'enable_bancontact',
             'deferred' => 'enable_payplug_deferred',
-            'giropay' => 'enable_giropay',
             'installment' => 'enable_payplug_inst',
             'ideal' => 'enable_ideal',
             'mybank' => 'enable_mybank',

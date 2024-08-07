@@ -118,7 +118,6 @@ class Routes
             'deferred' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360010088420',
             'embedded' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/4409698334098',
             'forgot_password' => 'https://portal.payplug.com/forgot_password',
-            'giropay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089089179420',
             'guide' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360011715080',
             'help' => 'https://support.payplug.com/hc/' . $iso_code . '/requests/new',
             'ideal' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089119071132',

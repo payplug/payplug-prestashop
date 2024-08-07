@@ -3,96 +3,90 @@
 namespace PayPlug\tests\utilities\validators\PaymentValidator;
 
 use PayPlug\src\utilities\validators\paymentValidator;
+use PayPlug\tests\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group unit
- * @group action
- * @group amount_helper
+ * @group validator
+ * @group payment_validator
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
 class isEligibleByCountryTest extends TestCase
 {
+    use FormatDataProvider;
+
     protected $validator;
+    protected $country;
+    protected $payment_method;
+    protected $payment_methods_countries;
 
     protected function setUp()
     {
         $this->validator = new paymentValidator();
+        $this->country = 'FR';
+        $this->payment_method = 'default';
+        $this->payment_methods_countries = '{"default":["FR","BE"]}';
     }
 
     /**
-     * @description invalid isEligibleByCountry params provider
-     *
-     * @return \Generator
-     */
-    public function invalidIsEligibleByAmountDataProvider()
-    {
-        yield [null, 'giropay', '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', '$country must be a string type'];
-        yield [42, 'giropay', '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', '$country must be a string type'];
-        yield [['key' => 'value'], 'giropay', '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', '$country must be a string type'];
-        yield [false, 'giropay', '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', '$country must be a string type'];
-
-        yield ['DE', null, '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', '$payment_method must be a string type'];
-        yield ['DE', 42, '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', '$payment_method must be a string type'];
-        yield ['DE', ['key' => 'value'], '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', '$payment_method must be a string type'];
-        yield ['DE', false, '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', '$payment_method must be a string type'];
-
-        yield ['DE', 'giropay', null, '$payment_methods_countries must be a string type'];
-        yield ['DE', 'giropay', 42, '$payment_methods_countries must be a string type'];
-        yield ['DE', 'giropay', ['key' => 'value'], '$payment_methods_countries must be a string type'];
-        yield ['DE', 'giropay', false, '$payment_methods_countries must be a string type'];
-    }
-
-    /**
-     * @description valid isEligibleByCountry params provider
-     *
-     * @return \Generator
-     */
-    public function validIsEligibleByAmountDataProvider()
-    {
-        yield ['DE', 'giropay', '{"default":["all"],"giropay":["DE"],"ideal":["NL"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}', 'DE is eligible for giropay'];
-    }
-
-    /**
-     * @description  test isEligibleByAmount with invalid data provider
-     *
-     * @dataProvider invalidIsEligibleByAmountDataProvider
+     * @dataProvider invalidStringFormatDataProvider
      *
      * @param $country
-     * @param $payment_method
-     * @param $payment_methods_countries
-     * @param $errorMsg
      */
-    public function testIsEligibleByAmountWithInvalidDataProvider($country, $payment_method, $payment_methods_countries, $errorMsg)
+    public function testWhenGivenCountryIsInvalidStringFormat($country)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'message' => $errorMsg,
+                'message' => '$country must be a string type',
             ],
-            $this->validator->isEligibleByCountry($country, $payment_method, $payment_methods_countries)
+            $this->validator->isEligibleByCountry($country, $this->payment_method, $this->payment_methods_countries)
         );
     }
 
     /**
-     * @description  test isEligibleByAmount with invalid data provider
+     * @dataProvider invalidStringFormatDataProvider
      *
-     * @dataProvider validIsEligibleByAmountDataProvider
-     *
-     * @param $country
      * @param $payment_method
-     * @param $payment_methods_countries
-     * @param $message
      */
-    public function testIsEligibleByAmountWithValidDataProvider($country, $payment_method, $payment_methods_countries, $message)
+    public function testWhenGivenPaymentMethodIsInvalidStringFormat($payment_method)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => '$payment_method must be a string type',
+            ],
+            $this->validator->isEligibleByCountry($this->payment_method, $payment_method, $this->payment_methods_countries)
+        );
+    }
+
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param $payment_methods_countries
+     */
+    public function testWhenGivenPaymentMethodCountryIsInvalidStringFormat($payment_methods_countries)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => '$payment_methods_countries must be a string type',
+            ],
+            $this->validator->isEligibleByCountry($this->payment_method, $this->payment_method, $payment_methods_countries)
+        );
+    }
+
+    public function testWhenGivenCountryIsEligible()
     {
         $this->assertSame(
             [
                 'result' => true,
-                'message' => $message,
+                'message' => $this->country . ' is eligible for ' . $this->payment_method,
             ],
-            $this->validator->isEligibleByCountry($country, $payment_method, $payment_methods_countries)
+            $this->validator->isEligibleByCountry($this->country, $this->payment_method, $this->payment_methods_countries)
         );
     }
 }
