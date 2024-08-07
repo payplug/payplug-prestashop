@@ -128,7 +128,10 @@ class Payplug extends PaymentModule
         // Check if controller name exist then if linked to the right module
         $idtab = Tab::getIdFromClassName($controllerName);
         if (!$idtab) {
-            $this->payplug_dependencies->getDependency('install')->installTab();
+            $this->payplug_dependencies->dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->installTabAction();
         } else {
             $tab = new Tab($idtab);
             if ('payplug' != $tab->module) {

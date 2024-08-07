@@ -3,6 +3,7 @@
 ## Version 4.11.0
 - Feature :
   - [PRE-2561](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2514): Remove giropay payment method
+  - [SMP-2882](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2515): Fix the use of installTab inside payplug.php
 
 - Bugfix :
   - [SMP-2870](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2511): Remove my-account from excluded controllers to restore saved card section
