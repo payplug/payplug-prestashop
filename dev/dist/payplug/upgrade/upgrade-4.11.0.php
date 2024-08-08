@@ -33,7 +33,7 @@ function upgrade_module_4_11_0($object)
 
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
     unset($payment_methods['giropay']);
-    $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_DISPLAY', json_encode($payment_methods));
+    $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
 
     $logger->addLog('End upgrade script 4.11.0, result: ' . ($flag ? 'ok' : 'ko'));
 
