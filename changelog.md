@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.12.0
+- Refactoring :
+  - [PRE-2519](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2517): Set Queue Entity
+
 ## Version 4.11.2
 - Bugfix :
   - [SMP-2936](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2518): Fix double order creation
