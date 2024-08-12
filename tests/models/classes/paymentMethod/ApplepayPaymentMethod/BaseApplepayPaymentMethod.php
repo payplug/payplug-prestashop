@@ -21,7 +21,6 @@ class BaseApplepayPaymentMethod extends BasePaymentMethod
                 'result' => true,
                 'message' => '',
             ]);
-
         $this->carrier_adapter
             ->shouldReceive([
                 'get' => CarrierMock::get(),

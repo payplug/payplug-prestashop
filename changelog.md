@@ -1,4 +1,8 @@
 # Payplug module changelog
+## Next Version
+- Bugfix :
+  - [SMP-2786](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2518): Fix Appelpay carrier display description
+
 
 ## Version 4.11.0
 - Feature :

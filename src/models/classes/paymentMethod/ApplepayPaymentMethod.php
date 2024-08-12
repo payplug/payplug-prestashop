@@ -665,7 +665,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         }
 
         foreach ($carriers_list as $id_carrier) {
-            $carrier = $carrier_adapter->get((int) $id_carrier);
+            $carrier = $carrier_adapter->get((int) $id_carrier, (int) $this->context->language->id);
             if (!$this->validate_adapter->validate('isLoadedObject', $carrier)) {
                 continue;
             }
