@@ -169,6 +169,12 @@ class PluginEntity
     private $query_repository;
 
     /** @var object */
+    private $queue_action;
+
+    /** @var object */
+    private $queue_repository;
+
+    /** @var object */
     private $query_adapter;
 
     /** @var object */
@@ -762,6 +768,22 @@ class PluginEntity
     public function getQueryRepository()
     {
         return $this->query_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getQueueAction()
+    {
+        return $this->queue_action;
+    }
+
+    /**
+     * @return object
+     */
+    public function getQueueRepository()
+    {
+        return $this->queue_repository;
     }
 
     /**
@@ -1770,6 +1792,38 @@ class PluginEntity
         }
 
         $this->query_repository = $query_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $queue_action
+     *
+     * @return self
+     */
+    public function setQueueAction($queue_action)
+    {
+        if (!is_object($queue_action)) {
+            throw new BadParameterException('Invalid argument, $queue_action must be a QueryAction');
+        }
+
+        $this->queue_action = $queue_action;
+
+        return $this;
+    }
+
+    /**
+     * @param object $queue_repository
+     *
+     * @return self
+     */
+    public function setQueueRepository($queue_repository)
+    {
+        if (!is_object($queue_repository)) {
+            throw new BadParameterException('Invalid argument, $queue_repository must be a QueueRepository');
+        }
+
+        $this->queue_repository = $queue_repository;
 
         return $this;
     }

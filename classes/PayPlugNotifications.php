@@ -218,6 +218,21 @@ class PayPlugNotifications
             $this->logger->addLog($str);
         }
         if ($this->lock_key) {
+            // Queue system
+            /*
+            $update_queue = $this->dependencies
+                ->getQueueAction()
+                ->updateAction($this->cart->id, $this->resource->id);
+            if (!$update_queue['result']) {
+                $this->logger->addLog('Lock cannot be deleted.', 'error');
+            }
+            if (!empty($update_queue['exists'])) {
+                // we update resource and reload the process
+                hydrate $this->payment = retrievePayment ($update_queue['exists']['resource_id'])
+                then call $this->processPayment()
+            }
+            //*/
+
             $delete_lock = $this->dependencies
                 ->getPlugin()
                 ->getLockRepository()
@@ -522,6 +537,18 @@ class PayPlugNotifications
     private function setLock()
     {
         $this->logger->addLog('Notification: setLock');
+
+        /*
+        // Queue usage :
+        $create_queue = $this->dependencies->getQueueAction()->hydrateAction($this->cart->id, $this->resource->id);
+        if (!$create_queue['result']) {
+            $this->exitProcess('Lock cannot be created.', 500);
+        }
+        if ($create_queue['exists']) {
+            $this->exitProcess('Queue already exists.', 200);
+        }
+        //*/
+
         $cart_lock = $this->payplugLock->createLockG2($this->cart->id, 'ipn');
         if (!$cart_lock) {
             $this->exitProcess('Lock cannot be created.', 500);
@@ -553,6 +580,9 @@ class PayPlugNotifications
     private function setPayment()
     {
         $this->logger->addLog('Notification: setPayment');
+        if ($this->payment) {
+            return true;
+        }
         $payment = $this->apiClass->retrievePayment($this->resource->id);
         if (!$payment['result']) {
             if ($this->sandbox) {
