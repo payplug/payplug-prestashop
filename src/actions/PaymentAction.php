@@ -359,17 +359,18 @@ class PaymentAction
         $resource = $this->plugin
             ->getPaymentRepository()
             ->getByCart((int) $cart_id);
-        if (!empty($resource)) {
-            $payment_method = $this->plugin
-                ->getPaymentMethodClass()
-                ->getPaymentMethod($resource['method']);
-            $removed = $this->removeAction($resource['resource_id'], $payment_method->cancellable);
-            if (!$removed) {
-                $this->logger->addLog('PaymentAction::createAction - Stored resource can\'t be remove.', 'error');
-
-                return [];
-            }
-        }
+        $this->logger->addLog(json_encode($resource));
+//        if (!empty($resource)) {
+//            $payment_method = $this->plugin
+//                ->getPaymentMethodClass()
+//                ->getPaymentMethod($resource['method']);
+//            $removed = $this->removeAction($resource['resource_id'], $payment_method->cancellable);
+//            if (!$removed) {
+//                $this->logger->addLog('PaymentAction::createAction - Stored resource can\'t be remove.', 'error');
+//
+//                return [];
+//            }
+//        }
 
         // Create the payment from given payment_tab
         $payment_method = $this->plugin
@@ -392,9 +393,12 @@ class PaymentAction
             'cart_hash' => $payment_hash,
             'date_upd' => date('Y-m-d H:i:s'),
         ];
+        $this->logger->addLog(json_encode($parameters));
         $save_hash = $this->plugin
             ->getPaymentRepository()
             ->createPayment($parameters);
+        $this->logger->addLog(json_encode($save_hash));
+
         if (!$save_hash) {
             $this->logger->addLog('PaymentAction::createAction - Payment method hash can\'t be generated.', 'error');
 

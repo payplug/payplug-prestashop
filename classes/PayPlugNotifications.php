@@ -422,10 +422,10 @@ class PayPlugNotifications
         $resource_id = isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id
             ? $this->resource->installment_plan_id
             : $this->resource->id;
-        $payment = $this->dependencies
+        $payments = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByResourceId($resource_id);
+            ->getAllByResourceId($resource_id);
         if (empty($payment)) {
             if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                 $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
@@ -435,8 +435,9 @@ class PayPlugNotifications
             $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
             $this->exitProcess($error_msg, $this->is_oney ? 242 : 500);
         }
+        $latest_payment = $payments[0];
 
-        $this->cart = $this->cartAdapter->get((int) $payment['id_cart']);
+        $this->cart = $this->cartAdapter->get((int) $latest_payment['id_cart']);
         if (!$this->validateAdapter->validate('isLoadedObject', $this->cart)) {
             $this->logger->addLog('The cart cannot be loaded with id ' . $payment['id_cart'], 'error');
             $this->exitProcess('The cart cannot be loaded.', 500);

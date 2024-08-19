@@ -189,6 +189,21 @@ class PaymentRepository extends QueryRepository
         return $result ?: [];
     }
 
+    public function getAllByResourceId($resource_id = '')
+    {
+        if (!is_string($resource_id) || !$resource_id) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->table_name)
+            ->where('`resource_id` = "' . $this->escape($resource_id) . '"')
+            ->orderBy('`date_upd` DESC')
+            ->build('result');
+    }
+
     /**
      * @description Create the table in the database
      *
