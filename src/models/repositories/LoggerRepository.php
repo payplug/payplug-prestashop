@@ -27,66 +27,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class LoggerRepository extends QueryRepository
+class LoggerRepository extends EntityRepository
 {
-    private $fields = [
-        'process' => 'string',
-        'content' => 'string',
-        'date_add' => 'string',
-        'date_upd' => 'string',
-    ];
-
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . $this->dependencies->name . '_logger';
-    }
-
-    /**
-     * @description Create a log from given parameters
-     *
-     * @param array $parameters
-     *
-     * @return bool
-     */
-    public function createLog($parameters = [])
-    {
-        if (!is_array($parameters) || empty($parameters)) {
-            return false;
-        }
-
-        $this
-            ->insert()
-            ->into($this->table_name);
-
-        foreach ($parameters as $key => $value) {
-            if (array_key_exists($key, $this->fields)) {
-                switch ($this->fields[$key]) {
-                    case 'string':
-                        if (is_string($value) && $value) {
-                            $this->fields($key)->values($this->escape($value));
-                        }
-
-                        break;
-                    case 'integer':
-                        if (is_int($value)) {
-                            $this->fields($key)->values((int) $value);
-                        }
-
-                        break;
-                    case 'bool':
-                        if (is_bool($value)) {
-                            $this->fields($key)->values($value ? 1 : 0);
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        return (bool) $this->build() ? $this->lastId() : false;
+        parent::__construct($dependencies);
+        $this->entity_name = 'LoggerEntity';
     }
 
     /**
@@ -101,64 +47,52 @@ class LoggerRepository extends QueryRepository
         if (!is_string($date) || !$date) {
             return false;
         }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
 
-        $this
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
+        $result = $this
             ->delete()
-            ->from($this->table_name)
-            ->where('`date_add` < ' . $this->escape($date));
+            ->from($this->getTableName($definition['table']))
+            ->where('`date_add` < ' . $this->escape($date))
+            ->build();
 
-        return (bool) $this->build();
+        return $result ?: false;
     }
 
     /**
      * @description Delete all log from a given id.
      *
-     * @param int $id_logger
+     * @param int $id
      *
      * @return bool
      */
-    public function deleteFromId($id_logger = 0)
+    public function deleteFromId($id = 0)
     {
-        if (!is_int($id_logger) || !$id_logger) {
+        if (!is_int($id) || !$id) {
+            return false;
+        }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
             return false;
         }
 
-        $this
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
+        $result = $this
             ->delete()
-            ->from($this->table_name)
-            ->where('`id_payplug_logger` < ' . (int) $id_logger);
-
-        return (bool) $this->build();
-    }
-
-    /**
-     * @description Flush the log table.
-     *
-     * @return bool
-     */
-    public function flushLog()
-    {
-        $result = $this
-            ->truncate()
-            ->table($this->table_name);
-
-        return (bool) $result;
-    }
-
-    /**
-     * @description Get all log from table.
-     *
-     * @return array
-     */
-    public function getAllLog()
-    {
-        $result = $this
-            ->select()
-            ->fields('*')
-            ->from($this->table_name)
+            ->from($this->getTableName($definition['table']))
+            ->where('`' . $definition['primary'] . '` < ' . (int) $id)
             ->build();
 
-        return $result ?: [];
+        return $result ?: false;
     }
 
     /**
@@ -173,12 +107,19 @@ class LoggerRepository extends QueryRepository
         if (!is_int($limit) || !$limit) {
             return [];
         }
-
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return [];
+        }
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return [];
+        }
+        $definition = $entity->getDefinition();
         $result = $this
             ->select()
-            ->fields('`id_payplug_logger`')
-            ->from($this->table_name)
-            ->orderBy('`id_payplug_logger` DESC')
+            ->fields($definition['primary'])
+            ->from($this->getTableName($definition['table']))
+            ->orderBy($definition['primary'] . ' DESC')
             ->limit($limit, 1)
             ->build('unique_row');
 
@@ -197,10 +138,17 @@ class LoggerRepository extends QueryRepository
         if (!is_string($engine) || !$engine) {
             return false;
         }
-
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
         $this
             ->create()
-            ->table($this->table_name)
+            ->table($this->getTableName($definition['table']))
             ->fields('`id_payplug_logger` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`process` VARCHAR(255) NOT NULL')
             ->fields('`content` TEXT NOT NULL')
@@ -209,59 +157,5 @@ class LoggerRepository extends QueryRepository
             ->engine($engine);
 
         return $this->build();
-    }
-
-    /**
-     * @description Update an existing payment for a given id logger.
-     *
-     * @param int $id_logger
-     * @param array $parameters
-     *
-     * @return bool
-     */
-    public function updateLog($id_logger = 0, $parameters = [])
-    {
-        if (!is_int($id_logger) || !$id_logger) {
-            return false;
-        }
-
-        if (!is_array($parameters) || empty($parameters)) {
-            return false;
-        }
-
-        $this
-            ->update()
-            ->table($this->table_name);
-
-        foreach ($parameters as $key => $value) {
-            if (array_key_exists($key, $this->fields)) {
-                switch ($this->fields[$key]) {
-                    case 'string':
-                        if (is_string($value) && $value) {
-                            $this->set($key . ' = "' . $this->escape($value) . '"');
-                        }
-
-                        break;
-                    case 'integer':
-                        if (is_int($value)) {
-                            $this->set($key . ' = ' . (int) $value);
-                        }
-
-                        break;
-                    case 'bool':
-                        if (is_bool($value)) {
-                            $this->set($key . ' = ' . ($value ? 1 : 0));
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        $this->where('`id_payplug_logger` = ' . (int) $id_logger);
-
-        return (bool) $this->build();
     }
 }

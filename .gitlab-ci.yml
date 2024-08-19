@@ -24,51 +24,11 @@ workflow:
     # Cleanup scenario
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "master" && $CLEANUP_BRANCH
 
-# Override check_project_integrity to remove .gitlab-ci.yml check
-check_project_integrity:
-  image: ${DALENYS_GITLAB_DOCKER_REGISTRY}/ci-job-basic:latest
-  tags:
-    - docker-gitlab-runner
-  stage: setup
-  interruptible: true
-  script:
-    - !reference [.log_utils, script]
-    - !reference [.validate_branchName, script]
-    - !reference [.validate_targetBranchName, script]
-    - !reference [.validate_mergeRequestTitle, script]
-    - !reference [.validate_readme_filled, script]
-    - !reference [.validate_replacePlaceHolder_removed, script]
-    - !reference [.validate_codeowners_existence, script]
-  rules:
-    - if: $CI_MERGE_REQUEST_DRAFT
-      when: manual
-    - if: $CI_COMMIT_BRANCH == "master" && $CLEANUP_BRANCH
-      when: manual
-    - if: $CI_COMMIT_BRANCH == "master" || $CI_MERGE_REQUEST_ID
+# Disable .gitlab-ci.yml check
+.validate_gitlab-ci_migration:
+  script: []
 
-# Override validate_jira_status to remove component validation
-# TODO: remove this override when the component validation is fixed
 validate_jira_status:
-  script:
-    - !reference [.git_utils, script]
-    - !reference [.jira_api_utils, script]
-    - set -a
-    - JIRA_TICKET=$(grep -E -o '^[A-Z][0-9A-Z]+-[0-9]+' <<< ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME})
-    - read_jira_data "issue/${JIRA_TICKET}?fields=issuetype,status,components,customfield_10179,assignee"
-      JIRA_ERRORS=.errors
-      JIRA_ERROR_MESSAGES=.errorMessages//empty
-      JIRA_TYPE_ID=.fields.issuetype.id
-      JIRA_TYPE_NAME=.fields.issuetype.name
-      JIRA_STATUS_ID=.fields.status.id
-      JIRA_STATUS_NAME=.fields.status.name
-      JIRA_COMPONENTS=.fields.components
-      JIRA_SQUAD=.fields.customfield_10179.value//empty
-      JIRA_ASSIGNEE=.fields.assignee//empty
-    - !reference [.validate_jira_valid_status, script]
-    - !reference [.validate_jira_commits, script]
-    - !reference [.update_gitlab_mr, script]
-    - !reference [.update_jira_assignee, script]
-    - transition_jira_dev_status "in_progress" "${JIRA_TICKET}"
   rules:
     - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"
       when: never
@@ -107,13 +67,12 @@ finally_check_project_integrity:
   when: manual # it is better to have the pipeline marked as "blocked" rather than "failed"
   allow_failure: false # we intend to always block the pipeline
 
-.define_artefact_version: &define_artefact_version |
-  export ARTIFACT_VERSION=$(cat dev/dist/payplug/composer.json | grep -o '"version": "[^"]*' | grep --color=no -o '[^"]*$')
+.setup_version_scripts:
+  parse_project_version:
+    - export ARTIFACT_VERSION=$( jq -r '.version' dev/dist/payplug/composer.json )
+    - export TAG_NAME=${ARTIFACT_VERSION}
 
 setup_version:
-  before_script:
-    - *define_artefact_version
-    - export TAG_NAME=${ARTIFACT_VERSION}
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -133,9 +92,9 @@ setup_version:
   echo "Injecting version in composer.json"
   sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION}'",/g' ./dev/dist/payplug/composer.json
   echo "Injecting version in package.json"
-  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION_JS}'",/g' ./dev/dist/payplug/package.json
+  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION}'",/g' ./dev/dist/payplug/package.json
   echo "Injecting version in package-lock.json"
-  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION_JS}'",/g' ./dev/dist/payplug/package-lock.json
+  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION}'",/g' ./dev/dist/payplug/package-lock.json
 
 setup_vendor:
   image: docker.io/composer:1.9

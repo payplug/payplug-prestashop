@@ -10,6 +10,13 @@ class BaseShopRepository extends BaseRepository
     protected function setUp()
     {
         parent::setUp();
-        $this->repository = \Mockery::mock(ShopRepository::class, ['prefix', $this->dependencies])->makePartial();
+        $this->repository = \Mockery::mock(ShopRepository::class, [$this->dependencies])
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $this->repository
+            ->shouldReceive('getTableName')
+            ->andReturnUsing(function ($value) {
+                return $value;
+            });
     }
 }

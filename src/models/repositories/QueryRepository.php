@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\models\repositories;
 
+use PrestaShopException;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -32,8 +34,6 @@ class QueryRepository
     public $table_name;
 
     protected $dependencies;
-
-    protected $prefix;
 
     protected $query = [
         'type' => [],
@@ -80,10 +80,9 @@ class QueryRepository
         'varbinary',
     ];
 
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
         $this->dependencies = $dependencies;
-        $this->prefix = $prefix;
     }
 
     /**
@@ -382,7 +381,7 @@ class QueryRepository
                     implode(",\n", $this->query['from'])) . "\n";
         } elseif ('CREATE' == $this->query['type']) {
             if (!$this->query['table']) {
-                throw new PrestaShopException('Can\'t create table because ->table() is not set or empty');
+                throw new \PrestaShopException('Can\'t create table because ->table() is not set or empty');
             }
 
             if (!$this->query['fields']) {
@@ -570,8 +569,11 @@ class QueryRepository
         try {
             $result = $this->dependencies->getPlugin()->getQueryAdapter()->query($sql);
         } catch (\Exception $e) {
-            // todo: add log
-            // $this->logger->addLog('QueryRepository::build() - Exception thrown: ' . $e->getMessage());
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('QueryRepository::build() - Exception thrown: ' . $e->getMessage());
+
             return false;
         }
 
@@ -601,73 +603,5 @@ class QueryRepository
     public function escape($string, $htmlOK = false)
     {
         return $this->dependencies->getPlugin()->getQueryAdapter()->escape($string, $htmlOK);
-    }
-
-    public function setPrefix($prefix = '')
-    {
-        $this->prefix = $prefix;
-    }
-
-    public function initialize()
-    {
-        $flag = true;
-        $repositories = $this->getChildRepositories();
-        $engine = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('_MYSQL_ENGINE_');
-        $engine = $engine ?: 'InnoDB';
-
-        foreach ($repositories as $repository) {
-            if ($flag) {
-                $flag = $flag && $repository->initialize($engine);
-            }
-        }
-
-        return $flag;
-    }
-
-    public function uninstall()
-    {
-        $flag = true;
-        $repositories = $this->getChildRepositories();
-        foreach ($repositories as $repository) {
-            if (!$flag) {
-                continue;
-            }
-
-            $exists = $this->ifExists()
-                ->table($repository->table_name)
-                ->build();
-
-            if (!$exists) {
-                continue;
-            }
-
-            $flag = $flag && $this
-                ->drop()
-                ->table($repository->table_name)
-                ->build();
-        }
-
-        return $flag;
-    }
-
-    private function getChildRepositories()
-    {
-        $repositories = [];
-
-        $query = get_class($this);
-
-        foreach (get_declared_classes() as $repository) {
-            if (is_subclass_of($repository, $query)) {
-                $repository_class = new $repository($this->prefix, $this->dependencies);
-                if ($repository_class->table_name && strpos($repository_class->table_name, $this->dependencies->name)) {
-                    $repositories[] = $repository_class;
-                }
-            }
-        }
-
-        return $repositories;
     }
 }

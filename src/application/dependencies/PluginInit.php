@@ -73,8 +73,6 @@ use PayPlug\src\models\classes\Order;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
-use PayPlug\src\models\entities\OneyEntity;
-use PayPlug\src\models\entities\OrderStateEntity;
 use PayPlug\src\models\entities\PluginEntity;
 use PayPlug\src\repositories\CacheRepository;
 use PayPlug\src\repositories\InstallRepository;
@@ -158,6 +156,7 @@ class PluginInit extends BaseClass
     private $translation_class;
 
     // Model repositories
+    private $entity_repository;
     private $card_repository;
     private $cache_repository;
     private $country_repository;
@@ -166,7 +165,6 @@ class PluginInit extends BaseClass
     private $module_repository;
     private $order_repository;
     private $order_state_repository;
-    private $order_payment_repository;
     private $payment_repository;
     private $payplug_order_state_repository;
     private $query_repository;
@@ -266,14 +264,14 @@ class PluginInit extends BaseClass
             ->setCardRepository($this->card_repository)
             ->setCacheRepository($this->cache_repository)
             ->setCountryRepository($this->country_repository)
+            ->setEntityRepository($this->entity_repository)
             ->setLockRepository($this->lock_repository)
             ->setLoggerRepository($this->logger_repository)
             ->setModuleRepository($this->module_repository)
             ->setOrderRepository($this->order_repository)
             ->setOrderStateRepository($this->order_state_repository)
-            ->setOrderPaymentRepository($this->order_payment_repository)
             ->setPaymentRepository($this->payment_repository)
-            ->setPayplugOrderStateRepository($this->payplug_order_state_repository)
+            ->setStateRepository($this->payplug_order_state_repository)
             ->setQueryRepository($this->query_repository)
             ->setShopRepository($this->shop_repository)
         ;
@@ -298,9 +296,7 @@ class PluginInit extends BaseClass
     private function setEntities()
     {
         $this->cacheEntity = new CacheEntity();
-        $this->oneyEntity = new OneyEntity();
         $this->plugin = new PluginEntity();
-        $this->order_state_entity = new OrderStateEntity();
     }
 
     private function setOldRepositories()
@@ -343,19 +339,7 @@ class PluginInit extends BaseClass
         );
 
         $this->install = new InstallRepository(
-            $this->configuration_class,
-            $this->constant_adapter,
-            $this->context_adapter,
-            $this->dependencies,
-            $this->order_state,
-            $this->order_state_entity,
-            $this->order_state_adapter,
-            $this->query_repository,
-            $this->shop_adapter,
-            $this->sql,
-            $this->tools_adapter,
-            $this->validate_adapter,
-            $this->myLogPhp
+            $this->dependencies
         );
     }
 
@@ -403,22 +387,20 @@ class PluginInit extends BaseClass
 
     private function setRepositories()
     {
-        $prefix = $this->constant_adapter->get('_DB_PREFIX_');
-
         // We use complete path instead `use` to avoid confusion with old repositories
-        $this->card_repository = new \PayPlug\src\models\repositories\CardRepository($prefix, $this->dependencies);
-        $this->cache_repository = new \PayPlug\src\models\repositories\CacheRepository($prefix, $this->dependencies);
-        $this->country_repository = new \PayPlug\src\models\repositories\CountryRepository($prefix, $this->dependencies);
-        $this->lock_repository = new \PayPlug\src\models\repositories\LockRepository($prefix, $this->dependencies);
-        $this->logger_repository = new \PayPlug\src\models\repositories\LoggerRepository($prefix, $this->dependencies);
-        $this->module_repository = new \PayPlug\src\models\repositories\ModuleRepository($prefix, $this->dependencies);
-        $this->order_repository = new \PayPlug\src\models\repositories\OrderRepository($prefix, $this->dependencies);
-        $this->order_state_repository = new \PayPlug\src\models\repositories\OrderStateRepository($prefix, $this->dependencies);
-        $this->order_payment_repository = new \PayPlug\src\models\repositories\OrderPaymentRepository($prefix, $this->dependencies);
-        $this->payment_repository = new \PayPlug\src\models\repositories\PaymentRepository($prefix, $this->dependencies);
-        $this->payplug_order_state_repository = new \PayPlug\src\models\repositories\PayplugOrderStateRepository($prefix, $this->dependencies);
-        $this->query_repository = new \PayPlug\src\models\repositories\QueryRepository($prefix, $this->dependencies);
-        $this->shop_repository = new \PayPlug\src\models\repositories\ShopRepository($prefix, $this->dependencies);
+        $this->card_repository = new \PayPlug\src\models\repositories\CardRepository($this->dependencies);
+        $this->cache_repository = new \PayPlug\src\models\repositories\CacheRepository($this->dependencies);
+        $this->country_repository = new \PayPlug\src\models\repositories\CountryRepository($this->dependencies);
+        $this->entity_repository = new \PayPlug\src\models\repositories\EntityRepository($this->dependencies);
+        $this->lock_repository = new \PayPlug\src\models\repositories\LockRepository($this->dependencies);
+        $this->logger_repository = new \PayPlug\src\models\repositories\LoggerRepository($this->dependencies);
+        $this->module_repository = new \PayPlug\src\models\repositories\ModuleRepository($this->dependencies);
+        $this->order_repository = new \PayPlug\src\models\repositories\OrderRepository($this->dependencies);
+        $this->order_state_repository = new \PayPlug\src\models\repositories\OrderStateRepository($this->dependencies);
+        $this->payment_repository = new \PayPlug\src\models\repositories\PaymentRepository($this->dependencies);
+        $this->payplug_order_state_repository = new \PayPlug\src\models\repositories\StateRepository($this->dependencies);
+        $this->query_repository = new \PayPlug\src\models\repositories\QueryRepository($this->dependencies);
+        $this->shop_repository = new \PayPlug\src\models\repositories\ShopRepository($this->dependencies);
     }
 
     private function setServices()

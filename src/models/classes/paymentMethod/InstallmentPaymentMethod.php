@@ -54,7 +54,8 @@ class InstallmentPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_object($installment) || !$installment) {
-            // todo: add error log
+            $this->logger->addLog('InstallmentPaymentMethod::getOrderTab() - Invalid argument given, $installment must be a non null object.');
+
             return [];
         }
 
@@ -151,7 +152,7 @@ class InstallmentPaymentMethod extends PaymentMethod
             }
         }
         if (!$retrieve['result']) {
-            $this->logger->addLog('PaymentMethod::getResourceDetail - Cannot retrieve the resource.', 'error');
+            $this->logger->addLog('PaymentMethod::getResourceDetail - Installment resource can\'t be retrieved for given resource id.', 'error');
 
             return [];
         }
@@ -213,7 +214,8 @@ class InstallmentPaymentMethod extends PaymentMethod
         $resource_tab = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByResourceId($resource->id);
+            ->getBy('resource_id', $resource->id);
+
         if (!isset($resource_tab['schedules']) || !$resource_tab['schedules']) {
             $this->dependencies->installmentClass->addPayplugInstallment($resource);
         }
@@ -248,22 +250,25 @@ class InstallmentPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!isset($this->name) || !$this->name) {
-            // todo: add error log
+            $this->logger->addLog('InstallmentPaymentMethod::getReturnUrl() - Invalid object prop, $name must be a non empty string.');
+
             return [];
         }
 
         $resource_stored = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $this->context->cart->id);
+            ->getBy('id_cart', (int) $this->context->cart->id);
         if (!$resource_stored) {
-            // todo: add error log
+            $this->logger->addLog('InstallmentPaymentMethod::getReturnUrl() - No stored resource retrieve for current context cart id.');
+
             return [];
         }
 
         $resource = $this->dependencies->apiClass->retrieveInstallment($resource_stored['resource_id']);
         if (!$resource['result']) {
-            // todo: add error log
+            $this->logger->addLog('InstallmentPaymentMethod::getReturnUrl() - Installment resource can\'t be retrieved for stored resource id.');
+
             return [];
         }
 
@@ -293,7 +298,8 @@ class InstallmentPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
-            // todo: Add error log
+            $this->logger->addLog('InstallmentPaymentMethod::isValidResource() - Context Cart object must be a valid object.');
+
             return false;
         }
         $id_cart = (int) $this->context->cart->id;
@@ -302,9 +308,10 @@ class InstallmentPaymentMethod extends PaymentMethod
         $stored_resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $id_cart);
+            ->getBy('id_cart', (int) $id_cart);
         if (empty($stored_resource)) {
-            // todo: Add error log
+            $this->logger->addLog('InstallmentPaymentMethod::isValidResource() - No stored resource retrieve for current context cart id.');
+
             return false;
         }
 
@@ -313,14 +320,16 @@ class InstallmentPaymentMethod extends PaymentMethod
             ->getValidators()['payment']
             ->isTimeoutCachedPayment($stored_resource['date_upd'])['result'];
         if (!$is_expired) {
-            // todo: Add error log
+            $this->logger->addLog('InstallmentPaymentMethod::isValidResource() - Current resource is expired.');
+
             return false;
         }
 
         // Get the resource from API
         $retrieved_resource = $this->dependencies->apiClass->retrieveInstallment($stored_resource['resource_id']);
         if (!$retrieved_resource['result']) {
-            // todo: Add error log
+            $this->logger->addLog('InstallmentPaymentMethod::isValidResource() - Installment resource can\'t retrieved for stored resource id.');
+
             return false;
         }
 
@@ -329,7 +338,8 @@ class InstallmentPaymentMethod extends PaymentMethod
         $schedule_id = end($first_chedule);
         $retrieved_schedule = $this->dependencies->apiClass->retrievePayment($schedule_id);
         if (isset($retrieved_schedule['resource']->failure->code) && $retrieved_schedule['resource']->failure->code) {
-            // todo: Add error log
+            $this->logger->addLog('InstallmentPaymentMethod::isValidResource() - Retrieved Installment has failure');
+
             return false;
         }
 
@@ -349,7 +359,7 @@ class InstallmentPaymentMethod extends PaymentMethod
     {
         return $this->dependencies
             ->installmentClass
-            ->addPayplugInstallment($resource->id);
+            ->addPayplugInstallment($resource);
     }
 
     /**
@@ -419,7 +429,8 @@ class InstallmentPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_object($resource) || !$resource) {
-            // todo: add error log
+            $this->logger->addLog('InstallmentPaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
+
             return [];
         }
 

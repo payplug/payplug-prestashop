@@ -51,7 +51,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $this->context->cart->id);
+            ->getBy('id_cart', (int) $this->context->cart->id);
 
         if (empty($payment)) {
             return [
@@ -277,21 +277,24 @@ class ApplepayPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_string($resource_id) || !$resource_id) {
-            // todo: add error log
+            $this->logger->addLog('ApplepayPaymentMethod::patchPaymentResource() - Invalid argument given, $resource_id must be a non empty string.');
+
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $resource_id must be a non empty string.',
             ];
         }
         if (!is_array($token) || empty($token)) {
-            // todo: add error log
+            $this->logger->addLog('ApplepayPaymentMethod::patchPaymentResource() - Invalid argument given, $token must be a non empty array.');
+
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $token must be a non empty string.',
             ];
         }
         if (!is_string($workflow) || !$workflow) {
-            // todo: add error log
+            $this->logger->addLog('ApplepayPaymentMethod::patchPaymentResource() - Invalid argument given, $workflow must be a non empty string.');
+
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $workflow must be a non empty string. given: ' . json_encode($workflow),
@@ -302,7 +305,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByResourceId($resource_id);
+            ->getBy('resource_id', $resource_id);
 
         if (empty($payment)) {
             return [
@@ -580,7 +583,8 @@ class ApplepayPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_string($resource_id) || !$resource_id) {
-            // todo: add error log
+            $this->logger->addLog('ApplepayPaymentMethod::getResourceDetail() - Invalid argument given, $resource_id must be a non empty string.');
+
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $resource_id must be a non empty string.',

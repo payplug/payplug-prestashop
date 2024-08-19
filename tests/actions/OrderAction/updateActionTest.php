@@ -51,7 +51,7 @@ class updateActionTest extends BaseOrderAction
         $resource_id = 'pay_azerty123456';
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [],
+                'getBy' => [],
             ]);
         $this->assertSame(
             [
@@ -67,7 +67,7 @@ class updateActionTest extends BaseOrderAction
         $resource_id = 'pay_azerty123456';
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -114,7 +114,7 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -160,7 +160,7 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -211,7 +211,7 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -233,8 +233,8 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payplug_order_state_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => false,
-                'setOrderState' => true,
+                'getBy' => [],
+                'createEntity' => true,
             ]);
 
         $this->assertSame(
@@ -267,7 +267,7 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -289,7 +289,9 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payplug_order_state_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => 'paid',
+                'getBy' => [
+                    'type' => 'paid',
+                ],
             ]);
 
         $this->assertSame(
@@ -330,7 +332,7 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -352,7 +354,9 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payplug_order_state_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => 'pending',
+                'getBy' => [
+                    'type' => 'pending',
+                ],
             ]);
 
         $this->assertSame(
@@ -393,7 +397,7 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -415,7 +419,9 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payplug_order_state_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => 'pending',
+                'getBy' => [
+                    'type' => 'pending',
+                ],
             ]);
 
         $this->assertSame(
@@ -466,7 +472,7 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -488,7 +494,9 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payplug_order_state_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => 'pending',
+                'getBy' => [
+                    'type' => 'pending',
+                ],
             ]);
 
         $this->assertSame(
@@ -541,7 +549,7 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'pay_azerty1234',
                     'method' => 'standard',
@@ -563,7 +571,9 @@ class updateActionTest extends BaseOrderAction
             ]);
         $this->payplug_order_state_repository
             ->shouldReceive([
-                'getTypeByIdOrderState' => 'pending',
+                'getBy' => [
+                    'type' => 'pending',
+                ],
             ]);
 
         $this->assertSame(

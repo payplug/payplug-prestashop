@@ -40,7 +40,7 @@ class BaseOrderAction extends TestCase
         $this->order_repository = \Mockery::mock('OrderRepository');
         $this->payment_method_class = \Mockery::mock('PaymentMethodClass');
         $this->payment_repository = \Mockery::mock('PaymentRepository');
-        $this->payplug_order_state_repository = \Mockery::mock('PayplugOrderStateRepository');
+        $this->payplug_order_state_repository = \Mockery::mock('StateRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
 
         $this->logger
@@ -65,7 +65,7 @@ class BaseOrderAction extends TestCase
                 'getOrder' => $this->order_adapter,
                 'getOrderClass' => $this->order_class,
                 'getOrderRepository' => $this->order_repository,
-                'getPayplugOrderStateRepository' => $this->payplug_order_state_repository,
+                'getStateRepository' => $this->payplug_order_state_repository,
                 'getPaymentMethodClass' => $this->payment_method_class,
                 'getPaymentRepository' => $this->payment_repository,
                 'getValidate' => $this->validate_adapter,

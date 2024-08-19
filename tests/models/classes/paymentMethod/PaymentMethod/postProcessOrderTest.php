@@ -10,7 +10,6 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  * @group unit
  * @group classes
  * @group payment_method_classes
- * @group debug
  *
  * @runTestsInSeparateProcesses
  */
@@ -88,38 +87,6 @@ class postProcessOrderTest extends BasePaymentMethod
         $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
     }
 
-    public function testWhenOrderPaymentCannotBeCreate()
-    {
-        $id_order = 42;
-        $resource = PaymentMock::getStandard();
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-
-        $patch_payment = \Mockery::mock('PatchPayment');
-        $patch_payment
-            ->shouldReceive([
-                'patchPayment' => [
-                    'result' => true,
-                    'resource' => $resource,
-                ],
-            ]);
-
-        $order_payment_repository = \Mockery::mock('OrderPaymentRepository');
-        $order_payment_repository
-            ->shouldReceive([
-                'createOrderPayment' => false,
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getOrderPaymentRepository' => $order_payment_repository,
-                'getApiService' => $patch_payment,
-            ]);
-
-        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
-    }
-
     public function testWhenOrderIsPostProcessed()
     {
         $id_order = 42;
@@ -138,14 +105,8 @@ class postProcessOrderTest extends BasePaymentMethod
                 ],
             ]);
 
-        $order_payment_repository = \Mockery::mock('OrderPaymentRepository');
-        $order_payment_repository
-            ->shouldReceive([
-                'createOrderPayment' => true,
-            ]);
         $this->plugin
             ->shouldReceive([
-                'getOrderPaymentRepository' => $order_payment_repository,
                 'getApiService' => $patch_payment,
             ]);
 

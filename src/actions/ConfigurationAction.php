@@ -244,7 +244,8 @@ class ConfigurationAction
 
         // Install SQL
         $txt_log->info('Install SQL');
-        if (!$this->dependencies->getPlugin()->getQueryRepository()->initialize()) {
+
+        if (!$this->dependencies->getPlugin()->getEntityRepository()->initialize()) {
             $txt_log->info('Install failed: Install SQL tables.');
 
             return [
@@ -315,6 +316,71 @@ class ConfigurationAction
     }
 
     /**
+     * @description Install tab
+     *
+     * todo: move this section in the appropriate files
+     *
+     * @return bool
+     */
+    public function installTabAction()
+    {
+        $installed = true;
+        $tab_adapter = $this->dependencies
+            ->getPlugin()
+            ->getTabAdapter();
+        $module = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
+
+        if (isset($module->adminControllers) && !empty($module->adminControllers)) {
+            foreach ($module->adminControllers as $adminController) {
+                if ($tab_adapter->getIdFromClassName($adminController['className'])) {
+                    continue;
+                }
+
+                $tab = $tab_adapter->get();
+
+                $languages_adatper = $this->dependencies
+                    ->getPlugin()
+                    ->getLanguage();
+
+                if (isset($adminController['name'])) {
+                    foreach ($languages_adatper->getLanguages(false) as $language) {
+                        $id_lang = (int) $language['id_lang'];
+                        $iso_code = $this->dependencies
+                            ->getPlugin()
+                            ->getTools()
+                            ->tool('strtolower', $language['iso_code']);
+                        if (isset($adminController['name'][$iso_code])) {
+                            $tab->name[$id_lang] = $adminController['name'][$iso_code];
+                        } else {
+                            $tab->name[$id_lang] = $adminController['name']['en'];
+                        }
+                    }
+                } else {
+                    $tab->name = array_fill_keys($languages_adatper->getIDs(false), $module->displayName);
+                }
+
+                if (isset($adminController['parent'])) {
+                    if (is_int($adminController['parent'])) {
+                        $tab->id_parent = $adminController['parent'];
+                    } else {
+                        $tab->id_parent = $tab_adapter->getIdFromClassName($adminController['parent']);
+                    }
+                }
+
+                $tab->class_name = $adminController['className'];
+                $tab->active = true;
+                $tab->module = $module->name;
+                $installed = $installed && $tab->add();
+            }
+        }
+
+        return $installed;
+    }
+
+    /**
      * @description Process the login of the merchant
      *
      * @param object $datas
@@ -330,7 +396,7 @@ class ConfigurationAction
         $logger = $this->dependencies->getPlugin()->getLogger();
 
         if (!is_object($datas) || !$datas) {
-            $logger->addLog('ConfigurationAction::loginAction: Invalid parameter given, $datas must be a non empty object.');
+            $logger->addLog('ConfigurationAction::loginAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
                 'success' => false,
@@ -520,7 +586,7 @@ class ConfigurationAction
         $logger = $this->dependencies->getPlugin()->getLogger();
 
         if (!is_object($datas) || !$datas) {
-            $logger->addLog('ConfigurationAction::saveAction: Invalid parameter given, $datas must be a non empty object.');
+            $logger->addLog('ConfigurationAction::saveAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
                 'success' => false,
@@ -793,7 +859,7 @@ class ConfigurationAction
             ->getLoggedTranslations();
         $logger = $this->dependencies->getPlugin()->getLogger();
         if (!is_object($datas) || !$datas) {
-            $logger->addLog('ConfigurationAction::submitSandboxAction: Invalid parameter given, $datas must be a non empty object.');
+            $logger->addLog('ConfigurationAction::submitSandboxAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
                 'success' => false,
@@ -893,7 +959,7 @@ class ConfigurationAction
         $txt_log->info('Drop module table');
         if (!$this->dependencies
             ->getPlugin()
-            ->getQueryRepository()
+            ->getEntityRepository()
             ->uninstall()) {
             $txt_log->info('Uninstall failed: Drop module table.');
 
@@ -974,71 +1040,6 @@ class ConfigurationAction
         }
 
         return $install_order_state;
-    }
-
-    /**
-     * @description Install tab
-     *
-     * todo: move this section in the appropriate files
-     *
-     * @return bool
-     */
-    protected function installTabAction()
-    {
-        $installed = true;
-        $tab_adapter = $this->dependencies
-            ->getPlugin()
-            ->getTabAdapter();
-        $module = $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name);
-
-        if (isset($module->adminControllers) && !empty($module->adminControllers)) {
-            foreach ($module->adminControllers as $adminController) {
-                if ($tab_adapter->getIdFromClassName($adminController['className'])) {
-                    continue;
-                }
-
-                $tab = $tab_adapter->get();
-
-                $languages_adatper = $this->dependencies
-                    ->getPlugin()
-                    ->getLanguage();
-
-                if (isset($adminController['name'])) {
-                    foreach ($languages_adatper->getLanguages(false) as $language) {
-                        $id_lang = (int) $language['id_lang'];
-                        $iso_code = $this->dependencies
-                            ->getPlugin()
-                            ->getTools()
-                            ->tool('strtolower', $language['iso_code']);
-                        if (isset($adminController['name'][$iso_code])) {
-                            $tab->name[$id_lang] = $adminController['name'][$iso_code];
-                        } else {
-                            $tab->name[$id_lang] = $adminController['name']['en'];
-                        }
-                    }
-                } else {
-                    $tab->name = array_fill_keys($languages_adatper->getIDs(false), $module->displayName);
-                }
-
-                if (isset($adminController['parent'])) {
-                    if (is_int($adminController['parent'])) {
-                        $tab->id_parent = $adminController['parent'];
-                    } else {
-                        $tab->id_parent = $tab_adapter->getIdFromClassName($adminController['parent']);
-                    }
-                }
-
-                $tab->class_name = $adminController['className'];
-                $tab->active = true;
-                $tab->module = $module->name;
-                $installed = $installed && $tab->add();
-            }
-        }
-
-        return $installed;
     }
 
     /**

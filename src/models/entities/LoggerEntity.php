@@ -41,25 +41,28 @@ class LoggerEntity
     private $date_upd;
 
     /** @var array */
-    private $definition;
+    private static $definition = [
+        'table' => 'payplug_logger',
+        'primary' => 'id_payplug_logger',
+        'fields' => [
+            'process' => ['type' => 'string', 'required' => true],
+            'content' => ['type' => 'string', 'required' => true],
+            'date_add' => ['type' => 'string'],
+            'date_upd' => ['type' => 'string'],
+        ],
+    ];
 
-    /** @var string */
+    /** @var int */
     private $id;
 
     /** @var int */
-    private $limit_number;
+    private static $limit_number = 4000;
 
     /** @var string */
-    private $limitDate;
+    private static $limitDate = 'P1M';
 
     /** @var string */
     private $process;
-
-    /** @var string */
-    private $table;
-
-    /** @var string */
-    private $type;
 
     /**
      * @return string
@@ -90,11 +93,11 @@ class LoggerEntity
      */
     public function getDefinition()
     {
-        return $this->definition;
+        return self::$definition;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getId()
     {
@@ -106,7 +109,7 @@ class LoggerEntity
      */
     public function getLimitDate()
     {
-        return $this->limitDate;
+        return self::$limitDate;
     }
 
     /**
@@ -114,7 +117,7 @@ class LoggerEntity
      */
     public function getLimitNumber()
     {
-        return $this->limit_number;
+        return self::$limit_number;
     }
 
     /**
@@ -123,22 +126,6 @@ class LoggerEntity
     public function getProcess()
     {
         return $this->process;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTable()
-    {
-        return $this->table;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -190,65 +177,17 @@ class LoggerEntity
     }
 
     /**
-     * @param $definition
-     *
-     * @return $this
-     */
-    public function setDefinition($definition)
-    {
-        if (!is_array($definition)) {
-            throw new BadParameterException('Invalid argument, $definition must be an array');
-        }
-
-        $this->definition = $definition;
-
-        return $this;
-    }
-
-    /**
      * @param $id
      *
      * @return $this
      */
     public function setId($id)
     {
-        if (!is_string($id)) {
-            throw new BadParameterException('Invalid argument, $id must be an string');
+        if (!is_int($id)) {
+            throw new BadParameterException('Invalid argument, $id must be an integer');
         }
 
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @param $limitDate
-     *
-     * @return $this
-     */
-    public function setLimitDate($limitDate)
-    {
-        if (!is_string($limitDate)) {
-            throw new BadParameterException('Invalid argument, $limit_number must be an integer');
-        }
-
-        $this->limitDate = $limitDate;
-
-        return $this;
-    }
-
-    /**
-     * @param $limit_number
-     *
-     * @return $this
-     */
-    public function setLimitNumber($limit_number)
-    {
-        if (!is_int($limit_number)) {
-            throw new BadParameterException('Invalid limit param, $limit_number must be an integer');
-        }
-
-        $this->limit_number = $limit_number;
 
         return $this;
     }
@@ -265,38 +204,6 @@ class LoggerEntity
         }
 
         $this->process = $process;
-
-        return $this;
-    }
-
-    /**
-     * @param $table
-     *
-     * @return $this
-     */
-    public function setTable($table)
-    {
-        if (!is_string($table)) {
-            throw new BadParameterException('Invalid argument, $table must be a string');
-        }
-
-        $this->table = $table;
-
-        return $this;
-    }
-
-    /**
-     * @param $type
-     *
-     * @return $this
-     */
-    public function setType($type)
-    {
-        if (!is_string($type)) {
-            throw new BadParameterException('Invalid argument, $type must be a string');
-        }
-
-        $this->type = $type;
 
         return $this;
     }

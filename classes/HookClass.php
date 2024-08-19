@@ -189,7 +189,7 @@ class HookClass
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $order->id_cart);
+            ->getBy('id_cart', (int) $order->id_cart);
 
         if ('installment' == $payment['method']) {
             return;

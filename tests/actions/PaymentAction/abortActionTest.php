@@ -240,7 +240,7 @@ class abortActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'inst_azerty12345',
                     'method' => 'installmnent',
@@ -249,7 +249,7 @@ class abortActionTest extends BasePaymentAction
                     'schedules' => '[{"id_payment":"pay_70Z8nKy6nWiZU6S77KFolE","step":"1\/2","amount":1150,"status":8,"scheduled_date":"2023-11-14","pay_id":"pay_70Z8nKy6nWiZU6S77KFolE"},{"id_payment":"","step":"1\/2","amount":1148,"status":6,"scheduled_date":"2023-12-14","pay_id":""}]',
                     'date_upd' => '1970-01-01 00:00:00',
                 ],
-                'updateByResourceId' => false,
+                'updateBy' => false,
             ]);
 
         $this->assertSame(
@@ -332,7 +332,7 @@ class abortActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'getByResourceId' => [
+                'getBy' => [
                     'id_payplug_payment' => 42,
                     'resource_id' => 'inst_azerty12345',
                     'method' => 'installmnent',
@@ -341,7 +341,7 @@ class abortActionTest extends BasePaymentAction
                     'schedules' => '[{"id_payment":"pay_70Z8nKy6nWiZU6S77KFolE","step":"1\/2","amount":1150,"status":8,"scheduled_date":"2023-11-14","pay_id":"pay_70Z8nKy6nWiZU6S77KFolE"},{"id_payment":"","step":"1\/2","amount":1148,"status":6,"scheduled_date":"2023-12-14","pay_id":""}]',
                     'date_upd' => '1970-01-01 00:00:00',
                 ],
-                'updateByResourceId' => true,
+                'updateBy' => true,
             ]);
 
         $this->assertSame(

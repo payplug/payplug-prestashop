@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class OrderStateRepository extends QueryRepository
+class OrderStateRepository extends EntityRepository
 {
     /**
      * @description Get all order states for a given module name
@@ -45,7 +45,7 @@ class OrderStateRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . 'order_state')
+            ->from($this->getTableName('order_state'))
             ->where('module_name = \'' . $this->escape($name) . '\'')
             ->build()
         ;
@@ -69,8 +69,8 @@ class OrderStateRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . 'orders', 'o')
-            ->leftJoin($this->prefix . 'order_state', 'os', 'os.`id_order_state` = o.`current_state`')
+            ->from($this->getTableName('orders'), 'o')
+            ->leftJoin($this->getTableName('order_state'), 'os', 'os.`id_order_state` = o.`current_state`')
             ->where('os.module_name = \'' . $this->escape($name) . '\'')
             ->build()
         ;
@@ -99,8 +99,8 @@ class OrderStateRepository extends QueryRepository
         $this
             ->select()
             ->fields('DISTINCT osl.`id_order_state`')
-            ->from($this->prefix . 'order_state_lang', 'osl')
-            ->leftJoin($this->prefix . 'order_state', 'os', 'osl.`id_order_state` = os.`id_order_state`')
+            ->from($this->getTableName('order_state_lang'), 'osl')
+            ->leftJoin($this->getTableName('order_state'), 'os', 'osl.`id_order_state` = os.`id_order_state`')
             ->where('os.`deleted` = 0')
             ->where('osl.`name` LIKE \'' . $this->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
             ->whereOr('osl.`name` LIKE \'' . $this->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
@@ -128,7 +128,7 @@ class OrderStateRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('os.id_order_state')
-            ->from($this->prefix . 'order_state', 'os')
+            ->from($this->getTableName('order_state'), 'os')
             ->where('os.module_name = \'' . $this->escape($module_name) . '\'')
             ->where('os.deleted = 0')
             ->build()
@@ -147,7 +147,7 @@ class OrderStateRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('c.value')
-            ->from($this->prefix . 'configuration', 'c')
+            ->from($this->getTableName('configuration'), 'c')
             ->where('c.name LIKE \'%' . $this->dependencies->getPlugin()->getTools()->tool('strtoupper', $this->dependencies->name) . '_ORDER_STATE_%\'')
             ->build()
         ;
@@ -171,7 +171,7 @@ class OrderStateRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('DISTINCT `id_order_state`')
-            ->from($this->prefix . 'order_state_lang')
+            ->from($this->getTableName('order_state_lang'))
             ->where('template = "' . $this->escape($template) . '"')
             ->limit(1, 1)
             ->build('unique_value')
@@ -193,8 +193,8 @@ class OrderStateRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('oh.id_order_state, osl.name')
-            ->from($this->prefix . 'order_history', 'oh')
-            ->leftJoin($this->prefix . 'order_state_lang', 'osl', 'osl.`id_order_state` = oh.`id_order_state`')
+            ->from($this->getTableName('order_history'), 'oh')
+            ->leftJoin($this->getTableName('order_state_lang'), 'osl', 'osl.`id_order_state` = oh.`id_order_state`')
             ->where('oh.id_order = ' . (int) $order_id)
             ->where('osl.id_lang = ' . (int) $lang_id)
             ->build();

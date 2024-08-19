@@ -44,13 +44,19 @@ class CacheEntity
     private $date_upd;
 
     /** @var array */
-    private $definition;
+    private static $definition = [
+        'table' => 'payplug_cache',
+        'primary' => 'id_payplug_cache',
+        'fields' => [
+            'cache_key' => ['type' => 'string', 'required' => true],
+            'cache_value' => ['type' => 'string', 'required' => true],
+            'date_add' => ['type' => 'string'],
+            'date_upd' => ['type' => 'string'],
+        ],
+    ];
 
-    /** @var string */
-    private $id_payplug_cache;
-
-    /** @var string */
-    private $table;
+    /** @var int */
+    private $id;
 
     /**
      * @return string
@@ -89,23 +95,15 @@ class CacheEntity
      */
     public function getDefinition()
     {
-        return $this->definition;
+        return self::$definition;
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getIdPayPlugCache()
+    public function getId()
     {
-        return $this->id_payplug_cache;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTable()
-    {
-        return $this->table;
+        return $this->id;
     }
 
     /**
@@ -173,49 +171,17 @@ class CacheEntity
     }
 
     /**
-     * @param $definition
+     * @param $id
      *
      * @return $this
      */
-    public function setDefinition($definition)
+    public function setId($id)
     {
-        if (!is_array($definition)) {
-            throw new BadParameterException('Invalid argument, $definition must be an array');
+        if (!is_int($id)) {
+            throw new BadParameterException('Invalid argument, $id must be an integer');
         }
 
-        $this->definition = $definition;
-
-        return $this;
-    }
-
-    /**
-     * @param $id_payplug_cache
-     *
-     * @return $this
-     */
-    public function setIdPayPlugCache($id_payplug_cache)
-    {
-        if (!is_string($id_payplug_cache)) {
-            throw new BadParameterException('Invalid argument, $id_payplug_cache must be a string');
-        }
-
-        $this->id_payplug_cache = $id_payplug_cache;
-
-        return $this;
-    }
-
-    /**
-     * @param $table
-     *
-     * @return $this
-     */
-    public function setTable($table)
-    {
-        if (!is_string($table)) {
-            throw new BadParameterException('Invalid argument, $table must be a string');
-        }
-
-        $this->table = $table;
+        $this->id = $id;
 
         return $this;
     }

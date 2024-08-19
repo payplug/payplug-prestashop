@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class LockRepository extends QueryRepository
+class LockRepository extends EntityRepository
 {
     private $fields = [
         'id_cart' => 'integer',
@@ -36,10 +36,10 @@ class LockRepository extends QueryRepository
         'date_upd' => 'string',
     ];
 
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . $this->dependencies->name . '_lock';
+        parent::__construct($dependencies);
+        $this->table_name = $this->dependencies->name . '_lock';
     }
 
     /**
@@ -57,7 +57,7 @@ class LockRepository extends QueryRepository
 
         $this
             ->insert()
-            ->into($this->table_name);
+            ->into($this->getTableName($this->table_name));
 
         foreach ($parameters as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -98,7 +98,7 @@ class LockRepository extends QueryRepository
 
         $result = $this
             ->delete()
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('`id_cart` = ' . (int) $cart_id)
             ->build();
 
@@ -122,7 +122,7 @@ class LockRepository extends QueryRepository
             $result = $this
                 ->select()
                 ->fields('*')
-                ->from($this->table_name)
+                ->from($this->getTableName($this->table_name))
                 ->where('`id_cart` = ' . (int) $cart_id)
                 ->build('unique_row');
         } catch (Exception $exception) {
@@ -147,7 +147,7 @@ class LockRepository extends QueryRepository
 
         $this
             ->create()
-            ->table($this->table_name)
+            ->table($this->getTableName($this->table_name))
             ->fields('`id_payplug_lock` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`id_order` VARCHAR(100)')

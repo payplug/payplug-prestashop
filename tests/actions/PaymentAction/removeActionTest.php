@@ -107,7 +107,7 @@ class removeActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'removeByResourceId' => false,
+                'deleteBy' => false,
             ]);
 
         $this->assertFalse(
@@ -133,7 +133,7 @@ class removeActionTest extends BasePaymentAction
 
         $this->payment_repository
             ->shouldReceive([
-                'removeByResourceId' => true,
+                'deleteBy' => true,
             ]);
 
         $this->assertTrue(

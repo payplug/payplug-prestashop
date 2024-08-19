@@ -11,6 +11,14 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class getLastLimitLogTest extends BaseLoggerRepository
 {
+    private $limit;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->limit = 42;
+    }
+
     /**
      * @dataProvider invalidIntegerFormatDataProvider
      *
@@ -21,46 +29,55 @@ class getLastLimitLogTest extends BaseLoggerRepository
         $this->assertSame([], $this->repository->getLastLimitLog($limit));
     }
 
+    public function testWhenNoEntityNameDefined()
+    {
+        $this->repository->entity_name = '';
+        $this->assertSame([], $this->repository->getLastLimitLog($this->limit));
+    }
+
+    public function testWhenEntityObjectCantBeGetted()
+    {
+        $this->repository->shouldReceive([
+            'getEntityObject' => null,
+        ]);
+        $this->assertSame([], $this->repository->getLastLimitLog($this->limit));
+    }
+
     public function testWhenNoResultIsGivenByTheQuery()
     {
-        $limit = 42;
-        $this
-            ->repository
-            ->shouldReceive([
-                'select' => $this->repository,
-                'fields' => $this->repository,
-                'from' => $this->repository,
-                'orderBy' => $this->repository,
-                'limit' => $this->repository,
-                'build' => [],
-            ]);
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'select' => $this->repository,
+            'fields' => $this->repository,
+            'from' => $this->repository,
+            'orderBy' => $this->repository,
+            'limit' => $this->repository,
+            'build' => [],
+        ]);
 
-        $this->assertSame([], $this->repository->getLastLimitLog($limit));
+        $this->assertSame([], $this->repository->getLastLimitLog($this->limit));
     }
 
     public function testWhenExpectedResultIsGivenByTheQuery()
     {
-        $limit = 42;
-        $date = date('Y-m-d H:i:s');
         $logger = [
             'id_payplug_logger' => 42,
             'process' => 'process',
             'content' => '{}',
-            'date_add' => $date,
-            'date_upd' => $date,
+            'date_add' => date('Y-m-d H:i:s'),
+            'date_upd' => date('Y-m-d H:i:s'),
         ];
 
-        $this
-            ->repository
-            ->shouldReceive([
-                'select' => $this->repository,
-                'fields' => $this->repository,
-                'from' => $this->repository,
-                'orderBy' => $this->repository,
-                'limit' => $this->repository,
-                'build' => $logger,
-            ]);
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'select' => $this->repository,
+            'fields' => $this->repository,
+            'from' => $this->repository,
+            'orderBy' => $this->repository,
+            'limit' => $this->repository,
+            'build' => $logger,
+        ]);
 
-        $this->assertSame($logger, $this->repository->getLastLimitLog($limit));
+        $this->assertSame($logger, $this->repository->getLastLimitLog($this->limit));
     }
 }

@@ -42,41 +42,6 @@ class LoggerRepository extends BaseClass
         $this->dependencies = $dependencies;
         $this->loggerEntity = new LoggerEntity();
         $this->validators = $this->dependencies->getValidators();
-        $this->setStdParams();
-    }
-
-    /**
-     * @description Hydrate standard entities
-     */
-    public function setStdParams()
-    {
-        $this->loggerEntity
-            ->setTable($this->dependencies->name . '_logger')
-            ->setLimitNumber((int) 4000)
-            ->setLimitDate('P1M')
-            ->setDefinition([
-                'table' => $this->loggerEntity->getTable(),
-                'primary' => 'id_payplug_logger',
-                'fields' => [
-                    /*
-                     * Different types,
-                     * according to modules/gamification/tests/mocks/ObjectModel.php :
-                     * TYPE_INT = 1;
-                     * TYPE_BOOL = 2;
-                     * TYPE_STRING = 3;
-                     * TYPE_FLOAT = 4;
-                     * TYPE_DATE = 5;
-                     * TYPE_HTML = 6;
-                     * TYPE_NOTHING = 7;
-                     * TYPE_SQL = 8;
-                     */
-                    'process' => ['type' => 3, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128],
-                    'content' => ['type' => 6, 'validate' => 'isCleanHtml', 'required' => true],
-                    'date_add' => ['type' => 5, 'validate' => 'isDate'],
-                    'date_upd' => ['type' => 5, 'validate' => 'isDate'],
-                ],
-            ])
-        ;
     }
 
     /**
@@ -170,13 +135,13 @@ class LoggerRepository extends BaseClass
         $id_logger = $this->dependencies
             ->getPlugin()
             ->getLoggerRepository()
-            ->createLog($parameters);
+            ->createEntity($parameters);
 
         if (!$id_logger) {
             return false;
         }
 
-        $this->loggerEntity->setId($id_logger);
+        $this->loggerEntity->setId((int) $id_logger);
     }
 
     /**
@@ -195,7 +160,7 @@ class LoggerRepository extends BaseClass
         return $this->dependencies
             ->getPlugin()
             ->getLoggerRepository()
-            ->updateLog((int) $this->loggerEntity->getId(), $parameters);
+            ->updateEntity((int) $this->loggerEntity->getId(), $parameters);
     }
 
     /**
@@ -231,7 +196,7 @@ class LoggerRepository extends BaseClass
             $logs = $this->dependencies
                 ->getPlugin()
                 ->LoggerRepository()
-                ->getAllLog();
+                ->getAll();
         } catch (Exception $exception) {
             return false;
         }
@@ -240,21 +205,22 @@ class LoggerRepository extends BaseClass
             return $this->dependencies
                 ->getPlugin()
                 ->LoggerRepository()
-                ->getAllLog();
+                ->getAll();
         }
 
-        $limits = $this->getLimit();
+        $limit_date = $this->loggerEntity->getLimitDate();
         $date = new DateTime('now');
-        $interval = new DateInterval($limits['date']);
+        $interval = new DateInterval($limit_date);
         $date_limit = $date->sub($interval);
 
         $flag = $this->dependencies
             ->getPlugin()
             ->LoggerRepository()
-            ->deleteFormDate($date_limit->format('Y-m-d'));
+            ->deleteFromDate($date_limit->format('Y-m-d'));
 
         // clean log beyong the limit
-        $log_limit = $limits['number'] - 1;
+        $limit_number = $this->loggerEntity->getLimitNumber();
+        $log_limit = $limit_number - 1;
         $last_valid_log = $this->dependencies
             ->getPlugin()
             ->LoggerRepository()
@@ -268,18 +234,5 @@ class LoggerRepository extends BaseClass
             ->getPlugin()
             ->LoggerRepository()
             ->deleteFormId((int) $last_valid_log['id_payplug_logger']);
-    }
-
-    /**
-     * @description Return the defined date and max elements limits
-     *
-     * @return array
-     */
-    protected function getLimit()
-    {
-        return [
-            'number' => $this->limit_number,
-            'date' => $this->limit_date,
-        ];
     }
 }

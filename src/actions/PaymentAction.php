@@ -188,7 +188,7 @@ class PaymentAction
 
         $resource = $this->plugin
             ->getPaymentRepository()
-            ->getByResourceId($installment->id);
+            ->getBy('resource_id', $installment->id);
         $schedules = json_decode((string) $resource['schedules'], true);
         foreach ($schedules as &$schedule) {
             $step = $schedule['step'];
@@ -201,7 +201,7 @@ class PaymentAction
         return [
             'result' => (bool) $this->plugin
                 ->getPaymentRepository()
-                ->updateByResourceId($installment->id, [
+                ->updateBy('resource_id', $installment->id, [
                     'schedules' => json_encode($schedules),
                 ]),
             'message' => '',
@@ -358,7 +358,7 @@ class PaymentAction
         // If a payment exists, we try to cancel it and remove from database.
         $resource = $this->plugin
             ->getPaymentRepository()
-            ->getByCart((int) $cart_id);
+            ->getBy('id_cart', (int) $cart_id);
         if (!empty($resource)) {
             $payment_method = $this->plugin
                 ->getPaymentMethodClass()
@@ -394,7 +394,7 @@ class PaymentAction
         ];
         $save_hash = $this->plugin
             ->getPaymentRepository()
-            ->createPayment($parameters);
+            ->createEntity($parameters);
         if (!$save_hash) {
             $this->logger->addLog('PaymentAction::createAction - Payment method hash can\'t be generated.', 'error');
 
@@ -495,7 +495,7 @@ class PaymentAction
             ->get()->cart->id;
         $stored_resource = $this->plugin
             ->getPaymentRepository()
-            ->getByCart((int) $cart_id);
+            ->getBy('id_cart', (int) $cart_id);
 
         $should_create_resource = $force_resource_creation
             || empty($stored_resource)
@@ -558,7 +558,7 @@ class PaymentAction
         // Remove the payment from the database
         return $this->plugin
             ->getPaymentRepository()
-            ->removeByResourceId($resource_id);
+            ->deleteBy('resource_id', $resource_id);
     }
 
     /**

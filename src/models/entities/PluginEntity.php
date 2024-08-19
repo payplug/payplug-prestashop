@@ -35,6 +35,7 @@ class PluginEntity
     private $address;
 
     private $address_class;
+
     /** @var object */
     private $apiClass;
 
@@ -97,6 +98,9 @@ class PluginEntity
 
     /** @var object */
     private $dispatcher;
+
+    /** @var object */
+    private $entity_repository;
 
     /** @var object */
     private $install;
@@ -529,6 +533,14 @@ class PluginEntity
     }
 
     /**
+     * @return object
+     */
+    public function getEntityRepository()
+    {
+        return $this->entity_repository;
+    }
+
+    /**
      * @return mixed
      */
     public function getInstall()
@@ -675,7 +687,7 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getPayplugOrderStateRepository()
+    public function getStateRepository()
     {
         return $this->payplug_order_state_repository;
     }
@@ -1252,6 +1264,22 @@ class PluginEntity
     }
 
     /**
+     * @param object $entity_repository
+     *
+     * @return self
+     */
+    public function setEntityRepository($entity_repository)
+    {
+        if (!is_object($entity_repository)) {
+            throw new BadParameterException('Invalid argument, $entity_repository must be an EntityRepository');
+        }
+
+        $this->entity_repository = $entity_repository;
+
+        return $this;
+    }
+
+    /**
      * @param mixed $install
      *
      * @return PluginEntity
@@ -1557,10 +1585,10 @@ class PluginEntity
      *
      * @return self
      */
-    public function setPayplugOrderStateRepository($payplug_order_state_repository)
+    public function setStateRepository($payplug_order_state_repository)
     {
         if (!is_object($payplug_order_state_repository)) {
-            throw new BadParameterException('Invalid argument, $payplug_order_state_repository must be an PayplugOrderStateRepository');
+            throw new BadParameterException('Invalid argument, $payplug_order_state_repository must be an StateRepository');
         }
 
         $this->payplug_order_state_repository = $payplug_order_state_repository;

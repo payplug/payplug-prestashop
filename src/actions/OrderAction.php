@@ -64,7 +64,7 @@ class OrderAction
         // Get the payment from database
         $payment_tab = $this->plugin
             ->getPaymentRepository()
-            ->getByResourceId($resource_id);
+            ->getBy('resource_id', $resource_id);
         if (empty($payment_tab)) {
             $this->logger->addLog('OrderAction::createAction - Can\'t retrieve resource from database', 'error');
 
@@ -261,7 +261,7 @@ class OrderAction
         // Get the payment from database
         $payment_tab = $this->plugin
             ->getPaymentRepository()
-            ->getByResourceId($resource_id);
+            ->getBy('resource_id', $resource_id);
         if (empty($payment_tab)) {
             $this->logger->addLog('OrderAction::updateAction - Can\'t retrieve resource from database', 'error');
 
@@ -336,16 +336,24 @@ class OrderAction
             ];
         }
 
-        $type = $this->plugin
-            ->getPayplugOrderStateRepository()
-            ->getTypeByIdOrderState((int) $order->current_state);
-        $type = $type ?: 'undefined';
+        $order_state = $this->dependencies
+            ->getPlugin()
+            ->getStateRepository()
+            ->getBy('id_order_state', (int) $order->current_state);
+        $type = !empty($order_state) ? $order_state['type'] : 'undefined';
 
         if ('undefined' == $type) {
+            $current_date = date('Y-m-d H:i:s');
+            $fields = [
+                'id_order_state' => $order->current_state,
+                'type' => $type,
+                'date_add' => $current_date,
+                'date_upd' => $current_date,
+            ];
             $this->dependencies
                 ->getPlugin()
-                ->getPayplugOrderStateRepository()
-                ->setOrderState((int) $order->current_state, $type);
+                ->getStateRepository()
+                ->createEntity($fields);
         }
 
         $no_action_state = ['cancelled', 'error', 'expired', 'nothing', 'paid', 'refund', 'undefined'];
@@ -450,7 +458,7 @@ class OrderAction
         $payment_tab = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByCart((int) $order->id_cart);
+            ->getBy('id_cart', (int) $order->id_cart);
         if (empty($payment_tab)) {
             return $order_details;
         }

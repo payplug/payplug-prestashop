@@ -27,12 +27,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class OrderRepository extends QueryRepository
+class OrderRepository extends EntityRepository
 {
-    public function __construct($prefix = '', $dependencies = null)
+    public function __construct($dependencies = null)
     {
-        parent::__construct($prefix, $dependencies);
-        $this->table_name = $this->prefix . 'orders';
+        parent::__construct($dependencies);
+        $this->table_name = 'orders';
     }
 
     /**
@@ -46,7 +46,7 @@ class OrderRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('`id_order`')
-            ->from($this->table_name)
+            ->from($this->getTableName($this->table_name))
             ->where('`module` = "payplug"')
             ->where('`date_add` > "' . $this->escape($current_date) . '"')
             ->build();
@@ -70,7 +70,7 @@ class OrderRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . 'orders')
+            ->from($this->getTableName($this->table_name))
             ->where('id_cart = ' . (int) $cart_id)
             ->build();
 
@@ -93,7 +93,7 @@ class OrderRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('*')
-            ->from($this->prefix . 'orders')
+            ->from($this->getTableName($this->table_name))
             ->where('module = \'' . $this->escape($name) . '\'')
             ->build()
         ;
@@ -117,7 +117,7 @@ class OrderRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('current_state')
-            ->from($this->prefix . 'orders')
+            ->from($this->getTableName($this->table_name))
             ->where('id_order = ' . (int) $order_id)
             ->build('unique_value');
 

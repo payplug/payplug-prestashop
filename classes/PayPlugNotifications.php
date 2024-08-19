@@ -425,7 +425,7 @@ class PayPlugNotifications
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getByResourceId($resource_id);
+            ->getBy('resource_id', $resource_id);
         if (empty($payment)) {
             if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
                 $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);

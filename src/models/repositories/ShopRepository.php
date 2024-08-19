@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class ShopRepository extends QueryRepository
+class ShopRepository extends EntityRepository
 {
     /**
      * @description Get all domains use by the merchant
@@ -39,7 +39,7 @@ class ShopRepository extends QueryRepository
         $result = $this
             ->select()
             ->fields('`domain` as `url`, `main` as `default`')
-            ->from($this->prefix . 'shop_url')
+            ->from($this->getTableName('shop_url'))
             ->where('active = 1')
             ->build();
 
