@@ -68,9 +68,9 @@ class CardEntity
         'table' => 'payplug_card',
         'primary' => 'id_payplug_card',
         'fields' => [
-            'id_customer' => ['type' => 'int', 'required' => true],
-            'id_company' => ['type' => 'int', 'required' => true],
-            'is_sandbox' => ['type' => 'int', 'required' => true],
+            'id_customer' => ['type' => 'integer', 'required' => true],
+            'id_company' => ['type' => 'integer', 'required' => true],
+            'is_sandbox' => ['type' => 'boolean', 'required' => true],
             'id_card' => ['type' => 'string', 'required' => true],
             'last4' => ['type' => 'string', 'required' => true],
             'exp_month' => ['type' => 'string', 'required' => true],
