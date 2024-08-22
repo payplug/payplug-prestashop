@@ -66,29 +66,16 @@ class getEntityTest extends BaseEntityRepository
     public function testWhenEntityObjectIsFound()
     {
         $this->repository->entity_name = 'EntityObject';
-        $this->repository->shouldReceive('getEntityObject')
-            ->with('EntityObject')
-            ->andReturn($this->entity);
-
-        $this->repository->shouldReceive('select')
-            ->andReturn($this->repository);
-
-        $this->repository->shouldReceive('fields')
-            ->andReturn($this->repository);
-
-        $this->repository->shouldReceive('from')
-            ->with('table_name')
-            ->andReturn($this->repository);
-        $this->repository->shouldReceive('where')
-            ->with('`id`=' . (int) $this->entity_id)
-            ->andReturn($this->repository);
-
-        $this->repository->shouldReceive('build')
-            ->with('unique_value')
-            ->andReturn(['entity_data']);
-
         $expected_result = ['entity_data'];
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'select' => $this->repository,
+            'fields' => $this->repository,
+            'from' => $this->repository,
+            'where' => $this->repository,
+            'build' => $expected_result,
+        ]);
 
-        $this->assertEquals($expected_result, $this->repository->getEntity($this->entity_id));
+        $this->assertSame($expected_result, $this->repository->getEntity($this->entity_id));
     }
 }
