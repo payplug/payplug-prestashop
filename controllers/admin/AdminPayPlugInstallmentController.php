@@ -131,7 +131,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         $payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->get((int) $id_payplug_payment);
+            ->getEntity((int) $id_payplug_payment);
 
         $orders = $this->dependencies
             ->getPlugin()
