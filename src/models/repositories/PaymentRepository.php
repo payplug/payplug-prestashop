@@ -52,10 +52,16 @@ class PaymentRepository extends EntityRepository
             return [];
         }
 
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return [];
+        }
+        $definition = $entity->getDefinition();
+
         $query = $this
             ->select()
             ->fields('*')
-            ->from($this->table_name)
+            ->from($this->getTableName($definition['table']))
             ->where('`method` = "' . $this->escape($method_name) . '"');
 
         if ($asc) {
