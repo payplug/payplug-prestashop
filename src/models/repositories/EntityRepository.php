@@ -378,7 +378,7 @@ class EntityRepository extends QueryRepository
             ->fields('*')
             ->from($this->getTableName($definition['table']))
             ->where('`' . $definition['primary'] . '` = ' . (int) $id)
-            ->build('unique_value');
+            ->build('unique_row');
 
         return $result ?: [];
     }
