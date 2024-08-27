@@ -217,30 +217,35 @@ class PayPlugNotifications
         if (is_string($str) && $str) {
             $this->logger->addLog($str);
         }
-        if ($this->lock_key) {
-            // Queue system
-            /*
-            $update_queue = $this->dependencies
-                ->getQueueAction()
-                ->updateAction($this->cart->id, $this->resource->id);
-            if (!$update_queue['result']) {
-                $this->logger->addLog('Lock cannot be deleted.', 'error');
-            }
-            if (!empty($update_queue['exists'])) {
-                // we update resource and reload the process
-                hydrate $this->payment = retrievePayment ($update_queue['exists']['resource_id'])
-                then call $this->processPayment()
-            }
-            //*/
+        // check if queuing system is enabled
+        if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+            if ($this->lock_key) {
+                $update_queue = $this->dependencies
+                    ->getQueueAction()
+                    ->updateAction($this->cart->id);
 
-            $delete_lock = $this->dependencies
-                ->getPlugin()
-                ->getLockRepository()
-                ->deleteLock((int) $this->lock_key);
-            if (!$delete_lock) {
-                $this->logger->addLog('Lock cannot be deleted.', 'error');
-            } else {
-                $this->logger->addLog('Lock deleted.', 'debug');
+                if (!$update_queue['result']) {
+                    $this->logger->addLog('Queue entry cannot be updated.', 'error');
+                }
+
+                if (!empty($update_queue['exists']) && isset($update_queue['exists']['resource_id'])) {
+                    $this->payment = $this->dependencies->apiClass->retrievePayment(
+                        $update_queue['exists']['resource_id']
+                    );
+                    $this->processPayment();
+                }
+            }
+        } else {
+            if ($this->lock_key) {
+                $delete_lock = $this->dependencies
+                    ->getPlugin()
+                    ->getLockRepository()
+                    ->deleteLock((int) $this->lock_key);
+                if (!$delete_lock) {
+                    $this->logger->addLog('Lock cannot be deleted.', 'error');
+                } else {
+                    $this->logger->addLog('Lock deleted.', 'debug');
+                }
             }
         }
 
@@ -320,8 +325,8 @@ class PayPlugNotifications
         // Set Context
         $this->setContext();
 
-        // Set Lock
-        $this->setLock();
+        // Set Lock or Queue
+        $this->setLockOrQueue();
 
         // Dipatch to the create|update process
         $this->dispatchPayment();
@@ -534,27 +539,35 @@ class PayPlugNotifications
         $this->logger->addLog('Context setted');
     }
 
-    private function setLock()
+    /**
+     * set up the locking mechanism or queue creation for a given cart.
+     */
+    private function setLockOrQueue()
     {
-        $this->logger->addLog('Notification: setLock');
+        if (!isset($this->cart) || !isset($this->resource)) {
+            $this->exitProcess('Cart or resource is not set.', 400);
+        }
+        // check if queueing system is enabled
+        if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+            $this->logger->addLog('Notification: Attempting to set queue for Cart ID: ' . $this->cart->id);
+            $create_queue = $this->dependencies->getQueueAction()->hydrateAction($this->cart->id, $this->resource->id);
+            if (!$create_queue['result']) {
+                $this->exitProcess('Error: Queue cannot be created for Cart ID: ' . $this->cart->id, 500);
+            }
+            if ($create_queue['exists']) {
+                $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
+            }
 
-        /*
-        // Queue usage :
-        $create_queue = $this->dependencies->getQueueAction()->hydrateAction($this->cart->id, $this->resource->id);
-        if (!$create_queue['result']) {
-            $this->exitProcess('Lock cannot be created.', 500);
+            $this->logger->addLog('Queue created successfully for Cart ID: ' . $this->cart->id);
+        } else {
+            $this->logger->addLog('Notification: Attempting to set lock for Cart ID: ' . $this->cart->id);
+            $cart_lock = $this->payplugLock->createLockG2($this->cart->id, 'ipn');
+            if (!$cart_lock) {
+                $this->exitProcess('Lock cannot be created for Cart ID: ' . $this->cart->id, 500);
+            }
+            $this->lock_key = $this->cart->id;
+            $this->logger->addLog('Lock created for Cart ID: ' . $this->cart->id);
         }
-        if ($create_queue['exists']) {
-            $this->exitProcess('Queue already exists.', 200);
-        }
-        //*/
-
-        $cart_lock = $this->payplugLock->createLockG2($this->cart->id, 'ipn');
-        if (!$cart_lock) {
-            $this->exitProcess('Lock cannot be created.', 500);
-        }
-        $this->lock_key = $this->cart->id;
-        $this->logger->addLog('Lock created');
     }
 
     /**
