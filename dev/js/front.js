@@ -670,7 +670,7 @@ var $document, $window, __moduleName__Module = {
             $('apple-pay-button, #payment-confirmation button').click(function (event) {
                 $(this).fadeOut(10).fadeIn(10);
                 let payment_method_id = $('input[name="payment-option"]:checked').attr('id'),
-                    payment_method = $('#pay-with-'+payment_method_id+'-form input[name="method"]').val();
+                    payment_method = $('#pay-with-' + payment_method_id + '-form input[name="method"]').val();
 
                 if ('applepay' == payment_method || 'checkout' != workflow) {
                     event.preventDefault();
@@ -703,7 +703,7 @@ var $document, $window, __moduleName__Module = {
             if (workflow === 'product' && $('#product_page_product_id').length && $('#quantity_wanted').length) {
                 data.id_product = $('#product_page_product_id').val();
                 data.quantity = $('#quantity_wanted').val();
-                data.empty_cart= true;
+                data.empty_cart = true;
             }
             let applepay_datas;
             applepay.props.query = $.ajax({
@@ -714,7 +714,7 @@ var $document, $window, __moduleName__Module = {
                 success: function (result) {
                     applepay_datas = JSON.parse(result);
                 },
-                error: function() {
+                error: function () {
                     __moduleName__Module.applepay.error();
                 }
             });
@@ -776,12 +776,12 @@ var $document, $window, __moduleName__Module = {
                     applepay.props.session.oncancel = applepay.session.cancel;
                     applepay.props.session.begin();
                 },
-                error: function() {
+                error: function () {
                     __moduleName__Module.applepay.error();
                 }
             });
         },
-        update: function() {
+        update: function () {
             let {applepay} = __moduleName__Module,
                 {workflow, carrier, address} = applepay.props,
                 request = null;
@@ -808,7 +808,7 @@ var $document, $window, __moduleName__Module = {
                     }
                     request = datas.request;
                 },
-                error: function() {
+                error: function () {
                     __moduleName__Module.applepay.error();
                 }
             });
@@ -840,9 +840,9 @@ var $document, $window, __moduleName__Module = {
 
                 const request = applepay.update();
                 const update = {
-                    'newTotal' : request.total,
-                    'newLineItems' : request.lineItems,
-                    'newShippingMethods' : request.shippingMethods,
+                    'newTotal': request.total,
+                    'newLineItems': request.lineItems,
+                    'newShippingMethods': request.shippingMethods,
                 };
 
                 session.completeShippingContactSelection(update);
@@ -856,8 +856,8 @@ var $document, $window, __moduleName__Module = {
 
                 const request = applepay.update();
                 const update = {
-                    'newTotal' : request.total,
-                    'newLineItems' : request.lineItems,
+                    'newTotal': request.total,
+                    'newLineItems': request.lineItems,
                 };
 
                 session.completeShippingMethodSelection(update);
@@ -894,7 +894,7 @@ var $document, $window, __moduleName__Module = {
                         session.completePayment({"status": ApplePaySession.STATUS_SUCCESS});
                         window.location.replace(result.return_url);
                     },
-                    error: function() {
+                    error: function () {
                         __moduleName__Module.applepay.error();
                     }
                 })
@@ -1473,6 +1473,79 @@ var $document, $window, __moduleName__Module = {
         removeSpinner: function () {
             $('.ipOverlay').remove();
         },
+    },
+    validation: {
+        props: {
+            identifier: '__moduleName__Validation',
+            duration: 1,
+            attemps: {
+                current: 0,
+                limit: 5,
+                interval: 2000,
+            },
+            query: null
+        },
+        init: function () {
+            const {validation} = __moduleName__Module;
+            validation.try();
+        },
+        try: function (last_try) {
+            const {validation} = __moduleName__Module;
+            if (validation.props.query != null) {
+                validation.props.query.abort();
+                validation.props.query = null;
+            }
+
+            let data = {
+                _ajax: 1
+            }
+            if (typeof last_try != 'undefined' && last_try) {
+                data['last_try'] = 1;
+            }
+
+            validation.props.query = $.ajax({
+                type: 'POST',
+                url: window['validation_ajax_url'],
+                dataType: 'json',
+                data: data,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR, textStatus, errorThrown);
+                },
+                success: function (data) {
+                    if (typeof data.action != 'undefined') {
+                        switch (data.action) {
+                            case 'redirect':
+                                validation.actions.redirect(data.redirected_url);
+                                break;
+                            case 'wait':
+                                validation.actions.wait();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                },
+            });
+        },
+        actions: {
+            redirect: function (url) {
+                window.location.href = url;
+            },
+            wait: function () {
+                let {validation} = __moduleName__Module,
+                    {props} = validation,
+                    {attemps} = props;
+
+                // update attemps
+                attemps.current++;
+                props.attemps = attemps;
+
+                let last_try = attemps.current >= attemps.limit;
+                setTimeout(() => {
+                    validation.try(last_try);
+                }, attemps.interval);
+            }
+        }
     },
 };
 
