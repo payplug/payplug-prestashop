@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.11.2
+- Security : 
+- [PRE-2586](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2529): delete usage of check-php job to avoid a vulnerability
+
 ## Version 4.11.1
 - Bugfix :
   - [SMP-2786](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2518): Fix Appelpay carrier display description
