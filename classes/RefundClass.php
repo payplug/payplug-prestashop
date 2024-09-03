@@ -280,7 +280,7 @@ class RefundClass
                 }
                 $order = $this->order->get((int) $id_order);
                 if ($this->validate->validate('isLoadedObject', $order)) {
-                    if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
+                    if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart, $resource_id)) {
                         exit(json_encode([
                             'status' => 'error',
                             'data' => $this->dependencies
@@ -341,7 +341,8 @@ class RefundClass
             if ($new_state || ($payment->is_refunded && empty($inst_id))) {
                 $order = $this->order->get((int) $id_order);
                 if ($this->validate->validate('isLoadedObject', $order)) {
-                    if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
+                    if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart, $resource_id)) {
+                        exit('test5');
                         exit(json_encode([
                             'status' => 'error',
                             'data' => $this->dependencies

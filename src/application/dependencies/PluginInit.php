@@ -72,6 +72,7 @@ use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\Country;
 use PayPlug\src\models\classes\Order;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
+use PayPlug\src\models\classes\Queue;
 use PayPlug\src\models\classes\Translation;
 use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\src\models\entities\PluginEntity;
@@ -155,6 +156,7 @@ class PluginInit extends BaseClass
     private $configuration_class;
     private $order_class;
     private $payment_method_class;
+    private $queue_class;
     private $translation_class;
 
     // Model repositories
@@ -260,6 +262,7 @@ class PluginInit extends BaseClass
             ->setCountryClass($this->country_class)
             ->setOrderClass($this->order_class)
             ->setPaymentMethodClass($this->payment_method_class)
+            ->setQueueClass($this->queue_class)
             ->setTranslationClass($this->translation_class)
         ;
 
@@ -388,6 +391,7 @@ class PluginInit extends BaseClass
         $this->country_class = new Country($this->dependencies);
         $this->order_class = new Order($this->dependencies);
         $this->payment_method_class = new PaymentMethod($this->dependencies);
+        $this->queue_class = new Queue($this->dependencies);
         $this->translation_class = new Translation($this->dependencies);
     }
 

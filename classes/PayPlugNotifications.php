@@ -396,19 +396,7 @@ class PayPlugNotifications
                 $this->exitProcess('Order cannot be loaded.', 500);
             }
 
-            // Set lock Lock the process with id_cart from order object
-            do {
-                $cart_lock = $this->payplugLock->createLockG2((int) $this->cart->id, 'ipn');
-                if (!$cart_lock) {
-                    $checkReturn = $this->payplugLock->check((int) $this->cart->id);
-                    if ('stop ipn' == $checkReturn) {
-                        $this->exitProcess('Lock cannot be created.', 500);
-                    }
-                } else {
-                    $this->logger->addLog('Lock created');
-                    $this->lock_key = $this->cart->id;
-                }
-            } while (!$cart_lock);
+            $this->setLockOrQueue();
 
             $new_order_state = $this->order_states['refund'];
             $current_state = (int) $this->dependencies

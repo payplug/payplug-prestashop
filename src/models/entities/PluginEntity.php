@@ -169,6 +169,9 @@ class PluginEntity
     private $query_repository;
 
     /** @var object */
+    private $queue;
+
+    /** @var object */
     private $queue_action;
 
     /** @var object */
@@ -776,6 +779,11 @@ class PluginEntity
     public function getQueueAction()
     {
         return $this->queue_action;
+    }
+
+    public function getQueueClass()
+    {
+        return $this->queue;
     }
 
     /**
@@ -1808,6 +1816,22 @@ class PluginEntity
         }
 
         $this->queue_action = $queue_action;
+
+        return $this;
+    }
+
+    /**
+     * @param object $queue
+     *
+     * @return self
+     */
+    public function setQueueClass($queue)
+    {
+        if (!is_object($queue)) {
+            throw new BadParameterException('Invalid argument, $queue must be a QueryAction');
+        }
+
+        $this->queue = $queue;
 
         return $this;
     }

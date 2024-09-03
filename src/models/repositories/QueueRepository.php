@@ -101,8 +101,8 @@ class QueueRepository extends EntityRepository
             ->select()
             ->fields('*')
             ->from($this->getTableName($definition['table']))
-            ->where('`id_cart`=' . (int) $cart_id)
-            ->where('`treated`= 0')
+            ->where('`id_cart` = ' . (int) $cart_id)
+            ->where('`treated` = 0')
             ->orderBy($definition['primary'] . ' ASC')
             ->limit(0, 1)
             ->build('unique_value');

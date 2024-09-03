@@ -295,7 +295,7 @@ class PaymentAction
             ];
         }
 
-        if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
+        if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart, $resource_id)) {
             $this->logger->addLog('PaymentAction::captureAction - An error occured on lock creation', 'error');
 
             return [

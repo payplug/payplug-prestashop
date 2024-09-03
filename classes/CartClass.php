@@ -43,17 +43,19 @@ class CartClass
      * @description Create a lock from a Cart ID
      *
      * @param int $id_cart
+     * @param mixed $id_resource
      *
      * @return bool
      */
-    public function createLockFromCartId($id_cart = 0)
+    public function createLockFromCartId($id_cart = 0, $id_resource = '')
     {
         if (!$id_cart || !is_int($id_cart)) {
             return false;
         }
 
-        $this->logger = $this->dependencies->getPlugin()->getLogger();
+        $queue = $this->dependencies->getPlugin()->getQueueClass();
 
+        $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->logger->addLog('Lock creation', 'notice');
 
         $creation_date = new \DateTime('now');
@@ -61,23 +63,7 @@ class CartClass
         $lifetime = new \DateInterval('PT' . $duration);
         $end_of_life = $creation_date->add($lifetime);
 
-        do {
-            $cart_lock = $this->dependencies->payplugLock->createLockG2($id_cart, $this->dependencies->name);
-
-            if (!$cart_lock) {
-                $time = new \DateTime('now');
-                if ($time > $end_of_life) {
-                    $this->logger->addLog(
-                        'Try to create lock during ' . $duration . ' sec, but can\'t proceed',
-                        'error'
-                    );
-
-                    return false;
-                }
-            } else {
-                $this->logger->addLog('Lock created', 'notice');
-            }
-        } while (!$cart_lock);
+        $queue->setLockOrQueue($id_cart, $id_resource, $end_of_life, $duration);
 
         return true;
     }
