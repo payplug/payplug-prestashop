@@ -138,6 +138,12 @@ class captureActionTest extends BasePaymentAction
         $resource_id = 'pay_azerty12345';
         $api_class = \Mockery::mock('ApiClass');
         $cart_class = \Mockery::mock('CartClass');
+        $configClass = \Mockery::mock('Config');
+        $configClass
+            ->shouldReceive([
+                'isValidFeature' => false,
+            ]);
+        $this->dependencies->configClass = $configClass;
 
         $resource = [
             'result' => true,
@@ -187,12 +193,18 @@ class captureActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenCaptureIsComplete()
+    public function testWhenCaptureWithLockIsComplete()
     {
         $order_id = 42;
         $resource_id = 'pay_azerty12345';
         $api_class = \Mockery::mock('ApiClass');
         $cart_class = \Mockery::mock('CartClass');
+        $configClass = \Mockery::mock('Config');
+        $configClass
+            ->shouldReceive([
+                'isValidFeature' => false,
+            ]);
+        $this->dependencies->configClass = $configClass;
 
         $resource = [
             'result' => true,
@@ -248,6 +260,158 @@ class captureActionTest extends BasePaymentAction
                 'getValidate' => $validate,
             ]);
 
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => '',
+            ],
+            $this->action->captureAction($resource_id, $order_id)
+        );
+    }
+
+    /**
+     * @description test capture paiement
+     * when queue cant be created
+     */
+    public function testWhenQueueCantBeCreated()
+    {
+        $order_id = 42;
+        $resource_id = 'pay_azerty12345';
+        $api_class = \Mockery::mock('ApiClass');
+        $config_class = \Mockery::mock('ConfigClass');
+        $queue_action = \Mockery::mock('QueueAction');
+        $this->plugin->shouldReceive([
+            'getQueueAction' => $queue_action,
+        ]);
+
+        $resource = [
+            'result' => true,
+            'resource' => PaymentMock::getStandard(),
+        ];
+        $api_class
+            ->shouldReceive([
+                'setSecretKey' => true,
+                'capturePayment' => $resource,
+            ]);
+        $config_class
+            ->shouldReceive('isValidFeature')
+            ->with('feature_queueing_system')
+            ->andReturn(true);
+
+        $queue_action->shouldReceive([
+            'hydrateAction' => [
+                'result' => false,
+            ],
+        ]);
+
+        $this->dependencies->apiClass = $api_class;
+        $this->dependencies->configClass = $config_class;
+
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('order_state_paid')
+            ->andReturn('2');
+
+        $order = \Mockery::mock('Order');
+        $order
+            ->shouldReceive([
+                'get' => OrderMock::get(),
+            ]);
+
+        $validate = \Mockery::mock('Validate');
+        $validate
+            ->shouldReceive([
+                'validate' => true,
+            ]);
+
+        $this->plugin
+            ->shouldReceive([
+                'getOrder' => $order,
+                'getValidate' => $validate,
+            ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'An error occurred on queue creation',
+            ],
+            $this->action->captureAction($resource_id, $order_id)
+        );
+    }
+
+    /**
+     * @desccription test capture paiement
+     * when queue is successfully create
+     */
+    public function testWhenCaptureWithQueueIsComplete()
+    {
+        $order_id = 42;
+        $resource_id = 'pay_azerty12345';
+        $api_class = \Mockery::mock('ApiClass');
+        $config_class = \Mockery::mock('ConfigClass');
+        $queue_action = \Mockery::mock('QueueAction');
+        $this->plugin->shouldReceive([
+            'getQueueAction' => $queue_action,
+        ]);
+
+        $resource = [
+            'result' => true,
+            'resource' => PaymentMock::getStandard(),
+        ];
+        $api_class
+            ->shouldReceive([
+                'setSecretKey' => true,
+                'capturePayment' => $resource,
+            ]);
+        $config_class
+            ->shouldReceive('isValidFeature')
+            ->with('feature_queueing_system')
+            ->andReturn(true);
+
+        $queue_action->shouldReceive([
+            'hydrateAction' => [
+                'result' => true,
+            ],
+        ]);
+
+        $this->dependencies->apiClass = $api_class;
+        $this->dependencies->configClass = $config_class;
+
+        $order_state = 2;
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('order_state_paid')
+            ->andReturn($order_state);
+        $order_obj = \Mockery::mock('OrderObj');
+        $order_obj->id = 42;
+        $order_obj->id_cart = 42;
+        $order_obj
+            ->shouldReceive([
+                'getCurrentState' => $order_state,
+            ]);
+
+        $order = \Mockery::mock('Order');
+        $order
+            ->shouldReceive([
+                'get' => $order_obj,
+            ]);
+
+        $validate = \Mockery::mock('Validate');
+        $validate
+            ->shouldReceive([
+                'validate' => true,
+            ]);
+
+        $this->plugin
+            ->shouldReceive([
+                'getOrder' => $order,
+                'getValidate' => $validate,
+            ]);
+        $queue_action->shouldReceive([
+            'updateAction' => [
+                'result' => true,
+            ],
+        ]);
         $this->assertSame(
             [
                 'result' => true,
