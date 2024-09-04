@@ -280,14 +280,33 @@ class RefundClass
                 }
                 $order = $this->order->get((int) $id_order);
                 if ($this->validate->validate('isLoadedObject', $order)) {
-                    if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
-                        exit(json_encode([
-                            'status' => 'error',
-                            'data' => $this->dependencies
-                                ->getPlugin()
-                                ->getTranslationClass()
-                                ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
-                        ]));
+                    if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+                        $this->logger->addLog('RefundClass::refundPayment - Attempting to set queue for Cart ID: ' . (int) $order->id_cart, 'notice');
+                        $create_queue = $this->dependencies->getPlugin()->getQueueAction()->hydrateAction((int) $order->id_cart, $resource_id);
+                        if (!$create_queue['result']) {
+                            $this->logger->addLog('RefundClass::refundPayment - An error occurred on queue creation', 'error');
+
+                            exit(json_encode([
+                                'status' => 'error',
+                                'data' => $this->dependencies
+                                    ->getPlugin()
+                                    ->getTranslationClass()
+                                    ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+                            ]));
+                        }
+                        $this->logger->addLog('RefundClass::refundPayment - Queue created successfully for Cart ID: ' . (int) $order->id_cart, 'notice');
+                    } else {
+                        $this->logger->addLog('RefundClass::refundPayment - Attempting to set lock for Cart ID: ' . (int) $order->id_cart, 'notice');
+                        if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
+                            exit(json_encode([
+                                'status' => 'error',
+                                'data' => $this->dependencies
+                                    ->getPlugin()
+                                    ->getTranslationClass()
+                                    ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+                            ]));
+                        }
+                        $this->logger->addLog('RefundClass::refundPayment - Lock created for Cart ID: ' . (int) $order->id_cart, 'notice');
                     }
 
                     $current_state = (int) $this->dependencies
@@ -341,14 +360,33 @@ class RefundClass
             if ($new_state || ($payment->is_refunded && empty($inst_id))) {
                 $order = $this->order->get((int) $id_order);
                 if ($this->validate->validate('isLoadedObject', $order)) {
-                    if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
-                        exit(json_encode([
-                            'status' => 'error',
-                            'data' => $this->dependencies
-                                ->getPlugin()
-                                ->getTranslationClass()
-                                ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
-                        ]));
+                    if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+                        $this->logger->addLog('RefundClass::refundPayment - Attempting to set queue for Cart ID: ' . (int) $order->id_cart, 'notice');
+                        $create_queue = $this->dependencies->getPlugin()->getQueueAction()->hydrateAction((int) $order->id_cart, $resource_id);
+                        if (!$create_queue['result']) {
+                            $this->logger->addLog('RefundClass::refundPayment - An error occurred on queue creation', 'error');
+
+                            exit(json_encode([
+                                'status' => 'error',
+                                'data' => $this->dependencies
+                                    ->getPlugin()
+                                    ->getTranslationClass()
+                                    ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+                            ]));
+                        }
+                        $this->logger->addLog('RefundClass::refundPayment - Queue created successfully for Cart ID: ' . (int) $order->id_cart, 'notice');
+                    } else {
+                        $this->logger->addLog('RefundClass::refundPayment - Attempting to set lock for Cart ID: ' . (int) $order->id_cart, 'notice');
+                        if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
+                            exit(json_encode([
+                                'status' => 'error',
+                                'data' => $this->dependencies
+                                    ->getPlugin()
+                                    ->getTranslationClass()
+                                    ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+                            ]));
+                        }
+                        $this->logger->addLog('RefundClass::refundPayment - Lock created for Cart ID: ' . (int) $order->id_cart, 'notice');
                     }
 
                     $current_state = (int) $this->dependencies
@@ -367,14 +405,28 @@ class RefundClass
                         $this->logger->addLog('Order status is already \'refunded\'', 'notice');
                     }
 
-                    $delete_lock = $this->dependencies
-                        ->getPlugin()
-                        ->getLockRepository()
-                        ->deleteLock((int) $order->id_cart);
-                    if (!$delete_lock) {
-                        $this->logger->addLog('Lock cannot be deleted.', 'error');
+                    if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+                        $this->logger->addLog('RefundClass::refundPayment - Attempting to update queue for Cart ID: ' . (int) $order->id_cart, 'notice');
+                        $update_queue = (bool) $this->dependencies
+                            ->getPlugin()
+                            ->getQueueAction()
+                            ->updateAction((int) $order->id_cart)['result'];
+
+                        if (!$update_queue) {
+                            $this->logger->addLog('RefundClass::refundPayment - Queue entry cannot be updated.', 'error');
+                        }
+                        $this->logger->addLog('RefundClass::refundPayment - Queue updated successfully for Cart ID: ' . (int) $order->id_cart, 'notice');
                     } else {
-                        $this->logger->addLog('Lock deleted.', 'notice');
+                        $this->logger->addLog('RefundClass::refundPayment - Attempting to delete lock for Cart ID: ' . (int) $order->id_cart, 'notice');
+                        $delete_lock = $this->dependencies
+                            ->getPlugin()
+                            ->getLockRepository()
+                            ->deleteLock((int) $order->id_cart);
+                        if (!$delete_lock) {
+                            $this->logger->addLog('RefundClass::refundPayment - Lock cannot be deleted.', 'error');
+                        } else {
+                            $this->logger->addLog('RefundClass::refundPayment - Lock deleted.', 'notice');
+                        }
                     }
                 }
                 $reload = true;

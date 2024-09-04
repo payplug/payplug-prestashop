@@ -397,18 +397,31 @@ class PayPlugNotifications
             }
 
             // Set lock Lock the process with id_cart from order object
-            do {
-                $cart_lock = $this->payplugLock->createLockG2((int) $this->cart->id, 'ipn');
-                if (!$cart_lock) {
-                    $checkReturn = $this->payplugLock->check((int) $this->cart->id);
-                    if ('stop ipn' == $checkReturn) {
-                        $this->exitProcess('Lock cannot be created.', 500);
-                    }
-                } else {
-                    $this->logger->addLog('Lock created');
-                    $this->lock_key = $this->cart->id;
+            if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+                $this->logger->addLog('Notification: Attempting to set queue for Cart ID: ' . $this->cart->id, 'notice');
+                $create_queue = $this->dependencies->getQueueAction()->hydrateAction($this->cart->id, $this->resource->id);
+                if (!$create_queue['result']) {
+                    $this->exitProcess('Error: Queue cannot be created for Cart ID: ' . $this->cart->id, 500);
                 }
-            } while (!$cart_lock);
+                if ($create_queue['exists']) {
+                    $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
+                }
+
+                $this->logger->addLog('Queue created successfully for Cart ID: ' . $this->cart->id, 'notice');
+            } else {
+                do {
+                    $cart_lock = $this->payplugLock->createLockG2((int) $this->cart->id, 'ipn');
+                    if (!$cart_lock) {
+                        $checkReturn = $this->payplugLock->check((int) $this->cart->id);
+                        if ('stop ipn' == $checkReturn) {
+                            $this->exitProcess('Lock cannot be created.', 500);
+                        }
+                    } else {
+                        $this->logger->addLog('Lock created', 'notice');
+                        $this->lock_key = $this->cart->id;
+                    }
+                } while (!$cart_lock);
+            }
 
             $new_order_state = $this->order_states['refund'];
             $current_state = (int) $this->dependencies
