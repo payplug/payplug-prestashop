@@ -5,6 +5,7 @@
   - [PRE-2519](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2517): Set Queue Entity
   - [PRE-2579](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2526): Add queue system on notifications and flag it
   - [PRE-2581](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2531): Add queue system on payment capture and flag it
+  - [PRE-2580](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2532): Add queue system on refund and flag it
 
 ## Version 4.11.2
 - Bugfix :
