@@ -11,6 +11,9 @@
 - Feature :
     - [PRE-2509](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2533): Improve database usage
 
+- Bugfix :
+    - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2534) : Fix unit tests on updateAction on queue system
+
 ## Version 4.11.2
 - Bugfix :
   - [SMP-2936](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2518): Fix double order creation
