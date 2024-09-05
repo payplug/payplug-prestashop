@@ -418,60 +418,6 @@ class QueryRepository
         }
 
         if (isset($this->query['where']) && (!empty($this->query['where']))) {
-            foreach ($this->query['where'] as &$where) {
-                if (strpos($where, ' = ')) {
-                    $column = explode(' = ', $where);
-                    $comparator = ' = ';
-                } elseif (strpos($where, ' != ')) {
-                    $column = explode(' != ', $where);
-                    $comparator = ' != ';
-                } elseif (strpos($where, ' LIKE ')) {
-                    $column = explode(' LIKE ', $where);
-                    $comparator = ' LIKE ';
-                }
-
-                if ('SELECT' == $this->query['type'] || 'DELETE' == $this->query['type']) {
-                    $table = $this->query['from'][0];
-                } elseif ('INSERT' == $this->query['type']) {
-                    $table = $this->query['into'][0];
-                } else {
-                    $table = $this->query['table'][0];
-                }
-
-                if (!strpos($column[0], '.')) {
-                    $column_name = $column[0];
-                } else {
-                    $column_name_text = explode('.', $column[0]);
-                    $column_name = $column_name_text[1];
-
-                    if (isset($this->query['join']) && !empty($this->query['join'])) {
-                        foreach ($this->query['join'] as $join) {
-                            $table_join = explode(' ON ', $join);
-                            $table_alias_join = explode(' ', $table_join[0]);
-                            $table_alias = end($table_alias_join);
-
-                            if (str_replace('`', '', $column_name_text[0]) == str_replace('`', '', $table_alias)) {
-                                $table = prev($table_alias_join);
-
-                                break;
-                            }
-                        }
-                    }
-                }
-                $table_name = explode('`', $table);
-
-                $data_type = $this->getDataType($table_name[1], $column_name);
-
-                if (in_array($data_type[0]['DATA_TYPE'], $this->data_type_text)) {
-                    $data = str_replace('\'', '', $column[1]);
-                    $data = str_replace('"', '', $data);
-                    $where = $column[0] . $comparator . '"' . $this->escape($data) . '"';
-                } else {
-                    $data = trim($column[1]);
-                    $where = $column[0] . $comparator . '"' . (int) $data . '"';
-                }
-            }
-
             $sql .= 'WHERE (' . implode(') AND (', $this->query['where']);
 
             if (isset($this->query['whereOr']) && (!empty($this->query['whereOr']))) {
@@ -480,60 +426,6 @@ class QueryRepository
         }
 
         if (isset($this->query['whereOr']) && (!empty($this->query['whereOr']))) {
-            foreach ($this->query['whereOr'] as &$whereOr) {
-                if (strpos($whereOr, ' = ')) {
-                    $column = explode(' = ', $whereOr);
-                    $comparator = ' = ';
-                } elseif (strpos($whereOr, ' != ')) {
-                    $column = explode(' != ', $whereOr);
-                    $comparator = ' != ';
-                } elseif (strpos($whereOr, ' LIKE ')) {
-                    $column = explode(' LIKE ', $whereOr);
-                    $comparator = ' LIKE ';
-                }
-
-                if ('SELECT' == $this->query['type']) {
-                    $table = $this->query['from'][0];
-                } elseif ('INSERT' == $this->query['type']) {
-                    $table = $this->query['into'][0];
-                } else {
-                    $table = $this->query['table'][0];
-                }
-
-                if (!strpos($column[0], '.')) {
-                    $column_name = $column[0];
-                } else {
-                    $column_name_text = explode('.', $column[0]);
-                    $column_name = $column_name_text[1];
-
-                    if (isset($this->query['join']) && !empty($this->query['join'])) {
-                        foreach ($this->query['join'] as $join) {
-                            $table_join = explode(' ON ', $join);
-                            $table_alias_join = explode(' ', $table_join[0]);
-                            $table_alias = end($table_alias_join);
-
-                            if (str_replace('`', '', $column_name_text[0]) == str_replace('`', '', $table_alias)) {
-                                $table = prev($table_alias_join);
-
-                                break;
-                            }
-                        }
-                    }
-                }
-                $table_name = explode('`', $table);
-
-                $data_type = $this->getDataType($table_name[1], $column_name);
-
-                if (in_array($data_type[0]['DATA_TYPE'], $this->data_type_text)) {
-                    $data = str_replace('\'', '', $column[1]);
-                    $data = str_replace('"', '', $data);
-                    $whereOr = $column[0] . $comparator . '"' . $this->escape($data) . '"';
-                } else {
-                    $data = trim($column[1]);
-                    $whereOr = $column[0] . $comparator . '"' . (int) $data . '"';
-                }
-            }
-
             $sql .= implode(' OR ', $this->query['whereOr']) . "\n";
         }
 
@@ -589,15 +481,6 @@ class QueryRepository
         $sql = null;
 
         return $result;
-    }
-
-    public function getDataType($table, $column)
-    {
-        $sql = 'SELECT DATA_TYPE, CHARACTER_MAXIMUM_LENGTH as data_type_length
-                FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_NAME = "' . str_replace('`', '', $table) . '" AND COLUMN_NAME = "' . str_replace('`', '', $column) . '"';
-
-        return $this->dependencies->getPlugin()->getQueryAdapter()->query($sql);
     }
 
     public function escape($string, $htmlOK = false)
