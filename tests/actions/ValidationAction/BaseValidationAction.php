@@ -1,0 +1,52 @@
+<?php
+
+namespace PayPlug\tests\actions\ValidationAction;
+
+use PayPlug\src\actions\ValidationAction;
+use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\mock\ContextMock;
+use PayPlug\tests\mock\MockHelper;
+use PHPUnit\Framework\TestCase;
+
+class BaseValidationAction extends TestCase
+{
+    use FormatDataProvider;
+    protected $action;
+    protected $context;
+    protected $dependencies;
+    protected $plugin;
+    protected $logger;
+
+    protected function setUp()
+    {
+        $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
+
+        $this->plugin = \Mockery::mock('Plugin');
+        $this->action = \Mockery::mock(ValidationAction::class, [$this->dependencies])->makePartial();
+        $this->toolsAdapter = \Mockery::mock('ToolsAdapter');
+
+        $this->dependencies
+            ->shouldReceive(
+                [
+                    'getPlugin' => $this->plugin,
+                ]
+            );
+
+        $this->context = \Mockery::mock('Context');
+        $this->context
+            ->shouldReceive([
+                'get' => ContextMock::get(),
+            ]);
+        $this->logger = \Mockery::mock('Logger');
+        $this->logger
+            ->shouldReceive([
+                'addLog' => true,
+            ]);
+        $this->plugin
+            ->shouldReceive([
+                'getContext' => $this->context,
+                'getLogger' => $this->logger,
+                'getTools' => $this->toolsAdapter,
+            ]);
+    }
+}

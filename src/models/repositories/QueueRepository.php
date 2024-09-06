@@ -97,16 +97,15 @@ class QueueRepository extends EntityRepository
         if (!is_array($definition) || !isset($definition['table'])) {
             return [];
         }
-        $result = $this
+        $this
             ->select()
             ->fields('*')
             ->from($this->getTableName($definition['table']))
             ->where('`id_cart` = ' . (int) $cart_id)
-            ->where('`treated` = 0')
+            ->where('`treated` =  0')
             ->orderBy($definition['primary'] . ' ASC')
-            ->limit(0, 1)
-            ->build('unique_value');
+            ->limit(1);
 
-        return $result ?: [];
+        return $this->build('unique_row') ?: [];
     }
 }

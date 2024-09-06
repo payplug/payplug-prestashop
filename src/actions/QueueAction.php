@@ -81,10 +81,10 @@ class QueueAction
         }
 
         // check if exists
-        $exists = (bool) $this->dependencies
+        $exists = !empty($this->dependencies
             ->getPlugin()
             ->getQueueRepository()
-            ->getFirstNotTreatedEntry((int) $id_cart);
+            ->getFirstNotTreatedEntry((int) $id_cart));
 
         $current_date = date('Y-m-d H:i:s');
         $fields = [
@@ -144,6 +144,7 @@ class QueueAction
 
         $fields = [
             'treated' => true,
+            'date_upd' => date('Y-m-d H:i:s'),
         ];
 
         $update = (bool) $this->dependencies
