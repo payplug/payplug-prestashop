@@ -45,7 +45,7 @@ class updateActionTest extends BaseQueueAction
     {
         $this->repository
             ->shouldReceive([
-                'getFirstNotTreatedEntry' => true,
+                'getFirstNotTreatedEntry' => ['id_payplug_queue' => 1],
                 'updateEntity' => false,
             ]);
 
@@ -61,13 +61,13 @@ class updateActionTest extends BaseQueueAction
     {
         $this->repository
             ->shouldReceive([
-                'getFirstNotTreatedEntry' => true,
+                'getFirstNotTreatedEntry' => ['id_payplug_queue' => 1],
                 'updateEntity' => true,
             ]);
 
         $this->assertSame(
             [
-                'exists' => true,
+                'exists' => ['id_payplug_queue' => 1],
                 'result' => true,
             ],
             $this->action->updateAction($this->id_cart)
@@ -84,7 +84,7 @@ class updateActionTest extends BaseQueueAction
         $this->repository
             ->shouldReceive('getFirstNotTreatedEntry')
             ->once()
-            ->andReturn(true);
+            ->andReturn(['id_payplug_queue' => 1]);
 
         $this->repository
             ->shouldReceive('getFirstNotTreatedEntry')
