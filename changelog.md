@@ -8,6 +8,9 @@
   - [PRE-2580](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2532): Add queue system on refund and flag it
   - [PRE-2578](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2527): Add queue system on validation and flag it
 
+- Feature :
+    - [PRE-2509](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2533): Improve database usage
+
 ## Version 4.11.2
 - Bugfix :
   - [SMP-2936](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2518): Fix double order creation
