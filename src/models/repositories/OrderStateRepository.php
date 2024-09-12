@@ -102,10 +102,10 @@ class OrderStateRepository extends EntityRepository
             ->from($this->getTableName('order_state_lang'), 'osl')
             ->leftJoin($this->getTableName('order_state'), 'os', 'osl.`id_order_state` = os.`id_order_state`')
             ->where('os.`deleted` = 0')
-            ->where('osl.`name` LIKE \'' . $this->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
-            ->whereOr('osl.`name` LIKE \'' . $this->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
-            ->whereOr('osl.`name` LIKE \'' . $this->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')))
-            ->whereOr('osl.`name` LIKE \'' . $this->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')));
+            ->where('osl.`name` LIKE \'' . $this->escape($name['en'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'')
+            ->whereOr('osl.`name` LIKE \'' . $this->escape($name['fr'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'')
+            ->whereOr('osl.`name` LIKE \'' . $this->escape($name['es'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'')
+            ->whereOr('osl.`name` LIKE \'' . $this->escape($name['it'] . ($test_mode ? ' [TEST]' : ' [PayPlug]')) . '\'');
 
         $result = $this->build('unique_value');
 
