@@ -41,13 +41,23 @@ class setLockTest extends BaseValidationAction
     }
 
     /**
+     * @dataProvider invalidIntegerFormatDataProvider
+     *
+     * @param mixed $cart_id
+     */
+    public function testWhenGivenCartIdIsInvalidIntegerFormat($cart_id)
+    {
+        $this->assertFalse($this->action->setLock($cart_id, $this->resource_id));
+    }
+
+    /**
      * @dataProvider invalidStringFormatDataProvider
      *
      * @param mixed $resource_id
      */
     public function testWhenGivenResourceIdIsInvalidStringFormat($resource_id)
     {
-        $this->assertFalse($this->action->setLock($resource_id));
+        $this->assertFalse($this->action->setLock($this->cart_id, $resource_id));
     }
 
     public function testwhenQueueAlreadyExists()
@@ -58,7 +68,7 @@ class setLockTest extends BaseValidationAction
         $this->queue_repository->shouldReceive([
             'getFirstNotTreatedEntry' => $this->queue_entry,
         ]);
-        $this->assertFalse($this->action->setLock($this->resource_id));
+        $this->assertFalse($this->action->setLock($this->cart_id, $this->resource_id));
     }
 
     public function testWhenQueueCantBeHydrated()
@@ -74,7 +84,7 @@ class setLockTest extends BaseValidationAction
                 'result' => false,
             ],
         ]);
-        $this->assertFalse($this->action->setLock($this->resource_id));
+        $this->assertFalse($this->action->setLock($this->cart_id, $this->resource_id));
     }
 
     public function testWhenQueueIsHydrated()
@@ -90,7 +100,7 @@ class setLockTest extends BaseValidationAction
                 'result' => true,
             ],
         ]);
-        $this->assertTrue($this->action->setLock($this->resource_id));
+        $this->assertTrue($this->action->setLock($this->cart_id, $this->resource_id));
     }
 
     public function testWhenLockCantBeCreated()
@@ -101,7 +111,7 @@ class setLockTest extends BaseValidationAction
         $this->payplugLock->shouldReceive([
             'createLockG2' => false,
         ]);
-        $this->assertFalse($this->action->setLock($this->resource_id));
+        $this->assertFalse($this->action->setLock($this->cart_id, $this->resource_id));
     }
 
     public function testWhenLockIsCreated()
@@ -112,6 +122,6 @@ class setLockTest extends BaseValidationAction
         $this->payplugLock->shouldReceive([
             'createLockG2' => true,
         ]);
-        $this->assertTrue($this->action->setLock($this->resource_id));
+        $this->assertTrue($this->action->setLock($this->cart_id, $this->resource_id));
     }
 }

@@ -38,6 +38,23 @@ class checkActionTest extends BaseValidationAction
     }
 
     /**
+     * @dataProvider invalidIntegerFormatDataProvider
+     *
+     * @param mixed $cart_id
+     */
+    public function testWhenGivenCartIdIsInvalidIntegerFormat($cart_id)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'action' => 'redirect',
+                'redirected_url' => $this->links['error'],
+            ],
+            $this->action->checkAction($cart_id)
+        );
+    }
+
+    /**
      * @dataProvider invalidBoolFormatDataProvider
      *
      * @param mixed $last_try
@@ -50,7 +67,7 @@ class checkActionTest extends BaseValidationAction
                 'action' => 'redirect',
                 'redirected_url' => $this->links['error'],
             ],
-            $this->action->checkAction($last_try)
+            $this->action->checkAction($this->cart_id, $last_try)
         );
     }
 
@@ -67,7 +84,7 @@ class checkActionTest extends BaseValidationAction
                 'action' => 'redirect',
                 'redirected_url' => $this->links['confirm'],
             ],
-            $this->action->checkAction()
+            $this->action->checkAction($this->cart_id)
         );
     }
 
@@ -83,7 +100,7 @@ class checkActionTest extends BaseValidationAction
                 'result' => true,
                 'action' => 'wait',
             ],
-            $this->action->checkAction()
+            $this->action->checkAction($this->cart_id)
         );
     }
 
@@ -104,7 +121,7 @@ class checkActionTest extends BaseValidationAction
                 'action' => 'redirect',
                 'redirected_url' => $this->links['error'],
             ],
-            $this->action->checkAction(true)
+            $this->action->checkAction($this->cart_id, true)
         );
     }
 
@@ -131,7 +148,7 @@ class checkActionTest extends BaseValidationAction
                 'action' => 'redirect',
                 'redirected_url' => $this->links['error'],
             ],
-            $this->action->checkAction(true)
+            $this->action->checkAction($this->cart_id, true)
         );
     }
 
@@ -159,7 +176,7 @@ class checkActionTest extends BaseValidationAction
                 'action' => 'redirect',
                 'redirected_url' => $this->links['confirm'],
             ],
-            $this->action->checkAction(true)
+            $this->action->checkAction($this->cart_id, true)
         );
     }
 }
