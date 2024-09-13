@@ -68,7 +68,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         $error_message = $this->dependencies
             ->getPlugin()
             ->getTranslationClass()
-            ->l('validation.message.error', 'validation');
+            ->l('The transaction was not completed and your card was not charged.', 'validation');
 
         if (!$order_validate['result']) {
             $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$error_message]);
