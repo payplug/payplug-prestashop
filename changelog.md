@@ -13,7 +13,8 @@
 
 - Bugfix :
     - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2534) : Fix unit tests on updateAction on queue system
-    - [PRE-2611](): Fix order state query at plugin install
+    - [PRE-2611](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2535): Fix order state query at plugin install
+    - [PRE-2614](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2536): Disable queue system
 
 ## Version 4.11.2
 - Bugfix :
