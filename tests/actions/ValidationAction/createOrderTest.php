@@ -11,7 +11,6 @@ namespace PayPlug\tests\actions\ValidationAction;
  */
 class createOrderTest extends BaseValidationAction
 {
-    protected $cart_id;
     protected $order_action;
     protected $payment_repository;
     protected $stored_payment;
@@ -19,7 +18,6 @@ class createOrderTest extends BaseValidationAction
     public function setUp()
     {
         parent::setUp();
-        $this->cart_id = 42;
         $this->order_action = \Mockery::mock('OrderAction');
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->stored_payment = [

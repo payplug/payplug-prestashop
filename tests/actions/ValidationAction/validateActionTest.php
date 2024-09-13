@@ -2,7 +2,7 @@
 
 namespace PayPlug\tests\actions\ValidationAction;
 
-use PayPlug\tests\mock\ContextMock;
+use PayPlug\tests\mock\CartMock;
 
 /**
  * @group unit
@@ -14,30 +14,35 @@ use PayPlug\tests\mock\ContextMock;
 class validateActionTest extends BaseValidationAction
 {
     protected $ps;
+    protected $cart_adapter;
     protected $cart_id;
     protected $links;
     protected $order;
     protected $order_id;
+    protected $validate_adapter;
 
     public function setUp()
     {
         parent::setUp();
 
-        $context = ContextMock::get();
+        $this->cart_adapter = \Mockery::mock('CartAdapter');
+
         $this->links = [
             'error' => 'error_url',
             'cancel' => 'cancel_url',
             'confirm' => 'confirm_url',
         ];
         $this->ps = 1;
-        $this->cart_id = $context->cart->id;
         $this->order = \Mockery::mock('Order');
         $this->order_id = 42;
+        $this->validate_adapter = \Mockery::mock('ValidateAdapter');
         $this->action->shouldReceive([
             'getOrderLinks' => $this->links,
         ]);
         $this->plugin->shouldReceive([
+            'getCart' => $this->cart_adapter,
             'getOrder' => $this->order,
+            'getValidate' => $this->validate_adapter,
         ]);
     }
 
@@ -58,16 +63,41 @@ class validateActionTest extends BaseValidationAction
         );
     }
 
-    public function testWhenGivenCartIdDoesntMatchWithContextCartId()
+    public function testWhenGivenCartIdIsNotValidObjectCartId()
     {
-        $cart_id = 4242;
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => false,
+        ]);
         $this->assertSame(
             [
                 'result' => false,
                 'url' => $this->links['error'],
-                'message' => 'Given cart id did not match with context cart id.',
+                'message' => 'Given cart obj isn\'t a valid object.',
             ],
-            $this->action->validateAction($this->ps, $cart_id)
+            $this->action->validateAction($this->ps, $this->cart_id)
+        );
+    }
+
+    public function testWhenGivenCartCustomerIdDoesntMatchWithContextCustomerId()
+    {
+        $cart = CartMock::get();
+        $cart->id_customer = 42;
+        $this->cart_adapter->shouldReceive([
+            'get' => $cart,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->assertSame(
+            [
+                'result' => false,
+                'url' => $this->links['error'],
+                'message' => 'Given cart customer id did not match with context customer id.',
+            ],
+            $this->action->validateAction($this->ps, $this->cart_id)
         );
     }
 
@@ -78,6 +108,12 @@ class validateActionTest extends BaseValidationAction
      */
     public function testWhenGivenPsIsInvalidIntegerFormat($ps)
     {
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->assertSame(
             [
                 'result' => false,
@@ -90,6 +126,12 @@ class validateActionTest extends BaseValidationAction
 
     public function testWhenGivenPsDoesntMatchWithExpectedValue()
     {
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $ps = 4242;
         $this->assertSame(
             [
@@ -103,6 +145,12 @@ class validateActionTest extends BaseValidationAction
 
     public function testWhenGivenPsReturnCancelAction()
     {
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $ps = 2;
         $this->assertSame(
             [
@@ -116,6 +164,12 @@ class validateActionTest extends BaseValidationAction
 
     public function testWhenOrderIsRetrieveForGivenCartId()
     {
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->order->shouldReceive([
             'getIdByCartId' => $this->order_id,
         ]);
@@ -131,6 +185,12 @@ class validateActionTest extends BaseValidationAction
 
     public function testWhenOrderCantBeCreated()
     {
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->order->shouldReceive([
             'getIdByCartId' => false,
         ]);
@@ -151,6 +211,12 @@ class validateActionTest extends BaseValidationAction
 
     public function testWhenOrderIsCreated()
     {
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->order->shouldReceive([
             'getIdByCartId' => false,
         ]);
@@ -172,6 +238,12 @@ class validateActionTest extends BaseValidationAction
 
     public function testWhenNoOrdersAreCreatedAndNoErrorsOccured()
     {
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->order->shouldReceive([
             'getIdByCartId' => false,
         ]);

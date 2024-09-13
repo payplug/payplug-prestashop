@@ -29,6 +29,16 @@ class clearLockTest extends BaseValidationAction
         ]);
     }
 
+    /**
+     * @dataProvider invalidIntegerFormatDataProvider
+     *
+     * @param mixed $cart_id
+     */
+    public function testWhenGivenCartIdIsInvalidIntegerFormat($cart_id)
+    {
+        $this->assertFalse($this->action->clearLock($cart_id));
+    }
+
     public function testWhenQueueCanBeUpdate()
     {
         $this->configClass->shouldReceive([
@@ -39,7 +49,7 @@ class clearLockTest extends BaseValidationAction
                 'result' => false,
             ],
         ]);
-        $this->assertFalse($this->action->clearLock());
+        $this->assertFalse($this->action->clearLock($this->cart_id));
     }
 
     public function testWhenQueueCanUpdate()
@@ -52,7 +62,7 @@ class clearLockTest extends BaseValidationAction
                 'result' => true,
             ],
         ]);
-        $this->assertTrue($this->action->clearLock());
+        $this->assertTrue($this->action->clearLock($this->cart_id));
     }
 
     public function testWhenLockCanBeUpdate()
@@ -63,7 +73,7 @@ class clearLockTest extends BaseValidationAction
         $this->lock_repository->shouldReceive([
             'deleteLock' => false,
         ]);
-        $this->assertFalse($this->action->clearLock());
+        $this->assertFalse($this->action->clearLock($this->cart_id));
     }
 
     public function testWhenLockCanUpdate()
@@ -74,6 +84,6 @@ class clearLockTest extends BaseValidationAction
         $this->lock_repository->shouldReceive([
             'deleteLock' => true,
         ]);
-        $this->assertTrue($this->action->clearLock());
+        $this->assertTrue($this->action->clearLock($this->cart_id));
     }
 }

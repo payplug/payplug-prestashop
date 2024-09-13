@@ -39,12 +39,21 @@ class ValidationAction
     /**
      * @description Check if order is created or force creation
      *
+     * @param int $cart_id
      * @param bool $last_try
      *
      * @return array
      */
-    public function checkAction($last_try = false)
+    public function checkAction($cart_id = 0, $last_try = false)
     {
+        if (!is_int($cart_id) || !$cart_id) {
+            return [
+                'result' => false,
+                'action' => 'redirect',
+                'redirected_url' => $this->getOrderLinks()['error'],
+            ];
+        }
+
         if (!is_bool($last_try)) {
             $this->dependencies
                 ->getPlugin()
@@ -58,15 +67,11 @@ class ValidationAction
             ];
         }
 
-        $context = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get();
         // Check if an order exists this related cart
         $id_order = $this->dependencies
             ->getPlugin()
             ->getOrder()
-            ->getIdByCartId((int) $context->cart->id);
+            ->getIdByCartId((int) $cart_id);
         if ($id_order) {
             return [
                 'result' => true,
@@ -90,7 +95,7 @@ class ValidationAction
         $update = (bool) $this->dependencies
             ->getPlugin()
             ->getQueueRepository()
-            ->updateBy('id_cart', (int) $context->cart->id, $fields);
+            ->updateBy('id_cart', (int) $cart_id, $fields);
         if (!$update) {
             return [
                 'result' => false,
@@ -100,7 +105,7 @@ class ValidationAction
         }
 
         // Then create order before redirect user
-        $order_create = $this->createOrder((int) $context->cart->id);
+        $order_create = $this->createOrder((int) $cart_id);
 
         // if result is false an error has been occured
         if (!$order_create['result']) {
@@ -112,7 +117,7 @@ class ValidationAction
         }
 
         // Clear lock before rendering it
-        $this->clearLock();
+        $this->clearLock((int) $cart_id);
 
         return [
             'result' => true,
@@ -124,26 +129,27 @@ class ValidationAction
     /**
      * @description Clear related lock
      *
+     * @param int $cart_id
+     *
      * @return bool
      */
-    public function clearLock()
+    public function clearLock($cart_id = 0)
     {
-        $context = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get();
+        if (!is_int($cart_id) || !$cart_id) {
+            return false;
+        }
 
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
             return (bool) $this->dependencies
                 ->getPlugin()
                 ->getQueueAction()
-                ->updateAction((int) $context->cart->id)['result'];
+                ->updateAction((int) $cart_id)['result'];
         }
 
         return $this->dependencies
             ->getPlugin()
             ->getLockRepository()
-            ->deleteLock((int) $context->cart->id);
+            ->deleteLock((int) $cart_id);
     }
 
     /**
@@ -170,7 +176,7 @@ class ValidationAction
         $stored_payment = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
-            ->getBy('id_cart', (int) $context->cart->id);
+            ->getBy('id_cart', (int) $cart_id);
         if (empty($stored_payment)) {
             return [
                 'result' => false,
@@ -178,7 +184,7 @@ class ValidationAction
         }
 
         // ...then if no lock is present to create order
-        $locked_setted = $this->setLock($stored_payment['resource_id']);
+        $locked_setted = $this->setLock((int) $cart_id, $stored_payment['resource_id']);
         if (!$locked_setted) {
             return [
                 'result' => true,
@@ -220,7 +226,7 @@ class ValidationAction
                 ->getOrder()
                 ->get((int) $id_order);
             $confirmation_url_fields = [
-                'id_cart' => $context->cart->id,
+                'id_cart' => $order->id_cart,
                 'id_module' => $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name)->id,
                 'id_order' => $id_order,
                 'key' => $order->secure_key,
@@ -243,12 +249,22 @@ class ValidationAction
     /**
      * @description Set lock
      *
+     * @param int $cart_id
      * @param string $resource_id
      *
      * @return bool
      */
-    public function setLock($resource_id = '')
+    public function setLock($cart_id = 0, $resource_id = '')
     {
+        if (!is_int($cart_id) || !$cart_id) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('Validation::setLock - $cart_id must be an non null integer', 'error');
+
+            return false;
+        }
+
         if (!is_string($resource_id) || !$resource_id) {
             $this->dependencies
                 ->getPlugin()
@@ -258,16 +274,11 @@ class ValidationAction
             return false;
         }
 
-        $context = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get();
-
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
             $exists = $this->dependencies
                 ->getPlugin()
                 ->getQueueRepository()
-                ->getFirstNotTreatedEntry((int) $context->cart->id);
+                ->getFirstNotTreatedEntry((int) $cart_id);
 
             if ($exists) {
                 return false;
@@ -276,10 +287,10 @@ class ValidationAction
             return (bool) $this->dependencies
                 ->getPlugin()
                 ->getQueueAction()
-                ->hydrateAction((int) $context->cart->id, $resource_id)['result'];
+                ->hydrateAction((int) $cart_id, $resource_id)['result'];
         }
 
-        return (bool) $this->dependencies->payplugLock->createLockG2((int) $context->cart->id, 'validation');
+        return (bool) $this->dependencies->payplugLock->createLockG2((int) $cart_id, 'validation');
     }
 
     /**
@@ -300,15 +311,34 @@ class ValidationAction
                 'message' => 'Invalid argument given, $cart_id must be a non null integer.',
             ];
         }
+
+        // Get the related cart from given cart_id
+        $cart = $this->dependencies
+            ->getPlugin()
+            ->getCart()
+            ->get((int) $cart_id);
+
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getValidate()
+            ->validate('isLoadedObject', $cart)) {
+            return [
+                'result' => false,
+                'url' => $this->getOrderLinks()['error'],
+                'message' => 'Given cart obj isn\'t a valid object.',
+            ];
+        }
+
         $context = $this->dependencies
             ->getPlugin()
             ->getContext()
             ->get();
-        if ($context->cart->id != $cart_id) {
+
+        if ($context->customer->id != $cart->id_customer) {
             return [
                 'result' => false,
                 'url' => $this->getOrderLinks()['error'],
-                'message' => 'Given cart id did not match with context cart id.',
+                'message' => 'Given cart customer id did not match with context customer id.',
             ];
         }
 
@@ -335,7 +365,7 @@ class ValidationAction
         $id_order = $this->dependencies
             ->getPlugin()
             ->getOrder()
-            ->getIdByCartId((int) $context->cart->id);
+            ->getIdByCartId((int) $cart->id);
         if ($id_order) {
             return [
                 'result' => true,
@@ -345,7 +375,7 @@ class ValidationAction
         }
 
         // ... then create order form cart id
-        $order_create = $this->createOrder((int) $context->cart->id);
+        $order_create = $this->createOrder((int) $cart->id);
 
         if (!$order_create['result']) {
             return [

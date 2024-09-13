@@ -36,6 +36,15 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
+        $ps = (int) $this->dependencies
+            ->getPlugin()
+            ->getTools()
+            ->tool('getValue', 'ps');
+        $cart_id = (int) $this->dependencies
+            ->getPlugin()
+            ->getTools()
+            ->tool('getValue', 'cartid');
+
         if ($this->dependencies
             ->getPlugin()
             ->getTools()
@@ -48,18 +57,10 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             $check = $this->dependencies
                 ->getPlugin()
                 ->getValidationAction()
-                ->checkAction((bool) $last_try);
+                ->checkAction((int) $cart_id, (bool) $last_try);
             exit(json_encode($check));
         }
 
-        $ps = (int) $this->dependencies
-            ->getPlugin()
-            ->getTools()
-            ->tool('getValue', 'ps');
-        $cart_id = (int) $this->dependencies
-            ->getPlugin()
-            ->getTools()
-            ->tool('getValue', 'cartid');
         $order_validate = $this->dependencies
             ->getPlugin()
             ->getValidationAction()
