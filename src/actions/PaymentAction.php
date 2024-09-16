@@ -295,13 +295,25 @@ class PaymentAction
             ];
         }
 
-        if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
-            $this->logger->addLog('PaymentAction::captureAction - An error occured on lock creation', 'error');
+        if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+            $create_queue = $this->dependencies->getPlugin()->getQueueAction()->hydrateAction((int) $order->id_cart, $resource_id);
+            if (!$create_queue['result']) {
+                $this->logger->addLog('PaymentAction::captureAction - An error occurred on queue creation', 'error');
 
-            return [
-                'result' => false,
-                'message' => 'An error occured on lock creation',
-            ];
+                return [
+                    'result' => false,
+                    'message' => 'An error occurred on queue creation',
+                ];
+            }
+        } else {
+            if (!$this->dependencies->cartClass->createLockFromCartId((int) $order->id_cart)) {
+                $this->logger->addLog('PaymentAction::captureAction - An error occured on lock creation', 'error');
+
+                return [
+                    'result' => false,
+                    'message' => 'An error occured on lock creation',
+                ];
+            }
         }
 
         $current_state = (int) $order->getCurrentState();
@@ -314,11 +326,26 @@ class PaymentAction
             $order_history->addWithemail();
         }
 
-        $delete_lock = $this->plugin
-            ->getLockRepository()
-            ->deleteLock((int) $order->id_cart);
-        if (!$delete_lock) {
-            $this->logger->addLog('PaymentAction::captureAction - Lock cannot be deleted.', 'error');
+        if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+            $update_queue = (bool) $this->dependencies
+                ->getPlugin()
+                ->getQueueAction()
+                ->updateAction((int) $order->id_cart)['result'];
+
+            if ($update_queue) {
+                $this->logger->addLog('PaymentAction::captureAction - Queue update succeeded for cart ID: ' . $order->id_cart, 'notice');
+            } else {
+                $this->logger->addLog('PaymentAction::captureAction - Queue entry cannot be updated for cart ID: ' . $order->id_cart, 'error');
+            }
+        } else {
+            $delete_lock = $this->plugin
+                ->getLockRepository()
+                ->deleteLock((int) $order->id_cart);
+            if ($delete_lock) {
+                $this->logger->addLog('PaymentAction::captureAction - Lock deletion succeeded for cart ID: ' . $order->id_cart, 'notice');
+            } else {
+                $this->logger->addLog('PaymentAction::captureAction - Lock cannot be deleted for cart ID: ' . $order->id_cart, 'error');
+            }
         }
 
         return [

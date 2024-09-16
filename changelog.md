@@ -1,5 +1,21 @@
 # Payplug module changelog
 
+## Version 4.12.0
+- Refactoring :
+  - [PRE-2519](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2517): Set Queue Entity
+  - [PRE-2579](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2526): Add queue system on notifications and flag it
+  - [PRE-2581](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2531): Add queue system on payment capture and flag it
+  - [PRE-2580](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2532): Add queue system on refund and flag it
+  - [PRE-2578](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2527): Add queue system on validation and flag it
+
+- Feature :
+    - [PRE-2509](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2533): Improve database usage
+
+- Bugfix :
+    - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2534) : Fix unit tests on updateAction on queue system
+    - [PRE-2611](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2535): Fix order state query at plugin install
+    - [PRE-2614](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2536): Disable queue system
+
 ## Version 4.11.2
 - Bugfix :
   - [SMP-2936](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2518): Fix double order creation

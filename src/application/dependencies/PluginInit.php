@@ -37,7 +37,9 @@ use PayPlug\src\actions\OneyAction;
 use PayPlug\src\actions\OrderAction;
 use PayPlug\src\actions\OrderStateAction;
 use PayPlug\src\actions\PaymentAction;
+use PayPlug\src\actions\QueueAction;
 use PayPlug\src\actions\RefundAction;
+use PayPlug\src\actions\ValidationAction;
 use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
 use PayPlug\src\application\adapter\CarrierAdapter;
@@ -93,13 +95,15 @@ class PluginInit extends BaseClass
     private $card_action;
     private $cart_action;
     private $configuration_action;
+    private $merchant_telemetry_action;
     private $onboarding_action;
     private $oney_action;
     private $order_action;
-    private $refund_action;
     private $order_state_action;
-    private $merchant_telemetry_action;
-    private $paymentAction;
+    private $queue_action;
+    private $refund_action;
+    private $payment_action;
+    private $validation_action;
 
     // EntitiesApiRest
     private $cacheEntity;
@@ -168,6 +172,7 @@ class PluginInit extends BaseClass
     private $payment_repository;
     private $payplug_order_state_repository;
     private $query_repository;
+    private $queue_repository;
     private $shop_repository;
 
     // Utilities services
@@ -243,9 +248,11 @@ class PluginInit extends BaseClass
             ->setOnboardingAction($this->onboarding_action)
             ->setOneyAction($this->oney_action)
             ->setOrderAction($this->order_action)
-            ->setRefundAction($this->refund_action)
             ->setOrderStateAction($this->order_state_action)
-            ->setPaymentAction($this->paymentAction)
+            ->setPaymentAction($this->payment_action)
+            ->setRefundAction($this->refund_action)
+            ->setQueueAction($this->queue_action)
+            ->setValidationAction($this->validation_action)
         ;
 
         // Set models/classes
@@ -273,6 +280,7 @@ class PluginInit extends BaseClass
             ->setPaymentRepository($this->payment_repository)
             ->setStateRepository($this->payplug_order_state_repository)
             ->setQueryRepository($this->query_repository)
+            ->setQueueRepository($this->queue_repository)
             ->setShopRepository($this->shop_repository)
         ;
 
@@ -288,9 +296,11 @@ class PluginInit extends BaseClass
         $this->onboarding_action = new OnboardingAction($this->dependencies);
         $this->oney_action = new OneyAction($this->dependencies);
         $this->order_action = new OrderAction($this->dependencies);
-        $this->refund_action = new RefundAction($this->dependencies);
         $this->order_state_action = new OrderStateAction($this->dependencies);
-        $this->paymentAction = new PaymentAction($this->dependencies);
+        $this->payment_action = new PaymentAction($this->dependencies);
+        $this->queue_action = new QueueAction($this->dependencies);
+        $this->refund_action = new RefundAction($this->dependencies);
+        $this->validation_action = new ValidationAction($this->dependencies);
     }
 
     private function setEntities()
@@ -400,6 +410,7 @@ class PluginInit extends BaseClass
         $this->payment_repository = new \PayPlug\src\models\repositories\PaymentRepository($this->dependencies);
         $this->payplug_order_state_repository = new \PayPlug\src\models\repositories\StateRepository($this->dependencies);
         $this->query_repository = new \PayPlug\src\models\repositories\QueryRepository($this->dependencies);
+        $this->queue_repository = new \PayPlug\src\models\repositories\QueueRepository($this->dependencies);
         $this->shop_repository = new \PayPlug\src\models\repositories\ShopRepository($this->dependencies);
     }
 
