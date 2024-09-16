@@ -1497,7 +1497,8 @@ var $document, $window, __moduleName__Module = {
             }
 
             let data = {
-                _ajax: 1
+                _ajax: 1,
+                cartid: window['ajax_cart_id'],
             }
             if (typeof last_try != 'undefined' && last_try) {
                 data['last_try'] = 1;
