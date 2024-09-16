@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\models\repositories;
 
-use ReflectionClass;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -593,7 +591,7 @@ class EntityRepository extends QueryRepository
      *
      * @param string $class_name
      *
-     * @return ReflectionClass|null
+     * @return mixed|null
      */
     protected function getEntityObject($class_name = '')
     {
