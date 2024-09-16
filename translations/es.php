@@ -506,4 +506,5 @@ $_MODULE['<{payplug}prestashop>type_66329ddfb8a6bcfba7aa72f602bc4abc'] = 'Config
 $_MODULE['<{payplug}prestashop>type_7cc9586e9d0d779fe9466941795a2df2'] = 'By selecting one of the above options, you will enable the Payplug payment module to accurately interpret your order status in an automated manner. [1]Learn more[/1]';
 $_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Update';
 $_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Update this order';
+$_MODULE['<{payplug}prestashop>validation_015c603172846437ee7a569dc2c36273'] = 'Waiting for confirmation';
 $_MODULE['<{payplug}prestashop>validation_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
