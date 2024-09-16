@@ -108,6 +108,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             ->getMedia()
             ->addJsDef(
                 [
+                    'ajax_cart_id' => $this->cart_id,
                     'validation_ajax_url' => $validation_ajax_url,
                 ],
                 true
