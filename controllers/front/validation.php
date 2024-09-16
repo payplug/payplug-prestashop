@@ -28,6 +28,9 @@ use PayPlug\classes\DependenciesClass;
 
 class PayplugValidationModuleFrontController extends ModuleFrontController
 {
+    private $cart_id;
+    private $ps;
+
     public function __construct()
     {
         parent::__construct();
@@ -36,11 +39,11 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
-        $ps = (int) $this->dependencies
+        $this->ps = (int) $this->dependencies
             ->getPlugin()
             ->getTools()
             ->tool('getValue', 'ps');
-        $cart_id = (int) $this->dependencies
+        $this->cart_id = (int) $this->dependencies
             ->getPlugin()
             ->getTools()
             ->tool('getValue', 'cartid');
@@ -57,14 +60,14 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             $check = $this->dependencies
                 ->getPlugin()
                 ->getValidationAction()
-                ->checkAction((int) $cart_id, (bool) $last_try);
+                ->checkAction((int) $this->cart_id, (bool) $last_try);
             exit(json_encode($check));
         }
 
         $order_validate = $this->dependencies
             ->getPlugin()
             ->getValidationAction()
-            ->validateAction($ps, $cart_id);
+            ->validateAction($this->ps, $this->cart_id);
 
         $error_message = $this->dependencies
             ->getPlugin()
@@ -131,7 +134,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
         $this->dependencies
             ->getPlugin()
             ->getValidationAction()
-            ->clearLock();
+            ->clearLock($this->cart_id);
 
         $this->dependencies
             ->getPlugin()
