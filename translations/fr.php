@@ -506,4 +506,5 @@ $_MODULE['<{payplug}prestashop>type_66329ddfb8a6bcfba7aa72f602bc4abc'] = 'Config
 $_MODULE['<{payplug}prestashop>type_7cc9586e9d0d779fe9466941795a2df2'] = 'L\'option que vous choisirez ci-dessus permettra au module de paiement Payplug d\'intérpreter avec précision votre statut de commande de façon automatisée. [1]En savoir plus[/1]';
 $_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Mettre à jour';
 $_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Mettre à jour cette commande';
+$_MODULE['<{payplug}prestashop>validation_015c603172846437ee7a569dc2c36273'] = 'Paiement en cours';
 $_MODULE['<{payplug}prestashop>validation_cef5ffe1ea30cca7818c988c27467aed'] = 'La transaction n\'a pas été effectuée et votre carte n\'a pas été débitée.';
