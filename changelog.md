@@ -10,6 +10,10 @@
   - [PRE-2974](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2558) : Fix var declaration in front js
   
 ## Version 4.12.0
+- Feature :
+    - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
+
+## Version 4.12.0
 - Refactoring :
   - [PRE-2519](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2517): Set Queue Entity
   - [PRE-2579](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2526): Add queue system on notifications and flag it
