@@ -6,9 +6,9 @@ use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group oneclick_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group oneclick_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -17,40 +17,36 @@ class getPaymentTabTest extends BaseOneClickPaymentMethod
     public function setUp()
     {
         parent::setUp();
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": true, "one_click": true, "installment": true}');
     }
 
     public function testWhenParentMethodReturnEmptyArray()
     {
-        $this->classe->set('name', '');
+        $this->class->set('name', '');
         $this->assertSame(
             [],
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenPaymentTabIsReturned()
     {
-        $this->classe->set('name', 'one_click');
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->class->set('name', 'one_click');
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->helpers['amount']
-            ->shouldReceive([
-                'validateAmount' => [
-                    'result' => true,
-                ],
-                'convertAmount' => 4242,
-            ]);
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => [
+                'result' => true,
+            ],
+            'convertAmount' => 4242,
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
@@ -58,18 +54,16 @@ class getPaymentTabTest extends BaseOneClickPaymentMethod
             'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => 'shop domain ssl',
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => 'shop domain ssl',
+        ]);
 
-        $this->card_repository
-            ->shouldReceive([
-                'getEntity' => [
-                    'id_customer' => ContextMock::get()->customer->id,
-                    'id_card' => 'card_azerty12345',
-                ],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getEntity' => [
+                'id_customer' => ContextMock::get()->customer->id,
+                'id_card' => 'card_azerty12345',
+            ],
+        ]);
 
         $expected_tab = [
             'currency' => 'EUR',
@@ -121,6 +115,6 @@ class getPaymentTabTest extends BaseOneClickPaymentMethod
             'payment_method' => 'card_azerty12345',
         ];
 
-        $this->assertSame($expected_tab, $this->classe->getPaymentTab());
+        $this->assertSame($expected_tab, $this->class->getPaymentTab());
     }
 }

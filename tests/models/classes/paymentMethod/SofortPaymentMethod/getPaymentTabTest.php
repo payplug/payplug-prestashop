@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\SofortPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group sofort_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group sofort_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -14,35 +14,31 @@ class getPaymentTabTest extends BaseSofortPaymentMethod
 {
     public function testWhenParentMethodReturnEmptyArray()
     {
-        $this->classe->set('name', '');
+        $this->class->set('name', '');
         $this->assertSame(
             [],
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenPaymentTabIsReturned()
     {
-        $this->classe->set('name', 'sofort');
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'sofort');
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => 'shop domain ssl',
-            ]);
-        $this->helpers['amount']
-            ->shouldReceive([
-                'validateAmount' => [
-                    'result' => true,
-                ],
-                'convertAmount' => 4242,
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => 'shop domain ssl',
+        ]);
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => [
+                'result' => true,
+            ],
+            'convertAmount' => 4242,
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
@@ -100,7 +96,7 @@ class getPaymentTabTest extends BaseSofortPaymentMethod
 
         $this->assertSame(
             $expected_tab,
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 }

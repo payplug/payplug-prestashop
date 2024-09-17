@@ -7,8 +7,8 @@ use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
- * @group classes
- * @group apirest_classes
+ * @group class
+ * @group apirest_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -22,8 +22,7 @@ class getSettingsSectionTest extends BaseApiRest
             'get' => ContextMock::get(),
         ]);
 
-        $this->configuration_class
-            ->shouldReceive('getDefault')
+        $this->configuration_class->shouldReceive('getDefault')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'email':
@@ -40,7 +39,7 @@ class getSettingsSectionTest extends BaseApiRest
             'getContext' => $context,
         ]);
 
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getDeferredState' => [],
         ]);
     }
@@ -54,7 +53,7 @@ class getSettingsSectionTest extends BaseApiRest
     {
         $this->assertSame(
             [],
-            $this->classe->getSettingsSection($current_configuration)
+            $this->class->getSettingsSection($current_configuration)
         );
     }
 
@@ -73,7 +72,7 @@ class getSettingsSectionTest extends BaseApiRest
         ];
         $this->assertSame(
             $current_configuration,
-            $this->classe->getSettingsSection($current_configuration)
+            $this->class->getSettingsSection($current_configuration)
         );
     }
 
@@ -95,7 +94,7 @@ class getSettingsSectionTest extends BaseApiRest
                 'mode' => 1,
                 'psaccount' => true,
             ],
-            $this->classe->getSettingsSection($current_configuration)
+            $this->class->getSettingsSection($current_configuration)
         );
     }
 
@@ -114,7 +113,7 @@ class getSettingsSectionTest extends BaseApiRest
         ];
         $this->assertSame(
             $current_configuration,
-            $this->classe->getSettingsSection($current_configuration)
+            $this->class->getSettingsSection($current_configuration)
         );
     }
 
@@ -137,7 +136,7 @@ class getSettingsSectionTest extends BaseApiRest
                 'mode' => 1,
                 'psaccount' => true,
             ],
-            $this->classe->getSettingsSection($current_configuration)
+            $this->class->getSettingsSection($current_configuration)
         );
     }
 
@@ -159,7 +158,7 @@ class getSettingsSectionTest extends BaseApiRest
         ];
         $this->assertSame(
             $current_configuration,
-            $this->classe->getSettingsSection($current_configuration)
+            $this->class->getSettingsSection($current_configuration)
         );
     }
 
@@ -181,7 +180,7 @@ class getSettingsSectionTest extends BaseApiRest
         ];
         $this->assertSame(
             $current_configuration,
-            $this->classe->getSettingsSection($current_configuration)
+            $this->class->getSettingsSection($current_configuration)
         );
     }
 
@@ -201,16 +200,14 @@ class getSettingsSectionTest extends BaseApiRest
         $configurationClass = \Mockery::mock('ConfigurationClass');
         $current_configuration = [
         ];
-        $configurationClass
-            ->shouldReceive('getDefault')
+        $configurationClass->shouldReceive('getDefault')
             ->with('email')
             ->andReturn('unit.test@payplug.com');
-        $configurationClass
-            ->shouldReceive('getDefault')
+        $configurationClass->shouldReceive('getDefault')
             ->with('sandbox_mode')
             ->andReturn('1');
         $this->assertFalse(
-            $this->classe->getSettingsSection($current_configuration)['logged']
+            $this->class->getSettingsSection($current_configuration)['logged']
         );
     }
 }

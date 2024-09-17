@@ -22,7 +22,7 @@ class isEligibleByCountryTest extends TestCase
     protected $payment_method;
     protected $payment_methods_countries;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->validator = new paymentValidator();
         $this->country = 'FR';

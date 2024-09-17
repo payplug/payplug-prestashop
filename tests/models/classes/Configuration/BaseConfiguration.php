@@ -11,24 +11,22 @@ class BaseConfiguration extends TestCase
 {
     use FormatDataProvider;
 
-    public $configuration;
-    public $dependencies;
-    public $classe;
+    protected $configuration;
+    protected $dependencies;
+    protected $class;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->configuration = \Mockery::mock('Configuration');
         $this->plugin = \Mockery::mock('Plugin');
-        $this->plugin
-            ->shouldReceive([
-                'getConfiguration' => $this->configuration,
-            ]);
+        $this->plugin->shouldReceive([
+            'getConfiguration' => $this->configuration,
+        ]);
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->name = 'payplug';
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
-        $this->classe = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
+        $this->class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
     }
 }

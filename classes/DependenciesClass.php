@@ -48,11 +48,9 @@ class DependenciesClass
 {
     public $adminClass;
     public $amountCurrencyClass;
-    public $apiClass;
     public $applePayClass;
     public $cartClass;
     public $configClass;
-    public $installmentClass;
     public $hookClass;
     public $mediaClass;
     public $name;
@@ -87,14 +85,12 @@ class DependenciesClass
         $this->setHelpers();
         $this->setPlugin((new PluginInit($this))->getEntity());
 
-        $this->apiClass = new ApiClass($this);
         $this->applePayClass = new ApplePayClass($this);
         $this->amountCurrencyClass = new AmountCurrencyClass($this);
         $this->adminClass = new AdminClass($this);
         $this->payplugLock = new PayplugLock($this);
         $this->cartClass = new CartClass($this);
         $this->configClass = new ConfigClass($this);
-        $this->installmentClass = new InstallmentClass($this);
         $this->hookClass = new HookClass($this);
         $this->mediaClass = new MediaClass($this);
         $this->orderClass = new OrderClass($this);

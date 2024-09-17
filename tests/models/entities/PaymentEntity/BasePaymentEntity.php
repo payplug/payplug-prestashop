@@ -34,6 +34,7 @@ class BasePaymentEntity extends TestCase
             'primary' => 'id_payplug_payment',
             'fields' => [
                 'resource_id' => ['type' => 'string', 'required' => true],
+                'is_live' => ['type' => 'boolean', 'required' => true],
                 'method' => ['type' => 'string', 'required' => true],
                 'id_cart' => ['type' => 'integer', 'required' => true],
                 'cart_hash' => ['type' => 'string', 'required' => true],

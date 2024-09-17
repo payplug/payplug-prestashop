@@ -14,12 +14,10 @@ class renderListTest extends BaseCardAction
     public function setUp()
     {
         parent::setUp();
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('sandbox_mode')
             ->andReturn(42);
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_id')
             ->andReturn(42);
     }
@@ -39,10 +37,9 @@ class renderListTest extends BaseCardAction
 
     public function testWhenNoCardsFound()
     {
-        $this->card_repository
-            ->shouldReceive([
-                'getAllByCustomer' => [],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getAllByCustomer' => [],
+        ]);
 
         $this->assertSame(
             [],
@@ -52,30 +49,28 @@ class renderListTest extends BaseCardAction
 
     public function testWhenCardsFoundAndExpiredAndOnlyActivedAreExpected()
     {
-        $this->card_repository
-            ->shouldReceive([
-                'getAllByCustomer' => [
-                    [
-                        'id_payplug_card' => 1,
-                        'id_customer' => 42,
-                        'id_company' => 4242,
-                        'is_sandbox' => false,
-                        'id_card' => 'card_azerty12345',
-                        'last4' => '4242',
-                        'exp_month' => '12',
-                        'exp_year' => '2030',
-                        'brand' => 'CB',
-                        'country' => 'GB',
-                        'metadata' => 'N;',
-                    ],
+        $this->card_repository->shouldReceive([
+            'getAllByCustomer' => [
+                [
+                    'id_payplug_card' => 1,
+                    'id_customer' => 42,
+                    'id_company' => 4242,
+                    'is_sandbox' => false,
+                    'id_card' => 'card_azerty12345',
+                    'last4' => '4242',
+                    'exp_month' => '12',
+                    'exp_year' => '2030',
+                    'brand' => 'CB',
+                    'country' => 'GB',
+                    'metadata' => 'N;',
                 ],
-            ]);
-        $this->card_validator
-            ->shouldReceive([
-                'isValidExpiration' => [
-                    'result' => false,
-                ],
-            ]);
+            ],
+        ]);
+        $this->card_validator->shouldReceive([
+            'isValidExpiration' => [
+                'result' => false,
+            ],
+        ]);
 
         $this->assertSame(
             [],
@@ -98,16 +93,14 @@ class renderListTest extends BaseCardAction
             'country' => 'GB',
             'metadata' => 'N;',
         ];
-        $this->card_repository
-            ->shouldReceive([
-                'getAllByCustomer' => [$card],
-            ]);
-        $this->card_validator
-            ->shouldReceive([
-                'isValidExpiration' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getAllByCustomer' => [$card],
+        ]);
+        $this->card_validator->shouldReceive([
+            'isValidExpiration' => [
+                'result' => false,
+            ],
+        ]);
 
         $card['expired'] = true;
         $card['expiry_date'] = '12 / 30';
@@ -134,16 +127,14 @@ class renderListTest extends BaseCardAction
             'country' => 'GB',
             'metadata' => 'N;',
         ];
-        $this->card_repository
-            ->shouldReceive([
-                'getAllByCustomer' => [$card],
-            ]);
-        $this->card_validator
-            ->shouldReceive([
-                'isValidExpiration' => [
-                    'result' => true,
-                ],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getAllByCustomer' => [$card],
+        ]);
+        $this->card_validator->shouldReceive([
+            'isValidExpiration' => [
+                'result' => true,
+            ],
+        ]);
 
         $card['expired'] = false;
         $card['expiry_date'] = '12 / 30';

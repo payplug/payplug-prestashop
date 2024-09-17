@@ -16,7 +16,7 @@ class hasPermissionsTest extends TestCase
 {
     private $paymentValidator;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->paymentValidator = new paymentValidator();
     }

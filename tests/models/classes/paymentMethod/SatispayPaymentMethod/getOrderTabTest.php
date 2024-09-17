@@ -6,16 +6,22 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group satispay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
 class getOrderTabTest extends BaseSatispayPaymentMethod
 {
-    public function setUp()
+    /**
+     * @dataProvider invalidArrayFormatDataProvider
+     *
+     * @param mixed $retrieve
+     */
+    public function testWhenGivenRetrieveIsntValidArray($retrieve)
     {
-        parent::setUp();
+        $this->assertSame([], $this->class->getOrderTab($retrieve));
     }
 
     /**
@@ -23,9 +29,13 @@ class getOrderTabTest extends BaseSatispayPaymentMethod
      *
      * @param mixed $resource
      */
-    public function testWhenGivenResourceIsntValidObject($resource)
+    public function testWhenGivenRetrieveResourceIsntValidObject($resource)
     {
-        $this->assertSame([], $this->classe->getOrderTab($resource));
+        $retrieve = [
+            'result' => true,
+            'resource' => $resource,
+        ];
+        $this->assertSame([], $this->class->getOrderTab($retrieve));
     }
 
     /**
@@ -34,15 +44,17 @@ class getOrderTabTest extends BaseSatispayPaymentMethod
      */
     public function testWhenOrderStateIsPending()
     {
-        $this->classe->set('name', 'satispay');
-        $resource = PaymentMock::getSatispay();
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'satispay');
+        $retrieve = [
+            'result' => true,
+            'resource' => PaymentMock::getSatispay(),
+        ];
+        $this->configuration->shouldReceive('getValue')
             ->with('order_state_pending')
             ->andReturn('6');
         $expected = [];
 
-        $this->assertSame($expected, $this->classe->getOrderTab($resource));
+        $this->assertSame($expected, $this->class->getOrderTab($retrieve));
     }
 
     /**
@@ -51,15 +63,15 @@ class getOrderTabTest extends BaseSatispayPaymentMethod
      */
     public function testWhenOrderStateIsPaid()
     {
-        $this->classe->set('name', 'satispay');
-        $resource = PaymentMock::getSatispay();
-        $resource->is_paid = true;
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'satispay');
+        $retrieve = [
+            'result' => true,
+            'resource' => PaymentMock::getSatispay(['is_paid' => true]),
+        ];
+        $this->configuration->shouldReceive('getValue')
             ->with('order_state_paid')
             ->andReturn('2');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('order_state_pending')
             ->andReturn('6');
         $expected = [
@@ -68,6 +80,6 @@ class getOrderTabTest extends BaseSatispayPaymentMethod
             'module_name' => 'order.module.satispay',
         ];
 
-        $this->assertSame($expected, $this->classe->getOrderTab($resource));
+        $this->assertSame($expected, $this->class->getOrderTab($retrieve));
     }
 }

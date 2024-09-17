@@ -25,10 +25,9 @@ class deleteTypeActionTest extends BaseOrderStateAction
     {
         $id_order_state = 42;
 
-        $this->payplug_orderstate_repository
-            ->shouldReceive([
-                'deleteBy' => false,
-            ]);
+        $this->payplug_orderstate_repository->shouldReceive([
+            'deleteBy' => false,
+        ]);
 
         $this->assertFalse($this->action->deleteTypeAction($id_order_state));
     }
@@ -37,10 +36,9 @@ class deleteTypeActionTest extends BaseOrderStateAction
     {
         $id_order_state = 42;
 
-        $this->payplug_orderstate_repository
-            ->shouldReceive([
-                'deleteBy' => true,
-            ]);
+        $this->payplug_orderstate_repository->shouldReceive([
+            'deleteBy' => true,
+        ]);
 
         $this->assertTrue($this->action->deleteTypeAction($id_order_state));
     }

@@ -60,10 +60,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             ];
         }
 
-        $aborted = $this->dependencies
-            ->getPlugin()
-            ->getApiService()
-            ->abortPayment($payment['resource_id']);
+        $aborted = $this->abort($payment['resource_id']);
         if (!$aborted['result']) {
             return [
                 'result' => false,

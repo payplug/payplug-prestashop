@@ -17,7 +17,7 @@ class isFeatureTest extends TestCase
     protected $moduleValidator;
     protected $features = [];
 
-    protected function setUp()
+    public function setUp()
     {
         $this->moduleValidator = new moduleValidator();
         $this->features = [

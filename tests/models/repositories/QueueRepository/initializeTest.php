@@ -38,8 +38,7 @@ class initializeTest extends BaseQueueRepository
     public function testWhenTableCantBeInitialized()
     {
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'create' => $this->repository,
                 'table' => $this->repository,
                 'fields' => $this->repository,
@@ -52,8 +51,7 @@ class initializeTest extends BaseQueueRepository
     public function testWhenTableIsInitialized()
     {
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'create' => $this->repository,
                 'table' => $this->repository,
                 'fields' => $this->repository,

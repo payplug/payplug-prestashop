@@ -6,8 +6,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -20,36 +21,34 @@ class getOptionTest extends BasePaymentMethod
      */
     public function testWhenGivenConfigurationIsntValidArray($configuration)
     {
-        $this->assertSame([], $this->classe->getOption($configuration));
+        $this->assertSame([], $this->class->getOption($configuration));
     }
 
     public function testWhenPaymentMethodHasNoName()
     {
         $configuration = [];
-        $this->classe->set('name', '');
-        $this->assertSame([], $this->classe->getOption($configuration));
+        $this->class->set('name', '');
+        $this->assertSame([], $this->class->getOption($configuration));
     }
 
     public function testWhenDefaultConfigurationIsGettedAsTrue()
     {
         $configuration = [];
-        $this->classe->set('name', 'standard');
+        $this->class->set('name', 'standard');
 
-        $this->configuration
-            ->shouldReceive('getDefault')
+        $this->configuration->shouldReceive('getDefault')
             ->with('payment_methods')
             ->andReturn('{"standard":true}');
-        $this->assertTrue($this->classe->getOption($configuration)['checked']);
+        $this->assertTrue($this->class->getOption($configuration)['checked']);
     }
 
     public function testWhenDefaultConfigurationIsGettedAsFalse()
     {
         $configuration = [];
-        $this->classe->set('name', 'standard');
-        $this->configuration
-            ->shouldReceive('getDefault')
+        $this->class->set('name', 'standard');
+        $this->configuration->shouldReceive('getDefault')
             ->with('payment_methods')
             ->andReturn('{"standard":false}');
-        $this->assertFalse($this->classe->getOption($configuration)['checked']);
+        $this->assertFalse($this->class->getOption($configuration)['checked']);
     }
 }

@@ -11,7 +11,7 @@ final class GetExpMonthCardTest extends BaseCardEntity
 {
     protected $card;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->entity->setExpMonth('1');

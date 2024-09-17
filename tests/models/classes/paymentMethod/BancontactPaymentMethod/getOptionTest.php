@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\BancontactPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group bancontact_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group bancontact_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -14,7 +14,7 @@ class getOptionTest extends BaseBancontactPaymentMethod
 {
     private $config;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->config = [
@@ -24,7 +24,7 @@ class getOptionTest extends BaseBancontactPaymentMethod
 
     public function testWhenGivenOptionIsntAvailableWithSandboxMode()
     {
-        $this->assertFalse($this->classe->getOption($this->config)['available_test_mode']);
+        $this->assertFalse($this->class->getOption($this->config)['available_test_mode']);
     }
 
     public function testWhenGivenOptionHasValidOption()
@@ -56,6 +56,6 @@ class getOptionTest extends BaseBancontactPaymentMethod
                 'checked' => true,
             ],
         ];
-        $this->assertSame($expected, $this->classe->getOption($this->config)['options']);
+        $this->assertSame($expected, $this->class->getOption($this->config)['options']);
     }
 }

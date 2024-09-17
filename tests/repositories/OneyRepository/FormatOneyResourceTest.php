@@ -25,16 +25,14 @@ final class FormatOneyResourceTest extends BaseOneyRepository
         parent::setUp();
 
         $this->repo
-            ->shouldAllowMockingProtectedMethods()
-            ->shouldReceive([
+            ->shouldAllowMockingProtectedMethods()->shouldReceive([
                 'getMethods' => [
                     'x3_with_fees',
                 ],
             ])
         ;
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('oney_allowed_countries')
             ->andReturn('FR');
 

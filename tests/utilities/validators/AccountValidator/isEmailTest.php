@@ -16,7 +16,7 @@ class isEmailTest extends TestCase
 {
     protected $validator;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->validator = new AccountValidator();
     }

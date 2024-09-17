@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group oney_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group oney_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -30,7 +30,7 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
     {
         $this->assertSame(
             'payplug.getPaymentOptions.errorOccurred',
-            $this->classe->getErrorLabel($error)
+            $this->class->getErrorLabel($error)
         );
     }
 
@@ -55,12 +55,10 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
                 'getOney' => $oney,
             ]);
         }
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => false,
-            ]);
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->validate_adapter->shouldReceive([
+            'validate' => false,
+        ]);
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
         $this->currency_adapter->shouldReceive([
@@ -69,7 +67,7 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
 
         $this->assertSame(
             $message,
-            $this->classe->getErrorLabel($error)
+            $this->class->getErrorLabel($error)
         );
     }
 }

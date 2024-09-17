@@ -8,8 +8,7 @@ class MockHelper extends Mockery
 {
     public static function createSetCacheMock($cacheMock, &$arrayCache)
     {
-        $cacheMock
-            ->shouldReceive('setCache')
+        $cacheMock->shouldReceive('setCache')
             ->andReturnUsing(function ($cache_id, $to_cache) use (&$arrayCache) {
                 $arrayCache[$cache_id] = $to_cache;
 
@@ -20,8 +19,7 @@ class MockHelper extends Mockery
 
     public static function createAddLogMock($loggerMock, &$arrayLog)
     {
-        $loggerMock
-            ->shouldReceive('addLog')
+        $loggerMock->shouldReceive('addLog')
             ->andReturnUsing(function ($message, $level = 'info') use (&$arrayLog) {
                 $arrayLog[] = ['level' => $level, 'message' => $message];
 
@@ -43,8 +41,7 @@ class MockHelper extends Mockery
     public static function createToolsMock($classPathname)
     {
         $tools = self::createMockFactory($classPathname);
-        $tools
-            ->shouldReceive('tool')
+        $tools->shouldReceive('tool')
             ->andReturnUsing(function ($action, $value, $params2 = false) {
                 switch ($action) {
                     case 'strlen':
@@ -79,8 +76,7 @@ class MockHelper extends Mockery
                 return false;
             })
         ;
-        $tools
-            ->shouldReceive('substr')
+        $tools->shouldReceive('substr')
             ->andReturnUsing(function ($param, $param1, $param2) {
                 return substr($param, $param1, $param2);
             })
@@ -92,8 +88,7 @@ class MockHelper extends Mockery
     public static function createTranslateMock($classPathname)
     {
         $translate = self::createMockFactory($classPathname);
-        $translate
-            ->shouldReceive('translate')
+        $translate->shouldReceive('translate')
             ->andReturnUsing(function ($module_class, $string, $repository_name) {
                 return $string;
             })
@@ -105,8 +100,7 @@ class MockHelper extends Mockery
     public static function createValidateMock($classPathname)
     {
         $validate = self::createMockFactory($classPathname);
-        $validate
-            ->shouldReceive('validate')
+        $validate->shouldReceive('validate')
             ->andReturnUsing(function ($action, $object) {
                 if ('' === $object || is_null($object)) {
                     return false;
@@ -133,8 +127,7 @@ class MockHelper extends Mockery
     public static function createSetParamstMock($classPathname)
     {
         $context = \Mockery::mock($classPathname);
-        $context
-            ->shouldReceive('setParams')
+        $context->shouldReceive('setParams')
             ->andReturnSelf()
         ;
 
@@ -144,8 +137,7 @@ class MockHelper extends Mockery
     public static function createAddressMock($classPathname)
     {
         $address = self::createMockFactory($classPathname);
-        $address
-            ->shouldReceive('get')
+        $address->shouldReceive('get')
             ->andReturn(AddressMock::get())
         ;
 
@@ -155,8 +147,7 @@ class MockHelper extends Mockery
     public static function createAssignMock($classPathname)
     {
         $assign = self::createMockFactory($classPathname);
-        $assign
-            ->shouldReceive('assign')
+        $assign->shouldReceive('assign')
             ->andReturn(true)
         ;
 
@@ -166,8 +157,7 @@ class MockHelper extends Mockery
     public static function createQueryMock($classPathname)
     {
         $query = self::createMockFactory($classPathname);
-        $query
-            ->shouldReceive('escape')
+        $query->shouldReceive('escape')
             ->andReturnUsing(function ($string, $htmlOk = false) {
                 return $string;
             })

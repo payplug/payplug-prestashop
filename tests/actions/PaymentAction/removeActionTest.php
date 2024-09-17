@@ -13,15 +13,29 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class removeActionTest extends BasePaymentAction
 {
+    private $resource_id;
+    private $cancellable;
+    private $stored_resource;
+
     public function setUp()
     {
         parent::setUp();
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->resource_id = 'pay_azerty';
+        $this->cancellable = true;
+        $this->stored_resource = [
+            'id_payplug_payment' => 42,
+            'resource_id' => 'pay_azerty1234',
+            'method' => 'standard',
+            'id_cart' => 42,
+            'cart_hash' => 'cart-hash-azerty1234567',
+            'schedules' => 'NULL',
+            'date_upd' => '1970-01-01 00:00:00',
+        ];
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+        ]);
     }
 
     /**
@@ -31,9 +45,8 @@ class removeActionTest extends BasePaymentAction
      */
     public function testWhenGivenResourceIdIsntValidString($resource_id)
     {
-        $cancellable = true;
         $this->assertFalse(
-            $this->action->removeAction($resource_id, $cancellable)
+            $this->action->removeAction($resource_id, $this->cancellable)
         );
     }
 
@@ -44,100 +57,92 @@ class removeActionTest extends BasePaymentAction
      */
     public function testWhenGivenCancellableIsntValidString($cancellable)
     {
-        $resource_id = 'pay_azerty';
         $this->assertFalse(
-            $this->action->removeAction($resource_id, $cancellable)
+            $this->action->removeAction($this->resource_id, $cancellable)
+        );
+    }
+
+    public function testWhenNoStoredPaymentCantBeGetted()
+    {
+        $this->payment_repository->shouldReceive([
+            'getBy' => [],
+        ]);
+        $this->assertFalse(
+            $this->action->removeAction($this->resource_id, $this->cancellable)
         );
     }
 
     public function testWhenResourceCantBeRetrieved()
     {
-        $resource_id = 'pay_azerty12345';
-        $cancellable = true;
-        $api_class = \Mockery::mock('ApiClass');
-        $api_class
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->dependencies->apiClass = $api_class;
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_resource,
+        ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => false,
+            ],
+        ]);
         $this->assertFalse(
-            $this->action->removeAction($resource_id, $cancellable)
+            $this->action->removeAction($this->resource_id, $this->cancellable)
         );
     }
 
     public function testWhenRetrievedResourceCantBeAborted()
     {
-        $resource_id = 'pay_azerty12345';
-        $cancellable = true;
-        $api_class = \Mockery::mock('ApiClass');
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_resource,
+        ]);
         $resource = [
             'result' => true,
             'resource' => PaymentMock::getStandard(),
         ];
-        $api_class
-            ->shouldReceive([
-                'retrievePayment' => $resource,
-                'abortPayment' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->dependencies->apiClass = $api_class;
+        $this->payment_method->shouldReceive([
+            'retrieve' => $resource,
+            'abort' => [
+                'result' => false,
+            ],
+        ]);
         $this->assertFalse(
-            $this->action->removeAction($resource_id, $cancellable)
+            $this->action->removeAction($this->resource_id, $this->cancellable)
         );
     }
 
     public function testWhenRetrievedResourceCantBeRemoveFromDataBase()
     {
-        $resource_id = 'pay_azerty12345';
-        $cancellable = true;
-        $api_class = \Mockery::mock('ApiClass');
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_resource,
+            'deleteBy' => false,
+        ]);
         $resource = [
             'result' => true,
             'resource' => PaymentMock::getStandard(),
         ];
-        $api_class
-            ->shouldReceive([
-                'retrievePayment' => $resource,
-                'abortPayment' => $resource,
-            ]);
-        $this->dependencies->apiClass = $api_class;
-
-        $this->payment_repository
-            ->shouldReceive([
-                'deleteBy' => false,
-            ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => $resource,
+            'abort' => $resource,
+        ]);
 
         $this->assertFalse(
-            $this->action->removeAction($resource_id, $cancellable)
+            $this->action->removeAction($this->resource_id, $this->cancellable)
         );
     }
 
     public function testWhenRetrievedResourceIsRemove()
     {
-        $resource_id = 'pay_azerty12345';
-        $cancellable = true;
-        $api_class = \Mockery::mock('ApiClass');
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_resource,
+            'deleteBy' => true,
+        ]);
         $resource = [
             'result' => true,
             'resource' => PaymentMock::getStandard(),
         ];
-        $api_class
-            ->shouldReceive([
-                'retrievePayment' => $resource,
-                'abortPayment' => $resource,
-            ]);
-        $this->dependencies->apiClass = $api_class;
-
-        $this->payment_repository
-            ->shouldReceive([
-                'deleteBy' => true,
-            ]);
-
+        $this->payment_method->shouldReceive([
+            'retrieve' => $resource,
+            'abort' => $resource,
+        ]);
         $this->assertTrue(
-            $this->action->removeAction($resource_id, $cancellable)
+            $this->action->removeAction($this->resource_id, $this->cancellable)
         );
     }
 }

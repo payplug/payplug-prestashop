@@ -6,8 +6,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -20,12 +21,12 @@ class getPaymentMethodHashTest extends BasePaymentMethod
      */
     public function testWhenGivenPaymentTabIsntValidObject($payment_tab)
     {
-        $this->assertSame('', $this->classe->getPaymentMethodHash($payment_tab));
+        $this->assertSame('', $this->class->getPaymentMethodHash($payment_tab));
     }
 
     public function testWhenGivenPaymentTabIsntEmpty()
     {
-        $this->assertSame('', $this->classe->getPaymentMethodHash([]));
+        $this->assertSame('', $this->class->getPaymentMethodHash([]));
     }
 
     public function testWhenHashIsReturned()
@@ -84,7 +85,7 @@ class getPaymentMethodHashTest extends BasePaymentMethod
         $expected_hash = hash('sha256', json_encode($payment_tab));
         $this->assertSame(
             $expected_hash,
-            $this->classe->getPaymentMethodHash($payment_tab)
+            $this->class->getPaymentMethodHash($payment_tab)
         );
     }
 }

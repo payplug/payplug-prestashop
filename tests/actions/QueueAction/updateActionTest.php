@@ -28,10 +28,9 @@ class updateActionTest extends BaseQueueAction
 
     public function testWhenNoQueueFoundInDatabase()
     {
-        $this->repository
-            ->shouldReceive([
-                'getFirstNotTreatedEntry' => [],
-            ]);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => [],
+        ]);
 
         $this->assertSame(
             [
@@ -43,11 +42,10 @@ class updateActionTest extends BaseQueueAction
 
     public function testWhenQueueCantBeUpdated()
     {
-        $this->repository
-            ->shouldReceive([
-                'getFirstNotTreatedEntry' => ['id_payplug_queue' => 1],
-                'updateEntity' => false,
-            ]);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => ['id_payplug_queue' => 1],
+            'updateEntity' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -59,11 +57,10 @@ class updateActionTest extends BaseQueueAction
 
     public function testWhenQueueIsUpdatedAndNeedToBeTreated()
     {
-        $this->repository
-            ->shouldReceive([
-                'getFirstNotTreatedEntry' => ['id_payplug_queue' => 1],
-                'updateEntity' => true,
-            ]);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => ['id_payplug_queue' => 1],
+            'updateEntity' => true,
+        ]);
 
         $this->assertSame(
             [
@@ -76,18 +73,15 @@ class updateActionTest extends BaseQueueAction
 
     public function testWhenQueueIsUpdatedAndTreated()
     {
-        $this->repository
-            ->shouldReceive([
-                'updateEntity' => true,
-            ]);
+        $this->repository->shouldReceive([
+            'updateEntity' => true,
+        ]);
 
-        $this->repository
-            ->shouldReceive('getFirstNotTreatedEntry')
+        $this->repository->shouldReceive('getFirstNotTreatedEntry')
             ->once()
             ->andReturn(['id_payplug_queue' => 1]);
 
-        $this->repository
-            ->shouldReceive('getFirstNotTreatedEntry')
+        $this->repository->shouldReceive('getFirstNotTreatedEntry')
             ->once()
             ->andReturn(false);
 

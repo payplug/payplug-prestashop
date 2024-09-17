@@ -39,6 +39,8 @@ class PaymentMethod
 
     /** @var bool */
     public $refundable;
+    /** @var object */
+    protected $api_service;
 
     /** @var object */
     protected $configuration;
@@ -94,6 +96,127 @@ class PaymentMethod
         $this->name = '';
         $this->order_name = '';
         $this->refundable = true;
+    }
+
+    /**
+     * @description Abort an resource from a given resource id
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
+    public function abort($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::retrieve - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+
+        if (!$stored_resource) {
+            $this->logger->addLog('PaymentMethod::retrieve - Can\'t find stored payment from given resource id.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Can\'t find stored payment from given resource id',
+            ];
+        }
+
+        // We retrieve the payment from the stored payment configuration
+        $api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
+            ? $this->configuration->getValue('live_api_key')
+            : $this->configuration->getValue('test_api_key');
+
+        $this->api_service->initialize($api_key);
+        $is_installment = 'installment' == $stored_resource['method'];
+        $abort = $is_installment
+            ? $this->api_service->abortInstallment($resource_id)
+            : $this->api_service->abortPayment($resource_id);
+
+        // If we don't find the payment, for retrocompatibility we switch the mode then try again
+        // This section could be removed for next version
+        if (!$abort['result']) {
+            $reverse_api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
+                ? $this->configuration->getValue('test_api_key')
+                : $this->configuration->getValue('live_api_key');
+
+            $this->api_service->initialize($reverse_api_key);
+            $abort = $is_installment
+                ? $this->api_service->abortInstallment($resource_id)
+                : $this->api_service->abortPayment($resource_id);
+        }
+
+        return $abort;
+    }
+
+    /**
+     * @description Capture an resource from a given resource id
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
+    public function capture($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::retrieve - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+
+        if (!$stored_resource) {
+            $this->logger->addLog('PaymentMethod::retrieve - Can\'t find stored payment from given resource id.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Can\'t find stored payment from given resource id',
+            ];
+        }
+
+        // We retrieve the payment from the stored payment configuration
+        $api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
+            ? $this->configuration->getValue('live_api_key')
+            : $this->configuration->getValue('test_api_key');
+
+        $this->api_service->initialize($api_key);
+        $capture = $this->api_service->capturePayment($resource_id);
+
+        // If we don't find the payment, for retrocompatibility we switch the mode then try again
+        // This section could be removed for next version
+        if (!$capture['result']) {
+            $reverse_api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
+                ? $this->configuration->getValue('test_api_key')
+                : $this->configuration->getValue('live_api_key');
+
+            $this->api_service->initialize($reverse_api_key);
+            $capture = $this->api_service->capturePayment($resource_id);
+        }
+
+        return $capture;
     }
 
     /**
@@ -248,16 +371,23 @@ class PaymentMethod
     }
 
     /**
-     * @description Get order tab for given resource
+     * @description Get order tab for given resource to create the order
      *
-     * @param null $resource
+     * @param array $retrieve
      *
      * @return array
      */
-    public function getOrderTab($resource = null)
+    public function getOrderTab($retrieve = [])
     {
         $this->setParameters();
 
+        if (!is_array($retrieve) || empty($retrieve)) {
+            $this->logger->addLog('PaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
+
+            return [];
+        }
+
+        $resource = $retrieve['resource'];
         if (!is_object($resource) || !$resource) {
             $this->logger->addLog('PaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
@@ -585,10 +715,18 @@ class PaymentMethod
         return $payment_tab;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the resource detail for order admin display
+     * todo: add coverage to this method
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
     public function getResourceDetail($resource_id = '')
     {
         $this->setParameters();
+
         if (!is_string($resource_id) || !$resource_id) {
             $this->logger->addLog('PaymentMethod::getResourceDetail - Invalid argument, $resource_id must be a non empty string.', 'error');
 
@@ -597,18 +735,7 @@ class PaymentMethod
                 'message' => 'Invalid argument, $resource_id must be a non empty string.',
             ];
         }
-
-        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
-        $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-        if (!$retrieve['result']) {
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-            } else {
-                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-            }
-        }
+        $retrieve = $this->retrieve($resource_id);
         if (!$retrieve['result']) {
             $this->logger->addLog('PaymentMethod::getResourceDetail - Payment resource can\'t be retrieved.', 'error');
 
@@ -766,24 +893,29 @@ class PaymentMethod
             return [];
         }
 
-        $resource_stored = $this->dependencies
+        $stored_resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
             ->getBy('id_cart', (int) $this->context->cart->id);
-        if (!$resource_stored) {
+        if (!$stored_resource) {
             $this->logger->addLog('PaymentMethod::getReturnUrl() - No stored resource retrieve for current context cart id.');
 
             return [];
         }
 
-        $resource = $this->dependencies->apiClass->retrievePayment($resource_stored['resource_id']);
-        if (!$resource['result']) {
+        $retrieve = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method'])
+            ->retrieve($stored_resource['resource_id']);
+
+        if (!$retrieve['result']) {
             $this->logger->addLog('PaymentMethod::getReturnUrl() - Payment resource can\'t be retrieved for stored resource id.');
 
             return [];
         }
 
-        $resource = $resource['resource'];
+        $resource = $retrieve['resource'];
         $return_url = $resource->hosted_payment
             ? $resource->hosted_payment->payment_url
                 ?: $resource->hosted_payment->return_url
@@ -791,7 +923,7 @@ class PaymentMethod
 
         return [
             'return_url' => $return_url,
-            'resource_stored' => $resource_stored,
+            'resource_stored' => $stored_resource,
         ];
     }
 
@@ -833,15 +965,20 @@ class PaymentMethod
         }
 
         // Get the resource from API
-        $retrieved_resource = $this->dependencies->apiClass->retrievePayment($stored_resource['resource_id']);
-        if (!$retrieved_resource['result']) {
+        $retrieve = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method'])
+            ->retrieve($stored_resource['resource_id']);
+
+        if (!$retrieve['result']) {
             $this->logger->addLog('PaymentMethod::isValidResource() - Payment resource can\'t be retrieved for stored resource id.');
 
             return false;
         }
 
         // Check if retrieved resource has failure
-        if (isset($retrieved_resource['resource']->failure->code) && $retrieved_resource['resource']->failure->code) {
+        if (isset($retrieve['resource']->failure->code) && $retrieve['resource']->failure->code) {
             $this->logger->addLog('PaymentMethod::isValidResource() - Retrieved Payment has failure');
 
             return false;
@@ -955,7 +1092,7 @@ class PaymentMethod
             ];
         }
 
-        $payment = $this->dependencies->apiClass->createPayment($payment_tab);
+        $payment = $this->api_service->createPayment($payment_tab);
 
         // If the payment resource can\'t be created due to to bad permission, we update the feature activation
         if (403 == (int) $payment['code']) {
@@ -1002,7 +1139,14 @@ class PaymentMethod
         return $this;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the current payment status
+     * @todo: add coverage to this method
+     *
+     * @param null $resource
+     *
+     * @return array
+     */
     public function getPaymentStatus($resource = null)
     {
         $this->setParameters();
@@ -1066,6 +1210,72 @@ class PaymentMethod
             'id_status' => 1,
             'code' => 'not_paid',
         ];
+    }
+
+    /**
+     * @description Retrieve the resource for a given resource id.
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
+    public function retrieve($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::retrieve - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+        if (!$stored_resource) {
+            $this->logger->addLog('PaymentMethod::retrieve - Can\'t find stored payment from given resource id.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Can\'t find stored payment from given resource id',
+            ];
+        }
+
+        // We retrieve the payment from the stored payment configuration
+        $api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
+            ? $this->configuration->getValue('live_api_key')
+            : $this->configuration->getValue('test_api_key');
+
+        $this->api_service->initialize($api_key);
+        $is_installment = 'installment' == $stored_resource['method'];
+        $retrieve = $is_installment
+            ? $this->api_service->retrieveInstallment($resource_id)
+            : $this->api_service->retrievePayment($resource_id);
+
+        // If we don't find the payment, for retrocompatibility we switch the mode then try again
+        // This section could be removed for highter module version
+        if (!$retrieve['result']) {
+            $reverse_api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
+                ? $this->configuration->getValue('test_api_key')
+                : $this->configuration->getValue('live_api_key');
+
+            $this->api_service->initialize($reverse_api_key);
+            $retrieve = $is_installment
+                ? $this->api_service->retrieveInstallment($resource_id)
+                : $this->api_service->retrievePayment($resource_id);
+        }
+
+        return $is_installment
+            ? $this
+                ->getPaymentMethod($stored_resource['method'])
+                ->retrieveSchedules($retrieve)
+            : $retrieve;
     }
 
     /**
@@ -1163,6 +1373,11 @@ class PaymentMethod
      */
     protected function setParameters()
     {
+        if (!$this->api_service) {
+            $this->api_service = $this->dependencies
+                ->getPlugin()
+                ->getApiService();
+        }
         if (!$this->configuration) {
             $this->configuration = $this->dependencies
                 ->getPlugin()

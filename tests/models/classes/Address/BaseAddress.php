@@ -10,12 +10,12 @@ use PHPUnit\Framework\TestCase;
 class BaseAddress extends TestCase
 {
     use FormatDataProvider;
-    public $dependencies;
-    public $address_adapter;
-    public $customer_adapter;
-    protected $classe;
+    protected $dependencies;
+    protected $address_adapter;
+    protected $customer_adapter;
+    protected $class;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
 
@@ -24,16 +24,14 @@ class BaseAddress extends TestCase
         $this->customer_adapter = \Mockery::mock('CustomerAdapter');
 
         $this->plugin = \Mockery::mock('Plugin');
-        $this->plugin
-            ->shouldReceive([
-                'getAddress' => $this->address_adapter,
-                'getCustomer' => $this->customer_adapter,
-            ]);
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
-        $this->classe = \Mockery::mock(Address::class, [$this->dependencies])
+        $this->plugin->shouldReceive([
+            'getAddress' => $this->address_adapter,
+            'getCustomer' => $this->customer_adapter,
+        ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
+        $this->class = \Mockery::mock(Address::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
     }

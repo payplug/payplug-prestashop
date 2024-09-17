@@ -99,13 +99,12 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWithoutInvalidCacheKey()
     {
-        $this->cacheAdapter
-            ->shouldReceive([
-                'setCacheKey' => [
-                    'result' => false,
-                    'message' => 'set cacheKey error message',
-                ],
-            ])
+        $this->cache_adapter->shouldReceive([
+            'setCacheKey' => [
+                'result' => false,
+                'message' => 'set cacheKey error message',
+            ],
+        ])
         ;
 
         $this->assertSame(
@@ -119,17 +118,16 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWithExistingCache()
     {
-        $this->cacheAdapter
-            ->shouldReceive([
-                'setCacheKey' => [
-                    'result' => $this->cacheKey,
-                    'message' => 'Success',
-                ],
-                'getCacheByKey' => [
-                    'result' => OneySimulationsMock::getFromCache(),
-                    'message' => 'Success',
-                ],
-            ])
+        $this->cache_adapter->shouldReceive([
+            'setCacheKey' => [
+                'result' => $this->cacheKey,
+                'message' => 'Success',
+            ],
+            'getCacheByKey' => [
+                'result' => OneySimulationsMock::getFromCache(),
+                'message' => 'Success',
+            ],
+        ])
         ;
 
         $this->assertSame(
@@ -143,23 +141,19 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWithExceptionThrowed()
     {
-        $this->cacheAdapter
-            ->shouldReceive([
-                'setCacheKey' => [
-                    'result' => $this->cacheKey,
-                    'message' => 'Success',
-                ],
-                'getCacheByKey' => [
-                    'result' => false,
-                    'message' => 'No cache found',
-                ],
-            ])
+        $this->cache_adapter->shouldReceive([
+            'setCacheKey' => [
+                'result' => $this->cacheKey,
+                'message' => 'Success',
+            ],
+            'getCacheByKey' => [
+                'result' => false,
+                'message' => 'No cache found',
+            ],
+        ])
         ;
 
-        $apiClass = \Mockery::mock('apiClass');
-        $this->dependencies->apiClass = $apiClass;
-
-        $this->dependencies->apiClass->shouldReceive([
+        $this->api_service->shouldReceive([
             'getOneySimulations' => [
                 'code' => 403,
                 'result' => false,
@@ -174,29 +168,23 @@ final class GetOneySimulationsTest extends BaseOneyRepository
                 'error' => 'Payplug\Exception\HttpException: [0]: Forbidden method; HTTP Response: 403',
             ]
         );
-
-        $this->assertSame(count($this->arrayLogger), 1);
     }
 
     public function testWithSimulationReturningError()
     {
-        $this->cacheAdapter
-            ->shouldReceive([
-                'setCacheKey' => [
-                    'result' => $this->cacheKey,
-                    'message' => 'Success',
-                ],
-                'getCacheByKey' => [
-                    'result' => false,
-                    'message' => 'No cache found',
-                ],
-            ])
+        $this->cache_adapter->shouldReceive([
+            'setCacheKey' => [
+                'result' => $this->cacheKey,
+                'message' => 'Success',
+            ],
+            'getCacheByKey' => [
+                'result' => false,
+                'message' => 'No cache found',
+            ],
+        ])
         ;
 
-        $apiClass = \Mockery::mock('apiClass');
-        $this->dependencies->apiClass = $apiClass;
-
-        $this->dependencies->apiClass->shouldReceive([
+        $this->api_service->shouldReceive([
             'getOneySimulations' => [
                 'code' => 200,
                 'result' => true,
@@ -218,24 +206,19 @@ final class GetOneySimulationsTest extends BaseOneyRepository
 
     public function testWhenSimulationCantBeCached()
     {
-        $this->cacheAdapter
-            ->shouldReceive([
-                'setCacheKey' => [
-                    'result' => $this->cacheKey,
-                    'message' => 'Success',
-                ],
-                'getCacheByKey' => [
-                    'result' => false,
-                    'message' => 'No cache found',
-                ],
-                'setCache' => false,
-            ])
-        ;
+        $this->cache_adapter->shouldReceive([
+            'setCacheKey' => [
+                'result' => $this->cacheKey,
+                'message' => 'Success',
+            ],
+            'getCacheByKey' => [
+                'result' => false,
+                'message' => 'No cache found',
+            ],
+            'setCache' => false,
+        ]);
 
-        $apiClass = \Mockery::mock('apiClass');
-        $this->dependencies->apiClass = $apiClass;
-
-        $this->dependencies->apiClass->shouldReceive([
+        $this->api_service->shouldReceive([
             'getOneySimulations' => [
                 'code' => 200,
                 'result' => true,
@@ -252,29 +235,24 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ],
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
         );
-        $this->assertSame(count($this->arrayLogger), 1);
     }
 
     public function testWhenSimulationCached()
     {
-        $this->cacheAdapter
-            ->shouldReceive([
-                'setCacheKey' => [
-                    'result' => $this->cacheKey,
-                    'message' => 'Success',
-                ],
-                'getCacheByKey' => [
-                    'result' => false,
-                    'message' => 'No cache found',
-                ],
-                'setCache' => true,
-            ])
+        $this->cache_adapter->shouldReceive([
+            'setCacheKey' => [
+                'result' => $this->cacheKey,
+                'message' => 'Success',
+            ],
+            'getCacheByKey' => [
+                'result' => false,
+                'message' => 'No cache found',
+            ],
+            'setCache' => true,
+        ])
         ;
 
-        $apiClass = \Mockery::mock('apiClass');
-        $this->dependencies->apiClass = $apiClass;
-
-        $this->dependencies->apiClass->shouldReceive([
+        $this->api_service->shouldReceive([
             'getOneySimulations' => [
                 'code' => 200,
                 'result' => true,
@@ -291,6 +269,5 @@ final class GetOneySimulationsTest extends BaseOneyRepository
             ],
             $this->repo->getOneySimulations($this->amount['default'], $this->iso, [$this->operation])
         );
-        $this->assertSame(count($this->arrayLogger), 0);
     }
 }

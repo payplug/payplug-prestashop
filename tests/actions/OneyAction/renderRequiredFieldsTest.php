@@ -11,7 +11,7 @@ namespace PayPlug\tests\actions\OneyAction;
  */
 class renderRequiredFieldsTest extends BaseOneyAction
 {
-    public function setup()
+    public function setUp()
     {
         parent::setUp();
     }

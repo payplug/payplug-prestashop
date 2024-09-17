@@ -37,10 +37,9 @@ class deleteActionTest extends BaseCardAction
     {
         $card_id = 4242;
         $customer_id = 4242;
-        $this->card_repository
-            ->shouldReceive([
-                'getEntity' => [],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getEntity' => [],
+        ]);
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
@@ -48,12 +47,11 @@ class deleteActionTest extends BaseCardAction
     {
         $card_id = 4242;
         $customer_id = 4242;
-        $this->card_repository
-            ->shouldReceive([
-                'getEntity' => [
-                    'id_customer' => 42,
-                ],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getEntity' => [
+                'id_customer' => 42,
+            ],
+        ]);
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
@@ -61,32 +59,30 @@ class deleteActionTest extends BaseCardAction
     {
         $card_id = 4242;
         $customer_id = 4242;
-        $this->card_repository
-            ->shouldReceive([
-                'getEntity' => [
-                    'id_customer' => $customer_id,
-                    'id_card' => 'card_azerty',
-                    'exp_month' => date('m'),
-                    'exp_year' => date('Y'),
-                ],
-            ]);
-        $this->card_validator
-            ->shouldReceive([
-                'isValidExpiration' => [
-                    'result' => true,
-                ],
-            ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'deleteCard' => [
-                    'code' => 200,
-                    'resource' => [
-                        'httpResponse' => [
-                            'object' => 'error',
-                        ],
+        $this->card_repository->shouldReceive([
+            'getEntity' => [
+                'id_customer' => $customer_id,
+                'id_card' => 'card_azerty',
+                'exp_month' => date('m'),
+                'exp_year' => date('Y'),
+            ],
+        ]);
+        $this->card_validator->shouldReceive([
+            'isValidExpiration' => [
+                'result' => true,
+            ],
+        ]);
+        $this->api_service->shouldReceive([
+            'deleteCard' => [
+                'result' => true,
+                'code' => 200,
+                'resource' => [
+                    'httpResponse' => [
+                        'object' => 'error',
                     ],
                 ],
-            ]);
+            ],
+        ]);
 
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
@@ -95,33 +91,31 @@ class deleteActionTest extends BaseCardAction
     {
         $card_id = 4242;
         $customer_id = 4242;
-        $this->card_repository
-            ->shouldReceive([
-                'getEntity' => [
-                    'id_customer' => $customer_id,
-                    'id_card' => 'card_azerty',
-                    'exp_month' => date('m'),
-                    'exp_year' => date('Y'),
-                ],
-                'deleteEntity' => false,
-            ]);
-        $this->card_validator
-            ->shouldReceive([
-                'isValidExpiration' => [
-                    'result' => true,
-                ],
-            ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'deleteCard' => [
-                    'code' => 200,
-                    'resource' => [
-                        'httpResponse' => [
-                            'object' => 'success',
-                        ],
+        $this->card_repository->shouldReceive([
+            'getEntity' => [
+                'id_customer' => $customer_id,
+                'id_card' => 'card_azerty',
+                'exp_month' => date('m'),
+                'exp_year' => date('Y'),
+            ],
+            'deleteEntity' => false,
+        ]);
+        $this->card_validator->shouldReceive([
+            'isValidExpiration' => [
+                'result' => true,
+            ],
+        ]);
+        $this->api_service->shouldReceive([
+            'deleteCard' => [
+                'result' => true,
+                'code' => 200,
+                'resource' => [
+                    'httpResponse' => [
+                        'object' => 'success',
                     ],
                 ],
-            ]);
+            ],
+        ]);
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
@@ -129,33 +123,31 @@ class deleteActionTest extends BaseCardAction
     {
         $card_id = 4242;
         $customer_id = 4242;
-        $this->card_repository
-            ->shouldReceive([
-                'getEntity' => [
-                    'id_customer' => $customer_id,
-                    'id_card' => 'card_azerty',
-                    'exp_month' => date('m'),
-                    'exp_year' => date('Y'),
-                ],
-                'deleteEntity' => false,
-            ]);
-        $this->card_validator
-            ->shouldReceive([
-                'isValidExpiration' => [
-                    'result' => true,
-                ],
-            ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'deleteCard' => [
-                    'code' => 200,
-                    'resource' => [
-                        'httpResponse' => [
-                            'object' => 'success',
-                        ],
+        $this->card_repository->shouldReceive([
+            'getEntity' => [
+                'id_customer' => $customer_id,
+                'id_card' => 'card_azerty',
+                'exp_month' => date('m'),
+                'exp_year' => date('Y'),
+            ],
+            'deleteEntity' => false,
+        ]);
+        $this->card_validator->shouldReceive([
+            'isValidExpiration' => [
+                'result' => true,
+            ],
+        ]);
+        $this->api_service->shouldReceive([
+            'deleteCard' => [
+                'result' => true,
+                'code' => 200,
+                'resource' => [
+                    'httpResponse' => [
+                        'object' => 'success',
                     ],
                 ],
-            ]);
+            ],
+        ]);
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
@@ -163,21 +155,19 @@ class deleteActionTest extends BaseCardAction
     {
         $card_id = 4242;
         $customer_id = 4242;
-        $this->card_repository
-            ->shouldReceive([
-                'getEntity' => [
-                    'id_customer' => $customer_id,
-                    'exp_month' => date('m'),
-                    'exp_year' => date('Y'),
-                ],
-                'deleteEntity' => false,
-            ]);
-        $this->card_validator
-            ->shouldReceive([
-                'isValidExpiration' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getEntity' => [
+                'id_customer' => $customer_id,
+                'exp_month' => date('m'),
+                'exp_year' => date('Y'),
+            ],
+            'deleteEntity' => false,
+        ]);
+        $this->card_validator->shouldReceive([
+            'isValidExpiration' => [
+                'result' => false,
+            ],
+        ]);
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 
@@ -185,21 +175,19 @@ class deleteActionTest extends BaseCardAction
     {
         $card_id = 4242;
         $customer_id = 4242;
-        $this->card_repository
-            ->shouldReceive([
-                'getEntity' => [
-                    'id_customer' => $customer_id,
-                    'exp_month' => date('m'),
-                    'exp_year' => date('Y'),
-                ],
-                'deleteEntity' => false,
-            ]);
-        $this->card_validator
-            ->shouldReceive([
-                'isValidExpiration' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getEntity' => [
+                'id_customer' => $customer_id,
+                'exp_month' => date('m'),
+                'exp_year' => date('Y'),
+            ],
+            'deleteEntity' => false,
+        ]);
+        $this->card_validator->shouldReceive([
+            'isValidExpiration' => [
+                'result' => false,
+            ],
+        ]);
         $this->assertFalse($this->action->deleteAction($customer_id, $card_id));
     }
 }

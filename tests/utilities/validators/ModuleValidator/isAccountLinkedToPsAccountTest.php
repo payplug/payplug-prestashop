@@ -16,7 +16,7 @@ class isAccountLinkedToPsAccountTest extends TestCase
 {
     protected $validator;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->validator = new moduleValidator();
     }
@@ -45,8 +45,7 @@ class isAccountLinkedToPsAccountTest extends TestCase
     public function testWhenGetServiceThrowingException()
     {
         $module = \Mockery::mock();
-        $module
-            ->shouldReceive('getService')
+        $module->shouldReceive('getService')
             ->andThrow('Exception', 'getService() method throw exception', 500);
 
         $this->assertSame([
@@ -58,13 +57,11 @@ class isAccountLinkedToPsAccountTest extends TestCase
     public function testWhenGetPsAccountsServiceThrowingException()
     {
         $facade = \Mockery::mock();
-        $facade
-            ->shouldReceive('getPsAccountsService')
+        $facade->shouldReceive('getPsAccountsService')
             ->andThrow('Exception', 'getPsAccountsService() method throw exception', 500);
 
         $module = \Mockery::mock();
-        $module
-            ->shouldReceive('getService')
+        $module->shouldReceive('getService')
             ->andReturn($facade);
 
         $this->assertSame([
@@ -76,18 +73,15 @@ class isAccountLinkedToPsAccountTest extends TestCase
     public function testWhenIsAccountLinkedThrowingException()
     {
         $service = \Mockery::mock();
-        $service
-            ->shouldReceive('isAccountLinked')
+        $service->shouldReceive('isAccountLinked')
             ->andThrow('Exception', 'isAccountLinked() method throw exception', 500);
 
         $facade = \Mockery::mock();
-        $facade
-            ->shouldReceive('getPsAccountsService')
+        $facade->shouldReceive('getPsAccountsService')
             ->andReturn($service);
 
         $module = \Mockery::mock();
-        $module
-            ->shouldReceive('getService')
+        $module->shouldReceive('getService')
             ->andReturn($facade);
 
         $this->assertSame([
@@ -99,18 +93,15 @@ class isAccountLinkedToPsAccountTest extends TestCase
     public function testWhenIsAccountLinkedReturnFalse()
     {
         $service = \Mockery::mock();
-        $service
-            ->shouldReceive('isAccountLinked')
+        $service->shouldReceive('isAccountLinked')
             ->andReturn(false);
 
         $facade = \Mockery::mock();
-        $facade
-            ->shouldReceive('getPsAccountsService')
+        $facade->shouldReceive('getPsAccountsService')
             ->andReturn($service);
 
         $module = \Mockery::mock();
-        $module
-            ->shouldReceive('getService')
+        $module->shouldReceive('getService')
             ->andReturn($facade);
 
         $this->assertSame([
@@ -122,18 +113,15 @@ class isAccountLinkedToPsAccountTest extends TestCase
     public function testWhenIsAccountLinkedReturnTrue()
     {
         $service = \Mockery::mock();
-        $service
-            ->shouldReceive('isAccountLinked')
+        $service->shouldReceive('isAccountLinked')
             ->andReturn(true);
 
         $facade = \Mockery::mock();
-        $facade
-            ->shouldReceive('getPsAccountsService')
+        $facade->shouldReceive('getPsAccountsService')
             ->andReturn($service);
 
         $module = \Mockery::mock();
-        $module
-            ->shouldReceive('getService')
+        $module->shouldReceive('getService')
             ->andReturn($facade);
 
         $this->assertSame([

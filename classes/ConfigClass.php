@@ -297,8 +297,14 @@ class ConfigClass
         if (!$this->isAllowed()) {
             return false;
         }
-
-        $permissions = $this->dependencies->apiClass->getAccountPermissions();
+        $api_key = $this->module
+            ->getPlugin()
+            ->getApiService()
+            ->getCurrentApiKey();
+        $permissions = $this->module
+            ->getPlugin()
+            ->getApiService()
+            ->getAccount($api_key, false);
 
         // in case if API is not available or not returning permissions
         if (empty($permissions)) {
@@ -464,7 +470,7 @@ class ConfigClass
     public function getLivePermissions()
     {
         $live_api_key = $this->configuration->getValue('live_api_key');
-        $livepermissions = $this->dependencies->apiClass->getAccount($live_api_key);
+        $livepermissions = $this->dependencies->getPlugin()->getApiService()->getAccount($live_api_key);
 
         return $livepermissions ? $livepermissions : [];
     }

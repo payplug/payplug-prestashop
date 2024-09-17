@@ -25,7 +25,7 @@ class BaseOneyAction extends TestCase
     public $toolsAdapter;
     public $translation;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
 
@@ -40,59 +40,50 @@ class BaseOneyAction extends TestCase
 //        $this->context_adapter->language = \Mockery::mock('Language');
 //        $this->context_adapter->language
 //            ->shouldReceive(['iso_code'=> 'FR']);
-        $this->context_adapter->cart
-            ->shouldReceive([
-                'getOrderTotal' => 42.42,
-            ]);
-        $this->context_adapter
-            ->shouldReceive([
-                'get' => ContextMock::get(),
-            ]);
+        $this->context_adapter->cart->shouldReceive([
+            'getOrderTotal' => 42.42,
+        ]);
+        $this->context_adapter->shouldReceive([
+            'get' => ContextMock::get(),
+        ]);
         $this->dispatcher = \Mockery::mock('Dispatcher');
         $this->instance = \Mockery::mock('Instance');
         $this->controller = \Mockery::mock('Controller');
-        $this->dispatcher
-            ->shouldReceive([
-                'getInstance' => $this->instance,
-                'getController' => $this->controller,
-            ]);
+        $this->dispatcher->shouldReceive([
+            'getInstance' => $this->instance,
+            'getController' => $this->controller,
+        ]);
 
         $this->payment_method_class = \Mockery::mock('PaymentMethodClass');
         $this->payment_method = \Mockery::mock('PaymentMethod');
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $this->payment_method,
-            ]);
+        $this->payment_method_class->shouldReceive([
+            'getPaymentMethod' => $this->payment_method,
+        ]);
 
         $logger = \Mockery::mock('Logger');
-        $logger
-            ->shouldReceive([
-                'addLog' => true,
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getConfiguration' => $this->configuration,
-                'getConfigurationClass' => $this->configuration_class,
-                'getContext' => $this->context_adapter,
-                'getDispatcher' => $this->dispatcher,
-                'getLogger' => $logger,
-                'getPaymentMethodClass' => $this->payment_method_class,
-                'getTools' => $this->toolsAdapter,
-                'getInstance' => $this->instance,
-                'getController' => $this->controller,
-            ]);
+        $logger->shouldReceive([
+            'addLog' => true,
+        ]);
+        $this->plugin->shouldReceive([
+            'getConfiguration' => $this->configuration,
+            'getConfigurationClass' => $this->configuration_class,
+            'getContext' => $this->context_adapter,
+            'getDispatcher' => $this->dispatcher,
+            'getLogger' => $logger,
+            'getPaymentMethodClass' => $this->payment_method_class,
+            'getTools' => $this->toolsAdapter,
+            'getInstance' => $this->instance,
+            'getController' => $this->controller,
+        ]);
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
 
-        $this->configuration
-            ->shouldReceive('getValue');
+        $this->configuration->shouldReceive('getValue');
 
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
-        $this->translation
-            ->shouldReceive('l')
+        $this->translation->shouldReceive('l')
             ->andReturnUsing(function ($str) {
                 return $str;
             });

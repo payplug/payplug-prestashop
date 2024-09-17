@@ -19,7 +19,7 @@ class sendTest extends TestCase
 
     protected $service;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->service = new MerchantTelemetry();
     }

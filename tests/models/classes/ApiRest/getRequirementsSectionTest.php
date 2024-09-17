@@ -6,8 +6,8 @@ use PayPlug\src\utilities\validators\moduleValidator;
 
 /**
  * @group unit
- * @group classes
- * @group apirest_classes
+ * @group class
+ * @group apirest_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -46,7 +46,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $this->configuration_helper->shouldReceive([
             'getRequirements' => $report,
         ]);
-        $response = $this->classe->getRequirementsSection();
+        $response = $this->class->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
             if ('payplug.getRequirementsTranslations.requirementsCurlText' == $requirement['text']) {
@@ -80,7 +80,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $this->configuration_helper->shouldReceive([
             'getRequirements' => $report,
         ]);
-        $response = $this->classe->getRequirementsSection();
+        $response = $this->class->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
             if ('payplug.getRequirementsTranslations.requirementsCurlText' == $requirement['text']) {
@@ -114,7 +114,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $this->configuration_helper->shouldReceive([
             'getRequirements' => $report,
         ]);
-        $response = $this->classe->getRequirementsSection();
+        $response = $this->class->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
             if ('payplug.getRequirementsTranslations.requirementsPhpText' == $requirement['text']) {
@@ -148,7 +148,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $this->configuration_helper->shouldReceive([
             'getRequirements' => $report,
         ]);
-        $response = $this->classe->getRequirementsSection();
+        $response = $this->class->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
             if ('payplug.getRequirementsTranslations.requirementsPhpText' == $requirement['text']) {
@@ -182,7 +182,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $this->configuration_helper->shouldReceive([
             'getRequirements' => $report,
         ]);
-        $response = $this->classe->getRequirementsSection();
+        $response = $this->class->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
             if ('payplug.getRequirementsTranslations.requirementsOpensslText' == $requirement['text']) {
@@ -216,7 +216,7 @@ class getRequirementsSectionTest extends BaseApiRest
         $this->configuration_helper->shouldReceive([
             'getRequirements' => $report,
         ]);
-        $response = $this->classe->getRequirementsSection();
+        $response = $this->class->getRequirementsSection();
 
         foreach ($response['requirements'] as $requirement) {
             if ('payplug.getRequirementsTranslations.requirementsOpensslText' == $requirement['text']) {

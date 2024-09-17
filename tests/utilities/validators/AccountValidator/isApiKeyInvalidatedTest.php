@@ -16,7 +16,7 @@ class isApiKeyInvalidatedTest extends TestCase
 {
     protected $accountValidator;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->accountValidator = new AccountValidator();
     }

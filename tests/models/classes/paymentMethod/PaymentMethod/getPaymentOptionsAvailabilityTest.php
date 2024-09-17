@@ -6,8 +6,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -15,56 +16,53 @@ class getPaymentOptionsAvailabilityTest extends BasePaymentMethod
 {
     public function testWhenNoPaymentMethodIsAvailable()
     {
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [],
         ]);
-        $this->assertSame([], $this->classe->getPaymentOptionsAvailability());
+        $this->assertSame([], $this->class->getPaymentOptionsAvailability());
     }
 
     public function testWhenNoPaymentMethodFoundInDatabase()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{}');
 
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
         ]);
-        $this->assertSame([], $this->classe->getPaymentOptionsAvailability());
+        $this->assertSame([], $this->class->getPaymentOptionsAvailability());
     }
 
     public function testWhenExpectedPaymentMethodNotFoundAvailableMethods()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"amex":true}');
 
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
         ]);
         $expected = ['standard' => false];
-        $this->assertSame($expected, $this->classe->getPaymentOptionsAvailability());
+        $this->assertSame($expected, $this->class->getPaymentOptionsAvailability());
     }
 
     public function testWhenExpectedPaymentMethodFoundAvailableMethods()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true}');
 
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
         ]);
         $expected = ['standard' => true];
-        $this->assertSame($expected, $this->classe->getPaymentOptionsAvailability());
+        $this->assertSame($expected, $this->class->getPaymentOptionsAvailability());
     }
 }

@@ -118,17 +118,20 @@ class RefundClass
         $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
         $id_order = $this->tools->tool('getValue', 'id_order');
         $resource_id = $this->tools->tool('getValue', 'resource_id');
-        $is_installment = $this->dependencies->getValidators()['payment']->isInstallment($resource_id)['result'];
-        $pay_id = !$is_installment ? $resource_id : false;
-        $inst_id = $is_installment ? $resource_id : false;
         $pay_mode = $this->tools->tool('getValue', 'pay_mode');
-
-        $this->dependencies->apiClass->initializeApi('test' == $pay_mode);
-
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+        $payment_method = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method']);
+        $is_installment = 'installment' == $stored_resource['method'];
+        $retrieve = $payment_method->retrieve($stored_resource['resource_id']);
         $amount_available = 0;
-        if ($inst_id) {
-            $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
-            if (!$installment['result']) {
+        if ($is_installment) {
+            if (!$retrieve['result']) {
                 exit(json_encode([
                     'status' => 'error',
                     'data' => $this->dependencies
@@ -138,17 +141,15 @@ class RefundClass
                 ]));
             }
 
-            foreach ($installment['resource']->schedule as $schedule) {
-                foreach ($schedule->payment_ids as $p_id) {
-                    $payment = $this->dependencies->apiClass->retrievePayment($p_id);
-                    if ($payment['resource']->is_paid && !$payment['resource']->is_refunded) {
-                        $amount_available += $payment['resource']->amount - $payment['resource']->amount_refunded;
+            foreach ($retrieve['schedule'] as $schedule) {
+                if ($schedule['resource']) {
+                    if ($schedule['resource']->is_paid && !$schedule['resource']->is_refunded) {
+                        $amount_available += $schedule['resource']->amount - $schedule['resource']->amount_refunded;
                     }
                 }
             }
         } else {
-            $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-            if (!$payment['result']) {
+            if (!$retrieve['result']) {
                 exit(json_encode([
                     'status' => 'error',
                     'data' => $this->dependencies
@@ -157,7 +158,7 @@ class RefundClass
                         ->l('payplug.refundPayment.cannotRefund', 'refundclass'),
                 ]));
             }
-            $amount_available = $payment['resource']->amount - $payment['resource']->amount_refunded;
+            $amount_available = $retrieve['resource']->amount - $retrieve['resource']->amount_refunded;
         }
 
         $amount = is_numeric($amount) ? $this->dependencies->amountCurrencyClass->convertAmount($amount) : 0;
@@ -207,16 +208,16 @@ class RefundClass
 
         $refund = $this->dependencies
             ->getPlugin()
-            ->getRefundAction()->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+            ->getRefundAction()
+            ->refundAction($stored_resource['resource_id'], $amount, $metadata, $pay_mode, $is_installment);
 
-        if ('error' == $refund) {
+        if (empty($refund)) {
             $this->logger->addLog('Cannot refund that amount.', 'notice');
             $this->logger->addLog(
-                '$pay_id : ' . $pay_id .
+                '$pay_id : ' . $stored_resource['resource_id'] .
                 ' - $amount : ' . $amount .
                 ' - $metadata : ' . json_encode($metadata) . // or implode() ?
-                ' - $pay_mode : ' . $pay_mode .
-                ' - $inst_id : ' . $inst_id,
+                ' - $pay_mode : ' . $pay_mode,
                 'debug'
             );
 
@@ -231,48 +232,40 @@ class RefundClass
         $new_state = 7;
         $reload = false;
 
-        if ($inst_id) {
-            $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
-            if (!$installment['result']) {
-                $this->logger->addLog('Cannot retrieve installment with id: ' . $inst_id, 'error');
+        $retrieve = $payment_method->retrieve($stored_resource['resource_id']);
+        if (!$retrieve['result']) {
+            $this->logger->addLog('Cannot retrieve resource with id: ' . $stored_resource['resource_id'], 'error');
 
-                exit(json_encode([
-                    'status' => 'error',
-                    'data' => $this->dependencies
-                        ->getPlugin()
-                        ->getTranslationClass()
-                        ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
-                ]));
-            }
+            exit(json_encode([
+                'status' => 'error',
+                'data' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
+            ]));
+        }
 
-            $installment = $installment['resource'];
+        if ($is_installment) {
             $amount_available = 0;
             $amount_refunded_payplug = 0;
-            if (isset($installment->schedule) && $installment->schedule) {
-                foreach ($installment->schedule as $schedule) {
-                    if (!empty($schedule->payment_ids)) {
-                        foreach ($schedule->payment_ids as $p_id) {
-                            $payment = $this->dependencies->apiClass->retrievePayment($p_id);
-                            if (!$payment['result']) {
-                                return 'error';
-                            }
-                            $payment = $payment['resource'];
-                            if ($payment->is_paid && !$payment->is_refunded) {
-                                $amount_available += (int) ($payment->amount - $payment->amount_refunded);
-                            }
-                            $amount_refunded_payplug += $payment->amount_refunded;
+            if (isset($retrieve['schedule']) && !empty($retrieve['schedule'])) {
+                foreach ($retrieve['schedule'] as $schedule) {
+                    if ($schedule['resource']) {
+                        $payment = $schedule['resource'];
+                        if ($payment->is_paid && !$payment->is_refunded) {
+                            $amount_available += (int) ($payment->amount - $payment->amount_refunded);
                         }
+                        $amount_refunded_payplug += $payment->amount_refunded;
                     }
                 }
             }
-
             $amount_available = (float) ($amount_available / 100);
             $amount_refunded_payplug = (float) ($amount_refunded_payplug / 100);
 
             if ((int) $this->tools->tool('getValue', 'id_state') || !$amount_available) {
                 $new_state = (int) $this->tools->tool('getValue', 'id_state');
                 if (!$new_state) {
-                    if (1 == $installment->is_live) {
+                    if ((bool) $retrieve['resource']->is_live) {
                         $new_state = (int) $this->configuration->getValue('order_state_refund');
                     } else {
                         $new_state = (int) $this->configuration->getValue('order_state_refund_test');
@@ -336,28 +329,17 @@ class RefundClass
                 $reload = true;
             }
         } else {
-            $payment = $this->dependencies->apiClass->retrievePayment($refund['id']);
-            if (!$payment['result']) {
-                exit(json_encode([
-                    'status' => 'error',
-                    'data' => $this->dependencies
-                        ->getPlugin()
-                        ->getTranslationClass()
-                        ->l('payplug.refundPayment.errorOccurred', 'refundclass'),
-                ]));
-            }
-            $payment = $payment['resource'];
             $new_state = (int) $this->tools->tool('getValue', 'id_state');
 
-            if ($payment->is_refunded) {
-                if (1 == $payment->is_live) {
+            if ($retrieve['resource']->is_refunded) {
+                if (1 == $retrieve['resource']->is_live) {
                     $new_state = (int) $this->configuration->getValue('order_state_refund');
                 } else {
                     $new_state = (int) $this->configuration->getValue('order_state_refund_test');
                 }
             }
 
-            if ($new_state || ($payment->is_refunded && empty($inst_id))) {
+            if ($new_state || ($retrieve['resource']->is_refunded && empty($inst_id))) {
                 $order = $this->order->get((int) $id_order);
                 if ($this->validate->validate('isLoadedObject', $order)) {
                     if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
@@ -432,8 +414,8 @@ class RefundClass
                 $reload = true;
             }
 
-            $amount_refunded_payplug = $payment->amount_refunded / 100;
-            $amount_available = ($payment->amount - $payment->amount_refunded) / 100;
+            $amount_refunded_payplug = $retrieve['resource']->amount_refunded / 100;
+            $amount_available = ($retrieve['resource']->amount - $retrieve['resource']->amount_refunded) / 100;
         }
 
         $data = $this->getRefundData(

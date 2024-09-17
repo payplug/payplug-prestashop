@@ -85,8 +85,7 @@ class RepositoryBase extends TestCase
     public function setUp()
     {
         $this->myLogPhp = MockHelper::createMockFactory('PayPlug\classes\MyLogPHP');
-        $this->myLogPhp
-            ->shouldReceive('info')
+        $this->myLogPhp->shouldReceive('info')
             ->andReturn(true)
         ;
 
@@ -137,8 +136,7 @@ class RepositoryBase extends TestCase
 
         $this->configuration = \Mockery::mock(Configuration::class)->makePartial();
         $this->translation = \Mockery::mock(Translation::class)->makePartial();
-        $this->translation
-            ->shouldReceive('l')
+        $this->translation->shouldReceive('l')
             ->andReturnUsing(function ($str) {
                 return $str;
             });
@@ -151,39 +149,35 @@ class RepositoryBase extends TestCase
         $this->card_action = \Mockery::mock('CardAction');
 
         $this->plugin = \Mockery::mock('Plugin');
-        $this->plugin
-            ->shouldReceive([
-                'getCart' => $this->cart,
-                'getCardAction' => $this->card_action,
-                'getConfiguration' => $this->config,
-                'getConfigurationClass' => $this->configuration,
-                'getCardRepository' => $this->card_repository,
-                'getCountryRepository' => $this->country_repository,
-                'getOrderStateRepository' => $this->order_state_repository,
-                'getPaymentRepository' => $this->payment_repository,
-                'getStateRepository' => $this->payplug_order_state_repository,
-                'getTranslationClass' => $this->translation,
-                'getValidate' => $this->validate,
-            ])
+        $this->plugin->shouldReceive([
+            'getCart' => $this->cart,
+            'getCardAction' => $this->card_action,
+            'getConfiguration' => $this->config,
+            'getConfigurationClass' => $this->configuration,
+            'getCardRepository' => $this->card_repository,
+            'getCountryRepository' => $this->country_repository,
+            'getOrderStateRepository' => $this->order_state_repository,
+            'getPaymentRepository' => $this->payment_repository,
+            'getStateRepository' => $this->payplug_order_state_repository,
+            'getTranslationClass' => $this->translation,
+            'getValidate' => $this->validate,
+        ])
         ;
 
-        $this->dependencies
-            ->shouldReceive([
-                'getValidators' => $this->validators,
-                'getPlugin' => $this->plugin,
-            ])
+        $this->dependencies->shouldReceive([
+            'getValidators' => $this->validators,
+            'getPlugin' => $this->plugin,
+        ])
         ;
-        $this->dependencies
-            ->shouldReceive(
-                [
-                    'getHelpers' => [
-                        'user' => \Mockery::mock(UserHelper::class)->makePartial(),
-                        'amount' => \Mockery::mock(AmountHelper::class)->makePartial(),
-                    ],
-                ]
-            );
-        $this->dependencies
-            ->shouldReceive('getConfigurationKey')
+        $this->dependencies->shouldReceive(
+            [
+                'getHelpers' => [
+                    'user' => \Mockery::mock(UserHelper::class)->makePartial(),
+                    'amount' => \Mockery::mock(AmountHelper::class)->makePartial(),
+                ],
+            ]
+        );
+        $this->dependencies->shouldReceive('getConfigurationKey')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'oneyMinAmounts':
@@ -209,8 +203,7 @@ class RepositoryBase extends TestCase
         $this->dependencies->name = DependenciesMock::get();
 
         $this->dependencies->amountCurrencyClass = \Mockery::mock('alias:PayPlug\classes\AmountCurrencyClass');
-        $this->dependencies->amountCurrencyClass
-            ->shouldReceive('convertAmount')
+        $this->dependencies->amountCurrencyClass->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $to_cents = false) {
                 if ($to_cents) {
                     return (float) ($amount / 100);
@@ -222,7 +215,6 @@ class RepositoryBase extends TestCase
             })
         ;
 
-        $this->dependencies->apiClass = \Mockery::mock('alias:PayPlug\classes\ApiClass');
         $this->dependencies->paymentClass = \Mockery::mock('alias:PayPlug\classes\PaymentClass');
         $this->dependencies->configClass = \Mockery::mock('alias:PayPlug\classes\ConfigClass');
     }

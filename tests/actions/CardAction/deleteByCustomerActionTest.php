@@ -25,20 +25,17 @@ class deleteByCustomerActionTest extends BaseCardAction
     {
         $customer_id = 42;
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('sandbox_mode')
             ->andReturn(42);
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_id')
             ->andReturn(42);
 
-        $this->card_repository
-            ->shouldReceive([
-                'getAllByCustomer' => [],
-            ]);
+        $this->card_repository->shouldReceive([
+            'getAllByCustomer' => [],
+        ]);
 
         $this->assertFalse($this->action->deleteByCustomerAction($customer_id));
     }
@@ -47,32 +44,28 @@ class deleteByCustomerActionTest extends BaseCardAction
     {
         $customer_id = 42;
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('sandbox_mode')
             ->andReturn(42);
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_id')
             ->andReturn(42);
 
-        $this->card_repository
-            ->shouldReceive([
-                'getAllByCustomer' => [
-                    [
-                        'id_payplug_card' => 'card_azery1',
-                    ],
-                    [
-                        'id_payplug_card' => 'card_azery2',
-                    ],
+        $this->card_repository->shouldReceive([
+            'getAllByCustomer' => [
+                [
+                    'id_payplug_card' => 'card_azery1',
                 ],
-            ]);
+                [
+                    'id_payplug_card' => 'card_azery2',
+                ],
+            ],
+        ]);
 
-        $this->action
-            ->shouldReceive([
-                'deleteAction' => false,
-            ]);
+        $this->action->shouldReceive([
+            'deleteAction' => false,
+        ]);
 
         $this->assertFalse($this->action->deleteByCustomerAction($customer_id));
     }
@@ -81,32 +74,28 @@ class deleteByCustomerActionTest extends BaseCardAction
     {
         $customer_id = 42;
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('sandbox_mode')
             ->andReturn(42);
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_id')
             ->andReturn(42);
 
-        $this->card_repository
-            ->shouldReceive([
-                'getAllByCustomer' => [
-                    [
-                        'id_payplug_card' => 'card_azery1',
-                    ],
-                    [
-                        'id_payplug_card' => 'card_azery2',
-                    ],
+        $this->card_repository->shouldReceive([
+            'getAllByCustomer' => [
+                [
+                    'id_payplug_card' => 'card_azery1',
                 ],
-            ]);
+                [
+                    'id_payplug_card' => 'card_azery2',
+                ],
+            ],
+        ]);
 
-        $this->action
-            ->shouldReceive([
-                'deleteAction' => true,
-            ]);
+        $this->action->shouldReceive([
+            'deleteAction' => true,
+        ]);
 
         $this->assertTrue($this->action->deleteByCustomerAction($customer_id));
     }

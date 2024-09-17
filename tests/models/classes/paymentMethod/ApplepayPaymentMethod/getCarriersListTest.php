@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -14,33 +14,29 @@ class getCarriersListTest extends BaseApplepayPaymentMethod
 {
     public function testWhenNoCarriersConfigured()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('applepay_carriers')
             ->andReturn('[]');
 
-        $this->assertSame([], $this->classe->getCarriersList());
+        $this->assertSame([], $this->class->getCarriersList());
     }
 
     public function testWhenNoCartDeliveryOptions()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('applepay_carriers')
             ->andReturn('[1,2,3]');
 
-        $this->cart_adapter
-            ->shouldReceive([
-                'getDeliveryOptionList' => [],
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'getDeliveryOptionList' => [],
+        ]);
 
-        $this->assertSame([], $this->classe->getCarriersList());
+        $this->assertSame([], $this->class->getCarriersList());
     }
 
     public function testWhenConfiguredCarriersDoesntMatchWithDeliveryOption()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('applepay_carriers')
             ->andReturn('[1,2,3]');
 
@@ -63,18 +59,16 @@ class getCarriersListTest extends BaseApplepayPaymentMethod
                 ],
             ],
         ];
-        $this->cart_adapter
-            ->shouldReceive([
-                'getDeliveryOptionList' => $delivery_options,
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'getDeliveryOptionList' => $delivery_options,
+        ]);
 
-        $this->assertSame([], $this->classe->getCarriersList());
+        $this->assertSame([], $this->class->getCarriersList());
     }
 
     public function testWhenConfiguredCarriersMatchWithDeliveryOption()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('applepay_carriers')
             ->andReturn('[1,2,3,4]');
         $delivery_options = [
@@ -96,11 +90,10 @@ class getCarriersListTest extends BaseApplepayPaymentMethod
                 ],
             ],
         ];
-        $this->cart_adapter
-            ->shouldReceive([
-                'getDeliveryOptionList' => $delivery_options,
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'getDeliveryOptionList' => $delivery_options,
+        ]);
 
-        $this->assertSame([], $this->classe->getCarriersList());
+        $this->assertSame([], $this->class->getCarriersList());
     }
 }

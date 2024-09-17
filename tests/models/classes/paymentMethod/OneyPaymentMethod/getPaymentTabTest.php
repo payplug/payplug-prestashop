@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group oney_payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group oney_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,27 +19,23 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
     {
         parent::setUp();
 
-        $this->classe->set('name', 'oney');
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->class->set('name', 'oney');
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->helpers['amount']
-            ->shouldReceive([
-                'validateAmount' => [
-                    'result' => true,
-                ],
-                'convertAmount' => 4242,
-            ]);
-        $this->helpers['cookies']
-            ->shouldReceive([
-                'setPaymentErrorsCookie' => true,
-            ]);
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => [
+                'result' => true,
+            ],
+            'convertAmount' => 4242,
+        ]);
+        $this->helpers['cookies']->shouldReceive([
+            'setPaymentErrorsCookie' => true,
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
@@ -47,8 +43,7 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
             'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
-        $this->tools_adapter
-            ->shouldReceive('tool')
+        $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $arg) {
                 switch ($method) {
                     case 'getShopDomainSsl':
@@ -118,30 +113,28 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
 
     public function testWhenParentMethodReturnEmptyArray()
     {
-        $this->classe->set('name', '');
+        $this->class->set('name', '');
         $this->assertSame(
             [],
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenCurrentCartIsntElligible()
     {
-        $this->classe
-            ->shouldReceive([
-                'getOneyPriceLimit' => [
-                    'min' => 100,
-                    'max' => 3000,
-                ],
-            ]);
+        $this->class->shouldReceive([
+            'getOneyPriceLimit' => [
+                'min' => 100,
+                'max' => 3000,
+            ],
+        ]);
 
-        $this->validators['payment']
-            ->shouldReceive([
-                'isOneyElligible' => [
-                    'result' => false,
-                    'code' => 'product_quantity',
-                ],
-            ]);
+        $this->validators['payment']->shouldReceive([
+            'isOneyElligible' => [
+                'result' => false,
+                'code' => 'product_quantity',
+            ],
+        ]);
 
         $this->cart_adapter->shouldReceive([
             'isGuestCartByCartId' => false,
@@ -149,12 +142,10 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         $this->cart_adapter->shouldReceive([
             'nbProducts' => 1001,
         ]);
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_TAX')
             ->andReturn('1');
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
         $this->currency_adapter->shouldReceive([
@@ -162,37 +153,33 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         ]);
         $this->assertSame(
             [],
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenRequiredFieldsIsNeeded()
     {
-        $this->classe
-            ->shouldReceive([
-                'hasOneyRequiredFields' => true,
-                'getOneyPriceLimit' => [
-                    'min' => 100,
-                    'max' => 3000,
-                ],
-            ]);
+        $this->class->shouldReceive([
+            'hasOneyRequiredFields' => true,
+            'getOneyPriceLimit' => [
+                'min' => 100,
+                'max' => 3000,
+            ],
+        ]);
 
-        $this->validators['payment']
-            ->shouldReceive([
-                'isOneyElligible' => [
-                    'result' => true,
-                ],
-            ]);
-        $this->helpers['phone']
-            ->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                ],
-            ]);
-        $this->helpers['cookies']
-            ->shouldReceive([
-                'getPaymentDataCookie' => [],
-            ]);
+        $this->validators['payment']->shouldReceive([
+            'isOneyElligible' => [
+                'result' => true,
+            ],
+        ]);
+        $this->helpers['phone']->shouldReceive([
+            'isPhoneNumber' => [
+                'result' => true,
+            ],
+        ]);
+        $this->helpers['cookies']->shouldReceive([
+            'getPaymentDataCookie' => [],
+        ]);
 
         $this->cart_adapter->shouldReceive([
             'isGuestCartByCartId' => false,
@@ -200,12 +187,10 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         $this->cart_adapter->shouldReceive([
             'nbProducts' => 1001,
         ]);
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_TAX')
             ->andReturn('1');
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
 
@@ -214,37 +199,33 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         ]);
         $this->assertSame(
             [],
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenPaymentTabIsReturned()
     {
-        $this->classe
-            ->shouldReceive([
-                'hasOneyRequiredFields' => false,
-                'getOneyPaymentContext' => [],
-                'getOneyPriceLimit' => [
-                    'min' => 100,
-                    'max' => 3000,
-                ],
-            ]);
+        $this->class->shouldReceive([
+            'hasOneyRequiredFields' => false,
+            'getOneyPaymentContext' => [],
+            'getOneyPriceLimit' => [
+                'min' => 100,
+                'max' => 3000,
+            ],
+        ]);
 
-        $this->validators['payment']
-            ->shouldReceive([
-                'isOneyElligible' => [
-                    'result' => true,
-                ],
-            ]);
-        $this->helpers['phone']
-            ->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                ],
-            ]);
+        $this->validators['payment']->shouldReceive([
+            'isOneyElligible' => [
+                'result' => true,
+            ],
+        ]);
+        $this->helpers['phone']->shouldReceive([
+            'isPhoneNumber' => [
+                'result' => true,
+            ],
+        ]);
         $oney_schedule = 2;
-        $this->tools_adapter
-            ->shouldReceive('tool')
+        $this->tools_adapter->shouldReceive('tool')
             ->with('payplugOney_type')
             ->andReturn($oney_schedule);
 
@@ -261,21 +242,19 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
         $this->cart_adapter->shouldReceive([
             'nbProducts' => 1001,
         ]);
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_CURRENCY_DEFAULT')
             ->andReturn('EUR');
         $this->currency_adapter->shouldReceive([
             'get' => 1,
         ]);
 
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_TAX')
             ->andReturn('1');
         $this->assertSame(
             $this->expected_tab,
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 }

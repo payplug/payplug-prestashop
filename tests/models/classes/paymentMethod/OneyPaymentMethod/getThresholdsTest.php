@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group oney_payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group oney_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -21,7 +21,7 @@ class getThresholdsTest extends BaseOneyPaymentMethod
     {
         $this->assertSame(
             [],
-            $this->classe->getThresholds($current_configuration)
+            $this->class->getThresholds($current_configuration)
         );
     }
 
@@ -62,7 +62,7 @@ class getThresholdsTest extends BaseOneyPaymentMethod
         ];
         $this->assertSame(
             $expected,
-            $this->classe->getThresholds($current_configuration)
+            $this->class->getThresholds($current_configuration)
         );
     }
 }

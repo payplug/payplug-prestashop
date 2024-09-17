@@ -62,10 +62,10 @@ class OrderAction
         }
 
         // Get the payment from database
-        $payment_tab = $this->plugin
+        $stored_resource = $this->plugin
             ->getPaymentRepository()
             ->getBy('resource_id', $resource_id);
-        if (empty($payment_tab)) {
+        if (empty($stored_resource)) {
             $this->logger->addLog('OrderAction::createAction - Can\'t retrieve resource from database', 'error');
 
             return [
@@ -75,10 +75,11 @@ class OrderAction
         }
 
         // Get the resource form API
-        $is_installment = $this->dependencies->getValidators()['payment']->isInstallment($resource_id)['result'];
-        $retrieve = $is_installment
-            ? $this->dependencies->apiClass->retrieveInstallment($resource_id)
-            : $this->dependencies->apiClass->retrievePayment($resource_id);
+        $payment_method = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method']);
+        $retrieve = $payment_method->retrieve($resource_id);
         if (!$retrieve['result']) {
             $this->logger->addLog('OrderAction::createAction - Can\'t retrieve resource from api', 'error');
 
@@ -102,7 +103,7 @@ class OrderAction
         // Get the related Cart
         $cart = $this->plugin
             ->getCart()
-            ->get((int) $payment_tab['id_cart']);
+            ->get((int) $stored_resource['id_cart']);
         if (!$this->validate_adapter->validate('isLoadedObject', $cart)) {
             $this->logger->addLog('OrderAction::createAction - $cart should be a valid Cart Object', 'error');
 
@@ -140,10 +141,10 @@ class OrderAction
         // Create the payment from given payment_tab
         $payment_method = $this->plugin
             ->getPaymentMethodClass()
-            ->getPaymentMethod($payment_tab['method']);
+            ->getPaymentMethod($stored_resource['method']);
 
         // Get props from PaymentMethod
-        $order_tab = $payment_method->getOrderTab($resource);
+        $order_tab = $payment_method->getOrderTab($retrieve);
         if (empty($order_tab)) {
             $this->logger->addLog('OrderAction::createAction - $order_tab must be an non empty array', 'error');
 
@@ -271,10 +272,10 @@ class OrderAction
         }
 
         // Get the payment from database
-        $payment_tab = $this->plugin
+        $stored_resource = $this->plugin
             ->getPaymentRepository()
             ->getBy('resource_id', $resource_id);
-        if (empty($payment_tab)) {
+        if (empty($stored_resource)) {
             $this->logger->addLog('OrderAction::updateAction - Can\'t retrieve resource from database', 'error');
 
             return [
@@ -284,7 +285,11 @@ class OrderAction
         }
 
         // Get the resource form API
-        $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
+        $payment_method = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method']);
+        $retrieve = $payment_method->retrieve($resource_id);
         if (!$retrieve['result']) {
             $this->logger->addLog('OrderAction::updateAction - Can\'t retrieve resource from api', 'error');
 
@@ -309,10 +314,7 @@ class OrderAction
             $id_order = $this->dependencies
                 ->getPlugin()
                 ->getOrder()
-                ->getIdByCartId((int) $payment_tab['id_cart']);
-            $payment_method = $this->plugin
-                ->getPaymentMethodClass()
-                ->getPaymentMethod($payment_tab['method']);
+                ->getIdByCartId((int) $stored_resource['id_cart']);
             $post_process = $payment_method->postProcessOrder($resource, (int) $id_order);
             if (!$post_process) {
                 $this->logger->addLog('OrderAction::updateAction - Payment cannot be patched', 'error');
@@ -467,11 +469,11 @@ class OrderAction
         }
 
         // Retrieve the resource from database
-        $payment_tab = $this->dependencies
+        $stored_resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
             ->getBy('id_cart', (int) $order->id_cart);
-        if (empty($payment_tab)) {
+        if (empty($stored_resource)) {
             return $order_details;
         }
 
@@ -487,7 +489,7 @@ class OrderAction
         // Create the detail from given payment_tab
         $payment_method = $this->plugin
             ->getPaymentMethodClass()
-            ->getPaymentMethod($payment_tab['method']);
+            ->getPaymentMethod($stored_resource['method']);
 
         if (empty($payment_method)) {
             return [];
@@ -504,13 +506,13 @@ class OrderAction
         }
 
         // Get payment detail section
-        $resource_detail = $payment_method->getResourceDetail($payment_tab['resource_id']);
+        $resource_detail = $payment_method->getResourceDetail($stored_resource['resource_id']);
         if (empty($resource_detail)) {
             return [];
         }
 
         $state_addons = 'live' == strtolower($resource_detail['mode']) ? '' : '_test';
-        if ('installment' == $payment_tab['method']) {
+        if ('installment' == $stored_resource['method']) {
             $order_details['installment'] = $resource_detail;
         } else {
             $order_details['payment'] = $resource_detail;

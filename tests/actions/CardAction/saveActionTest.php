@@ -19,8 +19,7 @@ class saveActionTest extends BaseCardAction
     {
         parent::setUp();
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_id')
             ->andReturn(42);
         $this->payment = PaymentMock::getOneClick();
@@ -38,30 +37,27 @@ class saveActionTest extends BaseCardAction
 
     public function testWhenCardAllrealdyExists()
     {
-        $this->card_repository
-            ->shouldReceive([
-                'exists' => true,
-            ]);
+        $this->card_repository->shouldReceive([
+            'exists' => true,
+        ]);
         $this->assertFalse($this->action->saveAction($this->payment));
     }
 
     public function testWhenCardCantBeRegistered()
     {
-        $this->card_repository
-            ->shouldReceive([
-                'exists' => false,
-                'createEntity' => false,
-            ]);
+        $this->card_repository->shouldReceive([
+            'exists' => false,
+            'createEntity' => false,
+        ]);
         $this->assertFalse($this->action->saveAction($this->payment));
     }
 
     public function testWhenCardIsRegistered()
     {
-        $this->card_repository
-            ->shouldReceive([
-                'exists' => false,
-                'createEntity' => true,
-            ]);
+        $this->card_repository->shouldReceive([
+            'exists' => false,
+            'createEntity' => true,
+        ]);
         $this->assertTrue($this->action->saveAction($this->payment));
     }
 }

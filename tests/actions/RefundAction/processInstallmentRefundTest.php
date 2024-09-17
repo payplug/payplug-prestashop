@@ -13,110 +13,144 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class processInstallmentRefundTest extends BaseRefundAction
 {
-    /**
-     * @description  test ProcessInstallmentRefund
-     * when retrieveInstallment return false
-     */
-    public function testProcessInstallmentRefundWithInValidInstallment()
+    private $resource_id;
+    private $amount;
+    private $metadata;
+    private $resource;
+
+    public function setUp()
     {
-        $inst_id = 'inst_5jjL5sWDZ5pkSty6eNjPtU';
-        $amount = 100;
-        $metadata = [
+        parent::setUp();
+        $this->resource_id = 'inst_5jjL5sWDZ5pkSty6eNjPtU';
+        $this->amount = 100;
+        $this->metadata = [
             'ID Client' => 4,
             'reason' => 'Refunded with Prestashop',
         ];
-        $this->dependencies->apiClass
-            ->shouldReceive(
+        $this->resource = [
+            'result' => true,
+            'resource' => PaymentMock::getInstallment(),
+            'schedule' => [
                 [
-                    'initializeApi' => true,
-                ]
-            );
+                    'amount' => 42,
+                    'date' => '1970-01-01 00:00:00',
+                    'resource' => PaymentMock::getStandard(),
+                ],
+            ],
+        ];
+    }
 
-        $this->dependencies->apiClass
-            ->shouldReceive(
-                [
-                    'retrieveInstallment' => [
-                        'result' => false,
-                    ],
-                    'refundPayment' => [
-                        'result' => true,
-
-                    ],
-                ]
-            );
-        $this->dependencies->installmentClass
-            ->shouldReceive([
-                'updatePayplugInstallment' => true,
-            ]);
-
-        $this->payment_validator
-            ->shouldReceive([
-                'canBeRefund' => [
-                    'result' => true,
-                ], ]);
-
-        $result = $this->action->processInstallmentRefund($inst_id, $amount, $metadata);
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $resource_id
+     */
+    public function testWhenGivenResourceIdIsntValidString($resource_id)
+    {
         $this->assertSame(
-            'error',
-            $result
+            [],
+            $this->action->processInstallmentRefund($resource_id, $this->amount, $this->metadata)
         );
     }
 
     /**
-     * @description  test processInstallmentrefund When
-     * amount can not be refund
+     * @dataProvider invalidIntegerFormatDataProvider
+     *
+     * @param mixed $amount
      */
-    public function testProcessInstallmentRefundWithCantBeRefunded()
+    public function testWhenGivenAmountIdIsntValidInteger($amount)
     {
-        $inst_id = 'inst_5jjL5sWDZ5pkSty6eNjPtU';
-        $amount = 100;
-        $metadata = [
-            'ID Client' => 4,
-            'reason' => 'Refunded with Prestashop',
-        ];
-        $this->dependencies->apiClass
-            ->shouldReceive(
-                [
-                    'initializeApi' => true,
-                ]
-            );
+        $this->assertSame(
+            [],
+            $this->action->processInstallmentRefund($this->resource_id, $amount, $this->metadata)
+        );
+    }
 
-        $this->dependencies->apiClass
-            ->shouldReceive(
-                ['retrievePayment' => [
-                    'result' => true,
+    /**
+     * @dataProvider invalidArrayFormatDataProvider
+     *
+     * @param mixed $metadata
+     */
+    public function testWhenGivenMetadataIdIsntValidArray($metadata)
+    {
+        $this->assertSame(
+            [],
+            $this->action->processInstallmentRefund($this->resource_id, $this->amount, $metadata)
+        );
+    }
+
+    public function testWhenResourceCantBeRetrieved()
+    {
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => false,
+            ],
+        ]);
+        $this->assertSame(
+            [],
+            $this->action->processInstallmentRefund($this->resource_id, $this->amount, $this->metadata)
+        );
+    }
+
+    public function testWhenScheduleResourceCantBeRefunded()
+    {
+        $this->resource = [
+            'result' => true,
+            'resource' => PaymentMock::getInstallment(),
+            'schedule' => [
+                [
+                    'amount' => 42,
+                    'date' => '1970-01-01 00:00:00',
                     'resource' => PaymentMock::getStandard(),
                 ],
-                    'retrieveInstallment' => [
-                        'result' => true,
-                        'resource' => PaymentMock::getInstallment(),
-                    ],
-                    'refundPayment' => [
-                        'result' => true,
-
-                    ],
-                ]
-            );
-        $this->dependencies->installmentClass
-            ->shouldReceive([
-                'updatePayplugInstallment' => true,
-            ]);
-
-        $this->payment_validator
-            ->shouldReceive([
-                'canBeRefund' => [
-                    'result' => false,
-                ], ]);
-        $this->payment_validator
-            ->shouldReceive([
-                'canBeRefund' => [
-                    'result' => true,
-                ], ]);
-
-        $result = $this->action->processInstallmentRefund($inst_id, $amount, $metadata);
+            ],
+        ];
+        $this->payment_method->shouldReceive([
+            'retrieve' => $this->resource,
+        ]);
+        $this->action->shouldReceive([
+            'processPaymentRefund' => false,
+        ]);
         $this->assertSame(
-            'error',
-            $result
+            [],
+            $this->action->processInstallmentRefund($this->resource_id, $this->amount, $this->metadata)
+        );
+    }
+
+    public function testWhenScheduleResourceIsRefunded()
+    {
+        $this->resource = [
+            'result' => true,
+            'resource' => PaymentMock::getInstallment(),
+            'schedule' => [
+                [
+                    'amount' => 42,
+                    'date' => '1970-01-01 00:00:00',
+                    'resource' => PaymentMock::getStandard(),
+                ],
+            ],
+        ];
+        $this->payment_method->shouldReceive([
+            'retrieve' => $this->resource,
+            'updateInstallmentSchedules' => true,
+        ]);
+        $expected = [
+            'id' => $this->resource_id,
+            'data' => [
+                'amount' => $this->amount,
+                'metadata' => $this->metadata,
+            ],
+            'response' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ];
+        $this->action->shouldReceive([
+            'processPaymentRefund' => $expected,
+        ]);
+        $this->assertSame(
+            $expected['response']['resource'],
+            $this->action->processInstallmentRefund($this->resource_id, $this->amount, $this->metadata)
         );
     }
 }

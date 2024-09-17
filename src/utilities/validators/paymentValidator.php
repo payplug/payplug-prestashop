@@ -49,7 +49,7 @@ class paymentValidator
      *
      * @return array
      */
-    public function canBeRefund($pay_id, $data, $truly_refundable_amount = false, $total_amount = false)
+    public function canBeRefund($pay_id, $data, $truly_refundable_amount = 0, $total_amount = 0)
     {
         if (null == $pay_id) {
             if (!is_numeric($total_amount)) {

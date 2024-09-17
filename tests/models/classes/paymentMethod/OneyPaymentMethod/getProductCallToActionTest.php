@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group oney_payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group oney_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -21,14 +21,14 @@ class getProductCallToActionTest extends BaseOneyPaymentMethod
     {
         $this->assertSame(
             [],
-            $this->classe->getProductCallToAction($active)
+            $this->class->getProductCallToAction($active)
         );
     }
 
     public function testWhenEnabled()
     {
         $configuration = true;
-        $response = $this->classe->getProductCallToAction($configuration);
+        $response = $this->class->getProductCallToAction($configuration);
 
         $assert_configurations = [];
         foreach ($response as $key => $schedule_configuration) {
@@ -42,7 +42,7 @@ class getProductCallToActionTest extends BaseOneyPaymentMethod
     public function testWhenDisabled()
     {
         $configuration = false;
-        $response = $this->classe->getProductCallToAction($configuration);
+        $response = $this->class->getProductCallToAction($configuration);
 
         $assert_configurations = [];
         foreach ($response as $key => $schedule_configuration) {

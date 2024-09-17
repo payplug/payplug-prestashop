@@ -94,8 +94,11 @@ class CardAction
             ->isValidExpiration((int) $card['exp_month'], (int) $card['exp_year']);
 
         if ($validate_expiration['result']) {
-            $delete = $this->dependencies->apiClass->deleteCard($card['id_card']);
-            if (200 == $delete['code']) {
+            $delete = $this->dependencies
+                ->getPlugin()
+                ->getApiService()
+                ->deleteCard($card['id_card']);
+            if ($delete['result']) {
                 $json_answer = $delete['resource']['httpResponse'];
                 if (isset($json_answer['object']) && 'error' == $json_answer['object']) {
                     return false;

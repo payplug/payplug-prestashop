@@ -4,8 +4,8 @@ namespace PayPlug\tests\models\classes\Configuration;
 
 /**
  * @group unit
- * @group classes
- * @group configuration_classes
+ * @group class
+ * @group configuration_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -13,31 +13,29 @@ class deleteAllTest extends BaseConfiguration
 {
     public function testWhenNoConfigurationKeysFound()
     {
-        $this->classe->configurations = [];
-        $this->assertFalse($this->classe->deleteAll());
+        $this->class->configurations = [];
+        $this->assertFalse($this->class->deleteAll());
     }
 
     public function testWhenConfigurationCantBeDeleted()
     {
-        $this->classe->configurations = [
+        $this->class->configurations = [
             'feature' => [],
         ];
-        $this->classe
-            ->shouldReceive([
-                'delete' => false,
-            ]);
-        $this->assertFalse($this->classe->deleteAll());
+        $this->class->shouldReceive([
+            'delete' => false,
+        ]);
+        $this->assertFalse($this->class->deleteAll());
     }
 
     public function testWhenConfigurationIsDeleted()
     {
-        $this->classe->configurations = [
+        $this->class->configurations = [
             'feature' => [],
         ];
-        $this->classe
-            ->shouldReceive([
-                'delete' => true,
-            ]);
-        $this->assertTrue($this->classe->deleteAll());
+        $this->class->shouldReceive([
+            'delete' => true,
+        ]);
+        $this->assertTrue($this->class->deleteAll());
     }
 }
