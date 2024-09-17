@@ -104,84 +104,48 @@ class hydrateActionTest extends BaseQueueAction
         );
     }
 
-    public function testWhenQueueExistsAndExpired()
+    public function testWhenFirstEntryQueueIsExpiredAndUpdated()
     {
+        $entry = [
+            'id_payplug_queue' => 42,
+            'date_add' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+        ];
         $this->repository
             ->shouldReceive('getFirstNotTreatedEntry')
             ->once()
-            ->andReturn([
-                'id_payplug_queue' => 7,
-                'id_cart' => $this->id_cart,
-                'resource_id' => $this->resource_id,
-                'type' => $this->type,
-                'date_add' => '2222-09-23 16:28:11',
-                'date_upd' => '2222-09-23 16:28:11',
-                'treated' => false,
-            ]);
-        $this->repository
-            ->shouldReceive([
-                'getFirstNotTreatedEntry' => [
-                    'id_payplug_queue' => 7,
-                    'id_cart' => $this->id_cart,
-                    'resource_id' => $this->resource_id,
-                    'type' => $this->type,
-                    'date_add' => '2024-09-23 16:28:11',
-                    'date_upd' => '2024-09-23 16:28:11',
-                    'treated' => false,
-                ],
-                'updateEntity' => true,
-                'createEntity' => true,
-                'hydrateAction' => [
-                    'exists' => true,
-                    'result' => true,
-                ],
-            ]);
+            ->andReturn($entry);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => false,
+            'updateEntity' => true,
+            'createEntity' => true,
+        ]);
+        $expected = [
+            'exists' => false,
+            'result' => true,
+        ];
         $this->assertSame(
-            [
-                'exists' => true,
-                'result' => true,
-            ],
+            $expected,
             $this->action->hydrateAction($this->id_cart, $this->resource_id, $this->type)
         );
     }
 
-    public function testWhenQueueExistsAndFailUpdate()
+    public function testWhenFirstEntryQueueIsExpiredAndCantBeUpdated()
     {
-        $this->repository
-            ->shouldReceive('getFirstNotTreatedEntry')
-            ->once()
-            ->andReturn([
-                'id_payplug_queue' => 7,
-                'id_cart' => $this->id_cart,
-                'resource_id' => $this->resource_id,
-                'type' => $this->type,
-                'date_add' => '2222-09-23 16:28:11',
-                'date_upd' => '2222-09-23 16:28:11',
-                'treated' => false,
-            ]);
-        $this->repository
-            ->shouldReceive([
-                'getFirstNotTreatedEntry' => [
-                    'id_payplug_queue' => 7,
-                    'id_cart' => $this->id_cart,
-                    'resource_id' => $this->resource_id,
-                    'type' => $this->type,
-                    'date_add' => '2024-09-23 16:28:11',
-                    'date_upd' => '2024-09-23 16:28:11',
-                    'treated' => false,
-                ],
-                'updateEntity' => false,
-                'createEntity' => true,
-                'hydrateAction' => [
-                    'exists' => true,
-                    'result' => true,
-                ],
-            ]);
+        $entry = [
+            'id_payplug_queue' => 42,
+            'date_add' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+        ];
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => $entry,
+            'updateEntity' => false,
+            'createEntity' => true,
+        ]);
+        $expected = [
+            'exists' => true,
+            'result' => true,
+        ];
         $this->assertSame(
-            [
-                'exists' => true,
-                'result' => true,
-            ],
+            $expected,
             $this->action->hydrateAction($this->id_cart, $this->resource_id, $this->type)
         );
     }

@@ -580,6 +580,8 @@ class PayPlugNotifications
                 $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
             }
 
+            $this->lock_key = $this->cart->id;
+
             $this->logger->addLog('Queue created successfully for Cart ID: ' . $this->cart->id);
         } else {
             $this->logger->addLog('Notification: Attempting to set lock for Cart ID: ' . $this->cart->id);
@@ -651,56 +653,46 @@ class PayPlugNotifications
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_oney = in_array($this->payment->payment_method['type'], $oney_payment_methods);
         }
-        $this->logger->addLog('Notification: is_oney: ' . ($this->is_oney ? 'ok' : 'nok'));
 
         // Define if payment is bancontact resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_bancontact = 'bancontact' == $this->payment->payment_method['type'];
         }
-        $this->logger->addLog('Notification: is_bancontact: ' . ($this->is_bancontact ? 'ok' : 'nok'));
 
         // Define if payment is deferred resource
         $this->is_deferred = !$this->is_oney && $this->validators['payment']->isDeferred($this->payment)['result'];
-        $this->logger->addLog('Notification: is_deferred: ' . ($this->is_deferred ? 'ok' : 'nok'));
 
         // Define if payment is from installment
         $this->is_installment = $this->validators['payment']->isInstallment($this->payment->id)['result'];
-        $this->logger->addLog('Notification: is_installment: ' . ($this->is_installment ? 'ok' : 'nok'));
 
         // Define if payment is applepay resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_applepay = 'apple_pay' == $this->payment->payment_method['type'];
         }
-        $this->logger->addLog('Notification: is_applepay: ' . ($this->is_applepay ? 'ok' : 'nok'));
 
         // Define if payment is amex resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_amex = 'american_express' == $this->payment->payment_method['type'];
         }
-        $this->logger->addLog('Notification: is_amex ' . ($this->is_amex ? 'ok' : 'nok'));
 
         // Define if payment is ideal resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_ideal = 'ideal' == $this->payment->payment_method['type'];
         }
-        $this->logger->addLog('Notification: is_ideal ' . ($this->is_ideal ? 'ok' : 'nok'));
 
         // Define if payment is mybank resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_mybank = 'mybank' == $this->payment->payment_method['type'];
         }
-        $this->logger->addLog('Notification: is_mybank ' . ($this->is_mybank ? 'ok' : 'nok'));
 
         // Define if payment is satispay resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_satispay = 'satispay' == $this->payment->payment_method['type'];
         }
-        $this->logger->addLog('Notification: is_satispay ' . ($this->is_satispay ? 'ok' : 'nok'));
 
         // Define if payment is sofort resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_sofort = 'sofort' == $this->payment->payment_method['type'];
         }
-        $this->logger->addLog('Notification: is_sofort ' . ($this->is_sofort ? 'ok' : 'nok'));
     }
 }
