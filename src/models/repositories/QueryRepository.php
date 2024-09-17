@@ -23,8 +23,6 @@
 
 namespace PayPlug\src\models\repositories;
 
-use PrestaShopException;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -373,7 +371,7 @@ class QueryRepository
                     implode(",\n", $this->query['into'])) . "\n";
         } elseif ('DELETE' == $this->query['type']) {
             if (!$this->query['from']) {
-                throw new PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
+                throw new \PrestaShopException('Table name not set in QueryRepository. Cannot build a valid SQL query.');
             }
 
             $sql = 'DELETE FROM ' . ((isset($this->query['table']) && (!empty($this->query['table']))) ?
@@ -385,7 +383,7 @@ class QueryRepository
             }
 
             if (!$this->query['fields']) {
-                throw new PrestaShopException('Can\'t create table because ->fields() is not set or empty');
+                throw new \PrestaShopException('Can\'t create table because ->fields() is not set or empty');
             }
 
             $sql = 'CREATE TABLE IF NOT EXISTS ' . implode($this->query['table']);
@@ -399,13 +397,13 @@ class QueryRepository
             }
         } elseif ('DROP' == $this->query['type']) {
             if (!$this->query['table']) {
-                throw new PrestaShopException('Table name not set in QueryRepository. Cannot drop it.');
+                throw new \PrestaShopException('Table name not set in QueryRepository. Cannot drop it.');
             }
 
             $sql = 'DROP TABLE IF EXISTS ' . implode($this->query['table']) . "\n";
         } elseif ('SHOW TABLES LIKE' == $this->query['type']) {
             if (!$this->query['table']) {
-                throw new PrestaShopException('Table name not set in QueryRepository. Cannot check if exists.');
+                throw new \PrestaShopException('Table name not set in QueryRepository. Cannot check if exists.');
             }
             $table = str_replace('`', '', implode($this->query['table']));
             $sql = "SHOW TABLES LIKE '%{$table}%'\n";
