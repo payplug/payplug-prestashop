@@ -26,7 +26,6 @@ $_MODULE['<{payplug}prestashop>ajax_443388128bed099c5199f1220572f96d'] = 'An err
 $_MODULE['<{payplug}prestashop>ajax_53e41386744dfc0c2665f7f5c84ab97f'] = 'Your information has been saved';
 $_MODULE['<{payplug}prestashop>ajax_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>ajax_f5146f3861c487374c38fb5ec78cda73'] = 'At least one of the fields is not correctly completed.';
-$_MODULE['<{payplug}prestashop>apiclass_9bd416a75a77a1f0f9cbfb6c24c78be3'] = 'The transaction was not completed and your card was not charged.';
 $_MODULE['<{payplug}prestashop>capture_44a50f07b4bdc57740901280f9eddaf5'] = 'Capture';
 $_MODULE['<{payplug}prestashop>cards_1_6_0b3db27bc15f682e92ff250ebb167d4b'] = 'Back to Your Account';
 $_MODULE['<{payplug}prestashop>cards_1_6_0d2d5fa0cfffc8577f948d683a82079e'] = 'Card sucessfully deleted.';

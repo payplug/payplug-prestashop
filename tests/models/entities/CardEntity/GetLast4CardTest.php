@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\CardEntity;
  */
 final class GetLast4CardTest extends BaseCardEntity
 {
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->entity->setLast4('4242');

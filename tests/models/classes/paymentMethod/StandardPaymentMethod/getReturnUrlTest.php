@@ -6,9 +6,9 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group standard_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group standard_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -16,76 +16,66 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
 {
     public function testWhenPaymentMethodHasNoNameDefined()
     {
-        $this->classe->set('name', '');
-        $this->assertSame([], $this->classe->getReturnUrl());
+        $this->class->set('name', '');
+        $this->assertSame([], $this->class->getReturnUrl());
     }
 
     public function testWhenStoredPaymentCantBeFoundInDataBase()
     {
-        $this->classe->set('name', 'standard');
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [],
-            ]);
-        $this->assertSame([], $this->classe->getReturnUrl());
+        $this->class->set('name', 'standard');
+        $this->payment_repository->shouldReceive([
+            'getBy' => [],
+        ]);
+        $this->assertSame([], $this->class->getReturnUrl());
     }
 
     public function testWhenTheResourceCantBeRetrieved()
     {
-        $this->classe->set('name', 'standard');
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->dependencies->apiClass = $apiClass;
-        $this->assertSame([], $this->classe->getReturnUrl());
+        $this->class->set('name', 'standard');
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => false,
+            ],
+        ]);
+        $this->assertSame([], $this->class->getReturnUrl());
     }
 
     public function testWhenReturnUrlGeneratedForIntegratedPayment()
     {
-        $this->classe->set('name', 'standard');
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
+        $this->class->set('name', 'standard');
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
         $resource = [
             'result' => true,
             'resource' => PaymentMock::getStandard(),
         ];
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
-            ->shouldReceive([
-                'retrievePayment' => $resource,
-            ]);
-        $this->dependencies->apiClass = $apiClass;
+        $this->payment_method->shouldReceive([
+            'retrieve' => $resource,
+        ]);
 
         $_SERVER['HTTP_USER_AGENT'] = 'lorem ipsum';
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('integrated');
 
@@ -96,38 +86,33 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
                 'cart_id' => 1,
                 'embedded' => true,
             ],
-            $this->classe->getReturnUrl()
+            $this->class->getReturnUrl()
         );
     }
 
     public function testWhenReturnUrlIsReturned()
     {
-        $this->classe->set('name', 'standard');
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
+        $this->class->set('name', 'standard');
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
         $resource = [
             'result' => true,
             'resource' => PaymentMock::getStandard(),
         ];
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
-            ->shouldReceive([
-                'retrievePayment' => $resource,
-            ]);
-        $this->dependencies->apiClass = $apiClass;
+        $this->payment_method->shouldReceive([
+            'retrieve' => $resource,
+        ]);
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('redirect');
 
@@ -136,7 +121,7 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
                 'return_url' => 'https://secure-qa.payplug.com/pay/5ktNvd3BNCp6GPcqIZvY9j',
                 'embedded' => false,
             ],
-            $this->classe->getReturnUrl()
+            $this->class->getReturnUrl()
         );
     }
 }

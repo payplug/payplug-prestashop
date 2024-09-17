@@ -22,35 +22,31 @@ class uninstallActionTest extends BaseConfigurationAction
         parent::setUp();
 
         $txt_log = \Mockery::mock(MyLogPHP::class);
-        $txt_log
-            ->shouldReceive([
-                'info' => 'log str',
-            ]);
+        $txt_log->shouldReceive([
+            'info' => 'log str',
+        ]);
 
         $this->card_action = \Mockery::mock('CardAction');
 
         $this->constant = \Mockery::mock('Constant');
-        $this->constant
-            ->shouldReceive('get')
+        $this->constant->shouldReceive('get')
             ->with('_PS_MODULE_DIR_')
             ->andReturn('module_path');
 
         $this->entity_repository = \Mockery::mock('EntityRepository');
 
-        $this->plugin
-            ->shouldReceive([
-                'getCardAction' => $this->card_action,
-                'getConstant' => $this->constant,
-                'getEntityRepository' => $this->entity_repository,
-            ]);
+        $this->plugin->shouldReceive([
+            'getCardAction' => $this->card_action,
+            'getConstant' => $this->constant,
+            'getEntityRepository' => $this->entity_repository,
+        ]);
     }
 
     public function testWhenCardCantBeUninstalled()
     {
-        $this->card_action
-            ->shouldReceive([
-                'uninstallAction' => false,
-            ]);
+        $this->card_action->shouldReceive([
+            'uninstallAction' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -63,14 +59,12 @@ class uninstallActionTest extends BaseConfigurationAction
 
     public function testWhenConfigurationCantBeUninstalled()
     {
-        $this->card_action
-            ->shouldReceive([
-                'uninstallAction' => true,
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'deleteAll' => false,
-            ]);
+        $this->card_action->shouldReceive([
+            'uninstallAction' => true,
+        ]);
+        $this->configuration_class->shouldReceive([
+            'deleteAll' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -83,18 +77,15 @@ class uninstallActionTest extends BaseConfigurationAction
 
     public function testWhenModuleTableCantBeDropped()
     {
-        $this->card_action
-            ->shouldReceive([
-                'uninstallAction' => true,
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'deleteAll' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'uninstall' => false,
-            ]);
+        $this->card_action->shouldReceive([
+            'uninstallAction' => true,
+        ]);
+        $this->configuration_class->shouldReceive([
+            'deleteAll' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'uninstall' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -107,22 +98,18 @@ class uninstallActionTest extends BaseConfigurationAction
 
     public function testWhenModuleTabCantBeUninstalled()
     {
-        $this->card_action
-            ->shouldReceive([
-                'uninstallAction' => true,
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'deleteAll' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'uninstall' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'uninstallTabAction' => false,
-            ]);
+        $this->card_action->shouldReceive([
+            'uninstallAction' => true,
+        ]);
+        $this->configuration_class->shouldReceive([
+            'deleteAll' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'uninstall' => true,
+        ]);
+        $this->action->shouldReceive([
+            'uninstallTabAction' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -135,22 +122,18 @@ class uninstallActionTest extends BaseConfigurationAction
 
     public function testWhenUninstallIsComplete()
     {
-        $this->card_action
-            ->shouldReceive([
-                'uninstallAction' => true,
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'deleteAll' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'uninstall' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'uninstallTabAction' => true,
-            ]);
+        $this->card_action->shouldReceive([
+            'uninstallAction' => true,
+        ]);
+        $this->configuration_class->shouldReceive([
+            'deleteAll' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'uninstall' => true,
+        ]);
+        $this->action->shouldReceive([
+            'uninstallTabAction' => true,
+        ]);
 
         $this->assertSame(
             [

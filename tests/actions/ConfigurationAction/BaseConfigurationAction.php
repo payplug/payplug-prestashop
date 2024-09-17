@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 class BaseConfigurationAction extends TestCase
 {
     public $action;
+    public $api_service;
     public $configuration;
     public $configuration_class;
     public $dependencies;
@@ -21,19 +22,18 @@ class BaseConfigurationAction extends TestCase
     public $validator;
     public $validate_adapter;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->configuration = \Mockery::mock(Configuration::class)->makePartial();
-        $this->configuration
-            ->shouldReceive([
-                'get' => true,
-            ]);
+        $this->configuration->shouldReceive([
+            'get' => true,
+        ]);
 
+        $this->api_service = \Mockery::mock('ApiService');
         $this->logger = \Mockery::mock('Logger');
-        $this->logger
-            ->shouldReceive([
-                'addLog' => true,
-            ]);
+        $this->logger->shouldReceive([
+            'addLog' => true,
+        ]);
 
         $this->oney = \Mockery::mock('Oney');
         $this->plugin = \Mockery::mock('Plugin');
@@ -41,48 +41,43 @@ class BaseConfigurationAction extends TestCase
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
-        $this->dependencies
-            ->shouldReceive('l')
+        $this->dependencies->shouldReceive('l')
             ->andReturnUsing(function ($string, $name) {
                 return $string;
             })
         ;
 
-        $this->dependencies
-            ->shouldReceive('getConfigurationKey')
+        $this->dependencies->shouldReceive('getConfigurationKey')
             ->andReturnUsing(function ($key) {
                 return $key;
             })
         ;
 
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
-        $this->translation
-            ->shouldReceive('l')
+        $this->translation->shouldReceive('l')
             ->andReturnUsing(function ($str) {
                 return $str;
             });
 
         $this->configuration_class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
-        $this->plugin
-            ->shouldReceive([
-                'getLogger' => $this->logger,
-                'getConfiguration' => $this->configuration,
-                'getConfigurationClass' => $this->configuration_class,
-                'getOney' => $this->oney,
-                'getTranslationClass' => $this->translation,
-                'getModule' => $this->module,
-                'getValidate' => $this->validate_adapter,
-            ]);
+        $this->plugin->shouldReceive([
+            'getApiService' => $this->api_service,
+            'getLogger' => $this->logger,
+            'getConfiguration' => $this->configuration,
+            'getConfigurationClass' => $this->configuration_class,
+            'getOney' => $this->oney,
+            'getTranslationClass' => $this->translation,
+            'getModule' => $this->module,
+            'getValidate' => $this->validate_adapter,
+        ]);
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
 
         $this->dependencies->name = 'payplug';
 
-        $this->dependencies
-            ->shouldReceive('l')
+        $this->dependencies->shouldReceive('l')
             ->andReturnUsing(function ($key) {
                 return $key;
             })

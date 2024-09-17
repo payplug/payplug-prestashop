@@ -6,9 +6,9 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group installment_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group installment_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -16,72 +16,64 @@ class getReturnUrlTest extends BaseInstallmentPaymentMethod
 {
     public function testWhenPaymentMethodHasNoNameDefined()
     {
-        $this->classe->set('name', '');
-        $this->assertSame([], $this->classe->getReturnUrl());
+        $this->class->set('name', '');
+        $this->assertSame([], $this->class->getReturnUrl());
     }
 
     public function testWhenStoredPaymentCantBeFoundInDataBase()
     {
-        $this->classe->set('name', 'installment');
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [],
-            ]);
-        $this->assertSame([], $this->classe->getReturnUrl());
+        $this->class->set('name', 'installment');
+        $this->payment_repository->shouldReceive([
+            'getBy' => [],
+        ]);
+        $this->assertSame([], $this->class->getReturnUrl());
     }
 
     public function testWhenTheResourceCantBeRetrieved()
     {
-        $this->classe->set('name', 'installment');
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'inst_azerty1234',
-                    'method' => 'installment',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
-            ->shouldReceive([
-                'retrieveInstallment' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->dependencies->apiClass = $apiClass;
-        $this->assertSame([], $this->classe->getReturnUrl());
+        $this->class->set('name', 'installment');
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'inst_azerty1234',
+                'is_live' => true,
+                'method' => 'installment',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->class->shouldReceive([
+            'retrieve' => [
+                'result' => false,
+            ],
+        ]);
+        $this->assertSame([], $this->class->getReturnUrl());
     }
 
     public function testWhenReturnUrlIsReturned()
     {
-        $this->classe->set('name', 'installment');
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'inst_azerty1234',
-                    'method' => 'installment',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
-            ->shouldReceive([
-                'retrieveInstallment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getInstallment(),
-                ],
-            ]);
-        $this->dependencies->apiClass = $apiClass;
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'installment');
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'inst_azerty1234',
+                'is_live' => true,
+                'method' => 'installment',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->class->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getInstallment(),
+            ],
+        ]);
+        $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('redirect');
 
@@ -90,7 +82,7 @@ class getReturnUrlTest extends BaseInstallmentPaymentMethod
                 'return_url' => 'https://secure-qa.payplug.com/pay/3nfaejGO3m9dyHFIwfsUTR',
                 'embedded' => false,
             ],
-            $this->classe->getReturnUrl()
+            $this->class->getReturnUrl()
         );
     }
 }

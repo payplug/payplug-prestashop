@@ -54,7 +54,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '4.13.0';
+        $this->version = '4.14.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -486,7 +486,10 @@ class Payplug extends PaymentModule
             }
 
             $context->smarty->assign([
-                'api_url' => $dependencies->apiClass->getApiUrl(),
+                'api_url' => $dependencies
+                    ->getPlugin()
+                    ->getApiService()
+                    ->getApiUrl(),
             ]);
 
             // Données sous forme de tableau
@@ -587,7 +590,14 @@ class Payplug extends PaymentModule
             $helpers['files']::clean();
 
             // Call getAccount method to update countries and amounts configurations from merchant account
-            $this->module->apiClass->getAccountPermissions();
+            $api_key = $this->module
+                ->getPlugin()
+                ->getApiService()
+                ->getCurrentApiKey();
+            $permissions = $this->module
+                ->getPlugin()
+                ->getApiService()
+                ->getAccount($api_key, false);
         }
 
         return parent::runUpgradeModule();

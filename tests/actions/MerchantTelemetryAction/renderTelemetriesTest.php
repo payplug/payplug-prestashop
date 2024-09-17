@@ -33,8 +33,7 @@ class renderTelemetriesTest extends BaseMerchantTelemetryAction
 
         // Expected hash for current mocked telemetries
         $expected_hash = '4b8611ab5ba4538dcf0b31881c33b52481b9b922088cf5283233a8ecc758a5bf';
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('telemetry_hash')
             ->andReturn($expected_hash);
 
@@ -53,14 +52,12 @@ class renderTelemetriesTest extends BaseMerchantTelemetryAction
 
         // Expected hash for current mocked telemetries
         $hash = 'wrong_hash';
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('telemetry_hash')
             ->andReturn($hash);
-        $this->configuration
-            ->shouldReceive([
-                'set' => true,
-            ]);
+        $this->configuration->shouldReceive([
+            'set' => true,
+        ]);
 
         $expected = [
             'result' => true,

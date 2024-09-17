@@ -36,12 +36,10 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
 
         $this->list = OneySimulationsMock::getFormated();
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('oney_allowed_countries')
             ->andReturn('"MQ","FR","BL","YT","RE","GF","PF","NC","GP","MF"');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('oney_fees')
             ->andReturn('1');
     }
@@ -62,13 +60,12 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
      */
     public function testGetList($amount, $country)
     {
-        $this->repo
-            ->shouldReceive([
-                'getOneySimulations' => [
-                    'result' => true,
-                    'simulations' => OneySimulationsMock::get(),
-                ],
-            ]);
+        $this->repo->shouldReceive([
+            'getOneySimulations' => [
+                'result' => true,
+                'simulations' => OneySimulationsMock::get(),
+            ],
+        ]);
 
         $x3_oney = [
             'installments' => [
@@ -137,13 +134,11 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
             ],
         ];
 
-        $this->repo
-            ->shouldReceive('formatOneyResource')
+        $this->repo->shouldReceive('formatOneyResource')
             ->once()
             ->andReturn($x3_oney);
 
-        $this->repo
-            ->shouldReceive('formatOneyResource')
+        $this->repo->shouldReceive('formatOneyResource')
             ->once()
             ->andReturn($x4_oney);
 
@@ -181,20 +176,18 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
 
     public function testGetListWithoutSimulation()
     {
-        $this->repo
-            ->shouldReceive([
-                'getOneySimulations' => [
-                    'result' => false,
-                    'error' => 'There is an error',
-                    'simulations' => [],
-                ],
-            ])
+        $this->repo->shouldReceive([
+            'getOneySimulations' => [
+                'result' => false,
+                'error' => 'There is an error',
+                'simulations' => [],
+            ],
+        ])
         ;
 
-        $this->amount_helper
-            ->shouldReceive([
-                'convertAmount' => 15000,
-            ]);
+        $this->amount_helper->shouldReceive([
+            'convertAmount' => 15000,
+        ]);
 
         $this->assertSame(
             [],

@@ -38,9 +38,6 @@ class PluginEntity
     private $address_class;
 
     /** @var object */
-    private $api_class;
-
-    /** @var object */
     private $api_rest;
 
     /** @var string */
@@ -264,14 +261,6 @@ class PluginEntity
     public function getAddressClass()
     {
         return $this->address_class;
-    }
-
-    /**
-     * @return object
-     */
-    public function getApiClass()
-    {
-        return $this->api_class;
     }
 
     /**
@@ -878,18 +867,6 @@ class PluginEntity
         }
 
         $this->address_class = $address_class;
-
-        return $this;
-    }
-
-    /**
-     * @param object $api_class
-     *
-     * @return PluginEntity
-     */
-    public function setApiClass($api_class)
-    {
-        $this->api_class = $api_class;
 
         return $this;
     }

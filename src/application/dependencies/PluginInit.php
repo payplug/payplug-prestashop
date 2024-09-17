@@ -110,7 +110,6 @@ class PluginInit extends BaseClass
     private $plugin;
 
     // Repositories & necessary classes
-    private $apiClass;
     private $cache;
     private $install;
     private $logger;
@@ -192,7 +191,6 @@ class PluginInit extends BaseClass
         $this->setServices();
 
         $this->plugin
-            ->setApiClass($this->apiClass)
             ->setApiVersion('2019-08-06')
             ->setApiService($this->api)
             ->setBrowser($this->browser)

@@ -30,7 +30,6 @@ if (!defined('_PS_VERSION_')) {
  */
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
-    private $apiClass;
     private $cart_adapter;
     private $configurationAdapter;
     private $configurationClass;
@@ -67,7 +66,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
 
         $this->dependencies = new PayPlug\classes\DependenciesClass();
         $this->validators = $this->dependencies->getValidators();
-        $this->apiClass = $this->dependencies->apiClass;
         $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
@@ -305,19 +303,19 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 $payment_id = $tools->tool('getValue', 'pay_id');
                 $cart_id = $tools->tool('getValue', 'cart_id');
 
-                $payment = $this->dependencies
+                $stored_resource = $this->dependencies
                     ->getPlugin()
                     ->getPaymentRepository()
                     ->getBy('id_cart', (int) $cart_id);
 
-                if (empty($payment)) {
+                if (empty($stored_resource)) {
                     exit(json_encode([
                         'result' => false,
                         'message' => 'No payment id for given cart id',
                     ]));
                 }
 
-                if ($payment_id != $payment['resource_id']) {
+                if ($payment_id != $stored_resource['resource_id']) {
                     exit(json_encode([
                         'result' => false,
                         'message' => 'No correspondance with given payment id',
@@ -325,15 +323,19 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 // Retrieve payment
-                $payment = $this->apiClass->retrievePayment($payment_id);
+                $retrieve = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod($stored_resource['method'])
+                    ->retrieve($stored_resource['resource_id']);
 
-                if (!$payment['result']) {
+                if (!$retrieve['result']) {
                     exit(json_encode([
                         'result' => false,
-                        'message' => $payment['message'],
+                        'message' => $retrieve['message'],
                     ]));
                 }
-                $payment = $payment['resource'];
+                $payment = $retrieve['resource'];
 
                 // Check if payment has failure
                 if ($this->validators['payment']->isFailed($payment)['result']) {

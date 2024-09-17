@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -14,46 +14,40 @@ class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
 {
     public function testWhenNoCarriersAvailable()
     {
-        $this->classe
-            ->shouldReceive([
-                'getCarriersList' => [],
-            ]);
-        $this->assertSame([], $this->classe->getDeliveryOptions());
+        $this->class->shouldReceive([
+            'getCarriersList' => [],
+        ]);
+        $this->assertSame([], $this->class->getDeliveryOptions());
     }
 
     public function testWhenNoValidateCarriersAvailable()
     {
-        $this->classe
-            ->shouldReceive([
-                'getCarriersList' => [
-                    42,
-                ],
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => false,
-            ]);
-        $this->assertSame([], $this->classe->getDeliveryOptions());
+        $this->class->shouldReceive([
+            'getCarriersList' => [
+                42,
+            ],
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => false,
+        ]);
+        $this->assertSame([], $this->class->getDeliveryOptions());
     }
 
     public function testWhenCarrierIsReturned()
     {
-        $this->classe
-            ->shouldReceive([
-                'getCarriersList' => [
-                    42,
-                ],
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $this->class->shouldReceive([
+            'getCarriersList' => [
+                42,
+            ],
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
 
         $cart = \Mockery::mock('Cart');
-        $cart
-            ->shouldReceive([
-                'getPackageShippingCost' => 42,
-            ]);
+        $cart->shouldReceive([
+            'getPackageShippingCost' => 42,
+        ]);
         $cart->id_address_delivery = 1;
         $this->context->cart = $cart;
 
@@ -67,7 +61,7 @@ class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
         ];
         $this->assertSame(
             $carriers,
-            $this->classe->getDeliveryOptions()
+            $this->class->getDeliveryOptions()
         );
     }
 }

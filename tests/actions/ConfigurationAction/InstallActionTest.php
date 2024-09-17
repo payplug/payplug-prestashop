@@ -24,14 +24,12 @@ class installActionTest extends BaseConfigurationAction
         parent::setUp();
 
         $txt_log = \Mockery::mock(MyLogPHP::class);
-        $txt_log
-            ->shouldReceive([
-                'info' => 'log str',
-            ]);
+        $txt_log->shouldReceive([
+            'info' => 'log str',
+        ]);
 
         $this->constant = \Mockery::mock('Constant');
-        $this->constant
-            ->shouldReceive('get')
+        $this->constant->shouldReceive('get')
             ->with('_PS_MODULE_DIR_')
             ->andReturn('module_path');
 
@@ -45,41 +43,38 @@ class installActionTest extends BaseConfigurationAction
 
         $this->order_state_action = \Mockery::mock('OrderStateAction');
 
-        $this->plugin
-            ->shouldReceive([
-                'getConstant' => $this->constant,
-                'getOrderStateAction' => $this->order_state_action,
-                'getEntityRepository' => $this->entity_repository,
-                'getShop' => $shop,
-            ]);
+        $this->plugin->shouldReceive([
+            'getConstant' => $this->constant,
+            'getOrderStateAction' => $this->order_state_action,
+            'getEntityRepository' => $this->entity_repository,
+            'getShop' => $shop,
+        ]);
 
         $this->configuration_helper = \Mockery::mock('ConfigurationHelper');
         $this->files_helper = \Mockery::mock('FilesHelper');
-        $this->dependencies
-            ->shouldReceive([
-                'getHelpers' => [
-                    'configuration' => $this->configuration_helper,
-                    'files' => $this->files_helper,
-                ],
-            ]);
+        $this->dependencies->shouldReceive([
+            'getHelpers' => [
+                'configuration' => $this->configuration_helper,
+                'files' => $this->files_helper,
+            ],
+        ]);
     }
 
     public function testWhenPHPRequirementsAreNotSatisfied()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => false,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => false,
                 ],
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -92,20 +87,19 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenCurlRequirementsAreNotSatisfied()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => false,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
+                'curl' => [
+                    'up2date' => false,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -118,20 +112,19 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenOpenSSLRequirementsAreNotSatisfied()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => false,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => false,
+                ],
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -144,24 +137,22 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenConfigurationCantBeInitialized()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'initialize' => false,
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -174,28 +165,25 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenQueryCantBeInitialized()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'initialize' => false,
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'initialize' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -208,32 +196,28 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenOrderStateCantBeInstalled()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'installOrderStateAction' => false,
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->action->shouldReceive([
+            'installOrderStateAction' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -246,36 +230,31 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenOrderStateTypeCantBeInstalled()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'installOrderStateAction' => true,
-            ]);
-        $this->order_state_action
-            ->shouldReceive([
-                'installTypeAction' => false,
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->action->shouldReceive([
+            'installOrderStateAction' => true,
+        ]);
+        $this->order_state_action->shouldReceive([
+            'installTypeAction' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -288,37 +267,32 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenTabCantBeInstalled()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'installOrderStateAction' => true,
-                'installTabAction' => false,
-            ]);
-        $this->order_state_action
-            ->shouldReceive([
-                'installTypeAction' => true,
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->action->shouldReceive([
+            'installOrderStateAction' => true,
+            'installTabAction' => false,
+        ]);
+        $this->order_state_action->shouldReceive([
+            'installTypeAction' => true,
+        ]);
 
         $this->assertSame(
             [
@@ -331,38 +305,33 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenHookCantBeInstalled()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'installHookAction' => false,
-                'installOrderStateAction' => true,
-                'installTabAction' => true,
-            ]);
-        $this->order_state_action
-            ->shouldReceive([
-                'installTypeAction' => true,
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->action->shouldReceive([
+            'installHookAction' => false,
+            'installOrderStateAction' => true,
+            'installTabAction' => true,
+        ]);
+        $this->order_state_action->shouldReceive([
+            'installTypeAction' => true,
+        ]);
 
         $this->assertSame(
             [
@@ -375,42 +344,36 @@ class installActionTest extends BaseConfigurationAction
 
     public function testWhenInstallIsComplete()
     {
-        $this->configuration_helper
-            ->shouldReceive([
-                'getRequirements' => [
-                    'php' => [
-                        'up2date' => true,
-                    ],
-                    'curl' => [
-                        'up2date' => true,
-                    ],
-                    'openssl' => [
-                        'up2date' => true,
-                    ],
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
                 ],
-            ]);
-        $this->configuration_class
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->entity_repository
-            ->shouldReceive([
-                'initialize' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'installHookAction' => true,
-                'installOrderStateAction' => true,
-                'installTabAction' => true,
-            ]);
-        $this->order_state_action
-            ->shouldReceive([
-                'installTypeAction' => true,
-            ]);
-        $this->files_helper
-            ->shouldReceive([
-                'clean' => true,
-            ]);
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->action->shouldReceive([
+            'installHookAction' => true,
+            'installOrderStateAction' => true,
+            'installTabAction' => true,
+        ]);
+        $this->order_state_action->shouldReceive([
+            'installTypeAction' => true,
+        ]);
+        $this->files_helper->shouldReceive([
+            'clean' => true,
+        ]);
 
         $this->assertSame(
             [

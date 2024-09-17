@@ -15,7 +15,7 @@ class isApplePayCompatibleTest extends TestCase
     protected $validator;
     private $browserValidator;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->browserValidator = new BrowserValidator();
     }

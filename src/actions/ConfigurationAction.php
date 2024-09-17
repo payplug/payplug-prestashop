@@ -62,9 +62,9 @@ class ConfigurationAction
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         if ($sandbox_mode) {
-            $permissions = $this->dependencies->apiClass->getAccountPermissions($configuration->getValue('test_api_key'));
+            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount($configuration->getValue('test_api_key'), true);
         } else {
-            $permissions = $this->dependencies->apiClass->getAccountPermissions($configuration->getValue('live_api_key'));
+            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount($configuration->getValue('live_api_key'), false);
         }
 
         $allowed_methods = [
@@ -449,7 +449,7 @@ class ConfigurationAction
             ];
         }
 
-        if (!$this->dependencies->apiClass->login($email, $password)) {
+        if (!$this->dependencies->getPlugin()->getApiService()->login($email, $password)) {
             $logger->addLog('ConfigurationAction::loginAction: invalid email and/or password.');
 
             return [
@@ -466,9 +466,10 @@ class ConfigurationAction
         $configuration->set('enable', 1);
 
         // Update global configuration
-        $permissions = $this->dependencies->apiClass->getAccountPermissions(
-            $configuration->getValue('live_api_key')
-        );
+        $permissions = $this->dependencies
+            ->getPlugin()
+            ->getApiService()
+            ->getAccount($configuration->getValue('live_api_key'), false);
 
         if (empty($permissions)) {
             $logger->addLog('ConfigurationAction::loginAction: No permissions found for this account');
@@ -888,7 +889,7 @@ class ConfigurationAction
 
         $password = base64_decode($datas->payplug_password);
 
-        if (!$this->dependencies->apiClass->login($email, $password)) {
+        if (!$this->dependencies->getPlugin()->getApiService()->login($email, $password)) {
             $logger->addLog('ConfigurationAction::submitSandboxAction: invalid email and/or password.');
 
             return [

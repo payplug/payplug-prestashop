@@ -4,8 +4,8 @@ namespace PayPlug\tests\models\classes\Configuration;
 
 /**
  * @group unit
- * @group classes
- * @group configuration_classes
+ * @group class
+ * @group configuration_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,7 +19,7 @@ class deleteTest extends BaseConfiguration
     public function testWhenGivenKeyIsInvalidStringFormat($key)
     {
         $this->assertFalse(
-            $this->classe->delete($key)
+            $this->class->delete($key)
         );
     }
 
@@ -27,10 +27,10 @@ class deleteTest extends BaseConfiguration
     {
         $key = 'config_key';
         $value = 'value';
-        $this->classe->configurations = [
+        $this->class->configurations = [
             'feature' => [],
         ];
-        $this->assertFalse($this->classe->delete($key, $value));
+        $this->assertFalse($this->class->delete($key, $value));
     }
 
     public function testWhenConfigurationCantBeDeleted()
@@ -39,7 +39,7 @@ class deleteTest extends BaseConfiguration
         $this->configuration->shouldReceive([
             'deleteByName' => false,
         ]);
-        $this->assertFalse($this->classe->delete($key));
+        $this->assertFalse($this->class->delete($key));
     }
 
     public function testWhenConfigurationIsDeleted()
@@ -48,9 +48,9 @@ class deleteTest extends BaseConfiguration
         $this->configuration->shouldReceive([
             'deleteByName' => true,
         ]);
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getName' => 'enable',
         ]);
-        $this->assertTrue($this->classe->delete($key));
+        $this->assertTrue($this->class->delete($key));
     }
 }

@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,7 +19,7 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
      */
     public function testWhenGivenPaymentOptionsIsntValidArrayFormat($payment_options)
     {
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenCurrentBrowserIsInvalid()
@@ -38,16 +38,14 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ],
         ]);
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('applepay_display')
             ->andReturn('{"checkout":true,"cart":false,"product":false}');
 
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenCurrentBrowserIsValid()
@@ -66,12 +64,10 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ],
         ]);
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('applepay_display')
             ->andReturn('{"checkout":true,"cart":false,"product":false}');
 
@@ -116,6 +112,6 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
             ],
         ];
 
-        $this->assertSame($expected, $this->classe->getPaymentOption($payment_options));
+        $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
 }

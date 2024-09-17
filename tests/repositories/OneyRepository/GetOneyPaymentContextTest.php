@@ -20,8 +20,7 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
     {
         parent::setUp();
 
-        $this->context
-            ->shouldReceive('get')
+        $this->context->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->carrier->shouldReceive([
@@ -30,8 +29,7 @@ final class GetOneyPaymentContextTest extends BaseOneyRepository
             'getDefaultDeliveryType' => 'storepickup',
         ]);
 
-        $this->dependencies
-            ->shouldReceive('convertAmount')
+        $this->dependencies->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $cent = false) {
                 if ($cent) {
                     return round($amount / 100, 2);

@@ -186,29 +186,20 @@ class HookClass
             return;
         }
 
-        $payment = $this->dependencies
+        $stored_resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
             ->getBy('id_cart', (int) $order->id_cart);
 
-        if ('installment' == $payment['method']) {
+        if ('installment' == $stored_resource['method']) {
             return;
         }
 
-        $retrieve = $this->dependencies->apiClass->retrievePayment($payment['resource_id']);
-        if (!$retrieve['result']) {
-            $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('live_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($payment['resource_id']);
-            } else {
-                $this->dependencies->apiClass->setSecretKey($this->configuration->getValue('test_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($payment['resource_id']);
-            }
-        }
-        if (!$retrieve['result']) {
-            return;
-        }
+        $retrieve = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method'])
+            ->retrieve($stored_resource['resource_id']);
 
         $payment = $retrieve['resource'];
 

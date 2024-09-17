@@ -11,7 +11,7 @@ class BaseCacheEntity extends TestCase
     use FormatDataProvider;
     protected $cache;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->cache = new CacheEntity();
         $this->cache->setCacheKey('test_key');

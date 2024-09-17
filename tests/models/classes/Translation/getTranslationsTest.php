@@ -4,8 +4,8 @@ namespace PayPlug\tests\models\classes\Translation;
 
 /**
  * @group unit
- * @group classes
- * @group translation_classes
+ * @group class
+ * @group translation_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -14,8 +14,7 @@ class getTranslationsTest extends BaseTranslation
     public function setUp()
     {
         parent::setUp();
-        $this->classe
-            ->shouldReceive('l')
+        $this->class->shouldReceive('l')
             ->andReturnUsing(function ($str) {
                 return $str;
             });
@@ -24,104 +23,104 @@ class getTranslationsTest extends BaseTranslation
     public function testIfCardTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getCardTranslations())
-            && !empty($this->classe->getCardTranslations())
+            is_array($this->class->getCardTranslations())
+            && !empty($this->class->getCardTranslations())
         );
     }
 
     public function testIfFooterTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getFooterTranslations())
-            && !empty($this->classe->getFooterTranslations())
+            is_array($this->class->getFooterTranslations())
+            && !empty($this->class->getFooterTranslations())
         );
     }
 
     public function testIfFrontIntegratedPaymentTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getFrontIntegratedPaymentTranslations())
-            && !empty($this->classe->getFrontIntegratedPaymentTranslations())
+            is_array($this->class->getFrontIntegratedPaymentTranslations())
+            && !empty($this->class->getFrontIntegratedPaymentTranslations())
         );
     }
 
     public function testIfHeaderTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getHeaderTranslations())
-            && !empty($this->classe->getHeaderTranslations())
+            is_array($this->class->getHeaderTranslations())
+            && !empty($this->class->getHeaderTranslations())
         );
     }
 
     public function testIfLoggedTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getLoggedTranslations())
-            && !empty($this->classe->getLoggedTranslations())
+            is_array($this->class->getLoggedTranslations())
+            && !empty($this->class->getLoggedTranslations())
         );
     }
 
     public function testIfLoginTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getLoginTranslations())
-            && !empty($this->classe->getLoginTranslations())
+            is_array($this->class->getLoginTranslations())
+            && !empty($this->class->getLoginTranslations())
         );
     }
 
     public function testIfModalTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getModalTranslations())
-            && !empty($this->classe->getModalTranslations())
+            is_array($this->class->getModalTranslations())
+            && !empty($this->class->getModalTranslations())
         );
     }
 
     public function testIfOrderTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getOrderTranslations())
-            && !empty($this->classe->getOrderTranslations())
+            is_array($this->class->getOrderTranslations())
+            && !empty($this->class->getOrderTranslations())
         );
     }
 
     public function testIfOrderStateActionRenderTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getOrderStateActionRenderTranslations())
-            && !empty($this->classe->getOrderStateActionRenderTranslations())
+            is_array($this->class->getOrderStateActionRenderTranslations())
+            && !empty($this->class->getOrderStateActionRenderTranslations())
         );
     }
 
     public function testIfPaylaterTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getPaylaterTranslations())
-            && !empty($this->classe->getPaylaterTranslations())
+            is_array($this->class->getPaylaterTranslations())
+            && !empty($this->class->getPaylaterTranslations())
         );
     }
 
     public function testIfPaymentMethodsTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getPaymentMethodsTranslations())
-            && !empty($this->classe->getPaymentMethodsTranslations())
+            is_array($this->class->getPaymentMethodsTranslations())
+            && !empty($this->class->getPaymentMethodsTranslations())
         );
     }
 
     public function testIfRequirementsTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getRequirementsTranslations())
-            && !empty($this->classe->getRequirementsTranslations())
+            is_array($this->class->getRequirementsTranslations())
+            && !empty($this->class->getRequirementsTranslations())
         );
     }
 
     public function testIfSubscribeTranslations()
     {
         $this->assertTrue(
-            is_array($this->classe->getSubscribeTranslations())
-            && !empty($this->classe->getSubscribeTranslations())
+            is_array($this->class->getSubscribeTranslations())
+            && !empty($this->class->getSubscribeTranslations())
         );
     }
 }

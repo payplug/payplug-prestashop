@@ -25,8 +25,7 @@ class getAllByMethodTest extends BasePaymentRepository
     {
         $method_name = 'method';
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'select' => $this->repository,
                 'fields' => $this->repository,
                 'from' => $this->repository,
@@ -50,8 +49,7 @@ class getAllByMethodTest extends BasePaymentRepository
             'date_upd' => '1970-01-01 00:00:00',
         ];
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'select' => $this->repository,
                 'fields' => $this->repository,
                 'from' => $this->repository,

@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\BancontactPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group bancontact_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group bancontact_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -16,12 +16,10 @@ class getPaymentOptionTest extends BaseBancontactPaymentMethod
     {
         parent::setUp();
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
-        $this->helpers['amount']
-            ->shouldReceive('validateAmount')
+        $this->helpers['amount']->shouldReceive('validateAmount')
             ->andReturn([
                 'result' => true,
                 'message' => '',
@@ -40,38 +38,34 @@ class getPaymentOptionTest extends BaseBancontactPaymentMethod
      */
     public function testWhenGivenPaymentOptionsIsntValidArrayFormat($payment_options)
     {
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenThereIsCountryRestrictionAndAddressDoesNotCorrespond()
     {
         $payment_options = [];
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('bancontact_country')
             ->andReturn(true);
-        $this->validators['payment']
-            ->shouldReceive([
-                'isAllowedCountry' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->validators['payment']->shouldReceive([
+            'isAllowedCountry' => [
+                'result' => false,
+            ],
+        ]);
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenThereIsCountryRestrictionAndAddressCorrespond()
     {
         $payment_options = [];
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('bancontact_country')
             ->andReturn(true);
-        $this->validators['payment']
-            ->shouldReceive([
-                'isAllowedCountry' => [
-                    'result' => true,
-                ],
-            ]);
+        $this->validators['payment']->shouldReceive([
+            'isAllowedCountry' => [
+                'result' => true,
+            ],
+        ]);
         $expected = [
             'bancontact' => [
                 'name' => 'bancontact',
@@ -105,14 +99,13 @@ class getPaymentOptionTest extends BaseBancontactPaymentMethod
                 'moduleName' => 'payplug',
             ],
         ];
-        $this->assertSame($expected, $this->classe->getPaymentOption($payment_options));
+        $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenThereIsNoCountryRestriction()
     {
         $payment_options = [];
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('bancontact_country')
             ->andReturn(false);
         $expected = [
@@ -148,6 +141,6 @@ class getPaymentOptionTest extends BaseBancontactPaymentMethod
                 'moduleName' => 'payplug',
             ],
         ];
-        $this->assertSame($expected, $this->classe->getPaymentOption($payment_options));
+        $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
 }

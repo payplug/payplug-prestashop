@@ -13,188 +13,150 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class refundActionTest extends BaseRefundAction
 {
-    /**
-     * @description test refundACtion when all params are valid
-     */
-    public function testRefundActionWithValidParameters()
+    private $resource_id;
+    private $amount;
+    private $metadata;
+    private $pay_mode;
+    private $resource;
+
+    public function setUp()
     {
-        $pay_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
-        $amount = 50;
-        $metadata = [
+        parent::setUp();
+        $this->resource_id = 'pay_azerty12345';
+        $this->amount = 100;
+        $this->metadata = [
             'ID Client' => 4,
             'reason' => 'Refunded with Prestashop',
         ];
-        $pay_mode = 'LIVE';
-        $inst_id = false;
-        $this->toolsAdapter
-            ->shouldReceive('tool')
-            ->andReturnUsing(function ($method, $pay_mode) {
-                if ('strtoupper' == $method) {
-                    return strtoupper($pay_mode);
-                }
-            });
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'initializeApi' => true, ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard([
-                        'is_paid' => true,
-                        'metadata' => ['Order' => 42],
-                    ]),
-                ],
-                'refundPayment' => ['result' => true,
+        $this->pay_mode = 'LIVE';
+        $this->resource = [
+            'result' => true,
+            'resource' => PaymentMock::getStandard(),
+        ];
+    }
 
-                ],
-            ]);
-
-        $result = $this->action->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $resource_id
+     */
+    public function testWhenGivenResourceIdIsntValidString($resource_id)
+    {
         $this->assertSame(
-            ['result' => true],
-            $result['response']
+            [],
+            $this->action->refundAction($resource_id, $this->amount, $this->metadata)
         );
     }
 
     /**
-     * @description  test refundACtion when Amount is invalid
-     * @dataProvider invalidNumericFormatDataProvider
+     * @dataProvider invalidIntegerFormatDataProvider
      *
      * @param mixed $amount
      */
-    public function testRefundActionWhenGivenAmountIsntNumeric($amount)
+    public function testWhenGivenAmountIdIsntValidInteger($amount)
     {
-        $pay_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
-        $metadata = [
-            'ID Client' => 4,
-            'reason' => 'Refunded with Prestashop',
-        ];
-        $pay_mode = 'LIVE';
-        $inst_id = false;
-        $this->toolsAdapter
-            ->shouldReceive('tool')
-            ->andReturnUsing(function ($method, $pay_mode) {
-                if ('strtoupper' == $method) {
-                    return strtoupper($pay_mode);
-                }
-            });
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'initializeApi' => true, ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard([
-                        'is_paid' => true,
-                        'metadata' => ['Order' => 42],
-                    ]),
-                ],
-                'refundPayment' => ['result' => false,
-
-                ],
-            ]);
-
-        $result = $this->action->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
-
         $this->assertSame(
-            'error',
-            $result
+            [],
+            $this->action->refundAction($this->resource_id, $amount, $this->metadata)
         );
     }
 
     /**
-     * @description  test Refund ACtion when Meta data
-     * is invalid
      * @dataProvider invalidArrayFormatDataProvider
      *
      * @param mixed $metadata
      */
-    public function testRefundActionWhenGivenMetaDataIsntArray($metadata)
+    public function testWhenGivenMetaDataIdIsntValidArray($metadata)
     {
-        $pay_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
-
-        $amount = 50;
-        $pay_mode = 'LIVE';
-        $inst_id = false;
-        $this->toolsAdapter
-            ->shouldReceive('tool')
-            ->andReturnUsing(function ($method, $pay_mode) {
-                if ('strtoupper' == $method) {
-                    return strtoupper($pay_mode);
-                }
-            });
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'initializeApi' => true, ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard([
-                        'is_paid' => true,
-                        'metadata' => ['Order' => 42],
-                    ]),
-                ],
-                'refundPayment' => ['result' => false,
-
-                ],
-            ]);
-
-        $result = $this->action->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
-
         $this->assertSame(
-            'error',
-            $result
+            [],
+            $this->action->refundAction($this->resource_id, $this->amount, $metadata)
         );
     }
 
     /**
-     * @description  testRefundAction when pay mode is invalid
      * @dataProvider invalidStringFormatDataProvider
      *
      * @param mixed $pay_mode
      */
-    public function testRefundActionWhenGivenPayModeIsntString($pay_mode)
+    public function testWhenGivenPayModeIdIsntValidString($pay_mode)
     {
-        $pay_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
-        $metadata = [
-            'ID Client' => 4,
-            'reason' => 'Refunded with Prestashop',
-        ];
-        $amount = 50;
-
-        $inst_id = false;
-        $this->toolsAdapter
-            ->shouldReceive('tool')
-            ->andReturnUsing(function ($method, $pay_mode) {
-                if ('strtoupper' == $method) {
-                    return strtoupper($pay_mode);
-                }
-            });
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'initializeApi' => true, ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard([
-                        'is_paid' => true,
-                        'metadata' => ['Order' => 42],
-                    ]),
-                ],
-                'refundPayment' => ['result' => false,
-
-                ],
-            ]);
-
-        $result = $this->action->refundAction($pay_id, $amount, $metadata, $pay_mode, $inst_id);
-
         $this->assertSame(
-            'error',
-            $result
+            [],
+            $this->action->refundAction($this->resource_id, $this->amount, $this->metadata, $pay_mode)
+        );
+    }
+
+    /**
+     * @dataProvider invalidBoolFormatDataProvider
+     *
+     * @param mixed $is_installment
+     */
+    public function testWhenGivenIsInstallmentIdIsntValidBoolean($is_installment)
+    {
+        $this->assertSame(
+            [],
+            $this->action->refundAction($this->resource_id, $this->amount, $this->metadata, $this->pay_mode, $is_installment)
+        );
+    }
+
+    public function testWhenInstallmentResourceCantBeRefunded()
+    {
+        $this->action->shouldReceive([
+            'processInstallmentRefund' => [],
+        ]);
+        $this->assertSame(
+            [],
+            $this->action->refundAction($this->resource_id, $this->amount, $this->metadata, $this->pay_mode, true)
+        );
+    }
+
+    public function testWhenInstallmentResourceIsRefunded()
+    {
+        $expected = [
+            'id' => $this->resource_id,
+            'data' => [
+                'amount' => $this->amount,
+                'metadata' => $this->metadata,
+            ],
+            'response' => $this->resource,
+        ];
+        $this->action->shouldReceive([
+            'processInstallmentRefund' => $expected,
+        ]);
+        $this->assertSame(
+            $expected,
+            $this->action->refundAction($this->resource_id, $this->amount, $this->metadata, $this->pay_mode, true)
+        );
+    }
+
+    public function testWhenPaymentResourceCantBeRefunded()
+    {
+        $this->action->shouldReceive([
+            'processPaymentRefund' => [],
+        ]);
+        $this->assertSame(
+            [],
+            $this->action->refundAction($this->resource_id, $this->amount, $this->metadata, $this->pay_mode, false)
+        );
+    }
+
+    public function testWhenPaymentResourceIsRefunded()
+    {
+        $expected = [
+            'id' => $this->resource_id,
+            'data' => [
+                'amount' => $this->amount,
+                'metadata' => $this->metadata,
+            ],
+            'response' => $this->resource,
+        ];
+        $this->action->shouldReceive([
+            'processPaymentRefund' => $expected,
+        ]);
+        $this->assertSame(
+            $expected,
+            $this->action->refundAction($this->resource_id, $this->amount, $this->metadata, $this->pay_mode)
         );
     }
 }

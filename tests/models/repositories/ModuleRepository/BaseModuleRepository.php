@@ -7,14 +7,13 @@ use PayPlug\tests\models\repositories\BaseRepository;
 
 class BaseModuleRepository extends BaseRepository
 {
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->repository = \Mockery::mock(ModuleRepository::class, [$this->dependencies])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
-        $this->repository
-            ->shouldReceive('getTableName')
+        $this->repository->shouldReceive('getTableName')
             ->andReturnUsing(function ($value) {
                 return $value;
             });

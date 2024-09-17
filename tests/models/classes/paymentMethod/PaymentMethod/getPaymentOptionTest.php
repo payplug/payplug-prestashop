@@ -6,8 +6,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -20,19 +21,18 @@ class getPaymentOptionTest extends BasePaymentMethod
      */
     public function testWhenGivenPaymentOptionsIsntValidArray($payment_options)
     {
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenNoNameFoundForPaymentMethod()
     {
-        $this->assertSame([], $this->classe->getPaymentOption([]));
+        $this->assertSame([], $this->class->getPaymentOption([]));
     }
 
     public function testWhenPaymentMethodDoesNotMatchWithCurrentAddressCountry()
     {
-        $this->classe->set('name', 'standard');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'standard');
+        $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{"standard":["FR"]}');
 
@@ -42,18 +42,16 @@ class getPaymentOptionTest extends BasePaymentMethod
         ]);
         $this->dependencies->configClass = $configClass;
 
-        $this->assertSame([], $this->classe->getPaymentOption([]));
+        $this->assertSame([], $this->class->getPaymentOption([]));
     }
 
     public function testWhenPaymentMethodMatchWithCurrentAddressCountry()
     {
-        $this->classe->set('name', 'standard');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'standard');
+        $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{"standard":["FR"]}');
-        $this->helpers['amount']
-            ->shouldReceive('validateAmount')
+        $this->helpers['amount']->shouldReceive('validateAmount')
             ->andReturn([
                 'result' => true,
                 'message' => '',
@@ -64,18 +62,16 @@ class getPaymentOptionTest extends BasePaymentMethod
         ]);
         $this->dependencies->configClass = $configClass;
 
-        $this->assertTrue(array_key_exists('standard', $this->classe->getPaymentOption()));
+        $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOption()));
     }
 
     public function testWhenPaymentMethodHasNoCountryRestriction()
     {
-        $this->classe->set('name', 'standard');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'standard');
+        $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
-        $this->helpers['amount']
-            ->shouldReceive('validateAmount')
+        $this->helpers['amount']->shouldReceive('validateAmount')
             ->andReturn([
                 'result' => true,
                 'message' => '',
@@ -86,6 +82,6 @@ class getPaymentOptionTest extends BasePaymentMethod
         ]);
         $this->dependencies->configClass = $configClass;
 
-        $this->assertTrue(array_key_exists('standard', $this->classe->getPaymentOption()));
+        $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOption()));
     }
 }

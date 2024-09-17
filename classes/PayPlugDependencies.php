@@ -29,9 +29,6 @@ if (!defined('_PS_VERSION_')) {
 
 class PayPlugDependencies
 {
-    /** @var ApiClass */
-    public $apiClass;
-
     /** @var HookClass */
     public $hookClass;
 
@@ -67,7 +64,6 @@ class PayPlugDependencies
     {
         $this->dependencies = new DependenciesClass();
 
-        $this->apiClass = $this->dependencies->apiClass;
         $this->install = $this->dependencies->getPlugin()->getInstall();
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->hookClass = $this->dependencies->hookClass;

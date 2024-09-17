@@ -23,10 +23,9 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             'max' => 30000,
         ];
 
-        $this->repo
-            ->shouldReceive([
-                'getOneyPriceLimit' => $this->limits,
-            ])
+        $this->repo->shouldReceive([
+            'getOneyPriceLimit' => $this->limits,
+        ])
         ;
     }
 
@@ -35,8 +34,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         $amount = 99;
 
         $this->dependencies->amountCurrencyClass = \Mockery::mock('alias:PayPlug\classes\AmountCurrencyClass');
-        $this->dependencies->amountCurrencyClass
-            ->shouldReceive('convertAmount')
+        $this->dependencies->amountCurrencyClass->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $to_cents = false) {
                 if ($to_cents) {
                     return (float) ($amount / 100);
@@ -48,10 +46,9 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             })
         ;
 
-        $this->amount_helper
-            ->shouldReceive([
-                'convertAmount' => $amount,
-            ]);
+        $this->amount_helper->shouldReceive([
+            'convertAmount' => $amount,
+        ]);
 
         $this->validators['payment']->shouldReceive([
             'isAmount' => [
@@ -60,11 +57,10 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             ],
         ]);
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-                'getValidators' => $this->validators,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+            'getValidators' => $this->validators,
+        ]);
 
         $this->assertSame(
             [
@@ -80,8 +76,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         $amount = 3001;
 
         $this->dependencies->amountCurrencyClass = \Mockery::mock('alias:PayPlug\classes\AmountCurrencyClass');
-        $this->dependencies->amountCurrencyClass
-            ->shouldReceive('convertAmount')
+        $this->dependencies->amountCurrencyClass->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $to_cents = false) {
                 if ($to_cents) {
                     return (float) ($amount / 100);
@@ -93,10 +88,9 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             })
         ;
 
-        $this->amount_helper
-            ->shouldReceive([
-                'convertAmount' => $amount,
-            ]);
+        $this->amount_helper->shouldReceive([
+            'convertAmount' => $amount,
+        ]);
 
         $this->validators['payment']->shouldReceive([
             'isAmount' => [
@@ -105,11 +99,10 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             ],
         ]);
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-                'getValidators' => $this->validators,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+            'getValidators' => $this->validators,
+        ]);
 
         $this->assertSame(
             [
@@ -128,8 +121,7 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
         $amount = 150;
 
         $this->dependencies->amountCurrencyClass = \Mockery::mock('alias:PayPlug\classes\AmountCurrencyClass');
-        $this->dependencies->amountCurrencyClass
-            ->shouldReceive('convertAmount')
+        $this->dependencies->amountCurrencyClass->shouldReceive('convertAmount')
             ->andReturnUsing(function ($amount, $to_cents = false) {
                 if ($to_cents) {
                     return (float) ($amount / 100);
@@ -141,10 +133,9 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             })
         ;
 
-        $this->amount_helper
-            ->shouldReceive([
-                'convertAmount' => $amount,
-            ]);
+        $this->amount_helper->shouldReceive([
+            'convertAmount' => $amount,
+        ]);
 
         $this->validators['payment']->shouldReceive([
             'isAmount' => [
@@ -153,11 +144,10 @@ final class IsValidOneyAmountTest extends BaseOneyRepository
             ],
         ]);
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-                'getValidators' => $this->validators,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+            'getValidators' => $this->validators,
+        ]);
 
         $this->assertSame(
             [

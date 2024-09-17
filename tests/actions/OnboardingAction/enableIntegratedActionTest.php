@@ -56,8 +56,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
 
     public function testWhenOnboardingStatesConfigurationCannotBeSetted()
     {
-        $this->configurationClass
-            ->shouldReceive('getValue')
+        $this->configurationClass->shouldReceive('getValue')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'onboarding_states':
@@ -69,8 +68,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 }
             });
 
-        $this->configurationClass
-            ->shouldReceive('set')
+        $this->configurationClass->shouldReceive('set')
             ->andReturnUsing(function ($key, $value) {
                 switch ($key) {
                     case 'onboarding_states':
@@ -93,8 +91,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
 
     public function testWhenEmbeddedModeConfigurationCannotBeSetted()
     {
-        $this->configurationClass
-            ->shouldReceive('getValue')
+        $this->configurationClass->shouldReceive('getValue')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'onboarding_states':
@@ -104,8 +101,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 }
             });
 
-        $this->configurationClass
-            ->shouldReceive('set')
+        $this->configurationClass->shouldReceive('set')
             ->andReturnUsing(function ($key, $value) {
                 switch ($key) {
                     case 'onboarding_states':
@@ -126,8 +122,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
 
     public function testWhenConfigurationsIsSetted()
     {
-        $this->configurationClass
-            ->shouldReceive('getValue')
+        $this->configurationClass->shouldReceive('getValue')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'onboarding_states':
@@ -137,8 +132,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 }
             });
 
-        $this->configurationClass
-            ->shouldReceive('set')
+        $this->configurationClass->shouldReceive('set')
             ->andReturnUsing(function ($key, $value) {
                 switch ($key) {
                     case 'onboarding_states':

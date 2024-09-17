@@ -9,19 +9,17 @@ class BaseOrderStateRepository extends BaseRepository
 {
     protected $repository;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->repository = \Mockery::mock(OrderStateRepository::class, [$this->dependencies])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
-        $this->repository
-            ->shouldReceive('escape')
+        $this->repository->shouldReceive('escape')
             ->andReturnUsing(function ($arg) {
                 return (string) $arg;
             });
-        $this->repository
-            ->shouldReceive('getTableName')
+        $this->repository->shouldReceive('getTableName')
             ->andReturnUsing(function ($value) {
                 return $value;
             });

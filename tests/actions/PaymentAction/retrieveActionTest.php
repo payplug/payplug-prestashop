@@ -72,19 +72,12 @@ class retrieveActionTest extends BasePaymentAction
             'date_upd' => '1970-01-01 00:00:00',
         ];
 
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getPaymentMethodHash' => 'not the same hash',
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'createAction' => 'create action',
-            ]);
+        $this->payment_method->shouldReceive([
+            'getPaymentMethodHash' => 'not the same hash',
+        ]);
+        $this->action->shouldReceive([
+            'createAction' => 'create action',
+        ]);
 
         $this->assertSame(
             'create action',
@@ -111,7 +104,6 @@ class retrieveActionTest extends BasePaymentAction
             'date_upd' => '1970-01-01 00:00:00',
         ];
 
-        $payment_method = \Mockery::mock('PaymentMethod');
         $return_url = [
             'result' => 'new_card',
             'embedded' => false,
@@ -119,15 +111,10 @@ class retrieveActionTest extends BasePaymentAction
             'return_url' => 'return_url',
             'resource_stored' => [],
         ];
-        $payment_method
-            ->shouldReceive([
-                'getPaymentMethodHash' => 'cart-hash-azerty1234567',
-                'getReturnUrl' => $return_url,
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
+        $this->payment_method->shouldReceive([
+            'getPaymentMethodHash' => 'cart-hash-azerty1234567',
+            'getReturnUrl' => $return_url,
+        ]);
         $this->assertSame(
             $return_url,
             $this->action->retrieveAction($stored_resource, $payment_tab)

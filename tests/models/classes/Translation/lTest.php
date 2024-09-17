@@ -4,8 +4,8 @@ namespace PayPlug\tests\models\classes\Translation;
 
 /**
  * @group unit
- * @group classes
- * @group translation_classes
+ * @group class
+ * @group translation_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -21,7 +21,7 @@ class lTest extends BaseTranslation
         $template = 'alias';
         $this->assertSame(
             '',
-            $this->classe->l($string, $template)
+            $this->class->l($string, $template)
         );
     }
 
@@ -35,7 +35,7 @@ class lTest extends BaseTranslation
         $string = 'translation.key';
         $this->assertSame(
             '',
-            $this->classe->l($string, $template)
+            $this->class->l($string, $template)
         );
     }
 
@@ -46,19 +46,17 @@ class lTest extends BaseTranslation
 
         $transation_adapter = \Mockery::mock('TranslationAdapter');
         $translation = 'transation';
-        $transation_adapter
-            ->shouldReceive([
-                'trans' => $translation,
-            ]);
+        $transation_adapter->shouldReceive([
+            'trans' => $translation,
+        ]);
 
-        $this->plugin
-            ->shouldReceive([
-                'getTranslationAdapter' => $transation_adapter,
-            ]);
+        $this->plugin->shouldReceive([
+            'getTranslationAdapter' => $transation_adapter,
+        ]);
 
         $this->assertSame(
             $translation,
-            $this->classe->l($string, $template)
+            $this->class->l($string, $template)
         );
     }
 
@@ -68,24 +66,21 @@ class lTest extends BaseTranslation
         $string = 'translation.key';
 
         $transation_adapter = \Mockery::mock('TranslationAdapter');
-        $transation_adapter
-            ->shouldReceive([
-                'trans' => $string,
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getTranslationAdapter' => $transation_adapter,
-            ]);
+        $transation_adapter->shouldReceive([
+            'trans' => $string,
+        ]);
+        $this->plugin->shouldReceive([
+            'getTranslationAdapter' => $transation_adapter,
+        ]);
 
         $translation = 'default transation';
-        $this->classe
-            ->shouldReceive([
-                'getDefaultTranslation' => $translation,
-            ]);
+        $this->class->shouldReceive([
+            'getDefaultTranslation' => $translation,
+        ]);
 
         $this->assertSame(
             $translation,
-            $this->classe->l($string, $template)
+            $this->class->l($string, $template)
         );
     }
 }

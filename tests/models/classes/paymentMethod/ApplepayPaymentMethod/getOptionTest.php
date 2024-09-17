@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -14,10 +14,9 @@ class getOptionTest extends BaseApplepayPaymentMethod
 {
     public function testWhenNoCarriersReturned()
     {
-        $this->classe
-            ->shouldReceive([
-                'getAvailableCarriers' => [],
-            ]);
+        $this->class->shouldReceive([
+            'getAvailableCarriers' => [],
+        ]);
         $configuration = [
             'applepay_display' => '{"checkout":true,"cart":false,"product":false}',
         ];
@@ -55,14 +54,13 @@ class getOptionTest extends BaseApplepayPaymentMethod
             ],
         ];
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => true,
-            ]);
+        $configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
         $this->dependencies->configClass = $configClass;
         $this->assertSame(
             $expected,
-            $this->classe->getOption($configuration)['options']
+            $this->class->getOption($configuration)['options']
         );
     }
 
@@ -75,10 +73,9 @@ class getOptionTest extends BaseApplepayPaymentMethod
                 'checked' => true,
             ],
         ];
-        $this->classe
-            ->shouldReceive([
-                'getAvailableCarriers' => $carriers,
-            ]);
+        $this->class->shouldReceive([
+            'getAvailableCarriers' => $carriers,
+        ]);
         $configuration = [
             'applepay_display' => '{"checkout":true,"cart":false,"product":false}',
         ];
@@ -131,14 +128,13 @@ class getOptionTest extends BaseApplepayPaymentMethod
         ];
 
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => true,
-            ]);
+        $configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
         $this->dependencies->configClass = $configClass;
         $this->assertSame(
             $expected,
-            $this->classe->getOption($configuration)['options']
+            $this->class->getOption($configuration)['options']
         );
     }
 }

@@ -7,8 +7,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -18,15 +19,15 @@ class getOptionCollectionTest extends BasePaymentMethod
 
     public function testWhenNoAvailablePaymentMethodFound()
     {
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [],
         ]);
-        $this->assertSame([], $this->classe->getOptionCollection());
+        $this->assertSame([], $this->class->getOptionCollection());
     }
 
     public function testWhenAvailablePaymentMethodIsntValidFeature()
     {
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
@@ -38,7 +39,7 @@ class getOptionCollectionTest extends BasePaymentMethod
         ]);
         $this->dependencies->configClass = $configClass;
 
-        $this->assertSame([], $this->classe->getOptionCollection());
+        $this->assertSame([], $this->class->getOptionCollection());
     }
 
     /**
@@ -48,7 +49,7 @@ class getOptionCollectionTest extends BasePaymentMethod
      */
     public function testWhenPaymentMethodGettedIsntAnObject($payment_method)
     {
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
@@ -61,16 +62,16 @@ class getOptionCollectionTest extends BasePaymentMethod
         ]);
         $this->dependencies->configClass = $configClass;
 
-        $this->assertSame([], $this->classe->getOptionCollection());
+        $this->assertSame([], $this->class->getOptionCollection());
     }
 
     public function testWhenOptionIsReturn()
     {
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
-            'getPaymentMethod' => $this->classe,
+            'getPaymentMethod' => $this->class,
             'getOption' => new \stdClass(),
         ]);
 
@@ -80,6 +81,6 @@ class getOptionCollectionTest extends BasePaymentMethod
         ]);
         $this->dependencies->configClass = $configClass;
 
-        $this->assertTrue(array_key_exists('standard', $this->classe->getOptionCollection()));
+        $this->assertTrue(array_key_exists('standard', $this->class->getOptionCollection()));
     }
 }

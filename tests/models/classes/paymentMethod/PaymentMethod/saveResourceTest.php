@@ -7,8 +7,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -20,7 +21,7 @@ class saveResourceTest extends BasePaymentMethod
             [
                 'result' => false,
             ],
-            $this->classe->saveResource()
+            $this->class->saveResource()
         );
     }
 
@@ -31,18 +32,18 @@ class saveResourceTest extends BasePaymentMethod
      */
     public function testWhenGivenPaymentTabIsntValidArray($payment_tab)
     {
-        $this->classe->set('name', 'standard');
+        $this->class->set('name', 'standard');
         $this->assertSame(
             [
                 'result' => false,
             ],
-            $this->classe->saveResource($payment_tab)
+            $this->class->saveResource($payment_tab)
         );
     }
 
     public function testWhenPermissionErrorIsReturned()
     {
-        $this->classe->set('name', 'standard');
+        $this->class->set('name', 'standard');
         $payment_tab = [
             'amount' => 4242,
             'force_3ds' => false,
@@ -55,37 +56,32 @@ class saveResourceTest extends BasePaymentMethod
             'result' => false,
             'message' => 'Bad permission',
         ];
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
-            ->shouldReceive([
-                'createPayment' => $resource,
-            ]);
+        $this->api_service->shouldReceive([
+            'createPayment' => $resource,
+        ]);
 
         $configClass = \Mockery::mock('configClass');
-        $configClass
-            ->shouldReceive([
-                'getAvailableOptions' => [
-                    'standard' => true,
-                ],
-            ]);
+        $configClass->shouldReceive([
+            'getAvailableOptions' => [
+                'standard' => true,
+            ],
+        ]);
 
-        $this->dependencies->apiClass = $apiClass;
         $this->dependencies->configClass = $configClass;
 
-        $this->classe
-            ->shouldReceive([
-                'resetPaymentMethodFromPermission' => true,
-            ]);
+        $this->class->shouldReceive([
+            'resetPaymentMethodFromPermission' => true,
+        ]);
 
         $this->assertSame(
             $resource,
-            $this->classe->saveResource($payment_tab)
+            $this->class->saveResource($payment_tab)
         );
     }
 
     public function testWhenCredentialErrorIsReturned()
     {
-        $this->classe->set('name', 'standard');
+        $this->class->set('name', 'standard');
         $payment_tab = [
             'amount' => 4242,
             'force_3ds' => false,
@@ -98,32 +94,27 @@ class saveResourceTest extends BasePaymentMethod
             'result' => false,
             'message' => 'Bad credential',
         ];
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
-            ->shouldReceive([
-                'createPayment' => $resource,
-            ]);
-        $this->dependencies->apiClass = $apiClass;
+        $this->api_service->shouldReceive([
+            'createPayment' => $resource,
+        ]);
 
         $configurationAction = \Mockery::mock('ConfigurationAction');
-        $configurationAction
-            ->shouldReceive([
-                'logoutAction' => true,
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getConfigurationAction' => $configurationAction,
-            ]);
+        $configurationAction->shouldReceive([
+            'logoutAction' => true,
+        ]);
+        $this->plugin->shouldReceive([
+            'getConfigurationAction' => $configurationAction,
+        ]);
 
         $this->assertSame(
             $resource,
-            $this->classe->saveResource($payment_tab)
+            $this->class->saveResource($payment_tab)
         );
     }
 
     public function testWhenResourceIsCreatedWithNoError()
     {
-        $this->classe->set('name', 'standard');
+        $this->class->set('name', 'standard');
         $payment_tab = [
             'amount' => 4242,
             'force_3ds' => false,
@@ -136,15 +127,12 @@ class saveResourceTest extends BasePaymentMethod
             'code' => 200,
             'resource' => PaymentMock::getStandard(),
         ];
-        $apiClass = \Mockery::mock('apiClass');
-        $apiClass
-            ->shouldReceive([
-                'createPayment' => $resource,
-            ]);
-        $this->dependencies->apiClass = $apiClass;
+        $this->api_service->shouldReceive([
+            'createPayment' => $resource,
+        ]);
         $this->assertSame(
             $resource,
-            $this->classe->saveResource($payment_tab)
+            $this->class->saveResource($payment_tab)
         );
     }
 }
