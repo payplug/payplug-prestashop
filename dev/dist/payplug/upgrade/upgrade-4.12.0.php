@@ -24,20 +24,30 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_4_8_0($object)
+function upgrade_module_4_12_0($object)
 {
     $flag = true;
 
     $logger = $object->module->getPlugin()->getLogger();
-    $logger->addLog('Start upgrade script 4.8.0');
+    $logger->addLog('Start upgrade script 4.12.0');
 
-    $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
-    $is_applepay = (bool) $payment_methods['applepay'];
-    $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CARRIERS', '[]');
-    $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CART', !$is_applepay);
-    $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CHECKOUT', $is_applepay);
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_queue` (
+            `id_payplug_queue` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `id_cart` INT(11) UNSIGNED NOT NULL,
+            `resource_id` VARCHAR(255) NULL,
+            `type` VARCHAR(64) NOT NULL,
+            `date_add` DATETIME NULL, 
+            `date_upd` DATETIME NULL,
+            `treated` TINYINT(1) NOT NULL DEFAULT 0, 
+            CONSTRAINT payplug_queue_unique UNIQUE (id_payplug_queue)) ENGINE=' . _MYSQL_ENGINE_;
 
-    $logger->addLog('End upgrade script 4.8.0, result: ' . ($flag ? 'ok' : 'ko'));
+    try {
+        $flag = $flag && Db::getInstance()->Execute($sql);
+    } catch (PrestaShopDatabaseException $e) {
+        $flag = false;
+    }
+
+    $logger->addLog('End upgrade script 4.12.0, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;
 }

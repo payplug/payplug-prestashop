@@ -451,9 +451,12 @@ class QueryRepository
         }
 
         if (isset($param) && 'debug' == $param) {
-            var_dump($sql);
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('QueryRepository::build() - Request: ' . $sql);
 
-            exit;
+            return false;
         }
 
         try {

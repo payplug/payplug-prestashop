@@ -7,9 +7,6 @@ use PayPlug\tests\models\repositories\BaseRepository;
 
 class BaseQueueRepository extends BaseRepository
 {
-    protected $entity;
-    protected $entity_id;
-
     protected function setUp()
     {
         parent::setUp();
@@ -27,12 +24,18 @@ class BaseQueueRepository extends BaseRepository
                 return $value;
             });
 
-        $this->entity_id = 42;
-        $this->entity = \Mockery::mock('EntityObject');
         $this->entity->shouldReceive([
             'getDefinition' => [
-                'table' => 'table',
-                'primary' => 'primary',
+                'table' => 'payplug_queue',
+                'primary' => 'id_payplug_queue',
+                'fields' => [
+                    'date_add' => ['type' => 'string'],
+                    'date_upd' => ['type' => 'string'],
+                    'id_cart' => ['type' => 'integer', 'required' => true],
+                    'resource_id' => ['type' => 'string', 'required' => true],
+                    'treated' => ['type' => 'boolean'],
+                    'type' => ['type' => 'string'],
+                ],
             ],
         ]);
     }

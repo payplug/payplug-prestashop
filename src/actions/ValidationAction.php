@@ -92,10 +92,19 @@ class ValidationAction
             'treated' => true,
             'date_upd' => date('Y-m-d H:i:s'),
         ];
-        $update = (bool) $this->dependencies
-            ->getPlugin()
-            ->getQueueRepository()
-            ->updateBy('id_cart', (int) $cart_id, $fields);
+
+        // If queueing system allowed, update the current event queue else clear the current lock
+        if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+            $update = (bool) $this->dependencies
+                ->getPlugin()
+                ->getQueueRepository()
+                ->updateBy('id_cart', (int) $cart_id, $fields);
+        } else {
+            $update = (bool) $this->dependencies
+                ->getPlugin()
+                ->getLockRepository()
+                ->deleteBy('id_cart', (int) $cart_id);
+        }
         if (!$update) {
             return [
                 'result' => false,
@@ -146,10 +155,10 @@ class ValidationAction
                 ->updateAction((int) $cart_id)['result'];
         }
 
-        return $this->dependencies
+        return (bool) $this->dependencies
             ->getPlugin()
             ->getLockRepository()
-            ->deleteLock((int) $cart_id);
+            ->deleteBy('id_cart', (int) $cart_id);
     }
 
     /**
@@ -190,6 +199,7 @@ class ValidationAction
                 'result' => true,
             ];
         }
+
         $order_create = $this->dependencies
             ->getPlugin()
             ->getOrderAction()

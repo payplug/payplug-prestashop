@@ -11,6 +11,9 @@ class BaseRepository extends TestCase
 
     protected $dependencies;
     protected $repository;
+    protected $engine;
+    protected $entity;
+    protected $entity_id;
 
     protected function setUp()
     {
@@ -19,5 +22,8 @@ class BaseRepository extends TestCase
         $this->dependencies->name = 'payplug';
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin->shouldReceive([]);
+        $this->engine = 'sql_engine';
+        $this->entity_id = 42;
+        $this->entity = \Mockery::mock('EntityObject');
     }
 }

@@ -24,11 +24,22 @@ class BaseCardRepository extends BaseRepository
                 return $value;
             });
 
-        $this->entity = \Mockery::mock('EntityObject');
         $this->entity->shouldReceive([
             'getDefinition' => [
-                'table' => 'table',
-                'primary' => 'primary',
+                'table' => 'payplug_card',
+                'primary' => 'id_payplug_card',
+                'fields' => [
+                    'id_customer' => ['type' => 'int', 'required' => true],
+                    'id_company' => ['type' => 'int', 'required' => true],
+                    'is_sandbox' => ['type' => 'int', 'required' => true],
+                    'id_card' => ['type' => 'string', 'required' => true],
+                    'last4' => ['type' => 'string', 'required' => true],
+                    'exp_month' => ['type' => 'string', 'required' => true],
+                    'exp_year' => ['type' => 'string', 'required' => true],
+                    'brand' => ['type' => 'string', 'required' => false],
+                    'country' => ['type' => 'string', 'required' => true],
+                    'metadata' => ['type' => 'string', 'required' => false],
+                ],
             ],
         ]);
     }

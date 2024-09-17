@@ -1,31 +1,31 @@
 <?php
 
-namespace PayPlug\tests\models\entities\PaymentEntity;
+namespace PayPlug\tests\models\entities\LockEntity;
 
 use PayPlug\src\exceptions\BadParameterException;
-use PayPlug\src\models\entities\PaymentEntity;
+use PayPlug\src\models\entities\LockEntity;
 
 /**
  * @group entity
- * @group payment
- * @group payment_entity
+ * @group lock
+ * @group lock_entity
  */
-final class SetIdTest extends BasePaymentEntity
+final class SetIdTest extends BaseLockEntity
 {
     public function testUpdateId()
     {
-        $this->entity->setId($this->id);
+        $this->entity->setId(42);
         $this->assertSame(
-            $this->id,
+            42,
             $this->entity->getId()
         );
     }
 
-    public function testReturnPaymentEntity()
+    public function testReturnLockEntity()
     {
         $this->assertInstanceOf(
-            PaymentEntity::class,
-            $this->entity->setId($this->id)
+            LockEntity::class,
+            $this->entity->setId(42)
         );
     }
 

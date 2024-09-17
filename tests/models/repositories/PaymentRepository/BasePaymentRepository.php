@@ -23,5 +23,19 @@ class BasePaymentRepository extends BaseRepository
             ->andReturnUsing(function ($value) {
                 return $value;
             });
+        $this->entity->shouldReceive([
+            'getDefinition' => [
+                'table' => 'payplug_payment',
+                'primary' => 'id_payplug_payment',
+                'fields' => [
+                    'resource_id' => ['type' => 'string', 'required' => true],
+                    'method' => ['type' => 'string', 'required' => true],
+                    'id_cart' => ['type' => 'integer', 'required' => true],
+                    'cart_hash' => ['type' => 'string', 'required' => true],
+                    'schedules' => ['type' => 'string'],
+                    'date_upd' => ['type' => 'string'],
+                ],
+            ],
+        ]);
     }
 }

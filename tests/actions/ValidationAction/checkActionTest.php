@@ -11,6 +11,7 @@ namespace PayPlug\tests\actions\ValidationAction;
  */
 class checkActionTest extends BaseValidationAction
 {
+    protected $configClass;
     protected $links;
     protected $order_adapter;
     protected $queue_repository;
@@ -35,6 +36,9 @@ class checkActionTest extends BaseValidationAction
             'getOrder' => $this->order_adapter,
             'getQueueRepository' => $this->queue_repository,
         ]);
+
+        $this->configClass = \Mockery::mock('ConfigClass');
+        $this->dependencies->configClass = $this->configClass;
     }
 
     /**
@@ -106,6 +110,9 @@ class checkActionTest extends BaseValidationAction
 
     public function testWhenCurrentQueueCantBeUpdated()
     {
+        $this->configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
         $this->order_adapter
             ->shouldReceive([
                 'getIdByCartId' => false,
@@ -125,8 +132,38 @@ class checkActionTest extends BaseValidationAction
         );
     }
 
+    public function testWhenCurrentLockCantBeUpdated()
+    {
+        $this->configClass->shouldReceive([
+            'isValidFeature' => false,
+        ]);
+        $this->order_adapter->shouldReceive([
+            'getIdByCartId' => false,
+        ]);
+
+        $lock_repository = \Mockery::mock('LockRepository');
+        $lock_repository->shouldReceive([
+            'deleteBy' => false,
+        ]);
+        $this->plugin->shouldReceive([
+            'getLockRepository' => $lock_repository,
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'action' => 'redirect',
+                'redirected_url' => $this->links['error'],
+            ],
+            $this->action->checkAction($this->cart_id, true)
+        );
+    }
+
     public function testWhenOrderCantBeCreated()
     {
+        $this->configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
         $this->order_adapter
             ->shouldReceive([
                 'getIdByCartId' => false,
@@ -154,6 +191,9 @@ class checkActionTest extends BaseValidationAction
 
     public function testWhenOrderIsCreated()
     {
+        $this->configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
         $this->order_adapter
             ->shouldReceive([
                 'getIdByCartId' => false,
