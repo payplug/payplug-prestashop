@@ -28,7 +28,7 @@
 
 {block name='page_content'}
     <div class="payplugValidation">
-        <p>Your payment is about to be validate, wait until the creation of your order.</p>
+        <p>{l s='Your payment is being processed. Please wait while we confirm your order.' mod='payplug'}</p>
         <div class="payplugUILoader" >
             <span></span>
         </div>

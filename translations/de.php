@@ -508,4 +508,5 @@ $_MODULE['<{payplug}prestashop>type_7cc9586e9d0d779fe9466941795a2df2'] = 'By sel
 $_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Update';
 $_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Update this order';
 $_MODULE['<{payplug}prestashop>validation_015c603172846437ee7a569dc2c36273'] = 'Waiting for confirmation';
+$_MODULE['<{payplug}prestashop>validation_4702e2c7cdb95d8ddef1fdcbdd690112'] = 'Your payment is being processed. Please wait while we confirm your order.';
 $_MODULE['<{payplug}prestashop>validation_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
