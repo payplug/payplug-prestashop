@@ -38,6 +38,7 @@ class QueryAdapter implements QueryInterface
         try {
             $this->db = \Db::getInstance();
         } catch (\Exception $e) {
+            // todo do something about this
             var_dump($e);
         }
     }
@@ -61,7 +62,8 @@ class QueryAdapter implements QueryInterface
 
             return $this->db->{$action}($SQLRequest);
         } catch (\Exception $e) {
-            var_dump($e);
+            // todo add log
+            return false;
         }
     }
 
