@@ -507,4 +507,5 @@ $_MODULE['<{payplug}prestashop>type_7cc9586e9d0d779fe9466941795a2df2'] = 'Grazie
 $_MODULE['<{payplug}prestashop>update_06933067aafd48425d67bcb01bba5cb6'] = 'Aggiorna';
 $_MODULE['<{payplug}prestashop>update_ee19a5b4e629f12ccab7e31449826748'] = 'Aggiorna questo ordine';
 $_MODULE['<{payplug}prestashop>validation_015c603172846437ee7a569dc2c36273'] = 'Pagamento in corso';
+$_MODULE['<{payplug}prestashop>validation_4702e2c7cdb95d8ddef1fdcbdd690112'] = 'Il tuo pagamento è in fase di elaborazione. Ti preghiamo di attendere, questa operazione potrebbe richiedere qualche istante.';
 $_MODULE['<{payplug}prestashop>validation_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
