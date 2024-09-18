@@ -107,9 +107,7 @@ class PluginInit extends BaseClass
 
     // EntitiesApiRest
     private $cacheEntity;
-    private $oneyEntity;
     private $plugin;
-    private $order_state_entity;
 
     // Repositories & necessary classes
     private $apiClass;

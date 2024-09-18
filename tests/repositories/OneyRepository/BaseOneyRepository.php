@@ -3,7 +3,6 @@
 namespace PayPlug\tests\repositories\OneyRepository;
 
 use PayPlug\src\models\classes\paymentMethod\OneyPaymentMethod;
-use PayPlug\src\models\entities\OneyEntity;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\tests\mock\AddressMock;
@@ -28,7 +27,6 @@ class BaseOneyRepository extends RepositoryBase
     protected $dependencies;
     protected $helpers;
     protected $loggerRepository;
-    protected $oney;
     protected $routes;
     protected $toolsAdapter;
 
@@ -36,9 +34,7 @@ class BaseOneyRepository extends RepositoryBase
     {
         parent::setUp();
 
-        $this->oney = $this->oney ? $this->oney : new OneyEntity();
         $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-
         $this->config
             ->shouldReceive('get')
             ->andReturnUsing(function ($key) {

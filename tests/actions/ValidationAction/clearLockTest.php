@@ -71,7 +71,7 @@ class clearLockTest extends BaseValidationAction
             'isValidFeature' => false,
         ]);
         $this->lock_repository->shouldReceive([
-            'deleteLock' => false,
+            'deleteBy' => false,
         ]);
         $this->assertFalse($this->action->clearLock($this->cart_id));
     }
@@ -82,7 +82,7 @@ class clearLockTest extends BaseValidationAction
             'isValidFeature' => false,
         ]);
         $this->lock_repository->shouldReceive([
-            'deleteLock' => true,
+            'deleteBy' => true,
         ]);
         $this->assertTrue($this->action->clearLock($this->cart_id));
     }

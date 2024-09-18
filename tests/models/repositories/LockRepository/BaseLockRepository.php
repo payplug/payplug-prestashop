@@ -23,5 +23,18 @@ class BaseLockRepository extends BaseRepository
             ->andReturnUsing(function ($value) {
                 return $value;
             });
+
+        $this->entity->shouldReceive([
+            'getDefinition' => [
+                'table' => 'payplug_lock',
+                'primary' => 'id_payplug_lock',
+                'fields' => [
+                    'id_cart' => ['type' => 'integer', 'required' => true],
+                    'id_order' => ['type' => 'string', 'required' => true],
+                    'date_add' => ['type' => 'string'],
+                    'date_upd' => ['type' => 'string'],
+                ],
+            ],
+        ]);
     }
 }

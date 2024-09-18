@@ -37,6 +37,6 @@ final class SetIdTest extends BaseLoggerEntity
     public function testThrowExceptionWhenNotAnInteger($id)
     {
         $this->expectException(BadParameterException::class);
-        $this->entity->setDateUpd($id);
+        $this->entity->setId($id);
     }
 }

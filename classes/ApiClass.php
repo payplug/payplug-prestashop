@@ -63,9 +63,7 @@ class ApiClass
     /** @var string */
     private $portal_url;
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     private $site_url;
 
     private $tools;

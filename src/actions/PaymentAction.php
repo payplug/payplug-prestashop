@@ -340,7 +340,7 @@ class PaymentAction
         } else {
             $delete_lock = $this->plugin
                 ->getLockRepository()
-                ->deleteLock((int) $order->id_cart);
+                ->deleteBy('id_cart', (int) $order->id_cart);
             if ($delete_lock) {
                 $this->logger->addLog('PaymentAction::captureAction - Lock deletion succeeded for cart ID: ' . $order->id_cart, 'notice');
             } else {

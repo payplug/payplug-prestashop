@@ -240,7 +240,7 @@ class PayPlugNotifications
                 $delete_lock = $this->dependencies
                     ->getPlugin()
                     ->getLockRepository()
-                    ->deleteLock((int) $this->lock_key);
+                    ->deleteBy('id_cart', (int) $this->lock_key);
                 if (!$delete_lock) {
                     $this->logger->addLog('Lock cannot be deleted.', 'error');
                 } else {

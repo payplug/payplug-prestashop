@@ -21,9 +21,22 @@ class initializeTest extends BaseCardRepository
         $this->assertFalse($this->repository->initialize($engine));
     }
 
+    public function testWhenNoEntityNameDefined()
+    {
+        $this->repository->entity_name = '';
+        $this->assertFalse($this->repository->initialize($this->engine));
+    }
+
+    public function testWhenEntityObjectCantBeGetted()
+    {
+        $this->repository->shouldReceive([
+            'getEntityObject' => null,
+        ]);
+        $this->assertFalse($this->repository->initialize($this->engine));
+    }
+
     public function testWhenTableCantBeInitialized()
     {
-        $engine = 'sql_engine';
         $this
             ->repository
             ->shouldReceive([
@@ -34,12 +47,11 @@ class initializeTest extends BaseCardRepository
                 'engine' => $this->repository,
                 'build' => false,
             ]);
-        $this->assertFalse($this->repository->initialize($engine));
+        $this->assertFalse($this->repository->initialize($this->engine));
     }
 
     public function testWhenTableIsInitialized()
     {
-        $engine = 'sql_engine';
         $this
             ->repository
             ->shouldReceive([
@@ -50,6 +62,6 @@ class initializeTest extends BaseCardRepository
                 'engine' => $this->repository,
                 'build' => true,
             ]);
-        $this->assertTrue($this->repository->initialize($engine));
+        $this->assertTrue($this->repository->initialize($this->engine));
     }
 }
