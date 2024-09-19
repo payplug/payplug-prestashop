@@ -3,6 +3,8 @@
 ## Version 4.13.0
 - Feature :
   - [PRE-2565](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2546): Update ApplePay translations in BO
+  - [PRE-2623](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2550): Activate queueing system
+  - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
 
 ## Version 4.12.1
 - Bugfix :
