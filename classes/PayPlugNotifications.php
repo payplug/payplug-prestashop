@@ -221,6 +221,7 @@ class PayPlugNotifications
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
             if ($this->lock_key) {
                 $update_queue = $this->dependencies
+                    ->getPlugin()
                     ->getQueueAction()
                     ->updateAction($this->cart->id);
 
@@ -399,7 +400,10 @@ class PayPlugNotifications
             // Set lock Lock the process with id_cart from order object
             if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
                 $this->logger->addLog('Notification: Attempting to set queue for Cart ID: ' . $this->cart->id, 'notice');
-                $create_queue = $this->dependencies->getQueueAction()->hydrateAction($this->cart->id, $this->resource->id);
+                $create_queue = $this->dependencies
+                    ->getPlugin()
+                    ->getQueueAction()
+                    ->hydrateAction($this->cart->id, $this->resource->id);
                 if (!$create_queue['result']) {
                     $this->exitProcess('Error: Queue cannot be created for Cart ID: ' . $this->cart->id, 500);
                 }
@@ -563,10 +567,15 @@ class PayPlugNotifications
         // check if queueing system is enabled
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
             $this->logger->addLog('Notification: Attempting to set queue for Cart ID: ' . $this->cart->id);
-            $create_queue = $this->dependencies->getQueueAction()->hydrateAction($this->cart->id, $this->resource->id);
+            $create_queue = $this->dependencies
+                ->getPlugin()
+                ->getQueueAction()
+                ->hydrateAction($this->cart->id, $this->resource->id);
+
             if (!$create_queue['result']) {
                 $this->exitProcess('Error: Queue cannot be created for Cart ID: ' . $this->cart->id, 500);
             }
+
             if ($create_queue['exists']) {
                 $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
             }
