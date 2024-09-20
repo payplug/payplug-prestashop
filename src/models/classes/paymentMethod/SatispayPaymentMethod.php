@@ -35,6 +35,7 @@ class SatispayPaymentMethod extends PaymentMethod
         $this->name = 'satispay';
         $this->order_name = 'satispay';
         $this->refundable = false;
+        $this->cancellable = false;
     }
 
     /**

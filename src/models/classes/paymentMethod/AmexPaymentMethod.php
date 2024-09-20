@@ -34,7 +34,6 @@ class AmexPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'amex';
         $this->order_name = 'amex';
-        $this->cancellable = false;
     }
 
     /**

@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.12.1
+- Bugfix :
+  - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2552) : Fix cancellable field for Satispay, Amex and Ideal payment methods
+  
 ## Version 4.12.0
 - Refactoring :
   - [PRE-2519](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2517): Set Queue Entity
