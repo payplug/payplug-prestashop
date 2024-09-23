@@ -103,4 +103,86 @@ class hydrateActionTest extends BaseQueueAction
             $this->action->hydrateAction($this->id_cart, $this->resource_id, $this->type)
         );
     }
+
+    public function testWhenQueueExistsAndExpired()
+    {
+        $this->repository
+            ->shouldReceive('getFirstNotTreatedEntry')
+            ->once()
+            ->andReturn([
+                'id_payplug_queue' => 7,
+                'id_cart' => $this->id_cart,
+                'resource_id' => $this->resource_id,
+                'type' => $this->type,
+                'date_add' => '2222-09-23 16:28:11',
+                'date_upd' => '2222-09-23 16:28:11',
+                'treated' => false,
+            ]);
+        $this->repository
+            ->shouldReceive([
+                'getFirstNotTreatedEntry' => [
+                    'id_payplug_queue' => 7,
+                    'id_cart' => $this->id_cart,
+                    'resource_id' => $this->resource_id,
+                    'type' => $this->type,
+                    'date_add' => '2024-09-23 16:28:11',
+                    'date_upd' => '2024-09-23 16:28:11',
+                    'treated' => false,
+                ],
+                'updateEntity' => true,
+                'createEntity' => true,
+                'hydrateAction' => [
+                    'exists' => true,
+                    'result' => true,
+                ],
+            ]);
+        $this->assertSame(
+            [
+                'exists' => true,
+                'result' => true,
+            ],
+            $this->action->hydrateAction($this->id_cart, $this->resource_id, $this->type)
+        );
+    }
+
+    public function testWhenQueueExistsAndFailUpdate()
+    {
+        $this->repository
+            ->shouldReceive('getFirstNotTreatedEntry')
+            ->once()
+            ->andReturn([
+                'id_payplug_queue' => 7,
+                'id_cart' => $this->id_cart,
+                'resource_id' => $this->resource_id,
+                'type' => $this->type,
+                'date_add' => '2222-09-23 16:28:11',
+                'date_upd' => '2222-09-23 16:28:11',
+                'treated' => false,
+            ]);
+        $this->repository
+            ->shouldReceive([
+                'getFirstNotTreatedEntry' => [
+                    'id_payplug_queue' => 7,
+                    'id_cart' => $this->id_cart,
+                    'resource_id' => $this->resource_id,
+                    'type' => $this->type,
+                    'date_add' => '2024-09-23 16:28:11',
+                    'date_upd' => '2024-09-23 16:28:11',
+                    'treated' => false,
+                ],
+                'updateEntity' => false,
+                'createEntity' => true,
+                'hydrateAction' => [
+                    'exists' => true,
+                    'result' => true,
+                ],
+            ]);
+        $this->assertSame(
+            [
+                'exists' => true,
+                'result' => true,
+            ],
+            $this->action->hydrateAction($this->id_cart, $this->resource_id, $this->type)
+        );
+    }
 }

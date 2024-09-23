@@ -14,6 +14,7 @@
 ## Version 4.12.0
 - Feature :
     - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
+    - [PRE-2624](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2553): Add 5 life time to queue
 
 ## Version 4.12.0
 - Refactoring :
