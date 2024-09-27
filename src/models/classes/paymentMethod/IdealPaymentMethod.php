@@ -35,6 +35,7 @@ class IdealPaymentMethod extends PaymentMethod
         $this->name = 'ideal';
         $this->order_name = 'ideal';
         $this->refundable = false;
+        $this->cancellable = false;
     }
 
     /**
