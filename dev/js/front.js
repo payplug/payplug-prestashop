@@ -153,6 +153,7 @@ var $document, $window, __moduleName__Module = {
                 integrated.props.submited = false;
 
                 if (clear) {
+                    let {form} = integrated.props;
                     form.cardHolder.clear();
                     form.pan.clear();
                     form.cvv.clear();
