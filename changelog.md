@@ -3,6 +3,7 @@
 ## Version 4.12.1
 - Bugfix :
   - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2552) : Fix cancellable field for Satispay, Amex and Ideal payment methods
+  - [PRE-2974](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2558) : Fix var declaration in front js
   
 ## Version 4.12.0
 - Refactoring :
