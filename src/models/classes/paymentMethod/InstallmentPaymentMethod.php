@@ -423,7 +423,13 @@ class InstallmentPaymentMethod extends PaymentMethod
         return $payment;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the current payment status from the resource
+     *
+     * @param null $resource
+     *
+     * @return array
+     */
     public function getPaymentStatus($resource = null)
     {
         $this->setParameters();
@@ -441,7 +447,66 @@ class InstallmentPaymentMethod extends PaymentMethod
             ];
         }
 
-        return parent::getPaymentStatus($resource);
+        if ((bool) $resource->failure) {
+            if ('aborted' == $resource->failure->code) {
+                return [
+                    'id_status' => 7,
+                    'code' => 'cancelled',
+                ];
+            } elseif ('timeout' == $resource->failure->code) {
+                return [
+                    'id_status' => 11,
+                    'code' => 'abandoned',
+                ];
+            }
+
+            return [
+                'id_status' => 3,
+                'code' => 'failed',
+            ];
+        }
+
+        $amount = 0;
+        $amount_refounded = 0;
+        foreach ($resource->schedule as $schedule) {
+            $amount += $schedule->amount;
+            if (count($schedule->payment_ids) > 0) {
+                $pay_id = $schedule->payment_ids[0];
+                $retrieve_payment = $this->dependencies
+                    ->getPlugin()
+                    ->getApiService()
+                    ->retrievePayment($pay_id);
+                if ($retrieve_payment['result']) {
+                    $amount_refounded += $retrieve_payment['resource']->amount_refunded;
+                }
+            }
+        }
+
+        if ((int) $amount == (int) $amount_refounded) {
+            return [
+                'id_status' => 5,
+                'code' => 'refunded',
+            ];
+        }
+
+        if (0 < (int) $amount_refounded) {
+            return [
+                'id_status' => 4,
+                'code' => 'partially_refunded',
+            ];
+        }
+
+        if ((bool) $resource->is_fully_paid) {
+            return [
+                'id_status' => 2,
+                'code' => 'paid',
+            ];
+        }
+
+        return [
+            'id_status' => 1,
+            'code' => 'not_paid',
+        ];
     }
 
     /**
