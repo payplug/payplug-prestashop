@@ -30,10 +30,12 @@ if (!defined('_PS_VERSION_')) {
 class QueueAction
 {
     private $dependencies;
+    private $queue_time;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
+        $this->queue_time = 5;
     }
 
     /**
@@ -81,12 +83,52 @@ class QueueAction
         }
 
         // check if exists
-        $exists = !empty($this->dependencies
+        $entry = $this->dependencies
             ->getPlugin()
             ->getQueueRepository()
-            ->getFirstNotTreatedEntry((int) $id_cart));
+            ->getFirstNotTreatedEntry((int) $id_cart);
 
+        $exists = !empty($entry);
         $current_date = date('Y-m-d H:i:s');
+
+        if ($exists) {
+            $lifetime = new \DateInterval('PT20S');
+            $date_add = new \DateTime($entry['date_add']);
+            $end_of_life = $date_add->add($lifetime);
+            $time = new \DateTime($current_date);
+
+            if ($time > $end_of_life) {
+                // queue expired
+                $fields = [
+                    'treated' => true,
+                    'date_upd' => $current_date,
+                ];
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('QueueAction::hydrateAction() - Treating expired queue' . $entry['id_payplug_queue']);
+
+                $update = (bool) $this->dependencies
+                    ->getPlugin()
+                    ->getQueueRepository()
+                    ->updateEntity((int) $entry['id_payplug_queue'], $fields);
+
+                if ($update) {
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getLogger()
+                        ->addLog('QueueAction::hydrateAction() - Expired queue treated');
+
+                    return $this->hydrateAction($id_cart, $resource_id, $type);
+                }
+
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('QueueAction::hydrateAction() - Error during treatment of expired queue', 'error');
+            }
+        }
+
         $fields = [
             'id_cart' => $id_cart,
             'resource_id' => $resource_id,
@@ -95,7 +137,6 @@ class QueueAction
             'date_upd' => $current_date,
             'treated' => false,
         ];
-
         $create = (bool) $this->dependencies
             ->getPlugin()
             ->getQueueRepository()

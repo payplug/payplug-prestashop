@@ -103,4 +103,50 @@ class hydrateActionTest extends BaseQueueAction
             $this->action->hydrateAction($this->id_cart, $this->resource_id, $this->type)
         );
     }
+
+    public function testWhenFirstEntryQueueIsExpiredAndUpdated()
+    {
+        $entry = [
+            'id_payplug_queue' => 42,
+            'date_add' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+        ];
+        $this->repository
+            ->shouldReceive('getFirstNotTreatedEntry')
+            ->once()
+            ->andReturn($entry);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => false,
+            'updateEntity' => true,
+            'createEntity' => true,
+        ]);
+        $expected = [
+            'exists' => false,
+            'result' => true,
+        ];
+        $this->assertSame(
+            $expected,
+            $this->action->hydrateAction($this->id_cart, $this->resource_id, $this->type)
+        );
+    }
+
+    public function testWhenFirstEntryQueueIsExpiredAndCantBeUpdated()
+    {
+        $entry = [
+            'id_payplug_queue' => 42,
+            'date_add' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+        ];
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => $entry,
+            'updateEntity' => false,
+            'createEntity' => true,
+        ]);
+        $expected = [
+            'exists' => true,
+            'result' => true,
+        ];
+        $this->assertSame(
+            $expected,
+            $this->action->hydrateAction($this->id_cart, $this->resource_id, $this->type)
+        );
+    }
 }

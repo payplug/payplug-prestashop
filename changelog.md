@@ -1,10 +1,22 @@
 # Payplug module changelog
 
+## Version 4.13.0
+- Feature :
+  - [PRE-2565](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2546): Update ApplePay translations in BO
+  - [PRE-2623](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2550): Activate queueing system
+  - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
+  - [PRE-2627](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2557): Update CB logo and Mastercard logo on merchant side + Mastercard logo on client side
+
 ## Version 4.12.1
 - Bugfix :
   - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2552) : Fix cancellable field for Satispay, Amex and Ideal payment methods
   - [PRE-2974](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2558) : Fix var declaration in front js
   
+## Version 4.12.0
+- Feature :
+    - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
+    - [PRE-2624](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2553): Add 5 life time to queue
+
 ## Version 4.12.0
 - Refactoring :
   - [PRE-2519](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2517): Set Queue Entity
