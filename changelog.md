@@ -7,6 +7,9 @@
   - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
   - [PRE-2627](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2557): Update CB logo and Mastercard logo on merchant side + Mastercard logo on client side
 
+- Bugfix :
+  - [PRE-2560](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2560) : Fix check if installment plan is partially or fully refund
+
 ## Version 4.12.1
 - Bugfix :
   - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2552) : Fix cancellable field for Satispay, Amex and Ideal payment methods
