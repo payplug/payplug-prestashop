@@ -5,7 +5,7 @@
   - [PRE-2565](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2546): Update ApplePay translations in BO
   - [PRE-2623](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2550): Activate queueing system
   - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
-  - [PRE-2627](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2557): Update CB logo and Mastercard logo on merchant side + Mastercard logo on client side
+  - [PRE-2627](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2557): Update CB logo and Mastercard logos
 
 - Bugfix :
   - [PRE-2560](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2560) : Fix check if installment plan is partially or fully refund
