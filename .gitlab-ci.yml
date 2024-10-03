@@ -3,7 +3,6 @@ include:
   - project: "dalenys/protected/cicd/live"
     ref: "gitlab-ci-template"
     file:
-      ## generic pipeline template
       - "ci/ci.gitlab-ci.yml"
 
 # Override the default value from
@@ -24,59 +23,10 @@ workflow:
     # Cleanup scenario
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "master" && $CLEANUP_BRANCH
 
-# Disable .gitlab-ci.yml check
-.validate_gitlab-ci_migration:
-  script: []
-
-validate_jira_status:
-  rules:
-    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"
-      when: never
-    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "develop"
-      when: never
-    - if: $CI_MERGE_REQUEST_ID
-
-.validate_branchName:
-  script: |
-    # Check branch name
-    if [[ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" =~ ^[A-Z][0-9A-Z]+-[0-9]+-?[-0-9A-Za-z]*$ || "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" = "master" || "$CI_COMMIT_BRANCH" = "master" || "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" = "develop" || "$CI_COMMIT_BRANCH" = "develop" ]]; then
-      echo "branch name OK"
-    else
-      echo_error "branch name must match '^[A-Z][0-9A-Z]+-[0-9]+-?[-0-9A-Za-z]*$' ex: CORP-1234 or CORP-1234-my-change"
-      false
-    fi
-
-.validate_targetBranchName:
-  script: |
-    # Check target branch
-    if [[ "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-${CI_COMMIT_BRANCH}}" =~ (master|develop) ]]; then
-      echo "the branch is correctly set to be merged to master or develop"
-    elif [[ "$FINALIZE_PROJECT_INTEGRITY_CHECK" == "true" && "$CI_JOB_STAGE" != "finalize" ]]; then
-      # make sure the previous condition is still aligned with 'finally_check_project_integrity'
-      echo_warning "The branch must always be merged to master or develop"
-    else
-      echo_error "The branch must always be merged to master or develop"
-      false
-    fi
-
-finally_check_project_integrity:
-  extends: check_project_integrity
-  stage: finalize
-  rules:
-    - if: $CI_MERGE_REQUEST_ID && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "master" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "develop"
-  when: manual # it is better to have the pipeline marked as "blocked" rather than "failed"
-  allow_failure: false # we intend to always block the pipeline
-
 .setup_version_scripts:
   parse_project_version:
     - export ARTIFACT_VERSION=$( jq -r '.version' dev/dist/payplug/composer.json )
     - export TAG_NAME=${ARTIFACT_VERSION}
-
-setup_version:
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_MERGE_REQUEST_ID
 
 # --- CI/CD pipeline ---
 
