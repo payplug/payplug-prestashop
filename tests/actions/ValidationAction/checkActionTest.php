@@ -24,11 +24,10 @@ class checkActionTest extends BaseValidationAction
             'cancel' => 'cancel_url',
             'confirm' => 'confirm_url',
         ];
-        $this->action
-            ->shouldReceive([
-                'getOrderLinks' => $this->links,
-                'clearLock' => true,
-            ]);
+        $this->action->shouldReceive([
+            'getOrderLinks' => $this->links,
+            'clearLock' => true,
+        ]);
 
         $this->order_adapter = \Mockery::mock('OrderAdapter');
         $this->queue_repository = \Mockery::mock('QueueRepository');
@@ -77,10 +76,9 @@ class checkActionTest extends BaseValidationAction
 
     public function testWhenAnOrderIsRetrievedForAGivenCartId()
     {
-        $this->order_adapter
-            ->shouldReceive([
-                'getIdByCartId' => 42,
-            ]);
+        $this->order_adapter->shouldReceive([
+            'getIdByCartId' => 42,
+        ]);
 
         $this->assertSame(
             [
@@ -94,10 +92,9 @@ class checkActionTest extends BaseValidationAction
 
     public function testWhenNoOrdersAreRetrievedForAGivenCartId()
     {
-        $this->order_adapter
-            ->shouldReceive([
-                'getIdByCartId' => false,
-            ]);
+        $this->order_adapter->shouldReceive([
+            'getIdByCartId' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -113,14 +110,12 @@ class checkActionTest extends BaseValidationAction
         $this->configClass->shouldReceive([
             'isValidFeature' => true,
         ]);
-        $this->order_adapter
-            ->shouldReceive([
-                'getIdByCartId' => false,
-            ]);
-        $this->queue_repository
-            ->shouldReceive([
-                'updateBy' => false,
-            ]);
+        $this->order_adapter->shouldReceive([
+            'getIdByCartId' => false,
+        ]);
+        $this->queue_repository->shouldReceive([
+            'updateBy' => false,
+        ]);
 
         $this->assertSame(
             [
@@ -164,20 +159,17 @@ class checkActionTest extends BaseValidationAction
         $this->configClass->shouldReceive([
             'isValidFeature' => true,
         ]);
-        $this->order_adapter
-            ->shouldReceive([
-                'getIdByCartId' => false,
-            ]);
-        $this->queue_repository
-            ->shouldReceive([
-                'updateBy' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'createOrder' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->order_adapter->shouldReceive([
+            'getIdByCartId' => false,
+        ]);
+        $this->queue_repository->shouldReceive([
+            'updateBy' => true,
+        ]);
+        $this->action->shouldReceive([
+            'createOrder' => [
+                'result' => false,
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -194,21 +186,18 @@ class checkActionTest extends BaseValidationAction
         $this->configClass->shouldReceive([
             'isValidFeature' => true,
         ]);
-        $this->order_adapter
-            ->shouldReceive([
-                'getIdByCartId' => false,
-            ]);
-        $this->queue_repository
-            ->shouldReceive([
-                'updateBy' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'createOrder' => [
-                    'result' => true,
-                    'id_order' => 42,
-                ],
-            ]);
+        $this->order_adapter->shouldReceive([
+            'getIdByCartId' => false,
+        ]);
+        $this->queue_repository->shouldReceive([
+            'updateBy' => true,
+        ]);
+        $this->action->shouldReceive([
+            'createOrder' => [
+                'result' => true,
+                'id_order' => 42,
+            ],
+        ]);
 
         $this->assertSame(
             [

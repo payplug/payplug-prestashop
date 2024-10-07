@@ -15,7 +15,7 @@ class BaseRepository extends TestCase
     protected $entity;
     protected $entity_id;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->dependencies = \Mockery::mock('Dependencies');

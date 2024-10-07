@@ -36,6 +36,70 @@ class InstallmentPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @description Add schedule to a stored installment resource
+     *
+     * @param array $retrieve
+     *
+     * @return bool
+     */
+    public function addInstallmentSchedules($retrieve = [])
+    {
+        if (!is_array($retrieve) || empty($retrieve)) {
+            return false;
+        }
+
+        $installment = $retrieve['resource'];
+        if (!is_object($installment) || !$installment) {
+            return false;
+        }
+
+        // Check if schedules already exists in database
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $installment->id);
+        if (!empty($stored_resource) && !empty($stored_resource['schedules'])) {
+            return $this->updateInstallmentSchedules($retrieve);
+        }
+
+        if (!isset($retrieve['schedule']) || empty($retrieve['schedule'])) {
+            return false;
+        }
+
+        $step_count = count($installment->schedule);
+        $index = 0;
+        $schedules = [];
+        foreach ($retrieve['schedule'] as $schedule) {
+            ++$index;
+            $id_payment = '';
+            if ($schedule['resource']) {
+                $id_payment = $schedule['resource']->id;
+                $status = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('standard')
+                    ->getPaymentStatus($schedule['resource'])['id_status'];
+            } else {
+                $status = 6;
+            }
+            $schedules[] = [
+                'id_payment' => $id_payment,
+                'step' => $index . '/' . $step_count,
+                'amount' => (int) $schedule['amount'],
+                'status' => (int) $status,
+                'scheduled_date' => $schedule['date'],
+            ];
+        }
+
+        return $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->updateBy('resource_id', $installment->id, [
+                'schedules' => json_encode($schedules),
+            ]);
+    }
+
+    /**
      * @description Get option for given configuration
      * For this payment method we always return empty array since this payment feature is contain in standard payment option
      *
@@ -48,35 +112,38 @@ class InstallmentPaymentMethod extends PaymentMethod
         return [];
     }
 
-    // todo: add coverage to this method
-    public function getOrderTab($installment = null)
+    /**
+     * @description Get order tab for given resource to create the order
+     * @todo: add coverage to this method
+     *
+     * @param array $retrieve
+     *
+     * @return array
+     */
+    public function getOrderTab($retrieve = null)
     {
         $this->setParameters();
 
-        if (!is_object($installment) || !$installment) {
-            $this->logger->addLog('InstallmentPaymentMethod::getOrderTab() - Invalid argument given, $installment must be a non null object.');
+        $resource = $retrieve['resource'];
+        if (!is_object($resource) || !$resource) {
+            $this->logger->addLog('InstallmentPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
         }
 
         $amount = 0;
         $order_state = 0;
-        foreach ($installment->schedule as $schedule) {
+        foreach ($retrieve['schedule'] as $schedule) {
             if (!$amount) {
-                $pay_id = $schedule->payment_ids[0];
-                $retrieve_payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-                if (!$retrieve_payment['result']) {
-                    return [];
-                }
-                $payment = $retrieve_payment['resource'];
-                $state_addons = $installment->is_live ? '' : '_test';
+                $payment = $schedule['resource'];
+                $state_addons = $resource->is_live ? '' : '_test';
                 if ($this->dependencies->getValidators()['payment']->isDeferred($payment)['result']) {
                     $order_state = $this->configuration->getValue('order_state_auth' . $state_addons);
                 } else {
                     $order_state = $this->configuration->getValue('order_state_paid' . $state_addons);
                 }
             }
-            $amount += (int) $schedule->amount;
+            $amount += (int) $schedule['amount'];
         }
 
         $amount = $this->dependencies
@@ -93,6 +160,32 @@ class InstallmentPaymentMethod extends PaymentMethod
             'amount' => $amount,
             'module_name' => $translation['module_name']['default'],
         ];
+    }
+
+    /**
+     * @description Get payment status for a given resource
+     *
+     * @param null $resource
+     *
+     * @return array
+     */
+    public function getPaymentStatus($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            // todo: add error log
+            return [];
+        }
+
+        if ((bool) $resource->is_active) {
+            return [
+                'id_status' => 6,
+                'code' => 'on_going',
+            ];
+        }
+
+        return parent::getPaymentStatus($resource);
     }
 
     /**
@@ -131,6 +224,7 @@ class InstallmentPaymentMethod extends PaymentMethod
     public function getResourceDetail($resource_id = '')
     {
         $this->setParameters();
+
         if (!is_string($resource_id) || !$resource_id) {
             $this->logger->addLog('InstallmentPaymentMethod::getResourceDetail - Invalid argument, $resource_id must be a non empty string.', 'error');
 
@@ -140,17 +234,7 @@ class InstallmentPaymentMethod extends PaymentMethod
             ];
         }
 
-        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
-        $retrieve = $this->dependencies->apiClass->retrieveInstallment($resource_id);
-        if (!$retrieve['result']) {
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrieveInstallment($resource_id);
-            } else {
-                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrieveInstallment($resource_id);
-            }
-        }
+        $retrieve = $this->retrieve($resource_id);
         if (!$retrieve['result']) {
             $this->logger->addLog('PaymentMethod::getResourceDetail - Installment resource can\'t be retrieved for given resource id.', 'error');
 
@@ -159,14 +243,12 @@ class InstallmentPaymentMethod extends PaymentMethod
 
         $resource = $retrieve['resource'];
 
-        $payment_list = [];
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslationClass()
             ->getOrderTranslations();
         $status = $this->getPaymentStatus($resource);
 
-        $amount_available = 0;
         $refund = [
             'refunded' => 0,
             'available' => 0,
@@ -174,53 +256,46 @@ class InstallmentPaymentMethod extends PaymentMethod
         ];
         $payment_list = [];
         $amount = 0;
-        foreach ($resource->schedule as $schedule) {
-            $amount += $schedule->amount;
-            if (!empty($schedule->payment_ids)) {
-                foreach ($schedule->payment_ids as $schedule_id) {
-                    $schedule_retrieve = $this->dependencies->apiClass->retrievePayment($schedule_id);
-                    if (!$schedule_retrieve['result']) {
-                        return false;
-                    }
-                    $schedule_resource = $schedule_retrieve['resource'];
-                    $schedule_detail = $this->dependencies
-                        ->getPlugin()
-                        ->getPaymentMethodClass()
-                        ->getPaymentMethod('standard')
-                        ->getResourceDetail($schedule_resource->id);
-                    $refund['refunded'] += $schedule_detail['refund']['refunded'];
-                    $refund['available'] += $schedule_detail['refund']['available'];
-                    $refund['is_refunded'] = (bool) $schedule_resource->is_refunded;
-                    $payment_list[] = $schedule_detail;
-                }
+        foreach ($retrieve['schedule'] as $schedule) {
+            $amount += $schedule['amount'];
+            if ($schedule['resource']) {
+                $schedule_resource = $schedule['resource'];
+                $schedule_detail = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('standard')
+                    ->getResourceDetail($schedule_resource->id);
+                $refund['refunded'] += $schedule_detail['refund']['refunded'];
+                $refund['available'] += $schedule_detail['refund']['available'];
+                $refund['is_refunded'] = (bool) $schedule_resource->is_refunded;
+                $payment_list[] = $schedule_detail;
             } else {
                 $payment_list[] = [
                     'id' => null,
                     'status' => $translation['detail']['status'][$status['code']],
                     'status_class' => $resource->is_active ? 'pp_success' : 'pp_error',
                     'status_code' => 'incoming',
-                    'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($schedule->amount, true),
+                    'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($schedule['amount'], true),
                     'card_brand' => null,
                     'card_mask' => null,
                     'tds' => null,
                     'card_date' => null,
                     'mode' => null,
                     'authorization' => null,
-                    'date' => \date('d/m/Y', \strtotime($schedule->date)),
+                    'date' => \date('d/m/Y', \strtotime($schedule['date'])),
                 ];
             }
         }
 
-        $resource_tab = $this->dependencies
+        $stored_resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
             ->getBy('resource_id', $resource->id);
-
-        if (!isset($resource_tab['schedules']) || !$resource_tab['schedules']) {
-            $this->dependencies->installmentClass->addPayplugInstallment($resource);
+        if (!isset($stored_resource['schedules']) || !$stored_resource['schedules']) {
+            $this->addInstallmentSchedules($retrieve);
         }
 
-        $this->dependencies->installmentClass->updatePayplugInstallment($resource);
+        $this->updateInstallmentSchedules($retrieve);
 
         return [
             'id' => $resource_id,
@@ -255,17 +330,17 @@ class InstallmentPaymentMethod extends PaymentMethod
             return [];
         }
 
-        $resource_stored = $this->dependencies
+        $stored_resource = $this->dependencies
             ->getPlugin()
             ->getPaymentRepository()
             ->getBy('id_cart', (int) $this->context->cart->id);
-        if (!$resource_stored) {
+        if (!$stored_resource) {
             $this->logger->addLog('InstallmentPaymentMethod::getReturnUrl() - No stored resource retrieve for current context cart id.');
 
             return [];
         }
 
-        $resource = $this->dependencies->apiClass->retrieveInstallment($resource_stored['resource_id']);
+        $resource = $this->retrieve($stored_resource['resource_id']);
         if (!$resource['result']) {
             $this->logger->addLog('InstallmentPaymentMethod::getReturnUrl() - Installment resource can\'t be retrieved for stored resource id.');
 
@@ -326,18 +401,16 @@ class InstallmentPaymentMethod extends PaymentMethod
         }
 
         // Get the resource from API
-        $retrieved_resource = $this->dependencies->apiClass->retrieveInstallment($stored_resource['resource_id']);
-        if (!$retrieved_resource['result']) {
+        $retrieve = $this->retrieve($stored_resource['resource_id']);
+        if (!$retrieve['result']) {
             $this->logger->addLog('InstallmentPaymentMethod::isValidResource() - Installment resource can\'t retrieved for stored resource id.');
 
             return false;
         }
 
         // Check if schedule has failure
-        $first_chedule = $retrieved_resource['resource']->schedule[0]->payment_ids;
-        $schedule_id = end($first_chedule);
-        $retrieved_schedule = $this->dependencies->apiClass->retrievePayment($schedule_id);
-        if (isset($retrieved_schedule['resource']->failure->code) && $retrieved_schedule['resource']->failure->code) {
+        $first_chedule = reset($retrieve['schedule']);
+        if (isset($first_chedule['resource']->failure->code) && $first_chedule['resource']->failure->code) {
             $this->logger->addLog('InstallmentPaymentMethod::isValidResource() - Retrieved Installment has failure');
 
             return false;
@@ -357,9 +430,59 @@ class InstallmentPaymentMethod extends PaymentMethod
      */
     public function postProcessOrder($resource = null, $id_order = 0)
     {
-        return $this->dependencies
-            ->installmentClass
-            ->addPayplugInstallment($resource);
+        return $this->addInstallmentSchedules($resource);
+    }
+
+    /**
+     * @description Get the related schedule for a given installment plan retrieve
+     *
+     * @param array $retrieve
+     *
+     * @return array
+     */
+    public function retrieveSchedules($retrieve = [])
+    {
+        $this->setParameters();
+
+        if (!is_array($retrieve) || !$retrieve) {
+            $this->logger->addLog('PaymentMethod::retrieveSchedule - Invalid argument, $retrieve must be a non empty array.', 'error');
+
+            return [
+                'result' => false,
+                'code' => 500,
+                'message' => 'Invalid argument, $retrieve must be a non empty array.',
+            ];
+        }
+
+        if (!$retrieve['result']) {
+            return $retrieve;
+        }
+
+        if (!isset($retrieve['resource']->schedule) || empty($retrieve['resource']->schedule)) {
+            return $retrieve;
+        }
+
+        $retrieve['schedule'] = [];
+        foreach ($retrieve['resource']->schedule as $schedule) {
+            $resource = null;
+            if (count($schedule->payment_ids) > 0) {
+                $pay_id = $schedule->payment_ids[0];
+                $retrieve_payment = $this->dependencies
+                    ->getPlugin()
+                    ->getApiService()
+                    ->retrievePayment($pay_id);
+                if ($retrieve_payment['result']) {
+                    $resource = $retrieve_payment['resource'];
+                }
+            }
+            $retrieve['schedule'][] = [
+                'amount' => $schedule->amount,
+                'date' => $schedule->date,
+                'resource' => $resource,
+            ];
+        }
+
+        return $retrieve;
     }
 
     /**
@@ -372,34 +495,28 @@ class InstallmentPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!isset($this->name) || !$this->name) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('InstallmentPaymentMethod::saveResource - Invalid argument, the method name must be defined.', 'error');
+            $this->logger->addLog('InstallmentPaymentMethod::saveResource - Invalid argument, the method name must be defined.', 'error');
 
             return [
                 'result' => false,
             ];
         }
         if (!is_array($payment_tab) || empty($payment_tab)) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('InstallmentPaymentMethod::saveResource - Invalid argument, $payment_tab must be a non empty array.', 'error');
+            $this->logger->addLog('InstallmentPaymentMethod::saveResource - Invalid argument, $payment_tab must be a non empty array.', 'error');
 
             return [
                 'result' => false,
             ];
         }
 
-        $payment = $this->dependencies->apiClass->createInstallment($payment_tab);
+        $payment = $this->dependencies
+            ->getPlugin()
+            ->getApiService()
+            ->createInstallment($payment_tab);
 
         // If the payment resource can\'t be created due to to bad permission, we update the feature activation
         if (403 == (int) $payment['code']) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('InstallmentPaymentMethod::saveResource - Bad permission error is returned by API.', 'error');
+            $this->logger->addLog('InstallmentPaymentMethod::saveResource - Bad permission error is returned by API.', 'error');
             $cart = $this->dependencies
                 ->getPlugin()
                 ->getContext()
@@ -410,10 +527,7 @@ class InstallmentPaymentMethod extends PaymentMethod
 
         // If the payment resource can\'t be created due to bad credential, we log out the merchand
         if (401 == (int) $payment['code']) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('InstallmentPaymentMethod::saveResource - Bad credential error is returned by API.', 'error');
+            $this->logger->addLog('InstallmentPaymentMethod::saveResource - Bad credential error is returned by API.', 'error');
             $this->dependencies
                 ->getPlugin()
                 ->getConfigurationAction()
@@ -423,25 +537,78 @@ class InstallmentPaymentMethod extends PaymentMethod
         return $payment;
     }
 
-    // todo: add coverage to this method
-    public function getPaymentStatus($resource = null)
+    /**
+     * @description Update stored installment ressource schedule
+     *
+     * @param array $retrieve
+     *
+     * @return false
+     */
+    public function updateInstallmentSchedules($retrieve = [])
     {
-        $this->setParameters();
-
-        if (!is_object($resource) || !$resource) {
-            $this->logger->addLog('InstallmentPaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
-
-            return [];
+        if (!is_array($retrieve) || empty($retrieve)) {
+            return false;
         }
 
-        if ((bool) $resource->is_active) {
-            return [
-                'id_status' => 6,
-                'code' => 'on_going',
+        $installment = $retrieve['resource'];
+        if (!is_object($installment) || !$installment) {
+            return false;
+        }
+
+        if (!isset($retrieve['schedule']) || empty($retrieve['schedule'])) {
+            return false;
+        }
+
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $installment->id);
+        if (empty($stored_resource)) {
+            return false;
+        }
+
+        $step_count = count($installment->schedule);
+        $step_to_update = [];
+        $index = 0;
+        foreach ($retrieve['schedule'] as $schedule) {
+            ++$index;
+            $id_payment = '';
+            if ($schedule['resource']) {
+                $id_payment = $schedule['resource']->id;
+                $status = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('standard')
+                    ->getPaymentStatus($schedule['resource'])['id_status'];
+            } else {
+                if (1 == (int) $installment->is_active) {
+                    $status = 6; // ongoing
+                } else {
+                    $status = 7; // cancelled
+                }
+            }
+            $step = $index . '/' . $step_count;
+            $step_to_update[$step] = [
+                'id_payment' => $id_payment,
+                'status' => (int) $status,
             ];
         }
 
-        return parent::getPaymentStatus($resource);
+        $schedules = json_decode($stored_resource['schedules'], true);
+        foreach ($schedules as &$schedule) {
+            $step = $schedule['step'];
+            if (array_key_exists($step, $step_to_update)) {
+                $schedule['id_payment'] = $step_to_update[$step]['id_payment'];
+                $schedule['status'] = $step_to_update[$step]['status'];
+            }
+        }
+
+        return $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->updateBy('resource_id', $installment->id, [
+                'schedules' => json_encode($schedules),
+            ]);
     }
 
     /**

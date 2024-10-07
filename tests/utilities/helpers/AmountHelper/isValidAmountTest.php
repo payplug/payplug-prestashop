@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @group unit
- * @group action
+ * @group helper
  * @group amount_helper
  *
  * @runTestsInSeparateProcesses
@@ -19,7 +19,7 @@ class validateAmountTest extends TestCase
 
     protected $helper;
 
-    protected function setUp()
+    public function setUp()
     {
         $dependencies = \Mockery::mock('Dependencies');
         $this->helper = \Mockery::mock(AmountHelper::class, [$dependencies])->makePartial();
@@ -69,8 +69,7 @@ class validateAmountTest extends TestCase
             'min' => 'EUR:99',
             'max' => 'EUR:2000000',
         ];
-        $this->helper
-            ->shouldReceive('convertAmount')
+        $this->helper->shouldReceive('convertAmount')
             ->andReturn(98);
         $this->assertSame(
             [
@@ -88,8 +87,7 @@ class validateAmountTest extends TestCase
             'min' => 'EUR:99',
             'max' => 'EUR:2000000',
         ];
-        $this->helper
-            ->shouldReceive('convertAmount')
+        $this->helper->shouldReceive('convertAmount')
             ->andReturn(2000100);
         $this->assertSame(
             [
@@ -107,8 +105,7 @@ class validateAmountTest extends TestCase
             'min' => 'EUR:99',
             'max' => 'EUR:2000000',
         ];
-        $this->helper
-            ->shouldReceive('convertAmount')
+        $this->helper->shouldReceive('convertAmount')
             ->andReturn(10000);
         $this->assertSame(
             [

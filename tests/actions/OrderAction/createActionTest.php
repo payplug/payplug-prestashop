@@ -35,10 +35,9 @@ class createActionTest extends BaseOrderAction
     public function testWhenNoPaymentRetrieveFromDatabase()
     {
         $resource_id = 'pay_azerty123456';
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [],
+        ]);
         $this->assertSame(
             [
                 'result' => false,
@@ -51,32 +50,29 @@ class createActionTest extends BaseOrderAction
     public function testWhenNoPaymentRetrieveFromAPI()
     {
         $resource_id = 'pay_azerty123456';
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
 
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+        ]);
 
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => false,
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -90,38 +86,35 @@ class createActionTest extends BaseOrderAction
     public function testWhenPaymentRetrievedHasFailure()
     {
         $resource_id = 'pay_azerty123456';
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
 
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+        ]);
 
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard([
-                        'failure' => [
-                            'code' => '401',
-                            'message' => 'Non authorized',
-                        ],
-                    ]),
-                ],
-            ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard([
+                    'failure' => [
+                        'code' => '401',
+                        'message' => 'Non authorized',
+                    ],
+                ]),
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -135,41 +128,36 @@ class createActionTest extends BaseOrderAction
     public function testWhenRelatedCartIsntValid()
     {
         $resource_id = 'pay_azerty123456';
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
 
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+        ]);
 
-        $this->cart_adapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
 
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
 
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $mock) {
                 return $mock != CartMock::get();
             });
@@ -186,46 +174,40 @@ class createActionTest extends BaseOrderAction
     public function testWhenRelatedCustomerIsntValid()
     {
         $resource_id = 'pay_azerty123456';
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
 
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+        ]);
 
-        $this->cart_adapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
 
-        $this->customer_adapter
-            ->shouldReceive([
-                'get' => CustomerMock::get(),
-            ]);
+        $this->customer_adapter->shouldReceive([
+            'get' => CustomerMock::get(),
+        ]);
 
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
 
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $mock) {
                 return $mock != CustomerMock::get();
             });
@@ -242,58 +224,43 @@ class createActionTest extends BaseOrderAction
     public function testWhenOrderTabCannotBeGeneratedForRelatedPaymentMethod()
     {
         $resource_id = 'pay_azerty123456';
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
 
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+        ]);
 
-        $this->cart_adapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
 
-        $this->customer_adapter
-            ->shouldReceive([
-                'get' => CustomerMock::get(),
-            ]);
+        $this->customer_adapter->shouldReceive([
+            'get' => CustomerMock::get(),
+        ]);
 
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
 
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getOrderTab' => [],
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
+        $this->payment_method->shouldReceive([
+            'getOrderTab' => [],
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -307,77 +274,59 @@ class createActionTest extends BaseOrderAction
     public function testWhenOrderCreationThrowAnException()
     {
         $resource_id = 'pay_azerty123456';
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getOrderTab' => [
-                    'order_state' => 2,
-                    'amount' => 4242,
-                    'module_name' => 'Payplug',
-                ],
-            ]);
 
         $card_action = \Mockery::mock('CardAction');
-        $card_action
-            ->shouldReceive([
-                'saveAction' => true,
-            ]);
+        $card_action->shouldReceive([
+            'saveAction' => true,
+        ]);
 
-        $this->cart_adapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-        $this->customer_adapter
-            ->shouldReceive([
-                'get' => CustomerMock::get(),
-            ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
-        $this->module
-            ->shouldReceive('validateOrder')
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->customer_adapter->shouldReceive([
+            'get' => CustomerMock::get(),
+        ]);
+        $this->payment_method->shouldReceive([
+            'getOrderTab' => [
+                'order_state' => 2,
+                'amount' => 4242,
+                'module_name' => 'Payplug',
+            ],
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
+        $this->module->shouldReceive('validateOrder')
             ->andThrow('Exception', 'validateOrder() method throw exception', 500);
-        $this->order_repository
-            ->shouldReceive([
-                'getCurrentOrders' => [],
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-                'canSaveCard' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getCardAction' => $card_action,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $this->order_repository->shouldReceive([
+            'getCurrentOrders' => [],
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+            'canSaveCard' => [
+                'result' => false,
+            ],
+        ]);
+        $this->plugin->shouldReceive([
+            'getCardAction' => $card_action,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
 
         $this->assertSame(
             [
@@ -391,81 +340,64 @@ class createActionTest extends BaseOrderAction
     public function testWhenOrderCreatedIsntValid()
     {
         $resource_id = 'pay_azerty123456';
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getOrderTab' => [
-                    'order_state' => 2,
-                    'amount' => 4242,
-                    'module_name' => 'Payplug',
-                ],
-            ]);
+        $this->payment_method->shouldReceive([
+            'getOrderTab' => [
+                'order_state' => 2,
+                'amount' => 4242,
+                'module_name' => 'Payplug',
+            ],
+        ]);
 
         $card_action = \Mockery::mock('CardAction');
-        $card_action
-            ->shouldReceive([
-                'saveAction' => true,
-            ]);
+        $card_action->shouldReceive([
+            'saveAction' => true,
+        ]);
 
-        $this->cart_adapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-        $this->customer_adapter
-            ->shouldReceive([
-                'get' => CustomerMock::get(),
-            ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
-        $this->module
-            ->shouldReceive([
-                'validateOrder' => true,
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->customer_adapter->shouldReceive([
+            'get' => CustomerMock::get(),
+        ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
+        $this->module->shouldReceive([
+            'validateOrder' => true,
+        ]);
         $this->module->currentOrder = 42;
-        $this->order_adapter
-            ->shouldReceive([
-                'get' => OrderMock::get(),
-            ]);
-        $this->order_repository
-            ->shouldReceive([
-                'getCurrentOrders' => [],
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-                'canSaveCard' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getCardAction' => $card_action,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->order_adapter->shouldReceive([
+            'get' => OrderMock::get(),
+        ]);
+        $this->order_repository->shouldReceive([
+            'getCurrentOrders' => [],
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+            'canSaveCard' => [
+                'result' => false,
+            ],
+        ]);
+        $this->plugin->shouldReceive([
+            'getCardAction' => $card_action,
+        ]);
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $mock) {
                 return $mock != OrderMock::get();
             });
@@ -482,93 +414,73 @@ class createActionTest extends BaseOrderAction
     public function testWhenOrderCannotBePostProcessed()
     {
         $resource_id = 'pay_azerty123456';
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getOrderTab' => [
-                    'order_state' => 2,
-                    'amount' => 4242,
-                    'module_name' => 'Payplug',
-                ],
-                'postProcessOrder' => true,
-            ]);
 
         $card_action = \Mockery::mock('CardAction');
-        $card_action
-            ->shouldReceive([
-                'saveAction' => true,
-            ]);
+        $card_action->shouldReceive([
+            'saveAction' => true,
+        ]);
 
         $order = \Mockery::mock('Order');
         $order->id = 42;
-        $order
-            ->shouldReceive([
-                'getOrderPayments' => [],
-                'addOrderPayment' => true,
-            ]);
+        $order->shouldReceive([
+            'getOrderPayments' => [],
+            'addOrderPayment' => true,
+        ]);
 
-        $this->cart_adapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-        $this->customer_adapter
-            ->shouldReceive([
-                'get' => CustomerMock::get(),
-            ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
-        $this->module
-            ->shouldReceive([
-                'validateOrder' => true,
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->customer_adapter->shouldReceive([
+            'get' => CustomerMock::get(),
+        ]);
+        $this->payment_method->shouldReceive([
+            'getOrderTab' => [
+                'order_state' => 2,
+                'amount' => 4242,
+                'module_name' => 'Payplug',
+            ],
+            'postProcessOrder' => true,
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
+        $this->module->shouldReceive([
+            'validateOrder' => true,
+        ]);
         $this->module->currentOrder = 42;
-        $this->order_adapter
-            ->shouldReceive([
-                'get' => $order,
-            ]);
-        $this->order_repository
-            ->shouldReceive([
-                'getCurrentOrders' => [],
-                'getByIdCart' => [],
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
-                    'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-            ]);
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-                'canSaveCard' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getCardAction' => $card_action,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $this->order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
+        $this->order_repository->shouldReceive([
+            'getCurrentOrders' => [],
+            'getByIdCart' => [],
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+            'canSaveCard' => [
+                'result' => false,
+            ],
+        ]);
+        $this->plugin->shouldReceive([
+            'getCardAction' => $card_action,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
 
         $this->assertSame(
             [
@@ -582,111 +494,90 @@ class createActionTest extends BaseOrderAction
     public function testWhenOrderIsCreatedAndTreated()
     {
         $resource_id = 'pay_azerty123456';
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getOrderTab' => [
-                    'order_state' => 2,
-                    'amount' => 4242,
-                    'module_name' => 'Payplug',
-                ],
-                'postProcessOrder' => true,
-            ]);
+        $this->payment_method->shouldReceive([
+            'getOrderTab' => [
+                'order_state' => 2,
+                'amount' => 4242,
+                'module_name' => 'Payplug',
+            ],
+            'postProcessOrder' => true,
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
 
         $card_action = \Mockery::mock('CardAction');
-        $card_action
-            ->shouldReceive([
-                'saveAction' => true,
-            ]);
+        $card_action->shouldReceive([
+            'saveAction' => true,
+        ]);
 
         $order = \Mockery::mock('Order');
         $order->id = 42;
-        $order
-            ->shouldReceive([
-                'getOrderPayments' => [],
-                'addOrderPayment' => true,
-            ]);
+        $order->shouldReceive([
+            'getOrderPayments' => [],
+            'addOrderPayment' => true,
+        ]);
 
         $merchant_telemetry_action = \Mockery::mock('MerchantTelemetryAction');
-        $merchant_telemetry_action
-            ->shouldReceive([
-                'sendAction' => true,
-            ]);
+        $merchant_telemetry_action->shouldReceive([
+            'sendAction' => true,
+        ]);
 
-        $this->cart_adapter
-            ->shouldReceive([
-                'get' => CartMock::get(),
-            ]);
-        $this->customer_adapter
-            ->shouldReceive([
-                'get' => CustomerMock::get(),
-            ]);
-        $this->dependencies->apiClass
-            ->shouldReceive([
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
-        $this->module
-            ->shouldReceive([
-                'validateOrder' => true,
-            ]);
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->customer_adapter->shouldReceive([
+            'get' => CustomerMock::get(),
+        ]);
+        $this->module->shouldReceive([
+            'validateOrder' => true,
+        ]);
         $this->module->currentOrder = 42;
-        $this->order_adapter
-            ->shouldReceive([
-                'get' => $order,
-            ]);
-        $this->order_repository
-            ->shouldReceive([
-                'getCurrentOrders' => [],
-                'getByIdCart' => [
-                    [
-                        'id_order' => 1,
-                        'id_lang' => 1,
-                        'id_customer' => 3,
-                        'id_cart' => 42,
-                        'id_currency' => 1,
-                        'id_address_delivery' => 14,
-                        'id_address_invoice' => 14,
-                        'current_state' => 2,
-                    ],
-                ],
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'pay_azerty1234',
-                    'method' => 'standard',
+        $this->order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
+        $this->order_repository->shouldReceive([
+            'getCurrentOrders' => [],
+            'getByIdCart' => [
+                [
+                    'id_order' => 1,
+                    'id_lang' => 1,
+                    'id_customer' => 3,
                     'id_cart' => 42,
-                    'cart_hash' => 'cart-hash-azerty1234567',
-                    'schedules' => 'NULL',
-                    'date_upd' => '1970-01-01 00:00:00',
+                    'id_currency' => 1,
+                    'id_address_delivery' => 14,
+                    'id_address_invoice' => 14,
+                    'current_state' => 2,
                 ],
-            ]);
-        $this->payment_validator
-            ->shouldReceive([
-                'isInstallment' => [
-                    'result' => false,
-                ],
-                'canSaveCard' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getCardAction' => $card_action,
-                'getMerchantTelemetryAction' => $merchant_telemetry_action,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+            ],
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+            'canSaveCard' => [
+                'result' => false,
+            ],
+        ]);
+        $this->plugin->shouldReceive([
+            'getCardAction' => $card_action,
+            'getMerchantTelemetryAction' => $merchant_telemetry_action,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
 
         $this->assertSame(
             [

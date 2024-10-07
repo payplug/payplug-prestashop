@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -37,7 +37,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
      */
     public function TestPrepareAddressDataWhenAddressDataIsNotValid($address_data)
     {
-        $this->assertEquals([], $this->classe->prepareAddressData($address_data));
+        $this->assertEquals([], $this->class->prepareAddressData($address_data));
     }
 
     /**
@@ -57,8 +57,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'mobile_phone_number' => '1234567890',
         ];
 
-        $this->tools_adapter
-            ->shouldReceive('tool')
+        $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $param) {
                 return strtolower($param);
             });
@@ -74,7 +73,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'getByIso' => 1,
         ]);
 
-        $this->assertEquals($expected_data, $this->classe->prepareAddressData($this->address_data));
+        $this->assertEquals($expected_data, $this->class->prepareAddressData($this->address_data));
     }
 
     /**
@@ -82,8 +81,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
      */
     public function testPrepareAddressDataForBilling()
     {
-        $this->tools_adapter
-            ->shouldReceive('tool')
+        $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $param) {
                 return strtolower($param);
             });
@@ -95,10 +93,9 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
         ]);
         $this->dependencies->configClass = $config_class;
 
-        $this->country_adapter
-            ->shouldReceive([
-                'getByIso' => 1,
-            ]);
+        $this->country_adapter->shouldReceive([
+            'getByIso' => 1,
+        ]);
         $expected_data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
@@ -110,6 +107,6 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'email' => 'john@example.com',
             'mobile_phone_number' => '0657789067',
         ];
-        $this->assertEquals($expected_data, $this->classe->prepareAddressData($this->address_data));
+        $this->assertEquals($expected_data, $this->class->prepareAddressData($this->address_data));
     }
 }

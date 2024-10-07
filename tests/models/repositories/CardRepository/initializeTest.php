@@ -38,8 +38,7 @@ class initializeTest extends BaseCardRepository
     public function testWhenTableCantBeInitialized()
     {
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'getEntityObject' => $this->entity,
                 'create' => $this->repository,
                 'table' => $this->repository,
@@ -53,8 +52,7 @@ class initializeTest extends BaseCardRepository
     public function testWhenTableIsInitialized()
     {
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'getEntityObject' => $this->entity,
                 'create' => $this->repository,
                 'table' => $this->repository,

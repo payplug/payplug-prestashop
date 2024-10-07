@@ -6,8 +6,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -16,8 +17,7 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
     public function setUp()
     {
         parent::setUp();
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     default:
@@ -29,20 +29,20 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
     public function testWhenNoAvailablePaymentMethodFound()
     {
         $configClass = \Mockery::mock('Config');
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [],
         ]);
         $configClass->shouldReceive([
             'getAvailableOptions' => [],
         ]);
         $this->dependencies->configClass = $configClass;
-        $this->assertSame([], $this->classe->getPaymentOptionCollection());
+        $this->assertSame([], $this->class->getPaymentOptionCollection());
     }
 
     public function testWhenNoAvailableOptionFound()
     {
         $configClass = \Mockery::mock('Config');
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
@@ -53,13 +53,13 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
             'getImgLang' => 'fr',
         ]);
         $this->dependencies->configClass = $configClass;
-        $this->assertSame([], $this->classe->getPaymentOptionCollection());
+        $this->assertSame([], $this->class->getPaymentOptionCollection());
     }
 
     public function testWhenPaymentMethodIsntAllowed()
     {
         $configClass = \Mockery::mock('Config');
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
@@ -71,7 +71,7 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
             'isValidFeature' => false,
         ]);
         $this->dependencies->configClass = $configClass;
-        $this->assertSame([], $this->classe->getPaymentOptionCollection());
+        $this->assertSame([], $this->class->getPaymentOptionCollection());
     }
 
     /**
@@ -82,7 +82,7 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
     public function testWhenPaymentMethodObjectIsntValid($payment_method)
     {
         $configClass = \Mockery::mock('Config');
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
@@ -95,17 +95,17 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
             'isValidFeature' => true,
         ]);
         $this->dependencies->configClass = $configClass;
-        $this->assertSame([], $this->classe->getPaymentOptionCollection());
+        $this->assertSame([], $this->class->getPaymentOptionCollection());
     }
 
     public function testWhenOptionIsReturn()
     {
         $configClass = \Mockery::mock('Config');
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
                 'standard',
             ],
-            'getPaymentMethod' => $this->classe,
+            'getPaymentMethod' => $this->class,
             'getPaymentOption' => [
                 'standard' => new \stdClass(),
             ],
@@ -117,6 +117,6 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
             'isValidFeature' => true,
         ]);
         $this->dependencies->configClass = $configClass;
-        $this->assertTrue(array_key_exists('standard', $this->classe->getPaymentOptionCollection()));
+        $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOptionCollection()));
     }
 }

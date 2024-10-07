@@ -6,8 +6,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -20,37 +21,37 @@ class getPaymentMethodTest extends BasePaymentMethod
      */
     public function testWhenGivenNameIsntValidStringFormat($name)
     {
-        $this->assertSame([], $this->classe->getPaymentMethod($name));
+        $this->assertSame([], $this->class->getPaymentMethod($name));
     }
 
     public function testWhenNoAvailablePaymentMethodsObjectReturn()
     {
         $name = 'standard';
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethodsObject' => [],
         ]);
-        $this->assertSame([], $this->classe->getPaymentMethod($name));
+        $this->assertSame([], $this->class->getPaymentMethod($name));
     }
 
     public function testWhenPaymentMethodIsntInAvailablePaymentMethodsObject()
     {
         $name = 'standard';
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethodsObject' => [
                 'amex' => new \stdClass(),
             ],
         ]);
-        $this->assertSame([], $this->classe->getPaymentMethod($name));
+        $this->assertSame([], $this->class->getPaymentMethod($name));
     }
 
     public function testWhenPaymentMethodIsInAvailablePaymentMethodsObject()
     {
         $name = 'standard';
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getAvailablePaymentMethodsObject' => [
                 'standard' => new \stdClass(),
             ],
         ]);
-        $this->assertTrue(is_object($this->classe->getPaymentMethod($name)));
+        $this->assertTrue(is_object($this->class->getPaymentMethod($name)));
     }
 }

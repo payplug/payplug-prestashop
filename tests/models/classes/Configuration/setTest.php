@@ -4,8 +4,8 @@ namespace PayPlug\tests\models\classes\Configuration;
 
 /**
  * @group unit
- * @group classes
- * @group configuration_classes
+ * @group class
+ * @group configuration_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,45 +19,45 @@ class setTest extends BaseConfiguration
     public function testWhenGivenKeyIsInvalidStringFormat($key)
     {
         $value = 'value';
-        $this->assertFalse($this->classe->set($key, $value));
+        $this->assertFalse($this->class->set($key, $value));
     }
 
     public function testWhenGivenKeyDoesNotExistsInAllowedConfiguration()
     {
         $key = 'config_key';
         $value = 'value';
-        $this->classe->configurations = [
+        $this->class->configurations = [
             'feature' => [],
         ];
-        $this->assertFalse($this->classe->set($key, $value));
+        $this->assertFalse($this->class->set($key, $value));
     }
 
     public function testWhenConfigurationKeyDoesNotReturnType()
     {
         $key = 'config_key';
         $value = 'value';
-        $this->classe->configurations = [
+        $this->class->configurations = [
             'feature' => [
                 'name' => 'FEATURE',
                 'defaultValue' => 0,
                 'setConf' => 1,
             ],
         ];
-        $this->assertFalse($this->classe->set($key, $value));
+        $this->assertFalse($this->class->set($key, $value));
     }
 
     public function testWhenGivenValueIsntAIntegerAsExpected()
     {
         $key = 'standard';
         $value = 'value';
-        $this->assertFalse($this->classe->set($key, $value));
+        $this->assertFalse($this->class->set($key, $value));
     }
 
     public function testWhenGivenValueIsntAStringAsExpected()
     {
         $key = 'company_iso';
         $value = 42;
-        $this->assertFalse($this->classe->set($key, $value));
+        $this->assertFalse($this->class->set($key, $value));
     }
 
     public function testWhenConfigurationCantBeUpdated()
@@ -67,7 +67,7 @@ class setTest extends BaseConfiguration
         $this->configuration->shouldReceive([
             'updateValue' => false,
         ]);
-        $this->assertFalse($this->classe->set($key, $value));
+        $this->assertFalse($this->class->set($key, $value));
     }
 
     public function testWhenConfigurationIsUpdated()
@@ -77,9 +77,9 @@ class setTest extends BaseConfiguration
         $this->configuration->shouldReceive([
             'updateValue' => true,
         ]);
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getName' => 'enable',
         ]);
-        $this->assertTrue($this->classe->set($key, $value));
+        $this->assertTrue($this->class->set($key, $value));
     }
 }

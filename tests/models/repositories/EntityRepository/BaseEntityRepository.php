@@ -11,19 +11,17 @@ class BaseEntityRepository extends BaseRepository
     protected $entity_key;
     protected $entity_value;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->repository = \Mockery::mock(EntityRepository::class)
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
-        $this->repository
-            ->shouldReceive('escape')
+        $this->repository->shouldReceive('escape')
             ->andReturnUsing(function ($value) {
                 return $value;
             });
-        $this->repository
-            ->shouldReceive('getTableName')
+        $this->repository->shouldReceive('getTableName')
             ->andReturnUsing(function ($value) {
                 return $value;
             });

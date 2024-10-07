@@ -422,7 +422,6 @@ class QueryRepository
                 $sql .= ' OR ';
             }
         }
-
         if (isset($this->query['whereOr']) && (!empty($this->query['whereOr']))) {
             $sql .= implode(' OR ', $this->query['whereOr']) . "\n";
         }

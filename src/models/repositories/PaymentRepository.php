@@ -72,6 +72,33 @@ class PaymentRepository extends EntityRepository
     }
 
     /**
+     * @description Get a store payment from the schedule for a given resource id
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
+    public function getFromSchedule($resource_id = '')
+    {
+        if (!is_string($resource_id) || !$resource_id) {
+            return [];
+        }
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return [];
+        }
+        $definition = $entity->getDefinition();
+        $result = $this
+            ->select()
+            ->fields('*')
+            ->from($this->getTableName($definition['table']))
+            ->where('`schedules` LIKE "%' . $this->escape($resource_id) . '%"')
+            ->build('unique_row');
+
+        return $result ?: [];
+    }
+
+    /**
      * @description Create the table in the database
      *
      * @param string $engine
@@ -96,6 +123,7 @@ class PaymentRepository extends EntityRepository
             ->table($this->getTableName($definition['table']))
             ->fields('`id_payplug_payment` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY')
             ->fields('`resource_id` VARCHAR(255) NULL')
+            ->fields('`is_live` TINYINT(1) NOT NULL DEFAULT 1')
             ->fields('`method` VARCHAR(255) NULL')
             ->fields('`id_cart` INT(11) UNSIGNED NOT NULL')
             ->fields('`cart_hash` VARCHAR(64) NULL')

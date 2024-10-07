@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group standard_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group standard_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -18,27 +18,23 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
     {
         parent::setUp();
 
-        $this->classe->set('name', 'standard');
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->class->set('name', 'standard');
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->helpers['amount']
-            ->shouldReceive([
-                'validateAmount' => [
-                    'result' => true,
-                ],
-                'convertAmount' => 4242,
-            ]);
-        $this->helpers['cookies']
-            ->shouldReceive([
-                'setPaymentErrorsCookie' => true,
-            ]);
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => [
+                'result' => true,
+            ],
+            'convertAmount' => 4242,
+        ]);
+        $this->helpers['cookies']->shouldReceive([
+            'setPaymentErrorsCookie' => true,
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
@@ -46,8 +42,7 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
             'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
-        $this->tools_adapter
-            ->shouldReceive('tool')
+        $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $arg) {
                 switch ($method) {
                     case 'getShopDomainSsl':
@@ -117,21 +112,19 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
 
     public function testWhenParentMethodReturnEmptyArray()
     {
-        $this->classe->set('name', '');
+        $this->class->set('name', '');
         $this->assertSame(
             [],
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenDeferredPaymentIsAllowed()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": true, "one_click": false}');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('redirect');
 
@@ -140,18 +133,16 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
 
         $this->assertSame(
             $this->expected_tab,
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenDisplayModeIsIntegrated()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": false, "one_click": false}');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('integrated');
 
@@ -160,18 +151,16 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
 
         $this->assertSame(
             $this->expected_tab,
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenOneClickIsAllowed()
     {
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": false, "one_click": true}');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('redirect');
         $this->cart_adapter->shouldReceive([
@@ -181,7 +170,7 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
 
         $this->assertSame(
             $this->expected_tab,
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 }

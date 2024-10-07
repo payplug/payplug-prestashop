@@ -67,8 +67,7 @@ class renderCTATest extends BaseOneyAction
             'tool' => 'PL',
         ]);
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_iso')
             ->andReturn('FR');
 
@@ -95,8 +94,7 @@ class renderCTATest extends BaseOneyAction
             'tool' => 'FR',
         ]);
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_iso')
             ->andReturn('FR');
 
@@ -123,17 +121,14 @@ class renderCTATest extends BaseOneyAction
             'isOneyAllowed' => true,
         ]);
 
-        $this->toolsAdapter
-            ->shouldReceive('tool')
+        $this->toolsAdapter->shouldReceive('tool')
             ->with('strtoupper', 'fr')
             ->andReturn('FR');
-        $this->toolsAdapter
-            ->shouldReceive('tool')
+        $this->toolsAdapter->shouldReceive('tool')
             ->with('getValue', 'action')
             ->andReturn('quickview');
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_iso')
             ->andReturn('FR');
 
@@ -161,17 +156,14 @@ class renderCTATest extends BaseOneyAction
             'isOneyAllowed' => true,
         ]);
 
-        $this->toolsAdapter
-            ->shouldReceive('tool')
+        $this->toolsAdapter->shouldReceive('tool')
             ->with('strtoupper', 'fr')
             ->andReturn('FR');
-        $this->toolsAdapter
-            ->shouldReceive('tool')
+        $this->toolsAdapter->shouldReceive('tool')
             ->with('getValue', 'action')
             ->andReturn('test');
 
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->with('company_iso')
             ->andReturn('FR');
 

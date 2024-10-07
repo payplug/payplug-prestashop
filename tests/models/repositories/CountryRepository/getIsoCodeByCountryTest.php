@@ -27,8 +27,7 @@ class getIsoCodeByCountryTest extends BaseCountryRepository
     {
         $id_country = 42;
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'select' => $this->repository,
                 'fields' => $this->repository,
                 'from' => $this->repository,
@@ -43,8 +42,7 @@ class getIsoCodeByCountryTest extends BaseCountryRepository
     {
         $id_country = 42;
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'select' => $this->repository,
                 'fields' => $this->repository,
                 'from' => $this->repository,

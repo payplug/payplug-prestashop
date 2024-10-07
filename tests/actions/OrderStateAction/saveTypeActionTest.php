@@ -40,14 +40,12 @@ class saveTypeActionTest extends BaseOrderStateAction
         $type = 'order_state_type';
 
         $order_state = \Mockery::mock('OrderState');
-        $this->order_state_adapter
-            ->shouldReceive([
-                'get' => $order_state,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => false,
-            ]);
+        $this->order_state_adapter->shouldReceive([
+            'get' => $order_state,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => false,
+        ]);
 
         $this->assertFalse($this->action->saveTypeAction($id_order_state, $type));
     }
@@ -60,18 +58,15 @@ class saveTypeActionTest extends BaseOrderStateAction
         $order_state = \Mockery::mock('OrderState');
         $order_state->deleted = true;
 
-        $this->order_state_adapter
-            ->shouldReceive([
-                'get' => $order_state,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->action
-            ->shouldReceive([
-                'deleteTypeAction' => false,
-            ]);
+        $this->order_state_adapter->shouldReceive([
+            'get' => $order_state,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->action->shouldReceive([
+            'deleteTypeAction' => false,
+        ]);
 
         $this->assertFalse($this->action->saveTypeAction($id_order_state, $type));
     }
@@ -83,19 +78,16 @@ class saveTypeActionTest extends BaseOrderStateAction
 
         $order_state = \Mockery::mock('OrderState');
 
-        $this->order_state_adapter
-            ->shouldReceive([
-                'get' => $order_state,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->payplug_orderstate_repository
-            ->shouldReceive([
-                'getBy' => [],
-                'createEntity' => false,
-            ]);
+        $this->order_state_adapter->shouldReceive([
+            'get' => $order_state,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->payplug_orderstate_repository->shouldReceive([
+            'getBy' => [],
+            'createEntity' => false,
+        ]);
 
         $this->assertFalse($this->action->saveTypeAction($id_order_state, $type));
     }
@@ -107,19 +99,16 @@ class saveTypeActionTest extends BaseOrderStateAction
 
         $order_state = \Mockery::mock('OrderState');
 
-        $this->order_state_adapter
-            ->shouldReceive([
-                'get' => $order_state,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->payplug_orderstate_repository
-            ->shouldReceive([
-                'getBy' => [],
-                'createEntity' => true,
-            ]);
+        $this->order_state_adapter->shouldReceive([
+            'get' => $order_state,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->payplug_orderstate_repository->shouldReceive([
+            'getBy' => [],
+            'createEntity' => true,
+        ]);
 
         $this->assertTrue($this->action->saveTypeAction($id_order_state, $type));
     }
@@ -131,22 +120,19 @@ class saveTypeActionTest extends BaseOrderStateAction
 
         $order_state = \Mockery::mock('OrderState');
 
-        $this->order_state_adapter
-            ->shouldReceive([
-                'get' => $order_state,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->payplug_orderstate_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_order_state' => 42,
-                    'type' => 'paid',
-                ],
-                'updateEntity' => false,
-            ]);
+        $this->order_state_adapter->shouldReceive([
+            'get' => $order_state,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->payplug_orderstate_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_order_state' => 42,
+                'type' => 'paid',
+            ],
+            'updateEntity' => false,
+        ]);
 
         $this->assertFalse($this->action->saveTypeAction($id_order_state, $type));
     }
@@ -158,22 +144,19 @@ class saveTypeActionTest extends BaseOrderStateAction
 
         $order_state = \Mockery::mock('OrderState');
 
-        $this->order_state_adapter
-            ->shouldReceive([
-                'get' => $order_state,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->payplug_orderstate_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_order_state' => 42,
-                    'type' => 'paid',
-                ],
-                'updateEntity' => true,
-            ]);
+        $this->order_state_adapter->shouldReceive([
+            'get' => $order_state,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->payplug_orderstate_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_order_state' => 42,
+                'type' => 'paid',
+            ],
+            'updateEntity' => true,
+        ]);
 
         $this->assertTrue($this->action->saveTypeAction($id_order_state, $type));
     }

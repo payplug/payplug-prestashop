@@ -11,7 +11,7 @@ final class GetMetadataTest extends BaseCardEntity
 {
     protected $metadata;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $metadata = [

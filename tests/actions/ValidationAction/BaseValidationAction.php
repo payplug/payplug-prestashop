@@ -19,7 +19,7 @@ class BaseValidationAction extends TestCase
     protected $plugin;
     protected $logger;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
 
@@ -28,28 +28,24 @@ class BaseValidationAction extends TestCase
         $this->action = \Mockery::mock(ValidationAction::class, [$this->dependencies])->makePartial();
         $this->toolsAdapter = \Mockery::mock('ToolsAdapter');
 
-        $this->dependencies
-            ->shouldReceive(
-                [
-                    'getPlugin' => $this->plugin,
-                ]
-            );
+        $this->dependencies->shouldReceive(
+            [
+                'getPlugin' => $this->plugin,
+            ]
+        );
 
         $this->context = \Mockery::mock('Context');
-        $this->context
-            ->shouldReceive([
-                'get' => ContextMock::get(),
-            ]);
+        $this->context->shouldReceive([
+            'get' => ContextMock::get(),
+        ]);
         $this->logger = \Mockery::mock('Logger');
-        $this->logger
-            ->shouldReceive([
-                'addLog' => true,
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getContext' => $this->context,
-                'getLogger' => $this->logger,
-                'getTools' => $this->toolsAdapter,
-            ]);
+        $this->logger->shouldReceive([
+            'addLog' => true,
+        ]);
+        $this->plugin->shouldReceive([
+            'getContext' => $this->context,
+            'getLogger' => $this->logger,
+            'getTools' => $this->toolsAdapter,
+        ]);
     }
 }

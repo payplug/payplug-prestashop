@@ -20,8 +20,7 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     {
         parent::setUp();
 
-        $this->context
-            ->shouldReceive('get')
+        $this->context->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
         $this->country->shouldReceive('getCountry')
@@ -102,16 +101,15 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithValidDataProvider($parameter)
     {
         $field = ['shipping-' . $parameter => $this->tab[$parameter]];
-        $this->validators['payment']
-            ->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                ],
-                'isValidMobilePhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+        $this->validators['payment']->shouldReceive([
+            'isPhoneNumber' => [
+                'result' => true,
+            ],
+            'isValidMobilePhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
         $response = $this->repo->checkOneyRequiredFields($field);
 
         $this->assertSame(
@@ -153,16 +151,15 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function testWithInvalidDataProvider($parameter, $expected)
     {
         $field = ['shipping-' . $parameter => null];
-        $this->validators['payment']
-            ->shouldReceive([
-                'isPhoneNumber' => [
-                    'result' => true,
-                ],
-                'isValidMobilePhoneNumber' => [
-                    'result' => false,
-                    'message' => '$iso_code is wrong',
-                ],
-            ]);
+        $this->validators['payment']->shouldReceive([
+            'isPhoneNumber' => [
+                'result' => true,
+            ],
+            'isValidMobilePhoneNumber' => [
+                'result' => false,
+                'message' => '$iso_code is wrong',
+            ],
+        ]);
         $response = $this->repo->checkOneyRequiredFields($field);
 
         $this->assertSame(

@@ -19,8 +19,7 @@ final class GetOneyDeliveryContextTest extends BaseOneyRepository
     public function setUp()
     {
         parent::setUp();
-        $this->context
-            ->shouldReceive('get')
+        $this->context->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
     }

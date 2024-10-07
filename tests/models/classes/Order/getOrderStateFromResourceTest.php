@@ -6,8 +6,8 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group classes
- * @group order_classes
+ * @group class
+ * @group order_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -25,172 +25,159 @@ class getOrderStateFromResourceTest extends BaseOrder
                 'result' => false,
                 'status' => 'error',
             ],
-            $this->classe->getOrderStateFromResource($resource)
+            $this->class->getOrderStateFromResource($resource)
         );
     }
 
     public function testWhenGivenResourceIsCancelled()
     {
         $resource = PaymentMock::getOney();
-        $this->payment_validator
-            ->shouldReceive([
-                'isFailed' => [
-                    'result' => true,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isFailed' => [
+                'result' => true,
+            ],
+        ]);
         $this->assertSame(
             [
                 'result' => false,
                 'status' => 'cancelled',
             ],
-            $this->classe->getOrderStateFromResource($resource)
+            $this->class->getOrderStateFromResource($resource)
         );
     }
 
     public function testWhenGivenResourceIsExpired()
     {
         $resource = PaymentMock::getStandard();
-        $this->payment_validator
-            ->shouldReceive([
-                'isDeferred' => [
-                    'result' => true,
-                ],
-                'isExpired' => [
-                    'result' => true,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isDeferred' => [
+                'result' => true,
+            ],
+            'isExpired' => [
+                'result' => true,
+            ],
+        ]);
         $this->assertSame(
             [
                 'result' => false,
                 'status' => 'expired',
             ],
-            $this->classe->getOrderStateFromResource($resource)
+            $this->class->getOrderStateFromResource($resource)
         );
     }
 
     public function testWhenGivenResourceIsFailed()
     {
         $resource = PaymentMock::getStandard();
-        $this->payment_validator
-            ->shouldReceive([
-                'isDeferred' => [
-                    'result' => false,
-                ],
-                'isExpired' => [
-                    'result' => false,
-                ],
-                'isFailed' => [
-                    'result' => true,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isDeferred' => [
+                'result' => false,
+            ],
+            'isExpired' => [
+                'result' => false,
+            ],
+            'isFailed' => [
+                'result' => true,
+            ],
+        ]);
         $this->assertSame(
             [
                 'result' => false,
                 'status' => 'error',
             ],
-            $this->classe->getOrderStateFromResource($resource)
+            $this->class->getOrderStateFromResource($resource)
         );
     }
 
     public function testWhenRelatedProductIsOutOfStock()
     {
         $resource = PaymentMock::getStandard(['metadata' => ['Order' => 42]]);
-        $this->payment_validator
-            ->shouldReceive([
-                'isDeferred' => [
-                    'result' => false,
-                ],
-                'isExpired' => [
-                    'result' => false,
-                ],
-                'isFailed' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isDeferred' => [
+                'result' => false,
+            ],
+            'isExpired' => [
+                'result' => false,
+            ],
+            'isFailed' => [
+                'result' => false,
+            ],
+        ]);
 
         $order = \Mockery::mock('Order');
-        $order
-            ->shouldReceive([
-                'getOrderDetailList' => [
-                    [
-                        'name' => 'product',
-                        'product_quantity_in_stock' => 0,
-                    ],
+        $order->shouldReceive([
+            'getOrderDetailList' => [
+                [
+                    'name' => 'product',
+                    'product_quantity_in_stock' => 0,
                 ],
-            ]);
+            ],
+        ]);
         $order_adapter = \Mockery::mock('OrderAdapter');
-        $order_adapter
-            ->shouldReceive([
-                'get' => $order,
-            ]);
+        $order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
         $configuration = \Mockery::mock('Configuration');
-        $configuration
-            ->shouldReceive('get')
+        $configuration->shouldReceive('get')
             ->with('PS_STOCK_MANAGEMENT')
             ->andReturn(true);
-        $this->plugin
-            ->shouldReceive([
-                'getConfiguration' => $configuration,
-                'getOrder' => $order_adapter,
-            ]);
+        $this->plugin->shouldReceive([
+            'getConfiguration' => $configuration,
+            'getOrder' => $order_adapter,
+        ]);
 
         $this->assertSame(
             [
                 'result' => true,
                 'status' => 'outofstock_paid',
             ],
-            $this->classe->getOrderStateFromResource($resource)
+            $this->class->getOrderStateFromResource($resource)
         );
     }
 
     public function testWhenGivenResourceIsPaid()
     {
         $resource = PaymentMock::getStandard(['metadata' => ['Order' => 42]]);
-        $this->payment_validator
-            ->shouldReceive([
-                'isDeferred' => [
-                    'result' => false,
-                ],
-                'isExpired' => [
-                    'result' => false,
-                ],
-                'isFailed' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->payment_validator->shouldReceive([
+            'isDeferred' => [
+                'result' => false,
+            ],
+            'isExpired' => [
+                'result' => false,
+            ],
+            'isFailed' => [
+                'result' => false,
+            ],
+        ]);
 
         $order = \Mockery::mock('Order');
-        $order
-            ->shouldReceive([
-                'getOrderDetailList' => [
-                    [
-                        'name' => 'product',
-                        'product_quantity_in_stock' => 0,
-                    ],
+        $order->shouldReceive([
+            'getOrderDetailList' => [
+                [
+                    'name' => 'product',
+                    'product_quantity_in_stock' => 0,
                 ],
-            ]);
+            ],
+        ]);
         $order_adapter = \Mockery::mock('OrderAdapter');
-        $order_adapter
-            ->shouldReceive([
-                'get' => $order,
-            ]);
+        $order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
         $configuration = \Mockery::mock('Configuration');
-        $configuration
-            ->shouldReceive('get')
+        $configuration->shouldReceive('get')
             ->with('PS_STOCK_MANAGEMENT')
             ->andReturn(false);
-        $this->plugin
-            ->shouldReceive([
-                'getConfiguration' => $configuration,
-                'getOrder' => $order_adapter,
-            ]);
+        $this->plugin->shouldReceive([
+            'getConfiguration' => $configuration,
+            'getOrder' => $order_adapter,
+        ]);
 
         $this->assertSame(
             [
                 'result' => true,
                 'status' => 'paid',
             ],
-            $this->classe->getOrderStateFromResource($resource)
+            $this->class->getOrderStateFromResource($resource)
         );
     }
 }

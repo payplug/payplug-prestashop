@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,18 +19,16 @@ class getLinesItemsTest extends BaseApplepayPaymentMethod
      */
     public function testWhenGivenPaymentOptionsIsntValidArrayFormat($carriers)
     {
-        $this->assertSame([], $this->classe->getLinesItems($carriers));
+        $this->assertSame([], $this->class->getLinesItems($carriers));
     }
 
     public function testWhenNoCarriersIsGiven()
     {
-        $this->cart_adapter
-            ->shouldReceive([
-                'getOrderTotalWithoutShipping' => 42,
-                'getOrderTotalDiscount' => 0,
-            ]);
-        $this->tools_adapter
-            ->shouldReceive('tool')
+        $this->cart_adapter->shouldReceive([
+            'getOrderTotalWithoutShipping' => 42,
+            'getOrderTotalDiscount' => 0,
+        ]);
+        $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($a, $b, $c) {
                 if ('ps_round' == $a) {
                     return (int) $b;
@@ -55,20 +53,18 @@ class getLinesItemsTest extends BaseApplepayPaymentMethod
                 'amount' => (int) 0,
             ],
         ];
-        $this->assertSame($expected, $this->classe->getLinesItems());
+        $this->assertSame($expected, $this->class->getLinesItems());
     }
 
     public function testWhenCartHasDiscount()
     {
         $subtotal = 1;
         $discount = 3;
-        $this->cart_adapter
-            ->shouldReceive([
-                'getOrderTotalWithoutShipping' => $subtotal,
-                'getOrderTotalDiscount' => $discount,
-            ]);
-        $this->tools_adapter
-            ->shouldReceive('tool')
+        $this->cart_adapter->shouldReceive([
+            'getOrderTotalWithoutShipping' => $subtotal,
+            'getOrderTotalDiscount' => $discount,
+        ]);
+        $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($a, $b, $c) {
                 if ('ps_round' == $a) {
                     return (int) $b;
@@ -98,18 +94,16 @@ class getLinesItemsTest extends BaseApplepayPaymentMethod
                 'amount' => 0,
             ],
         ];
-        $this->assertSame($expected, $this->classe->getLinesItems());
+        $this->assertSame($expected, $this->class->getLinesItems());
     }
 
     public function testWhenCarrierIsGiven()
     {
-        $this->cart_adapter
-            ->shouldReceive([
-                'getOrderTotalWithoutShipping' => 42,
-                'getOrderTotalDiscount' => 0,
-            ]);
-        $this->tools_adapter
-            ->shouldReceive('tool')
+        $this->cart_adapter->shouldReceive([
+            'getOrderTotalWithoutShipping' => 42,
+            'getOrderTotalDiscount' => 0,
+        ]);
+        $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($a, $b, $c) {
                 if ('ps_round' == $a) {
                     return (int) $b;
@@ -140,6 +134,6 @@ class getLinesItemsTest extends BaseApplepayPaymentMethod
                 'amount' => (int) 42,
             ],
         ];
-        $this->assertSame($expected, $this->classe->getLinesItems($carriers));
+        $this->assertSame($expected, $this->class->getLinesItems($carriers));
     }
 }

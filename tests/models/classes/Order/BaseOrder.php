@@ -13,36 +13,32 @@ class BaseOrder extends TestCase
 
     protected $logger;
     protected $dependencies;
-    protected $classe;
+    protected $class;
     protected $payment_validator;
     protected $plugin;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->logger = \Mockery::mock('Logger');
         $this->payment_validator = \Mockery::mock('PaymentValidator');
         $this->plugin = \Mockery::mock('Plugin');
 
-        $this->logger
-            ->shouldReceive([
-                'addLog' => true,
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getLogger' => $this->logger,
-            ]);
+        $this->logger->shouldReceive([
+            'addLog' => true,
+        ]);
+        $this->plugin->shouldReceive([
+            'getLogger' => $this->logger,
+        ]);
 
         $this->dependencies->name = 'payplug';
-        $this->dependencies->apiClass = \Mockery::mock('ApiClass');
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-                'getValidators' => [
-                    'payment' => $this->payment_validator,
-                ],
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+            'getValidators' => [
+                'payment' => $this->payment_validator,
+            ],
+        ]);
 
-        $this->classe = \Mockery::mock(Order::class, [$this->dependencies])->makePartial();
+        $this->class = \Mockery::mock(Order::class, [$this->dependencies])->makePartial();
     }
 }

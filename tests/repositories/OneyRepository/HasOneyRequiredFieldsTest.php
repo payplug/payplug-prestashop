@@ -16,8 +16,7 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
     {
         parent::setUp();
 
-        $this->dependencies->configClass
-            ->shouldReceive('isValidMobilePhoneNumber')
+        $this->dependencies->configClass->shouldReceive('isValidMobilePhoneNumber')
             ->andReturnUsing(function ($country, $phone) {
                 if (!$phone) {
                     return false;
@@ -51,13 +50,12 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidEmail()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyEmail' => [
-                    'result' => false,
-                    'error' => '',
-                ],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyEmail' => [
+                'result' => false,
+                'error' => '',
+            ],
+        ])
         ;
 
         $payment_data = [
@@ -74,12 +72,11 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingMobilePhone()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyEmail' => [
-                    'result' => true,
-                ],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyEmail' => [
+                'result' => true,
+            ],
+        ])
         ;
 
         $this->validators['payment']->shouldReceive([
@@ -116,12 +113,11 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidShippingCity()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyEmail' => [
-                    'result' => true,
-                ],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyEmail' => [
+                'result' => true,
+            ],
+        ])
         ;
 
         $this->validators['payment']->shouldReceive([
@@ -142,20 +138,18 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
             'tool' => 45,
         ]);
 
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyEmail' => [
-                    'result' => true,
-                ],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyEmail' => [
+                'result' => true,
+            ],
+        ])
         ;
-        $this->validators['payment']
-            ->shouldReceive([
-                'isValidMobilePhoneNumber' => [
-                    'result' => true,
-                    'message' => '',
-                ],
-            ]);
+        $this->validators['payment']->shouldReceive([
+            'isValidMobilePhoneNumber' => [
+                'result' => true,
+                'message' => '',
+            ],
+        ]);
 
         $payment_data = [
             'shipping' => [
@@ -174,12 +168,11 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidBillingMobilePhone()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyEmail' => [
-                    'result' => true,
-                ],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyEmail' => [
+                'result' => true,
+            ],
+        ])
         ;
 
         $this->validators['payment']->shouldReceive([
@@ -222,12 +215,11 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithInvalidBillingCity()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyEmail' => [
-                    'result' => true,
-                ],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyEmail' => [
+                'result' => true,
+            ],
+        ])
         ;
 
         $this->validators['payment']->shouldReceive([
@@ -270,12 +262,11 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
 
     public function testWithValidPaymentData()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyEmail' => [
-                    'result' => true,
-                ],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyEmail' => [
+                'result' => true,
+            ],
+        ])
         ;
 
         $this->validators['payment']->shouldReceive([

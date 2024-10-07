@@ -54,14 +54,22 @@ class PaymentClass
     /**
      * @description update payment ressource
      *
-     * @param $pay_id
+     * @param $resource_id
      * @param $order_id
      */
-    public function updatePayment($pay_id, $order_id)
+    public function updatePayment($resource_id, $order_id)
     {
-        $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+        $retrieve = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method'])
+            ->retrieve($stored_resource['resource_id']);
 
-        if (!$payment['result']) {
+        if (!$retrieve['result']) {
             exit(json_encode([
                 'data' => $this->dependencies
                     ->getPlugin()
@@ -70,7 +78,7 @@ class PaymentClass
                 'status' => 'error',
             ]));
         }
-        $payment = $payment['resource'];
+        $payment = $retrieve['resource'];
 
         $state_addons = ($payment->is_live ? '' : '_test');
         if ((bool) $payment->is_paid) {

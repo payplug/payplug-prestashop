@@ -12,7 +12,7 @@ use PayPlug\src\models\entities\CacheEntity;
  */
 final class SetIdTest extends BaseCacheEntity
 {
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->cache->setId(123);

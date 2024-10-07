@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group oney_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group oney_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,20 +19,18 @@ class getOptionTest extends BaseOneyPaymentMethod
      */
     public function testWhenGivenConfigurationIsntValidArrayFormat($current_configuration)
     {
-        $this->assertSame([], $this->classe->getOption($current_configuration));
+        $this->assertSame([], $this->class->getOption($current_configuration));
     }
 
     public function testWhenOneyCtaIsAllowed()
     {
         $current_configuration = [];
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('oney_allowed_countries')
             ->andReturn('FR');
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('oney_fees')
             ->andReturn(true);
 
@@ -154,20 +152,18 @@ class getOptionTest extends BaseOneyPaymentMethod
             ],
         ];
 
-        $this->assertSame($expected, $this->classe->getOption($current_configuration));
+        $this->assertSame($expected, $this->class->getOption($current_configuration));
     }
 
     public function testWhenOneyCtaIsntAllowed()
     {
         $current_configuration = [];
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('oney_allowed_countries')
             ->andReturn('BE');
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('oney_fees')
             ->andReturn(true);
 
@@ -220,7 +216,7 @@ class getOptionTest extends BaseOneyPaymentMethod
 
         $this->assertSame(
             $expected,
-            $this->classe->getOption($current_configuration)['options']['advanced_options']
+            $this->class->getOption($current_configuration)['options']['advanced_options']
         );
     }
 }

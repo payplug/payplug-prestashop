@@ -12,7 +12,7 @@ use PayPlug\src\models\entities\CardEntity;
  */
 final class SetLast4CardTest extends BaseCardEntity
 {
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->entity->setLast4('last4');

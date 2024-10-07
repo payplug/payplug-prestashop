@@ -12,30 +12,26 @@ class BaseOnboardingAction extends TestCase
     public $configurationClass;
     public $dependencies;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->configurationClass = \Mockery::mock(Configuration::class)->makePartial();
-        $this->configurationClass
-            ->shouldReceive([
-                'get' => true,
-            ]);
+        $this->configurationClass->shouldReceive([
+            'get' => true,
+        ]);
 
         $this->oney = \Mockery::mock('Oney');
         $this->plugin = \Mockery::mock('Plugin');
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
 
-        $this->plugin
-            ->shouldReceive([
-                'getConfigurationClass' => $this->configurationClass,
-            ]);
+        $this->plugin->shouldReceive([
+            'getConfigurationClass' => $this->configurationClass,
+        ]);
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
-        $this->dependencies
-            ->shouldReceive('getConfigurationKey')
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
+        $this->dependencies->shouldReceive('getConfigurationKey')
             ->andReturnUsing(function ($key) {
                 return $key;
             })

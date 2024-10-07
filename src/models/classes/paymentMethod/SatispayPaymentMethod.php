@@ -74,24 +74,32 @@ class SatispayPaymentMethod extends PaymentMethod
      * it logs a message indicating an abandoned order
      * and returns an empty array.
      *
-     * @param null $resource
+     * @param null $retrieve
      *
      * @return array
      */
-    public function getOrderTab($resource = null)
+    public function getOrderTab($retrieve = [])
     {
         $this->setParameters();
 
-        if (!is_object($resource) || !$resource) {
-            $this->logger->addLog('$resource must be a non-empty object');
+        if (!is_array($retrieve) || empty($retrieve)) {
+            $this->logger->addLog('SatispayPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
         }
-        $order_tab = parent::getOrderTab($resource);
+
+        $resource = $retrieve['resource'];
+        if (!is_object($resource) || !$resource) {
+            $this->logger->addLog('SatispayPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
+
+            return [];
+        }
+
+        $order_tab = parent::getOrderTab($retrieve);
         $order_state_pending = $this->configuration->getValue('order_state_pending');
 
         if ($order_state_pending == $order_tab['order_state']) {
-            $this->logger->addLog('this is an abandoned statispay order, it will not be be created ');
+            $this->logger->addLog('SatispayPaymentMethod::getOrderTab() - This is an abandoned statispay order, it will not be be created ');
 
             return [];
         }

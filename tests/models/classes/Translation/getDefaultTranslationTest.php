@@ -4,8 +4,8 @@ namespace PayPlug\tests\models\classes\Translation;
 
 /**
  * @group unit
- * @group classes
- * @group translation_classes
+ * @group class
+ * @group translation_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -21,7 +21,7 @@ class getDefaultTranslationTest extends BaseTranslation
         $template = 'alias';
         $this->assertSame(
             '',
-            $this->classe->getDefaultTranslation($string, $template)
+            $this->class->getDefaultTranslation($string, $template)
         );
     }
 
@@ -35,7 +35,7 @@ class getDefaultTranslationTest extends BaseTranslation
         $string = 'translation.key';
         $this->assertSame(
             '',
-            $this->classe->getDefaultTranslation($string, $template)
+            $this->class->getDefaultTranslation($string, $template)
         );
     }
 
@@ -47,7 +47,7 @@ class getDefaultTranslationTest extends BaseTranslation
         $default_translations = [];
         $this->assertSame(
             '',
-            $this->classe->getDefaultTranslation($string, $template, $default_translations, $default_lang)
+            $this->class->getDefaultTranslation($string, $template, $default_translations, $default_lang)
         );
     }
 
@@ -60,7 +60,7 @@ class getDefaultTranslationTest extends BaseTranslation
         ];
         $this->assertSame(
             $string,
-            $this->classe->getDefaultTranslation($string, $template, $default_translations)
+            $this->class->getDefaultTranslation($string, $template, $default_translations)
         );
     }
 
@@ -77,7 +77,7 @@ class getDefaultTranslationTest extends BaseTranslation
 
         $this->assertSame(
             $expected_translation,
-            $this->classe->getDefaultTranslation($string, $template, $default_translations, $default_lang)
+            $this->class->getDefaultTranslation($string, $template, $default_translations, $default_lang)
         );
     }
 }

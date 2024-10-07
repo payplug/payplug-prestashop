@@ -59,8 +59,7 @@ class sendActionTest extends BaseMerchantTelemetryAction
             ],
         ]);
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('live_api_key')
             ->andReturn('like_api_key');
 
@@ -93,8 +92,7 @@ class sendActionTest extends BaseMerchantTelemetryAction
             ],
         ]);
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('live_api_key')
             ->andReturn('like_api_key');
 

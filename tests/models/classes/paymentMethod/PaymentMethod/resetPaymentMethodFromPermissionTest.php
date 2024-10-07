@@ -6,8 +6,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -20,7 +21,7 @@ class resetPaymentMethodFromPermissionTest extends BasePaymentMethod
      */
     public function testWhenGivenPermissionIsntValidArray($permissions)
     {
-        $this->assertFalse($this->classe->resetPaymentMethodFromPermission($permissions));
+        $this->assertFalse($this->class->resetPaymentMethodFromPermission($permissions));
     }
 
     public function testWhenConfigurationCantBeUpdated()
@@ -28,12 +29,11 @@ class resetPaymentMethodFromPermissionTest extends BasePaymentMethod
         $permissions = [
             'standard' => true,
         ];
-        $this->configuration
-            ->shouldReceive([
-                'getValue' => '{"standard":true}',
-                'set' => false,
-            ]);
-        $this->assertFalse($this->classe->resetPaymentMethodFromPermission($permissions));
+        $this->configuration->shouldReceive([
+            'getValue' => '{"standard":true}',
+            'set' => false,
+        ]);
+        $this->assertFalse($this->class->resetPaymentMethodFromPermission($permissions));
     }
 
     public function testWhenConfigurationIsUpdated()
@@ -41,11 +41,10 @@ class resetPaymentMethodFromPermissionTest extends BasePaymentMethod
         $permissions = [
             'standard' => true,
         ];
-        $this->configuration
-            ->shouldReceive([
-                'getValue' => '{"standard":true}',
-                'set' => true,
-            ]);
-        $this->assertTrue($this->classe->resetPaymentMethodFromPermission($permissions));
+        $this->configuration->shouldReceive([
+            'getValue' => '{"standard":true}',
+            'set' => true,
+        ]);
+        $this->assertTrue($this->class->resetPaymentMethodFromPermission($permissions));
     }
 }

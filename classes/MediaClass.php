@@ -115,8 +115,8 @@ class MediaClass
             'title' => $title,
             'type' => $type,
             'admin_ajax_url' => $admin_ajax_url,
-            'site_url' => $this->dependencies->apiClass->getSiteUrl(),
-            'portal_url' => $this->dependencies->apiClass->getPortalUrl(),
+            'site_url' => $this->dependencies->getPlugin()->getApiService()->getSiteUrl(),
+            'portal_url' => $this->dependencies->getPlugin()->getApiService()->getPortalUrl(),
             'inst_id' => $inst_id,
         ]);
         $this->html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');

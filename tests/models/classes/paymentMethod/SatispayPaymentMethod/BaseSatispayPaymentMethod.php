@@ -7,11 +7,11 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 class BaseSatispayPaymentMethod extends BasePaymentMethod
 {
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
-        $this->classe = \Mockery::mock(SatispayPaymentMethod::class, [$this->dependencies])
+        $this->class = \Mockery::mock(SatispayPaymentMethod::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
     }

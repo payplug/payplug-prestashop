@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -14,35 +14,31 @@ class getPaymentTabTest extends BaseApplepayPaymentMethod
 {
     public function testWhenParentMethodReturnEmptyArray()
     {
-        $this->classe->set('name', '');
+        $this->class->set('name', '');
         $this->assertSame(
             [],
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenPaymentTabIsReturned()
     {
-        $this->classe->set('name', 'applepay');
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'applepay');
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => 'shop domain ssl',
-            ]);
-        $this->helpers['amount']
-            ->shouldReceive([
-                'validateAmount' => [
-                    'result' => true,
-                ],
-                'convertAmount' => 4242,
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => 'shop domain ssl',
+        ]);
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => [
+                'result' => true,
+            ],
+            'convertAmount' => 4242,
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
@@ -105,7 +101,7 @@ class getPaymentTabTest extends BaseApplepayPaymentMethod
 
         $this->assertSame(
             $expected_tab['payment_context'],
-            $this->classe->getPaymentTab()['payment_context']
+            $this->class->getPaymentTab()['payment_context']
         );
     }
 }

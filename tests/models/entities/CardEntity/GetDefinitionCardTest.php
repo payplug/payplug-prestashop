@@ -11,7 +11,7 @@ final class GetDefinitionCardTest extends BaseCardEntity
 {
     protected $brands;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->brands = [

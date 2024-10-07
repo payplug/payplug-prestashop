@@ -32,8 +32,7 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
             'max' => 300000,
         ];
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'amounts':
@@ -46,14 +45,12 @@ final class GetOneyPriceLimitTest extends BaseOneyRepository
             });
 
         $this->plugin = \Mockery::mock('Plugin');
-        $this->plugin
-            ->shouldReceive([
-                'getConfigurationClass' => $this->configuration,
-            ]);
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
+        $this->plugin->shouldReceive([
+            'getConfigurationClass' => $this->configuration,
+        ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
     }
 
     public function testWithCurrencyObject()

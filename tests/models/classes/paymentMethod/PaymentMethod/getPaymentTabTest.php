@@ -6,8 +6,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -15,87 +16,77 @@ class getPaymentTabTest extends BasePaymentMethod
 {
     public function testWhenPaymentMethodHasNoNameDefined()
     {
-        $this->assertSame([], $this->classe->getPaymentTab());
+        $this->assertSame([], $this->class->getPaymentTab());
     }
 
     public function testWhenCartInContextIsntAValidObject()
     {
-        $this->classe->set('name', 'standard');
+        $this->class->set('name', 'standard');
         $this->context->cart = null;
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->assertSame([], $this->classe->getPaymentTab());
+        $this->assertSame([], $this->class->getPaymentTab());
     }
 
     public function testWhenCurrencyInContextIsntAValidObject()
     {
-        $this->classe->set('name', 'standard');
+        $this->class->set('name', 'standard');
         $this->context->currency = null;
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->assertSame([], $this->classe->getPaymentTab());
+        $this->assertSame([], $this->class->getPaymentTab());
     }
 
     public function testWhenCurrentCurrencyIsoCodeIsntSupported()
     {
-        $this->classe->set('name', 'standard');
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->class->set('name', 'standard');
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('USD');
-        $this->assertSame([], $this->classe->getPaymentTab());
+        $this->assertSame([], $this->class->getPaymentTab());
     }
 
     public function testWhenCartIsntValidAmount()
     {
-        $this->classe->set('name', 'standard');
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->class->set('name', 'standard');
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->helpers['amount']
-            ->shouldReceive('validateAmount')
+        $this->helpers['amount']->shouldReceive('validateAmount')
             ->andReturn([
                 'result' => false,
             ]);
-        $this->assertSame([], $this->classe->getPaymentTab());
+        $this->assertSame([], $this->class->getPaymentTab());
     }
 
     public function testWhenPaymentTabIsReturn()
     {
-        $this->classe->set('name', 'standard');
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->class->set('name', 'standard');
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->helpers['amount']
-            ->shouldReceive([
-                'validateAmount' => [
-                    'result' => true,
-                ],
-                'convertAmount' => 4242,
-            ]);
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => [
+                'result' => true,
+            ],
+            'convertAmount' => 4242,
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
@@ -103,10 +94,9 @@ class getPaymentTabTest extends BasePaymentMethod
             'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => 'shop domain ssl',
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => 'shop domain ssl',
+        ]);
 
         $expected_tab = [
             'amount' => 4242,
@@ -156,29 +146,26 @@ class getPaymentTabTest extends BasePaymentMethod
             ],
         ];
 
-        $this->assertSame($expected_tab, $this->classe->getPaymentTab());
+        $this->assertSame($expected_tab, $this->class->getPaymentTab());
     }
 
     public function testWhenPaymentTabIsReturnWithoutAddresses()
     {
-        $this->classe->set('name', 'standard');
+        $this->class->set('name', 'standard');
         $this->context->customer = null;
-        $this->validate_adapter
-            ->shouldReceive('validate')
+        $this->validate_adapter->shouldReceive('validate')
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->helpers['amount']
-            ->shouldReceive([
-                'validateAmount' => [
-                    'result' => true,
-                ],
-                'convertAmount' => 4242,
-            ]);
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => [
+                'result' => true,
+            ],
+            'convertAmount' => 4242,
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
@@ -186,10 +173,9 @@ class getPaymentTabTest extends BasePaymentMethod
             'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => 'shop domain ssl',
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => 'shop domain ssl',
+        ]);
 
         $expected_tab = [
             'amount' => 4242,
@@ -208,6 +194,6 @@ class getPaymentTabTest extends BasePaymentMethod
             'allow_save_card' => false,
         ];
 
-        $this->assertSame($expected_tab, $this->classe->getPaymentTab());
+        $this->assertSame($expected_tab, $this->class->getPaymentTab());
     }
 }

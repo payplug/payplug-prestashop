@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @group unit
- * @group action
+ * @group helper
  * @group amount_helper
  *
  * @runTestsInSeparateProcesses
@@ -16,7 +16,7 @@ class formatOneyAmountTest extends TestCase
 {
     protected $amountHelper;
 
-    protected function setUp()
+    public function setUp()
     {
         $dependencies = \Mockery::mock('Dependencies');
         $this->amountHelper = new AmountHelper($dependencies);

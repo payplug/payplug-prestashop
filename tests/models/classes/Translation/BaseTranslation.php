@@ -11,22 +11,20 @@ class BaseTranslation extends TestCase
 {
     use FormatDataProvider;
 
-    public $dependencies;
-    public $classe;
+    protected $dependencies;
+    protected $class;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->plugin = \Mockery::mock('Plugin');
-        $this->plugin
-            ->shouldReceive([
-            ]);
+        $this->plugin->shouldReceive([
+        ]);
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->name = 'payplug';
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
-        $this->classe = \Mockery::mock(Translation::class, [$this->dependencies])
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
+        $this->class = \Mockery::mock(Translation::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
     }

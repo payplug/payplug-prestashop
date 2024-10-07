@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,33 +19,30 @@ class getAvailableCarriersTest extends BaseApplepayPaymentMethod
      */
     public function testWhenGivenPaymentOptionsIsntValidArrayFormat($id_lang)
     {
-        $this->assertSame([], $this->classe->getAvailableCarriers($id_lang));
+        $this->assertSame([], $this->class->getAvailableCarriers($id_lang));
     }
 
     public function testWhenNoCarriersAreSetted()
     {
         $id_lang = 42;
-        $this->carrier_adapter
-            ->shouldReceive([
-                'getAllActiveCarriers' => [],
-            ]);
-        $this->assertSame([], $this->classe->getAvailableCarriers($id_lang));
+        $this->carrier_adapter->shouldReceive([
+            'getAllActiveCarriers' => [],
+        ]);
+        $this->assertSame([], $this->class->getAvailableCarriers($id_lang));
     }
 
     public function testWhenSettedCarrierIsNotConfigured()
     {
         $id_lang = 42;
-        $this->carrier_adapter
-            ->shouldReceive([
-                'getAllActiveCarriers' => [
-                    [
-                        'id_carrier' => 42,
-                        'name' => 'carrier',
-                    ],
+        $this->carrier_adapter->shouldReceive([
+            'getAllActiveCarriers' => [
+                [
+                    'id_carrier' => 42,
+                    'name' => 'carrier',
                 ],
-            ]);
-        $this->configuration
-            ->shouldReceive('getValue')
+            ],
+        ]);
+        $this->configuration->shouldReceive('getValue')
             ->with('applepay_carriers')
             ->andReturn('[]');
         $expected = [
@@ -56,24 +53,22 @@ class getAvailableCarriersTest extends BaseApplepayPaymentMethod
             ],
         ];
 
-        $this->assertSame($expected, $this->classe->getAvailableCarriers($id_lang));
+        $this->assertSame($expected, $this->class->getAvailableCarriers($id_lang));
     }
 
     public function testWhenSettedCarrierIsConfigured()
     {
         $id_lang = 42;
-        $this->carrier_adapter
-            ->shouldReceive([
-                'getAllActiveCarriers' => [
-                    [
-                        'id_carrier' => 42,
-                        'name' => 'carrier',
-                    ],
+        $this->carrier_adapter->shouldReceive([
+            'getAllActiveCarriers' => [
+                [
+                    'id_carrier' => 42,
+                    'name' => 'carrier',
                 ],
-            ]);
+            ],
+        ]);
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('applepay_carriers')
             ->andReturn('[42]');
 
@@ -84,6 +79,6 @@ class getAvailableCarriersTest extends BaseApplepayPaymentMethod
                 'checked' => true,
             ],
         ];
-        $this->assertSame($expected, $this->classe->getAvailableCarriers($id_lang));
+        $this->assertSame($expected, $this->class->getAvailableCarriers($id_lang));
     }
 }

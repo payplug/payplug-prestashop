@@ -173,18 +173,26 @@ class OneyPaymentMethod extends PaymentMethod
         ];
     }
 
-    // todo: add coverage to this method
-    public function getOrderTab($resource = null)
+    /**
+     * @description Get order tab for given resource to create the order
+     * @todo: add coverage to this method
+     *
+     * @param array $retrieve
+     *
+     * @return array
+     */
+    public function getOrderTab($retrieve = null)
     {
         $this->setParameters();
 
+        $resource = $retrieve['resource'];
         if (!is_object($resource) || !$resource) {
             $this->logger->addLog('OneyPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
         }
 
-        $order_tab = parent::getOrderTab($resource);
+        $order_tab = parent::getOrderTab($retrieve);
 
         if (!$resource->is_paid) {
             $state_addons = $resource->is_live ? '' : '_test';
@@ -983,7 +991,10 @@ class OneyPaymentMethod extends PaymentMethod
             'country' => $this->getOneyCountry($country),
             'operations' => $operation,
         ];
-        $simulations = $this->dependencies->apiClass->getOneySimulations($data);
+        $simulations = $this->dependencies
+            ->getPlugin()
+            ->getApiService()
+            ->getOneySimulations($data);
 
         if (!$simulations['result']) {
             $this->logger->setProcess('oney');

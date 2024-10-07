@@ -18,10 +18,9 @@ class uninstallTabActionTest extends BaseConfigurationAction
         parent::setUp();
 
         $this->tab_adapter = \Mockery::mock('TabAdapter');
-        $this->plugin
-            ->shouldReceive([
-                'getTabAdapter' => $this->tab_adapter,
-            ]);
+        $this->plugin->shouldReceive([
+            'getTabAdapter' => $this->tab_adapter,
+        ]);
     }
 
     public function testWhenRetrieveModuleHasntAdminController()
@@ -41,14 +40,12 @@ class uninstallTabActionTest extends BaseConfigurationAction
                 'className' => 'AdminController',
             ],
         ];
-        $this->module
-            ->shouldReceive([
-                'getInstanceByName' => $module,
-            ]);
-        $this->tab_adapter
-            ->shouldReceive([
-                'getIdFromClassName' => false,
-            ]);
+        $this->module->shouldReceive([
+            'getInstanceByName' => $module,
+        ]);
+        $this->tab_adapter->shouldReceive([
+            'getIdFromClassName' => false,
+        ]);
         $this->assertTrue($this->action->uninstallTabAction());
     }
 
@@ -60,23 +57,19 @@ class uninstallTabActionTest extends BaseConfigurationAction
                 'className' => 'AdminController',
             ],
         ];
-        $this->module
-            ->shouldReceive([
-                'getInstanceByName' => $module,
-            ]);
-        $this->tab_adapter
-            ->shouldReceive([
-                'getIdFromClassName' => true,
-            ]);
+        $this->module->shouldReceive([
+            'getInstanceByName' => $module,
+        ]);
+        $this->tab_adapter->shouldReceive([
+            'getIdFromClassName' => true,
+        ]);
         $tab = \Mockery::mock('Tab');
-        $this->tab_adapter
-            ->shouldReceive([
-                'get' => $tab,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => false,
-            ]);
+        $this->tab_adapter->shouldReceive([
+            'get' => $tab,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => false,
+        ]);
         $this->assertFalse($this->action->uninstallTabAction());
     }
 
@@ -88,27 +81,22 @@ class uninstallTabActionTest extends BaseConfigurationAction
                 'className' => 'AdminController',
             ],
         ];
-        $this->module
-            ->shouldReceive([
-                'getInstanceByName' => $module,
-            ]);
-        $this->tab_adapter
-            ->shouldReceive([
-                'getIdFromClassName' => true,
-            ]);
+        $this->module->shouldReceive([
+            'getInstanceByName' => $module,
+        ]);
+        $this->tab_adapter->shouldReceive([
+            'getIdFromClassName' => true,
+        ]);
         $tab = \Mockery::mock('Tab');
-        $tab
-            ->shouldReceive([
-                'delete' => false,
-            ]);
-        $this->tab_adapter
-            ->shouldReceive([
-                'get' => $tab,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $tab->shouldReceive([
+            'delete' => false,
+        ]);
+        $this->tab_adapter->shouldReceive([
+            'get' => $tab,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->assertFalse($this->action->uninstallTabAction());
     }
 
@@ -120,27 +108,22 @@ class uninstallTabActionTest extends BaseConfigurationAction
                 'className' => 'AdminController',
             ],
         ];
-        $this->module
-            ->shouldReceive([
-                'getInstanceByName' => $module,
-            ]);
-        $this->tab_adapter
-            ->shouldReceive([
-                'getIdFromClassName' => true,
-            ]);
+        $this->module->shouldReceive([
+            'getInstanceByName' => $module,
+        ]);
+        $this->tab_adapter->shouldReceive([
+            'getIdFromClassName' => true,
+        ]);
         $tab = \Mockery::mock('Tab');
-        $tab
-            ->shouldReceive([
-                'delete' => true,
-            ]);
-        $this->tab_adapter
-            ->shouldReceive([
-                'get' => $tab,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $tab->shouldReceive([
+            'delete' => true,
+        ]);
+        $this->tab_adapter->shouldReceive([
+            'get' => $tab,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->assertTrue($this->action->uninstallTabAction());
     }
 }
