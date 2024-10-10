@@ -1,0 +1,7 @@
+# payplug/config/services.yml
+services:
+  _defaults:
+    public: true
+
+  payplug.models.classes.merchant:
+    class: PayPlug\src\models\classes\Merchant

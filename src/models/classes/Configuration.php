@@ -60,6 +60,18 @@ class Configuration
             'defaultValue' => 0,
             'setConf' => 1,
         ],
+        'client_id' => [
+            'type' => 'string',
+            'name' => 'CLIENT_ID',
+            'defaultValue' => null,
+            'setConf' => 1,
+        ],
+        'client_secret' => [
+            'type' => 'string',
+            'name' => 'CLIENT_SECRET',
+            'defaultValue' => null,
+            'setConf' => 1,
+        ],
         'company_id' => [
             'type' => 'string',
             'name' => 'COMPANY_ID',

@@ -425,6 +425,38 @@ class API
     }
 
     /**
+     * @param string $session
+     *
+     * @return array
+     */
+    public function getClientData($session = '')
+    {
+        if (!is_string($session) || !$session) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $session given',
+            ];
+        }
+
+        try {
+            $response = [
+                'result' => true,
+                'code' => 200,
+                'data' => Authentication::getClientData($session),
+            ];
+        } catch (\Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int) $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
      * @description get the oney simulations from the api
      *
      * @param array $data
