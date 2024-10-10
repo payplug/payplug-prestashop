@@ -1,8 +1,13 @@
 # Payplug module changelog
 
-# Version 4.14.0
+## Version 4.14.0
 - Feature :
-  - [PRE-2477](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2539): Set handler in database to define live/test mode
+  - [PRE-2477](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2539): Defined from database which mode create a payment resource
+  - [PRE-2599](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2568): Register client id and secret given from API
+
+## Version 4.13.1
+- Bugfix :
+  - [SMP-2979](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2565) : Add displayHeader to upgrade script
 
 ## Version 4.13.1
 - Bugfix :
@@ -14,13 +19,20 @@
   - [PRE-2565](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2546): Update ApplePay translations in BO
   - [PRE-2623](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2550): Activate queueing system
   - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
-  - [PRE-2627](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2557): Update CB logo and Mastercard logo on merchant side + Mastercard logo on client side
-  - [PRE-2624](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2553): Add 5 life time to queue
+  - [PRE-2627](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2557): Update CB logo and Mastercard logos
+
+- Bugfix :
+  - [SMP-2959](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2560) : Fix check if installment plan is partially or fully refund
 
 ## Version 4.12.1
 - Bugfix :
-  - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2552) : Fix cancellable field for Satispay, Amex and Ideal payment methods
-  - [PRE-2974](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2558) : Fix var declaration in front js
+  - [SMP-2948](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2552) : Fix cancellable field for Satispay, Amex and Ideal payment methods
+  - [SMP-2974](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2558) : Fix var declaration in front js
+  
+## Version 4.12.0
+- Feature :
+    - [PRE-2557](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2547): Update CB logo on client side
+    - [PRE-2624](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2553): Add 5 life time to queue
 
 ## Version 4.12.0
 - Refactoring :
