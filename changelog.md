@@ -7,6 +7,9 @@
   - [PRE-2599](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2568): Register client id and secret given from API
   - [PRE-2651](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2570): Add cache and parallelize tasks to optimize the packaging
 
+- Security :
+    - [PRE-2586](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2567): delete usage of check-php job to avoid a vulnerability
+
 ## Version 4.13.1
 - Bugfix :
   - [SMP-2979](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2565) : Add displayHeader to upgrade script
