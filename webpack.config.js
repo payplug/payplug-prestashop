@@ -26,7 +26,7 @@ const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 const path = require('path');
 const fs = require('fs');
 
-const dir_path = 'dev';
+const dir_path = path.join(__dirname, 'dev');
 const cssViewsFolder = 'css';
 const jsViewsFolder = 'js';
 
@@ -44,31 +44,45 @@ let entryFiles = {};
 
 function _getAllFilesFromFolder(dir)
 {
-    if (!fs.existsSync(dir_path + '/' + dir)) {
+    const joinedPath = path.join(dir_path, dir);
+    const fullPath = path.normalize(joinedPath);
+
+    if (!fullPath.startsWith(dir_path)) {
+        console.log("Invalid path specified!");
         return;
     }
 
-    fs.readdirSync(dir_path + '/' + dir).forEach(function (file) {
+    if (!fs.existsSync(fullPath)) {
+        return;
+    }
+
+    fs.readdirSync(fullPath).forEach(function (file) {
         var wpFile = '../' + dirViewsFinalPath + dir + '/' + path.parse(file).name;
-        file = dir_path + '/' + dir + '/' + file;
+        const fileJoinedPath = path.join(fullPath, file);
+        const filePath = path.normalize(fileJoinedPath);
+
+        if (!filePath.startsWith(fullPath)) {
+            console.log("Invalid path specified!");
+            return;
+        }
 
         // compilation des fichiers .less
-        if (path.extname(file).toLowerCase() == '.less') {
-            var stat = fs.statSync(file);
+        if (path.extname(filePath).toLowerCase() == '.less') {
+            var stat = fs.statSync(filePath);
 
             if (stat && stat.isDirectory()) {
-                _getAllFilesFromFolder(file);
+                _getAllFilesFromFolder(filePath);
             } else {
-                entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, file);
+                entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, filePath);
             }
         }
 
         // compilation des fichiers .js
-        if (path.extname(file).toLowerCase() == '.js') {
-            var stat = fs.statSync(file);
+        if (path.extname(filePath).toLowerCase() == '.js') {
+            var stat = fs.statSync(filePath);
 
             if (stat && stat.isDirectory()) {
-                _getAllFilesFromFolder(file);
+                _getAllFilesFromFolder(filePath);
             } else {
                 switch (dir) {
                     // compilation des fichiers "components" .js
@@ -78,12 +92,12 @@ function _getAllFilesFromFolder(dir)
                             entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion] = [];
                         }
 
-                        entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion].push(path.resolve(__dirname, file));
+                        entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion].push(path.resolve(__dirname, filePath));
                         break;
 
                     // compilation des fichiers .js
                     case jsViewsFolder:
-                        entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, file);
+                        entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, filePath);
                         break;
                 }
             }
@@ -140,7 +154,7 @@ module.exports = {
     mode: 'production',
     entry: entryFiles,
     output: {
-        path: path.resolve(__dirname, dir_path)
+        path: dir_path
     },
     module: {
         rules: [
