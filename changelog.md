@@ -5,6 +5,7 @@
   - [PRE-2477](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2539): Set handler in database to define live/test mode
   - [PRE-2637](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2569): Fix vulnerability path traversal and update webpack version
   - [PRE-2599](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2568): Register client id and secret given from API
+  - [PRE-2651](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2570): Add cache and parallelize tasks to optimize the packaging
 
 ## Version 4.13.1
 - Bugfix :
