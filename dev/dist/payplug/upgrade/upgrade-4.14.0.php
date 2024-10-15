@@ -35,15 +35,16 @@ function upgrade_module_4_14_0($object)
                         ADD COLUMN `is_live` TINYINT(1) NOT NULL DEFAULT 1
                         AFTER `resource_id`';
 
-    if ($flag) {
-        $exec = Db::getInstance()->execute($alter_table_sql);
-        if (!$exec) {
-            $logger->addLog('An error occured while executing sql: ' . $alter_table_sql);
-        }
-        $flag = $flag && $exec;
-
-        $logger->addLog('End upgrade script 4.14.0, result: ' . ($flag ? 'ok' : 'ko'));
-
-        return $flag;
+    $exec = Db::getInstance()->execute($alter_table_sql);
+    if (!$exec) {
+        $logger->addLog('An error occured while executing sql: ' . $alter_table_sql);
     }
+    $flag = $flag && $exec;
+
+    $flag = $flag && Configuration::updateValue('PAYPLUG_CLIENT_ID', '');
+    $flag = $flag && Configuration::updateValue('PAYPLUG_CLIENT_SECRET', '');
+
+    $logger->addLog('End upgrade script 4.14.0, result: ' . ($flag ? 'ok' : 'ko'));
+
+    return $flag;
 }
