@@ -27,7 +27,7 @@
     "mini-css-extract-plugin": "^2.4.5",
     "prestashop_accounts_vue_components": "^4.0.0",
     "style-loader": "^3.3.1",
-    "webpack": "^5.93.0",
+    "webpack": "^5.95.0",
     "webpack-cli": "^5.0.0",
     "webpack-fix-style-only-entries": "^0.6.1"
   },
