@@ -80,7 +80,6 @@ class ConfigurationAction
             'one_click' => 'can_save_cards',
             'oney' => 'can_use_oney',
             'satispay' => 'can_use_satispay',
-            'sofort' => 'can_use_sofort',
             'use_live_mode' => 'use_live_mode',
         ];
 
@@ -121,7 +120,6 @@ class ConfigurationAction
             case 'ideal':
             case 'mybank':
             case 'satispay':
-            case 'sofort':
                 $message .= sprintf(
                     $translation['premium']['description']['form'],
                     $translation['premium']['feature'][$payment_method]
@@ -814,7 +812,6 @@ class ConfigurationAction
             'one_click' => 'enable_one_click',
             'oney' => 'enable_oney',
             'satispay' => 'enable_satispay',
-            'sofort' => 'enable_sofort',
             'standard' => 'enable_standard',
         ];
         foreach ($payment_method_keys as $key => $config) {

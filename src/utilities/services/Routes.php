@@ -136,7 +136,6 @@ class Routes
             'sandbox' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/360021142492',
             'satispay' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089121532700',
             'signup' => 'https://portal.payplug.com/signup',
-            'sofort' => 'https://support.payplug.com/hc/' . $iso_code . '/articles/8089091941660',
         ];
     }
 }

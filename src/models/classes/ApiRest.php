@@ -79,7 +79,6 @@ class ApiRest
             case 'oney_permissions':
             case 'satispay_permissions':
             case 'mybank_permissions':
-            case 'sofort_permissions':
             case 'ideal_permissions':
                 $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $payment_method = str_replace('_permissions', '', $action);
@@ -183,7 +182,6 @@ class ApiRest
             'applepay_display' => $configuration->getValue('applepay_display'),
             'amex' => (bool) $payment_methods['amex'],
             'satispay' => (bool) $payment_methods['satispay'],
-            'sofort' => (bool) $payment_methods['sofort'],
             'ideal' => (bool) $payment_methods['ideal'],
             'mybank' => (bool) $payment_methods['mybank'],
         ];

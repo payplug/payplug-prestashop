@@ -590,11 +590,6 @@ class paymentValidator
 
                 break;
 
-            case 'sofort':
-                $payment = 'sofort';
-
-                break;
-
             default:
                 $payment = 'default';
 
@@ -667,11 +662,6 @@ class paymentValidator
 
             case 'satispay':
                 $payment = 'satispay';
-
-                break;
-
-            case 'sofort':
-                $payment = 'sofort';
 
                 break;
 
