@@ -247,7 +247,6 @@ class PaymentMethod
             'bancontact',
             'satispay',
             'mybank',
-            'sofort',
             'ideal',
             'oney',
         ];

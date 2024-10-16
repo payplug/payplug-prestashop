@@ -197,7 +197,6 @@ class Translation
                     'ideal' => $this->l('modal.premium.feature.ideal', 'translation'),
                     'mybank' => $this->l('modal.premium.feature.mybank', 'translation'),
                     'satispay' => $this->l('modal.premium.feature.satispay', 'translation'),
-                    'sofort' => $this->l('modal.premium.feature.sofort', 'translation'),
                 ],
                 'submit' => $this->l('modal.premium.submit', 'translation'),
             ],
@@ -242,7 +241,6 @@ class Translation
                     'x4_without_fees' => $this->l('order.module.oney.x4_without_fees', 'translation'),
                 ],
                 'satispay' => $this->l('order.module.satispay', 'translation'),
-                'sofort' => $this->l('order.module.sofort', 'translation'),
             ],
             'detail' => [
                 'mode' => [
@@ -554,15 +552,6 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.satispay.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.satispay.call_to_action', 'translation'),
-            ],
-            'sofort' => [
-                'title' => $this->l('paymentmethods.sofort.title', 'translation'),
-                'descriptions' => [
-                    'live' => $this->l('paymentmethods.sofort.descriptions.live', 'translation'),
-                    'sandbox' => $this->l('paymentmethods.sofort.descriptions.sandbox', 'translation'),
-                ],
-                'link' => $this->l('paymentmethods.sofort.link', 'translation'),
-                'call_to_action' => $this->l('paymentmethods.sofort.call_to_action', 'translation'),
             ],
             'ideal' => [
                 'title' => $this->l('paymentmethods.ideal.title', 'translation'),

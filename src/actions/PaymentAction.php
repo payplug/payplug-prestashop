@@ -39,7 +39,6 @@ class PaymentAction
         'one_click',
         'oney',
         'satispay',
-        'sofort',
         'standard',
     ];
     private $dependencies;

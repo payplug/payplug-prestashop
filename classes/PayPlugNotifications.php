@@ -52,7 +52,6 @@ class PayPlugNotifications
     public $is_mybank = false;
     public $is_oney = false;
     public $is_satispay = false;
-    public $is_sofort = false;
     public $key;
     public $lock_key;
     public $logger;
@@ -726,11 +725,6 @@ class PayPlugNotifications
         // Define if payment is satispay resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_satispay = 'satispay' == $this->payment->payment_method['type'];
-        }
-
-        // Define if payment is sofort resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_sofort = 'sofort' == $this->payment->payment_method['type'];
         }
     }
 }
