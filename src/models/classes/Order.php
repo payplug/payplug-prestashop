@@ -147,7 +147,7 @@ class Order
             return false;
         }
 
-        if ($new_order_state == $order->current_state) {
+        if ($new_order_state == (int) $order->getCurrentState()) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
@@ -162,6 +162,7 @@ class Order
             ->get();
         $order_history->id_order = (int) $order->id;
         $order_history->changeIdOrderState((int) $new_order_state, $order->id, true);
+        $order_history->addWithemail();
 
         if (!$order_history->save()) {
             $this->dependencies

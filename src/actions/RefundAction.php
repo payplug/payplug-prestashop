@@ -245,22 +245,50 @@ class RefundAction
         $amountRefundable = (int) ($payment->amount - $payment->amount_refunded);
         $trulyRefundableAmount = min($amount, $amountRefundable);
 
+        // After the retrieved of the resource
+        // If configured mode and resource mode are different
+        // then we set the api from the stored payment configuration
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+        $is_live = !(bool) $configuration->getValue('sandbox_mode');
+        if ($payment->is_live != $is_live) {
+            $api_service = $this->dependencies
+                ->getPlugin()
+                ->getApiService();
+
+            $api_key = (bool) $payment->is_live
+                ? $configuration->getValue('live_api_key')
+                : $configuration->getValue('test_api_key');
+
+            $api_service->initialize($api_key);
+        }
+
+        // Then we do the refund of the resource
+        $refund = $api_service->refundPayment(
+            $resource_id,
+            [
+                'amount' => $trulyRefundableAmount,
+                'metadata' => $metadata,
+            ]
+        );
+
+        // Then we reset the initial mode from configuration
+        if ($payment->is_live != $is_live) {
+            $api_key = (bool) $is_live
+                ? $configuration->getValue('live_api_key')
+                : $configuration->getValue('test_api_key');
+
+            $api_service->initialize($api_key);
+        }
+
         return [
             'id' => $resource_id,
             'data' => [
                 'amount' => $trulyRefundableAmount,
                 'metadata' => $metadata,
             ],
-            'response' => $this->dependencies
-                ->getPlugin()
-                ->getApiService()
-                ->refundPayment(
-                    $resource_id,
-                    [
-                        'amount' => $trulyRefundableAmount,
-                        'metadata' => $metadata,
-                    ]
-                ),
+            'response' => $refund,
         ];
     }
 
