@@ -37,7 +37,12 @@ class updateOrderStateTest extends BaseOrder
 
     public function testWhenCurrentStateAndNewStateAreTheSame()
     {
-        $order = OrderMock::get();
+        $order = \Mockery::mock('Order');
+        $order->id = 1;
+        $order->current_state = 42;
+        $order->shouldReceive([
+            'getCurrentState' => $order->current_state,
+        ]);
         $new_order_state = $order->current_state;
         $this->assertTrue($this->class->updateOrderState($order, $new_order_state));
     }
@@ -48,6 +53,7 @@ class updateOrderStateTest extends BaseOrder
         $order_history->shouldReceive([
             'changeIdOrderState' => true,
             'save' => false,
+            'addWithemail' => true,
         ]);
         $order_history_adapter = \Mockery::mock('OrderHistoryAdapter');
         $order_history_adapter->shouldReceive([
@@ -58,7 +64,12 @@ class updateOrderStateTest extends BaseOrder
             'getOrderHistory' => $order_history_adapter,
         ]);
 
-        $order = OrderMock::get();
+        $order = \Mockery::mock('Order');
+        $order->id = 1;
+        $order->current_state = 42;
+        $order->shouldReceive([
+            'getCurrentState' => $order->current_state,
+        ]);
         $new_order_state = 1;
         $this->assertFalse($this->class->updateOrderState($order, $new_order_state));
     }
@@ -70,6 +81,7 @@ class updateOrderStateTest extends BaseOrder
         $order_history->shouldReceive([
             'changeIdOrderState' => true,
             'save' => true,
+            'addWithemail' => true,
         ]);
         $order_history_adapter = \Mockery::mock('OrderHistoryAdapter');
         $order_history_adapter->shouldReceive([
@@ -79,6 +91,9 @@ class updateOrderStateTest extends BaseOrder
         $order = \Mockery::mock('Order');
         $order->id = 1;
         $order->current_state = 42;
+        $order->shouldReceive([
+            'getCurrentState' => $order->current_state,
+        ]);
 
         $this->plugin->shouldReceive([
             'getOrderHistory' => $order_history_adapter,

@@ -136,15 +136,9 @@ class PaymentAction
             ->getConfiguration()
             ->get('PS_OS_CANCELED');
 
-        $current_state = (int) $order->getCurrentState();
-        if ($current_state && $current_state != $new_state) {
-            $order_history = $this->plugin
-                ->getOrderHistory()
-                ->get();
-            $order_history->id_order = (int) $order->id;
-            $order_history->changeIdOrderState($new_state, (int) $order->id, true);
-            $order_history->addWithemail();
-        }
+        $this->dependencies->getPlugin()
+            ->getOrderClass()
+            ->updateOrderState($order, (int) $new_state);
 
         $step_to_update = [];
         foreach ($retrieve['schedule'] as $key => $schedule) {
@@ -295,15 +289,9 @@ class PaymentAction
             }
         }
 
-        $current_state = (int) $order->getCurrentState();
-        if ($current_state && $current_state != $new_state) {
-            $order_history = $this->plugin
-                ->getOrderHistory()
-                ->get();
-            $order_history->id_order = (int) $order->id;
-            $order_history->changeIdOrderState($new_state, (int) $order->id, true);
-            $order_history->addWithemail();
-        }
+        $this->dependencies->getPlugin()
+            ->getOrderClass()
+            ->updateOrderState($order, (int) $new_state);
 
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
             $update_queue = (bool) $this->dependencies
@@ -390,7 +378,7 @@ class PaymentAction
         }
 
         // Generate the hash and create payment in database
-        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab);
+        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab, $resource['resource']->is_live);
         $parameters = [
             'resource_id' => $resource['resource']->id,
             'is_live' => $resource['resource']->is_live,
@@ -617,7 +605,11 @@ class PaymentAction
             ->getPaymentMethod($stored_resource['method']);
 
         // Check if hash is valid then if not, return the createAction
-        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab);
+        $is_live = !$this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->getValue('sandbox_mode');
+        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab, (bool) $is_live);
         if ($stored_resource['cart_hash'] != $payment_hash) {
             return $this->createAction($stored_resource['method'], $payment_tab);
         }

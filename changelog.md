@@ -11,6 +11,9 @@
     - [PRE-2586](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2567): delete usage of check-php job to avoid a vulnerability
     - [PRE-2637](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2569): Fix vulnerability path traversal and update webpack version
 
+- Bugfix :
+  - [PRE-2652](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2572) : Fix state auto update on Oney order
+
 ## Version 4.13.1
 - Bugfix :
   - [SMP-2979](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2565) : Add displayHeader to upgrade script

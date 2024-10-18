@@ -115,6 +115,7 @@ class retrieveActionTest extends BasePaymentAction
             'getPaymentMethodHash' => 'cart-hash-azerty1234567',
             'getReturnUrl' => $return_url,
         ]);
+
         $this->assertSame(
             $return_url,
             $this->action->retrieveAction($stored_resource, $payment_tab)

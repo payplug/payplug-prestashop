@@ -45,17 +45,13 @@ class abortActionTest extends BasePaymentAction
             ],
         ]);
 
-        $order_state = 42;
-        $order_obj = \Mockery::mock('OrderObj');
-        $order_obj->id = 42;
-        $order_obj->id_cart = 42;
-        $order_obj->shouldReceive([
-            'getCurrentState' => $order_state,
+        $this->order_class->shouldReceive([
+            'updateOrderState' => true,
         ]);
 
         $order = \Mockery::mock('Order');
         $order->shouldReceive([
-            'get' => $order_obj,
+            'get' => OrderMock::get(),
         ]);
 
         $validate = \Mockery::mock('Validate');
@@ -66,7 +62,7 @@ class abortActionTest extends BasePaymentAction
         $configuration = \Mockery::mock('Configuration');
         $configuration->shouldReceive('get')
             ->with('PS_OS_CANCELED')
-            ->andReturn($order_state);
+            ->andReturn(42);
 
         $this->plugin->shouldReceive([
             'getOrder' => $order,
@@ -128,17 +124,9 @@ class abortActionTest extends BasePaymentAction
             ],
         ]);
 
-        $order_state = 42;
-        $order_obj = \Mockery::mock('OrderObj');
-        $order_obj->id = 42;
-        $order_obj->id_cart = 42;
-        $order_obj->shouldReceive([
-            'getCurrentState' => $order_state,
-        ]);
-
         $order = \Mockery::mock('Order');
         $order->shouldReceive([
-            'get' => $order_obj,
+            'get' => OrderMock::get(),
         ]);
 
         $validate = \Mockery::mock('Validate');
@@ -149,7 +137,11 @@ class abortActionTest extends BasePaymentAction
         $configuration = \Mockery::mock('Configuration');
         $configuration->shouldReceive('get')
             ->with('PS_OS_CANCELED')
-            ->andReturn($order_state);
+            ->andReturn(42);
+
+        $this->order_class->shouldReceive([
+            'updateOrderState' => true,
+        ]);
 
         $this->plugin->shouldReceive([
             'getOrder' => $order,

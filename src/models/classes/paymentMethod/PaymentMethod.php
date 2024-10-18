@@ -158,6 +158,16 @@ class PaymentMethod
                 : $this->api_service->abortPayment($resource_id);
         }
 
+        // Then retrieve the current mode from configuration
+        $is_live = !(bool) $this->configuration->getValue('sandbox_mode');
+        if ($stored_resource['is_live'] != $is_live) {
+            $api_key = (bool) $is_live
+                ? $this->configuration->getValue('live_api_key')
+                : $this->configuration->getValue('test_api_key');
+
+            $this->api_service->initialize($api_key);
+        }
+
         return $abort;
     }
 
@@ -214,6 +224,16 @@ class PaymentMethod
 
             $this->api_service->initialize($reverse_api_key);
             $capture = $this->api_service->capturePayment($resource_id);
+        }
+
+        // Then retrieve the current mode from configuration
+        $is_live = !(bool) $this->configuration->getValue('sandbox_mode');
+        if ($stored_resource['is_live'] != $is_live) {
+            $api_key = (bool) $is_live
+                ? $this->configuration->getValue('live_api_key')
+                : $this->configuration->getValue('test_api_key');
+
+            $this->api_service->initialize($api_key);
         }
 
         return $capture;
@@ -443,11 +463,12 @@ class PaymentMethod
     /**
      * @description Generate hash for a payment method from the current context
      *
-     * @param mixed $payment_tab
+     * @param array $payment_tab
+     * @param bool $is_live
      *
      * @return string
      */
-    public function getPaymentMethodHash($payment_tab = [])
+    public function getPaymentMethodHash($payment_tab = [], $is_live = true)
     {
         if (!is_array($payment_tab) || empty($payment_tab)) {
             $this->dependencies
@@ -458,7 +479,16 @@ class PaymentMethod
             return '';
         }
 
-        return hash('sha256', $this->name . json_encode($payment_tab));
+        if (!is_bool($is_live)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('PaymentMethod::getPaymentMethodHash() - Invalid argument given, $is_live must be a valid boolean.', 'error');
+
+            return '';
+        }
+
+        return hash('sha256', $this->name . json_encode($payment_tab) . ($is_live ? 'live' : 'test'));
     }
 
     /**
@@ -1268,6 +1298,18 @@ class PaymentMethod
             $retrieve = $is_installment
                 ? $this->api_service->retrieveInstallment($resource_id)
                 : $this->api_service->retrievePayment($resource_id);
+        }
+
+        // Then retrieve the current mode from configuration
+        if (!$is_installment) {
+            $is_live = !(bool) $this->configuration->getValue('sandbox_mode');
+            if ($stored_resource['is_live'] != $is_live) {
+                $api_key = (bool) $is_live
+                    ? $this->configuration->getValue('live_api_key')
+                    : $this->configuration->getValue('test_api_key');
+
+                $this->api_service->initialize($api_key);
+            }
         }
 
         return $is_installment
