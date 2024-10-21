@@ -142,7 +142,6 @@ const optimization = {
         chunks: 'all',
         maxInitialRequests: 30,
     },
-    runtimeChunk: true,
     removeAvailableModules: false,
     removeEmptyChunks: false,
 };
