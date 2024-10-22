@@ -425,11 +425,15 @@ class API
     }
 
     /**
+     * @description Get the client data from API
+     *
      * @param string $session
+     * @param string $company_id
+     * @param string $mode
      *
      * @return array
      */
-    public function getClientData($session = '')
+    public function getClientData($session = '', $company_id = '', $mode = '')
     {
         if (!is_string($session) || !$session) {
             return [
@@ -438,12 +442,26 @@ class API
                 'message' => 'Wrong $session given',
             ];
         }
+        if (!is_string($company_id) || !$company_id) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $company_id given',
+            ];
+        }
+        if (!is_string($mode) || !$mode) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $mode given',
+            ];
+        }
 
         try {
             $response = [
                 'result' => true,
                 'code' => 200,
-                'data' => Authentication::getClientData($session),
+                'data' => Authentication::createClientIdAndSecret($session, $company_id, $mode),
             ];
         } catch (\Exception $e) {
             $response = [
