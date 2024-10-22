@@ -39,6 +39,72 @@ class Merchant
     }
 
     /**
+     * @description Get client data for live and test mode
+     *
+     * @param string $session
+     * @param string $company_id
+     *
+     * @return array
+     */
+    public function getClientData($session = '', $company_id = '')
+    {
+        if (!is_string($session) || empty($session)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('Merchant::getClientData - Invalid argument, $session must be a non empty string.', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Wrong session given',
+            ];
+        }
+
+        if (!is_string($company_id) || empty($company_id)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('Merchant::getClientData - Invalid argument, $company_id must be a non empty string.', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Wrong company_id given',
+            ];
+        }
+
+        $data = [];
+
+        // Get the client id and secret for test mode
+        $client_data_test = $this->dependencies
+            ->getPlugin()
+            ->getApiService()
+            ->getClientData($session, $company_id, 'test');
+        $data['test'] = $client_data_test['result']
+            ? $client_data_test['data']
+            : [
+                'client_id' => '',
+                'client_secret' => '',
+            ];
+
+        // Get the client id and secret for live mode
+        $client_data_test = $this->dependencies
+            ->getPlugin()
+            ->getApiService()
+            ->getClientData($session, $company_id, 'live');
+        $data['live'] = $client_data_test['result']
+            ? $client_data_test['data']
+            : [
+                'client_id' => '',
+                'client_secret' => '',
+            ];
+
+        return [
+            'result' => true,
+            'data' => $data,
+        ];
+    }
+
+    /**
      * @description Register client data given getted from API
      *
      * @param array $client_data
@@ -56,19 +122,9 @@ class Merchant
             return false;
         }
 
-        $configuration = $this->dependencies
+        return $this->dependencies
             ->getPlugin()
-            ->getConfigurationClass();
-
-        $register = isset($client_data['client_id'])
-            && is_string($client_data['client_id'])
-            && $client_data['client_id']
-            && $configuration->set('client_id', $client_data['client_id']);
-
-        return $register
-            && isset($client_data['client_secret'])
-            && is_string($client_data['client_secret'])
-            && $client_data['client_secret']
-            && $configuration->set('client_secret', $client_data['client_secret']);
+            ->getConfigurationClass()
+            ->set('client_data', $client_data);
     }
 }

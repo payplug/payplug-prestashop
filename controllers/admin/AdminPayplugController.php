@@ -59,15 +59,13 @@ class AdminPayplugController extends ModuleAdminController
      */
     public function initContent()
     {
-        if ($session = $this->tools->tool('getValue', 'session')) {
-            $client_data = $this->dependencies
-                ->getPlugin()
-                ->getApiService()
-                ->getClientData($session);
+        if ($session = $this->tools->tool('getValue', 'session')
+            && $company_id = $this->tools->tool('getValue', '$company_id')) {
+            $merchant = $this->module
+                ->get('payplug.models.classes.merchant');
+            $client_data = $merchant->getClientData($session, $company_id);
             if ($client_data['result']) {
-                $register = $this->module
-                    ->get('payplug.models.classes.merchant')
-                    ->registerClientData($client_data['data']);
+                $merchant->registerClientData($client_data['data']);
             }
         }
 
