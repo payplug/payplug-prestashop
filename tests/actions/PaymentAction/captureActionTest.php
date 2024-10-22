@@ -220,20 +220,16 @@ class captureActionTest extends BasePaymentAction
         ]);
         $this->dependencies->cartClass = $cart_class;
 
-        $order_state = 2;
         $this->configuration->shouldReceive('getValue')
             ->with('order_state_paid')
-            ->andReturn($order_state);
-        $order_obj = \Mockery::mock('OrderObj');
-        $order_obj->id = 42;
-        $order_obj->id_cart = 42;
-        $order_obj->shouldReceive([
-            'getCurrentState' => $order_state,
+            ->andReturn(2);
+        $this->order_class->shouldReceive([
+            'updateOrderState' => true,
         ]);
 
         $order = \Mockery::mock('Order');
         $order->shouldReceive([
-            'get' => $order_obj,
+            'get' => OrderMock::get(),
         ]);
 
         $validate = \Mockery::mock('Validate');
@@ -367,20 +363,17 @@ class captureActionTest extends BasePaymentAction
 
         $this->dependencies->configClass = $config_class;
 
-        $order_state = 2;
         $this->configuration->shouldReceive('getValue')
             ->with('order_state_paid')
-            ->andReturn($order_state);
-        $order_obj = \Mockery::mock('OrderObj');
-        $order_obj->id = 42;
-        $order_obj->id_cart = 42;
-        $order_obj->shouldReceive([
-            'getCurrentState' => $order_state,
+            ->andReturn(2);
+
+        $this->order_class->shouldReceive([
+            'updateOrderState' => true,
         ]);
 
         $order = \Mockery::mock('Order');
         $order->shouldReceive([
-            'get' => $order_obj,
+            'get' => OrderMock::get(),
         ]);
 
         $validate = \Mockery::mock('Validate');

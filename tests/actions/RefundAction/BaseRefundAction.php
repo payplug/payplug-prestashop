@@ -15,6 +15,7 @@ class BaseRefundAction extends TestCase
 
     protected $api_service;
     protected $action;
+    protected $configuration;
     protected $dependencies;
     protected $logger;
     protected $payment_method;
@@ -33,10 +34,24 @@ class BaseRefundAction extends TestCase
         $this->tools_adapter = \Mockery::mock('ToolsAdapter');
         $this->payment_validator = \Mockery::mock('PaymentValidator');
         $this->dependencies->installmentClass = \Mockery::mock('InstallmentClass');
+        $this->configuration = \Mockery::mock('ConfigurationClass');
+        $this->configuration->shouldReceive('getValue')
+            ->with('sandbox_mode')
+            ->andReturn(true);
+        $this->configuration->shouldReceive('getValue')
+            ->with('test_api_key')
+            ->andReturn('test_api_key');
+        $this->configuration->shouldReceive('getValue')
+            ->with('live_api_key')
+            ->andReturn('live_api_key');
 
         $this->payment_method_class = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
 
         $this->api_service = \Mockery::mock('ApiService');
+        $this->api_service->shouldReceive([
+            'initialize' => true,
+        ]);
+
         $this->payment_method = \Mockery::mock('PaymentMethod');
         $this->payment_method_class->shouldReceive([
             'getPaymentMethod' => $this->payment_method,
@@ -65,6 +80,7 @@ class BaseRefundAction extends TestCase
 
         $this->plugin->shouldReceive([
             'getApiService' => $this->api_service,
+            'getConfigurationClass' => $this->configuration,
             'getPaymentMethodClass' => $this->payment_method_class,
             'getPaymentRepository' => $this->payment_repository,
             'getLogger' => $this->logger,

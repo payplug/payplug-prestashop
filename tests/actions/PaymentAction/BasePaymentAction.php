@@ -22,6 +22,7 @@ class BasePaymentAction extends TestCase
     protected $context;
     protected $dependencies;
     protected $logger;
+    protected $order_class;
     protected $payment_method;
     protected $payment_method_class;
     protected $payment_repository;
@@ -38,6 +39,9 @@ class BasePaymentAction extends TestCase
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": true, "amex": true}');
+        $this->configuration->shouldReceive('getValue')
+            ->with('sandbox_mode')
+            ->andReturn(true);
 
         $this->api_service = \Mockery::mock('ApiService');
         $this->cartAdapter = \Mockery::mock('CartAdapter');
@@ -60,6 +64,8 @@ class BasePaymentAction extends TestCase
             'addLog' => true,
         ]);
 
+        $this->order_class = \Mockery::mock('OrderClass');
+
         $this->payment_method_class = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
         $this->payment_method = \Mockery::mock('PaymentMethod');
         $this->payment_method_class->shouldReceive([
@@ -74,6 +80,7 @@ class BasePaymentAction extends TestCase
             'getLogger' => $this->logger,
             'getTools' => $this->toolsAdapter,
             'getConfigurationClass' => $this->configuration,
+            'getOrderClass' => $this->order_class,
             'getPaymentMethodClass' => $this->payment_method_class,
             'getPaymentRepository' => $this->payment_repository,
         ]);
