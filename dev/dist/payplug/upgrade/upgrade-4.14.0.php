@@ -44,16 +44,22 @@ function upgrade_module_4_14_0($object)
     $flag = $flag && Configuration::updateValue('PAYPLUG_CLIENT_ID', '');
     $flag = $flag && Configuration::updateValue('PAYPLUG_CLIENT_SECRET', '');
 
-    $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'));
-    unset($payment_methods['sofort']);
+    $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
+    if (isset($payment_methods['sofort'])) {
+        unset($payment_methods['sofort']);
+    }
     $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
 
-    $countries = json_decode(Configuration::get('PAYPLUG_COUNTRIES'));
-    unset($countries['sofort']);
+    $countries = json_decode(Configuration::get('PAYPLUG_COUNTRIES'), true);
+    if (isset($countries['sofort'])) {
+        unset($countries['sofort']);
+    }
     $flag = $flag && Configuration::updateValue('PAYPLUG_COUNTRIES', json_encode($countries));
 
-    $amounts = json_decode(Configuration::get('PAYPLUG_AMOUNTS'));
-    unset($amounts['sofort']);
+    $amounts = json_decode(Configuration::get('PAYPLUG_AMOUNTS'), true);
+    if (isset($amounts['sofort'])) {
+        unset($amounts['sofort']);
+    }
     $flag = $flag && Configuration::updateValue('PAYPLUG_AMOUNTS', json_encode($amounts));
 
     $logger->addLog('End upgrade script 4.14.0, result: ' . ($flag ? 'ok' : 'ko'));
