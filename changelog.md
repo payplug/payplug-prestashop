@@ -3,6 +3,7 @@
 ## Version 4.13.1
 - Bugfix :
   - [SMP-2979](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2565) : Add displayHeader to upgrade script
+  - [SMP-2999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2578) : Fix double order creation
 
 ## Version 4.13.0
 - Feature :
