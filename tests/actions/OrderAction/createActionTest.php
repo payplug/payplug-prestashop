@@ -199,6 +199,11 @@ class createActionTest extends BaseOrderAction
                 ],
             ]);
 
+        $this->order_repository
+            ->shouldReceive([
+                'getByIdCart' => [],
+            ]);
+
         $this->payment_validator
             ->shouldReceive([
                 'isInstallment' => [
@@ -285,6 +290,11 @@ class createActionTest extends BaseOrderAction
                 'validate' => true,
             ]);
 
+        $this->order_repository
+            ->shouldReceive([
+                'getByIdCart' => [],
+            ]);
+
         $payment_method = \Mockery::mock('PaymentMethod');
         $payment_method
             ->shouldReceive([
@@ -344,6 +354,7 @@ class createActionTest extends BaseOrderAction
         $this->order_repository
             ->shouldReceive([
                 'getCurrentOrders' => [],
+                'getByIdCart' => [],
             ]);
         $this->payment_method_class
             ->shouldReceive([
@@ -434,6 +445,7 @@ class createActionTest extends BaseOrderAction
         $this->order_repository
             ->shouldReceive([
                 'getCurrentOrders' => [],
+                'getByIdCart' => [],
             ]);
         $this->payment_method_class
             ->shouldReceive([
@@ -637,6 +649,10 @@ class createActionTest extends BaseOrderAction
             ->shouldReceive([
                 'get' => $order,
             ]);
+        $this->order_repository
+            ->shouldReceive('getByIdCart')
+            ->once()
+            ->andReturn([]);
         $this->order_repository
             ->shouldReceive([
                 'getCurrentOrders' => [],

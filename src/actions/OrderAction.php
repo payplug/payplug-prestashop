@@ -112,6 +112,18 @@ class OrderAction
             ];
         }
 
+        $res_nb_orders = $this->plugin
+            ->getOrderRepository()
+            ->getByIdCart((int) $cart->id);
+        if (count($res_nb_orders) > 0) {
+            $this->logger->addLog('OrderAction::createAction - Order cannot be created because an order already exists ', 'info');
+
+            return [
+                'result' => true,
+                'message' => 'Order already exists for the given cart',
+            ];
+        }
+
         // Get the related Customer
         $customer = $this->plugin
             ->getCustomer()
