@@ -24,8 +24,14 @@ class registerClientDataTest extends BaseMerchant
             'getConfigurationClass' => $this->configuration_class,
         ]);
         $this->client_data = [
-            'client_id' => 'client-id-key',
-            'client_secret' => 'clientSecretKey',
+            'test' => [
+                'client_id' => 'test_client_id',
+                'client_secret' => 'test_client_secret',
+            ],
+            'live' => [
+                'client_id' => 'live_client_id',
+                'client_secret' => 'live_client_secret',
+            ],
         ];
     }
 
@@ -39,47 +45,8 @@ class registerClientDataTest extends BaseMerchant
         $this->assertFalse($this->class->registerClientData($client_data));
     }
 
-    /**
-     * @dataProvider invalidStringFormatDataProvider
-     *
-     * * @param mixed $client_id
-     */
-    public function testWhenGivenClientIDIsntValidString($client_id)
+    public function testWhenClientDataCantBeRegistered()
     {
-        $client_data = $this->client_data;
-        $client_data['client_id'] = $client_id;
-        $this->assertFalse($this->class->registerClientData($client_data));
-    }
-
-    /**
-     * @dataProvider invalidStringFormatDataProvider
-     *
-     * * @param mixed $client_secret
-     */
-    public function testWhenGivenClientSecretIsntValidString($client_secret)
-    {
-        $client_data = $this->client_data;
-        $client_data['client_secret'] = $client_secret;
-        $this->configuration_class->shouldReceive([
-            'set' => true,
-        ]);
-        $this->assertFalse($this->class->registerClientData($client_data));
-    }
-
-    public function testWhenClientIDCantBeRegistered()
-    {
-        $this->configuration_class->shouldReceive([
-            'set' => false,
-        ]);
-        $this->assertFalse($this->class->registerClientData($this->client_data));
-    }
-
-    public function testWhenClientSecretCantBeRegistered()
-    {
-        $this->configuration_class
-            ->shouldReceive('set')
-            ->once()
-            ->andReturn(true);
         $this->configuration_class->shouldReceive([
             'set' => false,
         ]);
