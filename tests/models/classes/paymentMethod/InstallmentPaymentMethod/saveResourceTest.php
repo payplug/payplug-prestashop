@@ -122,19 +122,22 @@ class saveResourceTest extends BaseInstallmentPaymentMethod
             'metadata' => [],
             'allow_save_card' => false,
         ];
+        $schedules = [];
         $resource = [
             'result' => true,
             'code' => 200,
             'resource' => PaymentMock::getInstallment(),
         ];
+        $resource_with_schedules = $resource;
+        $resource_with_schedules['schedules'] = $schedules;
         $this->api_service->shouldReceive([
             'createInstallment' => $resource,
         ]);
         $this->class->shouldReceive([
-            'addInstallmentSchedules' => true,
+            'retrieveSchedules' => $resource_with_schedules,
         ]);
         $this->assertSame(
-            $resource,
+            $resource_with_schedules,
             $this->class->saveResource($payment_tab)
         );
     }

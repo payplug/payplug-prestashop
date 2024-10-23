@@ -220,7 +220,15 @@ class InstallmentPaymentMethod extends PaymentMethod
         return $payment_tab;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the resource detail
+     *
+     * todo: add coverage to this method
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
     public function getResourceDetail($resource_id = '')
     {
         $this->setParameters();
@@ -242,6 +250,16 @@ class InstallmentPaymentMethod extends PaymentMethod
         }
 
         $resource = $retrieve['resource'];
+
+        // Before processing resource schedules, we need to ensure that the database is updated
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource->id);
+        if (!isset($stored_resource['schedules']) || !$stored_resource['schedules']) {
+            $this->addInstallmentSchedules($retrieve);
+        }
+        $this->updateInstallmentSchedules($retrieve);
 
         $translation = $this->dependencies
             ->getPlugin()
@@ -286,16 +304,6 @@ class InstallmentPaymentMethod extends PaymentMethod
                 ];
             }
         }
-
-        $stored_resource = $this->dependencies
-            ->getPlugin()
-            ->getPaymentRepository()
-            ->getBy('resource_id', $resource->id);
-        if (!isset($stored_resource['schedules']) || !$stored_resource['schedules']) {
-            $this->addInstallmentSchedules($retrieve);
-        }
-
-        $this->updateInstallmentSchedules($retrieve);
 
         return [
             'id' => $resource_id,
@@ -543,7 +551,7 @@ class InstallmentPaymentMethod extends PaymentMethod
                 ->logoutAction();
         }
 
-        return $payment;
+        return $this->retrieveSchedules($payment);
     }
 
     /**

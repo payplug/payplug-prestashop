@@ -151,7 +151,15 @@ class OneClickPaymentMethod extends PaymentMethod
         return $return;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the resource detail
+     *
+     * todo: add coverage to this method
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
     public function getResourceDetail($resource_id = '')
     {
         $this->setParameters();
