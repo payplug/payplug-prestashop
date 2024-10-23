@@ -252,11 +252,11 @@ class RefundAction
             ->getPlugin()
             ->getConfigurationClass();
         $is_live = !(bool) $configuration->getValue('sandbox_mode');
-        if ($payment->is_live != $is_live) {
-            $api_service = $this->dependencies
-                ->getPlugin()
-                ->getApiService();
 
+        $api_service = $this->dependencies
+            ->getPlugin()
+            ->getApiService();
+        if ($payment->is_live != $is_live) {
             $api_key = (bool) $payment->is_live
                 ? $configuration->getValue('live_api_key')
                 : $configuration->getValue('test_api_key');
