@@ -381,7 +381,7 @@ class OneyPaymentMethod extends PaymentMethod
         if ('paid' == $resource_details['status_code']) {
             $order_id = $this->tools->tool('getValue', 'id_order');
             $is_live = 'TEST' != $resource_details['mode'];
-            $this->updateOrderState($order_id, $is_live);
+            $this->updateOrderState((int) $order_id, (bool) $is_live);
         }
 
         $translation = $this->dependencies
@@ -1945,7 +1945,7 @@ class OneyPaymentMethod extends PaymentMethod
             ->getOrder()
             ->get((int) $order_id);
 
-        if ($this->validate->validate('isLoadedObject', $order)) {
+        if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
             $this->logger->addLog('OneyPaymentMethod::updateOrderState() - Invalid argument given, $order getted must be a valid object.', 'error');
 
             return false;
