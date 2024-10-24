@@ -88,8 +88,17 @@ class hydrateActionTest extends BaseQueueAction
 
     public function testWhenQueueIsCreatedAndQueueExists()
     {
+        $entry = [
+            'id_payplug_queue' => 42,
+            'date_add' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+        ];
         $this->repository->shouldReceive([
-            'getFirstNotTreatedEntry' => true,
+            'getFirstNotTreatedEntry' => $entry,
+            'updateEntity' => false,
+            'createEntity' => true,
+        ]);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => $entry,
             'createEntity' => true,
         ]);
         $this->assertSame(
