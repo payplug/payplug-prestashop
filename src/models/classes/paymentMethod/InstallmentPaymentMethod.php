@@ -727,7 +727,7 @@ class InstallmentPaymentMethod extends PaymentMethod
 
         $is_live = !(bool) $this->configuration->getValue('sandbox_mode');
         if ($retrieve['resource']->is_live != $is_live) {
-            $this->api_service->initializeFromMode((bool) $is_live);
+            $this->api_service->initialize((bool) $is_live);
         }
 
         return $retrieve;

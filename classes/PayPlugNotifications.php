@@ -296,7 +296,7 @@ class PayPlugNotifications
             $this->dependencies
                 ->getPlugin()
                 ->getApiService()
-                ->initializeFromMode((bool) $is_live);
+                ->initialize((bool) $is_live);
             $this->resource = Notification::treat($body);
 
             if (isset($this->resource->failure->code)) {
@@ -687,7 +687,7 @@ class PayPlugNotifications
             $this->dependencies
                 ->getPlugin()
                 ->getApiService()
-                ->initializeFromMode(!(bool) $this->sandbox);
+                ->initialize(!(bool) $this->sandbox);
             $this->payment = null;
         } else {
             $this->payment = $retrieve['resource'];

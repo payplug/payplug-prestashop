@@ -80,7 +80,7 @@ class captureTest extends BasePaymentMethod
         ];
 
         $this->api_service->shouldReceive([
-            'initializeFromMode' => true,
+            'initialize' => true,
             'capturePayment' => $capture_failed,
         ]);
         $this->assertSame(
@@ -115,7 +115,7 @@ class captureTest extends BasePaymentMethod
             ->andReturn($capture_failed);
 
         $this->api_service->shouldReceive([
-            'initializeFromMode' => true,
+            'initialize' => true,
             'capturePayment' => $capture_success,
         ]);
         $this->assertSame(
@@ -140,7 +140,7 @@ class captureTest extends BasePaymentMethod
         ];
 
         $this->api_service->shouldReceive([
-            'initializeFromMode' => true,
+            'initialize' => true,
             'capturePayment' => $capture_success,
         ]);
         $this->assertSame(

@@ -22,7 +22,7 @@ class retrieveSchedulesTest extends BaseInstallmentPaymentMethod
             ->with('sandbox_mode')
             ->andReturn(true);
         $this->api_service->shouldReceive([
-            'initializeFromMode' => true,
+            'initialize' => true,
         ]);
     }
 

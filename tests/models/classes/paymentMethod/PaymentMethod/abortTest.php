@@ -80,7 +80,7 @@ class abortTest extends BasePaymentMethod
         ];
 
         $this->api_service->shouldReceive([
-            'initializeFromMode' => true,
+            'initialize' => true,
             'abortPayment' => $abort_failed,
         ]);
         $this->assertSame(
@@ -115,7 +115,7 @@ class abortTest extends BasePaymentMethod
             ->andReturn($abort_failed);
 
         $this->api_service->shouldReceive([
-            'initializeFromMode' => true,
+            'initialize' => true,
             'abortPayment' => $abort_success,
         ]);
         $this->assertSame(
@@ -140,7 +140,7 @@ class abortTest extends BasePaymentMethod
         ];
 
         $this->api_service->shouldReceive([
-            'initializeFromMode' => true,
+            'initialize' => true,
             'abortPayment' => $abort_success,
         ]);
         $this->assertSame(
