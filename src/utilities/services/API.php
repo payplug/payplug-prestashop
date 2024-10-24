@@ -589,13 +589,27 @@ class API
             return null;
         }
 
-        $configuration_key = ($is_live ? 'live' : 'test') . '_api_key';
-        $payplug_key = (bool) $this->dependencies
+        $mode = $is_live ? 'live' : 'test';
+        $configuration_key = $mode . '_api_key';
+        $configuration = $this->dependencies
             ->getPlugin()
-            ->getConfigurationClass()
-            ->getValue($configuration_key);
+            ->getConfigurationClass();
+        $payplug_api_key = $configuration->getValue($configuration_key);
+        $jwt = json_decode($configuration->getValue('jwt'), true);
+        if ($jwt) {
+            $current_date = time();
+            if ($jwt[$mode]['expires_date'] < $current_date) {
+                $client_data = json_decode($configuration->getValue('client_data'), true);
 
-        return $this->initialize($payplug_key);
+                // Renew the token
+                $this->getJWTToken($client_data[$mode]);
+
+                $jwt = json_decode($configuration->getValue('jwt'), true);
+            }
+            $payplug_api_key = $jwt[$mode]['access_token'];
+        }
+
+        return $this->initialize($payplug_api_key);
     }
 
     /**
