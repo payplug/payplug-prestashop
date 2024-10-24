@@ -80,7 +80,7 @@ class retrieveTest extends BasePaymentMethod
         ];
 
         $this->api_service->shouldReceive([
-            'initialize' => true,
+            'initializeFromMode' => true,
             'retrievePayment' => $retrieve_failed,
         ]);
         $this->assertSame(
@@ -115,7 +115,7 @@ class retrieveTest extends BasePaymentMethod
             ->andReturn($retrieve_failed);
 
         $this->api_service->shouldReceive([
-            'initialize' => true,
+            'initializeFromMode' => true,
             'retrievePayment' => $retrieve_success,
         ]);
         $this->assertSame(
@@ -140,7 +140,7 @@ class retrieveTest extends BasePaymentMethod
         ];
 
         $this->api_service->shouldReceive([
-            'initialize' => true,
+            'initializeFromMode' => true,
             'retrievePayment' => $retrieve_success,
         ]);
         $this->assertSame(
