@@ -38,18 +38,11 @@ class BaseRefundAction extends TestCase
         $this->configuration->shouldReceive('getValue')
             ->with('sandbox_mode')
             ->andReturn(true);
-        $this->configuration->shouldReceive('getValue')
-            ->with('test_api_key')
-            ->andReturn('test_api_key');
-        $this->configuration->shouldReceive('getValue')
-            ->with('live_api_key')
-            ->andReturn('live_api_key');
-
         $this->payment_method_class = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
 
         $this->api_service = \Mockery::mock('ApiService');
         $this->api_service->shouldReceive([
-            'initialize' => true,
+            'initializeFromMode' => true,
         ]);
 
         $this->payment_method = \Mockery::mock('PaymentMethod');

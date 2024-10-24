@@ -579,20 +579,21 @@ class API
      * @description set the api keys
      *
      * @param null $sandbox
+     * @param mixed|null $is_live
      *
      * @return Payplug
      */
-    public function initializeFromMode($sandbox = null)
+    public function initializeFromMode($is_live = null)
     {
-        if (null === $sandbox && $this->current_api_key) {
-            $payplug_key = $this->current_api_key;
-        } else {
-            $configuration_key = ($sandbox ? 'test' : 'live') . '_api_key';
-            $payplug_key = (bool) $this->dependencies
-                ->getPlugin()
-                ->getConfigurationClass()
-                ->getValue($configuration_key);
+        if (null === $is_live) {
+            return null;
         }
+
+        $configuration_key = ($is_live ? 'live' : 'test') . '_api_key';
+        $payplug_key = (bool) $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->getValue($configuration_key);
 
         return $this->initialize($payplug_key);
     }

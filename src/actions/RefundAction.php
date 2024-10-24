@@ -257,11 +257,7 @@ class RefundAction
             ->getPlugin()
             ->getApiService();
         if ($payment->is_live != $is_live) {
-            $api_key = (bool) $payment->is_live
-                ? $configuration->getValue('live_api_key')
-                : $configuration->getValue('test_api_key');
-
-            $api_service->initialize($api_key);
+            $api_service->initializeFromMode((bool) $payment->is_live);
         }
 
         // Then we do the refund of the resource
@@ -275,11 +271,7 @@ class RefundAction
 
         // Then we reset the initial mode from configuration
         if ($payment->is_live != $is_live) {
-            $api_key = (bool) $is_live
-                ? $configuration->getValue('live_api_key')
-                : $configuration->getValue('test_api_key');
-
-            $api_service->initialize($api_key);
+            $api_service->initializeFromMode((bool) $is_live);
         }
 
         return [
