@@ -13,7 +13,8 @@
 
 - Bugfix :
   - [PRE-2652](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2572) : Fix state auto update on Oney order
-  - [PRE-2666](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2581) : Fix unit tests 
+  - [PRE-2666](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2581) : Fix unit tests
+  - [PRE-2665](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2582) : Fix prestashop validator errors
 
 
 ## Version 4.13.1
