@@ -1025,7 +1025,7 @@ class API
             return [];
         }
 
-        if ((isset($json_answer['object']) && 'error' == $json_answer['object'])) {
+        if (isset($json_answer['object']) && 'error' == $json_answer['object']) {
             return [];
         }
         $configuration_class = $this->dependencies->getPlugin()->getConfigurationClass();

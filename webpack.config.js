@@ -135,6 +135,12 @@ const optimization = {
         new CssMinimizerPlugin(), // todo: uncomment for prod compilation
         new TerserPlugin({
             parallel: 8,
+            terserOptions: {
+                format: {
+                    comments: /^\**!|2013 - COPYRIGHT_YEAR Payplug SAS/i,
+                },
+            },
+            extractComments:false,
         }),
     ],
     splitChunks: {
