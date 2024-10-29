@@ -78,7 +78,7 @@ class InstallmentPaymentMethod extends PaymentMethod
                     ->getPlugin()
                     ->getPaymentMethodClass()
                     ->getPaymentMethod('standard')
-                    ->getPaymentStatus($schedule['resource']);
+                    ->getPaymentStatus($schedule['resource'])['id_status'];
             } else {
                 $status = 6;
             }
@@ -655,7 +655,7 @@ class InstallmentPaymentMethod extends PaymentMethod
                     ->getPlugin()
                     ->getPaymentMethodClass()
                     ->getPaymentMethod('standard')
-                    ->getPaymentStatus($schedule['resource']);
+                    ->getPaymentStatus($schedule['resource'])['id_status'];
             } else {
                 if (1 == (int) $installment->is_active) {
                     $status = 6; // ongoing

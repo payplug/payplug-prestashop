@@ -138,11 +138,6 @@ class OrderAction
             ];
         }
 
-        // Create the payment from given payment_tab
-        $payment_method = $this->plugin
-            ->getPaymentMethodClass()
-            ->getPaymentMethod($stored_resource['method']);
-
         // Get props from PaymentMethod
         $order_tab = $payment_method->getOrderTab($retrieve);
         if (empty($order_tab)) {
@@ -235,6 +230,14 @@ class OrderAction
             ];
         } elseif (count($res_nb_orders) > 1) {
             $this->logger->addLog('OrderAction::createAction - ' . count($res_nb_orders) . ' orders created for the given cart id', 'error');
+        }
+
+        // If payment resource is an installment update
+        if ('installment' == $stored_resource['method']) {
+            $schedule_update = $payment_method->updateInstallmentSchedules($retrieve);
+            if (!$schedule_update) {
+                $this->logger->addLog('OrderAction::createAction - Installment schedules can\'t be updated', 'warning');
+            }
         }
 
         // Before ending process, if this is the first order of the days, we send the telemetries

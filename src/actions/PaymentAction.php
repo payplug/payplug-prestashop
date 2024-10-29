@@ -396,14 +396,6 @@ class PaymentAction
             return [];
         }
 
-        if ('applepay' == $method) {
-            return $resource;
-        }
-
-        if ('installment' == $method) {
-            $payment_method->addInstallmentSchedules($resource);
-        }
-
         switch ($method) {
             case 'applepay':
                 return $resource;
