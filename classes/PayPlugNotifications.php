@@ -170,7 +170,18 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: dispatchPayment');
         $id_order = $this->orderAdapter->getIdByCartId($this->cart->id);
         if ($id_order) {
+            // If payment resource is installment, then update the schedules and exit
             if (isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id) {
+                $payment_method = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('installment');
+                $retrieve = $payment_method->retrieve($this->resource->installment_plan_id);
+                $schedule_update = $payment_method->updateInstallmentSchedules($retrieve);
+                if (!$schedule_update) {
+                    $this->logger->addLog('Notification: dispatchPayment - Installment schedules can\'t be updated', 'warning');
+                }
+
                 $this->exitProcess('No need to update a installment plan schedule.');
             }
 
