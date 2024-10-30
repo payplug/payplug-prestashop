@@ -152,6 +152,7 @@ class PayPlugNotifications
      */
     private function checkIsValidPaymentResource()
     {
+        $this->logger->addLog('Notification: checkIsValidPaymentResource');
         if (!$this->payment->is_paid && !$this->is_deferred && !$this->is_oney) {
             $this->logger->addLog('The transaction is not paid yet.');
             $this->logger->addLog('No action will be done.');
@@ -663,18 +664,21 @@ class PayPlugNotifications
             ->getPaymentRepository()
             ->getBy('resource_id', $this->resource->id);
 
+        $payment_method = $this->stored_resource['method'];
+
         if (empty($this->stored_resource)) {
             $this->stored_resource = $this->dependencies
                 ->getPlugin()
                 ->getPaymentRepository()
                 ->getFromSchedule($this->resource->id);
+            $payment_method = 'standard';
         }
 
         $retrieve = $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
-            ->getPaymentMethod($this->stored_resource['method'])
-            ->retrieve($this->stored_resource['resource_id']);
+            ->getPaymentMethod($payment_method)
+            ->retrieve($this->resource->id);
 
         if (!$retrieve['result']) {
             $this->logger->addLog('Can\'t retrieve payment with pay id: ' . $this->resource->id, 'debug');
