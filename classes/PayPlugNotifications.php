@@ -43,13 +43,9 @@ class PayPlugNotifications
     public $cart;
     public $except;
     public $flag;
-    public $is_amex = false;
     public $is_applepay = false;
-    public $is_bancontact = false;
     public $is_deferred = false;
-    public $is_ideal = false;
     public $is_installment = false;
-    public $is_mybank = false;
     public $is_oney = false;
     public $is_satispay = false;
     public $key;
@@ -136,7 +132,7 @@ class PayPlugNotifications
     private function canSaveCard()
     {
         $this->logger->addLog('Notification: canSaveCard');
-        $can_save_card = $this->is_installment ? false : true;
+        $can_save_card = $this->validators['payment']->isInstallment($this->payment->id)['result'] ? false : true;
 
         return $can_save_card && (
             $this->payment->save_card
@@ -722,40 +718,7 @@ class PayPlugNotifications
             $this->is_oney = in_array($this->payment->payment_method['type'], $oney_payment_methods);
         }
 
-        // Define if payment is bancontact resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_bancontact = 'bancontact' == $this->payment->payment_method['type'];
-        }
-
         // Define if payment is deferred resource
         $this->is_deferred = !$this->is_oney && $this->validators['payment']->isDeferred($this->payment)['result'];
-
-        // Define if payment is from installment
-        $this->is_installment = $this->validators['payment']->isInstallment($this->payment->id)['result'];
-
-        // Define if payment is applepay resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_applepay = 'apple_pay' == $this->payment->payment_method['type'];
-        }
-
-        // Define if payment is amex resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_amex = 'american_express' == $this->payment->payment_method['type'];
-        }
-
-        // Define if payment is ideal resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_ideal = 'ideal' == $this->payment->payment_method['type'];
-        }
-
-        // Define if payment is mybank resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_mybank = 'mybank' == $this->payment->payment_method['type'];
-        }
-
-        // Define if payment is satispay resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_satispay = 'satispay' == $this->payment->payment_method['type'];
-        }
     }
 }

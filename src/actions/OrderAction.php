@@ -74,11 +74,12 @@ class OrderAction
             ];
         }
 
-        // Get the resource form API
-        $payment_method = $this->dependencies
-            ->getPlugin()
+        // Create the payment from given payment_tab
+        $payment_method = $this->plugin
             ->getPaymentMethodClass()
             ->getPaymentMethod($stored_resource['method']);
+
+        // Get the resource form API
         $retrieve = $payment_method->retrieve($resource_id);
         if (!$retrieve['result']) {
             $this->logger->addLog('OrderAction::createAction - Can\'t retrieve resource from api', 'error');

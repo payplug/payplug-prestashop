@@ -498,7 +498,8 @@ class PaymentAction
 
         $should_create_resource = $force_resource_creation
             || empty($stored_resource)
-            || !$payment_method->isValidResource();
+            || !$payment_method->isValidResource()
+            || (!empty($stored_resource) && $stored_resource['method'] != $method);
 
         if ($should_create_resource) {
             return $this->createAction($method, $payment_tab);
