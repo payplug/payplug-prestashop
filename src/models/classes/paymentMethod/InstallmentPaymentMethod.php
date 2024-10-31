@@ -487,17 +487,21 @@ class InstallmentPaymentMethod extends PaymentMethod
     }
 
     /**
-     * @desccription Post process order
+     * @description Post process a given order from a resource retrieve
      * todo: add coverage to this method
      *
-     * @param null $resource
+     * @param array $retrieve
      * @param int $id_order
      *
      * @return bool
      */
-    public function postProcessOrder($resource = null, $id_order = 0)
+    public function postProcessOrder($retrieve = [], $id_order = 0)
     {
-        return $this->addInstallmentSchedules($resource);
+        if (!is_array($retrieve) || empty($retrieve)) {
+            return false;
+        }
+
+        return $this->addInstallmentSchedules($retrieve);
     }
 
     /**

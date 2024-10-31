@@ -1016,10 +1016,25 @@ class PaymentMethod
         return true;
     }
 
-    // todo: add coverage to this method
-    public function postProcessOrder($resource = null, $id_order = 0)
+    /**
+     * @description Post process a given order from a resource retrieve
+     *
+     * @param array $retrieve
+     * @param int $id_order
+     *
+     * @return bool
+     */
+    public function postProcessOrder($retrieve = [], $id_order = 0)
     {
         $this->setParameters();
+
+        if (!is_array($retrieve) || empty($retrieve)) {
+            $this->logger->addLog('PaymentMethod::postProcessOrder() - Invalid argument given, $retrieve must be a non empty array.');
+
+            return false;
+        }
+
+        $resource = $retrieve['resource'];
 
         if (!is_object($resource) || !$resource) {
             $this->logger->addLog('PaymentMethod::postProcessOrder() - Invalid argument given, $resource must be a non null object.');
