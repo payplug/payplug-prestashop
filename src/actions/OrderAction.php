@@ -206,7 +206,7 @@ class OrderAction
         }
 
         // Post process
-        $post_process = $payment_method->postProcessOrder($resource, (int) $order->id);
+        $post_process = $payment_method->postProcessOrder($retrieve, (int) $order->id);
         if (!$post_process) {
             $this->logger->addLog('OrderAction::createAction - Can\'t post process the order', 'error');
         }
@@ -230,14 +230,6 @@ class OrderAction
             ];
         } elseif (count($res_nb_orders) > 1) {
             $this->logger->addLog('OrderAction::createAction - ' . count($res_nb_orders) . ' orders created for the given cart id', 'error');
-        }
-
-        // If payment resource is an installment update
-        if ('installment' == $stored_resource['method']) {
-            $schedule_update = $payment_method->updateInstallmentSchedules($retrieve);
-            if (!$schedule_update) {
-                $this->logger->addLog('OrderAction::createAction - Installment schedules can\'t be updated', 'warning');
-            }
         }
 
         // Before ending process, if this is the first order of the days, we send the telemetries
@@ -318,7 +310,7 @@ class OrderAction
                 ->getPlugin()
                 ->getOrder()
                 ->getIdByCartId((int) $stored_resource['id_cart']);
-            $post_process = $payment_method->postProcessOrder($resource, (int) $id_order);
+            $post_process = $payment_method->postProcessOrder($retrieve, (int) $id_order);
             if (!$post_process) {
                 $this->logger->addLog('OrderAction::updateAction - Payment cannot be patched', 'error');
 

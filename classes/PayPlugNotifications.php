@@ -664,14 +664,14 @@ class PayPlugNotifications
             ->getPaymentRepository()
             ->getBy('resource_id', $this->resource->id);
 
-        $payment_method = $this->stored_resource['method'];
-
         if (empty($this->stored_resource)) {
             $this->stored_resource = $this->dependencies
                 ->getPlugin()
                 ->getPaymentRepository()
                 ->getFromSchedule($this->resource->id);
             $payment_method = 'standard';
+        } else {
+            $payment_method = $this->stored_resource['method'];
         }
 
         $retrieve = $this->dependencies
