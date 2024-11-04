@@ -372,11 +372,27 @@ class PayPlugNotifications
             ->getPaymentRepository()
             ->getBy('resource_id', $this->resource->payment_id);
 
+        if (empty($stored_resource)) {
+            $stored_resource = $this->dependencies
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getFromSchedule($this->resource->payment_id);
+            $payment_method = 'standard';
+        } else {
+            $payment_method = $stored_resource['method'];
+        }
+
+        if (empty($stored_resource)) {
+            $message = 'Stored resource cannot be getted';
+            $this->logger->addLog($message, 'error');
+            $this->exitProcess($message, 500);
+        }
+
         $retrieve = $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
-            ->getPaymentMethod($stored_resource['method'])
-            ->retrieve($stored_resource['resource_id']);
+            ->getPaymentMethod($payment_method)
+            ->retrieve($this->resource->payment_id);
 
         if (!$retrieve['result']) {
             $this->logger->addLog('Payment cannot be retrieved: ' . $retrieve['message'], 'error');
