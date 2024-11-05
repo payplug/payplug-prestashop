@@ -20,27 +20,24 @@ class BaseQueueAction extends TestCase
     public $resource_id;
     public $type;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->plugin = \Mockery::mock('Plugin');
 
         $this->logger = \Mockery::mock('Logger');
-        $this->logger
-            ->shouldReceive([
-                'addLog' => true,
-            ]);
+        $this->logger->shouldReceive([
+            'addLog' => true,
+        ]);
         $this->repository = \Mockery::mock('QueueRepository');
 
-        $this->plugin
-            ->shouldReceive([
-                'getLogger' => $this->logger,
-                'getQueueRepository' => $this->repository,
-            ]);
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
+        $this->plugin->shouldReceive([
+            'getLogger' => $this->logger,
+            'getQueueRepository' => $this->repository,
+        ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
         $this->action = \Mockery::mock(QueueAction::class, [$this->dependencies])->makePartial();
 
         $this->id_cart = 42;

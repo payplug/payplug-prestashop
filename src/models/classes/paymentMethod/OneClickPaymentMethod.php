@@ -48,18 +48,26 @@ class OneClickPaymentMethod extends PaymentMethod
         return [];
     }
 
-    // todo: add coverage to this method
-    public function getOrderTab($resource = null)
+    /**
+     * @description Get order tab for given resource to create the order
+     * @todo: add coverage to this method
+     *
+     * @param array $retrieve
+     *
+     * @return array
+     */
+    public function getOrderTab($retrieve = null)
     {
         $this->setParameters();
 
+        $resource = $retrieve['resource'];
         if (!is_object($resource) || !$resource) {
             $this->logger->addLog('OneClickPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
         }
 
-        $order_tab = parent::getOrderTab($resource);
+        $order_tab = parent::getOrderTab($retrieve);
 
         if ($this->dependencies->getValidators()['payment']->isDeferred($resource)['result']) {
             $state_addons = $resource->is_live ? '' : '_test';
@@ -120,7 +128,7 @@ class OneClickPaymentMethod extends PaymentMethod
             return $return;
         }
 
-        $retrieve = $this->dependencies->apiClass->retrievePayment($return['resource_stored']['resource_id']);
+        $retrieve = $this->retrieve($return['resource_stored']['resource_id']);
         $redirect = $retrieve['resource']->is_paid;
 
         $payment_methods = $this->configuration->getValue('payment_methods');
@@ -143,7 +151,15 @@ class OneClickPaymentMethod extends PaymentMethod
         return $return;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the resource detail
+     *
+     * todo: add coverage to this method
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
     public function getResourceDetail($resource_id = '')
     {
         $this->setParameters();
@@ -157,17 +173,7 @@ class OneClickPaymentMethod extends PaymentMethod
             ];
         }
 
-        $sandbox = (bool) $this->configuration->getValue('sandbox_mode');
-        $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-        if (!$retrieve['result']) {
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('live_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-            } else {
-                $this->dependencies->apiClass->setSecretKey((string) $this->configuration->getValue('test_api_key'));
-                $retrieve = $this->dependencies->apiClass->retrievePayment($resource_id);
-            }
-        }
+        $retrieve = $this->retrieve($resource_id);
         if (!$retrieve['result']) {
             $this->logger->addLog('OneClickPaymentMethod::getResourceDetail() - Payment resource can\'t be retrieved for given resource id.');
 

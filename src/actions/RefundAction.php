@@ -46,104 +46,119 @@ class RefundAction
      * and either processes a payment refund
      * or initiates the refund for each payment in the installment.
      *
-     * @param $pay_id
-     * @param $amount
-     * @param $metadata
+     * @param string $resource_id
+     * @param string $amount
+     * @param array $metadata
      * @param string $pay_mode
-     * @param null $inst_id
+     * @param false $is_installment
      *
-     * @return array|mixed|string|null
+     * @return array
      */
-    public function refundAction($pay_id, $amount, $metadata, $pay_mode = 'LIVE', $inst_id = null)
+    public function refundAction($resource_id = '', $amount = '0', $metadata = [], $pay_mode = 'LIVE', $is_installment = false)
     {
         $this->setParameters();
 
-        if (!is_string($pay_mode)) {
-            $this->logger->addLog(
-                'RefundAction::refundAction - Invalid argument, $pay_mode must be a string.',
-                'error'
-            );
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('RefundAction::refundAction - Invalid argument, $resource_id must be a non empty string.', 'error');
 
-            return 'error';
-        }
-
-        $sandbox = 'TEST' == $this->tools->tool('strtoupper', $pay_mode);
-
-        $this->dependencies->apiClass->initializeApi($sandbox);
-
-        if (null == $pay_id) {
-            return $inst_id ? $this->processInstallmentRefund($inst_id, $amount, $metadata) : 'error';
+            return [];
         }
 
         if (!is_numeric($amount) || $amount <= 0) {
-            $this->logger->addLog(
-                'RefundAction::refundAction - Invalid argument, $amount must be a positive numeric value.',
-                'error'
-            );
+            $this->logger->addLog('RefundAction::refundAction - Invalid argument, $amount must be a positive numeric value.', 'error');
 
-            return 'error';
+            return [];
         }
 
-        if (!is_array($metadata)) {
-            $this->logger->addLog(
-                'RefundAction::refundAction - Invalid argument, $metadata must be an array.',
-                'error'
-            );
+        if (!is_array($metadata) || empty($metadata)) {
+            $this->logger->addLog('RefundAction::refundAction - Invalid argument, $metadata must be an array.', 'error');
 
-            return 'error';
+            return [];
         }
 
-        return $this->processPaymentRefund($pay_id, $amount, $metadata);
+        if (!is_string($pay_mode)) {
+            $this->logger->addLog('RefundAction::refundAction - Invalid argument, $pay_mode must be a string.', 'error');
+
+            return [];
+        }
+
+        if (!is_bool($is_installment)) {
+            $this->logger->addLog('RefundAction::refundAction - Invalid argument, $is_installment must be a boolean.', 'error');
+
+            return [];
+        }
+
+        return (bool) $is_installment
+            ? $this->processInstallmentRefund($resource_id, $amount, $metadata)
+            : $this->processPaymentRefund($resource_id, $amount, $metadata);
     }
 
     /**
      * @description process refunds for each payment in the installment
      *
-     * @param $inst_id
-     * @param $amount
-     * @param $metadata
+     * @param string $resource_id
+     * @param string $amount
+     * @param array $metadata
      *
-     * @return mixed|string
+     * @return array
      */
-    public function processInstallmentRefund($inst_id, &$amount, $metadata)
+    public function processInstallmentRefund($resource_id = '', $amount = '0', $metadata = [])
     {
         $this->setParameters();
-        // if installment_id not defined
-        $installment = $this->dependencies->apiClass->retrieveInstallment($inst_id);
 
-        if (!$installment['result']) {
-            $error = 'error [RefundAction - processInstallmentRefund()]: Can\'t retrieve InstallmentPlan with given id: ' . $inst_id;
-            $this->logger->addLog($error, 'error');
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('RefundAction::processInstallmentRefund - Invalid argument, $resource_id must be a non empty string.', 'error');
 
-            return 'error';
+            return [];
         }
 
-        $this->logger->addLog('[RefundAction - processInstallmentRefund()] Retrieve installment id: ' . $inst_id);
+        if (!is_numeric($amount) || !$amount) {
+            $this->logger->addLog('RefundAction::processInstallmentRefund - Invalid argument, $amount must be a non null integer.', 'error');
+
+            return [];
+        }
+
+        if (!is_array($metadata) || empty($metadata)) {
+            $this->logger->addLog('RefundAction::processInstallmentRefund - Invalid argument, $metadata must be a non empty array.', 'error');
+
+            return [];
+        }
+
+        // if installment_id not defined
+        $payment_method = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod('installment');
+        $retrieve = $payment_method->retrieve($resource_id);
+        if (!$retrieve['result']) {
+            $this->logger->addLog('RefundAction::processInstallmentRefund - Can\'t retrieve InstallmentPlan with given id.', 'error');
+
+            return [];
+        }
+
+        $this->logger->addLog('RefundAction::processInstallmentRefund - Retrieve installment id: ' . $resource_id);
 
         $refundablePayments = [];
-        foreach ($installment['resource']->schedule as $schedule) {
-            if (!empty($schedule->payment_ids)) {
-                foreach ($schedule->payment_ids as $p_id) {
-                    $refundData = $this->processPaymentRefund($p_id, $amount, $metadata);
-
-                    if ($refundData) {
-                        $refundablePayments[] = $refundData;
-                    }
+        foreach ($retrieve['schedule'] as $schedule) {
+            if ($schedule['resource']) {
+                $refundData = $this->processPaymentRefund($schedule['resource']->id, $amount, $metadata);
+                if ($refundData) {
+                    $refundablePayments[] = $refundData;
                 }
             }
         }
-        if ($this->validators['payment']->canBeRefund($inst_id, $refundablePayments)['result']) {
-            foreach ($refundablePayments as $refund) {
-                if (!$refund['response']['result']) {
-                    return 'error';
-                }
-            }
-            $this->dependencies->installmentClass->updatePayplugInstallment($installment);
-        } else {
-            return 'error';
+
+        if (empty($refundablePayments)) {
+            $this->logger->addLog('RefundAction::processInstallmentRefund - Retrieve installment id: ' . $resource_id);
+
+            return [];
         }
 
-        return $refundablePayments[0]['response']['resource'];
+        $payment_method->updateInstallmentSchedules($retrieve);
+
+        $refund = reset($refundablePayments);
+
+        return $refund['response']['resource'];
     }
 
     /**
@@ -152,47 +167,129 @@ class RefundAction
      * calculates the refundable amount,
      * and initiates the refund if applicable.
      *
-     * @param $payment_id
-     * @param $amount
-     * @param $metadata
+     * @param string $resource_id
+     * @param int $amount
+     * @param array $metadata
      *
-     * @return array|null
+     * @return array
      */
-    public function processPaymentRefund($payment_id, $amount, $metadata)
+    public function processPaymentRefund($resource_id = '', $amount = 0, $metadata = [])
     {
-        $payment = $this->dependencies->apiClass->retrievePayment($payment_id);
+        $this->setParameters();
 
-        if (!$payment['result']) {
-            return null;
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('RefundAction::processPaymentRefund - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [];
         }
 
-        $payment = $payment['resource'];
+        if (!is_numeric($amount) || !$amount) {
+            $this->logger->addLog('RefundAction::processPaymentRefund - Invalid argument, $amount must be a non null integer.', 'error');
 
-        if ($payment->is_paid && !$payment->is_refunded && $amount > 0) {
-            $amountRefundable = (int) ($payment->amount - $payment->amount_refunded);
-            $trulyRefundableAmount = min($amount, $amountRefundable);
-
-            if ($trulyRefundableAmount > 0) {
-                $amount -= $trulyRefundableAmount;
-
-                return [
-                    'id' => $payment_id,
-                    'data' => [
-                        'amount' => $trulyRefundableAmount,
-                        'metadata' => $metadata,
-                    ],
-                    'response' => $this->dependencies->apiClass->refundPayment(
-                        $payment_id,
-                        [
-                            'amount' => $trulyRefundableAmount,
-                            'metadata' => $metadata,
-                        ]
-                    ),
-                ];
-            }
+            return [];
         }
 
-        return null;
+        if (!is_array($metadata) || empty($metadata)) {
+            $this->logger->addLog('RefundAction::processPaymentRefund - Invalid argument, $metadata must be a non empty array.', 'error');
+
+            return [];
+        }
+
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+
+        if (empty($stored_resource)) {
+            $stored_resource = $this->dependencies
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getFromSchedule($resource_id);
+        }
+
+        if (empty($stored_resource)) {
+            $this->logger->addLog('RefundAction::processPaymentRefund - Stored payment can\'t be getted.', 'error');
+
+            return [];
+        }
+
+        $method = 'installment' == $stored_resource['method']
+            ? 'standard'
+            : $stored_resource['method'];
+
+        $retrieve = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($method)
+            ->retrieve($resource_id);
+
+        if (!$retrieve['result']) {
+            $this->logger->addLog('RefundAction::processPaymentRefund - Payment resource can\'t be retrieved.', 'error');
+
+            return [];
+        }
+
+        $payment = $retrieve['resource'];
+        if (!$payment->is_paid) {
+            $this->logger->addLog('RefundAction::processPaymentRefund - Payment resource is not paid.', 'error');
+
+            return [];
+        }
+
+        if ($payment->is_refunded) {
+            $this->logger->addLog('RefundAction::processPaymentRefund - Payment resource is fully refund.', 'error');
+
+            return [];
+        }
+
+        $amountRefundable = (int) ($payment->amount - $payment->amount_refunded);
+        $trulyRefundableAmount = min($amount, $amountRefundable);
+
+        // After the retrieved of the resource
+        // If configured mode and resource mode are different
+        // then we set the api from the stored payment configuration
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+        $is_live = !(bool) $configuration->getValue('sandbox_mode');
+
+        $api_service = $this->dependencies
+            ->getPlugin()
+            ->getApiService();
+        if ($payment->is_live != $is_live) {
+            $api_key = (bool) $payment->is_live
+                ? $configuration->getValue('live_api_key')
+                : $configuration->getValue('test_api_key');
+
+            $api_service->initialize($api_key);
+        }
+
+        // Then we do the refund of the resource
+        $refund = $api_service->refundPayment(
+            $resource_id,
+            [
+                'amount' => $trulyRefundableAmount,
+                'metadata' => $metadata,
+            ]
+        );
+
+        // Then we reset the initial mode from configuration
+        if ($payment->is_live != $is_live) {
+            $api_key = (bool) $is_live
+                ? $configuration->getValue('live_api_key')
+                : $configuration->getValue('test_api_key');
+
+            $api_service->initialize($api_key);
+        }
+
+        return [
+            'id' => $resource_id,
+            'data' => [
+                'amount' => $trulyRefundableAmount,
+                'metadata' => $metadata,
+            ],
+            'response' => $refund,
+        ];
     }
 
     /**

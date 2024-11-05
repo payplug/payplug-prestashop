@@ -8,14 +8,17 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
 class postProcessOrderTest extends BasePaymentMethod
 {
     private $order_adapter;
+    private $retrieve;
+    private $id_order;
 
     public function setUp()
     {
@@ -24,9 +27,24 @@ class postProcessOrderTest extends BasePaymentMethod
         $this->order_adapter->shouldReceive([
             'get' => OrderMock::get(),
         ]);
+        $this->id_order = 42;
+        $this->retrieve = [
+            'result' => true,
+            'resource' => PaymentMock::getStandard(),
+        ];
         $this->plugin->shouldReceive([
             'getOrder' => $this->order_adapter,
         ]);
+    }
+
+    /**
+     * @dataProvider invalidArrayFormatDataProvider
+     *
+     * @param mixed $retrieve
+     */
+    public function testWhenGivenResourceIsntValidArray($retrieve)
+    {
+        $this->assertFalse($this->class->postProcessOrder($retrieve, $this->id_order));
     }
 
     /**
@@ -36,8 +54,10 @@ class postProcessOrderTest extends BasePaymentMethod
      */
     public function testWhenGivenResourceIsntValidObject($resource)
     {
-        $id_order = 42;
-        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
+        $retrieve = [
+            'resource' => $resource,
+        ];
+        $this->assertFalse($this->class->postProcessOrder($retrieve, $this->id_order));
     }
 
     /**
@@ -47,69 +67,42 @@ class postProcessOrderTest extends BasePaymentMethod
      */
     public function testWhenGivenOrderIsntValidInterger($id_order)
     {
-        $resource = PaymentMock::getStandard();
-        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
+        $this->assertFalse($this->class->postProcessOrder($this->retrieve, $id_order));
     }
 
     public function testWhenRelativeOrderCantBeRetrieved()
     {
-        $id_order = 42;
-        $resource = PaymentMock::getStandard();
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => false,
-            ]);
-        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
+        $this->validate_adapter->shouldReceive([
+            'validate' => false,
+        ]);
+        $this->assertFalse($this->class->postProcessOrder($this->retrieve, $this->id_order));
     }
 
     public function testWhenResourceCannotBePatched()
     {
-        $id_order = 42;
-        $resource = PaymentMock::getStandard();
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
 
-        $patch_payment = \Mockery::mock('PatchPayment');
-        $patch_payment
-            ->shouldReceive([
-                'patchPayment' => [
-                    'result' => false,
-                ],
-            ]);
+        $this->api_service->shouldReceive([
+            'patchPayment' => [
+                'result' => false,
+            ],
+        ]);
 
-        $this->plugin
-            ->shouldReceive([
-                'getApiService' => $patch_payment,
-            ]);
-
-        $this->assertFalse($this->classe->postProcessOrder($resource, $id_order));
+        $this->assertFalse($this->class->postProcessOrder($this->retrieve, $this->id_order));
     }
 
     public function testWhenOrderIsPostProcessed()
     {
-        $id_order = 42;
-        $resource = PaymentMock::getStandard();
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
 
-        $patch_payment = \Mockery::mock('PatchPayment');
-        $patch_payment
-            ->shouldReceive([
-                'patchPayment' => [
-                    'result' => true,
-                    'resource' => $resource,
-                ],
-            ]);
+        $this->api_service->shouldReceive([
+            'patchPayment' => $this->retrieve,
+        ]);
 
-        $this->plugin
-            ->shouldReceive([
-                'getApiService' => $patch_payment,
-            ]);
-
-        $this->assertTrue($this->classe->postProcessOrder($resource, $id_order));
+        $this->assertTrue($this->class->postProcessOrder($this->retrieve, $this->id_order));
     }
 }

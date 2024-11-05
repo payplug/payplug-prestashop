@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\InstallmentPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group installment_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group installment_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,20 +19,18 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
      */
     public function testWhenGivenPaymentOptionsIsntValidArrayFormat($payment_options)
     {
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenAmountIsTooLow()
     {
         $payment_options = [];
 
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_TAX')
             ->andReturn('1');
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('inst_min_amount')
             ->andReturn('150');
 
@@ -40,30 +38,26 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
             'getConfiguration' => $this->configuration,
         ]);
 
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenInstallmentPaymentMethodIsDisplayed()
     {
         $payment_options = [];
 
-        $this->configuration_adapter
-            ->shouldReceive('get')
+        $this->configuration_adapter->shouldReceive('get')
             ->with('PS_TAX')
             ->andReturn('1');
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('inst_min_amount')
             ->andReturn('30');
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
 
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('inst_mode')
             ->andReturn('3');
 
@@ -111,6 +105,6 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
             ],
         ];
 
-        $this->assertSame($expected, $this->classe->getPaymentOption($payment_options));
+        $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
 }

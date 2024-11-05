@@ -39,10 +39,9 @@ final class IsValidOneyCartTest extends BaseOneyRepository
 
     public function testWithTooMuchProducts()
     {
-        $this->cart
-            ->shouldReceive([
-                'nbProducts' => 1001,
-            ])
+        $this->cart->shouldReceive([
+            'nbProducts' => 1001,
+        ])
         ;
 
         $cart = CartMock::get();
@@ -65,10 +64,9 @@ final class IsValidOneyCartTest extends BaseOneyRepository
 
     public function testWithValudProductsNB()
     {
-        $this->cart
-            ->shouldReceive([
-                'nbProducts' => 999,
-            ])
+        $this->cart->shouldReceive([
+            'nbProducts' => 999,
+        ])
         ;
 
         $cart = CartMock::get();

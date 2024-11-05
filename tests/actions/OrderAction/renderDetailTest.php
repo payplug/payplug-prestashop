@@ -20,10 +20,9 @@ class renderDetailTest extends BaseOrderAction
         parent::setUp();
 
         $this->constant = \Mockery::mock('Constant');
-        $this->plugin
-            ->shouldReceive([
-                'getConstant' => $this->constant,
-            ]);
+        $this->plugin->shouldReceive([
+            'getConstant' => $this->constant,
+        ]);
     }
 
     /**
@@ -43,14 +42,12 @@ class renderDetailTest extends BaseOrderAction
     public function testWhenRelatedOrderCantBeGetted()
     {
         $order_id = 42;
-        $this->order_adapter
-            ->shouldReceive([
-                'get' => OrderMock::get(),
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => false,
-            ]);
+        $this->order_adapter->shouldReceive([
+            'get' => OrderMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => false,
+        ]);
         $this->assertSame(
             [],
             $this->action->renderDetail($order_id)
@@ -62,14 +59,12 @@ class renderDetailTest extends BaseOrderAction
         $order_id = 42;
         $order = OrderMock::get();
         $order->module = 'unknow_module';
-        $this->order_adapter
-            ->shouldReceive([
-                'get' => $order,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $this->order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->assertSame(
             [],
             $this->action->renderDetail($order_id)
@@ -81,18 +76,15 @@ class renderDetailTest extends BaseOrderAction
         $order_id = 42;
         $order = OrderMock::get();
         $order->module = 'payplug';
-        $this->order_adapter
-            ->shouldReceive([
-                'get' => $order,
-            ]);
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [],
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $this->order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [],
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
         $this->assertSame(
             [],
             $this->action->renderDetail($order_id)
@@ -102,17 +94,15 @@ class renderDetailTest extends BaseOrderAction
     public function testWhenUndefinedOrderStateIsInHistory()
     {
         $adminClass = \Mockery::mock('AdminClass');
-        $adminClass
-            ->shouldReceive([
-                'getAdminAjaxUrl' => '/',
-            ]);
+        $adminClass->shouldReceive([
+            'getAdminAjaxUrl' => '/',
+        ]);
         $this->dependencies->adminClass = $adminClass;
 
         $orderClass = \Mockery::mock('OrderClass');
-        $orderClass
-            ->shouldReceive([
-                'getUndefinedOrderHistory' => [],
-            ]);
+        $orderClass->shouldReceive([
+            'getUndefinedOrderHistory' => [],
+        ]);
         $this->dependencies->orderClass = $orderClass;
 
         $order_id = 42;
@@ -127,38 +117,27 @@ class renderDetailTest extends BaseOrderAction
             'schedules' => '',
             'date_upd' => '1970-01-01 00:00:00',
         ];
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getOrderTab' => [],
-                'getResourceDetail' => [
-                    'mode' => 'live',
-                ],
-            ]);
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->payment_method->shouldReceive([
+            'getOrderTab' => [],
+            'getResourceDetail' => [
+                'mode' => 'live',
+            ],
+        ]);
+        $this->configuration_class->shouldReceive('getValue')
             ->with('order_state_pending')
             ->andReturn('42');
-        $this->constant
-            ->shouldReceive('get')
+        $this->constant->shouldReceive('get')
             ->with('__PS_BASE_URI__')
             ->andReturn('/');
-        $this->order_adapter
-            ->shouldReceive([
-                'get' => $order,
-            ]);
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => $payment,
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
+        $this->order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => $payment,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
 
         $expected = [
             'logo_url' => '/modules/payplug/views/img/payplug.svg',

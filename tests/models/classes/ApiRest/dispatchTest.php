@@ -6,8 +6,8 @@ use PayPlug\src\models\classes\ApiRest;
 
 /**
  * @group unit
- * @group classes
- * @group apirest_classes
+ * @group class
+ * @group apirest_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -22,7 +22,7 @@ class dispatchTest extends BaseApiRest
     {
         $this->assertSame(
             [],
-            $this->classe->dispatch($action)
+            $this->class->dispatch($action)
         );
     }
 
@@ -42,20 +42,18 @@ class dispatchTest extends BaseApiRest
                 'footer' => [],
             ],
         ];
-        $this->configuration_action
-            ->shouldReceive([
-                'loginAction' => $response,
-            ]);
+        $this->configuration_action->shouldReceive([
+            'loginAction' => $response,
+        ]);
 
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => 'file_get_contents',
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => 'file_get_contents',
+        ]);
 
         $action = 'login';
         $this->assertSame(
             $response,
-            $this->classe->dispatch($action)
+            $this->class->dispatch($action)
         );
     }
 
@@ -75,14 +73,13 @@ class dispatchTest extends BaseApiRest
                 'footer' => [],
             ],
         ];
-        $this->configuration_action
-            ->shouldReceive([
-                'logoutAction' => $response,
-            ]);
+        $this->configuration_action->shouldReceive([
+            'logoutAction' => $response,
+        ]);
         $action = 'logout';
         $this->assertSame(
             $response,
-            $this->classe->dispatch($action)
+            $this->class->dispatch($action)
         );
     }
 
@@ -102,20 +99,18 @@ class dispatchTest extends BaseApiRest
                 'footer' => [],
             ],
         ];
-        $this->configuration_action
-            ->shouldReceive([
-                'saveAction' => $response,
-            ]);
+        $this->configuration_action->shouldReceive([
+            'saveAction' => $response,
+        ]);
 
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => 'file_get_contents',
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => 'file_get_contents',
+        ]);
 
         $action = 'save';
         $this->assertSame(
             $response,
-            $this->classe->dispatch($action)
+            $this->class->dispatch($action)
         );
     }
 
@@ -135,14 +130,13 @@ class dispatchTest extends BaseApiRest
                 'footer' => [],
             ],
         ];
-        $this->configuration_action
-            ->shouldReceive([
-                'renderConfiguration' => $response,
-            ]);
+        $this->configuration_action->shouldReceive([
+            'renderConfiguration' => $response,
+        ]);
         $action = 'init';
         $this->assertSame(
             $response,
-            $this->classe->dispatch($action)
+            $this->class->dispatch($action)
         );
     }
 }

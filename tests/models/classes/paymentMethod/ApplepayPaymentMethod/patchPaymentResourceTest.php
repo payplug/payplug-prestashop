@@ -6,15 +6,14 @@ use PayPlug\tests\mock\PaymentMock;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group applepay_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group applepay_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
 class patchPaymentResourceTest extends BaseApplepayPaymentMethod
 {
-    private $api_service;
     private $cart_data;
     private $resource_id;
     private $token;
@@ -25,7 +24,6 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
     {
         parent::setUp();
 
-        $this->api_service = \Mockery::mock('ApiService');
         $this->resource_id = 'pay_azerty1234';
         $this->token = [
             'token' => 'applepay_token',
@@ -44,11 +42,6 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
             'result' => true,
             'data' => [],
         ];
-
-        $this->plugin
-            ->shouldReceive([
-                'getApiService' => $this->api_service,
-            ]);
     }
 
     /**
@@ -61,7 +54,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument, $resource_id must be a non empty string.',
-        ], $this->classe->patchPaymentResource($resource_id));
+        ], $this->class->patchPaymentResource($resource_id));
     }
 
     /**
@@ -74,7 +67,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument, $token must be a non empty string.',
-        ], $this->classe->patchPaymentResource($this->resource_id, $token));
+        ], $this->class->patchPaymentResource($this->resource_id, $token));
     }
 
     /**
@@ -87,164 +80,145 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument, $workflow must be a non empty string. given: ' . json_encode($workflow),
-        ], $this->classe->patchPaymentResource($this->resource_id, $this->token, $workflow));
+        ], $this->class->patchPaymentResource($this->resource_id, $this->token, $workflow));
     }
 
     public function testWhenPaymentCantBeRetrieved()
     {
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [],
+        ]);
         $this->assertSame([
             'result' => false,
             'message' => 'No payment id for given resource id',
-        ], $this->classe->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
+        ], $this->class->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
     }
 
     public function testWhenPaymentRetrievedIdIsDifferentFromGivenResourceID()
     {
         $resource_id = 'pay_azerty';
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => $this->payment_database_mock,
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->payment_database_mock,
+        ]);
         $this->assertSame([
             'result' => false,
             'message' => 'No correspondance with given payment id',
-        ], $this->classe->patchPaymentResource($resource_id, $this->token, $this->workflow));
+        ], $this->class->patchPaymentResource($resource_id, $this->token, $this->workflow));
     }
 
     public function testWhenCartDataGetterReturnError()
     {
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => $this->payment_database_mock,
-            ]);
-        $this->classe
-            ->shouldReceive([
-                'getCartData' => [
-                    'result' => false,
-                    'message' => 'cart data can not be getted',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->payment_database_mock,
+        ]);
+        $this->class->shouldReceive([
+            'getCartData' => [
+                'result' => false,
+                'message' => 'cart data can not be getted',
+            ],
+        ]);
         $this->assertSame([
             'result' => false,
             'message' => 'cart data can not be getted',
-        ], $this->classe->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
+        ], $this->class->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
     }
 
     public function testWhenResourceCantBePatch()
     {
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => $this->payment_database_mock,
-            ]);
-        $this->classe
-            ->shouldReceive([
-                'getCartData' => $this->cart_data,
-            ]);
-        $this->api_service
-            ->shouldReceive([
-                'patchPayment' => [
-                    'result' => false,
-                    'message' => 'Payment can not be patched',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->payment_database_mock,
+        ]);
+        $this->class->shouldReceive([
+            'getCartData' => $this->cart_data,
+        ]);
+        $this->api_service->shouldReceive([
+            'patchPayment' => [
+                'result' => false,
+                'message' => 'Payment can not be patched',
+            ],
+        ]);
 
         $this->assertSame([
             'result' => false,
             'message' => 'An error occured during payment patch : Payment can not be patched',
-        ], $this->classe->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
+        ], $this->class->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
     }
 
     public function testWhenPatchedResourceIsFailed()
     {
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => $this->payment_database_mock,
-            ]);
-        $this->classe
-            ->shouldReceive([
-                'getCartData' => $this->cart_data,
-            ]);
-        $this->api_service
-            ->shouldReceive([
-                'patchPayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
-        $this->validators['payment']
-            ->shouldReceive([
-                'isFailed' => [
-                    'result' => true,
-                    'message' => 'Resource has failure',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->payment_database_mock,
+        ]);
+        $this->class->shouldReceive([
+            'getCartData' => $this->cart_data,
+        ]);
+        $this->api_service->shouldReceive([
+            'patchPayment' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
+        $this->validators['payment']->shouldReceive([
+            'isFailed' => [
+                'result' => true,
+                'message' => 'Resource has failure',
+            ],
+        ]);
         $this->assertSame([
             'result' => false,
             'message' => 'Resource has failure',
-        ], $this->classe->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
+        ], $this->class->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
     }
 
     public function testWhenPatchedResourceIsNotPaid()
     {
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => $this->payment_database_mock,
-            ]);
-        $this->classe
-            ->shouldReceive([
-                'getCartData' => $this->cart_data,
-            ]);
-        $this->api_service
-            ->shouldReceive([
-                'patchPayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(['is_paid' => false]),
-                ],
-            ]);
-        $this->validators['payment']
-            ->shouldReceive([
-                'isFailed' => [
-                    'result' => false,
-                    'message' => '',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->payment_database_mock,
+        ]);
+        $this->class->shouldReceive([
+            'getCartData' => $this->cart_data,
+        ]);
+        $this->api_service->shouldReceive([
+            'patchPayment' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(['is_paid' => false]),
+            ],
+        ]);
+        $this->validators['payment']->shouldReceive([
+            'isFailed' => [
+                'result' => false,
+                'message' => '',
+            ],
+        ]);
         $this->assertSame([
             'result' => false,
             'message' => 'Payment is not paid',
-        ], $this->classe->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
+        ], $this->class->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
     }
 
     public function testWhenPatchedResourceIsPatched()
     {
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => $this->payment_database_mock,
-            ]);
-        $this->classe
-            ->shouldReceive([
-                'getCartData' => $this->cart_data,
-            ]);
-        $this->api_service
-            ->shouldReceive([
-                'patchPayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(['is_paid' => true]),
-                ],
-            ]);
-        $this->validators['payment']
-            ->shouldReceive([
-                'isFailed' => [
-                    'result' => false,
-                    'message' => '',
-                ],
-            ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->payment_database_mock,
+        ]);
+        $this->class->shouldReceive([
+            'getCartData' => $this->cart_data,
+        ]);
+        $this->api_service->shouldReceive([
+            'patchPayment' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(['is_paid' => true]),
+            ],
+        ]);
+        $this->validators['payment']->shouldReceive([
+            'isFailed' => [
+                'result' => false,
+                'message' => '',
+            ],
+        ]);
         $this->assertSame([
             'result' => true,
             'return_url' => 'link',
-        ], $this->classe->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
+        ], $this->class->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
     }
 }

@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group standard_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group standard_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,7 +19,7 @@ class getOptionTest extends BaseStandardPaymentMethod
      */
     public function testWhenGivenConfigurationIsntValidArrayFormat($current_configuration)
     {
-        $this->assertSame([], $this->classe->getOption($current_configuration));
+        $this->assertSame([], $this->class->getOption($current_configuration));
     }
 
     public function testWhenOnlyStandardPaymentExpected()
@@ -30,10 +30,9 @@ class getOptionTest extends BaseStandardPaymentMethod
         ];
 
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => false,
-            ]);
+        $configClass->shouldReceive([
+            'isValidFeature' => false,
+        ]);
         $this->dependencies->configClass = $configClass;
 
         $expected = [
@@ -135,7 +134,7 @@ class getOptionTest extends BaseStandardPaymentMethod
             'advanced_settings' => [],
         ];
 
-        $this->assertSame($expected, $this->classe->getOption($current_configuration));
+        $this->assertSame($expected, $this->class->getOption($current_configuration));
     }
 
     public function testWhenIntegratedPaymentExpected()
@@ -146,8 +145,7 @@ class getOptionTest extends BaseStandardPaymentMethod
         ];
 
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
+        $configClass->shouldReceive('isValidFeature')
             ->andReturnUsing(function ($feature) {
                 return 'feature_integrated' == $feature;
             });
@@ -237,7 +235,7 @@ class getOptionTest extends BaseStandardPaymentMethod
             ],
         ];
 
-        $this->assertSame($expected, $this->classe->getOption($current_configuration)['options']);
+        $this->assertSame($expected, $this->class->getOption($current_configuration)['options']);
     }
 
     public function testWhenInstallmentPaymentExpected()
@@ -251,8 +249,7 @@ class getOptionTest extends BaseStandardPaymentMethod
         ];
 
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
+        $configClass->shouldReceive('isValidFeature')
             ->andReturnUsing(function ($feature) {
                 return 'feature_installment' == $feature;
             });
@@ -360,7 +357,7 @@ class getOptionTest extends BaseStandardPaymentMethod
             ],
         ];
 
-        $this->assertSame($expected, $this->classe->getOption($current_configuration)['advanced_settings']);
+        $this->assertSame($expected, $this->class->getOption($current_configuration)['advanced_settings']);
     }
 
     public function testWhenDeferredPaymentExpected()
@@ -372,13 +369,12 @@ class getOptionTest extends BaseStandardPaymentMethod
             'deferred_state' => 2,
         ];
 
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getDeferredState' => [],
         ]);
 
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
+        $configClass->shouldReceive('isValidFeature')
             ->andReturnUsing(function ($feature) {
                 return 'feature_deferred' == $feature;
             });
@@ -429,6 +425,6 @@ class getOptionTest extends BaseStandardPaymentMethod
             ],
         ];
 
-        $this->assertSame($expected, $this->classe->getOption($current_configuration)['advanced_settings']);
+        $this->assertSame($expected, $this->class->getOption($current_configuration)['advanced_settings']);
     }
 }

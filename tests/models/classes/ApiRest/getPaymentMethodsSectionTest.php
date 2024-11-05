@@ -7,8 +7,8 @@ use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
- * @group classes
- * @group apirest_classes
+ * @group class
+ * @group apirest_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -26,15 +26,14 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $this->plugin->shouldReceive([
             'getContext' => $context,
         ]);
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getDeferredState' => [],
         ]);
 
         $link = \Mockery::mock('Link');
-        $link
-            ->shouldReceive([
-                'getAdminLink' => 'AdminPayPlugInstallment',
-            ]);
+        $link->shouldReceive([
+            'getAdminLink' => 'AdminPayPlugInstallment',
+        ]);
         $this->plugin->getContext()->get()->link = $link;
 
         $this->payment_method_option = [
@@ -72,7 +71,6 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         yield ['feature_applepay', 'applepay'];
         yield ['feature_bancontact', 'bancontact'];
         yield ['feature_satispay', 'satispay'];
-        yield ['feature_sofort', 'sofort'];
         yield ['feature_ideal', 'ideal'];
         yield ['feature_mybank', 'mybank'];
     }
@@ -86,7 +84,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
     {
         $this->assertSame(
             [],
-            $this->classe->getPaymentMethodsSection($current_configuration)
+            $this->class->getPaymentMethodsSection($current_configuration)
         );
     }
 
@@ -95,12 +93,11 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         $current_configuration = [];
 
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => false,
-            ]);
+        $configClass->shouldReceive([
+            'isValidFeature' => false,
+        ]);
         $this->dependencies->configClass = $configClass;
-        $this->assertSame([], $this->classe->getPaymentMethodsSection($current_configuration));
+        $this->assertSame([], $this->class->getPaymentMethodsSection($current_configuration));
     }
 
     /**
@@ -112,8 +109,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
     public function testWhenGivenMethodIsEnable($feature, $expected)
     {
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive('isValidFeature')
+        $configClass->shouldReceive('isValidFeature')
             ->andReturnUsing(function ($key) use ($feature) {
                 return $feature == $key;
             });
@@ -125,7 +121,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
         }
 
         $this->dependencies->configClass = $configClass;
-        $response = $this->classe->getPaymentMethodsSection([]);
+        $response = $this->class->getPaymentMethodsSection([]);
         $payment_methods = [];
         if (isset($response['options'])) {
             foreach ($response['options'] as $payment_method) {

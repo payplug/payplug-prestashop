@@ -201,6 +201,11 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                 ->getPlugin()
                 ->getOrderRepository()
                 ->getByIdCart((int) $payment['id_cart']);
+
+            if (empty($orders)) {
+                continue;
+            }
+
             $order = reset($orders);
 
             $customer = $this->dependencies

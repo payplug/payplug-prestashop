@@ -6,8 +6,8 @@ use PayPlug\tests\mock\AddressMock;
 
 /**
  * @group unit
- * @group classes
- * @group address_classes
+ * @group class
+ * @group address_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,10 +19,9 @@ class checkAndSaveAddressTest extends BaseAddress
     {
         parent::setUp();
 
-        $this->address_adapter
-            ->shouldReceive([
-                'get' => AddressMock::get(),
-            ]);
+        $this->address_adapter->shouldReceive([
+            'get' => AddressMock::get(),
+        ]);
 
         $this->user_address = [
             'firstname' => 'John',
@@ -42,7 +41,7 @@ class checkAndSaveAddressTest extends BaseAddress
      */
     public function testWithInvalidUserAddress($user_address)
     {
-        $result = $this->classe->checkAndSaveAddress($user_address, 123, []);
+        $result = $this->class->checkAndSaveAddress($user_address, 123, []);
 
         $this->assertEquals(0, $result);
     }
@@ -55,7 +54,7 @@ class checkAndSaveAddressTest extends BaseAddress
      */
     public function testWithInvalidCustomerId($customer_id)
     {
-        $result = $this->classe->checkAndSaveAddress($this->user_address, $customer_id, []);
+        $result = $this->class->checkAndSaveAddress($this->user_address, $customer_id, []);
 
         $this->assertEquals(0, $result);
     }
@@ -68,7 +67,7 @@ class checkAndSaveAddressTest extends BaseAddress
      */
     public function testWithInvalidCustomerAddresses($customer_addresses)
     {
-        $result = $this->classe->checkAndSaveAddress($this->user_address, 123, $customer_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $customer_addresses);
 
         $this->assertEquals(0, $result);
     }
@@ -83,14 +82,13 @@ class checkAndSaveAddressTest extends BaseAddress
         $customer_id = 1;
         $customer_addresses = [];
 
-        $this->address_adapter
-            ->shouldReceive(
-                [
-                    'saveAddress' => true,
-                ]
-            );
+        $this->address_adapter->shouldReceive(
+            [
+                'saveAddress' => true,
+            ]
+        );
 
-        $result = $this->classe->checkAndSaveAddress($this->user_address, $customer_id, $customer_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, $customer_id, $customer_addresses);
 
         // Assert that the method returns the existing address ID
         $this->assertEquals($new_address_id, $result);
@@ -116,7 +114,7 @@ class checkAndSaveAddressTest extends BaseAddress
         $existing_address_id = AddressMock::get()->id;
         $customer_id = 123;
 
-        $result = $this->classe->checkAndSaveAddress($this->user_address, $customer_id, $existingAddresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, $customer_id, $existingAddresses);
 
         $this->assertEquals($existing_address_id, $result);
     }

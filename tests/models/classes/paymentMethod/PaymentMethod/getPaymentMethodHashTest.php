@@ -6,31 +6,20 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
+ * @group class
+ * @group payment_method_classe
+ * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
 class getPaymentMethodHashTest extends BasePaymentMethod
 {
-    /**
-     * @dataProvider invalidArrayFormatDataProvider
-     *
-     * @param mixed $payment_tab
-     */
-    public function testWhenGivenPaymentTabIsntValidObject($payment_tab)
-    {
-        $this->assertSame('', $this->classe->getPaymentMethodHash($payment_tab));
-    }
+    private $payment_tab;
 
-    public function testWhenGivenPaymentTabIsntEmpty()
+    public function setUp()
     {
-        $this->assertSame('', $this->classe->getPaymentMethodHash([]));
-    }
-
-    public function testWhenHashIsReturned()
-    {
-        $payment_tab = [
+        parent::setUp();
+        $this->payment_tab = [
             'is_live' => true,
             'amount' => 42042,
             'hosted_payment' => [
@@ -81,10 +70,39 @@ class getPaymentMethodHashTest extends BasePaymentMethod
                 'delivery_type' => 'BILLING',
             ],
         ];
-        $expected_hash = hash('sha256', json_encode($payment_tab));
+    }
+
+    /**
+     * @dataProvider invalidArrayFormatDataProvider
+     *
+     * @param mixed $payment_tab
+     */
+    public function testWhenGivenPaymentTabIsntValidArray($payment_tab)
+    {
+        $this->assertSame('', $this->class->getPaymentMethodHash($payment_tab));
+    }
+
+    /**
+     * @dataProvider invalidBoolFormatDataProvider
+     *
+     * @param mixed $is_live
+     */
+    public function testWhenGivenPaymentTabIsntValidBoolean($is_live)
+    {
+        $this->assertSame('', $this->class->getPaymentMethodHash($this->payment_tab, $is_live));
+    }
+
+    public function testWhenGivenPaymentTabIsntEmpty()
+    {
+        $this->assertSame('', $this->class->getPaymentMethodHash([]));
+    }
+
+    public function testWhenHashIsReturned()
+    {
+        $expected_hash = hash('sha256', json_encode($this->payment_tab) . 'live');
         $this->assertSame(
             $expected_hash,
-            $this->classe->getPaymentMethodHash($payment_tab)
+            $this->class->getPaymentMethodHash($this->payment_tab)
         );
     }
 }

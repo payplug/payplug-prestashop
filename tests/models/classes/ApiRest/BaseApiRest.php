@@ -19,44 +19,43 @@ class BaseApiRest extends TestCase
 {
     use FormatDataProvider;
 
-    public $address_adapter;
-    public $amount_helper;
-    public $assign_adapter;
-    public $carrier_adapter;
-    public $cart_adapter;
-    public $classe;
-    public $configuration;
-    public $configuration_action;
-    public $configuration_class;
-    public $configuration_helper;
-    public $constant;
-    public $country;
-    public $currency_adapter;
-    public $dependencies;
-    public $logger;
-    public $payment_method;
-    public $plugin;
-    public $tools_adapter;
-    public $translation;
-    public $validate_adapter;
+    protected $address_adapter;
+    protected $amount_helper;
+    protected $api_service;
+    protected $assign_adapter;
+    protected $carrier_adapter;
+    protected $cart_adapter;
+    protected $class;
+    protected $configuration;
+    protected $configuration_action;
+    protected $configuration_class;
+    protected $configuration_helper;
+    protected $constant;
+    protected $country;
+    protected $currency_adapter;
+    protected $dependencies;
+    protected $logger;
+    protected $payment_method;
+    protected $plugin;
+    protected $tools_adapter;
+    protected $translation;
+    protected $validate_adapter;
 
-    protected function setUp()
+    public function setUp()
     {
+        $this->api_service = \Mockery::mock('ApiService');
         $this->logger = \Mockery::mock('Logger');
-        $this->logger
-            ->shouldReceive([
-                'addLog' => true,
-            ]);
+        $this->logger->shouldReceive([
+            'addLog' => true,
+        ]);
 
         $this->configuration = \Mockery::mock('Configuration');
-        $this->configuration
-            ->shouldReceive([
-                'get' => true,
-            ]);
+        $this->configuration->shouldReceive([
+            'get' => true,
+        ]);
 
         $this->constant = \Mockery::mock('Constant');
-        $this->constant
-            ->shouldReceive('get')
+        $this->constant->shouldReceive('get')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case '_PS_VERSION_':
@@ -70,28 +69,24 @@ class BaseApiRest extends TestCase
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->name = 'payplug';
         $this->dependencies->version = 'x.xx.xx';
-        $this->dependencies
-            ->shouldReceive('l')
+        $this->dependencies->shouldReceive('l')
             ->andReturnUsing(function ($string, $name) {
                 return $string;
             });
-        $this->dependencies
-            ->shouldReceive('getConfigurationKey')
+        $this->dependencies->shouldReceive('getConfigurationKey')
             ->andReturnUsing(function ($key) {
                 return $key;
             });
 
         $this->configuration_class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
-        $this->configuration_class
-            ->shouldReceive('getDefault')
+        $this->configuration_class->shouldReceive('getDefault')
             ->with('amounts')
-            ->andReturn('{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:99","max":"EUR:2000000"},"ideal":{"min":"EUR:99","max":"EUR:2000000"},"mybank":{"min":"EUR:99","max":"EUR:2000000"},"satispay":{"min":"EUR:99","max":"EUR:2000000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}');
+            ->andReturn('{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:99","max":"EUR:2000000"},"ideal":{"min":"EUR:99","max":"EUR:2000000"},"mybank":{"min":"EUR:99","max":"EUR:2000000"},"satispay":{"min":"EUR:99","max":"EUR:2000000"}}');
 
         $this->payment_method = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
         $this->tools_adapter = MockHelper::createToolsMock('PayPlug\src\application\adapter\ToolsAdapter');
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
-        $this->translation
-            ->shouldReceive('l')
+        $this->translation->shouldReceive('l')
             ->andReturnUsing(function ($str) {
                 return $str;
             });
@@ -110,39 +105,37 @@ class BaseApiRest extends TestCase
         $this->country = \Mockery::mock('Country');
 
         $this->plugin = \Mockery::mock('Plugin');
-        $this->plugin
-            ->shouldReceive([
-                'getAddress' => $this->address_adapter,
-                'getAssign' => $this->assign_adapter,
-                'getCarrier' => $this->carrier_adapter,
-                'getCart' => $this->cart_adapter,
-                'getConfiguration' => $this->configuration,
-                'getConfigurationAction' => $this->configuration_action,
-                'getConfigurationClass' => $this->configuration_class,
-                'getConstant' => $this->constant,
-                'getCountry' => $this->country,
-                'getCurrency' => $this->currency_adapter,
-                'getLogger' => $this->logger,
-                'getPaymentMethodClass' => $this->payment_method,
-                'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),
-                'getTools' => $this->tools_adapter,
-                'getTranslationClass' => $this->translation,
-                'getValidate' => $this->validate_adapter,
-            ]);
+        $this->plugin->shouldReceive([
+            'getAddress' => $this->address_adapter,
+            'getApiService' => $this->api_service,
+            'getAssign' => $this->assign_adapter,
+            'getCarrier' => $this->carrier_adapter,
+            'getCart' => $this->cart_adapter,
+            'getConfiguration' => $this->configuration,
+            'getConfigurationAction' => $this->configuration_action,
+            'getConfigurationClass' => $this->configuration_class,
+            'getConstant' => $this->constant,
+            'getCountry' => $this->country,
+            'getCurrency' => $this->currency_adapter,
+            'getLogger' => $this->logger,
+            'getPaymentMethodClass' => $this->payment_method,
+            'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),
+            'getTools' => $this->tools_adapter,
+            'getTranslationClass' => $this->translation,
+            'getValidate' => $this->validate_adapter,
+        ]);
 
         $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();
         $this->configuration_helper = \Mockery::mock(ConfigurationHelper::class)->makePartial();
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-                'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
-                'getHelpers' => [
-                    'amount' => $this->amount_helper,
-                    'configuration' => $this->configuration_helper,
-                ],
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+            'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
+            'getHelpers' => [
+                'amount' => $this->amount_helper,
+                'configuration' => $this->configuration_helper,
+            ],
+        ]);
 
-        $this->classe = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();
-        $this->dependencies->apiClass = \Mockery::mock('alias:PayPlug\classes\ApiClass');
+        $this->class = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();
     }
 }

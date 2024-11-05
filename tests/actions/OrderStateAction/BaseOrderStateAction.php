@@ -21,7 +21,7 @@ class BaseOrderStateAction extends TestCase
     protected $translation;
     protected $validate_adapter;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
 
@@ -34,27 +34,23 @@ class BaseOrderStateAction extends TestCase
         $this->payplug_orderstate_repository = \Mockery::mock('StateRepository');
 
         $logger = \Mockery::mock('Logger');
-        $logger
-            ->shouldReceive([
-                'addLog' => true,
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getStateRepository' => $this->payplug_orderstate_repository,
-                'getOrderStateAdapter' => $this->order_state_adapter,
-                'getLogger' => $logger,
-                'getTools' => $this->tools_adapter,
-                'getValidate' => $this->validate_adapter,
-            ]);
+        $logger->shouldReceive([
+            'addLog' => true,
+        ]);
+        $this->plugin->shouldReceive([
+            'getStateRepository' => $this->payplug_orderstate_repository,
+            'getOrderStateAdapter' => $this->order_state_adapter,
+            'getLogger' => $logger,
+            'getTools' => $this->tools_adapter,
+            'getValidate' => $this->validate_adapter,
+        ]);
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
 
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
-        $this->translation
-            ->shouldReceive('l')
+        $this->translation->shouldReceive('l')
             ->andReturnUsing(function ($str) {
                 return $str;
             });

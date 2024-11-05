@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group standard_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group standard_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -21,7 +21,7 @@ class getDeferredStateTest extends BaseStandardPaymentMethod
     {
         $this->assertSame(
             [],
-            $this->classe->getDeferredState($deferred_state)
+            $this->class->getDeferredState($deferred_state)
         );
     }
 
@@ -44,7 +44,7 @@ class getDeferredStateTest extends BaseStandardPaymentMethod
                     'checked' => false,
                 ],
             ],
-            $this->classe->getDeferredState($deferred_state)
+            $this->class->getDeferredState($deferred_state)
         );
     }
 
@@ -98,7 +98,7 @@ class getDeferredStateTest extends BaseStandardPaymentMethod
                     'warning_msg' => 'paymentmethods.deferred.states.alert',
                 ],
             ],
-            $this->classe->getDeferredState($deferred_state)
+            $this->class->getDeferredState($deferred_state)
         );
     }
 
@@ -152,7 +152,7 @@ class getDeferredStateTest extends BaseStandardPaymentMethod
                     'warning_msg' => 'paymentmethods.deferred.states.alert',
                 ],
             ],
-            $this->classe->getDeferredState($deferred_state)
+            $this->class->getDeferredState($deferred_state)
         );
     }
 }

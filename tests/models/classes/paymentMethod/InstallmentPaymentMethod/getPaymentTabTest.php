@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\InstallmentPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group installment_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group installment_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -15,47 +15,41 @@ class getPaymentTabTest extends BaseInstallmentPaymentMethod
     public function setUp()
     {
         parent::setUp();
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": true, "one_click": true, "installment": true}');
     }
 
     public function testWhenParentMethodReturnEmptyArray()
     {
-        $this->classe->set('name', '');
+        $this->class->set('name', '');
         $this->assertSame(
             [],
-            $this->classe->getPaymentTab()
+            $this->class->getPaymentTab()
         );
     }
 
     public function testWhenPaymentTabIsReturned()
     {
-        $this->classe->set('name', 'installment');
-        $this->validate_adapter
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->class->set('name', 'installment');
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->configuration->shouldReceive('getValue')
             ->with('inst_mode')
             ->andReturn('2');
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => 'shop domain ssl',
-            ]);
-        $this->helpers['amount']
-            ->shouldReceive([
-                'validateAmount' => [
-                    'result' => true,
-                ],
-                'convertAmount' => 4242,
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => 'shop domain ssl',
+        ]);
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => [
+                'result' => true,
+            ],
+            'convertAmount' => 4242,
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
@@ -122,7 +116,7 @@ class getPaymentTabTest extends BaseInstallmentPaymentMethod
 
         $this->assertSame(
             $expected_tab['schedule'],
-            $this->classe->getPaymentTab()['schedule']
+            $this->class->getPaymentTab()['schedule']
         );
     }
 }

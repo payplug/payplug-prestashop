@@ -13,10 +13,9 @@ class disableActionTest extends BaseConfigurationAction
 {
     public function testWhenConfigurationCantBeSetted()
     {
-        $this->configuration_class
-            ->shouldReceive([
-                'set' => false,
-            ]);
+        $this->configuration_class->shouldReceive([
+            'set' => false,
+        ]);
         $this->assertSame(
             false,
             $this->action->disableAction()
@@ -25,10 +24,9 @@ class disableActionTest extends BaseConfigurationAction
 
     public function testWhenConfigurationIsSettedTrue()
     {
-        $this->configuration_class
-            ->shouldReceive([
-                'set' => true,
-            ]);
+        $this->configuration_class->shouldReceive([
+            'set' => true,
+        ]);
         $this->assertSame(
             true,
             $this->action->disableAction()

@@ -6,8 +6,8 @@ use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
- * @group classes
- * @group apirest_classes
+ * @group class
+ * @group apirest_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -52,7 +52,7 @@ class getPaylaterSectionTest extends BaseApiRest
     {
         $this->assertSame(
             [],
-            $this->classe->getPaylaterSection($current_configuration)
+            $this->class->getPaylaterSection($current_configuration)
         );
     }
 
@@ -78,7 +78,7 @@ class getPaylaterSectionTest extends BaseApiRest
             }
         }
 
-        $response = $this->classe->getPaylaterSection($current_configuration);
+        $response = $this->class->getPaylaterSection($current_configuration);
 
         // test Oney switch
         $this->assertSame(
@@ -86,8 +86,7 @@ class getPaylaterSectionTest extends BaseApiRest
             $response['options']['checked']
         );
 
-        $this->dependencies
-            ->shouldReceive('getConfigurationKey')
+        $this->dependencies->shouldReceive('getConfigurationKey')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'oneyAllowedCountries':

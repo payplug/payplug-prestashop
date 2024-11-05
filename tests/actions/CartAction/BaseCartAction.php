@@ -24,13 +24,12 @@ class BaseCartAction extends TestCase
     protected $plugin;
     protected $tools_adapter;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
-        $this->configuration
-            ->shouldReceive([
-                'get' => true,
-            ]);
+        $this->configuration->shouldReceive([
+            'get' => true,
+        ]);
 
         $this->plugin = \Mockery::mock('Plugin');
 
@@ -46,41 +45,37 @@ class BaseCartAction extends TestCase
 
         $this->customer_adapter = \Mockery::mock('Customer');
 
-        $this->context_adapter
-            ->shouldReceive([
-                'get' => $this->context,
-            ]);
+        $this->context_adapter->shouldReceive([
+            'get' => $this->context,
+        ]);
         $this->dispatcher = \Mockery::mock('Dispatcher');
         $this->instance = \Mockery::mock('Instance');
         $this->controller = \Mockery::mock('Controller');
 
         $this->tools_adapter = \Mockery::mock('ToolsAdapter');
 
-        $this->dispatcher
-            ->shouldReceive([
-                'getInstance' => $this->instance,
-                'getController' => $this->controller,
-            ]);
-        $this->plugin
-            ->shouldReceive([
-                'getCart' => $this->cartAdapter,
-                'getContext' => $this->context_adapter,
-                'getCustomer' => $this->customer_adapter,
-                'getConfigurationClass' => $this->configuration,
-                'getDispatcher' => $this->dispatcher,
-                'getTools' => $this->tools_adapter,
-            ]);
+        $this->dispatcher->shouldReceive([
+            'getInstance' => $this->instance,
+            'getController' => $this->controller,
+        ]);
+        $this->plugin->shouldReceive([
+            'getCart' => $this->cartAdapter,
+            'getContext' => $this->context_adapter,
+            'getCustomer' => $this->customer_adapter,
+            'getConfigurationClass' => $this->configuration,
+            'getDispatcher' => $this->dispatcher,
+            'getTools' => $this->tools_adapter,
+        ]);
 
         $this->dependencies->name = 'payplug';
 
         $this->browser_validator = \Mockery::mock('BrowserValidator');
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-                'getValidators' => [
-                    'browser' => $this->browser_validator,
-                ],
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+            'getValidators' => [
+                'browser' => $this->browser_validator,
+            ],
+        ]);
 
         $this->action = \Mockery::mock(CartAction::class, [$this->dependencies])->makePartial();
     }

@@ -16,16 +16,14 @@ class saveActionTest extends BaseConfigurationAction
         parent::setUp();
 
         $module = \Mockery::mock('PrestashopModule');
-        $module
-            ->shouldReceive([
-                'enable' => true,
-            ]);
+        $module->shouldReceive([
+            'enable' => true,
+        ]);
 
         $this->module = \Mockery::mock('Module');
-        $this->module
-            ->shouldReceive([
-                'getInstanceByName' => $module,
-            ]);
+        $this->module->shouldReceive([
+            'getInstanceByName' => $module,
+        ]);
     }
 
     public function invalidObjectFormatDataProvider()

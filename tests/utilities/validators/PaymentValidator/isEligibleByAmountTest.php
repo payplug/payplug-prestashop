@@ -22,7 +22,7 @@ class isEligibleByAmountTest extends TestCase
     protected $payment_method;
     protected $payment_methods_amount;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->validator = new paymentValidator();
         $this->amount = 4200;

@@ -15,16 +15,14 @@ class getIdsUsedByPayPlugTest extends BaseOrderStateRepository
     {
         $this->plugin = \Mockery::mock('Plugin');
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
 
         $tools = \Mockery::mock('Tools');
-        $tools
-            ->shouldReceive([
-                'tool' => '',
-            ]);
+        $tools->shouldReceive([
+            'tool' => '',
+        ]);
         $this->plugin->shouldReceive([
             'getTools' => $tools,
         ]);
@@ -47,16 +45,14 @@ class getIdsUsedByPayPlugTest extends BaseOrderStateRepository
     {
         $this->plugin = \Mockery::mock('Plugin');
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
 
         $tools = \Mockery::mock('Tools');
-        $tools
-            ->shouldReceive([
-                'tool' => '',
-            ]);
+        $tools->shouldReceive([
+            'tool' => '',
+        ]);
         $this->plugin->shouldReceive([
             'getTools' => $tools,
         ]);

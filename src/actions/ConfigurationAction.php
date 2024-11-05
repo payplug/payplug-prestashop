@@ -62,9 +62,9 @@ class ConfigurationAction
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         if ($sandbox_mode) {
-            $permissions = $this->dependencies->apiClass->getAccountPermissions($configuration->getValue('test_api_key'));
+            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount($configuration->getValue('test_api_key'), true);
         } else {
-            $permissions = $this->dependencies->apiClass->getAccountPermissions($configuration->getValue('live_api_key'));
+            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount($configuration->getValue('live_api_key'), false);
         }
 
         $allowed_methods = [
@@ -80,7 +80,6 @@ class ConfigurationAction
             'one_click' => 'can_save_cards',
             'oney' => 'can_use_oney',
             'satispay' => 'can_use_satispay',
-            'sofort' => 'can_use_sofort',
             'use_live_mode' => 'use_live_mode',
         ];
 
@@ -121,7 +120,6 @@ class ConfigurationAction
             case 'ideal':
             case 'mybank':
             case 'satispay':
-            case 'sofort':
                 $message .= sprintf(
                     $translation['premium']['description']['form'],
                     $translation['premium']['feature'][$payment_method]
@@ -449,7 +447,7 @@ class ConfigurationAction
             ];
         }
 
-        if (!$this->dependencies->apiClass->login($email, $password)) {
+        if (!$this->dependencies->getPlugin()->getApiService()->login($email, $password)) {
             $logger->addLog('ConfigurationAction::loginAction: invalid email and/or password.');
 
             return [
@@ -466,9 +464,10 @@ class ConfigurationAction
         $configuration->set('enable', 1);
 
         // Update global configuration
-        $permissions = $this->dependencies->apiClass->getAccountPermissions(
-            $configuration->getValue('live_api_key')
-        );
+        $permissions = $this->dependencies
+            ->getPlugin()
+            ->getApiService()
+            ->getAccount($configuration->getValue('live_api_key'), false);
 
         if (empty($permissions)) {
             $logger->addLog('ConfigurationAction::loginAction: No permissions found for this account');
@@ -813,7 +812,6 @@ class ConfigurationAction
             'one_click' => 'enable_one_click',
             'oney' => 'enable_oney',
             'satispay' => 'enable_satispay',
-            'sofort' => 'enable_sofort',
             'standard' => 'enable_standard',
         ];
         foreach ($payment_method_keys as $key => $config) {
@@ -888,7 +886,7 @@ class ConfigurationAction
 
         $password = base64_decode($datas->payplug_password);
 
-        if (!$this->dependencies->apiClass->login($email, $password)) {
+        if (!$this->dependencies->getPlugin()->getApiService()->login($email, $password)) {
             $logger->addLog('ConfigurationAction::submitSandboxAction: invalid email and/or password.');
 
             return [

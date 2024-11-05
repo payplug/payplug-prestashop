@@ -6,8 +6,8 @@ use PayPlug\src\models\classes\ApiRest;
 
 /**
  * @group unit
- * @group classes
- * @group apirest_classes
+ * @group class
+ * @group apirest_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -17,8 +17,7 @@ class getHeaderSectionTest extends BaseApiRest
     {
         parent::setUp();
 
-        $this->configuration_class
-            ->shouldReceive('getDefault')
+        $this->configuration_class->shouldReceive('getDefault')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'enable':
@@ -41,7 +40,7 @@ class getHeaderSectionTest extends BaseApiRest
     {
         $this->assertSame(
             [],
-            $this->classe->getHeaderSection($current_configuration)
+            $this->class->getHeaderSection($current_configuration)
         );
     }
 
@@ -90,7 +89,7 @@ class getHeaderSectionTest extends BaseApiRest
         ];
         $this->assertSame(
             $expected,
-            $this->classe->getHeaderSection($current_configuration)
+            $this->class->getHeaderSection($current_configuration)
         );
     }
 
@@ -139,7 +138,7 @@ class getHeaderSectionTest extends BaseApiRest
         ];
         $this->assertSame(
             $expected,
-            $this->classe->getHeaderSection($current_configuration)
+            $this->class->getHeaderSection($current_configuration)
         );
     }
 
@@ -188,7 +187,7 @@ class getHeaderSectionTest extends BaseApiRest
         ];
         $this->assertSame(
             $expected,
-            $this->classe->getHeaderSection($current_configuration)
+            $this->class->getHeaderSection($current_configuration)
         );
     }
 
@@ -237,7 +236,7 @@ class getHeaderSectionTest extends BaseApiRest
         ];
         $this->assertSame(
             $expected,
-            $this->classe->getHeaderSection($current_configuration)
+            $this->class->getHeaderSection($current_configuration)
         );
     }
 }

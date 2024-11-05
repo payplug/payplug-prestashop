@@ -16,7 +16,7 @@ class getExternalUrlTest extends TestCase
 {
     protected $service;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->service = new Routes();
     }

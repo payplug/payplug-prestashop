@@ -23,7 +23,7 @@ class BaseMerchantTelemetryAction extends TestCase
     public $repositories;
     public $shop_repository;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->name = 'payplug';
@@ -36,84 +36,76 @@ class BaseMerchantTelemetryAction extends TestCase
         ]);
 
         $this->logger = \Mockery::mock('Logger');
-        $this->logger
-            ->shouldReceive([
-                'addLog' => true,
-            ]);
+        $this->logger->shouldReceive([
+            'addLog' => true,
+        ]);
 
         $this->module_repository = \Mockery::mock('ModuleRepository');
-        $this->module_repository
-            ->shouldReceive([
-                'getActiveModule' => [
-                    [
-                        'name' => 'module_1',
-                        'version' => '1.0.0',
-                    ],
-                    [
-                        'name' => 'module_2',
-                        'version' => '2.0.0',
-                    ],
-                    [
-                        'name' => 'module_3',
-                        'version' => '3.0.0',
-                    ],
+        $this->module_repository->shouldReceive([
+            'getActiveModule' => [
+                [
+                    'name' => 'module_1',
+                    'version' => '1.0.0',
                 ],
-            ]);
+                [
+                    'name' => 'module_2',
+                    'version' => '2.0.0',
+                ],
+                [
+                    'name' => 'module_3',
+                    'version' => '3.0.0',
+                ],
+            ],
+        ]);
 
         $this->shop_repository = \Mockery::mock('ShopRepository');
-        $this->shop_repository
-            ->shouldReceive([
-                'getActiveShopUrl' => [
-                    [
-                        'url' => 'website.domain.1.com',
-                        'default' => true,
-                    ],
-                    [
-                        'url' => 'website.domain.2.com',
-                        'default' => false,
-                    ],
-                    [
-                        'url' => 'website.domain.3.com',
-                        'default' => false,
-                    ],
+        $this->shop_repository->shouldReceive([
+            'getActiveShopUrl' => [
+                [
+                    'url' => 'website.domain.1.com',
+                    'default' => true,
                 ],
-            ]);
+                [
+                    'url' => 'website.domain.2.com',
+                    'default' => false,
+                ],
+                [
+                    'url' => 'website.domain.3.com',
+                    'default' => false,
+                ],
+            ],
+        ]);
 
         $this->module = \Mockery::mock('Module');
         $instance = \Mockery::mock('Payplug');
         $instance->version = '1.0.0';
-        $this->module
-            ->shouldReceive([
-                'getInstanceByName' => $instance,
-            ]);
+        $this->module->shouldReceive([
+            'getInstanceByName' => $instance,
+        ]);
 
         $this->constant = \Mockery::mock('Constant');
-        $this->constant
-            ->shouldReceive('get')
+        $this->constant->shouldReceive('get')
             ->with('PHP_VERSION')
             ->andReturn('');
 
-        $this->plugin
-            ->shouldReceive([
-                'getConfigurationClass' => $this->configuration,
-                'getConstant' => $this->constant,
-                'getLogger' => $this->logger,
-                'getModule' => $this->module,
-                'getModuleRepository' => $this->module_repository,
-                'getShopRepository' => $this->shop_repository,
-            ]);
+        $this->plugin->shouldReceive([
+            'getConfigurationClass' => $this->configuration,
+            'getConstant' => $this->constant,
+            'getLogger' => $this->logger,
+            'getModule' => $this->module,
+            'getModuleRepository' => $this->module_repository,
+            'getShopRepository' => $this->shop_repository,
+        ]);
 
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => true,
-            ]);
+        $configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
         $this->dependencies->configClass = $configClass;
 
-        $this->dependencies
-            ->shouldReceive([
-                'getPlugin' => $this->plugin,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
 
         $this->action = \Mockery::mock(MerchantTelemetryAction::class, [$this->dependencies])->makePartial();
     }

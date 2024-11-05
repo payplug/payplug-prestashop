@@ -59,8 +59,14 @@ class AdminPayplugController extends ModuleAdminController
      */
     public function initContent()
     {
-        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
-            parent::initContent();
+        if ($session = $this->tools->tool('getValue', 'session')
+            && $company_id = $this->tools->tool('getValue', '$company_id')) {
+            $merchant = $this->module
+                ->get('payplug.models.classes.merchant');
+            $client_data = $merchant->getClientData($session, $company_id);
+            if ($client_data['result']) {
+                $merchant->registerClientData($client_data['data']);
+            }
         }
 
         $this->renderApiRest();
@@ -148,15 +154,9 @@ class AdminPayplugController extends ModuleAdminController
 
         $this->context->controller->addCSS($lib_path . '/css/app.css');
 
-        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
-            $content = $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->dependencies->name . '/views/templates/admin/admin.tpl');
-            $this->context->smarty->assign([
-                'content' => $this->content . $content,
-            ]);
-        } else {
-            $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
-            parent::initContent();
-        }
+        $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
+
+        parent::initContent();
     }
 
     /**

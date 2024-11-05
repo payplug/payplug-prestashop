@@ -22,8 +22,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
     {
         parent::setUp();
 
-        $this->context
-            ->shouldReceive('get')
+        $this->context->shouldReceive('get')
             ->andReturn(ContextMock::get())
         ;
 
@@ -53,8 +52,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
         ]);
 
         $this->repo
-            ->shouldAllowMockingProtectedMethods()
-            ->shouldReceive([
+            ->shouldAllowMockingProtectedMethods()->shouldReceive([
                 'displayOneyRequiredFields' => 'required_field',
                 'displayOneyPopin' => 'popin',
                 'displayOneyPaymentOptions' => 'payment_option',
@@ -79,12 +77,11 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
      */
     public function testWithValidData($cart, $amount, $country)
     {
-        $this->repo
-            ->shouldReceive([
-                'isOneyElligible' => ['result' => true, 'error' => false],
-                'isValidOneyAmount' => ['result' => true, 'error' => false],
-                'getOneyPaymentOptionsList' => ['payment_option_list'],
-            ])
+        $this->repo->shouldReceive([
+            'isOneyElligible' => ['result' => true, 'error' => false],
+            'isValidOneyAmount' => ['result' => true, 'error' => false],
+            'getOneyPaymentOptionsList' => ['payment_option_list'],
+        ])
         ;
 
         $this->validators['payment']->shouldReceive([
@@ -106,11 +103,10 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
 
     public function testWithIneligibleOney()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyAmount' => ['result' => true, 'error' => false],
-                'getOneyPaymentOptionsList' => ['payment_option_list'],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyAmount' => ['result' => true, 'error' => false],
+            'getOneyPaymentOptionsList' => ['payment_option_list'],
+        ])
         ;
 
         $this->validators['payment']->shouldReceive([
@@ -132,11 +128,10 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
 
     public function testWithInvalidAmount()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyAmount' => ['result' => false, 'error' => 'invalid_amount'],
-                'getOneyPaymentOptionsList' => ['payment_option_list'],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyAmount' => ['result' => false, 'error' => 'invalid_amount'],
+            'getOneyPaymentOptionsList' => ['payment_option_list'],
+        ])
         ;
 
         $this->assertSame(
@@ -151,11 +146,10 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyRepository
 
     public function testWithoutPaymentOption()
     {
-        $this->repo
-            ->shouldReceive([
-                'isValidOneyAmount' => ['result' => true, 'error' => false],
-                'getOneyPaymentOptionsList' => [],
-            ])
+        $this->repo->shouldReceive([
+            'isValidOneyAmount' => ['result' => true, 'error' => false],
+            'getOneyPaymentOptionsList' => [],
+        ])
         ;
 
         $this->validators['payment']->shouldReceive([

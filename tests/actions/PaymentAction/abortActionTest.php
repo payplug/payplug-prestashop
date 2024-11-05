@@ -14,18 +14,158 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class abortActionTest extends BasePaymentAction
 {
-    /**
-     * @dataProvider invalidStringFormatDataProvider
-     *
-     * @param mixed $resource_id
-     */
-    public function testWhenGivenResourceIdIsntValidString($resource_id)
+    public function testWhenDataBaseCantBeUpdated()
     {
         $order_id = 42;
+        $resource_id = 'inst_azerty';
+        $resource = [
+            'result' => true,
+            'resource' => PaymentMock::getInstallment(),
+            'schedule' => [
+                [
+                    'amount' => 42,
+                    'date' => '1970-01-01 00:00:00',
+                    'resource' => PaymentMock::getStandard(),
+                ],
+            ],
+        ];
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'resource_id' => $resource_id,
+                'method' => 'installment',
+                'schedules' => '[{"id_payment":"pay_7goqcIHyGH6xd5mMjcCX3b","step":"1\/3","amount":766,"status":5,"scheduled_date":"2024-08-30","pay_id":"pay_7goqcIHyGH6xd5mMjcCX3b"},{"id_payment":"","step":"2\/3","amount":764,"status":7,"scheduled_date":"2024-09-29","pay_id":""}]',
+            ],
+        ]);
+        $this->payment_method->shouldReceive([
+            'abort' => $resource,
+            'retrieve' => $resource,
+            'getPaymentStatus' => [
+                'id_status' => 2,
+                'code' => 'paid',
+            ],
+        ]);
+
+        $this->order_class->shouldReceive([
+            'updateOrderState' => true,
+        ]);
+
+        $order = \Mockery::mock('Order');
+        $order->shouldReceive([
+            'get' => OrderMock::get(),
+        ]);
+
+        $validate = \Mockery::mock('Validate');
+        $validate->shouldReceive([
+            'validate' => true,
+        ]);
+
+        $configuration = \Mockery::mock('Configuration');
+        $configuration->shouldReceive('get')
+            ->with('PS_OS_CANCELED')
+            ->andReturn(42);
+
+        $this->plugin->shouldReceive([
+            'getOrder' => $order,
+            'getValidate' => $validate,
+            'getConfiguration' => $configuration,
+        ]);
+
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'inst_azerty12345',
+                'method' => 'installmnent',
+                'id_cart' => 42,
+                'cart_hash' => '4cbaebd7df677672ac3d571012ea0498129a5314271b0c38603c66425560bf43',
+                'schedules' => '[{"id_payment":"pay_70Z8nKy6nWiZU6S77KFolE","step":"1\/2","amount":1150,"status":8,"scheduled_date":"2023-11-14","pay_id":"pay_70Z8nKy6nWiZU6S77KFolE"},{"id_payment":"","step":"1\/2","amount":1148,"status":6,"scheduled_date":"2023-12-14","pay_id":""}]',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+            'updateBy' => false,
+        ]);
+
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+                'message' => '',
+            ],
+            $this->action->abortAction($resource_id, $order_id)
+        );
+    }
+
+    public function testWhenDataBaseIsUpdated()
+    {
+        $order_id = 42;
+        $resource_id = 'inst_azerty';
+        $payment_standard = PaymentMock::getStandard();
+        $resource = [
+            'result' => true,
+            'resource' => PaymentMock::getInstallment(),
+            'schedule' => [
+                [
+                    'amount' => 42,
+                    'date' => '1970-01-01 00:00:00',
+                    'resource' => $payment_standard,
+                ],
+            ],
+        ];
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'resource_id' => $resource_id,
+                'method' => 'installment',
+                'schedules' => '[{"id_payment":"' . $payment_standard->id . '","step":"1\/1","amount":4242,"status":5,"scheduled_date":"1970-01-01","pay_id":"' . $payment_standard->id . '"}]',
+            ],
+        ]);
+        $this->payment_method->shouldReceive([
+            'abort' => $resource,
+            'retrieve' => $resource,
+            'getPaymentStatus' => [
+                'id_status' => 2,
+                'code' => 'paid',
+            ],
+        ]);
+
+        $order = \Mockery::mock('Order');
+        $order->shouldReceive([
+            'get' => OrderMock::get(),
+        ]);
+
+        $validate = \Mockery::mock('Validate');
+        $validate->shouldReceive([
+            'validate' => true,
+        ]);
+
+        $configuration = \Mockery::mock('Configuration');
+        $configuration->shouldReceive('get')
+            ->with('PS_OS_CANCELED')
+            ->andReturn(42);
+
+        $this->order_class->shouldReceive([
+            'updateOrderState' => true,
+        ]);
+
+        $this->plugin->shouldReceive([
+            'getOrder' => $order,
+            'getValidate' => $validate,
+            'getConfiguration' => $configuration,
+        ]);
+
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'inst_azerty12345',
+                'method' => 'installmnent',
+                'id_cart' => 42,
+                'cart_hash' => '4cbaebd7df677672ac3d571012ea0498129a5314271b0c38603c66425560bf43',
+                'schedules' => '[{"id_payment":"pay_70Z8nKy6nWiZU6S77KFolE","step":"1\/2","amount":1150,"status":8,"scheduled_date":"2023-11-14","pay_id":"pay_70Z8nKy6nWiZU6S77KFolE"},{"id_payment":"","step":"1\/2","amount":1148,"status":6,"scheduled_date":"2023-12-14","pay_id":""}]',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+            'updateBy' => true,
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => '',
             ],
             $this->action->abortAction($resource_id, $order_id)
         );
@@ -48,32 +188,38 @@ class abortActionTest extends BasePaymentAction
         );
     }
 
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $resource_id
+     */
+    public function testWhenGivenResourceIdIsntValidString($resource_id)
+    {
+        $order_id = 42;
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ],
+            $this->action->abortAction($resource_id, $order_id)
+        );
+    }
+
     public function testWhenInstallmentCannotBeAbort()
     {
         $order_id = 42;
         $resource_id = 'inst_azerty';
-        $api_class = \Mockery::mock('ApiClass');
-        $api_class
-            ->shouldReceive([
-                'setSecretKey' => true,
-                'abortInstallment' => [
-                    'result' => false,
-                ],
-            ]);
-        $this->dependencies->apiClass = $api_class;
-
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('sandbox_mode')
-            ->andReturn('0');
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('live_api_key')
-            ->andReturn('sk_live_azerty234567');
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('test_api_key')
-            ->andReturn('sk_test_azerty234567');
+        $this->payment_method->shouldReceive([
+            'abort' => [
+                'result' => false,
+            ],
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'resource_id' => $resource_id,
+                'method' => 'installment',
+            ],
+        ]);
 
         $this->assertSame(
             [
@@ -88,34 +234,29 @@ class abortActionTest extends BasePaymentAction
     {
         $order_id = 42;
         $resource_id = 'inst_azerty';
-        $api_class = \Mockery::mock('ApiClass');
         $resource = [
             'result' => true,
             'resource' => PaymentMock::getInstallment(),
-        ];
-        $api_class
-            ->shouldReceive([
-                'setSecretKey' => true,
-                'abortInstallment' => $resource,
-                'retrieveInstallment' => [
-                    'result' => false,
+            'schedule' => [
+                [
+                    'amount' => 42,
+                    'date' => '1970-01-01 00:00:00',
+                    'resource' => PaymentMock::getStandard(),
                 ],
-            ]);
-        $this->dependencies->apiClass = $api_class;
-
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('sandbox_mode')
-            ->andReturn('0');
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('live_api_key')
-            ->andReturn('sk_live_azerty234567');
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('test_api_key')
-            ->andReturn('sk_test_azerty234567');
-
+            ],
+        ];
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'resource_id' => $resource_id,
+                'method' => 'installment',
+            ],
+        ]);
+        $this->payment_method->shouldReceive([
+            'abort' => $resource,
+            'retrieve' => [
+                'result' => false,
+            ],
+        ]);
         $this->assertSame(
             [
                 'result' => false,
@@ -125,229 +266,67 @@ class abortActionTest extends BasePaymentAction
         );
     }
 
+    public function testWhenNoStoredPaymentCantBeGetted()
+    {
+        $order_id = 42;
+        $resource_id = 'inst_azerty';
+        $this->payment_repository->shouldReceive([
+            'getBy' => [],
+        ]);
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Can\'t abort the payment.',
+            ],
+            $this->action->abortAction($resource_id, $order_id)
+        );
+    }
+
     public function testWhenRelatedOrderIsntValid()
     {
         $order_id = 42;
         $resource_id = 'inst_azerty';
-        $api_class = \Mockery::mock('ApiClass');
         $resource = [
             'result' => true,
             'resource' => PaymentMock::getInstallment(),
+            'schedule' => [
+                [
+                    'amount' => 42,
+                    'date' => '1970-01-01 00:00:00',
+                    'resource' => PaymentMock::getStandard(),
+                ],
+            ],
         ];
-        $api_class
-            ->shouldReceive([
-                'setSecretKey' => true,
-                'abortInstallment' => $resource,
-                'retrieveInstallment' => $resource,
-            ]);
-        $this->dependencies->apiClass = $api_class;
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'resource_id' => $resource_id,
+                'method' => 'installment',
+            ],
+        ]);
+        $this->payment_method->shouldReceive([
+            'abort' => $resource,
+            'retrieve' => $resource,
+        ]);
 
         $order = \Mockery::mock('Order');
-        $order
-            ->shouldReceive([
-                'get' => OrderMock::get(),
-            ]);
+        $order->shouldReceive([
+            'get' => OrderMock::get(),
+        ]);
 
         $validate = \Mockery::mock('Validate');
-        $validate
-            ->shouldReceive([
-                'validate' => false,
-            ]);
+        $validate->shouldReceive([
+            'validate' => false,
+        ]);
 
-        $this->plugin
-            ->shouldReceive([
-                'getOrder' => $order,
-                'getValidate' => $validate,
-            ]);
+        $this->plugin->shouldReceive([
+            'getOrder' => $order,
+            'getValidate' => $validate,
+        ]);
 
         $this->assertSame(
             [
                 'result' => false,
                 'message' => 'The related Order object is not valid.',
-            ],
-            $this->action->abortAction($resource_id, $order_id)
-        );
-    }
-
-    public function testWhenDataBaseCantBeUpdated()
-    {
-        $order_id = 42;
-        $resource_id = 'inst_azerty';
-        $api_class = \Mockery::mock('ApiClass');
-        $resource = [
-            'result' => true,
-            'resource' => PaymentMock::getInstallment(),
-        ];
-        $api_class
-            ->shouldReceive([
-                'setSecretKey' => true,
-                'abortInstallment' => $resource,
-                'retrieveInstallment' => $resource,
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
-
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getPaymentStatus' => [
-                    'id_status' => 2,
-                    'code' => 'paid',
-                ],
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-
-        $this->dependencies->apiClass = $api_class;
-
-        $order_state = 42;
-        $order_obj = \Mockery::mock('OrderObj');
-        $order_obj->id = 42;
-        $order_obj->id_cart = 42;
-        $order_obj
-            ->shouldReceive([
-                'getCurrentState' => $order_state,
-            ]);
-
-        $order = \Mockery::mock('Order');
-        $order
-            ->shouldReceive([
-                'get' => $order_obj,
-            ]);
-
-        $validate = \Mockery::mock('Validate');
-        $validate
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-
-        $configuration = \Mockery::mock('Configuration');
-        $configuration
-            ->shouldReceive('get')
-            ->with('PS_OS_CANCELED')
-            ->andReturn($order_state);
-
-        $this->plugin
-            ->shouldReceive([
-                'getOrder' => $order,
-                'getValidate' => $validate,
-                'getConfiguration' => $configuration,
-            ]);
-
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'inst_azerty12345',
-                    'method' => 'installmnent',
-                    'id_cart' => 42,
-                    'cart_hash' => '4cbaebd7df677672ac3d571012ea0498129a5314271b0c38603c66425560bf43',
-                    'schedules' => '[{"id_payment":"pay_70Z8nKy6nWiZU6S77KFolE","step":"1\/2","amount":1150,"status":8,"scheduled_date":"2023-11-14","pay_id":"pay_70Z8nKy6nWiZU6S77KFolE"},{"id_payment":"","step":"1\/2","amount":1148,"status":6,"scheduled_date":"2023-12-14","pay_id":""}]',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-                'updateBy' => false,
-            ]);
-
-        $this->assertSame(
-            [
-                'result' => false,
-                'message' => '',
-            ],
-            $this->action->abortAction($resource_id, $order_id)
-        );
-    }
-
-    public function testWhenDataBaseIsUpdated()
-    {
-        $order_id = 42;
-        $resource_id = 'inst_azerty';
-        $api_class = \Mockery::mock('ApiClass');
-        $resource = [
-            'result' => true,
-            'resource' => PaymentMock::getInstallment(),
-        ];
-        $api_class
-            ->shouldReceive([
-                'setSecretKey' => true,
-                'abortInstallment' => $resource,
-                'retrieveInstallment' => $resource,
-                'retrievePayment' => [
-                    'result' => true,
-                    'resource' => PaymentMock::getStandard(),
-                ],
-            ]);
-
-        $payment_method = \Mockery::mock('PaymentMethod');
-        $payment_method
-            ->shouldReceive([
-                'getPaymentStatus' => [
-                    'id_status' => 2,
-                    'code' => 'paid',
-                ],
-            ]);
-        $this->payment_method_class
-            ->shouldReceive([
-                'getPaymentMethod' => $payment_method,
-            ]);
-
-        $this->dependencies->apiClass = $api_class;
-
-        $order_state = 42;
-        $order_obj = \Mockery::mock('OrderObj');
-        $order_obj->id = 42;
-        $order_obj->id_cart = 42;
-        $order_obj
-            ->shouldReceive([
-                'getCurrentState' => $order_state,
-            ]);
-
-        $order = \Mockery::mock('Order');
-        $order
-            ->shouldReceive([
-                'get' => $order_obj,
-            ]);
-
-        $validate = \Mockery::mock('Validate');
-        $validate
-            ->shouldReceive([
-                'validate' => true,
-            ]);
-
-        $configuration = \Mockery::mock('Configuration');
-        $configuration
-            ->shouldReceive('get')
-            ->with('PS_OS_CANCELED')
-            ->andReturn($order_state);
-
-        $this->plugin
-            ->shouldReceive([
-                'getOrder' => $order,
-                'getValidate' => $validate,
-                'getConfiguration' => $configuration,
-            ]);
-
-        $this->payment_repository
-            ->shouldReceive([
-                'getBy' => [
-                    'id_payplug_payment' => 42,
-                    'resource_id' => 'inst_azerty12345',
-                    'method' => 'installmnent',
-                    'id_cart' => 42,
-                    'cart_hash' => '4cbaebd7df677672ac3d571012ea0498129a5314271b0c38603c66425560bf43',
-                    'schedules' => '[{"id_payment":"pay_70Z8nKy6nWiZU6S77KFolE","step":"1\/2","amount":1150,"status":8,"scheduled_date":"2023-11-14","pay_id":"pay_70Z8nKy6nWiZU6S77KFolE"},{"id_payment":"","step":"1\/2","amount":1148,"status":6,"scheduled_date":"2023-12-14","pay_id":""}]',
-                    'date_upd' => '1970-01-01 00:00:00',
-                ],
-                'updateBy' => true,
-            ]);
-
-        $this->assertSame(
-            [
-                'result' => true,
-                'message' => '',
             ],
             $this->action->abortAction($resource_id, $order_id)
         );

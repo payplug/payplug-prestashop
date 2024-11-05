@@ -52,7 +52,6 @@ class PayPlugNotifications
     public $is_mybank = false;
     public $is_oney = false;
     public $is_satispay = false;
-    public $is_sofort = false;
     public $key;
     public $lock_key;
     public $logger;
@@ -85,15 +84,14 @@ class PayPlugNotifications
     private $validateAdapter;
 
     private $amountCurrencyClass;
-    private $apiClass;
     private $configuration;
-    private $installmentClass;
     private $module;
     private $orderClass;
     private $paymentClass;
     private $payplugLock;
-    private $plugin;
     private $validators;
+
+    private $stored_resource;
 
     public function __construct()
     {
@@ -154,6 +152,7 @@ class PayPlugNotifications
      */
     private function checkIsValidPaymentResource()
     {
+        $this->logger->addLog('Notification: checkIsValidPaymentResource');
         if (!$this->payment->is_paid && !$this->is_deferred && !$this->is_oney) {
             $this->logger->addLog('The transaction is not paid yet.');
             $this->logger->addLog('No action will be done.');
@@ -172,7 +171,18 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: dispatchPayment');
         $id_order = $this->orderAdapter->getIdByCartId($this->cart->id);
         if ($id_order) {
+            // If payment resource is installment, then update the schedules and exit
             if (isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id) {
+                $payment_method = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod('installment');
+                $retrieve = $payment_method->retrieve($this->resource->installment_plan_id);
+                $schedule_update = $payment_method->updateInstallmentSchedules($retrieve);
+                if (!$schedule_update) {
+                    $this->logger->addLog('Notification: dispatchPayment - Installment schedules can\'t be updated', 'warning');
+                }
+
                 $this->exitProcess('No need to update a installment plan schedule.');
             }
 
@@ -230,10 +240,23 @@ class PayPlugNotifications
                 }
 
                 if (!empty($update_queue['exists']) && isset($update_queue['exists']['resource_id'])) {
-                    $this->payment = $this->dependencies->apiClass->retrievePayment(
-                        $update_queue['exists']['resource_id']
-                    );
-                    $this->processPayment();
+                    $this->stored_resource = $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentRepository()
+                        ->getBy('resource_id', $update_queue['exists']['resource_id']);
+                    if (!empty($this->stored_resource)) {
+                        $retrieve = $this->dependencies
+                            ->getPlugin()
+                            ->getPaymentMethodClass()
+                            ->getPaymentMethod($this->stored_resource['method'])
+                            ->retrieve($this->stored_resource['resource_id']);
+
+                        if ($retrieve['result']) {
+                            $this->payment = $retrieve['resource'];
+
+                            return $this->processPayment();
+                        }
+                    }
                 }
             }
         } else {
@@ -277,7 +300,10 @@ class PayPlugNotifications
             $this->configuration->getValue('test_api_key');
 
         try {
-            $this->apiClass->setSecretKey($this->api_key);
+            $this->dependencies
+                ->getPlugin()
+                ->getApiService()
+                ->initialize($this->api_key);
             $this->resource = Notification::treat($body);
 
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
@@ -341,22 +367,52 @@ class PayPlugNotifications
         $this->logger->addLog('Notification: processRefund');
         $this->logger->addLog('Refund ID : ' . $this->resource->id);
 
-        $payment = $this->apiClass->retrievePayment($this->resource->payment_id);
-        if (!$payment['result']) {
-            $this->logger->addLog('Payment cannot be retrieved: ' . $payment['message'], 'error');
-            $this->exitProcess($payment['message'], 500);
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $this->resource->payment_id);
+
+        if (empty($stored_resource)) {
+            $stored_resource = $this->dependencies
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getFromSchedule($this->resource->payment_id);
+            $payment_method = 'standard';
+        } else {
+            $payment_method = $stored_resource['method'];
         }
-        $this->payment = $payment['resource'];
+
+        if (empty($stored_resource)) {
+            $message = 'Stored resource cannot be getted';
+            $this->logger->addLog($message, 'error');
+            $this->exitProcess($message, 500);
+        }
+
+        $retrieve = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($payment_method)
+            ->retrieve($this->resource->payment_id);
+
+        if (!$retrieve['result']) {
+            $this->logger->addLog('Payment cannot be retrieved: ' . $retrieve['message'], 'error');
+            $this->exitProcess($retrieve['message'], 500);
+        }
+
+        $this->payment = $retrieve['resource'];
         $this->setOrderStates();
 
         if ($this->payment->installment_plan_id) {
-            $installment = $this->apiClass->retrieveInstallment($this->payment->installment_plan_id);
-            if (!$installment['result']) {
-                $this->logger->addLog('Installment cannot be retrieved: ' . $installment['message'], 'error');
-                $this->exitProcess($installment['message'], 500);
+            $retrieved_installment = $this->dependencies
+                ->getPlugin()
+                ->getApiService()
+                ->retrieveInstallment($this->payment->installment_plan_id);
+            if (!$retrieved_installment['result']) {
+                $this->logger->addLog('Installment cannot be retrieved: ' . $retrieved_installment['message'], 'error');
+                $this->exitProcess($retrieved_installment['message'], 500);
             }
 
-            $installment = $installment['resource'];
+            $installment = $retrieved_installment['resource'];
             $meta = $installment->metadata;
         } else {
             $meta = $this->payment->metadata;
@@ -515,10 +571,8 @@ class PayPlugNotifications
         $this->validators = $this->dependencies->getValidators();
         $this->setAdapters();
 
-        $this->apiClass = $this->dependencies->apiClass;
         $this->orderClass = $this->dependencies->orderClass;
         $this->paymentClass = $this->dependencies->paymentClass;
-        $this->installmentClass = $this->dependencies->installmentClass;
         $this->amountCurrencyClass = $this->dependencies->amountCurrencyClass;
         $this->payplugLock = $this->dependencies->payplugLock;
 
@@ -620,23 +674,37 @@ class PayPlugNotifications
         if ($this->payment) {
             return true;
         }
-        $payment = $this->apiClass->retrievePayment($this->resource->id);
-        if (!$payment['result']) {
-            if ($this->sandbox) {
-                $this->apiClass->initializeApi(false);
-                $payment = $this->apiClass->retrievePayment($this->resource->id);
-            } else {
-                $this->apiClass->initializeApi(true);
-                $payment = $this->apiClass->retrievePayment($this->resource->id);
-            }
+
+        $this->stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $this->resource->id);
+
+        if (empty($this->stored_resource)) {
+            $this->stored_resource = $this->dependencies
+                ->getPlugin()
+                ->getPaymentRepository()
+                ->getFromSchedule($this->resource->id);
+            $payment_method = 'standard';
+        } else {
+            $payment_method = $this->stored_resource['method'];
         }
 
-        if (!$payment['result']) {
+        $retrieve = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($payment_method)
+            ->retrieve($this->resource->id);
+
+        if (!$retrieve['result']) {
             $this->logger->addLog('Can\'t retrieve payment with pay id: ' . $this->resource->id, 'debug');
-            $this->apiClass->initializeApi((bool) $this->sandbox);
+            $this->dependencies
+                ->getPlugin()
+                ->getApiService()
+                ->initializeFromMode((bool) $this->sandbox);
             $this->payment = null;
         } else {
-            $this->payment = $payment['resource'];
+            $this->payment = $retrieve['resource'];
         }
     }
 
@@ -688,11 +756,6 @@ class PayPlugNotifications
         // Define if payment is satispay resource
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
             $this->is_satispay = 'satispay' == $this->payment->payment_method['type'];
-        }
-
-        // Define if payment is sofort resource
-        if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_sofort = 'sofort' == $this->payment->payment_method['type'];
         }
     }
 }

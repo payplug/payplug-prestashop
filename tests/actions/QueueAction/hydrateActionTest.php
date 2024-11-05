@@ -58,11 +58,10 @@ class hydrateActionTest extends BaseQueueAction
 
     public function testWhenQueueCantBeCreated()
     {
-        $this->repository
-            ->shouldReceive([
-                'getFirstNotTreatedEntry' => false,
-                'createEntity' => false,
-            ]);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => false,
+            'createEntity' => false,
+        ]);
         $this->assertSame(
             [
                 'exists' => false,
@@ -74,11 +73,10 @@ class hydrateActionTest extends BaseQueueAction
 
     public function testWhenQueueIsCreatedAndQueueDoesntExists()
     {
-        $this->repository
-            ->shouldReceive([
-                'getFirstNotTreatedEntry' => false,
-                'createEntity' => true,
-            ]);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => false,
+            'createEntity' => true,
+        ]);
         $this->assertSame(
             [
                 'exists' => false,
@@ -90,11 +88,19 @@ class hydrateActionTest extends BaseQueueAction
 
     public function testWhenQueueIsCreatedAndQueueExists()
     {
-        $this->repository
-            ->shouldReceive([
-                'getFirstNotTreatedEntry' => true,
-                'createEntity' => true,
-            ]);
+        $entry = [
+            'id_payplug_queue' => 42,
+            'date_add' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+        ];
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => $entry,
+            'updateEntity' => false,
+            'createEntity' => true,
+        ]);
+        $this->repository->shouldReceive([
+            'getFirstNotTreatedEntry' => $entry,
+            'createEntity' => true,
+        ]);
         $this->assertSame(
             [
                 'exists' => true,

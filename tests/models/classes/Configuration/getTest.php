@@ -4,8 +4,8 @@ namespace PayPlug\tests\models\classes\Configuration;
 
 /**
  * @group unit
- * @group classes
- * @group configuration_classes
+ * @group class
+ * @group configuration_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -18,13 +18,13 @@ class getTest extends BaseConfiguration
      */
     public function testWhenGivenKeyIsInvalidStringFormat($key)
     {
-        $this->assertSame([], $this->classe->get($key));
+        $this->assertSame([], $this->class->get($key));
     }
 
     public function testWhenGivenKeyDoesNotExistsInAllowedConfiguration()
     {
         $key = 'config_key';
-        $this->assertSame([], $this->classe->get($key));
+        $this->assertSame([], $this->class->get($key));
     }
 
     public function testWhenConfigurationIsReturned()
@@ -37,7 +37,7 @@ class getTest extends BaseConfiguration
                 'defaultValue' => 0,
                 'setConf' => 1,
             ],
-            $this->classe->get($key)
+            $this->class->get($key)
         );
     }
 }

@@ -14,29 +14,24 @@ use PayPlug\tests\repositories\RepositoryBase;
 // todo: Move Oney tests out of "tests/repositories" folder
 class BaseOneyRepository extends RepositoryBase
 {
-    protected $account_validator;
     protected $address_adapter;
     protected $amount_helper;
+    protected $api_service;
     protected $assign_adapter;
-    protected $arrayCache;
-    protected $arrayLogger;
-    protected $cacheAdapter;
+    protected $cache_adapter;
     protected $constant;
-    protected $contextAdapter;
-    protected $countryAdapter;
+    protected $context_adapter;
     protected $dependencies;
     protected $helpers;
     protected $loggerRepository;
     protected $routes;
-    protected $toolsAdapter;
 
     public function setUp()
     {
         parent::setUp();
 
         $this->cache = MockHelper::createMockFactory('Payplug\src\repositories\CacheRepository');
-        $this->config
-            ->shouldReceive('get')
+        $this->config->shouldReceive('get')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'PS_CURRENCY_DEFAULT':
@@ -64,12 +59,13 @@ class BaseOneyRepository extends RepositoryBase
         $this->address_adapter->shouldReceive([
             'get' => AddressMock::get(),
         ]);
+        $this->api_service = \Mockery::mock('ApiService');
         $this->assign_adapter = \Mockery::mock('AssignAdapter');
         $this->assign_adapter->shouldReceive([
             'assign' => '',
         ]);
-        $this->cacheAdapter = \Mockery::mock('CacheAdapter');
-        $this->contextAdapter = \Mockery::mock('ContextAdapter');
+        $this->cache_adapter = \Mockery::mock('CacheAdapter');
+        $this->context_adapter = \Mockery::mock('ContextAdapter');
         $get_context = \Mockery::mock('GetContext');
         $get_context->shouldReceive([
             'getContext' => \Mockery::mock('GetContext'),
@@ -77,62 +73,58 @@ class BaseOneyRepository extends RepositoryBase
         $get_context->shouldReceive([
             'getContext' => \Mockery::mock('GetContext'),
         ]);
-        $this->contextAdapter->shouldReceive([
+        $this->context_adapter->shouldReceive([
             'get' => ContextMock::get(),
         ]);
         $this->country->shouldReceive([
             'getCountry' => CountryMock::get(),
         ]);
         $this->constant = \Mockery::mock('Constant');
-        $this->constant
-            ->shouldReceive([
-                'get' => '',
-            ]);
+        $this->constant->shouldReceive([
+            'get' => '',
+        ]);
+        $this->logger = \Mockery::mock('Logger');
+        $this->logger->shouldReceive([
+            'addLog' => true,
+        ]);
         $this->routes = \Mockery::mock(Routes::class)->makePartial();
-        $this->plugin
-            ->shouldReceive([
-                'getAddress' => $this->address_adapter,
-                'getAssign' => $this->assign_adapter,
-                'getCache' => $this->cacheAdapter,
-                'getCarrier' => $this->carrier,
-                'getCart' => $this->cart,
-                'getConstant' => $this->constant,
-                'getContext' => $this->contextAdapter,
-                'getCountry' => $this->country,
-                'getCurrency' => $this->currency,
-                'getLogger' => $this->logger,
-                'getRoutes' => $this->routes,
-                'getTools' => $this->tools,
-            ]);
+        $this->plugin->shouldReceive([
+            'getAddress' => $this->address_adapter,
+            'getApiService' => $this->api_service,
+            'getAssign' => $this->assign_adapter,
+            'getCache' => $this->cache_adapter,
+            'getCarrier' => $this->carrier,
+            'getCart' => $this->cart,
+            'getConstant' => $this->constant,
+            'getContext' => $this->context_adapter,
+            'getCountry' => $this->country,
+            'getCurrency' => $this->currency,
+            'getLogger' => $this->logger,
+            'getRoutes' => $this->routes,
+            'getTools' => $this->tools,
+        ]);
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $configClass = \Mockery::mock('Config');
-        $configClass
-            ->shouldReceive([
-                'isValidFeature' => true,
-            ]);
+        $configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
         $this->dependencies->amountCurrencyClass = \Mockery::mock('alias:PayPlug\classes\AmountCurrencyClass');
         $this->dependencies->configClass = $configClass;
         $this->dependencies->name = 'payplug';
-        $this->dependencies
-            ->shouldReceive([
-                'getHelpers' => [
-                    'user' => \Mockery::mock(UserHelper::class)->makePartial(),
-                    'amount' => $this->amount_helper,
-                ],
-                'getPlugin' => $this->plugin,
-                'getValidators' => $this->validators,
-            ]);
+        $this->dependencies->shouldReceive([
+            'getHelpers' => [
+                'user' => \Mockery::mock(UserHelper::class)->makePartial(),
+                'amount' => $this->amount_helper,
+            ],
+            'getPlugin' => $this->plugin,
+            'getValidators' => $this->validators,
+        ]);
 
         $this->logger->shouldReceive([
             'setProcess' => $this->logger,
         ]);
 
         $this->repo = \Mockery::mock(OneyPaymentMethod::class, [$this->dependencies])->makePartial();
-
-        $this->arrayCache = [];
-        $this->arrayLogger = [];
-
-        MockHelper::createAddLogMock($this->logger, $this->arrayLogger);
     }
 }

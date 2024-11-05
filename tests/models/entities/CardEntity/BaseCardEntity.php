@@ -11,7 +11,7 @@ class BaseCardEntity extends TestCase
     use FormatDataProvider;
     protected $entity;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->entity = \Mockery::mock(CardEntity::class)->makePartial();

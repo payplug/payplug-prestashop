@@ -7,8 +7,8 @@ use PayPlug\tests\mock\ContextMock;
 
 /**
  * @group unit
- * @group classes
- * @group apirest_classes
+ * @group class
+ * @group apirest_classe
  *
  * @runTestsInSeparateProcesses
  */
@@ -25,8 +25,7 @@ class getLoggedSectionTest extends BaseApiRest
             'getContext' => $context,
         ]);
 
-        $this->configuration_class
-            ->shouldReceive('getDefault')
+        $this->configuration_class->shouldReceive('getDefault')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'sandbox_mode':
@@ -71,19 +70,19 @@ class getLoggedSectionTest extends BaseApiRest
     {
         $this->assertSame(
             [],
-            $this->classe->getLoggedSection($current_configuration)
+            $this->class->getLoggedSection($current_configuration)
         );
     }
 
     public function testWhenNoSandboxModeIsGiven()
     {
         $current_configuration = [];
-        $this->dependencies->apiClass->shouldReceive(
+        $this->api_service->shouldReceive(
             [
-                'getAccountPermissions' => ['onboarding_oney_completed' => true],
+                'getAccount' => ['onboarding_oney_completed' => true],
             ]
         );
-        $response = $this->classe->getLoggedSection($current_configuration);
+        $response = $this->class->getLoggedSection($current_configuration);
         $this->assertSame(
             [
                 [
@@ -108,12 +107,12 @@ class getLoggedSectionTest extends BaseApiRest
         $current_configuration = [
             'sandbox_mode' => true,
         ];
-        $this->dependencies->apiClass->shouldReceive(
+        $this->api_service->shouldReceive(
             [
-                'getAccountPermissions' => ['onboarding_oney_completed' => true],
+                'getAccount' => ['onboarding_oney_completed' => true],
             ]
         );
-        $response = $this->classe->getLoggedSection($current_configuration);
+        $response = $this->class->getLoggedSection($current_configuration);
         $this->assertSame(
             [
                 [
@@ -138,12 +137,12 @@ class getLoggedSectionTest extends BaseApiRest
         $current_configuration = [
             'sandbox_mode' => false,
         ];
-        $this->dependencies->apiClass->shouldReceive(
+        $this->api_service->shouldReceive(
             [
-                'getAccountPermissions' => ['onboarding_oney_completed' => true],
+                'getAccount' => ['onboarding_oney_completed' => true],
             ]
         );
-        $response = $this->classe->getLoggedSection($current_configuration);
+        $response = $this->class->getLoggedSection($current_configuration);
         $this->assertSame(
             [
                 [
@@ -177,8 +176,7 @@ class getLoggedSectionTest extends BaseApiRest
             'sandbox_mode' => false,
         ];
         $this->dependencies->name = $module_name;
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->andReturnUsing(function ($key) use ($live_api_key) {
                 switch ($key) {
                     case 'live_api_key':
@@ -187,12 +185,12 @@ class getLoggedSectionTest extends BaseApiRest
             })
         ;
 
-        $this->dependencies->apiClass->shouldReceive(
+        $this->api_service->shouldReceive(
             [
-                'getAccountPermissions' => ['onboarding_oney_completed' => $onboarding_oney_completed],
+                'getAccount' => ['onboarding_oney_completed' => $onboarding_oney_completed],
             ]
         );
-        $response = $this->classe->getLoggedSection($current_configuration);
+        $response = $this->class->getLoggedSection($current_configuration);
         $this->assertSame(
             [
                 'inactive' => true,
@@ -221,8 +219,7 @@ class getLoggedSectionTest extends BaseApiRest
             'sandbox_mode' => false,
         ];
         $this->dependencies->name = $module_name;
-        $this->configuration_class
-            ->shouldReceive('getValue')
+        $this->configuration_class->shouldReceive('getValue')
             ->andReturnUsing(function ($key) use ($live_api_key) {
                 switch ($key) {
                     case 'live_api_key':
@@ -231,12 +228,12 @@ class getLoggedSectionTest extends BaseApiRest
             })
         ;
 
-        $this->dependencies->apiClass->shouldReceive(
+        $this->api_service->shouldReceive(
             [
-                'getAccountPermissions' => ['onboarding_oney_completed' => $onboarding_oney_completed],
+                'getAccount' => ['onboarding_oney_completed' => $onboarding_oney_completed],
             ]
         );
-        $response = $this->classe->getLoggedSection($current_configuration);
+        $response = $this->class->getLoggedSection($current_configuration);
         $this->assertSame(
             [
                 'inactive' => false,

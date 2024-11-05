@@ -4,9 +4,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneClickPaymentMethod;
 
 /**
  * @group unit
- * @group classes
- * @group payment_method_classes
- * @group oneclick_payment_method_classes
+ * @group class
+ * @group payment_method_class
+ * @group oneclick_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
@@ -14,7 +14,7 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
 {
     private $card;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
      */
     public function testWhenGivenPaymentOptionsIsntValidArrayFormat($payment_options)
     {
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenNoCustomerCardsFound()
@@ -40,7 +40,7 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
         $this->card->shouldReceive([
             'renderList' => [],
         ]);
-        $this->assertSame([], $this->classe->getPaymentOption($payment_options));
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
     public function testWhenCustomerCardsFound()
@@ -56,24 +56,21 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
                 ],
             ],
         ]);
-        $this->configuration
-            ->shouldReceive('getValue')
+        $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');
-        $this->helpers['amount']
-            ->shouldReceive('validateAmount')
+        $this->helpers['amount']->shouldReceive('validateAmount')
             ->andReturn([
                 'result' => true,
                 'message' => '',
             ]);
-        $this->classe->shouldReceive([
+        $this->class->shouldReceive([
             'getCardBrand' => 'CB',
         ]);
-        $this->tools_adapter
-            ->shouldReceive([
-                'tool' => '',
-                'strtolower' => 'brand',
-            ]);
+        $this->tools_adapter->shouldReceive([
+            'tool' => '',
+            'strtolower' => 'brand',
+        ]);
 
         $expected = [
             'one_click_1' => [
@@ -109,6 +106,6 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
             ],
         ];
 
-        $this->assertSame($expected, $this->classe->getPaymentOption($payment_options));
+        $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
 }

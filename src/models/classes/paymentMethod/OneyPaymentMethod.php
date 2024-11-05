@@ -173,18 +173,26 @@ class OneyPaymentMethod extends PaymentMethod
         ];
     }
 
-    // todo: add coverage to this method
-    public function getOrderTab($resource = null)
+    /**
+     * @description Get order tab for given resource to create the order
+     * @todo: add coverage to this method
+     *
+     * @param array $retrieve
+     *
+     * @return array
+     */
+    public function getOrderTab($retrieve = null)
     {
         $this->setParameters();
 
+        $resource = $retrieve['resource'];
         if (!is_object($resource) || !$resource) {
             $this->logger->addLog('OneyPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
         }
 
-        $order_tab = parent::getOrderTab($resource);
+        $order_tab = parent::getOrderTab($retrieve);
 
         if (!$resource->is_paid) {
             $state_addons = $resource->is_live ? '' : '_test';
@@ -342,7 +350,15 @@ class OneyPaymentMethod extends PaymentMethod
         return $payment_tab;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the resource detail
+     *
+     * todo: add coverage to this method
+     *
+     * @param string $resource_id
+     *
+     * @return array
+     */
     public function getResourceDetail($resource_id = '')
     {
         $this->setParameters();
@@ -359,6 +375,13 @@ class OneyPaymentMethod extends PaymentMethod
         $resource_details = parent::getResourceDetail($resource_id);
         if (empty($resource_details)) {
             return $resource_details;
+        }
+
+        // If status is paid but order state is pending then update the current state
+        if ('paid' == $resource_details['status_code']) {
+            $order_id = $this->tools->tool('getValue', 'id_order');
+            $is_live = 'TEST' != $resource_details['mode'];
+            $this->updateOrderState((int) $order_id, (bool) $is_live);
         }
 
         $translation = $this->dependencies
@@ -983,7 +1006,10 @@ class OneyPaymentMethod extends PaymentMethod
             'country' => $this->getOneyCountry($country),
             'operations' => $operation,
         ];
-        $simulations = $this->dependencies->apiClass->getOneySimulations($data);
+        $simulations = $this->dependencies
+            ->getPlugin()
+            ->getApiService()
+            ->getOneySimulations($data);
 
         if (!$simulations['result']) {
             $this->logger->setProcess('oney');
@@ -1887,6 +1913,68 @@ class OneyPaymentMethod extends PaymentMethod
         $this->cart_adapter = $this->cart_adapter ?: $this->dependencies->getPlugin()->getCart();
         $this->country = $this->country ?: $this->dependencies->getPlugin()->getCountry();
         $this->validators = $this->validators ?: $this->dependencies->getValidators();
+    }
+
+    /**
+     * @description Update the order state if current state is pending
+     *
+     * todo: add coverage to this method
+     *
+     * @param int $order_id
+     * @param bool $is_live
+     *
+     * @return bool
+     */
+    protected function updateOrderState($order_id = 0, $is_live = true)
+    {
+        $this->setParameters();
+
+        if (!is_int($order_id) || !$order_id) {
+            $this->logger->addLog('OneyPaymentMethod::updateOrderState() - Invalid argument given, $order_id must be a non null integer.', 'error');
+
+            return false;
+        }
+
+        if (!is_bool($is_live)) {
+            $this->logger->addLog('OneyPaymentMethod::updateOrderState() - Invalid argument given, $is_live must be a valid boolean.', 'error');
+
+            return false;
+        }
+
+        $order = $this->dependencies->getPlugin()
+            ->getOrder()
+            ->get((int) $order_id);
+
+        if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
+            $this->logger->addLog('OneyPaymentMethod::updateOrderState() - Invalid argument given, $order getted must be a valid object.', 'error');
+
+            return false;
+        }
+
+        $state_addons = $is_live ? '' : '_test';
+        $pending_os = $this->configuration->getValue('order_state_oney_pg' . $state_addons);
+
+        if ($order->getCurrentState() != $pending_os) {
+            return true;
+        }
+
+        $paid_os = $this->configuration->getValue('order_state_paid' . $state_addons);
+        $update_order_history = $this->dependencies
+            ->getPlugin()
+            ->getOrderClass()
+            ->updateOrderState($order, (int) $paid_os);
+
+        // If order history well update, then we force the reload
+        if (!$update_order_history) {
+            $this->logger->addLog('OneyPaymentMethod::updateOrderState() - Failed to update order state', 'error');
+
+            return false;
+        }
+
+        $parameters = ['vieworder' => 1, 'id_order' => (int) $order->id];
+        $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
+
+        return $this->tools->tool('redirectAdmin', $link_order);
     }
 
     /**

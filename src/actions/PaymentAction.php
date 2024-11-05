@@ -39,7 +39,6 @@ class PaymentAction
         'one_click',
         'oney',
         'satispay',
-        'sofort',
         'standard',
     ];
     private $dependencies;
@@ -81,28 +80,23 @@ class PaymentAction
             ];
         }
 
-        $abort = $this->dependencies->apiClass->abortInstallment($resource_id);
-        if (!$abort['result']) {
-            $sandbox = (bool) $this->plugin
-                ->getConfigurationClass()
-                ->getValue('sandbox_mode');
-            $live_api_key = $this->plugin
-                ->getConfigurationClass()
-                ->getValue('live_api_key');
-            $test_api_key = $this->plugin
-                ->getConfigurationClass()
-                ->getValue('test_api_key');
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+        if (empty($stored_resource)) {
+            $this->logger->addLog('PaymentAction::abortAction - Can\'t get the stored payment resource.', 'error');
 
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey($live_api_key);
-                $abort = $this->dependencies->apiClass->abortInstallment($resource_id);
-                $this->dependencies->apiClass->setSecretKey($test_api_key);
-            } elseif (!$sandbox) {
-                $this->dependencies->apiClass->setSecretKey($test_api_key);
-                $abort = $this->dependencies->apiClass->abortInstallment($resource_id);
-                $this->dependencies->apiClass->setSecretKey($live_api_key);
-            }
+            return [
+                'result' => false,
+                'message' => 'Can\'t abort the payment.',
+            ];
         }
+        $payment_method = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method']);
+        $abort = $payment_method->abort($resource_id);
         if (!$abort['result']) {
             $this->logger->addLog('PaymentAction::abortAction - Can\'t abort the payment.', 'error');
 
@@ -112,7 +106,7 @@ class PaymentAction
             ];
         }
 
-        $retrieve = $this->dependencies->apiClass->retrieveInstallment($resource_id);
+        $retrieve = $payment_method->retrieve($resource_id);
         if (!$retrieve['result']) {
             $this->logger->addLog('PaymentAction::abortAction - Can\'t retrieve the aborted payment.', 'error');
 
@@ -142,36 +136,20 @@ class PaymentAction
             ->getConfiguration()
             ->get('PS_OS_CANCELED');
 
-        $current_state = (int) $order->getCurrentState();
-        if ($current_state && $current_state != $new_state) {
-            $order_history = $this->plugin
-                ->getOrderHistory()
-                ->get();
-            $order_history->id_order = (int) $order->id;
-            $order_history->changeIdOrderState($new_state, (int) $order->id, true);
-            $order_history->addWithemail();
-        }
+        $this->dependencies->getPlugin()
+            ->getOrderClass()
+            ->updateOrderState($order, (int) $new_state);
 
         $step_to_update = [];
-        foreach ($installment->schedule as $key => $schedule) {
-            $pay_id = '';
-            if (count($schedule->payment_ids) > 0) {
-                $pay_id = $schedule->payment_ids[0];
-                $payment = $this->dependencies->apiClass->retrievePayment($pay_id);
-                if (!$payment['result']) {
-                    $this->logger->addLog('PaymentAction::abortAction - Unable to retrieve the schedule payment', 'error');
-
-                    return [
-                        'result' => false,
-                        'message' => 'Unable to retrieve the schedule payment',
-                    ];
-                }
-                $payment = $payment['resource'];
+        foreach ($retrieve['schedule'] as $key => $schedule) {
+            $schedule_resource_id = '';
+            if ($schedule['resource']) {
+                $schedule_resource_id = $schedule['resource']->id;
                 $status = $this->dependencies
                     ->getPlugin()
                     ->getPaymentMethodClass()
                     ->getPaymentMethod('standard')
-                    ->getPaymentStatus($payment)['id_status'];
+                    ->getPaymentStatus($schedule['resource'])['id_status'];
             } else {
                 if (1 == (int) $installment->is_active) {
                     $status = 6; // ongoing
@@ -181,15 +159,15 @@ class PaymentAction
             }
             $step = ($key + 1) . '/' . count($installment->schedule);
             $step_to_update[$step] = [
-                'pay_id' => $pay_id,
+                'pay_id' => $schedule_resource_id,
                 'status' => (int) $status,
             ];
         }
 
-        $resource = $this->plugin
+        $stored_resource = $this->plugin
             ->getPaymentRepository()
             ->getBy('resource_id', $installment->id);
-        $schedules = json_decode((string) $resource['schedules'], true);
+        $schedules = json_decode((string) $stored_resource['schedules'], true);
         foreach ($schedules as &$schedule) {
             $step = $schedule['step'];
             if (array_key_exists($step, $step_to_update)) {
@@ -238,28 +216,23 @@ class PaymentAction
             ];
         }
 
-        $capture = $this->dependencies->apiClass->capturePayment($resource_id);
-        if (!$capture['result']) {
-            $sandbox = (bool) $this->plugin
-                ->getConfigurationClass()
-                ->getValue('sandbox_mode');
-            $live_api_key = $this->plugin
-                ->getConfigurationClass()
-                ->getValue('live_api_key');
-            $test_api_key = $this->plugin
-                ->getConfigurationClass()
-                ->getValue('test_api_key');
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+        if (empty($stored_resource)) {
+            $this->logger->addLog('PaymentAction::captureAction - Can\'t get the stored payment resource.', 'error');
 
-            if ($sandbox) {
-                $this->dependencies->apiClass->setSecretKey($live_api_key);
-                $capture = $this->dependencies->apiClass->capturePayment($resource_id);
-                $this->dependencies->apiClass->setSecretKey($test_api_key);
-            } elseif (!$sandbox) {
-                $this->dependencies->apiClass->setSecretKey($test_api_key);
-                $capture = $this->dependencies->apiClass->capturePayment($resource_id);
-                $this->dependencies->apiClass->setSecretKey($live_api_key);
-            }
+            return [
+                'result' => false,
+                'message' => 'Can\'t capture the payment.',
+            ];
         }
+        $payment_method = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method']);
+        $capture = $payment_method->capture($resource_id);
         if (!$capture['result']) {
             $this->logger->addLog('PaymentAction::captureAction - Can\'t capture the payment.', 'error');
 
@@ -316,15 +289,9 @@ class PaymentAction
             }
         }
 
-        $current_state = (int) $order->getCurrentState();
-        if ($current_state && $current_state != $new_state) {
-            $order_history = $this->plugin
-                ->getOrderHistory()
-                ->get();
-            $order_history->id_order = (int) $order->id;
-            $order_history->changeIdOrderState($new_state, (int) $order->id, true);
-            $order_history->addWithemail();
-        }
+        $this->dependencies->getPlugin()
+            ->getOrderClass()
+            ->updateOrderState($order, (int) $new_state);
 
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
             $update_queue = (bool) $this->dependencies
@@ -411,9 +378,10 @@ class PaymentAction
         }
 
         // Generate the hash and create payment in database
-        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab);
+        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab, $resource['resource']->is_live);
         $parameters = [
             'resource_id' => $resource['resource']->id,
+            'is_live' => $resource['resource']->is_live,
             'method' => $method,
             'id_cart' => (int) $cart_id,
             'cart_hash' => $payment_hash,
@@ -428,11 +396,15 @@ class PaymentAction
             return [];
         }
 
-        if ('applepay' == $method) {
-            return $resource;
+        switch ($method) {
+            case 'applepay':
+                return $resource;
+            case 'installment':
+                $payment_method->addInstallmentSchedules($resource);
+                // no break
+            default:
+                return $payment_method->getReturnUrl();
         }
-
-        return $payment_method->getReturnUrl();
     }
 
     /**
@@ -559,10 +531,20 @@ class PaymentAction
             return false;
         }
 
-        $is_installment = $this->dependencies->getValidators()['payment']->isInstallment($resource_id)['result'];
-        $resource = $is_installment
-            ? $this->dependencies->apiClass->retrieveInstallment($resource_id)
-            : $this->dependencies->apiClass->retrievePayment($resource_id);
+        $stored_resource = $this->dependencies
+            ->getPlugin()
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+        if (empty($stored_resource)) {
+            $this->logger->addLog('PaymentAction::removeAction - Can\'t get the stored payment resource.', 'error');
+
+            return false;
+        }
+        $payment_method = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method']);
+        $resource = $payment_method->retrieve($resource_id);
 
         if (!$resource['result']) {
             $this->logger->addLog('PaymentAction::removeAction - Can\'t retrieve the resource from given $resource_id.', 'error');
@@ -572,9 +554,7 @@ class PaymentAction
 
         // Check the resource is cancellable
         if (!$resource['resource']->failure && $cancellable) {
-            $abort = $is_installment
-                ? $this->dependencies->apiClass->abortInstallment($resource_id)
-                : $this->dependencies->apiClass->abortPayment($resource_id);
+            $abort = $payment_method->abort($resource_id);
             if (!$abort['result']) {
                 $this->logger->addLog('PaymentAction::removeAction - Can\'t abord the retrieved resource.', 'error');
 
@@ -617,7 +597,11 @@ class PaymentAction
             ->getPaymentMethod($stored_resource['method']);
 
         // Check if hash is valid then if not, return the createAction
-        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab);
+        $is_live = !$this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->getValue('sandbox_mode');
+        $payment_hash = $payment_method->getPaymentMethodHash($payment_tab, (bool) $is_live);
         if ($stored_resource['cart_hash'] != $payment_hash) {
             return $this->createAction($stored_resource['method'], $payment_tab);
         }

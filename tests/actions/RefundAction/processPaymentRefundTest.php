@@ -13,115 +13,162 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class processPaymentRefundTest extends BaseRefundAction
 {
-    /**
-     * Process payment refund when
-     * all param are valids.
-     */
-    public function testProcessPaymentRefundWithValidParameters()
+    private $resource_id;
+    private $amount;
+    private $metadata;
+    private $resource;
+    private $stored_resource;
+
+    public function setUp()
     {
-        $payment_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
-        $amount = 100;
-        $metadata = [
+        parent::setUp();
+        $this->resource_id = 'pay_azerty12345';
+        $this->amount = 100;
+        $this->metadata = [
             'ID Client' => 4,
             'reason' => 'Refunded with Prestashop',
         ];
+        $this->resource = [
+            'result' => true,
+            'resource' => PaymentMock::getStandard(),
+        ];
+        $this->stored_resource = [
+            'id_payplug_payment' => 42,
+            'resource_id' => 'pay_azerty1234',
+            'method' => 'standard',
+            'id_cart' => 42,
+            'cart_hash' => 'cart-hash-azerty1234567',
+            'schedules' => 'NULL',
+            'date_upd' => '1970-01-01 00:00:00',
+        ];
+    }
 
-        $this->dependencies->apiClass
-            ->shouldReceive(
-                [
-                    [
-                        'initializeApi' => true,
-                    ],
-                    'retrievePayment' => [
-                        'result' => true,
-                        'resource' => PaymentMock::getStandard(
-                            [
-                                'is_paid' => true,
-                                'metadata' => ['Order' => 42],
-                            ]
-                        ),
-                    ],
-                    'refundPayment' => [
-                        'result' => true,
-
-                    ],
-                ]
-            );
-
-        $result = $this->action->processPaymentRefund($payment_id, $amount, $metadata);
+    /**
+     * @dataProvider invalidStringFormatDataProvider
+     *
+     * @param mixed $resource_id
+     */
+    public function testWhenGivenResourceIdIsntValidString($resource_id)
+    {
         $this->assertSame(
-            true,
-            $result['response']['result']
+            [],
+            $this->action->processPaymentRefund($resource_id, $this->amount, $this->metadata)
         );
     }
 
     /**
-     * @description  test ProcessPaymentRefund
-     * When Payment param is Invalid
+     * @dataProvider invalidIntegerFormatDataProvider
+     *
+     * @param mixed $amount
      */
-    public function testProcessPaymentRefundWithInValidPayment()
+    public function testWhenGivenAmountIdIsntValidInteger($amount)
     {
-        $payment_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
-        $amount = -100;
-        $metadata = [
-            'ID Client' => 4,
-            'reason' => 'Refunded with Prestashop',
-        ];
-
-        $this->dependencies->apiClass
-            ->shouldReceive(
-                [
-                    [
-                        'initializeApi' => true,
-                    ],
-                    'retrievePayment' => [
-                        'result' => true,
-                        'resource' => PaymentMock::getStandard(
-                            [
-                                'is_paid' => true,
-                                'metadata' => ['Order' => 42],
-                            ]
-                        ),
-                    ],
-                    'refundPayment' => [
-                        'result' => true,
-
-                    ],
-                ]
-            );
-        $result = $this->action->processPaymentRefund($payment_id, $amount, $metadata);
         $this->assertSame(
-            null,
-            $result
+            [],
+            $this->action->processPaymentRefund($this->resource_id, $amount, $this->metadata)
         );
     }
 
-    public function testProcessPaymentRefundWithInValidAmount()
+    /**
+     * @dataProvider invalidArrayFormatDataProvider
+     *
+     * @param mixed $metadata
+     */
+    public function testWhenGivenMetadataIdIsntValidArray($metadata)
     {
-        $payment_id = 'pay_19movrH1FmfuNtpkG6EC4Z';
-        $amount = 100;
-        $metadata = [
-            'ID Client' => 4,
-            'reason' => 'Refunded with Prestashop',
-        ];
-
-        $this->dependencies->apiClass
-            ->shouldReceive(
-                [
-                    [
-                        'initializeApi' => true,
-                    ],
-                    'retrievePayment' => [
-                        'result' => false,
-                        'resource' => PaymentMock::getInstallment(),
-                    ],
-                ]
-            );
-
-        $result = $this->action->processPaymentRefund($payment_id, $amount, $metadata);
         $this->assertSame(
-            null,
-            $result
+            [],
+            $this->action->processPaymentRefund($this->resource_id, $this->amount, $metadata)
+        );
+    }
+
+    public function testWhenStoredResourceAndScheduleCantBeGetted()
+    {
+        $this->payment_repository->shouldReceive([
+            'getBy' => [],
+            'getFromSchedule' => [],
+        ]);
+        $this->assertSame(
+            [],
+            $this->action->processPaymentRefund($this->resource_id, $this->amount, $this->metadata)
+        );
+    }
+
+    public function testWhenPaymentResourceCantBeRetrieved()
+    {
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_resource,
+        ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => false,
+            ],
+        ]);
+        $this->assertSame(
+            [],
+            $this->action->processPaymentRefund($this->resource_id, $this->amount, $this->metadata)
+        );
+    }
+
+    public function testWhenRefundableAmountIsNotPaid()
+    {
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_resource,
+        ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => $this->resource,
+        ]);
+        $this->assertSame(
+            [],
+            $this->action->processPaymentRefund($this->resource_id, $this->amount, $this->metadata)
+        );
+    }
+
+    public function testWhenRefundableAmountIsAlreadyRefunded()
+    {
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_resource,
+        ]);
+        $retrieve = $this->resource;
+        $retrieve['resource'] = PaymentMock::getStandard([
+            'is_paid' => true,
+            'is_refunded' => true,
+        ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => $retrieve,
+        ]);
+        $this->assertSame(
+            [],
+            $this->action->processPaymentRefund($this->resource_id, $this->amount, $this->metadata)
+        );
+    }
+
+    public function testWhenResourceIsRefunded()
+    {
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_resource,
+        ]);
+        $retrieve = $this->resource;
+        $retrieve['resource'] = PaymentMock::getStandard([
+            'is_paid' => true,
+        ]);
+        $this->payment_method->shouldReceive([
+            'retrieve' => $retrieve,
+        ]);
+
+        $this->api_service->shouldReceive([
+            'refundPayment' => $this->resource,
+        ]);
+        $this->assertSame(
+            [
+                'id' => $this->resource_id,
+                'data' => [
+                    'amount' => $this->amount,
+                    'metadata' => $this->metadata,
+                ],
+                'response' => $this->resource,
+            ],
+            $this->action->processPaymentRefund($this->resource_id, $this->amount, $this->metadata)
         );
     }
 }

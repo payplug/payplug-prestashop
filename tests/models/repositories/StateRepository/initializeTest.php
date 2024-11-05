@@ -25,8 +25,7 @@ class initializeTest extends BaseStateRepository
     {
         $engine = 'sql_engine';
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'create' => $this->repository,
                 'table' => $this->repository,
                 'fields' => $this->repository,
@@ -40,8 +39,7 @@ class initializeTest extends BaseStateRepository
     {
         $engine = 'sql_engine';
         $this
-            ->repository
-            ->shouldReceive([
+            ->repository->shouldReceive([
                 'create' => $this->repository,
                 'table' => $this->repository,
                 'fields' => $this->repository,
