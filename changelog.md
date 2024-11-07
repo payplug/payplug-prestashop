@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.14.1
+- Bugfix :
+  - [SMP-3005](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2589) : Fix 4.14.0 upgrade
+
 ## Version 4.14.0
 - Feature :
   - [PRE-2477](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2539): Set handler in database to define live/test mode

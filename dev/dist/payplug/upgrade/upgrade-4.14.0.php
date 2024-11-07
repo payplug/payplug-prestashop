@@ -27,31 +27,43 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_4_14_0($object)
 {
     $flag = true;
+    $exec = true;
 
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.14.0');
 
-    $alter_table_sql = 'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_payment`
+    $sql_column_exists = 'SELECT * 
+	FROM information_schema.COLUMNS 
+	WHERE TABLE_NAME = "' . _DB_PREFIX_ . $object->name . '_payment" 
+	AND COLUMN_NAME = "is_live"';
+    $column_exists = Db::getInstance()->execute($sql_column_exists);
+
+    if (!$column_exists) {
+        $alter_table_sql = 'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_payment`
                         ADD COLUMN `is_live` TINYINT(1) NOT NULL DEFAULT 1
                         AFTER `resource_id`';
 
-    $exec = Db::getInstance()->execute($alter_table_sql);
-    if (!$exec) {
-        $logger->addLog('An error occured while executing sql: ' . $alter_table_sql);
+        try {
+            $exec = Db::getInstance()->execute($alter_table_sql);
+        } catch (Exception $e) {
+            $logger->addLog('An error occured while executing sql: ' . $alter_table_sql, 'error');
+            $logger->addLog($e, 'error');
+            $flag = false;
+        }
     }
     $flag = $flag && $exec;
 
     $flag = $flag && Configuration::updateValue('PAYPLUG_CLIENT_DATA', '{}');
 
-    $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'));
+    $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
     unset($payment_methods['sofort']);
     $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
 
-    $countries = json_decode(Configuration::get('PAYPLUG_COUNTRIES'));
+    $countries = json_decode(Configuration::get('PAYPLUG_COUNTRIES'), true);
     unset($countries['sofort']);
     $flag = $flag && Configuration::updateValue('PAYPLUG_COUNTRIES', json_encode($countries));
 
-    $amounts = json_decode(Configuration::get('PAYPLUG_AMOUNTS'));
+    $amounts = json_decode(Configuration::get('PAYPLUG_AMOUNTS'), true);
     unset($amounts['sofort']);
     $flag = $flag && Configuration::updateValue('PAYPLUG_AMOUNTS', json_encode($amounts));
 
