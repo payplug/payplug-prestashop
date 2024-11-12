@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.14.2
+- Bugfix :
+  - [SMP-3003](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2590) : Force resource creation if stored and selected payment method are not the same
+
 ## Version 4.14.1
 - Bugfix :
   - [SMP-3005](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2589) : Fix 4.14.0 upgrade
@@ -20,11 +24,10 @@
   - [PRE-2666](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2581) : Fix unit tests
   - [PRE-2665](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2582) : Fix prestashop validator errors
 
-
 ## Version 4.13.1
 - Bugfix :
-    - [SMP-2979](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2565) : Add displayHeader to upgrade script
-    - [SMP-2999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2578) : Fix double order creation
+  - [SMP-2979](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2565) : Add displayHeader to upgrade script
+  - [SMP-2999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2578) : Fix double order creation
 
 ## Version 4.13.0
 - Feature :
