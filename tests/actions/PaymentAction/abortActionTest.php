@@ -74,6 +74,7 @@ class abortActionTest extends BasePaymentAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'inst_azerty12345',
+                'is_live' => true,
                 'method' => 'installmnent',
                 'id_cart' => 42,
                 'cart_hash' => '4cbaebd7df677672ac3d571012ea0498129a5314271b0c38603c66425560bf43',
@@ -153,6 +154,7 @@ class abortActionTest extends BasePaymentAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'inst_azerty12345',
+                'is_live' => true,
                 'method' => 'installmnent',
                 'id_cart' => 42,
                 'cart_hash' => '4cbaebd7df677672ac3d571012ea0498129a5314271b0c38603c66425560bf43',

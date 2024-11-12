@@ -41,6 +41,7 @@ class PaymentAction
         'satispay',
         'standard',
     ];
+    private $context;
     private $dependencies;
     private $logger;
     private $plugin;
@@ -509,6 +510,152 @@ class PaymentAction
     }
 
     /**
+     * @description Refund a payment resource
+     *
+     * @param string $resource_id
+     * @param int $amount
+     * @param int $id_customer
+     * @param int $id_order
+     * @param bool $update_order_state
+     *
+     * @return array
+     */
+    public function refundAction($resource_id = '', $amount = 0, $id_customer = 0, $id_order = 0, $update_order_state = false)
+    {
+        $this->setParameters();
+
+        $translations = $this->plugin
+            ->getTranslationClass()
+            ->getRefundTranslations();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentAction::refundAction - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'result' => false,
+                'message' => $translations['error']['default'],
+            ];
+        }
+
+        if (!is_int($amount) || !$amount) {
+            $this->logger->addLog('PaymentAction::refundAction - Invalid argument, $amount must be a non null integer.', 'error');
+
+            return [
+                'result' => false,
+                'message' => $translations['error']['default'],
+            ];
+        }
+
+        if (!is_int($id_customer) || !$id_customer) {
+            $this->logger->addLog('PaymentAction::refundAction - Invalid argument, $id_customer must be a non null integer.', 'error');
+
+            return [
+                'result' => false,
+                'message' => $translations['error']['default'],
+            ];
+        }
+
+        if (!is_int($id_order) || !$id_order) {
+            $this->logger->addLog('PaymentAction::refundAction - Invalid argument, $id_order must be a non null integer.', 'error');
+
+            return [
+                'result' => false,
+                'message' => $translations['error']['default'],
+            ];
+        }
+
+        if (!is_bool($update_order_state)) {
+            $this->logger->addLog('PaymentAction::refundAction - Invalid argument, $update_order_state must be valid boolean.', 'error');
+
+            return [
+                'result' => false,
+                'message' => $translations['error']['default'],
+            ];
+        }
+
+        // Get the stored resource
+        $stored_resource = $this->plugin
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+        if (empty($stored_resource)) {
+            $this->logger->addLog('PaymentAction::refundAction - No stored payment found for given resource ID.', 'error');
+
+            return [
+                'result' => false,
+                'message' => $translations['error']['default'],
+            ];
+        }
+
+        $payment_method = $this->plugin
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method']);
+
+        // Get the refundable amount for the getted resource ID
+        $refundable_amount = $payment_method->getRefundableAmount($stored_resource['resource_id']);
+
+        // Check if given amount to refund is valid
+        $is_refundable_amount = $this->dependencies->getValidators()['payment']->isRefundableAmount(
+            (int) $amount,
+            (int) $refundable_amount
+        );
+        if (!$is_refundable_amount['result']) {
+            $this->logger->addLog('PaymentAction::refundAction - ' . $translations['error'][$is_refundable_amount['code']], 'error');
+
+            return [
+                'result' => false,
+                'message' => $translations['error'][$is_refundable_amount['code']],
+            ];
+        }
+
+        $metadata = [
+            'ID Client' => (int) $id_customer,
+            'reason' => 'Refunded with Prestashop',
+        ];
+
+        $refund = $payment_method->refund($resource_id, $amount, $metadata);
+        if (!$refund['result']) {
+            return [
+                'result' => false,
+                'message' => $translations['error']['default'],
+            ];
+        }
+
+        // Get the remaining amount to check if the resource is fully refund
+        $remaining_refundable_amount = $payment_method->getRefundableAmount($stored_resource['resource_id']);
+        $refunded_amount = $payment_method->getRefundedAmount($stored_resource['resource_id']);
+
+        // If there is no remain amount, and so we considere the resource fully refund, or $update_order_state is true
+        // and a refund has been done
+        // then we update the current order
+        $reload = false;
+        $refund_error = isset($refund['resource']->object) && 'error' == $refund['resource']->object;
+        if ((!$remaining_refundable_amount || $update_order_state) && !$refund_error) {
+            $state_addons = $refund['resource']->is_live ? '' : '_test';
+            $new_state = (int) $this->plugin->getConfigurationClass()->getValue('order_state_refund' . $state_addons);
+            $order = $this->plugin
+                ->getOrder()
+                ->get((int) $id_order);
+
+            if ($this->plugin->getValidate()->validate('isLoadedObject', $order)) {
+                $reload = $this->plugin
+                    ->getOrderClass()
+                    ->updateOrderState($order, $new_state);
+            } else {
+                $this->logger->addLog('PaymentAction::refundAction - The related Order object is not valid.', 'error');
+            }
+        }
+
+        return [
+            'result' => true,
+            'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount),
+            'template' => $this->renderTemplate($id_order),
+            'message' => $translations['success'],
+            'modal' => $refund_error ? $this->renderModalTemplate() : '',
+            'reload' => $reload,
+        ];
+    }
+
+    /**
      * @description Process on the removal of a payment
      *
      * @param string $resource_id
@@ -611,28 +758,46 @@ class PaymentAction
     }
 
     /**
+     * @description Render the refund modal template
+     *
+     * @return string
+     */
+    public function renderModalTemplate()
+    {
+        $this->setParameters();
+        $external_url = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl($this->context->language->iso_code);
+        $this->context->smarty->assign([
+            'support_page_url' => $external_url['default'],
+        ]);
+
+        return $this->dependencies->configClass->fetchTemplate('/views/templates/admin/modal/refund.tpl');
+    }
+
+    /**
      * @description display payment errors
      *
-     * @param $errors
+     * @param array $errors
      *
-     * @return bool
+     * @return string
      */
-    public function renderPaymentErrors($errors)
+    public function renderPaymentErrors($errors = [])
     {
-        if (empty($errors)) {
-            return false;
-        }
+        $this->setParameters();
 
-        $context = $this->dependencies->getPlugin()->getContext()->get();
+        if (!is_array($errors) || empty($errors)) {
+            return '';
+        }
 
         $formated = [];
         $with_msg_button = false;
 
         foreach ($errors as $error) {
             if (false !== strpos($error, 'oney_required_field')) {
-                $context->getContext()->smarty->assign(['is_popin_tpl' => true]);
-                $formated[] = $this->dependencies
-                    ->getPlugin()
+                $this->context->smarty->assign(['is_popin_tpl' => true]);
+                $formated[] = $this->plugin
                     ->getOneyAction()
                     ->renderRequiredFields($error);
             } else {
@@ -644,7 +809,7 @@ class PaymentAction
             }
         }
 
-        $context->getContext()->smarty->assign([
+        $this->context->smarty->assign([
             'is_error_message' => true,
             'messages' => $formated,
             'with_msg_button' => $with_msg_button,
@@ -654,12 +819,66 @@ class PaymentAction
     }
 
     /**
+     * @description Render the refund data
+     *
+     * @param int $amount_refunded_payplug
+     * @param int $amount_available
+     *
+     * @return string
+     */
+    public function renderRefundData($amount_refunded_payplug = 0, $amount_available = 0)
+    {
+        $this->setParameters();
+
+        if (!is_int($amount_refunded_payplug)) {
+            $this->logger->addLog('PaymentAction::renderRefundData - Invalid argument, $amount_refunded_payplug must be a valid integer.', 'error');
+
+            return '';
+        }
+
+        if (!is_int($amount_available)) {
+            $this->logger->addLog('PaymentAction::renderRefundData - Invalid argument, $amount_available must be a valid integer.', 'error');
+
+            return '';
+        }
+
+        $this->context->smarty->assign([
+            'amount_refunded_payplug' => $this->dependencies->getHelpers()['amount']->convertAmount($amount_refunded_payplug, true),
+            'amount_available' => $this->dependencies->getHelpers()['amount']->convertAmount($amount_available, true),
+        ]);
+
+        return $this->dependencies->configClass->fetchTemplate('/views/templates/admin/order/refund_data.tpl');
+    }
+
+    /**
+     * @description Render the order template
+     *
+     * @param int $id_order
+     *
+     * @return string
+     */
+    public function renderTemplate($id_order = 0)
+    {
+        $this->setParameters();
+
+        if (!is_int($id_order) || !$id_order) {
+            $this->logger->addLog('PaymentAction::renderTemplate - Invalid argument, $id_order must be a non null integer.', 'error');
+
+            return '';
+        }
+
+        return $this->dependencies->hookClass->displayAdminOrderMain(['id_order' => $id_order]);
+    }
+
+    /**
      * @description Set needed object from dependencies
      */
     private function setParameters()
     {
         $this->plugin = $this->plugin ?: $this->dependencies
             ->getPlugin();
+        $this->context = $this->context ?: $this->plugin
+            ->getContext()->get();
         $this->logger = $this->logger ?: $this->plugin
             ->getLogger();
     }

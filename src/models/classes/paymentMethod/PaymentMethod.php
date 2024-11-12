@@ -548,6 +548,79 @@ class PaymentMethod
     }
 
     /**
+     * @description Get the current payment status
+     *
+     * @param null $resource
+     *
+     * @return array
+     * @todo: add coverage to this method
+     */
+    public function getPaymentStatus($resource = null)
+    {
+        $this->setParameters();
+
+        if (!is_object($resource) || !$resource) {
+            $this->logger->addLog('PaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
+
+            return [];
+        }
+
+        if ((bool) $resource->failure) {
+            if ('aborted' == $resource->failure->code) {
+                return [
+                    'id_status' => 7,
+                    'code' => 'cancelled',
+                ];
+            } elseif ('timeout' == $resource->failure->code) {
+                return [
+                    'id_status' => 11,
+                    'code' => 'abandoned',
+                ];
+            }
+
+            return [
+                'id_status' => 3,
+                'code' => 'failed',
+            ];
+        }
+
+        if ((bool) $resource->is_refunded) {
+            return [
+                'id_status' => 5,
+                'code' => 'refunded',
+            ];
+        }
+
+        if (0 < (int) $resource->amount_refunded) {
+            return [
+                'id_status' => 4,
+                'code' => 'partially_refunded',
+            ];
+        }
+
+        // todo : we should use OneyPaymentMethod::getPaymentStatus() to defined this state
+        if (isset($resource->payment_method['is_pending'])
+            && (bool) $resource->payment_method['is_pending']) {
+            return [
+                'id_status' => 10,
+                'code' => 'oney_pending',
+            ];
+        }
+
+        if ((bool) $resource->is_paid) {
+            return [
+                'id_status' => 2,
+                'code' => 'paid',
+            ];
+        }
+
+        return [
+            'id_status' => 1,
+            'code' => 'not_paid',
+        ];
+    }
+
+    /**
      * @description Get the payment tab required to generate a resource payment.
      *
      * @return array
@@ -742,6 +815,62 @@ class PaymentMethod
         }
 
         return $payment_tab;
+    }
+
+    /**
+     * @description Get refundable amount for a given resource id.
+     *
+     * @param string $resource_id
+     *
+     * @return int
+     */
+    public function getRefundableAmount($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::getRefundableAmount - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return 0;
+        }
+
+        $retrieve = $this->retrieve($resource_id);
+        if (!$retrieve['result']) {
+            $this->logger->addLog('PaymentMethod::getRefundableAmount - Can\'t retrieve the resource for the given id', 'error');
+
+            return 0;
+        }
+
+        $resource = $retrieve['resource'];
+
+        return $resource->amount - $resource->amount_refunded;
+    }
+
+    /**
+     * @description Get refunded amount for a given resource id.
+     *
+     * @param string $resource_id
+     *
+     * @return int
+     */
+    public function getRefundedAmount($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::getRefundedAmount - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return 0;
+        }
+
+        $retrieve = $this->retrieve($resource_id);
+        if (!$retrieve['result']) {
+            $this->logger->addLog('PaymentMethod::getRefundedAmount - Can\'t retrieve the resource for the given id', 'error');
+
+            return 0;
+        }
+
+        return $retrieve['resource']->amount_refunded;
     }
 
     /**
@@ -1170,7 +1299,7 @@ class PaymentMethod
     public function set($key = '', $value = null)
     {
         if (!is_string($key) || !$key) {
-            $this->logger->addLog('PaymentMethod::getPaymentMethod: Can\'t load option the name is missing.');
+            $this->logger->addLog('PaymentMethod::set - Can\'t load option the name is missing.');
 
             return $this;
         }
@@ -1184,76 +1313,115 @@ class PaymentMethod
     }
 
     /**
-     * @description Get the current payment status
-     * @todo: add coverage to this method
+     * @description Refund the resource for a given resource id and amount
      *
-     * @param null $resource
+     * @param string $resource_id
+     * @param int $amount
+     * @param array $metadata
      *
      * @return array
      */
-    public function getPaymentStatus($resource = null)
+    public function refund($resource_id = '', $amount = 0, $metadata = [])
     {
         $this->setParameters();
 
-        if (!is_object($resource) || !$resource) {
-            $this->logger->addLog('PaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
-
-            return [];
-        }
-
-        if ((bool) $resource->failure) {
-            if ('aborted' == $resource->failure->code) {
-                return [
-                    'id_status' => 7,
-                    'code' => 'cancelled',
-                ];
-            } elseif ('timeout' == $resource->failure->code) {
-                return [
-                    'id_status' => 11,
-                    'code' => 'abandoned',
-                ];
-            }
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::refund - Invalid argument, $resource_id must be a non empty string.', 'error');
 
             return [
-                'id_status' => 3,
-                'code' => 'failed',
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
             ];
         }
 
-        if ((bool) $resource->is_refunded) {
+        if (!is_numeric($amount) || !$amount) {
+            $this->logger->addLog('PaymentMethod::refund - Invalid argument, $amount must be a non null integer.', 'error');
+
             return [
-                'id_status' => 5,
-                'code' => 'refunded',
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $amount must be a non null integer.',
             ];
         }
 
-        if (0 < (int) $resource->amount_refunded) {
+        if (!is_array($metadata) || empty($metadata)) {
+            $this->logger->addLog('PaymentMethod::refund - Invalid argument, $metadata must be a non empty array.', 'error');
+
             return [
-                'id_status' => 4,
-                'code' => 'partially_refunded',
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $metadata must be a non empty array.',
             ];
         }
 
-        // todo : we should use OneyPaymentMethod::getPaymentStatus() to defined this state
-        if (isset($resource->payment_method['is_pending'])
-            && (bool) $resource->payment_method['is_pending']) {
+        // Retrieve the resource
+        $retrieve = $this->retrieve($resource_id);
+        if (!$retrieve['result']) {
+            $this->logger->addLog('PaymentMethod::refund - The resource can\'t be retrieve.', 'error');
+
+            return $retrieve;
+        }
+
+        $resource = $retrieve['resource'];
+
+        // then check if the refund is paid
+        if (!$resource->is_paid) {
+            $this->logger->addLog('PaymentMethod::refund - Payment resource is not paid.', 'error');
+
             return [
-                'id_status' => 10,
-                'code' => 'oney_pending',
+                'code' => 500,
+                'result' => false,
+                'message' => 'Payment resource is not paid.',
             ];
         }
 
-        if ((bool) $resource->is_paid) {
+        // then check if the refund is already refund
+        if ($resource->is_refunded) {
+            $this->logger->addLog('PaymentMethod::refund - Payment resource is fully refund.', 'error');
+
             return [
-                'id_status' => 2,
-                'code' => 'paid',
+                'code' => 500,
+                'result' => false,
+                'message' => 'Payment resource is fully refund.',
             ];
         }
 
-        return [
-            'id_status' => 1,
-            'code' => 'not_paid',
-        ];
+        // then getted the truly refundable amount
+        $refundable_amount = (int) ($resource->amount - $resource->amount_refunded);
+        $truly_refundable_amount = min($amount, $refundable_amount);
+
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $is_live = !(bool) $configuration->getValue('sandbox_mode');
+        $api_service = $this->dependencies->getPlugin()->getApiService();
+
+        if ($resource->is_live != $is_live) {
+            $api_key = (bool) $resource->is_live
+                ? $configuration->getValue('live_api_key')
+                : $configuration->getValue('test_api_key');
+
+            $api_service->initialize($api_key);
+        }
+
+        // then we do the refund of the resource
+        $refund = $api_service->refundPayment(
+            $resource_id,
+            [
+                'amount' => $truly_refundable_amount,
+                'metadata' => $metadata,
+            ]
+        );
+
+        // then we reset the initial mode from configuration
+        if ($resource->is_live != $is_live) {
+            $api_key = (bool) $is_live
+                ? $configuration->getValue('live_api_key')
+                : $configuration->getValue('test_api_key');
+
+            $api_service->initialize($api_key);
+        }
+
+        return $refund;
     }
 
     /**
