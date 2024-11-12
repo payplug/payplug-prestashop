@@ -280,6 +280,89 @@ class InstallmentPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @description Get refundable amount for a given resource id.
+     *
+     * @param string $resource_id
+     *
+     * @return int
+     */
+    public function getRefundableAmount($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::getRefundableAmount - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return 0;
+        }
+
+        $retrieve = $this->retrieve($resource_id);
+        if (!$retrieve['result']) {
+            $this->logger->addLog('PaymentMethod::getRefundableAmount - Can\'t retrieve the resource for the given id', 'error');
+
+            return 0;
+        }
+
+        if (!isset($retrieve['schedule']) || empty($retrieve['schedule'])) {
+            $this->logger->addLog('PaymentMethod::getRefundableAmount - Can\'t retrieve the installment schedules', 'error');
+
+            return 0;
+        }
+
+        $amount = 0;
+        foreach ($retrieve['schedule'] as $schedule) {
+            if ($schedule['resource']) {
+                if ($schedule['resource']->is_paid && !$schedule['resource']->is_refunded) {
+                    $amount += $schedule['resource']->amount - $schedule['resource']->amount_refunded;
+                }
+            }
+        }
+
+        return (int) $amount;
+    }
+
+    /**
+     * @description Get refunded amount for a given resource id.
+     * todo: Add coverage to this method
+     *
+     * @param string $resource_id
+     *
+     * @return int
+     */
+    public function getRefundedAmount($resource_id = '')
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::getRefundedAmount - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return 0;
+        }
+
+        $retrieve = $this->retrieve($resource_id);
+        if (!$retrieve['result']) {
+            $this->logger->addLog('PaymentMethod::getRefundedAmount - Can\'t retrieve the resource for the given id', 'error');
+
+            return 0;
+        }
+
+        if (!isset($retrieve['schedule']) || empty($retrieve['schedule'])) {
+            $this->logger->addLog('PaymentMethod::getRefundedAmount - Can\'t retrieve the installment schedules', 'error');
+
+            return 0;
+        }
+
+        $amount = 0;
+        foreach ($retrieve['schedule'] as $schedule) {
+            if ($schedule['resource']) {
+                $amount += $schedule['resource']->amount_refunded;
+            }
+        }
+
+        return (int) $amount;
+    }
+
+    /**
      * @description Get the resource detail
      *
      * todo: add coverage to this method
@@ -505,6 +588,95 @@ class InstallmentPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @description Refund the resource for a given resource id and amount
+     *
+     * @param string $resource_id
+     * @param int $amount
+     * @param array $metadata
+     *
+     * @return array
+     */
+    public function refund($resource_id = '', $amount = 0, $metadata = [])
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentMethod::refund - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $resource_id must be a non empty string.',
+            ];
+        }
+
+        if (!is_numeric($amount) || !$amount) {
+            $this->logger->addLog('PaymentMethod::refund - Invalid argument, $amount must be a non null integer.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $amount must be a non null integer.',
+            ];
+        }
+
+        if (!is_array($metadata) || empty($metadata)) {
+            $this->logger->addLog('PaymentMethod::refund - Invalid argument, $metadata must be a non empty array.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Invalid argument, $metadata must be a non empty array.',
+            ];
+        }
+
+        // Retrieve the resource
+        $retrieve = $this->retrieve($resource_id);
+        if (!$retrieve['result']) {
+            $this->logger->addLog('PaymentMethod::refund - The resource can\'t be retrieve.', 'error');
+
+            return $retrieve;
+        }
+
+        $refundable_payments = [];
+        $payment_method_schedule = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod('standard');
+        foreach ($retrieve['schedule'] as $schedule) {
+            if ($schedule['resource']) {
+                $refund = $payment_method_schedule->refund($schedule['resource']->id, $amount, $metadata);
+                if ($refund['result']) {
+                    $amount -= (int) $refund['resource']->amount;
+                    $refundable_payments[] = $refund;
+                }
+            }
+        }
+
+        if (empty($refundable_payments)) {
+            $this->logger->addLog('PaymentMethod::refund - No refund executed for this installment plan.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'No refund executed for this installment plan.',
+            ];
+        }
+
+        if (!$this->updateInstallmentSchedules($retrieve)) {
+            $this->logger->addLog('PaymentMethod::refund - Can\'t update the schedule.', 'error');
+
+            return [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Can\'t update the schedule.',
+            ];
+        }
+
+        return reset($refundable_payments);
+    }
+
+    /**
      * @description Get the related schedule for a given installment plan retrieve
      *
      * @param array $retrieve
@@ -622,7 +794,7 @@ class InstallmentPaymentMethod extends PaymentMethod
      *
      * @param array $retrieve
      *
-     * @return false
+     * @return bool
      */
     public function updateInstallmentSchedules($retrieve = [])
     {

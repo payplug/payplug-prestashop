@@ -73,7 +73,26 @@ class AdminPayplugController extends ModuleAdminController
 
         if ($this->tools->tool('getValue', '_ajax')) {
             if ($this->tools->tool('getValue', 'refund')) {
-                $this->dependencies->refundClass->refundPayment();
+                $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
+                $amount_formated = is_numeric($amount)
+                    ? $this->dependencies->amountCurrencyClass->convertAmount($amount)
+                    : 0;
+                $resource_id = $this->tools->tool('getValue', 'resource_id');
+                $id_customer = $this->tools->tool('getValue', 'id_customer');
+                $id_order = $this->tools->tool('getValue', 'id_order');
+                $update_order_state = $this->tools->tool('getValue', 'update_order_state');
+                $refund = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentAction()
+                    ->refundAction(
+                        (string) $resource_id,
+                        (int) $amount_formated,
+                        (int) $id_customer,
+                        (int) $id_order,
+                        (bool) $update_order_state
+                    );
+
+                exit(json_encode($refund));
             }
             if ($this->tools->tool('getValue', 'capture')) {
                 $resource_id = $this->tools->tool('getValue', 'pay_id');

@@ -24,7 +24,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Go to the branch to rebase and update: " ${from}
-git checkout ${from} && git rebase origin/${target}
+git checkout ${from} && git pull && git rebase origin/${target}
 if [ $? -ne 0 ]; then
     echo "❌ An error occured during branch rebase, please merge conflict"
     exit
