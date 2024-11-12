@@ -3,6 +3,7 @@
 ## Version 4.14.2
 - Bugfix :
   - [SMP-3003](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2590) : Force resource creation if stored and selected payment method are not the same
+  - [SMP-3009](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2592) : Update upgrade script to fix column creation
 
 ## Version 4.14.1
 - Bugfix :
