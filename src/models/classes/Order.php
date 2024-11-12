@@ -176,15 +176,22 @@ class Order
         return true;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the used order states
+     *
+     * @param bool $is_live
+     *
+     * @return array
+     */
     public function getOrderStates($is_live = true)
     {
+        if (!is_bool($is_live)) {
+            return [];
+        }
+
         $configuration_class = $this->dependencies
             ->getPlugin()
             ->getConfigurationClass();
-        $configuration_adapter = $this->dependencies
-            ->getPlugin()
-            ->getConfiguration();
 
         $state_addons = $is_live ? '' : '_test';
 
@@ -194,11 +201,56 @@ class Order
             'error' => $configuration_class->getValue('order_state_error' . $state_addons),
             'expired' => $configuration_class->getValue('order_state_exp' . $state_addons),
             'oney_pg' => $configuration_class->getValue('order_state_oney_pg' . $state_addons),
-            'outofstock_paid' => $configuration_adapter->get('PS_OS_OUTOFSTOCK_PAID'),
-            'outofstock_unpaid' => $configuration_adapter->get('PS_OS_OUTOFSTOCK_UNPAID'),
+            'outofstock_paid' => $configuration_class->getValue('PS_OS_OUTOFSTOCK_PAID'),
+            'outofstock_unpaid' => $configuration_class->getValue('PS_OS_OUTOFSTOCK_UNPAID'),
             'paid' => $configuration_class->getValue('order_state_paid' . $state_addons),
             'pending' => $configuration_class->getValue('order_state_pending' . $state_addons),
             'refund' => $configuration_class->getValue('order_state_refund' . $state_addons),
         ];
+    }
+
+    /**
+     * @description Get total amount already refunded
+     *
+     * @param int $id_order
+     *
+     * @return int
+     */
+    public function getTotalRefunded($id_order = 0)
+    {
+        if (!$id_order || !is_int($id_order)) {
+            return 0;
+        }
+
+        $order = $this->dependencies
+            ->getPlugin()
+            ->getOrder()
+            ->get((int) $id_order);
+
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getValidate()
+            ->validate('isLoadedObject', $order)) {
+            return 0;
+        }
+
+        $amount_refunded_presta = 0;
+        $flag_shipping_refunded = false;
+
+        $order_slips = $this->dependencies
+            ->getPlugin()
+            ->getOrderSlip()
+            ->getOrdersSlip($order->id_customer, $order->id);
+        if (isset($order_slips) && !empty($order_slips) && sizeof($order_slips)) {
+            foreach ($order_slips as $order_slip) {
+                $amount_refunded_presta += $order_slip['amount'];
+                if (!$flag_shipping_refunded && 1 == $order_slip['shipping_cost']) {
+                    $amount_refunded_presta += $order_slip['shipping_cost_amount'];
+                    $flag_shipping_refunded = true;
+                }
+            }
+        }
+
+        return $amount_refunded_presta;
     }
 }

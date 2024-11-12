@@ -46,6 +46,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'inst_azerty1234',
+                'is_live' => true,
                 'method' => 'installment',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -71,6 +72,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'inst_azerty1234',
+                'is_live' => true,
                 'method' => 'installment',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -103,6 +105,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'inst_azerty1234',
+                'is_live' => true,
                 'method' => 'installment',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -148,6 +151,7 @@ class isValidResourceTest extends BaseInstallmentPaymentMethod
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'inst_azerty1234',
+                'is_live' => true,
                 'method' => 'installment',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',

@@ -54,6 +54,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -90,6 +91,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -132,6 +134,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -178,6 +181,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -232,6 +236,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -315,6 +320,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -389,6 +395,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -470,6 +477,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',
@@ -570,6 +578,7 @@ class createActionTest extends BaseOrderAction
             'getBy' => [
                 'id_payplug_payment' => 42,
                 'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
                 'method' => 'standard',
                 'id_cart' => 42,
                 'cart_hash' => 'cart-hash-azerty1234567',

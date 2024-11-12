@@ -176,9 +176,6 @@ class PluginEntity
     private $query_adapter;
 
     /** @var object */
-    private $refund_action;
-
-    /** @var object */
     private $cart_action;
 
     /** @var object */
@@ -733,14 +730,6 @@ class PluginEntity
     public function getQueueRepository()
     {
         return $this->queue_repository;
-    }
-
-    /**
-     * @return object
-     */
-    public function getRefundAction()
-    {
-        return $this->refund_action;
     }
 
     /**
@@ -1796,22 +1785,6 @@ class PluginEntity
         }
 
         $this->queue_repository = $queue_repository;
-
-        return $this;
-    }
-
-    /**
-     * @param object $refund_action
-     *
-     * @return self
-     */
-    public function setRefundAction($refund_action)
-    {
-        if (!is_object($refund_action)) {
-            throw new BadParameterException('Invalid argument, $refund_action must be a RefundAction');
-        }
-
-        $this->refund_action = $refund_action;
 
         return $this;
     }

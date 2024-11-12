@@ -171,7 +171,7 @@ var $document, $window, __moduleName__Module = {
             $('#pppanel form p.ppsuccess').hide();
 
             if ($('#pppanel input[name=change_order_state]').is(":checked")) {
-                data['id_state'] = $('#pppanel input[name=change_order_state]').val();
+                data['update_order_state'] = true;
             }
 
             $.ajax({
@@ -196,11 +196,19 @@ var $document, $window, __moduleName__Module = {
                     $('input[name=submit__moduleName__Refund]').prop("disabled", false);
                 },
                 success: function (result) {
-                    if (result.status == 'error') {
-                        $('#pppanel form p.pperror').html(result.data)
+                    if (!result.result) {
+                        $('#pppanel form p.pperror').html(result.message)
                             .removeClass('hide')
                             .show();
-                    } else {
+                    }
+                    else if (result.modal) {
+                        var {popup} = __moduleName__Module;
+                        popup.set(result.modal);
+                    }
+                    else {
+
+
+                        //
                         $('.__moduleName__Order').replaceWith(result.template);
                         $('#pppanel form p.ppsuccess').html(result.message)
                             .removeClass('hide')
