@@ -24,13 +24,14 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_4_14_2($object)
+function upgrade_module_4_14_1($object)
 {
     $flag = true;
 
     $logger = $object->module->getPlugin()->getLogger();
-    $logger->addLog('Start upgrade script 4.14.2');
+    $logger->addLog('Start upgrade script 4.14.1');
 
+    // If exception is thrown or the table is not altered, we just log the event
     try {
         $sql = 'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_payment`
                 ADD COLUMN `is_live` TINYINT(1) NOT NULL DEFAULT 1
@@ -43,7 +44,27 @@ function upgrade_module_4_14_2($object)
         $logger->addLog($e->getMessage(), 'error');
     }
 
-    $logger->addLog('End upgrade script 4.14.2, result: ' . ($flag ? 'ok' : 'ko'));
+    $flag = $flag && Configuration::updateValue('PAYPLUG_CLIENT_DATA', '{}');
+
+    $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
+    if (isset($payment_methods['sofort'])) {
+        unset($payment_methods['sofort']);
+    }
+    $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
+
+    $countries = json_decode(Configuration::get('PAYPLUG_COUNTRIES'), true);
+    if (isset($countries['sofort'])) {
+        unset($countries['sofort']);
+    }
+    $flag = $flag && Configuration::updateValue('PAYPLUG_COUNTRIES', json_encode($countries));
+
+    $amounts = json_decode(Configuration::get('PAYPLUG_AMOUNTS'), true);
+    if (isset($amounts['sofort'])) {
+        unset($amounts['sofort']);
+    }
+    $flag = $flag && Configuration::updateValue('PAYPLUG_AMOUNTS', json_encode($amounts));
+
+    $logger->addLog('End upgrade script 4.14.1, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;
 }
