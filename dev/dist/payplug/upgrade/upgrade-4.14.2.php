@@ -35,11 +35,31 @@ function upgrade_module_4_14_2($object)
         $sql = 'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_payment`
                 ADD COLUMN `is_live` TINYINT(1) NOT NULL DEFAULT 1
                 AFTER `resource_id`';
-        $flag = $flag && Db::getInstance()->execute($sql);
+        Db::getInstance()->execute($sql);
     } catch (Exception $e) {
         $logger->addLog('An error occured while executing sql: ' . $sql, 'error');
         $logger->addLog($e->getMessage(), 'error');
     }
+
+    $flag = $flag && Configuration::updateValue('PAYPLUG_CLIENT_DATA', '{}');
+
+    $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
+    if (isset($payment_methods['sofort'])) {
+        unset($payment_methods['sofort']);
+    }
+    $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
+
+    $countries = json_decode(Configuration::get('PAYPLUG_COUNTRIES'), true);
+    if (isset($countries['sofort'])) {
+        unset($countries['sofort']);
+    }
+    $flag = $flag && Configuration::updateValue('PAYPLUG_COUNTRIES', json_encode($countries));
+
+    $amounts = json_decode(Configuration::get('PAYPLUG_AMOUNTS'), true);
+    if (isset($amounts['sofort'])) {
+        unset($amounts['sofort']);
+    }
+    $flag = $flag && Configuration::updateValue('PAYPLUG_AMOUNTS', json_encode($amounts));
 
     $logger->addLog('End upgrade script 4.14.2, result: ' . ($flag ? 'ok' : 'ko'));
 
