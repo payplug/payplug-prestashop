@@ -39,6 +39,50 @@ class Merchant
     }
 
     /**
+     * @description Generate JWT
+     *
+     * @param array $client_datas
+     *
+     * @return array
+     */
+    public function generateJWT($client_datas)
+    {
+        if (!is_array($client_datas) || empty($client_datas)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('Merchant::generateJWT - Invalid argument, $client_datas must be a non empty array.', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Wrong $client_datas given',
+            ];
+        }
+
+        $jwt = [];
+        foreach ($client_datas as $key => $data) {
+            $generated_jwt = $this->dependencies
+                ->getPlugin()
+                ->getApiService()
+                ->generateJWT($data['client_id'], $data['client_secret']);
+
+            if (!$generated_jwt['result']) {
+                return [
+                    'result' => false,
+                    'message' => 'Error during JWT generation',
+                ];
+            }
+
+            $jwt[$key] = $generated_jwt['data'];
+        }
+
+        return [
+            'result' => true,
+            'data' => $jwt,
+        ];
+    }
+
+    /**
      * @description Get client data for live and test mode
      *
      * @param string $session
@@ -125,6 +169,30 @@ class Merchant
         return $this->dependencies
             ->getPlugin()
             ->getConfigurationClass()
-            ->set('client_data', $client_data);
+            ->set('client_data', json_encode($client_data));
+    }
+
+    /**
+     * @description Register JWT got from API
+     *
+     * @param array $jwt
+     *
+     * @return bool
+     */
+    public function registerJWT($jwt = [])
+    {
+        if (!is_array($jwt) || empty($jwt)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('Merchant::registerJWT - Invalid argument, jwt must be an array.', 'error');
+
+            return false;
+        }
+
+        return $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->set('jwt', json_encode($jwt));
     }
 }
