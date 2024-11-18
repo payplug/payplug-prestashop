@@ -439,7 +439,13 @@ class OrderAction
         ];
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Render the order detail section
+     *
+     * @param int $order_id
+     *
+     * @return array
+     */
     public function renderDetail($order_id = 0)
     {
         $this->setParameters();
@@ -522,7 +528,10 @@ class OrderAction
 
         // Get the refund section
         if ($resource_detail['refund']['available']) {
-            $refunded_presta = $this->dependencies->refundClass->getTotalRefunded($order->id);
+            $refunded_presta = $this->dependencies
+                ->getPlugin()
+                ->getOrderClass()
+                ->getTotalRefunded($order->id);
             $amount_suggested = \min($refunded_presta, $resource_detail['refund']['available']) - $resource_detail['refund']['refunded'];
             $amount_suggested = \number_format((float) $amount_suggested, 2);
             $amount_suggested = 0 <= $amount_suggested ? $amount_suggested : 0;

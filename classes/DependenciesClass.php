@@ -58,7 +58,6 @@ class DependenciesClass
     public $paymentClass;
     public $payplugLock;
     public $version;
-    public $refundClass;
 
     private $classes;
     private $plugin;
@@ -95,7 +94,6 @@ class DependenciesClass
         $this->mediaClass = new MediaClass($this);
         $this->orderClass = new OrderClass($this);
         $this->paymentClass = new PaymentClass($this);
-        $this->refundClass = new RefundClass($this);
     }
 
     public function setPlugin($plugin)

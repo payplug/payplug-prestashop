@@ -34,7 +34,6 @@ class SatispayPaymentMethod extends PaymentMethod
         parent::__construct($dependencies);
         $this->name = 'satispay';
         $this->order_name = 'satispay';
-        $this->refundable = false;
         $this->cancellable = false;
     }
 

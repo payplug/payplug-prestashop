@@ -38,7 +38,6 @@ use PayPlug\src\actions\OrderAction;
 use PayPlug\src\actions\OrderStateAction;
 use PayPlug\src\actions\PaymentAction;
 use PayPlug\src\actions\QueueAction;
-use PayPlug\src\actions\RefundAction;
 use PayPlug\src\actions\ValidationAction;
 use PayPlug\src\application\adapter\AddressAdapter;
 use PayPlug\src\application\adapter\AssignAdapter;
@@ -101,7 +100,6 @@ class PluginInit extends BaseClass
     private $order_action;
     private $order_state_action;
     private $queue_action;
-    private $refund_action;
     private $payment_action;
     private $validation_action;
 
@@ -246,7 +244,6 @@ class PluginInit extends BaseClass
             ->setOrderAction($this->order_action)
             ->setOrderStateAction($this->order_state_action)
             ->setPaymentAction($this->payment_action)
-            ->setRefundAction($this->refund_action)
             ->setQueueAction($this->queue_action)
             ->setValidationAction($this->validation_action)
         ;
@@ -295,7 +292,6 @@ class PluginInit extends BaseClass
         $this->order_state_action = new OrderStateAction($this->dependencies);
         $this->payment_action = new PaymentAction($this->dependencies);
         $this->queue_action = new QueueAction($this->dependencies);
-        $this->refund_action = new RefundAction($this->dependencies);
         $this->validation_action = new ValidationAction($this->dependencies);
     }
 
