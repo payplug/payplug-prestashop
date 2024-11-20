@@ -69,6 +69,33 @@ check_php_version:
   allow_failure:
     exit_codes: 126
 
+generate_changelog:
+  stage: pre_build
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git
+    - wget -O /tmp/git-chglog_0.15.4_linux_amd64.tar.gz https://github.com/git-chglog/git-chglog/releases/download/v0.15.4/git-chglog_0.15.4_linux_amd64.tar.gz
+    - tar -zxvf /tmp/git-chglog_0.15.4_linux_amd64.tar.gz git-chglog > ./git-chglog
+
+  script:
+#    - git config --global user.email "ci@example.com"
+#    - git config --global user.name "CI Bot"
+#    - git remote set-url --push origin "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+
+    - ./git-chglog 4.14.0..4.14.4 > CHANGELOG.md
+#    - ./git-chglog 4.14.0..4.14.4
+#    - git add changelog.md
+#    - git commit --amend --no-edit
+#    - echo ${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+#    - echo $CI_COMMIT_REF_NAME
+#    - git push origin HEAD:$CI_COMMIT_REF_NAME
+    - cat CHANGELOG.md
+  artifacts:
+    paths:
+      - CHANGELOG.md
+  only:
+    - merge_requests
+
 test_php_unit:
   image: docker.io/php:7.2.1
   stage: pre_build
