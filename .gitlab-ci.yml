@@ -87,6 +87,24 @@ check_php_version:
   allow_failure:
     exit_codes: 126
 
+generate_changelog:
+  stage: pre_build
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git
+    - wget -O /usr/local/bin/git-chglog https://github.com/git-chglog/git-chglog/releases/download/v0.15.4/git-chglog_0.15.4_linux_amd64.tar.gz
+    - tar -xzf /tmp/git-chglog.tar.gz -C /usr/local/bin
+    - chmod +x /usr/local/bin/git-chglog
+  script:
+    - git config --global user.email "ci@example.com"
+    - git config --global user.name "CI Bot"
+    - git-chglog -o changelog.md
+    - git add changelog.md
+    - git commit --amend --no-edit
+    - git push origin HEAD:$(CI_COMMIT_REF_NAME)
+  only:
+    - merge_requests
+
 test_php_unit:
   image: docker.io/php:7.2.1
   stage: pre_build
