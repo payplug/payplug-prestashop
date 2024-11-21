@@ -430,7 +430,7 @@ class ConfigurationAction
             ];
         }
 
-        $password = base64_decode($datas->payplug_password);
+        $password = utf8_encode(base64_decode($datas->payplug_password));
         $is_valid_password = $this->dependencies
             ->getValidators()['account']
             ->isPassword($password)['result'];
