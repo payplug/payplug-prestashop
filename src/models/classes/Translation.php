@@ -577,6 +577,22 @@ class Translation
     /**
      * @return array
      */
+    public function getRefundTranslations()
+    {
+        return [
+            'error' => [
+                'format' => $this->l('refund.error.format', 'translation'),
+                'lower' => $this->l('refund.error.lower', 'translation'),
+                'upper' => $this->l('refund.error.upper', 'translation'),
+                'default' => $this->l('refund.error.default', 'translation'),
+            ],
+            'success' => $this->l('refund.success', 'translation'),
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getRequirementsTranslations()
     {
         return [
