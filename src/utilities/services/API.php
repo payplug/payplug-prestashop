@@ -367,6 +367,56 @@ class API
     }
 
     /**
+     * @description Generate the JWT from API
+     *
+     * @param string $client_id
+     * @param string $client_secret
+     *
+     * @return array
+     */
+    public function generateJWT($client_id = '', $client_secret = '')
+    {
+        if (!is_string($client_id) || !$client_id) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $client_id given',
+            ];
+        }
+
+        if (!is_string($client_secret) || !$client_secret) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $client_secret given',
+            ];
+        }
+
+        try {
+            if (!$this->api) {
+                $this->api = Payplug::init([
+                    'secretKey' => base64_encode($client_id . ':' . $client_secret),
+                    'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
+                ]);
+            }
+
+            $response = [
+                'result' => true,
+                'code' => 200,
+                'data' => Authentication::generateJWT($client_id),
+            ];
+        } catch (\Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int) $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
      * @description Get account permission from Payplug API
      *
      * @param $api_key

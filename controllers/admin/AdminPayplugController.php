@@ -32,7 +32,9 @@ class AdminPayplugController extends ModuleAdminController
 {
     private $dependencies;
     private $api_rest;
+    private $configuration;
     private $constant;
+    private $logger;
     private $media;
     private $tools;
 
@@ -44,7 +46,9 @@ class AdminPayplugController extends ModuleAdminController
 
         $this->dependencies = new DependenciesClass();
         $this->api_rest = $this->dependencies->getPlugin()->getApiRestClass();
+        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
+        $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
@@ -66,6 +70,13 @@ class AdminPayplugController extends ModuleAdminController
             $client_data = $merchant->getClientData($session, $company_id);
             if ($client_data['result']) {
                 $merchant->registerClientData($client_data['data']);
+
+                $storedJWT = $this->configuration->getValue('jwt');
+
+                if (!$storedJWT) {
+                    $jwt = $merchant->generateJWT($client_data['data']);
+                    $merchant->registerJWT($jwt['data']);
+                }
             }
         }
 
