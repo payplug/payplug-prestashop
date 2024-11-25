@@ -62,9 +62,9 @@ class ConfigurationAction
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         if ($sandbox_mode) {
-            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount($configuration->getValue('test_api_key'), true);
+            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $configuration->getValue('test_api_key'), true);
         } else {
-            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount($configuration->getValue('live_api_key'), false);
+            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $configuration->getValue('live_api_key'), false);
         }
 
         $allowed_methods = [
@@ -467,7 +467,7 @@ class ConfigurationAction
         $permissions = $this->dependencies
             ->getPlugin()
             ->getApiService()
-            ->getAccount($configuration->getValue('live_api_key'), false);
+            ->getAccount((string) $configuration->getValue('live_api_key'), false);
 
         if (empty($permissions)) {
             $logger->addLog('ConfigurationAction::loginAction: No permissions found for this account');

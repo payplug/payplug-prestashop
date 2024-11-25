@@ -302,7 +302,7 @@ class ApiRest
             ->getConfigurationClass();
 
         $live_api_key = $configuration->getValue('live_api_key');
-        $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount($live_api_key, false);
+        $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $live_api_key, false);
         if (!$permissions) {
             return [];
         }

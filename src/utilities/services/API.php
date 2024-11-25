@@ -377,7 +377,7 @@ class API
      */
     public function getAccount($api_key = '', $sandbox = true, $treat_account = true)
     {
-        if (!is_string($api_key) || !$api_key) {
+        if (!is_string($api_key)) {
             return [];
         }
         if (!is_bool($sandbox)) {

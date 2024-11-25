@@ -304,7 +304,7 @@ class ConfigClass
         $permissions = $this->module
             ->getPlugin()
             ->getApiService()
-            ->getAccount($api_key, false);
+            ->getAccount((string) $api_key, false);
 
         // in case if API is not available or not returning permissions
         if (empty($permissions)) {
@@ -470,7 +470,7 @@ class ConfigClass
     public function getLivePermissions()
     {
         $live_api_key = $this->configuration->getValue('live_api_key');
-        $livepermissions = $this->dependencies->getPlugin()->getApiService()->getAccount($live_api_key);
+        $livepermissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $live_api_key);
 
         return $livepermissions ? $livepermissions : [];
     }
