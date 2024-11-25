@@ -3,6 +3,7 @@
 ## Version 4.15.0
 - Feature :
   - [PRE-2673](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2594): Allow refund for PPRO payment resource
+  - [PRE-2600](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2601): Save JWT informations
 
 ## Version 4.14.3
 - Bugfix :

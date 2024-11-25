@@ -1,8 +1,6 @@
 <?php
 
-namespace PayPlug\tests\models\classes\Address;
-
-use PayPlug\tests\models\classes\Merchant\BaseMerchant;
+namespace PayPlug\tests\models\classes\Merchant;
 
 /**
  * @group unit

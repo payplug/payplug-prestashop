@@ -132,6 +132,12 @@ class Configuration
             'defaultValue' => 3,
             'setConf' => 1,
         ],
+        'jwt' => [
+            'type' => 'string',
+            'name' => 'JWT',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'keep_cards' => [
             'type' => 'integer',
             'name' => 'KEEP_CARDS',
