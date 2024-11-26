@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.14.4
+- Bugfix :
+  - [SMP-3018](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2602) :Fix return notification if notification resource has failure
+
 ## Version 4.14.3
 - Bugfix :
   - [SMP-3017](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2600) :Fix permissions got when merchant has no live api key + Fix password encodage
