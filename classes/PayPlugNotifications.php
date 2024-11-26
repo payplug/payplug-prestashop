@@ -302,6 +302,11 @@ class PayPlugNotifications
                 ->initialize($this->api_key);
             $this->resource = Notification::treat($body);
 
+            if (isset($this->resource->failure->code)) {
+                $this->logger->addLog('Given payment has a failure and should not be treated: ' . $this->resource->id);
+                $this->exitProcess('Given payment has a failure and should not be treated: ' . $this->resource->id, 200);
+            }
+
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
         } catch (UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), 500);
@@ -508,26 +513,9 @@ class PayPlugNotifications
     private function setCartFromResource()
     {
         $this->logger->addLog('Notification: setCartFromResource');
-        $resource_id = isset($this->resource->installment_plan_id) && $this->resource->installment_plan_id
-            ? $this->resource->installment_plan_id
-            : $this->resource->id;
-        $payment = $this->dependencies
-            ->getPlugin()
-            ->getPaymentRepository()
-            ->getBy('resource_id', $resource_id);
-        if (empty($payment)) {
-            if (isset($this->resource->failure->code) && 'timeout' == $this->resource->failure->code) {
-                $this->logger->addLog('Payment timeout for payment ID: ' . $this->resource->id);
-                $this->exitProcess('Payment timeout for payment ID: ' . $this->resource->id, 200);
-            }
-
-            $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-            $this->exitProcess($error_msg, $this->is_oney ? 242 : 500);
-        }
-
-        $this->cart = $this->cartAdapter->get((int) $payment['id_cart']);
+        $this->cart = $this->cartAdapter->get((int) $this->stored_resource['id_cart']);
         if (!$this->validateAdapter->validate('isLoadedObject', $this->cart)) {
-            $this->logger->addLog('The cart cannot be loaded with id ' . $payment['id_cart'], 'error');
+            $this->logger->addLog('The cart cannot be loaded with id ' . $this->stored_resource['id_cart'], 'error');
             $this->exitProcess('The cart cannot be loaded.', 500);
         }
     }
@@ -684,6 +672,11 @@ class PayPlugNotifications
             $payment_method = 'standard';
         } else {
             $payment_method = $this->stored_resource['method'];
+        }
+
+        if (empty($this->stored_resource)) {
+            $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
+            $this->exitProcess($error_msg, 'oney' == $payment_method ? 242 : 500);
         }
 
         $retrieve = $this->dependencies
