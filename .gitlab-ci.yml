@@ -5,24 +5,6 @@ include:
     file:
       - "ci/ci.gitlab-ci.yml"
 
-# Override the default value from
-# https://gitlab.com/dalenys/public/cicd-pipelines/gitlab-ci-template/-/blob/ebb84efb5593e73c45d9481cdfec23779d2c0eb9/src/ci/workflow-job.gitlab-ci.yml#L1-2
-workflow:
-  rules:
-    # Template project, content might not be valid yet
-    - if: $CI_PROJECT_NAMESPACE =~ /.*project-templates$/
-      when: never
-    # Draft mode
-    - if: $CI_MERGE_REQUEST_ID && $CI_MERGE_REQUEST_TITLE =~ /^draft:/i
-      variables:
-        CI_MERGE_REQUEST_DRAFT: "true" # https://gitlab.com/gitlab-org/gitlab/-/issues/275981
-    # Default branches, MR + master
-    - if: $CI_MERGE_REQUEST_ID
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_COMMIT_BRANCH == "develop" # Added for the project to manage the develop branch
-    # Cleanup scenario
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "master" && $CLEANUP_BRANCH
-
 .setup_version_scripts:
   parse_project_version:
     - export ARTIFACT_VERSION=$( jq -r '.version' dev/dist/payplug/composer.json )
@@ -266,7 +248,5 @@ trigger_release:
 variables:
   VERSION_FORMAT: "php"
   SEMANTIC_BRANCHES: "master_and_develop"
-  SONAR_SOURCE_FOLDER: "src"
-  SONAR_TEST_FOLDER: "tests"
   SONAR_ENABLED: "true"
   RUN_FOR_RELEASE: "false"
