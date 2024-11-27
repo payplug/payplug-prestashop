@@ -52,7 +52,7 @@ class refundActionTest extends BasePaymentAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'refund.error.default',
+                'message' => 'refund.error.format',
             ],
             $this->action->refundAction($resource_id, $this->amount, $this->id_customer, $this->id_order, $this->update_order_state)
         );
@@ -68,7 +68,7 @@ class refundActionTest extends BasePaymentAction
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'refund.error.default',
+                'message' => 'refund.error.format',
             ],
             $this->action->refundAction($this->resource_id, $amount, $this->id_customer, $this->id_order, $this->update_order_state)
         );
