@@ -179,10 +179,29 @@ package_and_publish:
       else
         cp payplug_qa_${ARTIFACT_VERSION}.zip payplug_qa_${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}.zip
       fi
+    - php-cgi -f ./dev/ci/prestashop_validator.php?modulePath=payplug_qa_${ARTIFACT_VERSION}.zip
   artifacts:
     paths:
       - payplug_*.zip
       - payplug_qa_*.zip
+
+#plugin_validator:
+#  image: docker.io/composer:1.9
+#  stage: publish
+#  tags:
+#    - general-retail-amd64
+#  before_script:
+#    - *inject_artefact_version
+#    - ./dev/ci/dist_files.sh -b payplug
+#    - rm -rf ./vendor
+#    - composer install --no-dev
+#  script:
+#    - *inject_artefact_version
+#    - php-cgi -f ./dev/ci/prestashop_validator.php modulePath=payplug_qa_${ARTIFACT_VERSION}.zip
+#  artifacts:
+#    paths:
+#      - payplug_*.zip
+#      - payplug_qa_*.zip
 
 run_test:
   image: docker.io/composer:1.9
