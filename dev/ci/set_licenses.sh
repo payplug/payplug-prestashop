@@ -15,8 +15,7 @@ echo "Looking for tag in ${branch}.php..."
 tag=`grep '$this->version =' ${branch}.php | sed -n "s/.*= '//p" | sed -n "s/';//p"`
 
 jsPath="./views/js/"
-#export jsFile="components"
-export jsFile="components psAccountsVue"
+export jsFile="front"
 
 licenseText="/**
   * 2013 - COPYRIGHT_YEAR PayPlug SAS
