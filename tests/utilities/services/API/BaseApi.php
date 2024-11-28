@@ -31,7 +31,7 @@ class BaseApi extends MockeryTestCase
 
     public function setUp()
     {
-        $this->plugin = Mockery::mock('Plugin');
+        $this->plugin = \Mockery::mock('Plugin');
         $this->plugin->shouldReceive([]);
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->name = 'payplug';

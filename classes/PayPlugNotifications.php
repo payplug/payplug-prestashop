@@ -291,15 +291,12 @@ class PayPlugNotifications
         }
 
         $is_live = isset($resource['is_live']) && $resource['is_live'];
-        $this->api_key = (bool) $is_live ?
-            $this->configuration->getValue('live_api_key') :
-            $this->configuration->getValue('test_api_key');
 
         try {
             $this->dependencies
                 ->getPlugin()
                 ->getApiService()
-                ->initialize($this->api_key);
+                ->initialize((bool) $is_live);
             $this->resource = Notification::treat($body);
 
             if (isset($this->resource->failure->code)) {
@@ -690,7 +687,7 @@ class PayPlugNotifications
             $this->dependencies
                 ->getPlugin()
                 ->getApiService()
-                ->initializeFromMode((bool) $this->sandbox);
+                ->initialize(!(bool) $this->sandbox);
             $this->payment = null;
         } else {
             $this->payment = $retrieve['resource'];

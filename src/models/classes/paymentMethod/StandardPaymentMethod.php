@@ -550,21 +550,14 @@ class StandardPaymentMethod extends PaymentMethod
         }
 
         // We retrieve the payment from the stored payment configuration
-        $api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
-            ? $this->configuration->getValue('live_api_key')
-            : $this->configuration->getValue('test_api_key');
-
-        $this->api_service->initialize($api_key);
+        $is_live = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live'];
+        $this->api_service->initialize((bool) $is_live);
         $retrieve = $this->api_service->retrievePayment($resource_id);
 
         // If we don't find the payment, for retrocompatibility we switch the mode then try again
         // This section could be removed for highter module version
         if (!$retrieve['result']) {
-            $reverse_api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
-                ? $this->configuration->getValue('test_api_key')
-                : $this->configuration->getValue('live_api_key');
-
-            $this->api_service->initialize($reverse_api_key);
+            $this->api_service->initialize(!(bool) $is_live);
             $retrieve = $this->api_service->retrievePayment($resource_id);
         }
 

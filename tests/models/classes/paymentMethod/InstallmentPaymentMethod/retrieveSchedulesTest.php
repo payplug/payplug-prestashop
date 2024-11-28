@@ -21,14 +21,6 @@ class retrieveSchedulesTest extends BaseInstallmentPaymentMethod
             ->shouldReceive('getValue')
             ->with('sandbox_mode')
             ->andReturn(true);
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('test_api_key')
-            ->andReturn('test_api_key');
-        $this->configuration
-            ->shouldReceive('getValue')
-            ->with('live_api_key')
-            ->andReturn('live_api_key');
         $this->api_service->shouldReceive([
             'initialize' => true,
         ]);

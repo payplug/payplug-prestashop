@@ -135,24 +135,17 @@ class PaymentMethod
         }
 
         // We retrieve the payment from the stored payment configuration
-        $api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
-            ? $this->configuration->getValue('live_api_key')
-            : $this->configuration->getValue('test_api_key');
-
-        $this->api_service->initialize($api_key);
+        $is_live = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live'];
+        $this->api_service->initialize((bool) $is_live);
         $is_installment = 'installment' == $stored_resource['method'];
         $abort = $is_installment
             ? $this->api_service->abortInstallment($resource_id)
             : $this->api_service->abortPayment($resource_id);
 
         // If we don't find the payment, for retrocompatibility we switch the mode then try again
-        // This section could be removed for next version
+        // Keep this code as long as the retrocompatibility is needed
         if (!$abort['result']) {
-            $reverse_api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
-                ? $this->configuration->getValue('test_api_key')
-                : $this->configuration->getValue('live_api_key');
-
-            $this->api_service->initialize($reverse_api_key);
+            $this->api_service->initialize(!(bool) $is_live);
             $abort = $is_installment
                 ? $this->api_service->abortInstallment($resource_id)
                 : $this->api_service->abortPayment($resource_id);
@@ -161,11 +154,7 @@ class PaymentMethod
         // Then retrieve the current mode from configuration
         $is_live = !(bool) $this->configuration->getValue('sandbox_mode');
         if ($stored_resource['is_live'] != $is_live) {
-            $api_key = (bool) $is_live
-                ? $this->configuration->getValue('live_api_key')
-                : $this->configuration->getValue('test_api_key');
-
-            $this->api_service->initialize($api_key);
+            $this->api_service->initialize((bool) $is_live);
         }
 
         return $abort;
@@ -208,32 +197,21 @@ class PaymentMethod
         }
 
         // We retrieve the payment from the stored payment configuration
-        $api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
-            ? $this->configuration->getValue('live_api_key')
-            : $this->configuration->getValue('test_api_key');
-
-        $this->api_service->initialize($api_key);
+        $is_live = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live'];
+        $this->api_service->initialize((bool) $is_live);
         $capture = $this->api_service->capturePayment($resource_id);
 
         // If we don't find the payment, for retrocompatibility we switch the mode then try again
-        // This section could be removed for next version
+        // Keep this code as long as the retrocompatibility is needed
         if (!$capture['result']) {
-            $reverse_api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
-                ? $this->configuration->getValue('test_api_key')
-                : $this->configuration->getValue('live_api_key');
-
-            $this->api_service->initialize($reverse_api_key);
+            $this->api_service->initialize(!(bool) $is_live);
             $capture = $this->api_service->capturePayment($resource_id);
         }
 
         // Then retrieve the current mode from configuration
         $is_live = !(bool) $this->configuration->getValue('sandbox_mode');
         if ($stored_resource['is_live'] != $is_live) {
-            $api_key = (bool) $is_live
-                ? $this->configuration->getValue('live_api_key')
-                : $this->configuration->getValue('test_api_key');
-
-            $this->api_service->initialize($api_key);
+            $this->api_service->initialize((bool) $is_live);
         }
 
         return $capture;
@@ -1396,11 +1374,7 @@ class PaymentMethod
         $api_service = $this->dependencies->getPlugin()->getApiService();
 
         if ($resource->is_live != $is_live) {
-            $api_key = (bool) $resource->is_live
-                ? $configuration->getValue('live_api_key')
-                : $configuration->getValue('test_api_key');
-
-            $api_service->initialize($api_key);
+            $api_service->initialize((bool) $resource->is_live);
         }
 
         // then we do the refund of the resource
@@ -1414,11 +1388,7 @@ class PaymentMethod
 
         // then we reset the initial mode from configuration
         if ($resource->is_live != $is_live) {
-            $api_key = (bool) $is_live
-                ? $configuration->getValue('live_api_key')
-                : $configuration->getValue('test_api_key');
-
-            $api_service->initialize($api_key);
+            $api_service->initialize((bool) $is_live);
         }
 
         return $refund;
@@ -1460,11 +1430,9 @@ class PaymentMethod
         }
 
         // We retrieve the payment from the stored payment configuration
-        $api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
-            ? $this->configuration->getValue('live_api_key')
-            : $this->configuration->getValue('test_api_key');
+        $is_live = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live'];
+        $this->api_service->initialize((bool) $is_live);
 
-        $this->api_service->initialize($api_key);
         $is_installment = 'installment' == $stored_resource['method'];
         $retrieve = $is_installment
             ? $this->api_service->retrieveInstallment($resource_id)
@@ -1473,11 +1441,7 @@ class PaymentMethod
         // If we don't find the payment, for retrocompatibility we switch the mode then try again
         // This section could be removed for highter module version
         if (!$retrieve['result']) {
-            $reverse_api_key = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live']
-                ? $this->configuration->getValue('test_api_key')
-                : $this->configuration->getValue('live_api_key');
-
-            $this->api_service->initialize($reverse_api_key);
+            $this->api_service->initialize(!(bool) $is_live);
             $retrieve = $is_installment
                 ? $this->api_service->retrieveInstallment($resource_id)
                 : $this->api_service->retrievePayment($resource_id);
@@ -1487,11 +1451,7 @@ class PaymentMethod
         if (!$is_installment) {
             $is_live = !(bool) $this->configuration->getValue('sandbox_mode');
             if ($stored_resource['is_live'] != $is_live) {
-                $api_key = (bool) $is_live
-                    ? $this->configuration->getValue('live_api_key')
-                    : $this->configuration->getValue('test_api_key');
-
-                $this->api_service->initialize($api_key);
+                $this->api_service->initialize((bool) $is_live);
             }
         }
 

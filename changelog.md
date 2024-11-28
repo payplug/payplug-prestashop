@@ -4,6 +4,8 @@
 - Feature :
   - [PRE-2673](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2594): Allow refund for PPRO payment resource
   - [PRE-2600](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2601): Save JWT informations
+  - [PRE-2601](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2584): Send JWT in api request
+
 - Bugfix :
   - [PRE-2687](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2605/diffs): Delete the usage of deprecated php function utf8_encode
   - [PRE-2688](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2608): Fix the refund error message + unit tests

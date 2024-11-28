@@ -437,7 +437,7 @@ class API
             return [];
         }
 
-        $this->api = $this->initialize($api_key);
+        $this->api = $this->initialize(!(bool) $sandbox);
         if (!$this->api) {
             return [];
         }
@@ -542,9 +542,11 @@ class API
         }
 
         try {
-            $api = $this->initialize();
+            if (!$this->api) {
+                $this->api = $this->initialize();
+            }
 
-            if (!$api) {
+            if (!$this->api) {
                 $response = [
                     'result' => false,
                     'code' => 500,
@@ -554,7 +556,7 @@ class API
                 $response = [
                     'result' => true,
                     'code' => 200,
-                    'resource' => OneySimulation::getSimulations($data, $api),
+                    'resource' => OneySimulation::getSimulations($data, $this->api),
                 ];
             }
         } catch (\Exception $e) {
@@ -591,26 +593,53 @@ class API
     /**
      * @description Initialize the api session
      *
-     * @param string $token
+     * @param bool $is_live
      *
-     * @return Payplug
+     * @return Payplug|null
      */
-    public function initialize($token = '')
+    public function initialize($is_live = null)
     {
-        if (!is_string($token)) {
-            return null;
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+
+        if (null === $is_live) {
+            $is_live = !(bool) $configuration->getValue('sandbox_mode');
         }
 
-        if (!$token && null != $this->getCurrentApiKey()) {
-            $token = $this->getCurrentApiKey();
-        }
+        $mode = $is_live ? 'live' : 'test';
+        $configuration_key = $mode . '_api_key';
+        $token = $configuration->getValue($configuration_key);
+        $jwt = json_decode($configuration->getValue('jwt'), true);
+        if ($jwt) {
+            $current_date = time();
+            if ($jwt[$mode]['expires_date'] < $current_date) {
+                $client_data = json_decode($configuration->getValue('client_data'), true);
 
-        if (!$token) {
-            return null;
+                // Renew the token
+                $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+                $merchant = $module->get('payplug.models.classes.merchant');
+
+                $jwt = $merchant->generateJWT($client_data);
+                if (!$jwt) {
+                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be generated');
+
+                    return null;
+                }
+
+                $renew = $merchant->registerJWT($jwt['data']);
+                if (!$renew) {
+                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be registered');
+
+                    return null;
+                }
+
+                $jwt = $jwt['data'];
+            }
+            $token = $jwt[$mode]['access_token'];
         }
 
         $this->current_api_key = $token;
-
         $this->setUserAgent();
 
         try {
@@ -619,32 +648,12 @@ class API
                 'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
             ]);
         } catch (\Exception $e) {
+            $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - API can\'t be setted');
+
             $this->api = null;
         }
 
         return $this->api;
-    }
-
-    /**
-     * @description set the api keys
-     *
-     * @param null $sandbox
-     *
-     * @return Payplug
-     */
-    public function initializeFromMode($sandbox = null)
-    {
-        if (null === $sandbox && $this->current_api_key) {
-            $payplug_key = $this->current_api_key;
-        } else {
-            $configuration_key = ($sandbox ? 'test' : 'live') . '_api_key';
-            $payplug_key = (bool) $this->dependencies
-                ->getPlugin()
-                ->getConfigurationClass()
-                ->getValue($configuration_key);
-        }
-
-        return $this->initialize($payplug_key);
     }
 
     /**
@@ -1000,9 +1009,9 @@ class API
         $configuration->set('test_api_key', $api_keys['test_key']);
         $configuration->set('live_api_key', $api_keys['live_key']);
 
-        $is_sandbox = (bool) $configuration->getValue('sandbox_mode');
+        $is_live = !(bool) $configuration->getValue('sandbox_mode');
 
-        return $this->initialize($api_keys[$is_sandbox ? 'test_key' : 'live_key']);
+        return $this->initialize($is_live);
     }
 
     /**
