@@ -167,10 +167,7 @@ class OneClickPaymentMethod extends PaymentMethod
         if (!is_string($resource_id) || !$resource_id) {
             $this->logger->addLog('OneClickPaymentMethod::getResourceDetail() - Invalid argument given, $resource_id must be a non empty string.');
 
-            return [
-                'result' => false,
-                'message' => 'Invalid argument, $resource_id must be a non empty string.',
-            ];
+            return [];
         }
 
         $retrieve = $this->retrieve($resource_id);

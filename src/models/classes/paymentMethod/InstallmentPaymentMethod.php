@@ -378,10 +378,7 @@ class InstallmentPaymentMethod extends PaymentMethod
         if (!is_string($resource_id) || !$resource_id) {
             $this->logger->addLog('InstallmentPaymentMethod::getResourceDetail - Invalid argument, $resource_id must be a non empty string.', 'error');
 
-            return [
-                'result' => false,
-                'message' => 'Invalid argument, $resource_id must be a non empty string.',
-            ];
+            return [];
         }
 
         $retrieve = $this->retrieve($resource_id);

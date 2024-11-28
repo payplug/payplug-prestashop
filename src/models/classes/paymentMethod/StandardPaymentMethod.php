@@ -409,9 +409,7 @@ class StandardPaymentMethod extends PaymentMethod
         if (!is_string($resource_id) || !$resource_id) {
             $this->logger->addLog('StandardPaymentMethod::getResourceDetail - Invalid argument, $resource_id must be a non empty string.', 'error');
 
-            return [
-                'result' => false,
-            ];
+            return [];
         }
 
         $retrieve = $this->retrieve($resource_id);

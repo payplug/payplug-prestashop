@@ -490,10 +490,15 @@ class PayPlugNotifications
             $this->logger->addLog('Current state: ' . $current_state);
 
             if ($current_state != $new_order_state) {
-                $this->dependencies
+                $update = $this->dependencies
                     ->getPlugin()
                     ->getOrderClass()
                     ->updateOrderState($this->order, (int) $new_order_state);
+                if (!$update) {
+                    $this->exitProcess('Order status can\'t be updated \'refunded\'');
+                }
+
+                $this->exitProcess('Order status is update with status \'refunded\'');
             } else {
                 $this->logger->addLog('Order status is already \'refunded\'');
                 $this->exitProcess('Order status is already \'refunded\'');

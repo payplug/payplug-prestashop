@@ -366,10 +366,7 @@ class OneyPaymentMethod extends PaymentMethod
         if (!is_string($resource_id) || !$resource_id) {
             $this->logger->addLog('OneyPaymentMethod::getResourceDetail() - Invalid argument given, $resource_id must be a non empty string.');
 
-            return [
-                'result' => false,
-                'message' => 'Invalid argument, $resource_id must be a non empty string.',
-            ];
+            return [];
         }
 
         $resource_details = parent::getResourceDetail($resource_id);
