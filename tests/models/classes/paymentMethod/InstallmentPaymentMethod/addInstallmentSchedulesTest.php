@@ -87,7 +87,9 @@ class addInstallmentSchedulesTest extends BaseInstallmentPaymentMethod
             'updateInstallmentSchedules' => true,
         ]);
         $this->payment_method->shouldReceive([
-            'getPaymentStatus' => 1,
+            'getPaymentStatus' => [
+                'id_status' => 1,
+            ],
         ]);
         $this->payment_repository->shouldReceive([
             'getBy' => [],
@@ -102,7 +104,9 @@ class addInstallmentSchedulesTest extends BaseInstallmentPaymentMethod
             'updateInstallmentSchedules' => true,
         ]);
         $this->payment_method->shouldReceive([
-            'getPaymentStatus' => 1,
+            'getPaymentStatus' => [
+                'id_status' => 1,
+            ],
         ]);
         $this->payment_repository->shouldReceive([
             'getBy' => [],

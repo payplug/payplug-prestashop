@@ -533,7 +533,7 @@ class PaymentAction
 
             return [
                 'result' => false,
-                'message' => $translations['error']['default'],
+                'message' => $translations['error']['format'],
             ];
         }
 
@@ -542,7 +542,7 @@ class PaymentAction
 
             return [
                 'result' => false,
-                'message' => $translations['error']['default'],
+                'message' => $translations['error']['format'],
             ];
         }
 

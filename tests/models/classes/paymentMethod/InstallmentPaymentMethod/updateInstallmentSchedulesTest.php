@@ -73,7 +73,9 @@ class updateInstallmentSchedulesTest extends BaseInstallmentPaymentMethod
     public function testWhenStoredInstallmentCantBeUpdated()
     {
         $this->payment_method->shouldReceive([
-            'getPaymentStatus' => 1,
+            'getPaymentStatus' => [
+                'id_status' => 1,
+            ],
         ]);
         $this->payment_repository->shouldReceive([
             'getBy' => [
@@ -89,7 +91,9 @@ class updateInstallmentSchedulesTest extends BaseInstallmentPaymentMethod
     public function testWhenStoredInstallmentIsUpdated()
     {
         $this->payment_method->shouldReceive([
-            'getPaymentStatus' => 1,
+            'getPaymentStatus' => [
+                'id_status' => 1,
+            ],
         ]);
         $this->payment_repository->shouldReceive([
             'getBy' => [
