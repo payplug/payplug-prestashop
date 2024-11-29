@@ -866,10 +866,7 @@ class PaymentMethod
         if (!is_string($resource_id) || !$resource_id) {
             $this->logger->addLog('PaymentMethod::getResourceDetail - Invalid argument, $resource_id must be a non empty string.', 'error');
 
-            return [
-                'result' => false,
-                'message' => 'Invalid argument, $resource_id must be a non empty string.',
-            ];
+            return [];
         }
         $retrieve = $this->retrieve($resource_id);
         if (!$retrieve['result']) {
@@ -885,6 +882,12 @@ class PaymentMethod
             $this->logger->addLog('PaymentMethod::getResourceDetail - Cannot define the resource status', 'error');
 
             return [];
+        }
+
+        // If status is refunded but order state is paid then update the current state
+        if ('refunded' == $status['code']) {
+            $order_id = $this->tools->tool('getValue', 'id_order');
+            $this->updateOrderState((int) $order_id, (bool) $resource->is_live);
         }
 
         // Define status translation
@@ -1460,6 +1463,68 @@ class PaymentMethod
                 ->getPaymentMethod($stored_resource['method'])
                 ->retrieveSchedules($retrieve)
             : $retrieve;
+    }
+
+    /**
+     * @description Update the order state if current state is refunded
+     *
+     * todo: add coverage to this method
+     *
+     * @param int $order_id
+     * @param bool $is_live
+     *
+     * @return bool
+     */
+    protected function updateOrderState($order_id = 0, $is_live = true)
+    {
+        $this->setParameters();
+
+        if (!is_int($order_id) || !$order_id) {
+            $this->logger->addLog('PaymentMethod::updateOrderState() - Invalid argument given, $order_id must be a non null integer.', 'error');
+
+            return false;
+        }
+
+        if (!is_bool($is_live)) {
+            $this->logger->addLog('PaymentMethod::updateOrderState() - Invalid argument given, $is_live must be a valid boolean.', 'error');
+
+            return false;
+        }
+
+        $order = $this->dependencies->getPlugin()
+            ->getOrder()
+            ->get((int) $order_id);
+
+        if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
+            $this->logger->addLog('PaymentMethod::updateOrderState() - Invalid argument given, $order getted must be a valid object.', 'error');
+
+            return false;
+        }
+
+        $state_addons = $is_live ? '' : '_test';
+        $paid_os = $this->configuration->getValue('order_state_paid' . $state_addons);
+
+        if ($order->getCurrentState() != $paid_os) {
+            return true;
+        }
+
+        $refund_os = $this->configuration->getValue('order_state_refund' . $state_addons);
+        $update_order_history = $this->dependencies
+            ->getPlugin()
+            ->getOrderClass()
+            ->updateOrderState($order, (int) $refund_os);
+
+        // If order history well update, then we force the reload
+        if (!$update_order_history) {
+            $this->logger->addLog('PaymentMethod::updateOrderState() - Failed to update order state', 'error');
+
+            return false;
+        }
+
+        $parameters = ['vieworder' => 1, 'id_order' => (int) $order->id];
+        $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
+
+        return $this->tools->tool('redirectAdmin', $link_order);
     }
 
     /**
