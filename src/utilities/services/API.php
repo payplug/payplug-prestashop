@@ -437,7 +437,7 @@ class API
             return [];
         }
 
-        $this->api = $this->initialize(!(bool) $sandbox);
+        $this->api = $this->initialize();
         if (!$this->api) {
             return [];
         }
