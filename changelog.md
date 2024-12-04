@@ -10,6 +10,7 @@
 - Bugfix :
   - [PRE-2687](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2605/diffs): Delete the usage of deprecated php function utf8_encode
   - [PRE-2688](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2608): Fix the refund error message + unit tests
+  - [PRE-2715](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2611/diffs): Fix login for non onborded account
 
 ## Version 4.14.4
 - Bugfix :
