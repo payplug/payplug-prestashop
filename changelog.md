@@ -12,6 +12,7 @@
   - [PRE-2642](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2618): Rename deprecated customerAccount hook name for Prestashop 1.7 and upper
   - [PRE-2004](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2628): remove cards template for ps1.6
   - [PRE-2745](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2624): Replace use of deprecated displayPrice by formatPrice for Oney CTA
+  - [PRE-2000](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2623): Remove obsolete oney method
 
 ## Version 4.16.0
 - Refactoring :
