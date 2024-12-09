@@ -48,8 +48,6 @@ class PrestashopAdapter16
     public function displayHeader()
     {
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addCSS($views_path . '/css/front_1_6-v' . $this->dependencies->version . '.css');
-        $this->context->controller->addJS($views_path . '/js/front_1_6-v' . $this->dependencies->version . '.js');
         $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
 
         \Media::addJsDef([

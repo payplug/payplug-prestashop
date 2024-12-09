@@ -31,10 +31,6 @@ const dir_path = path.join(__dirname, 'dev');
 const cssViewsFolder = 'css';
 const jsViewsFolder = 'js';
 
-const jsAtomsFolder = 'js/components/atoms';
-const jsMoleculesFolder = 'js/components/molecules';
-
-const dirJsFinalPath = 'views/js/';
 const dirViewsFinalPath = 'views/';
 
 const configuration = require('./composer.json');
@@ -54,6 +50,7 @@ function _getAllFilesFromFolder(dir)
     }
 
     if (!fs.existsSync(fullPath)) {
+        console.log("Missing path: " + fullPath);
         return;
     }
 
@@ -86,16 +83,6 @@ function _getAllFilesFromFolder(dir)
                 _getAllFilesFromFolder(filePath);
             } else {
                 switch (dir) {
-                    // compilation des fichiers "components" .js
-                    case jsAtomsFolder:
-                    case jsMoleculesFolder:
-                        if (typeof entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion] == 'undefined') {
-                            entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion] = [];
-                        }
-
-                        entryFiles['../' + dirJsFinalPath + 'components' + '-v' + moduleVersion].push(path.resolve(__dirname, filePath));
-                        break;
-
                     // compilation des fichiers .js
                     case jsViewsFolder:
                         entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, filePath);
@@ -107,8 +94,6 @@ function _getAllFilesFromFolder(dir)
 };
 
 _getAllFilesFromFolder(cssViewsFolder);
-_getAllFilesFromFolder(jsAtomsFolder);
-_getAllFilesFromFolder(jsMoleculesFolder);
 _getAllFilesFromFolder(jsViewsFolder);
 
 const loaders = [

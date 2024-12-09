@@ -4,6 +4,7 @@
 - Refactoring :
   - [PRE-1999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2615): Clean obsolete hook
   - [PRE-1998](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2613): Clean last PayPlugAjaxClass usage
+  - [PRE-1997](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2609): Remove obsolete front file
 
 ## Version 4.15.0
 - Feature :
