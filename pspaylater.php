@@ -136,21 +136,6 @@ class PsPaylater extends PaymentModule
     }
 
     /**
-     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
-     *
-     * @param $params   $this->setDependencies();
-     *
-     * @return mixed
-     */
-    public function hookActionAdminPerformanceControllerAfter($params)
-    {
-        // todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
-        if ($this->module) {
-            return $this->payplug_dependencies->hookClass->actionAdminPerformanceControllerAfter($params);
-        }
-    }
-
-    /**
      * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
      *
      * @param $params
@@ -297,32 +282,6 @@ class PsPaylater extends PaymentModule
                 ->getPlugin()
                 ->getOrderStateAction()
                 ->renderOption();
-        }
-    }
-
-    /**
-     * @param $params
-     *
-     * @return mixed
-     */
-    public function hookDisplayBackOfficeFooter($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->hookClass->displayBackOfficeFooter($params);
-        }
-    }
-
-    /**
-     * @description Display Oney CTA on Shopping cart page
-     *
-     * @param $params
-     *
-     * @return mixed
-     */
-    public function hookDisplayBeforeShoppingCartBlock($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->hookClass->displayBeforeShoppingCartBlock($params);
         }
     }
 
@@ -526,7 +485,6 @@ class PsPaylater extends PaymentModule
         return [
             'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
-            'actionAdminPerformanceControllerAfter',
             'actionCarrierUpdate',
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
@@ -539,8 +497,6 @@ class PsPaylater extends PaymentModule
             'actionUpdateLangAfter',
             'adminOrder',
             'displayAdminOrderMain',
-            'displayBackOfficeFooter',
-            'displayBeforeShoppingCartBlock',
             'displayExpressCheckout',
             'displayProductPriceBlock',
             'displayAdminStatusesForm',

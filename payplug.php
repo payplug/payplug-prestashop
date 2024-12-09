@@ -54,7 +54,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '4.15.0';
+        $this->version = '4.16.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -155,21 +155,6 @@ class Payplug extends PaymentModule
     {
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->actionAdminControllerSetMedia();
-        }
-    }
-
-    /**
-     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared.
-     *
-     * @param $params
-     *
-     * return bool
-     */
-    public function hookActionAdminPerformanceControllerAfter($params)
-    {
-        // todo: Rajouter le test de la table payplug cache avant d'executer ce code*/
-        if ($this->module) {
-            return $this->payplug_dependencies->hookClass->actionAdminPerformanceControllerAfter($params);
         }
     }
 
@@ -354,35 +339,6 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @param $params
-     *
-     * @return mixed
-     */
-    public function hookDisplayBackOfficeFooter($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->hookClass->displayBackOfficeFooter($params);
-        }
-    }
-
-    /**
-     * @description Display Oney CTA on Shopping cart page
-     *
-     * @param $params
-     *
-     * @return mixed
-     */
-    public function hookDisplayBeforeShoppingCartBlock($params)
-    {
-        if ($this->module) {
-            $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
-            if ((bool) $configuration->getValue('oney_cart_cta')) {
-                return $this->payplug_dependencies->hookClass->displayBeforeShoppingCartBlock($params);
-            }
-        }
-    }
-
-    /**
      * @description  display applepay button on product page
      *
      * @return mixed
@@ -453,20 +409,6 @@ class Payplug extends PaymentModule
     {
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->displayHeader($params);
-        }
-    }
-
-    /**
-     * @param $params
-     *
-     * @return mixed
-     *
-     * This hook is not used anymore in PS 1.7 but we have to keep it for retro-compatibility
-     */
-    public function hookPayment($params)
-    {
-        if ($this->module) {
-            return $this->payplug_dependencies->hookClass->payment($params);
         }
     }
 
@@ -649,7 +591,6 @@ class Payplug extends PaymentModule
         return [
             'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
-            'actionAdminPerformanceControllerAfter',
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
             'actionExportGDPRData',
@@ -661,14 +602,11 @@ class Payplug extends PaymentModule
             'adminOrder',
             'customerAccount',
             'displayAdminOrderMain',
-            'displayBackOfficeFooter',
-            'displayBeforeShoppingCartBlock',
             'displayExpressCheckout',
             'displayProductAdditionalInfo',
             'displayProductPriceBlock',
             'displayAdminStatusesForm',
             'displayHeader',
-            'payment',
             'paymentReturn',
             'paymentOptions',
         ];

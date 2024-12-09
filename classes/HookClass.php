@@ -101,19 +101,7 @@ class HookClass
     }
 
     /**
-     * @description Flush PayPlugCache (PS 1.6), when PrestaShop cache cleared
-     *
-     * @return bool
-     */
-    public function actionAdminPerformanceControllerAfter()
-    {
-        if ($this->sql->checkExistingTable($this->dependencies->name . '_cache', 1)) {
-            return $this->cache->flushCache();
-        }
-    }
-
-    /**
-     * @description Flush PayPlugCache (PS 1.7), when PrestaShop cache cleared
+     * @description Flush PayPlugCache, when PrestaShop cache cleared
      *
      * @return bool
      */
@@ -331,20 +319,6 @@ class HookClass
                     $module_url . 'views/js/utilities-v' . $this->dependencies->version . '.js',
                 ]);
             }
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function displayBackOfficeFooter()
-    {
-        if (\version_compare(_PS_VERSION_, '1.6.1.0', '<')) {
-            $this->assign->assign([
-                'js_def' => $this->media->getJsDef(),
-            ]);
-
-            return $this->dependencies->configClass->fetchTemplate('/views/templates/hook/_partials/javascript.tpl');
         }
     }
 
