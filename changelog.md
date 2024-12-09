@@ -3,7 +3,8 @@
 ## Version 4.16.0
 - Refactoring :
   - [PRE-1999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2615): Clean obsolete hook
-  
+  - [PRE-1998](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2613): Clean last PayPlugAjaxClass usage
+
 ## Version 4.15.0
 - Feature :
   - [PRE-2673](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2594): Allow refund for PPRO payment resource
