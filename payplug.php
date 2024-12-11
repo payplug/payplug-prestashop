@@ -298,7 +298,7 @@ class Payplug extends PaymentModule
      *
      * @return mixed
      */
-    public function hookCustomerAccount($params)
+    public function hookDisplayCustomerAccount($params)
     {
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->customerAccount($params);
@@ -600,7 +600,7 @@ class Payplug extends PaymentModule
             'actionObjectOrderStateDeleteAfter',
             'actionUpdateLangAfter',
             'adminOrder',
-            'customerAccount',
+            'displayCustomerAccount',
             'displayAdminOrderMain',
             'displayAdminStatusesForm',
             'displayExpressCheckout',
