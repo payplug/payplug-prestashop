@@ -197,6 +197,7 @@ class Translation
                     'ideal' => $this->l('modal.premium.feature.ideal', 'translation'),
                     'mybank' => $this->l('modal.premium.feature.mybank', 'translation'),
                     'satispay' => $this->l('modal.premium.feature.satispay', 'translation'),
+                    'oney' => $this->l('modal.premium.feature.oney', 'translation'),
                 ],
                 'submit' => $this->l('modal.premium.submit', 'translation'),
             ],

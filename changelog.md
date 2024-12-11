@@ -12,6 +12,7 @@
   - [PRE-2600](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2601): Save JWT informations
   - [PRE-2601](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2584): Send JWT in api request
   - [PRE-2708](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2610): Update order state if payment resource is refunded
+  - [PRE-2674](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2614): Change support contact message for disabled features
 
 - Bugfix :
   - [PRE-2687](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2605/diffs): Delete the usage of deprecated php function utf8_encode
