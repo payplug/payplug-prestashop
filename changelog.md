@@ -5,6 +5,9 @@
   - [PRE-1958](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2630): Fix thresholds error on paylater feature (update payplug-ui to 1.7.4)
   - [PRE-2002](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2627): Remove obsolete adapter for prestashop 1.6.X and relative usage
 
+- Refactoring
+  - [PRE-2640](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2621): Add second parameter when using ps_round for Prestashop 9
+
 ## Version 4.16.0
 - Refactoring :
   - [PRE-1999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2615): Clean obsolete hook
@@ -25,9 +28,9 @@
   - [PRE-2674](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2614): Change support contact message for disabled features
 
 - Bugfix :
-  - [PRE-2687](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2605/): Delete the usage of deprecated php function utf8_encode
+  - [PRE-2687](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2605): Delete the usage of deprecated php function utf8_encode
   - [PRE-2688](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2608): Fix the refund error message + unit tests
-  - [PRE-2715](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2611/): Fix login for non onborded account
+  - [PRE-2715](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2611): Fix login for non onborded account
 
 ## Version 4.14.4
 - Bugfix :

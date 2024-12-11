@@ -56,7 +56,7 @@ class AmountHelper
         $amount = (float) ($amount * 1000); // we use this trick to avoid rounding while converting to int
         $amount = (float) ($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
 
-        $amount = $this->dependencies->getPlugin()->getTools()->tool('ps_round', $amount);
+        $amount = $this->dependencies->getPlugin()->getTools()->tool('ps_round', $amount, 2);
 
         return intval(strval($amount));
     }
