@@ -450,7 +450,7 @@ class Payplug extends PaymentModule
      *
      * @return mixed
      */
-    public function hookPaymentReturn($params)
+    public function hookDisplayPaymentReturn($params)
     {
         if ($this->module) {
             return $this->payplug_dependencies->hookClass->paymentReturn($params);
@@ -602,12 +602,12 @@ class Payplug extends PaymentModule
             'adminOrder',
             'customerAccount',
             'displayAdminOrderMain',
+            'displayAdminStatusesForm',
             'displayExpressCheckout',
+            'displayPaymentReturn',
             'displayProductAdditionalInfo',
             'displayProductPriceBlock',
-            'displayAdminStatusesForm',
             'displayHeader',
-            'paymentReturn',
             'paymentOptions',
         ];
     }
