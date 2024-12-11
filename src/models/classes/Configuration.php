@@ -424,7 +424,7 @@ class Configuration
                 'en' => 'Payment authorized',
                 'fr' => 'Paiement autorisé',
                 'es' => 'Pago',
-                'it' => 'Pagamento',
+                'it' => 'Pagamento autorizzato',
             ],
             'type' => 'pending',
         ],
