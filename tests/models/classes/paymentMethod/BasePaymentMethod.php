@@ -97,6 +97,10 @@ class BasePaymentMethod extends TestCase
         ]);
         $this->context->cookie = \Mockery::mock('Cookie');
         $this->context->cookie->id_customer = 1;
+        $this->context->currentLocale = \Mockery::mock('CurrentLocale');
+        $this->context->currentLocale->shouldReceive([
+            'formatPrice' => 15, 00,
+        ]);
 
         $link = \Mockery::mock('Link');
         $link->shouldReceive([
