@@ -824,6 +824,7 @@ class ConfigurationAction
             ];
         }
 
+        $this->dependencies->getPlugin()->getApiService()->initialize(!(bool) $configuration->getValue('sandbox_mode'));
         $render_telemetry = $this->dependencies->getPlugin()->getMerchantTelemetryAction()->sendAction('save');
         if (!$render_telemetry) {
             $logger->addLog('ConfigurationAction::saveAction: Error during telemetry sending');

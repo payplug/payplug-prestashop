@@ -186,6 +186,9 @@ class saveActionTest extends BaseConfigurationAction
         $this->plugin->shouldReceive([
             'getMerchantTelemetryAction' => $telemetry,
         ]);
+        $this->api_service->shouldReceive([
+            'initialize' => true,
+        ]);
 
         $this->assertSame(
             true,
