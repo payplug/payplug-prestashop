@@ -117,28 +117,6 @@ class ConfigurationAction
         $target_blank = '" target="_blank">';
         $link_prefix = '<a href="';
         switch ($payment_method) {
-            case 'applepay':
-                $has_permission = $has_permission ? $this->dependencies
-                    ->getValidators()['payment']
-                    ->isApplepayAllowedDomain(
-                        $context->shop->domain,
-                        $permissions['apple_pay_allowed_domains']
-                    )['result'] : false;
-            // no break
-            case 'american_express':
-            case 'bancontact':
-            case 'ideal':
-            case 'integrated':
-            case 'mybank':
-            case 'satispay':
-                $message .= sprintf(
-                    $translation['premium']['description']['contact'],
-                    $translation['premium']['feature'][$payment_method]
-                );
-                $link = $link_prefix . $external_url['help'] . $target_blank . $translation['premium']['link']['contact'] . '</a>';
-                $message = str_replace('$link', $link, $message);
-
-                break;
             case 'oney':
                 $message .= sprintf(
                     $translation['premium']['description']['oney'],
@@ -148,10 +126,20 @@ class ConfigurationAction
                 $message = str_replace('$link', $link, $message);
 
                 break;
-
+            case 'applepay':
+                $has_permission = $has_permission ? $this->dependencies
+                    ->getValidators()['payment']
+                    ->isApplepayAllowedDomain(
+                        $context->shop->domain,
+                        $permissions['apple_pay_allowed_domains']
+                    )['result'] : false;
+            // no break
             default:
-                $message .= $translation['premium']['description']['default'];
-                $link = $link_prefix . $external_url['help'] . $target_blank . $translation['premium']['link']['default'] . '</a>';
+                $message .= sprintf(
+                    $translation['premium']['description']['contact'],
+                    $translation['premium']['feature'][$payment_method]
+                );
+                $link = $link_prefix . $external_url['help'] . $target_blank . $translation['premium']['link']['contact'] . '</a>';
                 $message = str_replace('$link', $link, $message);
 
                 break;

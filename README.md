@@ -2,6 +2,13 @@
 Prestashop payment module using Payplug
 ========================================
 
+## Impact overview
+* **Domain** : Accept/ Pretashop plugin scope
+* **Critical features**: no
+* **Scope** : oos
+* **Sensible data**: none
+* **Incident emergency contact team**: @all-squad-presta
+
 Installation
 ------------
 
