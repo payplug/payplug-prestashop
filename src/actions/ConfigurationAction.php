@@ -133,7 +133,7 @@ class ConfigurationAction
                         $context->shop->domain,
                         $permissions['apple_pay_allowed_domains']
                     )['result'] : false;
-            // no break
+                // no break
             default:
                 $message .= sprintf(
                     $translation['premium']['description']['contact'],
