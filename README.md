@@ -96,13 +96,13 @@ To do it, go on your payplug-ui project with your terminal then run theses comma
 
 There an example of usage:
 
-    npx vue-cli-service build --mode prestashop && rm -rf ~/Sites/docker-module/build/modules/dev/dist/payplug/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/payplug/views/
-    npx vue-cli-service build --mode pspaylater && rm -rf ~/Sites/docker-module/build/modules/dev/dist/pspaylater/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/pspaylater/views/
+    npx vue-cli-service build --mode prestashop && rm -rf ~/Sites/plugin-docker/build/modules/payplug/dev/dist/payplug/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/plugin-docker/build/modules/payplug/dev/dist/payplug/views/
+    npx vue-cli-service build --mode pspaylater && rm -rf ~/Sites/plugin-docker/build/modules/payplug/dev/dist/pspaylater/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/plugin-docker/build/modules/payplug/dev/dist/pspaylater/views/
 
 It is possible to use npm as alternative, adapte the following example to your need :
 
-    cp .env.prestashop .env && npm run build && rm -rf ~/Sites/docker-module/build/modules/dev/dist/payplug/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/payplug/views/ 
-    cp .env.pspaylater .env && npm run build && rm -rf ~/Sites/docker-module/build/modules/dev/dist/pspaylater/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/docker-module/build/modules/dev/dist/pspaylater/views/
+    cp .env.prestashop .env && npm run build && rm -rf ~/Sites/plugin-docker/build/modules/payplug/dev/dist/payplug/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/plugin-docker/build/modules/payplug/dev/dist/payplug/views/ 
+    cp .env.pspaylater .env && npm run build && rm -rf ~/Sites/plugin-docker/build/modules/payplug/dev/dist/pspaylater/views/ && cp -R ~/Sites/payplug-ui-plugins/dist/ ~/Sites/plugin-docker/build/modules/payplug/dev/dist/pspaylater/views/
     
 NB: Use npm nor npx command will generate `.map` files who could be helpfull for the development of feature.
 
