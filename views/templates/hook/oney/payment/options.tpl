@@ -24,7 +24,7 @@
         {assign var=split value="x{$oney_payment_option.split}"}
         <label class="{$module_name|escape:'htmlall':'UTF-8'}OneyOption -{$oney_type|escape:'htmlall':'UTF-8'}{if !isset($oney_payment_option.installments) || !$oney_payment_option.installments} -withoutSchedule{/if}">
             <div class="{$module_name|escape:'htmlall':'UTF-8'}OneyOption_title">
-                    <img src="{$oney_image.$split|escape:'htmlall':'UTF-8'}" class="{$module_name|escape:'htmlall':'UTF-8'}OneyLogo -optimized-16" />
+                    <img src="{$oney_image.$split|escape:'htmlall':'UTF-8'}" class="{$module_name|escape:'htmlall':'UTF-8'}OneyLogo" />
                    {$oney_payment_option.title|escape:'htmlall':'UTF-8'}
             </div>
             {if isset($oney_payment_option.installments) && $oney_payment_option.installments}

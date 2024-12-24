@@ -16,6 +16,7 @@
   - [PRE-2004](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2628): remove cards template for ps1.6
   - [PRE-2745](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2624): Replace use of deprecated displayPrice by formatPrice for Oney CTA
   - [PRE-2000](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2623): Remove obsolete oney method
+  - [PRE-2003](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2631): Clean ps 16 front dependencies
 
 ## Version 4.16.0
 - Refactoring :
