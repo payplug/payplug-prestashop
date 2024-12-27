@@ -1,6 +1,9 @@
 # Payplug module changelog
 
 ## Version 4.16.1
+- Feature :
+  - [PRE-2106](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2632): PRE-2106 : Remove Oney BE and ES
+
 - Bugfix :
   - [PRE-1958](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2630): Fix thresholds error on paylater feature (update payplug-ui to 1.7.4)
   - [PRE-2002](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2627): Remove obsolete adapter for prestashop 1.6.X and relative usage
