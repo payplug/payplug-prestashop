@@ -1627,15 +1627,6 @@ class OneyPaymentMethod extends PaymentMethod
 
             $oneyLabel = $error ? $err_label : sprintf($text, $split);
 
-            if ($optimized) {
-                $adapter = $this->dependencies->loadAdapterPresta();
-                if ($adapter && method_exists($adapter, 'getPaymentOption')) {
-                    $oneyData = $adapter->getPaymentOption();
-                    $oneyLogo = $oneyData['oneyLogo'];
-                    $oneyLabel = $oneyData['oneyCallToActionText'];
-                }
-            }
-
             $payment_options[$this->name]['name'] = 'oney';
             $payment_options[$this->name]['inputs']['method']['value'] = 'oney';
             $payment_options[$this->name]['is_optimized'] = $optimized;
