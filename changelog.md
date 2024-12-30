@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.16.1
+- Bugfix :
+  - [PRE-1958](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2630): Fix thresholds error on paylater feature (update payplug-ui to 1.7.4)
+
 ## Version 4.16.0
 - Refactoring :
   - [PRE-1999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2615): Clean obsolete hook
@@ -20,26 +24,26 @@
   - [PRE-2674](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2614): Change support contact message for disabled features
 
 - Bugfix :
-  - [PRE-2687](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2605/diffs): Delete the usage of deprecated php function utf8_encode
+  - [PRE-2687](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2605): Delete the usage of deprecated php function utf8_encode
   - [PRE-2688](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2608): Fix the refund error message + unit tests
-  - [PRE-2715](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2611/diffs): Fix login for non onborded account
+  - [PRE-2715](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2611): Fix login for non onborded account
 
 ## Version 4.14.4
 - Bugfix :
-  - [SMP-3018](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2602) :Fix return notification if notification resource has failure
+  - [SMP-3018](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2602): Fix return notification if notification resource has failure
 
 ## Version 4.14.3
 - Bugfix :
-  - [SMP-3017](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2600) :Fix permissions got when merchant has no live api key + Fix password encodage
+  - [SMP-3017](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2600): Fix permissions got when merchant has no live api key + Fix password encodage
 
 ## Version 4.14.2
 - Bugfix :
-  - [SMP-3003](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2590) : Force resource creation if stored and selected payment method are not the same
-  - [SMP-3009](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2592) : Update upgrade script to fix column creation
+  - [SMP-3003](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2590): Force resource creation if stored and selected payment method are not the same
+  - [SMP-3009](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2592): Update upgrade script to fix column creation
 
 ## Version 4.14.1
 - Bugfix :
-  - [SMP-3005](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2589) : Fix 4.14.0 upgrade
+  - [SMP-3005](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2589): Fix 4.14.0 upgrade
 
 ## Version 4.14.0
 - Feature :
@@ -53,14 +57,14 @@
     - [PRE-2637](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2569): Fix vulnerability path traversal and update webpack version
 
 - Bugfix :
-  - [PRE-2652](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2572) : Fix state auto update on Oney order
-  - [PRE-2666](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2581) : Fix unit tests
-  - [PRE-2665](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2582) : Fix prestashop validator errors
+  - [PRE-2652](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2572): Fix state auto update on Oney order
+  - [PRE-2666](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2581): Fix unit tests
+  - [PRE-2665](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2582): Fix prestashop validator errors
 
 ## Version 4.13.1
 - Bugfix :
-  - [SMP-2979](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2565) : Add displayHeader to upgrade script
-  - [SMP-2999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2578) : Fix double order creation
+  - [SMP-2979](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2565): Add displayHeader to upgrade script
+  - [SMP-2999](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2578): Fix double order creation
 
 ## Version 4.13.0
 - Feature :
@@ -70,12 +74,12 @@
   - [PRE-2627](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2557): Update CB logo and Mastercard logos
 
 - Bugfix :
-  - [SMP-2959](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2560) : Fix check if installment plan is partially or fully refund
+  - [SMP-2959](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2560): Fix check if installment plan is partially or fully refund
 
 ## Version 4.12.1
 - Bugfix :
-  - [SMP-2948](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2552) : Fix cancellable field for Satispay, Amex and Ideal payment methods
-  - [SMP-2974](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2558) : Fix var declaration in front js
+  - [SMP-2948](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2552): Fix cancellable field for Satispay, Amex and Ideal payment methods
+  - [SMP-2974](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2558): Fix var declaration in front js
   
 ## Version 4.12.0
 - Feature :
@@ -94,7 +98,7 @@
     - [PRE-2509](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2533): Improve database usage
 
 - Bugfix :
-    - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2534) : Fix unit tests on updateAction on queue system
+    - [PRE-2507](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2534): Fix unit tests on updateAction on queue system
     - [PRE-2611](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2535): Fix order state query at plugin install
     - [PRE-2614](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2536): Disable queue system
 
@@ -165,7 +169,7 @@
 
 ## Version 4.9.24
 - Bugfix :
-  - [SMP-2634](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2477):  Fix double resource creation for one click and amex payment
+  - [SMP-2634](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2477): Fix double resource creation for one click and amex payment
 
 ## Version 4.9.23
 - Bugfix :
@@ -209,7 +213,7 @@
 
 ## Version 4.9.12
 - Bugfix :
-  - [PRE-2522](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2461):  Fix lock usage in notification script to prevent overload peak
+  - [PRE-2522](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2461): Fix lock usage in notification script to prevent overload peak
 
 ## Version 4.9.10
 - Bugfix :
@@ -374,4 +378,4 @@
 ## Version 4.3.2
 
  - Improvement :
-   - [PRE-2039](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2256) : Uniformisation of order states between Validation and Notification.
+   - [PRE-2039](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2256): Uniformisation of order states between Validation and Notification.
