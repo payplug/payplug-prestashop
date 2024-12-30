@@ -257,11 +257,6 @@ class HookClass
             true
         );
 
-        $adapter = $this->dependencies->loadAdapterPresta();
-        if ($adapter && \method_exists($adapter, 'customerAccount')) {
-            $adapter->customerAccount();
-        }
-
         $this->assign->assign([
             'version' => _PS_VERSION_[0] . '.' . _PS_VERSION_[2],
             'payplug_cards_url' => $payplug_cards_url,
