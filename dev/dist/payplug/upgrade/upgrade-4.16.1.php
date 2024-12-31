@@ -31,16 +31,28 @@ function upgrade_module_4_16_1($object)
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.16.1');
 
-    $hook_name = 'displayPaymentReturn';
-    $is_register_in_hook = $object->isRegisteredInHook($hook_name);
-    if (!$is_register_in_hook) {
-        $flag = $flag && $object->registerHook($hook_name);
+    $new_hooks = [
+        'displayPaymentReturn',
+        'displayCustomerAccount',
+    ];
+
+    $old_hooks = [
+        'paymentReturn',
+        'customerAccount',
+    ];
+
+    foreach ($new_hooks as $hook) {
+        $is_register_in_hook = $object->isRegisteredInHook($hook);
+        if (!$is_register_in_hook) {
+            $flag = $flag && $object->registerHook($hook);
+        }
     }
 
-    $hook_name = 'paymentReturn';
-    $is_register_in_hook = $object->isRegisteredInHook($hook_name);
-    if ($is_register_in_hook) {
-        $flag = $flag && $object->unregisterHook($hook_name);
+    foreach ($old_hooks as $hook) {
+        $is_register_in_hook = $object->isRegisteredInHook($hook);
+        if ($is_register_in_hook) {
+            $flag = $flag && $object->unregisterHook($hook);
+        }
     }
 
     $logger->addLog('End upgrade script 4.16.1, result: ' . ($flag ? 'ok' : 'ko'));
