@@ -8,6 +8,7 @@
 - Refactoring
   - [PRE-2640](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2621): Add second parameter when using ps_round for Prestashop 9
   - [PRE-2643](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2620): Use deprecated function l from translation class instead of ModuleAdminController
+  - [PRE-2639](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2619): Rename deprecated paymentReturn hook name for Prestashop 1.7 and upper
 
 ## Version 4.16.0
 - Refactoring :
