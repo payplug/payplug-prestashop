@@ -889,7 +889,7 @@ class PaymentMethod
         // If status is refunded but order state is paid then update the current state
         if ('refunded' == $status['code']) {
             $order_id = $this->tools->tool('getValue', 'id_order');
-            $this->updateOrderStateFromPaidToRefund((int) $order_id, (bool) $resource->is_live);
+            $this->updateOrderStateIfRefunded((int) $order_id, (bool) $resource->is_live);
         }
 
         // Define status translation
@@ -1470,63 +1470,47 @@ class PaymentMethod
     /**
      * @description Update the order state if current state is refunded
      *
-     * todo: add coverage to this method
-     *
      * @param int $order_id
      * @param bool $is_live
      *
      * @return bool
      */
-    protected function updateOrderStateFromPaidToRefund($order_id = 0, $is_live = true)
+    public function updateOrderStateIfRefunded($order_id = 0, $is_live = true)
     {
         $this->setParameters();
+        $result = false;
 
         if (!is_int($order_id) || !$order_id) {
-            $this->logger->addLog('PaymentMethod::updateOrderState() - Invalid argument given, $order_id must be a non null integer.', 'error');
+            $this->logger->addLog('PaymentMethod::updateOrderStateIfRefunded() - Invalid argument given, $order_id must be a non null integer.', 'error');
+        } elseif (!is_bool($is_live)) {
+            $this->logger->addLog('PaymentMethod::updateOrderStateIfRefunded() - Invalid argument given, $is_live must be a valid boolean.', 'error');
+        } else {
+            $order = $this->dependencies->getPlugin()->getOrder()->get((int) $order_id);
 
-            return false;
+            if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
+                $this->logger->addLog('PaymentMethod::updateOrderStateIfRefunded() - Invalid argument given, $order getted must be a valid object.', 'error');
+            } else {
+                $state_addons = $is_live ? '' : '_test';
+                $paid_os = $this->configuration->getValue('order_state_paid' . $state_addons);
+
+                if ($order->getCurrentState() != $paid_os) {
+                    $result = true;
+                } else {
+                    $refund_os = $this->configuration->getValue('order_state_refund' . $state_addons);
+                    $update_order_history = $this->dependencies->getPlugin()->getOrderClass()->updateOrderState($order, (int) $refund_os);
+
+                    if (!$update_order_history) {
+                        $this->logger->addLog('PaymentMethod::updateOrderStateIfRefunded() - Failed to update order state', 'error');
+                    } else {
+                        $parameters = ['vieworder' => 1, 'id_order' => (int) $order->id];
+                        $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
+                        $result = $this->tools->tool('redirectAdmin', $link_order);
+                    }
+                }
+            }
         }
 
-        if (!is_bool($is_live)) {
-            $this->logger->addLog('PaymentMethod::updateOrderState() - Invalid argument given, $is_live must be a valid boolean.', 'error');
-
-            return false;
-        }
-
-        $order = $this->dependencies->getPlugin()
-            ->getOrder()
-            ->get((int) $order_id);
-
-        if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
-            $this->logger->addLog('PaymentMethod::updateOrderState() - Invalid argument given, $order getted must be a valid object.', 'error');
-
-            return false;
-        }
-
-        $state_addons = $is_live ? '' : '_test';
-        $paid_os = $this->configuration->getValue('order_state_paid' . $state_addons);
-
-        if ($order->getCurrentState() != $paid_os) {
-            return true;
-        }
-
-        $refund_os = $this->configuration->getValue('order_state_refund' . $state_addons);
-        $update_order_history = $this->dependencies
-            ->getPlugin()
-            ->getOrderClass()
-            ->updateOrderState($order, (int) $refund_os);
-
-        // If order history well update, then we force the reload
-        if (!$update_order_history) {
-            $this->logger->addLog('PaymentMethod::updateOrderState() - Failed to update order state', 'error');
-
-            return false;
-        }
-
-        $parameters = ['vieworder' => 1, 'id_order' => (int) $order->id];
-        $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
-
-        return $this->tools->tool('redirectAdmin', $link_order);
+        return $result;
     }
 
     /**
