@@ -56,45 +56,75 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
         $this->fields_list = [
             'id_payplug_payment' => [
-                'title' => $this->l('ID'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('ID', 'adminpaypluginstallmentcontroller'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs',
             ],
             'resource_id' => [
-                'title' => $this->l('Installment ID'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Installment ID', 'adminpaypluginstallmentcontroller'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs',
             ],
             'id_payment' => [
-                'title' => $this->l('Payment ID'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Payment ID', 'adminpaypluginstallmentcontroller'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs',
             ],
             'reference' => [
-                'title' => $this->l('Order reference'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Order reference', 'adminpaypluginstallmentcontroller'),
             ],
             'customer' => [
-                'title' => $this->l('Customer'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Customer', 'adminpaypluginstallmentcontroller'),
                 'havingFilter' => true,
             ],
             'order_total' => [
-                'title' => $this->l('Order total'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Order total', 'adminpaypluginstallmentcontroller'),
                 'type' => 'price',
                 'currency' => true,
             ],
             'step' => [
-                'title' => $this->l('Installment payment #'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Installment payment #', 'adminpaypluginstallmentcontroller'),
             ],
             'amount' => [
-                'title' => $this->l('Installment amount'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Installment amount', 'adminpaypluginstallmentcontroller'),
                 'type' => 'price',
                 'currency' => true,
             ],
             'status' => [
-                'title' => $this->l('PayPlug payment status'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('PayPlug payment status', 'adminpaypluginstallmentcontroller'),
             ],
             'scheduled_date' => [
-                'title' => $this->l('Date'),
+                'title' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Date', 'adminpaypluginstallmentcontroller'),
                 'type' => 'datetime',
             ],
         ];
@@ -166,7 +196,10 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         if ($this->allow_export) {
             $this->toolbar_btn['export'] = [
                 'href' => self::$currentIndex . '&export' . $this->table . '&token=' . $this->token,
-                'desc' => $this->l('Export'),
+                'desc' => $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('Export', 'adminpaypluginstallmentcontroller'),
             ];
         }
         parent::initToolbar();

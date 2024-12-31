@@ -7,6 +7,7 @@
 
 - Refactoring
   - [PRE-2640](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2621): Add second parameter when using ps_round for Prestashop 9
+  - [PRE-2643](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2620): Use deprecated function l from translation class instead of ModuleAdminController
 
 ## Version 4.16.0
 - Refactoring :
