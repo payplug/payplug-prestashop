@@ -10,6 +10,7 @@
   - [PRE-2643](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2620): Use deprecated function l from translation class instead of ModuleAdminController
   - [PRE-2639](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2619): Rename deprecated paymentReturn hook name for Prestashop 1.7 and upper
   - [PRE-2642](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2618): Rename deprecated customerAccount hook name for Prestashop 1.7 and upper
+  - [PRE-2004](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2628): remove cards template for ps1.6
 
 ## Version 4.16.0
 - Refactoring :
