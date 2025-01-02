@@ -754,11 +754,18 @@ class OneyPaymentMethod extends PaymentMethod
 
         $withFirstSchedule = 'it' == $this->context->language->iso_code;
 
+        $context = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get();
+
         $this->assign_adapter->assign([
             'payplug_oney_required_field' => false,
             'payplug_oney_amount' => [
                 'amount' => $amount,
-                'value' => $this->tools->tool('displayPrice', $amount),
+                'value' => $context
+                    ->currentLocale
+                    ->formatPrice($amount, $this->context->currency->iso_code),
             ],
             'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
             'payplug_oney_error' => $error,
@@ -814,8 +821,14 @@ class OneyPaymentMethod extends PaymentMethod
         $this->context->getContext()->smarty->assign([
             'learnMoreLink' => (bool) $learnMoreLink,
             'oneyWithFees' => (bool) $this->configuration->getValue('oney_fees'),
-            'oneyMinAmounts' => $this->tools->tool('displayPrice', $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result']),
-            'oneyMaxAmounts' => $this->tools->tool('displayPrice', $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result']),
+            'oneyMinAmounts' => $this->context->currentLocale->formatPrice(
+                $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
+                $this->context->currency->iso_code
+            ),
+            'oneyMaxAmounts' => $this->context->currentLocale->formatPrice(
+                $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result'],
+                $this->context->currency->iso_code
+            ),
             'oneyUrl' => 'https://www.oney.' . $this->context->language->iso_code,
         ]);
     }
@@ -900,9 +913,14 @@ class OneyPaymentMethod extends PaymentMethod
             return false;
         }
 
-        if ($total_amount && !is_int($total_amount)) {
+        if (!$total_amount || !is_int($total_amount)) {
             return false;
         }
+
+        $context = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get();
 
         $type = explode('_', $operation);
 
@@ -916,23 +934,39 @@ class OneyPaymentMethod extends PaymentMethod
         $total_cost = $this->dependencies
             ->getHelpers()['amount']
             ->convertAmount($resource['total_cost'], true);
+
         $resource['total_cost'] = [
             'amount' => number_format($total_cost, 2),
-            'value' => $this->tools->tool('displayPrice', $total_cost),
+            'value' => $context
+                ->currentLocale
+                ->formatPrice(
+                    $total_cost,
+                    $context->currency->iso_code
+                ),
         ];
         $down_payment_amount = $this->dependencies
             ->getHelpers()['amount']
             ->convertAmount($resource['down_payment_amount'], true);
         $resource['down_payment_amount'] = [
             'amount' => number_format($down_payment_amount, 2),
-            'value' => $this->tools->tool('displayPrice', $down_payment_amount),
+            'value' => $context
+                ->currentLocale
+                ->formatPrice(
+                    $down_payment_amount,
+                    $context->currency->iso_code
+                ),
         ];
         foreach ($resource['installments'] as &$installment) {
             $amount = $this->dependencies
                 ->getHelpers()['amount']
                 ->convertAmount($installment['amount'], true);
             $installment['amount'] = number_format($amount, 2);
-            $installment['value'] = $this->tools->tool('displayPrice', $amount);
+            $installment['value'] = $context
+                ->currentLocale
+                ->formatPrice(
+                    $amount,
+                    $context->currency->iso_code
+                );
         }
 
         $total_amount = $this->dependencies
@@ -941,7 +975,12 @@ class OneyPaymentMethod extends PaymentMethod
         $total_amount += $total_cost;
         $resource['total_amount'] = [
             'amount' => number_format($total_amount, 2),
-            'value' => $this->tools->tool('displayPrice', $total_amount),
+            'value' => $context
+                ->currentLocale
+                ->formatPrice(
+                    $total_amount,
+                    $context->currency->iso_code
+                ),
         ];
 
         return $resource;
