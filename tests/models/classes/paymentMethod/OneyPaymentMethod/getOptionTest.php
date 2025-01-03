@@ -34,6 +34,26 @@ class getOptionTest extends BaseOneyPaymentMethod
             ->with('oney_fees')
             ->andReturn(true);
 
+        $this->class->shouldReceive('getProductCallToAction')
+            ->with('oney_product_animation')
+            ->andReturn([
+                'name' => 'oney_product_animation',
+                'image_url' => 'modules/payplug/views/img/oney/payplug-productOneyCta.jpg',
+                'title' => 'oneyPopupProduct.title',
+                'switch' => true,
+                'checked' => false,
+            ]);
+
+        $this->class->shouldReceive('getCartCallToAction')
+            ->with('oney_cart_animation')
+            ->andReturn([
+                'name' => 'oney_cart_animation',
+                'image_url' => 'modules/payplug/views/img/oney/payplug-cartOneyCta.jpg',
+                'title' => 'oneyPopupCart.title',
+                'switch' => true,
+                'checked' => false,
+            ]);
+
         $expected = [
             'name' => 'paymentMethodsBlock',
             'title' => 'paylater.title',
@@ -167,6 +187,22 @@ class getOptionTest extends BaseOneyPaymentMethod
             ->with('oney_fees')
             ->andReturn(true);
 
+        $this->class->shouldReceive('getThresholds')
+            ->with('')
+            ->andReturn([]);
+
+        $this->class->shouldReceive('getSchedule')
+            ->with('')
+            ->andReturn([]);
+
+        $this->class->shouldReceive('getProductCallToAction')
+            ->with('')
+            ->andReturn([]);
+
+        $this->class->shouldReceive('getCartCallToAction')
+            ->with('')
+            ->andReturn([]);
+
         $expected = [
             [
                 'name' => 'thresholds',
@@ -194,23 +230,6 @@ class getOptionTest extends BaseOneyPaymentMethod
                     ],
                 ],
                 'switch' => false,
-            ],
-            [
-                'name' => 'oney_schedule',
-                'image_url' => 'modules/payplug/views/img/oney/payplug-optimized.jpg',
-                'title' => 'oneySchedule.title',
-                'descriptions' => [
-                    [
-                        'description' => 'oneySchedule.description',
-                        'link_know_more' => [
-                            'text' => 'paylater.link',
-                            'url' => 'https://support.payplug.com/hc/fr/articles/360013071080#h_2595dd3d-a281-43ab-a51a-4986fecde5ee',
-                            'target' => '_blank',
-                        ],
-                    ],
-                ],
-                'switch' => true,
-                'checked' => false,
             ],
         ];
 

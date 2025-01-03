@@ -90,27 +90,21 @@ class OneyPaymentMethod extends PaymentMethod
 
         $advanced_options = [];
         $thresholds = $this->getThresholds($current_configuration);
-        if ($thresholds) {
+        if (!empty($thresholds)) {
             $advanced_options[] = $thresholds;
         }
         $schedules = $this->getSchedule((bool) $current_configuration['oney_schedule']);
-        if ($schedules) {
+        if (!empty($schedules)) {
             $advanced_options[] = $schedules;
         }
 
-        $can_use_cta = !in_array(
-            $this->configuration->getValue('oney_allowed_countries'),
-            ['ES', 'BE']
-        );
-        if ($can_use_cta) {
-            $product = $this->getProductCallToAction((bool) $current_configuration['oney_product_animation']);
-            if ($product) {
-                $advanced_options[] = $product;
-            }
-            $cart = $this->getCartCallToAction((bool) $current_configuration['oney_cart_animation']);
-            if ($cart) {
-                $advanced_options[] = $cart;
-            }
+        $product = $this->getProductCallToAction((bool) $current_configuration['oney_product_animation']);
+        if (!empty($product)) {
+            $advanced_options[] = $product;
+        }
+        $cart = $this->getCartCallToAction((bool) $current_configuration['oney_cart_animation']);
+        if (!empty($cart)) {
+            $advanced_options[] = $cart;
         }
 
         return [
@@ -1112,23 +1106,12 @@ class OneyPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        $options = [
+        return [
             'x3_with_fees',
             'x3_without_fees',
             'x4_with_fees',
             'x4_without_fees',
         ];
-
-        $oney_allowed_countries = $this->configuration->getValue('oney_allowed_countries');
-        if ('payplug' != $this->dependencies->name
-            && $this->validators['payment']->isAllowedCountry($oney_allowed_countries, 'BE')['result']) {
-            $options = [
-                'x3_with_fees',
-                'x3_without_fees',
-            ];
-        }
-
-        return $options;
     }
 
     /**
