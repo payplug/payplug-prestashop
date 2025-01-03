@@ -55,7 +55,6 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
 
         $this->class
             ->shouldAllowMockingProtectedMethods()->shouldReceive([
-                'displayOneyRequiredFields' => 'required_field',
                 'displayOneyPopin' => 'popin',
                 'displayOneyPaymentOptions' => 'payment_option',
             ])
