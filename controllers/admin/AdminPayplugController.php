@@ -66,7 +66,7 @@ class AdminPayplugController extends ModuleAdminController
         if ($session = $this->tools->tool('getValue', 'session')
             && $company_id = $this->tools->tool('getValue', '$company_id')) {
             $merchant = $this->module
-                ->get('payplug.models.classes.merchant');
+                ->getService('payplug.models.classes.merchant');
             $client_data = $merchant->getClientData($session, $company_id);
             if ($client_data['result']) {
                 $merchant->registerClientData($client_data['data']);

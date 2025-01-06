@@ -29,25 +29,30 @@ use PayPlug\classes\DependenciesClass;
 class PayplugValidationModuleFrontController extends ModuleFrontController
 {
     private $cart_id;
-    private $dependencies;
     private $ps;
+    private $dependencies;
+    private $logger;
 
     public function __construct()
     {
         parent::__construct();
         $this->dependencies = new DependenciesClass();
+        $this->logger = $this->dependencies->getPlugin()->getLogger();
     }
 
     public function postProcess()
     {
+        $this->logger->addLog('ValidationController::postProcess - Start validation post processing');
         $this->ps = (int) $this->dependencies
             ->getPlugin()
             ->getTools()
             ->tool('getValue', 'ps');
+        $this->logger->addLog('ValidationController::postProcess - Given ps argument: ' . $this->ps);
         $this->cart_id = (int) $this->dependencies
             ->getPlugin()
             ->getTools()
             ->tool('getValue', 'cartid');
+        $this->logger->addLog('ValidationController::postProcess - Given cart_id argument: ' . $this->cart_id);
 
         if ($this->dependencies
             ->getPlugin()
@@ -58,6 +63,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 ->getTools()
                 ->tool('getValue', 'last_try');
 
+            $this->logger->addLog('ValidationController::postProcess - is last try: ' . ($last_try ? 'yes' : 'no'));
             $check = $this->dependencies
                 ->getPlugin()
                 ->getValidationAction()
@@ -76,13 +82,17 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
             ->l('The transaction was not completed and your card was not charged.', 'validation');
 
         if (!$order_validate['result']) {
+            $this->logger->addLog('ValidationController::postProcess - An error occured: ' . $order_validate['message']);
             $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$error_message]);
             $this->exitProcess($order_validate['url'], $order_validate['message']);
         }
 
         if (isset($order_validate['url'])) {
+            $this->logger->addLog('ValidationController::postProcess - Order url getted, redirect on: ' . $order_validate['url']);
             $this->exitProcess($order_validate['url'], $order_validate['message']);
         }
+
+        $this->logger->addLog('ValidationController::postProcess - No redirection reach during the postprocess treatment');
     }
 
     /**
@@ -92,6 +102,9 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
      */
     public function initContent()
     {
+        $this->logger->addLog('ValidationController::initContent - Start initContent');
+
+        $this->display_column_left = false;
         parent::initContent();
 
         $validation_ajax_url = $this->context->link->getModuleLink(
@@ -125,10 +138,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
     private function exitProcess($url = '', $message = '')
     {
         if (is_string($message) && $message) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog($message);
+            $this->logger->addLog($message);
         }
 
         // Remove lock
