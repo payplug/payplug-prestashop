@@ -618,7 +618,7 @@ class API
 
                 // Renew the token
                 $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-                $merchant = $module->get('payplug.models.classes.merchant');
+                $merchant = $module->getService('payplug.models.classes.merchant');
 
                 $jwt = $merchant->generateJWT($client_data);
                 if (!$jwt) {
