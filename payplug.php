@@ -28,6 +28,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once dirname(__FILE__) . '/vendor/autoload.php';
+require_once dirname(__FILE__) . '/../../app/AppKernel.php';
 
 class Payplug extends PaymentModule
 {
@@ -37,6 +38,7 @@ class Payplug extends PaymentModule
     public $adminControllers;
     public $errors;
     public $module;
+    public $kernel;
 
     /**
      * Constructor.
@@ -55,7 +57,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = true;
         $this->tab = 'payments_gateways';
-        $this->version = '4.16.2';
+        $this->version = '4.17.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -151,6 +153,29 @@ class Payplug extends PaymentModule
         Tools::redirectAdmin($this->context->link->getAdminLink($controllerName));
     }
 
+    public function getService($name = '')
+    {
+        if (!is_string($name) || '' == $name) {
+            return null;
+        }
+
+        // Check if service exists to avoid exception
+        if ($this->getContainer()->has($name)) {
+            return $this->getContainer()->get($name);
+        }
+
+        // Check if kernel is defined
+        if (!$this->kernel) {
+            $env = _PS_MODE_DEV_ ? 'dev' : 'prod';
+            $debug = _PS_MODE_DEV_ ? true : false;
+            $kernel = new \AppKernel($env, $debug);
+            $kernel->boot();
+            $this->kernel = $kernel;
+        }
+
+        return $this->kernel->getContainer()->has($name) ? $this->kernel->getContainer()->get($name) : null;
+    }
+
     /**
      * Load asset on the back office.
      */
@@ -205,10 +230,12 @@ class Payplug extends PaymentModule
      *
      * @return mixed
      */
-    public function hookActionOrderStatusUpdate($params)
+    public function hookActionObjectOrderHistoryAddAfter($params)
     {
         if ($this->module) {
-            return $this->payplug_dependencies->hookClass->actionOrderStatusUpdate($params);
+            return $this
+                ->getService('payplug.models.classes.hook')
+                ->actionObjectOrderHistoryAddAfter($params);
         }
     }
 
@@ -597,7 +624,7 @@ class Payplug extends PaymentModule
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
             'actionExportGDPRData',
-            'actionOrderStatusUpdate',
+            'actionObjectOrderHistoryAddAfter',
             'actionObjectOrderStateAddAfter',
             'actionObjectOrderStateUpdateAfter',
             'actionObjectOrderStateDeleteAfter',
@@ -619,6 +646,9 @@ class Payplug extends PaymentModule
     {
         if ($this->payplug_dependencies) {
             $this->module = $this->payplug_dependencies->dependencies;
+
+            global $kernel;
+            $this->kernel = $kernel;
         }
     }
 }
