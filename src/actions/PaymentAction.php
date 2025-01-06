@@ -36,6 +36,8 @@ class PaymentAction
         'ideal',
         'installment',
         'mybank',
+        'email_link',
+        'sms_link',
         'one_click',
         'oney',
         'satispay',
@@ -270,7 +272,10 @@ class PaymentAction
         }
 
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
-            $create_queue = $this->dependencies->getPlugin()->getQueueAction()->hydrateAction((int) $order->id_cart, $resource_id);
+            $create_queue = $this->dependencies
+                ->getPlugin()
+                ->getQueueAction()
+                ->hydrateAction((int) $order->id_cart, $resource_id);
             if (!$create_queue['result']) {
                 $this->logger->addLog('PaymentAction::captureAction - An error occurred on queue creation', 'error');
 
@@ -290,7 +295,8 @@ class PaymentAction
             }
         }
 
-        $this->dependencies->getPlugin()
+        $this->dependencies
+            ->getPlugin()
             ->getOrderClass()
             ->updateOrderState($order, (int) $new_state);
 

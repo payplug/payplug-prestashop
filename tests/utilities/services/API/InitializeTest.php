@@ -48,7 +48,7 @@ class InitializeTest extends BaseApi
         $this->merchant = \Mockery::mock('Merchant');
         $this->module = \Mockery::mock('Module');
         $this->module->shouldReceive([
-            'get' => $this->merchant,
+            'getService' => $this->merchant,
         ]);
         $this->module_adapter = \Mockery::mock('ModuleAdapter');
         $this->module_adapter->shouldReceive([
