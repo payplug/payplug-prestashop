@@ -28,6 +28,7 @@
             "!views/css/*.css",
             "!views/js/*.js",
             "!views/img/*.svg",
+            "!views/img/*.png",
             "!.htaccess",
             "dev",
             "test",
