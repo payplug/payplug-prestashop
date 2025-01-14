@@ -7,6 +7,7 @@
 - Bugfix :
   - [PRE-1958](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2630): Fix thresholds error on paylater feature (update payplug-ui to 1.7.4)
   - [PRE-2002](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2627): Remove obsolete adapter for prestashop 1.6.X and relative usage
+  - [PRE-2760](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2637): Fix missing Payplug logo in configuration
 
 - Refactoring
   - [PRE-2640](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2621): Add second parameter when using ps_round for Prestashop 9
