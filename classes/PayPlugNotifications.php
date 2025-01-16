@@ -200,6 +200,10 @@ class PayPlugNotifications
                 ? $this->resource->installment_plan_id
                 : $this->resource->id;
 
+            // Check if this notification is the first of the day
+            $is_first_order = empty($this->plugin->getOrderRepository()->getCurrentOrders());
+
+            // Then create order
             $order_create = $this->dependencies
                 ->getPlugin()
                 ->getOrderAction()
@@ -207,6 +211,14 @@ class PayPlugNotifications
             if (!$order_create['result']) {
                 $this->exitProcess('An error while order creation: ' . $order_create['message'], 500);
             }
+
+            // Before ending process, if this is the first order of the days, we send the telemetries
+            if ($is_first_order) {
+                $this->plugin
+                    ->getMerchantTelemetryAction()
+                    ->sendAction('notification');
+            }
+
             $this->exitProcess('Order created.');
         }
     }

@@ -313,7 +313,6 @@ class createActionTest extends BaseOrderAction
         $this->module->shouldReceive('validateOrder')
             ->andThrow('Exception', 'validateOrder() method throw exception', 500);
         $this->order_repository->shouldReceive([
-            'getCurrentOrders' => [],
             'getByIdCart' => [],
         ]);
         $this->payment_repository->shouldReceive([
@@ -388,7 +387,6 @@ class createActionTest extends BaseOrderAction
             'get' => OrderMock::get(),
         ]);
         $this->order_repository->shouldReceive([
-            'getCurrentOrders' => [],
             'getByIdCart' => [],
         ]);
         $this->payment_repository->shouldReceive([
@@ -470,7 +468,6 @@ class createActionTest extends BaseOrderAction
             'get' => $order,
         ]);
         $this->order_repository->shouldReceive([
-            'getCurrentOrders' => [],
             'getByIdCart' => [],
         ]);
         $this->payment_repository->shouldReceive([
@@ -537,11 +534,6 @@ class createActionTest extends BaseOrderAction
             'addOrderPayment' => true,
         ]);
 
-        $merchant_telemetry_action = \Mockery::mock('MerchantTelemetryAction');
-        $merchant_telemetry_action->shouldReceive([
-            'sendAction' => true,
-        ]);
-
         $this->cart_adapter->shouldReceive([
             'get' => CartMock::get(),
         ]);
@@ -560,7 +552,6 @@ class createActionTest extends BaseOrderAction
             ->once()
             ->andReturn([]);
         $this->order_repository->shouldReceive([
-            'getCurrentOrders' => [],
             'getByIdCart' => [
                 [
                     'id_order' => 1,
@@ -596,7 +587,6 @@ class createActionTest extends BaseOrderAction
         ]);
         $this->plugin->shouldReceive([
             'getCardAction' => $card_action,
-            'getMerchantTelemetryAction' => $merchant_telemetry_action,
         ]);
         $this->validate_adapter->shouldReceive([
             'validate' => true,
