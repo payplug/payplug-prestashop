@@ -80,6 +80,7 @@ class QueueRepository extends EntityRepository
      */
     public function getFirstNotTreatedEntry($cart_id = 0)
     {
+        $this->dependencies->getPlugin()->getLogger()->addLog('QueueRepository::getFirstNotTreatedEntry() - Start processing getFirstNotTreatedEntry', 'debug');
         if (!is_int($cart_id) || !$cart_id) {
             return [];
         }
@@ -105,7 +106,18 @@ class QueueRepository extends EntityRepository
             ->where('`treated` =  0')
             ->orderBy($definition['primary'] . ' ASC')
             ->limit(1);
+        $result = $this->build('unique_row') ?: [];
+        if (!$result) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('QueueRepository::getFirstNotTreatedEntry() - No non-treated entry found for Cart ID: ' . $cart_id, 'debug');
+        }
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('QueueRepository::getFirstNotTreatedEntry() -  End processing. Result: ' . json_encode($result), 'debug');
 
-        return $this->build('unique_row') ?: [];
+        return $result;
     }
 }

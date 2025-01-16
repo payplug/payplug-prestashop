@@ -7,12 +7,22 @@ use PayPlug\tests\models\repositories\BaseRepository;
 
 class BaseQueueRepository extends BaseRepository
 {
+    public $logger;
+
     public function setUp()
     {
         parent::setUp();
         $this->repository = \Mockery::mock(QueueRepository::class, [$this->dependencies])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
+        $this->logger = \Mockery::mock('Logger');
+        $this->logger->shouldReceive([
+            'addLog' => true,
+        ]);
+        $this->plugin->shouldReceive(['getLogger' => $this->logger]);
+        $this->dependencies->shouldReceive([
+            'getPlugin' => $this->plugin,
+        ]);
         $this->repository->shouldReceive('escape')
             ->andReturnUsing(function ($arg) {
                 return (string) $arg;
