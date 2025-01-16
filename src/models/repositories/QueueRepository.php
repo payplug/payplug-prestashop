@@ -105,7 +105,14 @@ class QueueRepository extends EntityRepository
             ->where('`treated` =  0')
             ->orderBy($definition['primary'] . ' ASC')
             ->limit(1);
+        $result = $this->build('unique_row') ?: [];
+        if (!$result) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('QueueRepository::getFirstNotTreatedEntry() - No non-treated entry found for Cart ID: ' . $cart_id, 'error');
+        }
 
-        return $this->build('unique_row') ?: [];
+        return $result;
     }
 }
