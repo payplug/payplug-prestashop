@@ -41,6 +41,11 @@ class EntityRepository extends QueryRepository
      */
     public function createEntity($fields = [])
     {
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('EntityRepository::createEntity() - Start processing createEntity', 'debug');
+
         if (!is_array($fields) || empty($fields)) {
             return 0;
         }
@@ -125,8 +130,21 @@ class EntityRepository extends QueryRepository
                 }
             }
         }
+        $result = (bool) $this->build();
 
-        return (bool) $this->build() ? $this->lastId() : 0;
+        if ($result) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('EntityRepository::createEntity() - Entity created successfully', 'debug');
+        } else {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('EntityRepository::createEntity() - Failed to create entity', 'debug');
+        }
+
+        return $result ? $this->lastId() : 0;
     }
 
     /**
@@ -490,6 +508,10 @@ class EntityRepository extends QueryRepository
      */
     public function updateEntity($id = 0, $fields = [])
     {
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('EntityRepository::UpdateEntity() - Start processing updateEntity', 'debug');
         if (!is_int($id) || !$id) {
             return false;
         }
@@ -540,7 +562,15 @@ class EntityRepository extends QueryRepository
 
         $this->where('`' . $definition['primary'] . '` = ' . (int) $id);
 
-        return (bool) $this->build();
+        $result = (bool) $this->build();
+        if (!$result) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('EntityRepository::updateEntity() - failed to update entity for id: ' . $id, 'debug');
+        }
+
+        return $result;
     }
 
     /**
