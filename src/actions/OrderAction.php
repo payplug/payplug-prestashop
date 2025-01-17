@@ -50,6 +50,7 @@ class OrderAction
      */
     public function createAction($resource_id = '')
     {
+        $this->logger->addLog('OrderAction::createAction - Start processing createAction', 'debug');
         $this->setParameters();
 
         if (!is_string($resource_id) || !$resource_id) {
@@ -174,6 +175,7 @@ class OrderAction
                 ->getCardAction()
                 ->saveAction($resource);
         }
+        $this->logger->addLog('OrderAction::createAction - start validateOrder', 'debug');
 
         try {
             $module->validateOrder(
@@ -195,6 +197,7 @@ class OrderAction
                 'message' => 'Order cannot be validated: ' . $exception->getMessage(),
             ];
         }
+        $this->logger->addLog('OrderAction::createAction - end validateOrder', 'debug');
 
         // Get the related Order
         $order = $this->plugin
@@ -242,6 +245,7 @@ class OrderAction
                 ->getMerchantTelemetryAction()
                 ->sendAction('notification');
         }
+        $this->logger->addLog('OrderAction::createAction - End processing createAction', 'debug');
 
         return [
             'result' => true,
@@ -259,6 +263,7 @@ class OrderAction
      */
     public function updateAction($resource_id = '')
     {
+        $this->logger->addLog('OrderAction::updateAction -  Start processing updateAction', 'debug');
         $this->setParameters();
 
         if (!is_string($resource_id) || !$resource_id) {
@@ -433,6 +438,7 @@ class OrderAction
                 'message' => 'Can\'t update order state',
             ];
         }
+        $this->logger->addLog('OrderAction::updateAction - Order update with state: ' . $order_states[$new_order_state['status']], 'debug');
 
         return [
             'result' => true,
