@@ -21,6 +21,8 @@ class BaseRepository extends TestCase
         $this->dependencies = \Mockery::mock('Dependencies');
         $this->dependencies->name = 'payplug';
         $this->plugin = \Mockery::mock('Plugin');
+        $this->plugin = \Mockery::mock('Plugin');
+
         $this->plugin->shouldReceive([]);
         $this->engine = 'sql_engine';
         $this->entity_id = 42;

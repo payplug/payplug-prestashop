@@ -225,6 +225,7 @@ class PayPlugNotifications
         }
         // check if queuing system is enabled
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+            $this->logger->addLog('PaypPlugNotifications::exitProcess: Attempting to update queue', 'debug');
             if ($this->lock_key) {
                 $update_queue = $this->dependencies
                     ->getPlugin()
@@ -255,6 +256,7 @@ class PayPlugNotifications
                     }
                 }
             }
+            $this->logger->addLog('PaypPlugNotifications::exitProcess: exit process successfully', 'debug');
         } else {
             if ($this->lock_key) {
                 $delete_lock = $this->dependencies

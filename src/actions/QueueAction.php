@@ -49,6 +49,10 @@ class QueueAction
      */
     public function hydrateAction($id_cart = 0, $resource_id = '', $type = 'payment')
     {
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('QueueAction::hydrateAction() - Start processing hydrateAction', 'debug');
         if (!is_int($id_cart) || !$id_cart) {
             $this->dependencies
                 ->getPlugin()
@@ -88,6 +92,11 @@ class QueueAction
             ->getQueueRepository()
             ->getFirstNotTreatedEntry((int) $id_cart);
 
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('QueueAction::hydrateAction() - Retrieved entry: ' . json_encode($entry), 'debug');
+
         $exists = !empty($entry);
         $current_date = date('Y-m-d H:i:s');
 
@@ -119,13 +128,13 @@ class QueueAction
                         ->getLogger()
                         ->addLog('QueueAction::hydrateAction() - Expired queue treated');
 
+                    //todo: not-for-prod This can cause a stack overflow if there are many expired entries. we should loop instead
                     return $this->hydrateAction($id_cart, $resource_id, $type);
                 }
-
                 $this->dependencies
                     ->getPlugin()
                     ->getLogger()
-                    ->addLog('QueueAction::hydrateAction() - Error during treatment of expired queue', 'error');
+                    ->addLog('QueueAction::hydrateAction() - Error during treatment of expired queue' . $entry['id_payplug_queue'], 'error');
             }
         }
 
@@ -142,6 +151,17 @@ class QueueAction
             ->getQueueRepository()
             ->createEntity($fields);
 
+        if (!$create) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('QueueAction::hydrateAction() - Failed to create queue entry for Cart id: ' . $id_cart, 'debug');
+        }
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('QueueAction::hydrateAction() - End processing. Result: ' . json_encode(['exists' => $exists, 'result' => $create]), 'debug');
+
         return [
             'exists' => $exists,
             'result' => $create,
@@ -157,6 +177,11 @@ class QueueAction
      */
     public function updateAction($id_cart = 0)
     {
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('QueueAction::updateAction() - Start processing updateAction', 'debug');
+
         if (!is_int($id_cart) || !$id_cart) {
             $this->dependencies
                 ->getPlugin()
@@ -172,6 +197,12 @@ class QueueAction
             ->getPlugin()
             ->getQueueRepository()
             ->getFirstNotTreatedEntry((int) $id_cart);
+
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('QueueAction::updateAction() - Retrieved entry to update: ' . json_encode($entry_to_update), 'debug');
+
         if (empty($entry_to_update)) {
             $this->dependencies
                 ->getPlugin()
@@ -208,6 +239,16 @@ class QueueAction
             ->getPlugin()
             ->getQueueRepository()
             ->getFirstNotTreatedEntry((int) $id_cart);
+
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('QueueAction::updateAction() - Retrieved exists: ' . json_encode($exists), 'debug');
+
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('QueueAction::updateAction() - End processing updateAction', 'debug');
 
         return [
             'exists' => $exists,
