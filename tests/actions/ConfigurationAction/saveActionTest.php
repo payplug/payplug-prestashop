@@ -177,15 +177,6 @@ class saveActionTest extends BaseConfigurationAction
             ],
         ]);
 
-        $telemetry = \Mockery::mock('MerchantTelemetryAction');
-        $telemetry->shouldReceive([
-            'sendAction' => [
-                'result' => true,
-            ],
-        ]);
-        $this->plugin->shouldReceive([
-            'getMerchantTelemetryAction' => $telemetry,
-        ]);
         $this->api_service->shouldReceive([
             'initialize' => true,
         ]);

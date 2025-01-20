@@ -102,6 +102,22 @@ class ApiRest
                 $json = $configurationAction->saveAction($datas);
 
                 break;
+            case 'send_telemetry':
+                $render_telemetry = $this->dependencies
+                    ->getPlugin()
+                    ->getMerchantTelemetryAction()
+                    ->sendAction('save');
+                if (!$render_telemetry) {
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getLogger()
+                        ->addLog('ConfigurationAction::saveAction: Error during telemetry sending');
+                }
+                $json = [
+                    'success' => true,
+                ];
+
+                break;
             case 'init':
             default:
                 $json = $configurationAction->renderConfiguration();
