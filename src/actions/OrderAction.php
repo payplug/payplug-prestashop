@@ -154,9 +154,6 @@ class OrderAction
             ? $cart->secure_key
             : (isset($customer->secure_key) && $customer->secure_key ? $customer->secure_key : '');
 
-        // Check if this notification is the first of the day
-        $is_first_order = empty($this->plugin->getOrderRepository()->getCurrentOrders());
-
         // Create the order
         $module = $this->plugin
             ->getModule()
@@ -231,13 +228,6 @@ class OrderAction
             ];
         } elseif (count($res_nb_orders) > 1) {
             $this->logger->addLog('OrderAction::createAction - ' . count($res_nb_orders) . ' orders created for the given cart id', 'error');
-        }
-
-        // Before ending process, if this is the first order of the days, we send the telemetries
-        if ($is_first_order) {
-            $this->plugin
-                ->getMerchantTelemetryAction()
-                ->sendAction('notification');
         }
 
         return [
