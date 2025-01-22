@@ -43,11 +43,9 @@ class PayPlugNotifications
     public $cart;
     public $except;
     public $flag;
-    public $is_applepay = false;
     public $is_deferred = false;
     public $is_installment = false;
     public $is_oney = false;
-    public $is_satispay = false;
     public $key;
     public $lock_key;
     public $logger;
@@ -66,15 +64,12 @@ class PayPlugNotifications
     private $addressAdapter;
     private $cartAdapter;
     private $configAdapter;
-    private $constantAdapter;
     private $contextAdapter;
     private $countryAdapter;
     private $currencyAdapter;
     private $customerAdapter;
     private $languageAdapter;
-    private $messageAdapter;
     private $orderAdapter;
-    private $orderHistoryAdapter;
     private $shopAdapter;
     private $toolsAdapter;
     private $validateAdapter;
@@ -88,6 +83,9 @@ class PayPlugNotifications
     private $validators;
 
     private $stored_resource;
+
+    private $attemps = 0;
+    private $max_attemps = 10;
 
     public function __construct()
     {
@@ -266,7 +264,7 @@ class PayPlugNotifications
                         if ($retrieve['result']) {
                             $this->payment = $retrieve['resource'];
 
-                            return $this->processPayment();
+                            return $this->processPayment(true);
                         }
                     }
                 }
@@ -339,10 +337,40 @@ class PayPlugNotifications
 
     /**
      * @description Treat the notification has a payment
+     *
+     * @param bool $process_queue
      */
-    private function processPayment()
+    private function processPayment($process_queue = false)
     {
         $this->logger->addLog('Notification: processPayment');
+
+        // If max attemps reach, we stop the process as we could be in infinite loop
+        ++$this->attemps;
+        if ($this->max_attemps <= $this->attemps) {
+            // We unset the lock key to stop the recursive action from exitProcess method
+            $this->lock_key = null;
+            // Then we return an error
+            $this->exitProcess('Error: Event queue can\'t be treated', 500);
+        }
+
+        // Get payment context
+        $this->buildPaymentContext();
+
+        // Set Lock or Queue
+        if (!$process_queue) {
+            $this->setLockOrQueue();
+        }
+
+        // Dipatch to the create|update process
+        $this->dispatchPayment();
+    }
+
+    /**
+     * @description Get all require part to treat the order like cart, order state, ..
+     */
+    private function buildPaymentContext()
+    {
+        $this->logger->addLog('Notification: buildPaymentContext');
 
         // Set the payment
         $this->setPayment();
@@ -365,12 +393,6 @@ class PayPlugNotifications
 
         // Set Context
         $this->setContext();
-
-        // Set Lock or Queue
-        $this->setLockOrQueue();
-
-        // Dipatch to the create|update process
-        $this->dispatchPayment();
     }
 
     /**
@@ -546,15 +568,12 @@ class PayPlugNotifications
         $this->addressAdapter = $this->dependencies->getPlugin()->getAddress();
         $this->cartAdapter = $this->dependencies->getPlugin()->getCart();
         $this->configAdapter = $this->dependencies->getPlugin()->getConfiguration();
-        $this->constantAdapter = $this->dependencies->getPlugin()->getConstant();
         $this->contextAdapter = $this->dependencies->getPlugin()->getContext();
         $this->countryAdapter = $this->dependencies->getPlugin()->getCountry();
         $this->currencyAdapter = $this->dependencies->getPlugin()->getCurrency();
         $this->customerAdapter = $this->dependencies->getPlugin()->getCustomer();
         $this->languageAdapter = $this->dependencies->getPlugin()->getLanguage();
-        $this->messageAdapter = $this->dependencies->getPlugin()->getMessage();
         $this->orderAdapter = $this->dependencies->getPlugin()->getOrder();
-        $this->orderHistoryAdapter = $this->dependencies->getPlugin()->getOrderHistory();
         $this->shopAdapter = $this->dependencies->getPlugin()->getShop();
         $this->toolsAdapter = $this->dependencies->getPlugin()->getTools();
         $this->validateAdapter = $this->dependencies->getPlugin()->getValidate();
