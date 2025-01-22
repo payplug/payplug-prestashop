@@ -201,7 +201,10 @@ class PayPlugNotifications
                 : $this->resource->id;
 
             // Check if this notification is the first of the day
-            $is_first_order = empty($this->plugin->getOrderRepository()->getCurrentOrders());
+            $is_first_order = empty($this->dependencies
+                ->getPlugin()
+                ->getOrderRepository()
+                ->getCurrentOrders());
 
             // Then create order
             $order_create = $this->dependencies
@@ -214,7 +217,8 @@ class PayPlugNotifications
 
             // Before ending process, if this is the first order of the days, we send the telemetries
             if ($is_first_order) {
-                $this->plugin
+                $this->dependencies
+                    ->getPlugin()
                     ->getMerchantTelemetryAction()
                     ->sendAction('notification');
             }
