@@ -110,6 +110,9 @@ class PluginEntity
     private $logger;
 
     /** @var object */
+    private $merchant_telemetry;
+
+    /** @var object */
     private $merchant_telemetry_action;
 
     /** @var object */
@@ -159,6 +162,9 @@ class PluginEntity
 
     /** @var object */
     private $payment_action;
+
+    /** @var object */
+    private $paymentMethod;
 
     /** @var object */
     private $product;

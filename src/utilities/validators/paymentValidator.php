@@ -1080,7 +1080,7 @@ class paymentValidator
      */
     public function isValidMobilePhoneNumber($phone_number = '', $iso_code = '')
     {
-        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
+        if (!is_string($phone_number) || !$phone_number || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $phone_number must be a valid phone number',

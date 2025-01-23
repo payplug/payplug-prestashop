@@ -39,23 +39,16 @@ if (!defined('_PS_VERSION_')) {
  */
 class PayPlugNotifications
 {
-    public $api_key;
     public $cart;
-    public $except;
-    public $flag;
     public $is_deferred = false;
-    public $is_installment = false;
     public $is_oney = false;
-    public $key;
     public $lock_key;
     public $logger;
     public $order;
     public $order_states = [];
     public $payment;
     public $resource;
-    public $resp;
     public $sandbox;
-    public $type;
     public $query;
 
     private $dependencies;
@@ -64,6 +57,7 @@ class PayPlugNotifications
     private $addressAdapter;
     private $cartAdapter;
     private $configAdapter;
+    private $context;
     private $contextAdapter;
     private $countryAdapter;
     private $currencyAdapter;
@@ -584,10 +578,6 @@ class PayPlugNotifications
      */
     private function setConfig()
     {
-        $this->key = microtime(true) * 10000;
-        $this->flag = false;
-        $this->except = null;
-        $this->resp = [];
         $this->dependencies = new DependenciesClass();
         $this->validators = $this->dependencies->getValidators();
         $this->setAdapters();

@@ -57,11 +57,6 @@ class MyLogPHP
             'FILE';
     }
 
-    public static function factory($installLog)
-    {
-        return new \Payplug\classes\MyLogPHP(_PS_MODULE_DIR_ . $installLog);
-    }
-
     /**
      * @description Function to write non INFOrmation messages that will be written into $LOGFILENAME.
      *

@@ -302,7 +302,7 @@ class OneClickPaymentMethod extends PaymentMethod
                 $card['last4'],
                 $card['expiry_date']
             );
-            $payment_options[$payment_key]['action'] = $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', ['def' => isset($options['deferred']) ? (int) $options['deferred'] : 0], true);
+            $payment_options[$payment_key]['action'] = $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', ['def' => 0], true);
         }
 
         unset($payment_options[$this->name]);

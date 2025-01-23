@@ -4,6 +4,7 @@ namespace PayPlug\tests\actions\OrderAction;
 
 use PayPlug\src\actions\OrderAction;
 use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -83,6 +84,14 @@ class BaseOrderAction extends TestCase
             'getValidators' => [
                 'payment' => $this->payment_validator,
             ],
+        ]);
+
+        $context = \Mockery::mock('Context');
+        $context->shouldReceive([
+            'get' => ContextMock::get(),
+        ]);
+        $this->plugin->shouldReceive([
+            'getContext' => $context,
         ]);
 
         $this->action = \Mockery::mock(OrderAction::class, [$this->dependencies])->makePartial();

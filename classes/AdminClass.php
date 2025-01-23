@@ -49,6 +49,7 @@ class AdminClass
      */
     public function getAdminAjaxUrl($controller_name = 'AdminModules', $id_order = 0)
     {
+        $admin_ajax_url = '';
         if ('AdminModules' == $controller_name) {
             switch ($this->dependencies->name) {
                 case 'pspaylater':
