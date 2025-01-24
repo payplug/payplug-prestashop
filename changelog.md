@@ -5,6 +5,10 @@
   - [PRE-2769](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2644): Fix infinite loop in queue treatment from notification
 
 ## Version 4.16.1
+- Bugfix :
+  - [SMP-3047](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2646): Add sleep 1 second on validation
+
+## Version 4.16.1
 - Feature :
   - [PRE-2106](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2632): PRE-2106 : Remove Oney BE and ES
 
