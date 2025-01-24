@@ -370,6 +370,8 @@ class ValidationAction
             default:
                 break;
         }
+        // this is temporary, sleep 1 second in order to wait for notification
+        sleep(1);
 
         // ...then check if an order exists this related cart before redirect user
         $id_order = $this->dependencies
