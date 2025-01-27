@@ -29,6 +29,7 @@ use PayPlug\classes\DependenciesClass;
 class PayplugValidationModuleFrontController extends ModuleFrontController
 {
     private $cart_id;
+    private $dependencies;
     private $ps;
 
     public function __construct()
@@ -91,7 +92,6 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
      */
     public function initContent()
     {
-        $this->display_column_left = false;
         parent::initContent();
 
         $validation_ajax_url = $this->context->link->getModuleLink(

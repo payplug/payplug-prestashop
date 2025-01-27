@@ -223,6 +223,7 @@ class ConfigClass
 
     private $api_live;
     private $api_test;
+    private $configuration;
     private $configurationAdapter;
     private $constant;
     private $context;
@@ -457,11 +458,6 @@ class ConfigClass
         return new PayPlugNotifications();
     }
 
-    public static function setValidation()
-    {
-        return new PayPlugValidation();
-    }
-
     /**
      * @description Get live permissions.
      *
@@ -513,40 +509,6 @@ class ConfigClass
         }
 
         return false;
-    }
-
-    /**
-     * @description Check if given phone number is valid mobile phone number.
-     *
-     * @deprecated Use paymentValidator::isValidMobilePhoneNumber() insteed
-     *
-     * @param $iso_code
-     * @param false $phone_number
-     *
-     * @return bool
-     */
-    public function isValidMobilePhoneNumber($iso_code, $phone_number = false)
-    {
-        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
-            return false;
-        }
-
-        try {
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
-            $parsed = $phone_util->parse($phone_number, $iso_code);
-
-            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
-                return false;
-            }
-
-            $is_mobile = $phone_util->getNumberType($parsed);
-
-            return in_array($is_mobile, [1, 2], true);
-        } catch (libphonenumberlight\NumberParseException $e) {
-            $this->logger->addLog('ConfigClass::isValidMobilePhoneNumber() - Exception thrown: ' . $e->getMessage());
-
-            return false;
-        }
     }
 
     /**

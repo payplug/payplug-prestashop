@@ -33,7 +33,9 @@ class ModuleAdapter implements ModuleInterface
 {
     public function displayError($error)
     {
-        return \Module::displayError($error);
+        $module = new \Module();
+
+        return $module->displayError($error);
     }
 
     public function getInstanceByName($moduleName)

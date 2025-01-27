@@ -511,6 +511,34 @@ class ApplepayPaymentMethod extends PaymentMethod
             } else {
                 $id_carrier = $delivery_options[0]['identifier'];
             }
+
+            if (!empty($delivery_options)) {
+                $additionalPaymentRequestDatas['shippingMethods'] = $delivery_options;
+            }
+
+            $additionalPaymentRequestDatas['requiredBillingContactFields'] = [
+                'postalAddress',
+                'name',
+            ];
+            $additionalPaymentRequestDatas['requiredShippingContactFields'] = [
+                'email',
+                'name',
+                'phone',
+                'postalAddress',
+            ];
+
+            $lineItems = $this->getLinesItems($carrier ? [$carrier] : $delivery_options);
+            $additionalPaymentRequestDatas['lineItems'] = $lineItems;
+
+            // delete newly created address
+            if (isset($new_address_id)) {
+                $cart_adapter->updateAddresses($this->context->cart, $current_delivery_id, $current_invoice_id);
+                $tmp_address = $address_adapter->get((int) $new_address_id);
+                if (!$tmp_address->id_customer) {
+                    $address_adapter->delete($tmp_address);
+                }
+                $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
+            }
         } else {
             $id_carrier = (int) $this->context->cart->id_carrier;
         }
@@ -540,36 +568,6 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'apple_pay_domain' => $this->context->shop->domain_ssl,
             ])),
         ];
-
-        if ('checkout' != $workflow) {
-            if (!empty($delivery_options)) {
-                $additionalPaymentRequestDatas['shippingMethods'] = $delivery_options;
-            }
-
-            $additionalPaymentRequestDatas['requiredBillingContactFields'] = [
-                'postalAddress',
-                'name',
-            ];
-            $additionalPaymentRequestDatas['requiredShippingContactFields'] = [
-                'email',
-                'name',
-                'phone',
-                'postalAddress',
-            ];
-
-            $lineItems = $this->getLinesItems($carrier ? [$carrier] : $delivery_options);
-            $additionalPaymentRequestDatas['lineItems'] = $lineItems;
-
-            // delete newly created address
-            if (isset($new_address_id)) {
-                $cart_adapter->updateAddresses($this->context->cart, $current_delivery_id, $current_invoice_id);
-                $tmp_address = $address_adapter->get((int) $new_address_id);
-                if (!$tmp_address->id_customer) {
-                    $address_adapter->delete($tmp_address);
-                }
-                $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
-            }
-        }
 
         return array_merge($applePayPaymentRequest, $additionalPaymentRequestDatas);
     }
@@ -631,7 +629,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             'city' => $address_data['locality'],
             'country' => $address_data['countryCode'],
             'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
-            'email' => !empty($shipping_email) ? $shipping_email : $address_data['emailAddress'],
+            'email' => '' != $shipping_email ? $shipping_email : $address_data['emailAddress'],
         ];
 
         if (isset($address_data['phoneNumber'])) {

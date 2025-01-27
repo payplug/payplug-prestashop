@@ -29,6 +29,8 @@ if (!defined('_PS_VERSION_')) {
 
 class Country
 {
+    private $dependencies;
+
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;

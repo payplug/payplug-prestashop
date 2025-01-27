@@ -595,6 +595,10 @@ class ConfigurationAction
             ];
         }
 
+        $applepay_cart = false;
+        $applepay_product = false;
+        $applepay_checkout = false;
+
         if (isset($datas->enable_applepay)) {
             $applepay_cart = isset($datas->enable_applepay_cart) && (bool) $datas->enable_applepay_cart;
             $applepay_product = isset($datas->enable_applepay_product) && (bool) $datas->enable_applepay_product;
@@ -779,7 +783,7 @@ class ConfigurationAction
                 }
             }
 
-            if ('payplug_enable' == $key && (bool) $value) {
+            if ('payplug_enable' == $key && (bool) $datas->payplug_enable) {
                 $module = $this->dependencies->getPlugin()->getModule();
                 $module->getInstanceByName($this->dependencies->name)->enable();
             }

@@ -82,7 +82,7 @@ class LoggerRepository extends BaseClass
 
         $debug = '';
         $debugBacktrace = debug_backtrace();
-        if (isset($debugBacktrace)) {
+        if (!empty($debugBacktrace)) {
             $debug = reset($debugBacktrace);
         }
 
@@ -115,7 +115,7 @@ class LoggerRepository extends BaseClass
             return $this->updateLog();
         }
 
-        $this->addToDb();
+        return $this->addToDb();
     }
 
     /**
@@ -142,6 +142,8 @@ class LoggerRepository extends BaseClass
         }
 
         $this->loggerEntity->setId((int) $id_logger);
+
+        return true;
     }
 
     /**

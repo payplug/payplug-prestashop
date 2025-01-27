@@ -46,9 +46,7 @@ class PrestashopAdapter17
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
-        $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->oney = $this->dependencies->getPlugin()->getOney();
-        $this->paymentClass = $this->dependencies->paymentClass;
     }
 
     public function displayHeader()
