@@ -856,7 +856,7 @@ class OneyPaymentMethod extends PaymentMethod
             }
 
             $iso_list = explode(',', $iso_code_list);
-            if (isset($iso_list)) {
+            if (!empty($iso_list)) {
                 $country = reset($iso_list);
             }
         }
@@ -880,7 +880,7 @@ class OneyPaymentMethod extends PaymentMethod
         foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
             if (isset($oney_simulation['installments']) && $oney_simulation['installments']) {
                 $payment_list[$method] = $this->formatOneyResource($method, $oney_simulation, $amount);
-                if (isset($use_fees) && !$use_fees) {
+                if (!$use_fees) {
                     $payment_list[$method]['effective_annual_percentage_rate'] = 0;
                 }
             }
@@ -1417,7 +1417,7 @@ class OneyPaymentMethod extends PaymentMethod
      */
     public function hasOneyRequiredFields($payment_data = [])
     {
-        if (!$payment_data || !is_array($payment_data) || empty($payment_data)) {
+        if (!is_array($payment_data) || empty($payment_data)) {
             return false;
         }
 
@@ -1435,12 +1435,11 @@ class OneyPaymentMethod extends PaymentMethod
         // Validate phone number
         $is_valid_phone = $this->validators['payment']
             ->isPhoneNumber($shipping['mobile_phone_number'])['result'];
-        $is_valid_mobile_phone_number = $this->validators['payment']
-            ->isValidMobilePhoneNumber($shipping['country'], $shipping['mobile_phone_number'])['result'];
-        $valid_shipping_mobile = $is_valid_phone && $this->dependencies->configClass->isValidMobilePhoneNumber(
-            $shipping['country'],
-            $shipping['mobile_phone_number']
-        );
+        $valid_shipping_mobile = $is_valid_phone && $this->validators['payment']
+            ->isValidMobilePhoneNumber(
+                $shipping['mobile_phone_number'],
+                $shipping['country']
+            )['result'];
 
         if (!$valid_shipping_mobile) {
             return true;
@@ -1457,12 +1456,11 @@ class OneyPaymentMethod extends PaymentMethod
         // Validate phone number
         $is_valid_phone = $this->validators['payment']
             ->isPhoneNumber($billing['mobile_phone_number'])['result'];
-        $is_valid_mobile_phone_number = $this->validators['payment']
-            ->isValidMobilePhoneNumber($shipping['country'], $shipping['mobile_phone_number'])['result'];
-        $valid_billing_mobile = $is_valid_phone && $this->dependencies->configClass->isValidMobilePhoneNumber(
-            $billing['country'],
-            $billing['mobile_phone_number']
-        );
+        $valid_billing_mobile = $is_valid_phone && $this->validators['payment']
+            ->isValidMobilePhoneNumber(
+                $shipping['mobile_phone_number'],
+                $shipping['country']
+            )['result'];
 
         if (!$valid_billing_mobile) {
             return true;

@@ -47,6 +47,8 @@ if (!defined('_PS_VERSION_')) {
 class API
 {
     private $current_api_key = '';
+
+    private $dependencies;
     private $site_url = '';
     private $portal_url = '';
     private $api_url = '';

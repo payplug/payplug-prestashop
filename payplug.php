@@ -35,6 +35,7 @@ class Payplug extends PaymentModule
 
     /** @var array */
     public $adminControllers;
+    public $errors;
     public $module;
 
     /**
@@ -107,10 +108,12 @@ class Payplug extends PaymentModule
                     ->getConfigurationAction()
                     ->disableAction();
         }
+
+        return true;
     }
 
     /**
-     * @return string
+     * Redirect to our Module configuration controller.
      *
      * @see Module::getContent()
      */

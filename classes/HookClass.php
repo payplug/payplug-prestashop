@@ -110,6 +110,8 @@ class HookClass
         if ($this->sql->checkExistingTable($this->dependencies->name . '_cache', 1)) {
             return $this->cache->flushCache();
         }
+
+        return true;
     }
 
     /**

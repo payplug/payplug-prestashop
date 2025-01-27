@@ -31,6 +31,7 @@ class Address
 {
     /** @var object */
     protected $address_adapter;
+    protected $dependencies;
 
     public function __construct($dependencies)
     {

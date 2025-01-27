@@ -119,8 +119,8 @@ class MediaClass
             'portal_url' => $this->dependencies->getPlugin()->getApiService()->getPortalUrl(),
             'inst_id' => $inst_id,
         ]);
-        $this->html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
-        exit(json_encode(['content' => $this->html]));
+        $html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
+        exit(json_encode(['content' => $html]));
     }
 
     /**

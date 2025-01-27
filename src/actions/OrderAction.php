@@ -487,13 +487,18 @@ class OrderAction
             return [];
         }
 
+        $context = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get();
+
         // Check order state history
         $undefined_history_states = $this->dependencies->orderClass->getUndefinedOrderHistory((int) $order->id);
         if (!empty($undefined_history_states)) {
             $order_details['payplug_order_state_url'] = $this->dependencies
                 ->getPlugin()
                 ->getRoutes()
-                ->getExternalUrl($this->context->language->iso_code)['order_state'];
+                ->getExternalUrl($context->language->iso_code)['order_state'];
             $order_details['undefined_history_states'] = $undefined_history_states;
         }
 
