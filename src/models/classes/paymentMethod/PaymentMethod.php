@@ -247,6 +247,8 @@ class PaymentMethod
             'mybank',
             'ideal',
             'oney',
+            'email_link',
+            'sms_link',
         ];
     }
 
