@@ -1,11 +1,12 @@
 # Payplug module changelog
 
+## Version 4.17.0
+- Feature :
+  - [PRE-2725](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2647): Register user client id through the portal
+
 ## Version 4.16.2
 - Bugfix :
   - [PRE-2769](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2644): Fix infinite loop in queue treatment from notification
-
-## Version 4.16.1
-- Bugfix :
   - [SMP-3047](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2646): Add sleep 1 second on validation
 
 ## Version 4.16.1

@@ -16,24 +16,23 @@ class BaseApi extends MockeryTestCase
 {
     use FormatDataProvider;
 
-    protected $api;
-    protected $authentication;
-    protected $card;
-    protected $dependencies;
-    protected $installment_plan;
-    protected $oney_simulation;
-    protected $payment;
-    protected $plugin;
-    protected $refund;
-    protected $resource_attribute;
-    protected $resource_id;
-    protected $service;
+    public $api;
+    public $authentication;
+    public $card;
+    public $dependencies;
+    public $installment_plan;
+    public $oney_simulation;
+    public $payment;
+    public $plugin;
+    public $refund;
+    public $resource_attribute;
+    public $resource_id;
+    public $service;
 
     public function setUp()
     {
-        $this->plugin = \Mockery::mock('Plugin');
-        $this->plugin->shouldReceive([]);
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
+        $this->plugin = \Mockery::mock('Plugin');
         $this->dependencies->name = 'payplug';
         $this->dependencies->shouldReceive([
             'getPlugin' => $this->plugin,
@@ -57,9 +56,10 @@ class BaseApi extends MockeryTestCase
             'allow_save_card' => false,
         ];
         $this->resource_id = 'pay_azerty12345';
-        $this->service = Mockery::mock(API::class, [$this->dependencies])
+        $this->service = Mockery::mock(API::class)
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
+        $this->service->dependencies = $this->dependencies;
         $this->service->shouldReceive([
             'checkEnvironment' => true,
             'setEnvironment' => true,

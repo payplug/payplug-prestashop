@@ -3,5 +3,14 @@ services:
   _defaults:
     public: true
 
+  payplug.dependencies_class:
+    class: PayPlug\classes\DependenciesClass
+
   payplug.models.classes.merchant:
     class: PayPlug\src\models\classes\Merchant
+
+  payplug.utilities.service.api:
+    class: PayPlug\src\utilities\services\API
+
+  payplug.utilities.validator.regex:
+    class: PayPlug\src\utilities\validators\RegexValidator

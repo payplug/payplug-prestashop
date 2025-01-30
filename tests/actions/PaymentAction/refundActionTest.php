@@ -15,11 +15,11 @@ use PayPlug\tests\mock\RefundMock;
  */
 class refundActionTest extends BasePaymentAction
 {
-    private $resource_id;
-    private $amount;
-    private $id_customer;
-    private $id_order;
-    private $update_order_state;
+    public $resource_id;
+    public $amount;
+    public $id_customer;
+    public $id_order;
+    public $update_order_state;
 
     public function setUp()
     {
