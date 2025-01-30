@@ -11,8 +11,8 @@ namespace PayPlug\tests\actions\CartAction;
  */
 class renderPaymentCtaTest extends BaseCartAction
 {
-    private $payment_method;
-    private $payment_method_class;
+    public $payment_method;
+    public $payment_method_class;
 
     public function setUp()
     {

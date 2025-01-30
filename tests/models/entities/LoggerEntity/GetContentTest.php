@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\LoggerEntity;
  */
 final class GetContentTest extends BaseLoggerEntity
 {
-    private $content;
+    public $content;
 
     public function setUp()
     {

@@ -40,6 +40,9 @@ class BaseApiRest extends TestCase
     protected $tools_adapter;
     protected $translation;
     protected $validate_adapter;
+    protected $module;
+    protected $module_adapter;
+    protected $merchant_class;
 
     public function setUp()
     {
@@ -105,10 +108,25 @@ class BaseApiRest extends TestCase
         $this->cart_adapter = \Mockery::mock('CartAdapter');
         $this->country = \Mockery::mock('Country');
 
+        $this->api_service = \Mockery::mock('ApiService');
+        $this->merchant_class = \Mockery::mock('MerchantClass');
+        $this->module = \Mockery::mock('Module');
+        $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->module_adapter->shouldReceive([
+            'getInstanceByName' => $this->module,
+        ]);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.api')
+            ->andReturn($this->api_service);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.models.classes.merchant')
+            ->andReturn($this->merchant_class);
+
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin->shouldReceive([
             'getAddress' => $this->address_adapter,
-            'getApiService' => $this->api_service,
             'getAssign' => $this->assign_adapter,
             'getCarrier' => $this->carrier_adapter,
             'getCart' => $this->cart_adapter,
@@ -119,6 +137,7 @@ class BaseApiRest extends TestCase
             'getCountry' => $this->country,
             'getCurrency' => $this->currency_adapter,
             'getLogger' => $this->logger,
+            'getModule' => $this->module_adapter,
             'getPaymentMethodClass' => $this->payment_method,
             'getRoutes' => \Mockery::mock(Routes::class)->makePartial(),
             'getTools' => $this->tools_adapter,

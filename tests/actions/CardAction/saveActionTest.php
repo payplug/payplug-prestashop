@@ -13,7 +13,7 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class saveActionTest extends BaseCardAction
 {
-    private $payment;
+    public $payment;
 
     public function setUp()
     {
