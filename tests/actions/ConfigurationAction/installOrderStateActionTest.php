@@ -11,7 +11,7 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  */
 class installOrderStateActionTest extends BaseConfigurationAction
 {
-    private $order_state;
+    public $order_state;
 
     public function setUp()
     {

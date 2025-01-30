@@ -40,7 +40,6 @@ class Payplug extends PaymentModule
 
     /** @var array */
     public $adminControllers;
-    public $errors;
     public $module;
 
     /**
@@ -113,8 +112,6 @@ class Payplug extends PaymentModule
                     ->getConfigurationAction()
                     ->disableAction();
         }
-
-        return true;
     }
 
     /**
@@ -469,9 +466,8 @@ class Payplug extends PaymentModule
             }
 
             $context->smarty->assign([
-                'api_url' => $dependencies
-                    ->getPlugin()
-                    ->getApiService()
+                'api_url' => $this
+                    ->getService('payplug.utilities.service.api')
                     ->getApiUrl(),
             ]);
 
@@ -576,10 +572,12 @@ class Payplug extends PaymentModule
             $helpers['files']::clean();
 
             // Call getAccount method to update countries and amounts configurations from merchant account
-            $api_key = $this->module
-                ->getPlugin()
-                ->getApiService()
+            $api_key = $this
+                ->getService('payplug.utilities.service.api')
                 ->getCurrentApiKey();
+            $permissions = $this
+                ->getService('payplug.utilities.service.api')
+                ->getAccount((string) $api_key, false);
         }
 
         return parent::runUpgradeModule();

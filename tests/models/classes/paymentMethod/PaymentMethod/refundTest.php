@@ -16,9 +16,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class refundTest extends BasePaymentMethod
 {
-    private $resource_id;
-    private $amount;
-    private $metadata;
+    public $resource_id;
+    public $amount;
+    public $metadata;
 
     public function setUp()
     {
