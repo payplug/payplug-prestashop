@@ -11,7 +11,7 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class deleteFromDateTest extends BaseLoggerRepository
 {
-    private $date;
+    public $date;
 
     public function setUp()
     {

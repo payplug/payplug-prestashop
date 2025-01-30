@@ -15,7 +15,7 @@ use PayPlug\tests\mock\ContextMock;
  */
 final class GetOneyRequiredFieldsTest extends BaseOneyRepository
 {
-    private $addressMock;
+    public $addressMock;
 
     public function setUp()
     {

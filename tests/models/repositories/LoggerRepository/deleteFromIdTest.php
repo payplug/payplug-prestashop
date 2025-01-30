@@ -11,7 +11,7 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class deleteFromIdTest extends BaseLoggerRepository
 {
-    private $last_id;
+    public $last_id;
 
     public function setUp()
     {

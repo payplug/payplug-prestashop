@@ -1177,7 +1177,9 @@ class PaymentMethod
 
         $patchPayment = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->patchPayment($resource->id, $data);
         if (!$patchPayment['result']) {
             $this->logger->addLog('PaymentMethod::postProcessOrder() - Payment resource can not be patch for given datas');
@@ -1376,7 +1378,11 @@ class PaymentMethod
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $is_live = !(bool) $configuration->getValue('sandbox_mode');
-        $api_service = $this->dependencies->getPlugin()->getApiService();
+        $api_service = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api');
 
         if ($resource->is_live != $is_live) {
             $api_service->initialize((bool) $resource->is_live);
@@ -1627,7 +1633,9 @@ class PaymentMethod
         if (!$this->api_service) {
             $this->api_service = $this->dependencies
                 ->getPlugin()
-                ->getApiService();
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api');
         }
         if (!$this->configuration) {
             $this->configuration = $this->dependencies

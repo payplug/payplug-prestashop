@@ -12,8 +12,8 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
  */
 class prepareAddressDataTest extends BaseApplepayPaymentMethod
 {
+    public $address_data;
     protected $tools_adapter;
-    private $address_data;
 
     public function setUp()
     {

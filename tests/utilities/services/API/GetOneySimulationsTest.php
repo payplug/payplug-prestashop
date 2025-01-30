@@ -13,7 +13,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
  */
 class GetOneySimulationsTest extends BaseApi
 {
-    private $data;
+    public $data;
 
     public function setUp()
     {
