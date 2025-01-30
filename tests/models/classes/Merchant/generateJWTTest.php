@@ -11,16 +11,14 @@ namespace PayPlug\tests\models\classes\Merchant;
  */
 class generateJWTTest extends BaseMerchant
 {
-    private $api_service;
-    private $client_datas;
-    private $client_id;
-    private $generated_jwt;
-    private $jwt;
+    public $client_datas;
+    public $client_id;
+    public $generated_jwt;
+    public $jwt;
 
     public function setUp()
     {
         parent::setUp();
-        $this->api_service = \Mockery::mock('ApiService');
         $this->client_datas = [
             'test' => [
                 'client_id' => 'some_client_id_test',
@@ -56,9 +54,6 @@ class generateJWTTest extends BaseMerchant
                 'token_type' => 'bearer',
             ],
         ];
-        $this->plugin->shouldReceive([
-            'getApiService' => $this->api_service,
-        ]);
     }
 
     /**

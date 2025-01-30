@@ -16,9 +16,9 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class postProcessOrderTest extends BasePaymentMethod
 {
-    private $order_adapter;
-    private $retrieve;
-    private $id_order;
+    public $order_adapter;
+    public $retrieve;
+    public $id_order;
 
     public function setUp()
     {

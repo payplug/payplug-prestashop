@@ -599,7 +599,7 @@ class PaymentAction
             ->getPaymentMethodClass()
             ->getPaymentMethod($stored_resource['method']);
 
-        // Get the refundable amount for the getted resource ID
+        // Get the refundable amount for the got resource ID
         $refundable_amount = $payment_method->getRefundableAmount($stored_resource['resource_id']);
 
         // Check if given amount to refund is valid
