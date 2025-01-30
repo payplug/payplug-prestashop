@@ -27,7 +27,7 @@ class initializeTest extends BasePaymentRepository
         $this->assertFalse($this->repository->initialize($this->engine));
     }
 
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->shouldReceive([
             'getEntityObject' => null,
