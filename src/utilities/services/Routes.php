@@ -27,7 +27,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PayPlug\src\exceptions\BadParameterException;
 use Symfony\Component\Dotenv\Dotenv;
 
 class Routes
@@ -46,11 +45,6 @@ class Routes
             $api_url = $_ENV['API_BASE_URL'];
         } else {
             $api_url = 'https://api.payplug.com';
-        }
-
-        if (!is_string($api_url)
-            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
-            throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
         }
 
         return $api_url;
@@ -138,7 +132,7 @@ class Routes
             'refund' => $default . '/articles/360022214692',
             'sandbox' => $default . '/articles/360021142492',
             'satispay' => $default . '/articles/8089121532700',
-            'signup' => 'https://portal.payplug.com/signup',
+            'signup' => 'https://portal.payplug.com/auth/signup',
         ];
     }
 }

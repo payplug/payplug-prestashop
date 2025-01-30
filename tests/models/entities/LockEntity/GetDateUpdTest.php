@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\LockEntity;
  */
 final class GetDateUpdTest extends BaseLockEntity
 {
-    private $date;
+    public $date;
 
     public function setUp()
     {

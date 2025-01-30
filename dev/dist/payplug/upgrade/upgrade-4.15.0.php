@@ -26,7 +26,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_15_0($object)
 {
-    $logger = $object->module->getPlugin()->getLogger();
+    $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.15.0');
 
     $flag = Configuration::updateValue('PAYPLUG_JWT', '{}');

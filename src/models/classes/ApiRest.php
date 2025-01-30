@@ -32,6 +32,7 @@ class ApiRest
     private $dependencies;
     private $helpers;
     private $validators;
+    private $module;
 
     public function __construct($dependencies)
     {
@@ -56,10 +57,36 @@ class ApiRest
             return [];
         }
 
-        $configurationAction = $this->dependencies->getPlugin()->getConfigurationAction();
-        $tools = $this->dependencies->getPlugin()->getTools();
+        $configurationAction = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationAction();
+        $tools = $this->dependencies
+            ->getPlugin()
+            ->getTools();
+        $this->module = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
 
         switch ($action) {
+            case 'login_portal':
+                $api = $this->module->getService('payplug.utilities.service.api');
+                $context = $this->dependencies
+                    ->getPlugin()
+                    ->getContext()
+                    ->get();
+                $register_url = $api->getRegisterUrl($context->link->getAdminLink('AdminPayplug'));
+                $json = [
+                    'success' => $register_url['result'],
+                ];
+                if ($register_url['result']) {
+                    $json['url'] = $register_url['redirection'];
+                } else {
+                    $json['message'] = $register_url['message'];
+                }
+
+                break;
+
             case 'login':
                 $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->loginAction($datas);
@@ -145,23 +172,14 @@ class ApiRest
             ->getPlugin()
             ->getConfigurationClass();
 
-        $userHelper = $this->helpers['user'];
-        $is_api_key = $this->validators['account']->isApiKey(
-            $configuration->getValue('test_api_key')
-        );
-        $is_email = $this->validators['account']->isEmail(
-            $configuration->getValue('email')
-        );
-        $logged = false;
-        if ($is_api_key['result'] && $is_email['result']) {
-            $logged = $userHelper->isLogged(
-                $is_email['result'],
-                $is_api_key['result']
-            )['result'];
-        }
+        $logged = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.models.classes.merchant')
+            ->isLogged();
 
-        $psAccountConnected = $this->dependencies->configClass->checkPsAccount();
-        if ($logged && !$psAccountConnected) {
+        if (!$logged) {
             $this->dependencies
                 ->getPlugin()
                 ->getConfigurationAction()
@@ -288,7 +306,7 @@ class ApiRest
             'options' => [
                 'type' => 'select',
                 'name' => 'payplug_enable',
-                'disabled' => !$this->dependencies->configClass->checkPsAccount() || !$current_configuration['logged'],
+                'disabled' => !$current_configuration['logged'],
                 'options' => [
                     [
                         'value' => 1,
@@ -322,8 +340,14 @@ class ApiRest
             ->getPlugin()
             ->getConfigurationClass();
 
-        $live_api_key = $configuration->getValue('live_api_key');
-        $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $live_api_key, false);
+        $this->module = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
+
+        $permissions = $this->module
+            ->getService('payplug.utilities.service.api')
+            ->getAccount();
         if (!$permissions) {
             return [];
         }
@@ -342,11 +366,9 @@ class ApiRest
             ->getRoutes()
             ->getExternalUrl($iso_code);
 
-        if ('pspaylater' == $this->dependencies->name) {
-            $active = $live_api_key && $permissions['onboarding_oney_completed'];
-        } else {
-            $active = is_null($live_api_key) ? false : $live_api_key;
-        }
+        $active = $this->module
+            ->getService('payplug.models.classes.merchant')
+            ->isOnboarded();
 
         $default_configuration = [
             'sandbox_mode' => $configuration->getDefault('sandbox_mode'),
@@ -368,41 +390,39 @@ class ApiRest
             . '</span>';
         $inactive_description = str_replace('$trigger', $live_trigger, $inactive_description);
 
+        $description = [
+            'description' => $translation['description'],
+            'logout' => $translation['user']['logout'],
+            'mode' => $translation['mode']['title'],
+            'mode_description' => $translation['mode']['description']['live'],
+            'link_learn_more' => [
+                'text' => $translation['mode']['link']['live'],
+                'url' => $external_url['sandbox'],
+                'target' => '_blank',
+            ],
+            'link_access_portal' => [
+                'text' => $translation['user']['link'],
+                'url' => $external_url['portal'],
+                'target' => '_blank',
+            ],
+        ];
+        $inactive_modal = [
+            'inactive' => !$active,
+            'title' => $translation['inactive']['modal']['title'],
+            'description_1' => $translation['inactive']['modal']['description_1'],
+            'description_2' => $translation['inactive']['modal']['description_2'],
+            'cancel' => $translation['inactive']['modal']['cancel'],
+            'oauth' => $translation['inactive']['modal']['oauth'],
+            'oauth_url' => $this->module
+                ->getService('payplug.utilities.service.api')
+                ->getRegisterUrl($context->link->getAdminLink('AdminPayplug'))['redirection'],
+        ];
+
         return [
             'title' => $translation['title'],
             'descriptions' => [
-                'live' => [
-                    'description' => $translation['description'],
-                    'logout' => $translation['user']['logout'],
-                    'mode' => $translation['mode']['title'],
-                    'mode_description' => $translation['mode']['description']['live'],
-                    'link_learn_more' => [
-                        'text' => $translation['mode']['link']['live'],
-                        'url' => $external_url['sandbox'],
-                        'target' => '_blank',
-                    ],
-                    'link_access_portal' => [
-                        'text' => $translation['user']['link'],
-                        'url' => $external_url['portal'],
-                        'target' => '_blank',
-                    ],
-                ],
-                'sandbox' => [
-                    'description' => $translation['description'],
-                    'logout' => $translation['user']['logout'],
-                    'mode' => $translation['mode']['title'],
-                    'mode_description' => $translation['mode']['description']['sandbox'],
-                    'link_learn_more' => [
-                        'text' => $translation['mode']['link']['sandbox'],
-                        'url' => $external_url['sandbox'],
-                        'target' => '_blank',
-                    ],
-                    'link_access_portal' => [
-                        'text' => $translation['user']['link'],
-                        'url' => $external_url['portal'],
-                        'target' => '_blank',
-                    ],
-                ],
+                'live' => $description,
+                'sandbox' => $description,
             ],
             'options' => [
                 [
@@ -419,14 +439,7 @@ class ApiRest
                 ],
             ],
             'can_be_disabled' => true,
-            'inactive_modal' => [
-                'inactive' => !$active,
-                'title' => $translation['inactive']['modal']['title'],
-                'description' => $translation['inactive']['modal']['description'],
-                'password_label' => $translation['inactive']['modal']['password_label'],
-                'cancel' => $translation['inactive']['modal']['cancel'],
-                'ok' => $translation['inactive']['modal']['ok'],
-            ],
+            'inactive_modal' => $inactive_modal,
             'payment_link' => [
                 'active' => true,
                 'info' => [
@@ -452,55 +465,38 @@ class ApiRest
     }
 
     /**
-     * @description build login section for api usage
+     * @description build oauth section for front usage
      *
      * @return array
      */
-    public function getLoginSection()
+    public function getOAuthSection()
     {
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslationClass()
-            ->getLoginTranslations();
+            ->getOauthLoginTranslations();
+        $context = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get();
+        $title = $translation['title'];
+        unset($translation['title']);
+        $external_urls = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl();
+        $translation['form']['create_account_url'] = $external_urls['signup'];
+        $translation['form']['forgot_password_url'] = $external_urls['forgot_password'];
+        $translation['sso']['button_url'] = $this->module
+            ->getService('payplug.utilities.service.api')
+            ->getRegisterUrl($context->link->getAdminLink('AdminPayplug'))['redirection'];
 
         return [
-            'name' => 'generalLogin',
-            'title' => $translation['title'],
+            'name' => 'oauthLogin',
+            'title' => $title,
             'descriptions' => [
-                'live' => [
-                    'description' => $translation['description'],
-                    'not_registered' => $translation['register'],
-                    'connect' => $translation['connect'],
-                    'email_label' => $translation['email'],
-                    'email_placeholder' => $translation['email'],
-                    'password_label' => $translation['password'],
-                    'password_placeholder' => $translation['password'],
-                    'link_forgot_password' => [
-                        'text' => $translation['forgot_password'],
-                        'url' => $this->dependencies
-                            ->getPlugin()
-                            ->getRoutes()
-                            ->getExternalUrl()['forgot_password'],
-                        'target' => '_blank',
-                    ],
-                ],
-                'sandbox' => [
-                    'description' => $translation['description'],
-                    'not_registered' => $translation['register'],
-                    'connect' => $translation['connect'],
-                    'email_label' => $translation['email'],
-                    'email_placeholder' => $translation['email'],
-                    'password_label' => $translation['password'],
-                    'password_placeholder' => $translation['password'],
-                    'link_forgot_password' => [
-                        'text' => $translation['forgot_password'],
-                        'url' => $this->dependencies
-                            ->getPlugin()
-                            ->getRoutes()
-                            ->getExternalUrl()['forgot_password'],
-                        'target' => '_blank',
-                    ],
-                ],
+                'live' => $translation,
+                'sandbox' => $translation,
             ],
         ];
     }
@@ -714,7 +710,6 @@ class ApiRest
             'email' => $current_configuration['email'],
             'logged' => $current_configuration['logged'],
             'mode' => (bool) $current_configuration['sandbox_mode'] ? 1 : 0,
-            'psaccount' => $this->dependencies->configClass->checkPsAccount(),
         ];
     }
 

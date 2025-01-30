@@ -212,7 +212,9 @@ class InstallmentPaymentMethod extends PaymentMethod
                 $pay_id = $schedule->payment_ids[0];
                 $retrieve_payment = $this->dependencies
                     ->getPlugin()
-                    ->getApiService()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.utilities.service.api')
                     ->retrievePayment($pay_id);
                 if ($retrieve_payment['result']) {
                     $amount_refounded += $retrieve_payment['resource']->amount_refunded;
@@ -501,12 +503,16 @@ class InstallmentPaymentMethod extends PaymentMethod
             : '';
 
         // todo: getter of $_SERVER['HTTP_USER_AGENT'] should be in a service
+        $regex_validator = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.validator.regex');
+
         return [
             'return_url' => $return_url,
             'embedded' => 'redirect' != (string) $this->configuration->getValue('embedded_mode')
-                && !$this->dependencies
-                    ->getValidators()['browser']
-                    ->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'],
+                && !$regex_validator->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'],
         ];
     }
 
@@ -709,7 +715,9 @@ class InstallmentPaymentMethod extends PaymentMethod
                 $pay_id = $schedule->payment_ids[0];
                 $retrieve_payment = $this->dependencies
                     ->getPlugin()
-                    ->getApiService()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.utilities.service.api')
                     ->retrievePayment($pay_id);
                 if ($retrieve_payment['result']) {
                     $resource = $retrieve_payment['resource'];
@@ -756,7 +764,9 @@ class InstallmentPaymentMethod extends PaymentMethod
 
         $payment = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->createInstallment($payment_tab);
 
         // If the payment resource can\'t be created due to to bad permission, we update the feature activation
