@@ -1,45 +1,18 @@
 <?php
 
-use PayPlug\src\utilities\validators\browserValidator;
-use PHPUnit\Framework\TestCase;
+namespace PayPlug\tests\utilities\validators\RegexValidator;
 
 /**
  * @group unit
  * @group validator
- * @group module_validator
+ * @group regex_validator
  *
  * @runTestsInSeparateProcesses
  */
-class isMobileDeviceTest extends TestCase
+class isMobileDeviceTest extends BaseRegexValidator
 {
-    protected $validator;
-    private $browserValidator;
-
-    public function setUp()
-    {
-        $this->browserValidator = new BrowserValidator();
-    }
-
     /**
-     * @description  invalid $userAgent data provider
-     *
-     * @return Generator
-     */
-    public function invalidUserAgentDataProvider()
-    {
-        yield [[]];
-
-        yield [''];
-
-        yield [null];
-
-        yield [['key' => 'value']];
-
-        yield [300];
-    }
-
-    /**
-     * @description a non mobiledevice $userAgent provider
+     * @description a non mobiledevice $user_agent provider
      *
      * @return Generator
      */
@@ -49,7 +22,7 @@ class isMobileDeviceTest extends TestCase
     }
 
     /**
-     * @description mobile device $userAgent data provider
+     * @description mobile device $user_agent data provider
      *
      * @return Generator
      */
@@ -65,53 +38,50 @@ class isMobileDeviceTest extends TestCase
     }
 
     /**
-     * @description test with invalid $userAgent format
-     * @dataProvider invalidUserAgentDataProvider
+     * @dataProvider invalidStringFormatDataProvider
      *
-     * @param mixed $userAgent
+     * @param mixed $user_agent
      */
-    public function testWithInvalidArgumentsFormat($userAgent)
+    public function testWhenGivenUserAgentIsntValidStringFormat($user_agent)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Invalid parameter given, $useragent must be a non empty string.',
+                'message' => 'Invalid parameter given, $user_agent must be a non empty string.',
             ],
-            $this->browserValidator->isMobileDevice($userAgent)
+            $this->validator->isMobileDevice($user_agent)
         );
     }
 
     /**
-     * @description test with valid $userAgent format: non mobile Device case
      * @dataProvider nonMobileDeviceUserAgentData
      *
-     * @param mixed $userAgent
+     * @param mixed $user_agent
      */
-    public function testWithValidNonMobileDeviceUserAgent($userAgent)
+    public function testWhenGivenUserAgentIsntAMobileDevice($user_agent)
     {
         $this->assertSame(
             [
                 'result' => false,
                 'message' => 'Current device is not a mobile device.',
             ],
-            $this->browserValidator->isMobileDevice($userAgent)
+            $this->validator->isMobileDevice($user_agent)
         );
     }
 
     /**
-     * @description test with valid $userAgent format: mobile Device case
      * @dataProvider mobileDeviceUserAgentData
      *
-     * @param mixed $userAgent
+     * @param mixed $user_agent
      */
-    public function testWithValidMobileDeviceUserAgent($userAgent)
+    public function testWhenGivenUserAgentIsAMobileDevice($user_agent)
     {
         $this->assertSame(
             [
                 'result' => true,
                 'message' => 'Current device is a mobile device.',
             ],
-            $this->browserValidator->isMobileDevice($userAgent)
+            $this->validator->isMobileDevice($user_agent)
         );
     }
 }

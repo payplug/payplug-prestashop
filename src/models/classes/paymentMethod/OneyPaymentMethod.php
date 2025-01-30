@@ -1030,7 +1030,9 @@ class OneyPaymentMethod extends PaymentMethod
         ];
         $simulations = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getOneySimulations($data);
 
         if (!$simulations['result']) {
@@ -1954,7 +1956,7 @@ class OneyPaymentMethod extends PaymentMethod
             ->get((int) $order_id);
 
         if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
-            $this->logger->addLog('OneyPaymentMethod::updateOrderState() - Invalid argument given, $order getted must be a valid object.', 'error');
+            $this->logger->addLog('OneyPaymentMethod::updateOrderState() - Invalid argument given, $order got must be a valid object.', 'error');
 
             return false;
         }

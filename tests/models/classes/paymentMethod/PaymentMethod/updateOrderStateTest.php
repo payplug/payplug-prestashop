@@ -14,10 +14,10 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class updateOrderStateTest extends BasePaymentMethod
 {
-    private $order_id;
-    private $order;
-    private $order_adapter;
-    private $order_class;
+    public $order_id;
+    public $order;
+    public $order_adapter;
+    public $order_class;
 
     public function setUp()
     {
@@ -60,7 +60,7 @@ class updateOrderStateTest extends BasePaymentMethod
         );
     }
 
-    public function testWhenOrderGettedIsNotValid()
+    public function testWhenOrderGotIsNotValid()
     {
         $this->validate_adapter->shouldReceive([
             'validate' => false,
