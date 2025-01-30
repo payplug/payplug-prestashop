@@ -1,7 +1,7 @@
 # Adaptation of the Gitlab CI/CD pipeline for the PayPlug Prestashop module
 include:
-  - project: "dalenys/protected/cicd/live"
-    ref: "gitlab-ci-template"
+  - project: "dalenys/protected/cicd/live-staging"
+    ref: "gitlab-ci-template-FOUND-2078"
     file:
       - "ci/ci.gitlab-ci.yml"
 
@@ -246,7 +246,5 @@ trigger_release:
       - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "parent_pipeline"
 
 variables:
-  VERSION_FORMAT: "php"
-  SEMANTIC_BRANCHES: "master_and_develop"
   SONAR_ENABLED: "true"
   RUN_FOR_RELEASE: "false"
