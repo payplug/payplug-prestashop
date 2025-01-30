@@ -11,12 +11,12 @@ namespace PayPlug\tests\actions\CartAction;
  */
 class renderApplePayCheckoutTest extends BaseCartAction
 {
-    private $payment_method_class;
-    private $payment_method;
-    private $routes;
-    private $assign;
-    private $media;
-    private $link;
+    public $payment_method_class;
+    public $payment_method;
+    public $routes;
+    public $assign;
+    public $media;
+    public $link;
 
     public function setUp()
     {

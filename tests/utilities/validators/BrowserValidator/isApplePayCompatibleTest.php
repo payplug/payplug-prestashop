@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
  */
 class isApplePayCompatibleTest extends TestCase
 {
+    public $browserValidator;
     protected $validator;
-    private $browserValidator;
 
     public function setUp()
     {
