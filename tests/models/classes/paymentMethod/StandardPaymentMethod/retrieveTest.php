@@ -14,7 +14,7 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class retrieveTest extends BaseStandardPaymentMethod
 {
-    private $stored_payment;
+    public $stored_payment;
 
     public function setUp()
     {

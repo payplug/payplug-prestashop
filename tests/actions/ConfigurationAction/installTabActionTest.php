@@ -58,44 +58,31 @@ class installTabActionTest extends BaseConfigurationAction
 
     public function testWhenRetrieveModuleHasntAdminController()
     {
-        $module = new \stdClass();
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
         $this->assertTrue($this->action->installTabAction());
     }
 
     public function testWhenTabIsAlreadyInstalled()
     {
-        $module = new \stdClass();
-        $module->adminControllers = [
+        $this->module->adminControllers = [
             [
                 'className' => 'AdminController',
             ],
         ];
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
         $this->tab_adapter->shouldReceive([
             'getIdFromClassName' => true,
         ]);
-
         $this->assertTrue($this->action->installTabAction());
     }
 
     public function testWhenTabCantBeSaved()
     {
-        $module = new \stdClass();
-        $module->name = 'payplug';
-        $module->displayName = 'payplug';
-        $module->adminControllers = [
+        $this->module->name = 'payplug';
+        $this->module->displayName = 'payplug';
+        $this->module->adminControllers = [
             [
                 'className' => 'AdminController',
             ],
         ];
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
 
         $tab = \Mockery::mock('Tab');
         $tab->shouldReceive([
@@ -110,17 +97,13 @@ class installTabActionTest extends BaseConfigurationAction
 
     public function testWhenTabIsSaved()
     {
-        $module = new \stdClass();
-        $module->name = 'payplug';
-        $module->displayName = 'payplug';
-        $module->adminControllers = [
+        $this->module->name = 'payplug';
+        $this->module->displayName = 'payplug';
+        $this->module->adminControllers = [
             [
                 'className' => 'AdminController',
             ],
         ];
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
 
         $tab = \Mockery::mock('Tab');
         $tab->shouldReceive([

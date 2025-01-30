@@ -26,7 +26,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_7_1($object)
 {
-    $logger = $object->module->getPlugin()->getLogger();
+    $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.7.1');
 
     $sql = 'UPDATE ' . _DB_PREFIX_ . $object->name . '_payment 

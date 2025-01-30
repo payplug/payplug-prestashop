@@ -12,7 +12,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\BancontactPaymentMethod;
  */
 class getOptionTest extends BaseBancontactPaymentMethod
 {
-    private $config;
+    public $config;
 
     public function setUp()
     {

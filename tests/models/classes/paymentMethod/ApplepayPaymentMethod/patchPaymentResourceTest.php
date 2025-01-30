@@ -14,11 +14,11 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class patchPaymentResourceTest extends BaseApplepayPaymentMethod
 {
-    private $cart_data;
-    private $resource_id;
-    private $token;
-    private $workflow;
-    private $payment_database_mock;
+    public $cart_data;
+    public $resource_id;
+    public $token;
+    public $workflow;
+    public $payment_database_mock;
 
     public function setUp()
     {
@@ -114,12 +114,12 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
         $this->class->shouldReceive([
             'getCartData' => [
                 'result' => false,
-                'message' => 'cart data can not be getted',
+                'message' => 'cart data can not be got',
             ],
         ]);
         $this->assertSame([
             'result' => false,
-            'message' => 'cart data can not be getted',
+            'message' => 'cart data can not be got',
         ], $this->class->patchPaymentResource($this->resource_id, $this->token, $this->workflow));
     }
 

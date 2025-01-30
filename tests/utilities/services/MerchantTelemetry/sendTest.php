@@ -17,29 +17,15 @@ class sendTest extends TestCase
 {
     use FormatDataProvider;
 
+    protected $data;
     protected $service;
+    protected $plugin_telemetry;
 
     public function setUp()
     {
+        $this->data = 'some_json_data';
         $this->service = new MerchantTelemetry();
-    }
-
-    /**
-     * @dataProvider invalidStringFormatDataProvider
-     *
-     * @param mixed $api_key
-     */
-    public function testWhenGivenApiKeyHasInvalidStringFormat($api_key)
-    {
-        $datas = 'string value';
-        $this->assertSame(
-            [
-                'code' => null,
-                'result' => false,
-                'message' => 'Invalid argument given, $api_key must be a non empty string',
-            ],
-            $this->service->send($api_key, $datas)
-        );
+        $this->plugin_telemetry = \Mockery::mock('alias:Payplug\PluginTelemetry');
     }
 
     /**
@@ -49,22 +35,48 @@ class sendTest extends TestCase
      */
     public function testWhenGivenDatasHasInvalidStringFormat($datas)
     {
-        $api_key = 'string value';
         $this->assertSame(
             [
-                'code' => null,
                 'result' => false,
+                'code' => null,
                 'message' => 'Invalid argument given, $datas must be a non empty string',
             ],
-            $this->service->send($api_key, $datas)
+            $this->service->send($datas)
         );
     }
 
-    public function testWhenSendReturnAnError()
+    public function testWhenNotFoundExceptionIsThrown()
     {
+        $this->plugin_telemetry
+            ->shouldReceive('Send')
+            ->andThrow(new \Exception('An error occured during the process', 404));
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'code' => 404,
+                'message' => 'An error occured during the process',
+            ],
+            $this->service->send($this->data)
+        );
     }
 
-    public function testWhenSendReturn()
+    public function testWhenTelemetryIsSend()
     {
+        $success_code = 201;
+        $this->plugin_telemetry->shouldReceive([
+            'Send' => [
+                'httpStatus' => $success_code,
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'code' => $success_code,
+                'message' => '',
+            ],
+            $this->service->send($this->data)
+        );
     }
 }

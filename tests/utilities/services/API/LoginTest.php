@@ -11,8 +11,8 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class LoginTest extends BaseApi
 {
-    private $email;
-    private $password;
+    public $email;
+    public $password;
 
     public function setUp()
     {

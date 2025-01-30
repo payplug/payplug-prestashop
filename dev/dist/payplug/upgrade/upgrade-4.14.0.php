@@ -26,7 +26,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_14_0($object)
 {
-    $logger = $object->module->getPlugin()->getLogger();
+    $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.14.0');
 
     $alter_table_sql = 'ALTER TABLE `' . _DB_PREFIX_ . $object->name . '_payment`
@@ -42,7 +42,7 @@ function upgrade_module_4_14_0($object)
         $logger->addLog($e->getMessage(), 'error');
     }
 
-    $flag = Configuration::updateValue('PAYPLUG_CLIENT_DATA', '{}');
+    $flag = Configuration::updateValue('PAYPLUG_OAUTH_CLIENT_DATA', '{}');
 
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
     unset($payment_methods['sofort']);

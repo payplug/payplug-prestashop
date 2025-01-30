@@ -26,7 +26,7 @@ class createEntityTest extends BaseEntityRepository
         $this->assertSame(0, $this->repository->createEntity($this->entity_fields));
     }
 
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([
