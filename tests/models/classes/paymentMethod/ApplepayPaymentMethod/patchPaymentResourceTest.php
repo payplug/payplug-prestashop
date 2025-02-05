@@ -14,11 +14,11 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class patchPaymentResourceTest extends BaseApplepayPaymentMethod
 {
-    private $cart_data;
-    private $resource_id;
-    private $token;
-    private $workflow;
-    private $payment_database_mock;
+    public $cart_data;
+    public $resource_id;
+    public $token;
+    public $workflow;
+    public $payment_database_mock;
 
     public function setUp()
     {

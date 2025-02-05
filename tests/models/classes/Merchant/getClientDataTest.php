@@ -11,19 +11,14 @@ namespace PayPlug\tests\models\classes\Merchant;
  */
 class getClientDataTest extends BaseMerchant
 {
-    private $api_service;
-    private $session;
-    private $company_id;
+    public $session;
+    public $company_id;
 
     public function setUp()
     {
         parent::setUp();
-        $this->api_service = \Mockery::mock('ApiService');
         $this->session = 'session_token';
         $this->company_id = 'company_id';
-        $this->plugin->shouldReceive([
-            'getApiService' => $this->api_service,
-        ]);
     }
 
     /**
@@ -138,7 +133,9 @@ class getClientDataTest extends BaseMerchant
         // Get the client id and secret for test mode
         $client_data_test = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getClientData($session, $company_id, 'test');
         $data['test'] = $client_data_test['result']
             ? $client_data_test['data']
@@ -150,7 +147,9 @@ class getClientDataTest extends BaseMerchant
         // Get the client id and secret for live mode
         $client_data_test = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getClientData($session, $company_id, 'live');
         $data['live'] = $client_data_test['result']
             ? $client_data_test['data']

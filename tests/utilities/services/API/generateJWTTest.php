@@ -11,11 +11,10 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class generateJWTTest extends BaseApi
 {
-    protected $plugin;
-    private $client_id;
-    private $client_secret;
-    private $client_data;
-    private $jwt;
+    public $client_id;
+    public $client_secret;
+    public $client_data;
+    public $jwt;
 
     public function setUp()
     {

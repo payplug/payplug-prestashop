@@ -13,9 +13,9 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class removeActionTest extends BasePaymentAction
 {
-    private $resource_id;
-    private $cancellable;
-    private $stored_resource;
+    public $resource_id;
+    public $cancellable;
+    public $stored_resource;
 
     public function setUp()
     {

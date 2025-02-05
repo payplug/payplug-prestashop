@@ -63,7 +63,9 @@ class Merchant
         foreach ($client_datas as $key => $data) {
             $generated_jwt = $this->dependencies
                 ->getPlugin()
-                ->getApiService()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
                 ->generateJWT($data['client_id'], $data['client_secret']);
 
             if (!$generated_jwt['result']) {
@@ -121,7 +123,9 @@ class Merchant
         // Get the client id and secret for test mode
         $client_data_test = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getClientData($session, $company_id, 'test');
         $data['test'] = $client_data_test['result']
             ? $client_data_test['data']
@@ -133,7 +137,9 @@ class Merchant
         // Get the client id and secret for live mode
         $client_data_test = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getClientData($session, $company_id, 'live');
         $data['live'] = $client_data_test['result']
             ? $client_data_test['data']

@@ -25,6 +25,7 @@ namespace PayPlug\src\utilities\services;
 
 use Payplug\Authentication;
 use Payplug\Card;
+use PayPlug\classes\DependenciesClass;
 use Payplug\Core\APIRoutes;
 use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
@@ -46,20 +47,17 @@ if (!defined('_PS_VERSION_')) {
 
 class API
 {
-    private $current_api_key = '';
+    public $dependencies;
 
-    private $dependencies;
+    private $current_api_key = '';
     private $site_url = '';
     private $portal_url = '';
     private $api_url = '';
     private $api;
 
-    public function __construct($dependencies)
+    public function __construct()
     {
-        $this->dependencies = $dependencies;
-
-        $this->checkEnvironment();
-        $this->setEnvironment();
+        $this->dependencies = new DependenciesClass();
     }
 
     /**
@@ -583,6 +581,43 @@ class API
     }
 
     /**
+     * @description get the portal url to register user
+     *
+     * @param string $callback_uri
+     *
+     * @return array
+     */
+    public function getRegisterUrl($callback_uri = '')
+    {
+        if (!$callback_uri || !is_string($callback_uri)) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $callback_uri given',
+            ];
+        }
+
+        try {
+            $this->setUserAgent();
+            $api_response = Authentication::getRegisterUrl($callback_uri, $callback_uri);
+            $json_answer = $api_response['httpResponse'];
+            $response = [
+                'result' => true,
+                'code' => 200,
+                'redirection' => $json_answer['redirect_to'],
+            ];
+        } catch (\Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
      * @description  get the site url
      *
      * @return mixed
@@ -601,6 +636,8 @@ class API
      */
     public function initialize($is_live = null)
     {
+        $this->setParameters();
+
         $configuration = $this->dependencies
             ->getPlugin()
             ->getConfigurationClass();
@@ -620,7 +657,7 @@ class API
 
                 // Renew the token
                 $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-                $merchant = $module->get('payplug.models.classes.merchant');
+                $merchant = $module->getService('payplug.models.classes.merchant');
 
                 $jwt = $merchant->generateJWT($client_data);
                 if (!$jwt) {
@@ -677,6 +714,7 @@ class API
         }
 
         try {
+            $this->setParameters();
             $this->setUserAgent();
             $response = Authentication::getKeysByLogin($email, $password);
             $json_answer = $response['httpResponse'];
@@ -967,6 +1005,9 @@ class API
                 $dotenv->load($dotenvFile);
             }
         }
+        if (isset($_ENV['PLUGIN_SETUP_URL'])) {
+            APIRoutes::setPluginSetupUrl($_ENV['PLUGIN_SETUP_URL']);
+        }
         if (isset($_ENV['API_BASE_URL'])) {
             APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
@@ -1025,8 +1066,13 @@ class API
      */
     protected function setApiUrl($api_url = '')
     {
-        if (!is_string($api_url)
-            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
+        $regex_validator = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.validator.regex');
+
+        if (!$regex_validator->isApiUrl($api_url)['result']) {
             throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
         }
         $this->api_url = $api_url;
@@ -1045,17 +1091,13 @@ class API
             $this->setApiUrl('https://api.payplug.com');
         }
 
-        if (isset($_ENV['PAYPLUG_SITE_URL']) && !empty($_ENV['PAYPLUG_SITE_URL'])) {
-            $this->site_url = $_ENV['PAYPLUG_SITE_URL'];
-        } else {
-            $this->site_url = 'https://www.payplug.com';
-        }
+        $this->site_url = !$this->site_url && isset($_ENV['PAYPLUG_SITE_URL']) && !empty($_ENV['PAYPLUG_SITE_URL'])
+            ? $_ENV['PAYPLUG_SITE_URL']
+            : 'https://www.payplug.com';
 
-        if (isset($_ENV['PAYPLUG_PORTAL_URL']) && !empty(['PAYPLUG_PORTAL_URL'])) {
-            $this->portal_url = $_ENV['PAYPLUG_PORTAL_URL'];
-        } else {
-            $this->portal_url = 'https://portal.payplug.com';
-        }
+        $this->portal_url = !$this->portal_url && isset($_ENV['PAYPLUG_PORTAL_URL']) && !empty($_ENV['PAYPLUG_PORTAL_URL'])
+            ? $_ENV['PAYPLUG_PORTAL_URL']
+            : 'https://portal.payplug.com';
     }
 
     /**
@@ -1070,6 +1112,12 @@ class API
                 'Prestashop/' . _PS_VERSION_
             );
         }
+    }
+
+    protected function setParameters()
+    {
+        $this->checkEnvironment();
+        $this->setEnvironment();
     }
 
     /**

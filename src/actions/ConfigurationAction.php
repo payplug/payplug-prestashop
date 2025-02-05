@@ -62,9 +62,19 @@ class ConfigurationAction
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         if ($sandbox_mode) {
-            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $configuration->getValue('test_api_key'), true);
+            $permissions = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
+                ->getAccount((string) $configuration->getValue('test_api_key'), true);
         } else {
-            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $configuration->getValue('live_api_key'), false);
+            $permissions = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
+                ->getAccount((string) $configuration->getValue('live_api_key'), false);
         }
 
         $allowed_methods = [
@@ -432,7 +442,12 @@ class ConfigurationAction
             ];
         }
 
-        if (!$this->dependencies->getPlugin()->getApiService()->login($email, $password)) {
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->login($email, $password)) {
             $logger->addLog('ConfigurationAction::loginAction: invalid email and/or password.');
 
             return [
@@ -451,7 +466,9 @@ class ConfigurationAction
         // Update global configuration
         $permissions = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getAccount((string) $configuration->getValue('live_api_key'), false);
 
         if (empty($permissions)) {
@@ -816,7 +833,12 @@ class ConfigurationAction
             ];
         }
 
-        $this->dependencies->getPlugin()->getApiService()->initialize(!(bool) $configuration->getValue('sandbox_mode'));
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
 
         return [
             'success' => true,
@@ -873,7 +895,12 @@ class ConfigurationAction
 
         $password = base64_decode($datas->payplug_password);
 
-        if (!$this->dependencies->getPlugin()->getApiService()->login($email, $password)) {
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->login($email, $password)) {
             $logger->addLog('ConfigurationAction::submitSandboxAction: invalid email and/or password.');
 
             return [

@@ -11,7 +11,7 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class getLastLimitLogTest extends BaseLoggerRepository
 {
-    private $limit;
+    public $limit;
 
     public function setUp()
     {

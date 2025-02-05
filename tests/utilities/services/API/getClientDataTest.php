@@ -11,10 +11,10 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class getClientDataTest extends BaseApi
 {
-    private $session;
-    private $company_id;
-    private $mode;
-    private $client_data;
+    public $session;
+    public $company_id;
+    public $mode;
+    public $client_data;
 
     public function setUp()
     {

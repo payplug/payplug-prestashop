@@ -17,6 +17,7 @@ class BaseConfigurationAction extends TestCase
     public $dependencies;
     public $logger;
     public $module;
+    public $module_adapter;
     public $oney;
     public $plugin;
     public $validator;
@@ -37,7 +38,6 @@ class BaseConfigurationAction extends TestCase
 
         $this->oney = \Mockery::mock('Oney');
         $this->plugin = \Mockery::mock('Plugin');
-        $this->module = \Mockery::mock('Module');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
@@ -60,14 +60,24 @@ class BaseConfigurationAction extends TestCase
             });
 
         $this->configuration_class = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
+
+        $this->module = \Mockery::mock('Module');
+        $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->module_adapter->shouldReceive([
+            'getInstanceByName' => $this->module,
+        ]);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.api')
+            ->andReturn($this->api_service);
+
         $this->plugin->shouldReceive([
-            'getApiService' => $this->api_service,
             'getLogger' => $this->logger,
             'getConfiguration' => $this->configuration,
             'getConfigurationClass' => $this->configuration_class,
             'getOney' => $this->oney,
             'getTranslationClass' => $this->translation,
-            'getModule' => $this->module,
+            'getModule' => $this->module_adapter,
             'getValidate' => $this->validate_adapter,
         ]);
 

@@ -111,12 +111,17 @@ class MediaClass
             ->getPlugin()
             ->getTranslationClass()
             ->l('payplug.displayPopin.suspendInstallment', 'mediaclass');
+        $api_service = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api');
         $this->context->smarty->assign([
             'title' => $title,
             'type' => $type,
             'admin_ajax_url' => $admin_ajax_url,
-            'site_url' => $this->dependencies->getPlugin()->getApiService()->getSiteUrl(),
-            'portal_url' => $this->dependencies->getPlugin()->getApiService()->getPortalUrl(),
+            'site_url' => $api_service->getSiteUrl(),
+            'portal_url' => $api_service->getPortalUrl(),
             'inst_id' => $inst_id,
         ]);
         $html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');

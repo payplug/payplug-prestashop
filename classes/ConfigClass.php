@@ -231,7 +231,7 @@ class ConfigClass
     private $dependencies;
     private $img_lang;
     private $media;
-    private $module;
+    private $module_adapter;
     private $oney;
     private $payment_status;
     private $ssl_enable;
@@ -250,7 +250,7 @@ class ConfigClass
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
         $this->media = $this->dependencies->getPlugin()->getMedia();
-        $this->module = $this->dependencies->getPlugin()->getModule();
+        $this->module_adapter = $this->dependencies->getPlugin()->getModule();
         $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
@@ -298,13 +298,13 @@ class ConfigClass
         if (!$this->isAllowed()) {
             return false;
         }
-        $api_key = $this->module
-            ->getPlugin()
-            ->getApiService()
+        $api_key = $this->module_adapter
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getCurrentApiKey();
-        $permissions = $this->module
-            ->getPlugin()
-            ->getApiService()
+        $permissions = $this->module_adapter
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getAccount((string) $api_key, false);
 
         // in case if API is not available or not returning permissions
@@ -398,7 +398,7 @@ class ConfigClass
             (bool) $this->configuration->getValue('enable')
         );
         $is_allowed = $this->validators['module']->isAllowed(
-            (bool) $this->module->isEnabled($this->dependencies->name),
+            (bool) $this->module_adapter->isEnabled($this->dependencies->name),
             $is_shown['result']
         );
 
@@ -417,23 +417,6 @@ class ConfigClass
         );
 
         return $state['result'];
-    }
-
-    /**
-     * @description check if account is linked to Psaccount
-     *
-     * @return bool
-     */
-    public function checkPsAccount()
-    {
-        if ('pspaylater' == $this->dependencies->name) {
-            $module = $this->module->getInstanceByName($this->dependencies->name);
-            $check_ps_account = $this->validators['module']->isAccountLinkedToPsAccount($module);
-
-            return $check_ps_account['result'];
-        }
-
-        return true;
     }
 
     /**
@@ -466,7 +449,10 @@ class ConfigClass
     public function getLivePermissions()
     {
         $live_api_key = $this->configuration->getValue('live_api_key');
-        $livepermissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $live_api_key);
+        $livepermissions = $this->module_adapter
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->getAccount((string) $live_api_key);
 
         return $livepermissions ? $livepermissions : [];
     }
@@ -722,8 +708,7 @@ class ConfigClass
             'module_name' => $this->dependencies->name,
         ]);
 
-        return $this
-            ->module
+        return $this->module_adapter
             ->getInstanceByName($this->dependencies->name)
             ->display(_PS_MODULE_DIR_ . $this->dependencies->name . '/' . $this->dependencies->name . '.php', $file);
     }

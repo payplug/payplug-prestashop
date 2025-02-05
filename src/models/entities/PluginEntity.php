@@ -275,14 +275,6 @@ class PluginEntity
     }
 
     /**
-     * @return object
-     */
-    public function getApiService()
-    {
-        return $this->api_service;
-    }
-
-    /**
      * @return string
      */
     public function getApiVersion()
@@ -883,22 +875,6 @@ class PluginEntity
     }
 
     /**
-     * @param object $api_service
-     *
-     * @return self
-     */
-    public function setApiService($api_service)
-    {
-        if (!is_object($api_service)) {
-            throw new BadParameterException('Invalid argument, $api_service must be a Services/API');
-        }
-
-        $this->api_service = $api_service;
-
-        return $this;
-    }
-
-    /**
      * @param string $api_version
      *
      * @return self
@@ -906,7 +882,7 @@ class PluginEntity
     public function setApiVersion($api_version)
     {
         if (!is_string($api_version) || !preg_match('/(\d{4})-(\d{2})-(\d{2})/', $api_version)) {
-            throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
+            throw new BadParameterException('Invalid argument, $api_version must be a a valid version format');
         }
 
         $this->api_version = $api_version;
