@@ -14,8 +14,8 @@ use PayPlug\tests\mock\CurrencyMock;
  */
 final class GetOneyPriceLimitTest extends BaseOneyRepository
 {
-    private $currencyMock;
-    private $amounts;
+    public $currencyMock;
+    public $amounts;
 
     public function setUp()
     {

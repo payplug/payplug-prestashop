@@ -1038,7 +1038,9 @@ class OneyPaymentMethod extends PaymentMethod
         ];
         $simulations = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getOneySimulations($data);
 
         if (!$simulations['result']) {

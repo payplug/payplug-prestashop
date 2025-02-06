@@ -11,10 +11,9 @@ namespace PayPlug\tests\models\classes\Merchant;
  */
 class registerJWTTest extends BaseMerchant
 {
-    private $api_service;
-    private $client_id;
-    private $configuration_class;
-    private $jwt;
+    public $client_id;
+    public $configuration_class;
+    public $jwt;
 
     public function setUp()
     {
@@ -31,9 +30,6 @@ class registerJWTTest extends BaseMerchant
                 'token_type' => 'bearer',
             ],
         ];
-        $this->plugin->shouldReceive([
-            'getApiService' => $this->api_service,
-        ]);
         $this->configuration_class = \Mockery::mock('ConfigurationClass');
         $this->plugin->shouldReceive([
             'getConfigurationClass' => $this->configuration_class,

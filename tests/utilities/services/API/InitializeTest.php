@@ -11,14 +11,14 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class InitializeTest extends BaseApi
 {
-    private $configuration_class;
-    private $merchant;
-    private $module;
-    private $module_adapter;
-    private $jwt;
-    private $logger;
-    private $token;
-    private $client_data;
+    public $configuration_class;
+    public $merchant;
+    public $module;
+    public $module_adapter;
+    public $jwt;
+    public $logger;
+    public $token;
+    public $client_data;
 
     public function setUp()
     {
@@ -48,7 +48,7 @@ class InitializeTest extends BaseApi
         $this->merchant = \Mockery::mock('Merchant');
         $this->module = \Mockery::mock('Module');
         $this->module->shouldReceive([
-            'get' => $this->merchant,
+            'getService' => $this->merchant,
         ]);
         $this->module_adapter = \Mockery::mock('ModuleAdapter');
         $this->module_adapter->shouldReceive([

@@ -14,7 +14,7 @@ use PayPlug\tests\mock\ContextMock;
  */
 class getPaymentMethodsSectionTest extends BaseApiRest
 {
-    private $payment_method_option;
+    public $payment_method_option;
 
     public function setUp()
     {

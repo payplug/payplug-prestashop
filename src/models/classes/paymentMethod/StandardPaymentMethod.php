@@ -386,8 +386,14 @@ class StandardPaymentMethod extends PaymentMethod
         }
 
         // todo: getter of $_SERVER['HTTP_USER_AGENT'] should be in a service
+        $regex_validator = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.validator.regex');
+
         $return['embedded'] = 'redirect' != (string) $this->configuration->getValue('embedded_mode')
-            && !$this->dependencies->getValidators()['browser']->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'];
+            && !$regex_validator->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'];
 
         unset($return['resource_stored']);
 

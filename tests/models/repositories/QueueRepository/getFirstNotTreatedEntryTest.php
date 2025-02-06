@@ -11,7 +11,7 @@ namespace PayPlug\tests\models\repositories\QueueRepository;
  */
 class getFirstNotTreatedEntryTest extends BaseQueueRepository
 {
-    private $id_cart;
+    public $id_cart;
 
     public function setUp()
     {
