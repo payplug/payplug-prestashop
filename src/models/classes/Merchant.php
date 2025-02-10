@@ -119,6 +119,7 @@ class Merchant
         }
 
         $data = [];
+        $client_name = 'Prestashop';
 
         // Get the client id and secret for test mode
         $client_data_test = $this->dependencies
@@ -126,7 +127,7 @@ class Merchant
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
-            ->getClientData($session, $company_id, 'test');
+            ->getClientData($company_id, $client_name, 'test', $session);
         $data['test'] = $client_data_test['result']
             ? $client_data_test['data']
             : [
@@ -140,7 +141,7 @@ class Merchant
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
-            ->getClientData($session, $company_id, 'live');
+            ->getClientData($company_id, $client_name, 'live', $session);
         $data['live'] = $client_data_test['result']
             ? $client_data_test['data']
             : [

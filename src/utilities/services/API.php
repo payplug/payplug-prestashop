@@ -393,17 +393,22 @@ class API
         }
 
         try {
-            if (!$this->api) {
-                $this->api = Payplug::init([
-                    'secretKey' => base64_encode($client_id . ':' . $client_secret),
-                    'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
-                ]);
+            $this->setParameters();
+            $jwt_response = Authentication::generateJWT($client_id, $client_secret);
+            if (!isset($jwt_response['httpResponse']) || empty($jwt_response['httpResponse'])) {
+                return [
+                    'result' => false,
+                    'code' => null,
+                    'message' => 'Wrong httpResponse getted',
+                ];
             }
+
+            $jwt_response['httpResponse']['expires_date'] = time() + $jwt_response['httpResponse']['expires_in'];
 
             $response = [
                 'result' => true,
                 'code' => 200,
-                'data' => Authentication::generateJWT($client_id),
+                'data' => $jwt_response['httpResponse'],
             ];
         } catch (\Exception $e) {
             $response = [
@@ -550,26 +555,27 @@ class API
     /**
      * @description Get the client data from API
      *
-     * @param string $session
      * @param string $company_id
+     * @param string $client_name
      * @param string $mode
+     * @param string $session
      *
      * @return array
      */
-    public function getClientData($session = '', $company_id = '', $mode = '')
+    public function getClientData($company_id = '', $client_name = '', $mode = '', $session = '')
     {
-        if (!is_string($session) || !$session) {
-            return [
-                'result' => false,
-                'code' => null,
-                'message' => 'Wrong $session given',
-            ];
-        }
         if (!is_string($company_id) || !$company_id) {
             return [
                 'result' => false,
                 'code' => null,
                 'message' => 'Wrong $company_id given',
+            ];
+        }
+        if (!is_string($client_name) || !$client_name) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $client_name given',
             ];
         }
         if (!is_string($mode) || !$mode) {
@@ -579,12 +585,24 @@ class API
                 'message' => 'Wrong $mode given',
             ];
         }
+        if (!is_string($session) || !$session) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $session given',
+            ];
+        }
 
         try {
+            $this->setParameters();
+            Payplug::init([
+                'secretKey' => $session,
+                'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
+            ]);
             $response = [
                 'result' => true,
                 'code' => 200,
-                'data' => Authentication::createClientIdAndSecret($session, $company_id, $mode),
+                'data' => Authentication::createClientIdAndSecret($company_id, $client_name, $mode),
             ];
         } catch (\Exception $e) {
             $response = [
@@ -1121,14 +1139,11 @@ class API
                 $dotenv->load($dotenvFile);
             }
         }
-        if (isset($_ENV['PLUGIN_SETUP_URL'])) {
-            APIRoutes::setPluginSetupUrl($_ENV['PLUGIN_SETUP_URL']);
-        }
         if (isset($_ENV['API_BASE_URL'])) {
             APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
-        if (isset($_ENV['MERCHANT_PLUGINS_DATA_COLLECTOR_RESOURCE'])) {
-            APIRoutes::setMerchantPluginsDataCollectorService($_ENV['MERCHANT_PLUGINS_DATA_COLLECTOR_RESOURCE']);
+        if (isset($_ENV['SERVICE_BASE_URL'])) {
+            APIRoutes::setServiceBaseUrl($_ENV['SERVICE_BASE_URL']);
         }
     }
 

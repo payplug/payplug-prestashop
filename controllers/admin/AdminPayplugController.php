@@ -63,27 +63,6 @@ class AdminPayplugController extends ModuleAdminController
      */
     public function initContent()
     {
-        if ($session = $this->tools->tool('getValue', 'session')
-            && $company_id = $this->tools->tool('getValue', 'company_id')) {
-            $merchant = $this->module
-                ->getService('payplug.models.classes.merchant');
-            $client_data = $merchant->getClientData($session, $company_id);
-            if ($client_data['result']) {
-                $merchant->registerClientData($client_data['data']);
-
-                $storedJWT = $this->configuration->getValue('jwt');
-
-                if (!$storedJWT) {
-                    $jwt = $merchant->generateJWT(
-                        $this->tools->tool('getValue', 'code'),
-                        $this->context->link->getAdminLink('AdminPayplug'),
-                        $this->tools->tool('getValue', 'client_id')
-                    );
-                    $merchant->registerJWT($jwt['data']);
-                }
-            }
-        }
-
         if ($this->tools->tool('getValue', 'client_id')
             && $company_id = $this->tools->tool('getValue', 'company_id')) {
             $this->configuration->set('oauth_client_id', $this->tools->tool('getValue', 'client_id'));
@@ -126,6 +105,27 @@ class AdminPayplugController extends ModuleAdminController
                 ->getPlugin()
                 ->getLogger()
                 ->addLog('AdminPayplugController::initContent - JWT OneShot registered', 'info');
+
+            // Get the client data
+            $merchant = $this->module
+                ->getService('payplug.models.classes.merchant');
+
+            $company_id = $this->configuration->get('oauth_company_id');
+            $client_data = $merchant->getClientData($jwt, $company_id);
+
+            if ($client_data['result']) {
+                $merchant->registerClientData($client_data['data']);
+
+                $storedJWT = json_decode($this->configuration->getValue('jwt'), true);
+
+                if (empty($storedJWT)) {
+                    $jwt = $merchant->generateJWT($client_data['data']);
+
+                    if ($jwt['result']) {
+                        $merchant->registerJWT($jwt['data']);
+                    }
+                }
+            }
         }
 
         $this->renderApiRest();
