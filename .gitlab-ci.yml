@@ -250,4 +250,3 @@ variables:
   SEMANTIC_BRANCHES: "master_and_develop"
   SONAR_ENABLED: "true"
   RUN_FOR_RELEASE: "false"
-  CI_CD_ALTERNATIVE_BRANCH_NAME: "PRE-2698-payment-link-feature"
