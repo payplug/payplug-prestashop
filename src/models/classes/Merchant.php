@@ -45,7 +45,7 @@ class Merchant
      *
      * @return array
      */
-    public function generateJWT($client_datas)
+    public function generateJWT($client_datas = [])
     {
         if (!is_array($client_datas) || empty($client_datas)) {
             $this->dependencies

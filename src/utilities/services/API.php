@@ -395,6 +395,7 @@ class API
         try {
             $this->setParameters();
             $jwt_response = Authentication::generateJWT($client_id, $client_secret);
+
             if (!isset($jwt_response['httpResponse']) || empty($jwt_response['httpResponse'])) {
                 return [
                     'result' => false,
@@ -466,23 +467,13 @@ class API
         }
 
         try {
-            if (!$this->api) {
-                $this->api = $this->initialize();
-            }
-
-            if (!$this->api) {
-                $response = [
-                    'result' => false,
-                    'code' => 500,
-                    'message' => 'Cannot connect to the API',
-                ];
-            } else {
-                $response = [
-                    'result' => true,
-                    'code' => 200,
-                    'data' => Authentication::generateJWTOneShot($authorization_code, $redirect_uri, $client_id, $code_verifier),
-                ];
-            }
+            $this->setParameters();
+            $api_response = Authentication::generateJWTOneShot($authorization_code, $redirect_uri, $client_id, $code_verifier);
+            $response = [
+                'result' => true,
+                'code' => 200,
+                'data' => $api_response['httpResponse']['access_token'],
+            ];
         } catch (\Exception $e) {
             $response = [
                 'result' => false,
@@ -819,6 +810,7 @@ class API
         }
 
         try {
+            $this->setParameters();
             Authentication::initiateOAuth($client_id, $redirect_uri, $code_verifier);
         } catch (\Exception $e) {
             $this->dependencies->getPlugin()->getLogger()->addLog('Api::initiateOAuth - Can\'t initiate OAuth : ' . $e->getMessage(), 'error');
@@ -1203,9 +1195,9 @@ class API
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.validator.regex');
 
-        if (!$regex_validator->isApiUrl($api_url)['result']) {
-            throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
-        }
+//        if (!$regex_validator->isApiUrl($api_url)['result']) {
+//            throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
+//        }
         $this->api_url = $api_url;
 
         return $this;

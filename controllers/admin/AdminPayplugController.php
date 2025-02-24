@@ -70,10 +70,7 @@ class AdminPayplugController extends ModuleAdminController
             $code_verifier = bin2hex(openssl_random_pseudo_bytes(50));
             $this->configuration->set('oauth_code_verifier', $code_verifier);
 
-            $api = $this->dependencies
-                ->getPlugin()
-                ->getModule()
-                ->getInstanceByName($this->dependencies->name)
+            $api = $this->module
                 ->getService('payplug.utilities.service.api');
             $api->initiateOAuth(
                 $this->tools->tool('getValue', 'client_id'),
@@ -89,10 +86,7 @@ class AdminPayplugController extends ModuleAdminController
                 ->addLog('AdminPayplugController::initContent - Entering JWT OneShot registeration', 'info');
             $authorization_code = $this->tools->tool('getValue', 'code');
 
-            $api = $this->dependencies
-                ->getPlugin()
-                ->getModule()
-                ->getInstanceByName($this->dependencies->name)
+            $api = $this->module
                 ->getService('payplug.utilities.service.api');
             $jwt = $api->generateJWTOneShot(
                 $authorization_code,
@@ -100,29 +94,32 @@ class AdminPayplugController extends ModuleAdminController
                 $this->configuration->getValue('oauth_client_id'),
                 $this->configuration->getValue('oauth_code_verifier')
             );
-            $this->configuration->set('oauth_code_verifier', '');
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('AdminPayplugController::initContent - JWT OneShot registered', 'info');
 
-            // Get the client data
-            $merchant = $this->module
-                ->getService('payplug.models.classes.merchant');
+            if ($jwt['result']) {
+                $this->configuration->set('oauth_code_verifier', '');
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('AdminPayplugController::initContent - JWT OneShot registered', 'info');
 
-            $company_id = $this->configuration->get('oauth_company_id');
-            $client_data = $merchant->getClientData($jwt, $company_id);
+                // Get the client data
+                $merchant = $this->module
+                    ->getService('payplug.models.classes.merchant');
 
-            if ($client_data['result']) {
-                $merchant->registerClientData($client_data['data']);
+                $company_id = $this->configuration->getValue('oauth_company_id');
+                $client_data = $merchant->getClientData($jwt['data'], $company_id);
 
-                $storedJWT = json_decode($this->configuration->getValue('jwt'), true);
+                if ($client_data['result']) {
+                    $merchant->registerClientData($client_data['data']);
 
-                if (empty($storedJWT)) {
-                    $jwt = $merchant->generateJWT($client_data['data']);
+                    $storedJWT = json_decode($this->configuration->getValue('jwt'), true);
 
-                    if ($jwt['result']) {
-                        $merchant->registerJWT($jwt['data']);
+                    if (empty($storedJWT)) {
+                        $jwt = $merchant->generateJWT($client_data['data']);
+
+                        if ($jwt['result']) {
+                            $merchant->registerJWT($jwt['data']);
+                        }
                     }
                 }
             }
