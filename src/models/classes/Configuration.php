@@ -150,6 +150,24 @@ class Configuration
             'defaultValue' => null,
             'setConf' => 1,
         ],
+        'oauth_client_id' => [
+            'type' => 'string',
+            'name' => 'OAUTH_CLIENT_ID',
+            'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'oauth_code_verifier' => [
+            'type' => 'string',
+            'name' => 'OAUTH_CODE_VERIFIER',
+            'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'oauth_company_id' => [
+            'type' => 'string',
+            'name' => 'OAUTH_COMPANY_ID',
+            'defaultValue' => '',
+            'setConf' => 1,
+        ],
         'onboarding_states' => [
             'type' => 'string',
             'name' => 'ONBOARDING_STATES',
