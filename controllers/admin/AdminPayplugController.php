@@ -64,7 +64,7 @@ class AdminPayplugController extends ModuleAdminController
     public function initContent()
     {
         if ($session = $this->tools->tool('getValue', 'session')
-            && $company_id = $this->tools->tool('getValue', '$company_id')) {
+            && $company_id = $this->tools->tool('getValue', 'company_id')) {
             $merchant = $this->module
                 ->getService('payplug.models.classes.merchant');
             $client_data = $merchant->getClientData($session, $company_id);
@@ -74,10 +74,58 @@ class AdminPayplugController extends ModuleAdminController
                 $storedJWT = $this->configuration->getValue('jwt');
 
                 if (!$storedJWT) {
-                    $jwt = $merchant->generateJWT($client_data['data']);
+                    $jwt = $merchant->generateJWT(
+                        $this->tools->tool('getValue', 'code'),
+                        $this->context->link->getAdminLink('AdminPayplug'),
+                        $this->tools->tool('getValue', 'client_id')
+                    );
                     $merchant->registerJWT($jwt['data']);
                 }
             }
+        }
+
+        if ($this->tools->tool('getValue', 'client_id')
+            && $company_id = $this->tools->tool('getValue', 'company_id')) {
+            $this->configuration->set('oauth_client_id', $this->tools->tool('getValue', 'client_id'));
+            $this->configuration->set('oauth_company_id', $company_id);
+            $code_verifier = bin2hex(openssl_random_pseudo_bytes(50));
+            $this->configuration->set('oauth_code_verifier', $code_verifier);
+
+            $api = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api');
+            $api->initiateOAuth(
+                $this->tools->tool('getValue', 'client_id'),
+                $this->context->link->getAdminLink('AdminPayplug'),
+                $code_verifier
+            );
+        }
+
+        if ($this->tools->tool('getValue', 'code')) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('AdminPayplugController::initContent - Entering JWT OneShot registeration', 'info');
+            $authorization_code = $this->tools->tool('getValue', 'code');
+
+            $api = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api');
+            $jwt = $api->generateJWTOneShot(
+                $authorization_code,
+                $this->context->link->getAdminLink('AdminPayplug'),
+                $this->configuration->getValue('oauth_client_id'),
+                $this->configuration->getValue('oauth_code_verifier')
+            );
+            $this->configuration->set('oauth_code_verifier', '');
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('AdminPayplugController::initContent - JWT OneShot registered', 'info');
         }
 
         $this->renderApiRest();

@@ -417,6 +417,79 @@ class API
     }
 
     /**
+     * @description Generate the JWT OneShot from the API
+     *
+     * @param string $authorization_code
+     * @param string $redirect_uri
+     * @param string $client_id
+     * @param string $code_verifier
+     *
+     * @return array
+     */
+    public function generateJWTOneShot($authorization_code = '', $redirect_uri = '', $client_id = '', $code_verifier = '')
+    {
+        if (!is_string($authorization_code) || !$authorization_code) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $authorization_code given',
+            ];
+        }
+
+        if (!is_string($redirect_uri) || !$redirect_uri) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $redirect_uri given',
+            ];
+        }
+
+        if (!is_string($client_id) || !$client_id) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $client_id given',
+            ];
+        }
+
+        if (!is_string($code_verifier) || !$code_verifier) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $code_verifier given',
+            ];
+        }
+
+        try {
+            if (!$this->api) {
+                $this->api = $this->initialize();
+            }
+
+            if (!$this->api) {
+                $response = [
+                    'result' => false,
+                    'code' => 500,
+                    'message' => 'Cannot connect to the API',
+                ];
+            } else {
+                $response = [
+                    'result' => true,
+                    'code' => 200,
+                    'data' => Authentication::generateJWTOneShot($authorization_code, $redirect_uri, $client_id, $code_verifier),
+                ];
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int) $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
      * @description Get account permission from Payplug API
      *
      * @param $api_key
@@ -598,6 +671,7 @@ class API
         }
 
         try {
+            $this->setParameters();
             $this->setUserAgent();
             $api_response = Authentication::getRegisterUrl($callback_uri, $callback_uri);
             $json_answer = $api_response['httpResponse'];
@@ -650,9 +724,9 @@ class API
         $configuration_key = $mode . '_api_key';
         $token = $configuration->getValue($configuration_key);
         $jwt = json_decode($configuration->getValue('jwt'), true);
-        if ($jwt) {
+        if ($jwt && !empty($jwt)) {
             $current_date = time();
-            if ($jwt[$mode]['expires_date'] < $current_date) {
+            if ($jwt[$mode]['expires_in'] < $current_date) {
                 $client_data = json_decode($configuration->getValue('client_data'), true);
 
                 // Renew the token
@@ -661,19 +735,17 @@ class API
 
                 $jwt = $merchant->generateJWT($client_data);
                 if (!$jwt) {
-                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be generated');
+                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be generated', 'error');
 
                     return null;
                 }
 
-                $renew = $merchant->registerJWT($jwt['data']);
+                $renew = $merchant->registerJWT($jwt);
                 if (!$renew) {
-                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be registered');
+                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be registered', 'error');
 
                     return null;
                 }
-
-                $jwt = $jwt['data'];
             }
             $token = $jwt[$mode]['access_token'];
         }
@@ -687,12 +759,56 @@ class API
                 'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
             ]);
         } catch (\Exception $e) {
-            $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - API can\'t be setted');
+            $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - API can\'t be set', 'error');
 
             $this->api = null;
         }
 
         return $this->api;
+    }
+
+    /**
+     * @description initiate the authentication
+     *
+     * @param string $client_id
+     * @param string $redirect_uri
+     * @param string $code_verifier
+     */
+    public function initiateOAuth($client_id = '', $redirect_uri = '', $code_verifier = '')
+    {
+        if (!is_string($client_id) || !$client_id) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $client_id given',
+            ];
+        }
+
+        if (!is_string($redirect_uri) || !$redirect_uri) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $redirect_uri given',
+            ];
+        }
+
+        if (!is_string($code_verifier) || !$code_verifier) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $code_verifier given',
+            ];
+        }
+
+        try {
+            Authentication::initiateOAuth($client_id, $redirect_uri, $code_verifier);
+        } catch (\Exception $e) {
+            $this->dependencies->getPlugin()->getLogger()->addLog('Api::initiateOAuth - Can\'t initiate OAuth : ' . $e->getMessage(), 'error');
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
