@@ -155,61 +155,6 @@ class HookClass
     /**
      * @param $params
      *
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
-    public function actionOrderStatusUpdate($params)
-    {
-        $order = $this->orderAdapter->get((int) $params['id_order']);
-        $active = $this->module->isEnabled($this->dependencies->name);
-
-        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
-        $can_use_deferred = (bool) $payment_methods['deferred'];
-        $deferredState = $this->configuration->getValue('deferred_state');
-
-        if (!$active
-            || $order->payment != $this->module->getInstanceByName($this->dependencies->name)->displayName
-            || !$can_use_deferred
-            || !(bool) $deferredState
-            || $params['newOrderStatus']->id != $deferredState
-        ) {
-            return;
-        }
-
-        $stored_resource = $this->dependencies
-            ->getPlugin()
-            ->getPaymentRepository()
-            ->getBy('id_cart', (int) $order->id_cart);
-
-        if ('installment' == $stored_resource['method']) {
-            return;
-        }
-
-        $retrieve = $this->dependencies
-            ->getPlugin()
-            ->getPaymentMethodClass()
-            ->getPaymentMethod($stored_resource['method'])
-            ->retrieve($stored_resource['resource_id']);
-
-        $payment = $retrieve['resource'];
-
-        $can_be_captured = $this->validators['payment']->isPayment($payment)['result']
-            && !$this->validators['payment']->isFailed($payment)['result']
-            && !$this->validators['payment']->isPaid($payment)['result']
-            && $this->validators['payment']->isDeferred($payment)['result']
-            && !$this->validators['payment']->isExpired($payment)['result'];
-
-        if ($can_be_captured) {
-            $this->dependencies
-                ->getPlugin()
-                ->getPaymentAction()
-                ->captureAction($payment->id, (int) $order->id);
-        }
-    }
-
-    /**
-     * @param $params
-     *
      * @return bool
      */
     public function actionUpdateLangAfter($params)

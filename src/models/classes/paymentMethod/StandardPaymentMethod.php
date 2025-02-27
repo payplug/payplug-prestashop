@@ -333,7 +333,12 @@ class StandardPaymentMethod extends PaymentMethod
         return $order_tab;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get the payment tab required to generate a resource payment.
+     * @todo: add coverage to this method
+     *
+     * @return array
+     */
     public function getPaymentTab()
     {
         $payment_tab = parent::getPaymentTab();
@@ -368,7 +373,13 @@ class StandardPaymentMethod extends PaymentMethod
         return $payment_tab;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Generate and return correct resource return url
+     *
+     * todo: add coverage to this method
+     *
+     * @return array
+     */
     public function getReturnUrl()
     {
         $this->setParameters();
