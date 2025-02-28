@@ -146,7 +146,11 @@ class ApiRest
                 break;
             case 'init':
             default:
-                $json = $configurationAction->renderConfiguration();
+                if ($this->dependencies->getPlugin()->getTools()->tool('getValue', 'oauth2')) {
+                    $json = $configurationAction->renderOAuthConfiguration();
+                } else {
+                    $json = $configurationAction->renderConfiguration();
+                }
 
                 break;
         }
@@ -506,6 +510,70 @@ class ApiRest
         return [
             'name' => 'generalLogin',
             'title' => $translation['title'],
+            'descriptions' => [
+                'live' => $section,
+                'sandbox' => $section,
+            ],
+        ];
+    }
+
+    public function getOAuthLoginSection()
+    {
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getLoginTranslations();
+
+        $section = [
+            'description' => $translation['description'],
+            'connect' => $translation['connect'],
+            'fields' => [
+                [
+                    'class' => '_email',
+                    'type' => 'email',
+                    'name' => 'payplug_email',
+                    'placeholder' => 'Email address',
+                    'label' => 'Your email address',
+                    'data' => 'oauth_email',
+                ],
+                [
+                    'class' => '_clientIdTest',
+                    'type' => 'text',
+                    'name' => 'payplug_client_id_test',
+                    'placeholder' => 'Client ID Test',
+                    'label' => 'Your Client ID Test',
+                    'data' => 'oauth_client_id_test',
+                ],
+                [
+                    'class' => '_clientSecretTest',
+                    'type' => 'text',
+                    'name' => 'payplug_client_secret_test',
+                    'placeholder' => 'Client Secret Test',
+                    'label' => 'Your Client Secret Test',
+                    'data' => 'oauth_client_secret_test',
+                ],
+                [
+                    'class' => '_clientIdLive',
+                    'type' => 'text',
+                    'name' => 'payplug_client_id_live',
+                    'placeholder' => 'Client ID Live',
+                    'label' => 'Your Client ID Live',
+                    'data' => 'oauth_client_id_live',
+                ],
+                [
+                    'class' => '_clientSecretLive',
+                    'type' => 'text',
+                    'name' => 'payplug_client_secret_live',
+                    'placeholder' => 'Client Secret Live',
+                    'label' => 'Your Client Secret Live',
+                    'data' => 'oauth_client_secret_live',
+                ],
+            ],
+        ];
+
+        return [
+            'name' => 'oauthLogin',
+            'title' => 'Oauth2 Login Section Title',
             'descriptions' => [
                 'live' => $section,
                 'sandbox' => $section,

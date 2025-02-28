@@ -551,22 +551,51 @@ class ConfigurationAction
             $datas = [
                 'settings' => $api_rest->getSettingsSection(),
                 'header' => $header,
-                'login' => $api_rest->getLoginSection(),
-                'subscribe' => $api_rest->getSubscribeSection(),
-                'payment_paylater' => $api_rest->getPaylaterSection(),
-                'status' => $api_rest->getRequirementsSection(),
-                'footer' => $footer,
+                'oauth_login' => $api_rest->getOAuthLoginSection(),
+                // todo: Not for prod, just for testing ui development
+                //                'login' => $api_rest->getLoginSection(),
+                //                'subscribe' => $api_rest->getSubscribeSection(),
+                //                'payment_methods' => $api_rest->getPaymentMethodsSection(),
+                //                'payment_paylater' => $api_rest->getPaylaterSection(),
+                //                'status' => $api_rest->getRequirementsSection(),
+                //                'footer' => $footer,
             ];
-
-            // Add payment_methods section if module is payplug
-            if ('payplug' == $this->dependencies->name) {
-                $datas['payment_methods'] = $api_rest->getPaymentMethodsSection();
-            }
         }
 
         return [
             'success' => true,
             'data' => $datas,
+        ];
+    }
+
+    /**
+     * @description render the module configuration section for manual oauth2 login
+     *
+     * @return array
+     */
+    public function renderOAuthConfiguration()
+    {
+        $api_rest = $this->dependencies->getPlugin()->getApiRestClass();
+        $current_configuration = $api_rest->getDataFields();
+        $is_logged = isset($current_configuration['logged']) ? $current_configuration['logged'] : false;
+        if ((bool) $is_logged) {
+            return [
+                'success' => false,
+                'data' => [
+                    'title' => null,
+                    'msg' => 'User already logged',
+                    'close' => 'Ok',
+                ],
+            ];
+        }
+
+        return [
+            'success' => true,
+            'data' => [
+                'settings' => $api_rest->getSettingsSection(),
+                'header' => $api_rest->getHeaderSection($current_configuration),
+                'login' => $api_rest->getLoginSection(),
+            ],
         ];
     }
 

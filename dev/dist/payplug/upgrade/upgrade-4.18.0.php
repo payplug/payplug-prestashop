@@ -24,7 +24,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_4_18_0($object)
+function upgrade_module_4_17_0($object)
 {
     $flag = true;
 
@@ -33,6 +33,13 @@ function upgrade_module_4_18_0($object)
 
     $flag = $flag && Configuration::updateValue('PAYPLUG_OAUTH_CLIENT_ID', '');
     $flag = $flag && Configuration::updateValue('PAYPLUG_OAUTH_COMPANY_ID', '');
+
+    // Install AdminPayplugAuth Tab
+    $tab = new Tab();
+    $tab->class_name = 'AdminPayplugAuth';
+    $tab->active = true;
+    $tab->module = 'payplug';
+    $flag = $flag && $tab->add();
 
     $logger->addLog('End upgrade script 4.18.0, result: ' . ($flag ? 'ok' : 'ko'));
 
