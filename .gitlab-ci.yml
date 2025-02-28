@@ -1,6 +1,6 @@
 # Adaptation of the Gitlab CI/CD pipeline for the PayPlug Prestashop module
 include:
-  - project: "dalenys/protected/cicd/live"
+  - project: "dalenys/protected/cicd/live-staging"
     ref: "gitlab-ci-template"
     file:
       - "ci/ci.gitlab-ci.yml"
