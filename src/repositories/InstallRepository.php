@@ -103,6 +103,9 @@ class InstallRepository extends BaseClass
         }
 
         $this->order_state->removeIdsUnusedByPayPlug();
+
+        // Update order type
+        $this->dependencies->getPlugin()->getOrderStateAction()->installTypeAction();
     }
 
     /**
