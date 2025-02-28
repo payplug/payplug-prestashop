@@ -118,6 +118,13 @@ class Translation
                     'sandbox' => $this->l('logged.mode.options.sandbox', 'translation'),
                 ],
             ],
+
+            'payment_link' => [
+                'info' => [
+                    'title' => $this->l('logged.payment_link.info.title', 'translation'),
+                    'description' => $this->l('logged.payment_link.info.description', 'translation'),
+                ],
+            ],
             'inactive' => [
                 'modal' => [
                     'title' => $this->l('logged.inactive.modal.title', 'translation'),
