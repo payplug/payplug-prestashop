@@ -613,7 +613,7 @@ class API
         $configuration_key = $mode . '_api_key';
         $token = $configuration->getValue($configuration_key);
         $jwt = json_decode($configuration->getValue('jwt'), true);
-        if ($jwt) {
+        if (!empty($jwt)) {
             $current_date = time();
             if ($jwt[$mode]['expires_date'] < $current_date) {
                 $client_data = json_decode($configuration->getValue('client_data'), true);
