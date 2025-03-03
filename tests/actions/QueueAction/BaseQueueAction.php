@@ -11,6 +11,7 @@ class BaseQueueAction extends TestCase
 {
     use FormatDataProvider;
 
+    public $action;
     public $dependencies;
     public $logger;
     public $plugin;
