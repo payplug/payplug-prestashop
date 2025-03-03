@@ -44,7 +44,7 @@ class updateOrderStateTest extends BasePaymentMethod
     public function testWhenGivenOrderIdIsntValidInteger($order_id)
     {
         $this->assertFalse(
-            $this->class->updateOrderState($order_id)
+            $this->class->updateOrderStateFromPaidToRefund($order_id)
         );
     }
 
@@ -56,7 +56,7 @@ class updateOrderStateTest extends BasePaymentMethod
     public function testWhenGivenIsLiveIsntValidBoolean($is_live)
     {
         $this->assertFalse(
-            $this->class->updateOrderState($this->order_id, $is_live)
+            $this->class->updateOrderStateFromPaidToRefund($this->order_id, $is_live)
         );
     }
 
@@ -66,7 +66,7 @@ class updateOrderStateTest extends BasePaymentMethod
             'validate' => false,
         ]);
         $this->assertFalse(
-            $this->class->updateOrderState($this->order_id)
+            $this->class->updateOrderStateFromPaidToRefund($this->order_id)
         );
     }
 
@@ -83,7 +83,7 @@ class updateOrderStateTest extends BasePaymentMethod
         ]);
 
         $this->assertTrue(
-            $this->class->updateOrderState($this->order_id)
+            $this->class->updateOrderStateFromPaidToRefund($this->order_id)
         );
     }
 
@@ -106,7 +106,7 @@ class updateOrderStateTest extends BasePaymentMethod
         ]);
 
         $this->assertFalse(
-            $this->class->updateOrderState($this->order_id)
+            $this->class->updateOrderStateFromPaidToRefund($this->order_id)
         );
     }
 
@@ -133,7 +133,7 @@ class updateOrderStateTest extends BasePaymentMethod
 
         $this->assertSame(
             'reload',
-            $this->class->updateOrderState($this->order_id)
+            $this->class->updateOrderStateFromPaidToRefund($this->order_id)
         );
     }
 }
