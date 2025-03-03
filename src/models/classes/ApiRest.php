@@ -421,6 +421,13 @@ class ApiRest
                 'cancel' => $translation['inactive']['modal']['cancel'],
                 'ok' => $translation['inactive']['modal']['ok'],
             ],
+            'payment_link' => [
+                'active' => true,
+                'info' => [
+                    'title' => $translation['payment_link']['info']['title'],
+                    'description' => $translation['payment_link']['info']['description'],
+                ],
+            ],
             'inactive_account' => [
                 'warning' => [
                     'title' => $translation['inactive']['account']['warning']['title'],

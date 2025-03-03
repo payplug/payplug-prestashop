@@ -171,15 +171,15 @@ class ValidationAction
     public function createOrder($cart_id = 0)
     {
         if (!is_int($cart_id) || !$cart_id) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::createOrder - Given cart_id argument: Invalid argument given, $cart_id must be a non null integer.');
+
             return [
                 'result' => false,
             ];
         }
-
-        $context = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get();
 
         // Check if a resource exists for the context cart id...
         $stored_payment = $this->dependencies
@@ -187,14 +187,29 @@ class ValidationAction
             ->getPaymentRepository()
             ->getBy('id_cart', (int) $cart_id);
         if (empty($stored_payment)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::createOrder - No stored payment getted for given cart id.');
+
             return [
                 'result' => false,
             ];
         }
 
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('ValidationAction::createOrder - Payment resource retrieve: ' . $stored_payment['resource_id']);
+
         // ...then if no lock is present to create order
         $locked_setted = $this->setLock((int) $cart_id, $stored_payment['resource_id']);
         if (!$locked_setted) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::createOrder - Lock can\'t be setted.');
+
             return [
                 'result' => true,
             ];
@@ -205,6 +220,11 @@ class ValidationAction
             ->getOrderAction()
             ->createAction($stored_payment['resource_id']);
         if (!$order_create['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::createOrder - Order can\'t be created.');
+
             return [
                 'result' => false,
             ];
@@ -291,6 +311,11 @@ class ValidationAction
                 ->getFirstNotTreatedEntry((int) $cart_id);
 
             if ($exists) {
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('ValidationAction::setLock - A lock already exists for given cart id.');
+
                 return false;
             }
 
@@ -315,6 +340,11 @@ class ValidationAction
     {
         // Check if given cart id valid and is the same than from context
         if (!is_int($cart_id) || !$cart_id) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::validateAction - Given cart_id argument: Invalid argument given, $cart_id must be a non null integer.');
+
             return [
                 'result' => false,
                 'url' => $this->getOrderLinks()['error'],
@@ -332,6 +362,11 @@ class ValidationAction
             ->getPlugin()
             ->getValidate()
             ->validate('isLoadedObject', $cart)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::validateAction - Given cart obj isn\'t a valid object.');
+
             return [
                 'result' => false,
                 'url' => $this->getOrderLinks()['error'],
@@ -345,6 +380,11 @@ class ValidationAction
             ->get();
 
         if ($context->customer->id != $cart->id_customer) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::validateAction - Given cart customer id did not match with context customer id.');
+
             return [
                 'result' => false,
                 'url' => $this->getOrderLinks()['error'],
@@ -379,6 +419,11 @@ class ValidationAction
             ->getOrder()
             ->getIdByCartId((int) $cart->id);
         if ($id_order) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::validateAction - Order already exists, the customer will be redirected on order-confirmation page.');
+
             return [
                 'result' => true,
                 'url' => $this->getOrderLinks($id_order)['confirm'],
@@ -390,6 +435,11 @@ class ValidationAction
         $order_create = $this->createOrder((int) $cart->id);
 
         if (!$order_create['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::validateAction - No stored payment get from given id cart.');
+
             return [
                 'result' => false,
                 'url' => $this->getOrderLinks()['error'],
@@ -399,6 +449,15 @@ class ValidationAction
 
         // If an order has beed created,  return confirmation link
         if (isset($order_create['id_order'])) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::validateAction - Order created: ' . $order_create['id_order']);
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::validateAction - Redirecting to order-confirmation page.');
+
             return [
                 'result' => true,
                 'url' => $this->getOrderLinks((int) $order_create['id_order'])['confirm'],

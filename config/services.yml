@@ -3,5 +3,11 @@ services:
   _defaults:
     public: true
 
+  payplug.action.hook:
+    class: PayPlug\src\actions\HookAction
+
   payplug.models.classes.merchant:
     class: PayPlug\src\models\classes\Merchant
+
+  payplug.models.classes.hook:
+    class: PayPlug\src\models\classes\Hook
