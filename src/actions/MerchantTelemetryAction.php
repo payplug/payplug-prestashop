@@ -65,11 +65,9 @@ class MerchantTelemetryAction
             return true;
         }
 
-        $api_key = $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass()
-            ->getValue('live_api_key');
-
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $this->dependencies->getPlugin()->getApiService()->initialize(!(bool) $configuration->getValue('sandbox_mode'));
+        $api_key = $configuration->getValue('live_api_key');
         $send = $this->dependencies
             ->getPlugin()
             ->getMerchantTelemetry()
