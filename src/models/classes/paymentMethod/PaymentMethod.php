@@ -889,7 +889,7 @@ class PaymentMethod
         // If status is refunded but order state is paid then update the current state
         if ('refunded' == $status['code']) {
             $order_id = $this->tools->tool('getValue', 'id_order');
-            $this->updateOrderState((int) $order_id, (bool) $resource->is_live);
+            $this->updateOrderStateFromPaidToRefund((int) $order_id, (bool) $resource->is_live);
         }
 
         // Define status translation
@@ -1477,7 +1477,7 @@ class PaymentMethod
      *
      * @return bool
      */
-    protected function updateOrderState($order_id = 0, $is_live = true)
+    protected function updateOrderStateFromPaidToRefund($order_id = 0, $is_live = true)
     {
         $this->setParameters();
 
