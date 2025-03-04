@@ -5,6 +5,9 @@
     - [PRE-2699](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2635/): Activate Payment Link in BO
     - [PRE-2798](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2651): Initialize config before calling MPDC
 
+- Bugfix :
+  - [SMP-3080](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2658): Fix ordre state update 
+  
 ## Version 4.16.2
 - Bugfix :
   - [PRE-2769](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2644): Fix infinite loop in queue treatment from notification
