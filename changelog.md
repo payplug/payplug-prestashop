@@ -3,6 +3,7 @@
 - Feature :
     - [PRE-2700](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2636): Create order from payment link
     - [PRE-2699](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2635/): Activate Payment Link in BO
+    - [PRE-2798](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2651): Initialize config before calling MPDC
 
 ## Version 4.16.2
 - Bugfix :

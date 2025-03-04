@@ -11,6 +11,24 @@ namespace PayPlug\tests\actions\MerchantTelemetryAction;
  */
 class sendActionTest extends BaseMerchantTelemetryAction
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->configuration->shouldReceive('getValue')
+            ->with('live_api_key')
+            ->andReturn('like_api_key')
+            ->shouldReceive('getValue')
+            ->with('sandbox_mode')
+            ->andReturn(false);
+
+        $this->api_service = \Mockery::mock('API');
+        $this->api_service->shouldReceive('initialize')
+            ->with(!$this->configuration->getValue('sandbox_mode'));
+
+        $this->plugin->shouldReceive(['getApiService' => $this->api_service]);
+    }
+
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
@@ -59,10 +77,6 @@ class sendActionTest extends BaseMerchantTelemetryAction
             ],
         ]);
 
-        $this->configuration->shouldReceive('getValue')
-            ->with('live_api_key')
-            ->andReturn('like_api_key');
-
         $telemetry = \Mockery::mock('MerchantTelemetry');
         $telemetry->shouldReceive([
             'send' => [
@@ -91,10 +105,6 @@ class sendActionTest extends BaseMerchantTelemetryAction
                 ],
             ],
         ]);
-
-        $this->configuration->shouldReceive('getValue')
-            ->with('live_api_key')
-            ->andReturn('like_api_key');
 
         $telemetry = \Mockery::mock('MerchantTelemetry');
         $telemetry->shouldReceive([
