@@ -109,7 +109,7 @@ class OrderStateAction
             $result = (bool) $this->dependencies
                 ->getPlugin()
                 ->getStateRepository()
-                ->updateEntity($order_state['id_payplug_order_state'], [
+                ->updateEntity((int) $order_state['id_payplug_order_state'], [
                     'type' => $type,
                     'date_upd' => $current_date,
                 ]);
