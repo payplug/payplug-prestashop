@@ -1,9 +1,13 @@
 # Payplug module changelog
+## Version 4.17.2
+- Bugfix :
+  - [PRE-2785](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2659): Fix Oney mobile phone check for Mayotte
+  
 ## Version 4.17.1
 - Bugfix :
   - [SMP-3111](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2666): Add symf vendor for retrocompatibility
 
-# Version 4.17.0
+## Version 4.17.0
 - Feature :
     - [PRE-2700](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2636): Create order from payment link
     - [PRE-2699](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2635/): Activate Payment Link in BO
@@ -17,10 +21,6 @@
   - [PRE-2769](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2644): Fix infinite loop in queue treatment from notification
 
 ## Version 4.16.1
-- Bugfix :
-  - [SMP-3047](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2646): Add sleep 1 second on validation
-
-## Version 4.16.1
 - Feature :
   - [PRE-2106](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2632): PRE-2106 : Remove Oney BE and ES
 
@@ -28,6 +28,7 @@
   - [PRE-1958](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2630): Fix thresholds error on paylater feature (update payplug-ui to 1.7.4)
   - [PRE-2002](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2627): Remove obsolete adapter for prestashop 1.6.X and relative usage
   - [PRE-2760](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2637): Fix missing Payplug logo in configuration
+  - [SMP-3047](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2646): Add sleep 1 second on validation
 
 - Refactoring
   - [PRE-2640](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2621): Add second parameter when using ps_round for Prestashop 9
