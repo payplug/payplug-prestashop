@@ -28,6 +28,7 @@ use PayPlug\classes\DependenciesClass;
 
 class PayplugValidationModuleFrontController extends ModuleFrontController
 {
+    public $display_column_left;
     private $cart_id;
     private $ps;
     private $dependencies;
