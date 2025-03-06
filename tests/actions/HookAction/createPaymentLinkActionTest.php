@@ -20,6 +20,9 @@ class createPaymentLinkActionTest extends BaseHookAction
 
         $this->order_state_id = 1;
         $this->id_cart = 2;
+        $this->configuration->shouldReceive([
+            'set' => true,
+        ]);
     }
 
     /**

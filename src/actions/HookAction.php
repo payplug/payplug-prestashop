@@ -65,14 +65,20 @@ class HookAction
             return false;
         }
 
+        $is_live_order_state = false;
+
         // Check the order state
         switch (true) {
             case $order_state_id == $this->configuration->getValue('order_state_email_link'):
+                $is_live_order_state = true;
+                // no break
             case $order_state_id == $this->configuration->getValue('order_state_email_link_test'):
                 $method = 'email_link';
 
                 break;
             case $order_state_id == $this->configuration->getValue('order_state_sms_link'):
+                $is_live_order_state = true;
+                // no break
             case $order_state_id == $this->configuration->getValue('order_state_sms_link_test'):
                 $method = 'sms_link';
 
@@ -103,7 +109,13 @@ class HookAction
         // Check context variable
         $this->setContextFromCartId((int) $id_cart);
 
-        // Create payment resource
+        // If the configuration differe the order state, we force the configuration to comply before create the payment
+        $is_live_mode = !(bool) $this->configuration->getValue('sandbox_mode');
+        if ($is_live_order_state != $is_live_mode) {
+            $this->configuration->set('sandbox_mode', ($is_live_order_state ? 0 : 1));
+        }
+
+        // We create payment resource
         $resource = $this->dependencies
             ->getPlugin()
             ->getPaymentAction()
@@ -112,6 +124,11 @@ class HookAction
             $this->logger->addLog('HookAction::createPaymentLinkAction() - The payment can\'t be created', 'critical');
 
             return false;
+        }
+
+        // ...then we reset the configuration in case of needs
+        if ($is_live_order_state != $is_live_mode) {
+            $this->configuration->set('sandbox_mode', ($is_live_mode ? 0 : 1));
         }
 
         return true;
