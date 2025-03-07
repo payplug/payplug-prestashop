@@ -164,14 +164,11 @@ class Payplug extends PaymentModule
             return $this->getContainer()->get($name);
         }
 
-        // Check if kernel is defined
-        if (!$this->kernel) {
-            $env = _PS_MODE_DEV_ ? 'dev' : 'prod';
-            $debug = _PS_MODE_DEV_ ? true : false;
-            $kernel = new \AppKernel($env, $debug);
-            $kernel->boot();
-            $this->kernel = $kernel;
-        }
+        $env = _PS_MODE_DEV_ ? 'dev' : 'prod';
+        $debug = _PS_MODE_DEV_ ? true : false;
+        $kernel = new \AppKernel($env, $debug);
+        $kernel->boot();
+        $this->kernel = $kernel;
 
         return $this->kernel->getContainer()->has($name) ? $this->kernel->getContainer()->get($name) : null;
     }
@@ -566,10 +563,6 @@ class Payplug extends PaymentModule
                 ->getPlugin()
                 ->getApiService()
                 ->getCurrentApiKey();
-            $permissions = $this->module
-                ->getPlugin()
-                ->getApiService()
-                ->getAccount((string) $api_key, false);
         }
 
         return parent::runUpgradeModule();
@@ -646,9 +639,6 @@ class Payplug extends PaymentModule
     {
         if ($this->payplug_dependencies) {
             $this->module = $this->payplug_dependencies->dependencies;
-
-            global $kernel;
-            $this->kernel = $kernel;
         }
     }
 }

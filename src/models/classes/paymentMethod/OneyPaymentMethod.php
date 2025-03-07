@@ -856,9 +856,7 @@ class OneyPaymentMethod extends PaymentMethod
             }
 
             $iso_list = explode(',', $iso_code_list);
-            if (!empty($iso_list)) {
-                $country = reset($iso_list);
-            }
+            $country = reset($iso_list);
         }
         $country = $this->tools->tool('strtoupper', $country);
 
