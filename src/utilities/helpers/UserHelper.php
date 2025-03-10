@@ -45,6 +45,7 @@ class UserHelper
                 'message' => '$isEmail must be a bool type',
             ];
         }
+
         if (!is_bool($isApiKey)) {
             return [
                 'result' => false,

@@ -16,6 +16,8 @@ class GenerateJWTOneShotTest extends BaseApi
     public $code_verifier;
     public $authorization_code;
     public $jwt;
+    public $id_token;
+    public $email;
 
     public function setUp()
     {
@@ -25,6 +27,8 @@ class GenerateJWTOneShotTest extends BaseApi
         $this->code_verifier = 'some_code_verifier';
         $this->authorization_code = 'some_authorization_code';
         $this->jwt = 'some_jwt_one_shot';
+        $this->id_token = 'some_id_token.ewogICJlbWFpbCI6ICJ0ZXN0QHRlc3QuY29tIgp9';
+        $this->email = 'test@test.com';
     }
 
     /**
@@ -118,6 +122,7 @@ class GenerateJWTOneShotTest extends BaseApi
                 'generateJWTOneShot' => [
                     'httpResponse' => [
                         'access_token' => $this->jwt,
+                        'id_token' => $this->id_token,
                     ],
                 ],
             ]);
@@ -127,6 +132,7 @@ class GenerateJWTOneShotTest extends BaseApi
                 'result' => true,
                 'code' => 200,
                 'data' => $this->jwt,
+                'email' => $this->email,
             ],
             $this->service->generateJWTOneShot($this->authorization_code, $this->redirect_uri, $this->client_id, $this->code_verifier)
         );

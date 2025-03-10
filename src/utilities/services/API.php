@@ -469,10 +469,16 @@ class API
         try {
             $this->setParameters();
             $api_response = Authentication::generateJWTOneShot($authorization_code, $redirect_uri, $client_id, $code_verifier);
+            $id_token = $api_response['httpResponse']['id_token'];
+            $id_token_split = explode('.', $id_token);
+            $payload = base64_decode($id_token_split[1]);
+            $payload_decode = json_decode($payload, true);
+            $email = $payload_decode['email'];
             $response = [
                 'result' => true,
                 'code' => 200,
                 'data' => $api_response['httpResponse']['access_token'],
+                'email' => $email,
             ];
         } catch (\Exception $e) {
             $response = [
@@ -736,7 +742,7 @@ class API
         $jwt = json_decode($configuration->getValue('jwt'), true);
         if ($jwt && !empty($jwt)) {
             $current_date = time();
-            if ($jwt[$mode]['expires_in'] < $current_date) {
+            if ($jwt[$mode]['expires_date'] < $current_date) {
                 $client_data = json_decode($configuration->getValue('client_data'), true);
 
                 // Renew the token
@@ -750,12 +756,8 @@ class API
                     return null;
                 }
 
-                $renew = $merchant->registerJWT($jwt);
-                if (!$renew) {
-                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be registered', 'error');
-
-                    return null;
-                }
+                $configuration->set('jwt', json_encode($jwt['data']));
+                $jwt = $jwt['data'];
             }
             $token = $jwt[$mode]['access_token'];
         }
@@ -1218,7 +1220,6 @@ class API
         $this->site_url = !$this->site_url && isset($_ENV['PAYPLUG_SITE_URL']) && !empty($_ENV['PAYPLUG_SITE_URL'])
             ? $_ENV['PAYPLUG_SITE_URL']
             : 'https://www.payplug.com';
-
         $this->portal_url = !$this->portal_url && isset($_ENV['PAYPLUG_PORTAL_URL']) && !empty($_ENV['PAYPLUG_PORTAL_URL'])
             ? $_ENV['PAYPLUG_PORTAL_URL']
             : 'https://portal.payplug.com';
