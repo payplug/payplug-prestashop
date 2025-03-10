@@ -79,7 +79,12 @@ class AdminPayplugController extends ModuleAdminController
                 ->getPlugin()
                 ->getConfigurationAction()
                 ->OauthLoginAction($authorization_code);
-            // todo: return error in previous method return a false result
+
+            // todo: return error in previous method return a false result,
+            // Or reload the page to avoid user to see unify auth get params
+            if ($auth['result']) {
+                Tools::redirectAdmin($this->context->link->getAdminLink('AdminPayplug'));
+            }
         }
 
         $this->renderApiRest();
