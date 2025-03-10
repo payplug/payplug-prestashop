@@ -26,11 +26,11 @@ class InitializeTest extends BaseApi
         $this->jwt = [
             'test' => [
                 'access_token' => 'JWT_Token',
-                'expires_in' => 1729753256,
+                'expires_date' => 1729753256,
             ],
             'live' => [
                 'access_token' => 'JWT_Token',
-                'expires_in' => 1729753256,
+                'expires_date' => 1729753256,
             ],
         ];
         $this->client_data = [
@@ -156,8 +156,11 @@ class InitializeTest extends BaseApi
             ->shouldReceive('getValue')
             ->with('client_data')
             ->andReturn(json_encode($this->client_data));
+        $this->configuration_class->shouldReceive([
+            'set' => false,
+        ]);
         $this->merchant->shouldReceive([
-            'generateJWT' => $this->jwt,
+            'generateJWT' => ['data' => $this->jwt],
             'registerJWT' => false,
         ]);
 
@@ -182,8 +185,11 @@ class InitializeTest extends BaseApi
             ->shouldReceive('getValue')
             ->with('client_data')
             ->andReturn(json_encode($this->client_data));
+        $this->configuration_class->shouldReceive([
+            'set' => false,
+        ]);
         $this->merchant->shouldReceive([
-            'generateJWT' => $this->jwt,
+            'generateJWT' => ['data' => $this->jwt],
             'registerJWT' => true,
         ]);
 

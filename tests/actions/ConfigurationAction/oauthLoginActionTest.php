@@ -89,6 +89,7 @@ class oauthLoginActionTest extends BaseConfigurationAction
             'generateJWTOneShot' => [
                 'result' => false,
                 'message' => 'an error occured',
+                'email' => 'test@test.com',
             ],
         ]);
         $this->assertSame(
@@ -107,6 +108,7 @@ class oauthLoginActionTest extends BaseConfigurationAction
                 'result' => true,
                 'code' => 200,
                 'data' => $this->jwt['access_token'],
+                'email' => 'test@test.com',
             ],
         ]);
         $this->merchant->shouldReceive([
@@ -131,6 +133,7 @@ class oauthLoginActionTest extends BaseConfigurationAction
                 'result' => true,
                 'code' => 200,
                 'data' => $this->jwt['access_token'],
+                'email' => 'test@test.com',
             ],
         ]);
         $this->merchant->shouldReceive([
@@ -159,7 +162,9 @@ class oauthLoginActionTest extends BaseConfigurationAction
                 'result' => true,
                 'code' => 200,
                 'data' => $this->jwt['access_token'],
+                'email' => 'test@test.com',
             ],
+            'getAccount' => true,
         ]);
         $this->merchant->shouldReceive([
             'getClientData' => [
