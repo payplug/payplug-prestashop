@@ -3,7 +3,6 @@
 - Feature :
   - [PRE-2725](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2647): Register user client id through the portal
   - [PRE-2727](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2648): Create jwt from unify authentication
-  - [PRE-2727](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2648): Create jwt from unify authentication
 
 ## Version 4.17.0
 - Feature :
