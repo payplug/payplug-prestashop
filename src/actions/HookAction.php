@@ -65,6 +65,14 @@ class HookAction
             return false;
         }
 
+        // Check if merchant is logged
+        $is_logged = (bool) $this->configuration->getValue('test_api_key') && (bool) $this->configuration->getValue('email');
+        if (!$is_logged) {
+            $this->logger->addLog('HookAction::createPaymentLinkAction() - Merchant should be logged to create payment link');
+
+            return true;
+        }
+
         $is_live_order_state = false;
 
         // Check the order state
@@ -91,6 +99,14 @@ class HookAction
 
         if (!$method) {
             $this->logger->addLog('HookAction::createPaymentLinkAction() - Invalid order status to create payment link');
+
+            return true;
+        }
+
+        // Check if merchant can create payment link on live
+        $can_use_live = $this->configuration->getValue('live_api_key');
+        if (!(bool) $can_use_live) {
+            $this->logger->addLog('HookAction::createPaymentLinkAction() - Merchant should has no permission to create payment link in live mode');
 
             return true;
         }
