@@ -166,17 +166,16 @@ class ApiRest
             ->getConfigurationClass();
 
         $userHelper = $this->helpers['user'];
-        $is_api_key = $this->validators['account']->isApiKey(
-            $configuration->getValue('test_api_key')
-        );
+        $jwt = json_decode($configuration->getValue('jwt'), true);
+        $jwt_test = isset($jwt['test']) ? $jwt['test'] : '';
         $is_email = $this->validators['account']->isEmail(
             $configuration->getValue('email')
         );
         $logged = false;
-        if ($is_api_key['result'] && $is_email['result']) {
+        if ($is_email['result'] && $jwt_test) {
             $logged = $userHelper->isLogged(
                 $is_email['result'],
-                $is_api_key['result']
+                $jwt_test
             )['result'];
         }
 
@@ -476,46 +475,54 @@ class ApiRest
     }
 
     /**
-     * @description build login section for api usage
+     * @description build oauth section for front usage
      *
      * @return array
      */
-    public function getLoginSection()
+    public function getOAuthSection()
     {
         $translation = $this->dependencies
             ->getPlugin()
             ->getTranslationClass()
-            ->getLoginTranslations();
-
-        $section = [
-            'description' => $translation['description'],
-            'not_registered' => $translation['register'],
-            'connect' => $translation['connect'],
-            'email_label' => $translation['email'],
-            'email_placeholder' => $translation['email'],
-            'password_label' => $translation['password'],
-            'password_placeholder' => $translation['password'],
-            'link_forgot_password' => [
-                'text' => $translation['forgot_password'],
-                'url' => $this->dependencies
-                    ->getPlugin()
-                    ->getRoutes()
-                    ->getExternalUrl()['forgot_password'],
-                'target' => '_blank',
-            ],
-            // todo: not for prod - add translation before push it to prod
-            //            'portal' => [
-            //                'text' => $translation['portal']['text'],
-            //                'button' => $translation['portal']['button'],
-            //            ],
-        ];
+            ->getOauthLoginTranslations();
+        $register_link = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl()['signup'];
 
         return [
-            'name' => 'generalLogin',
+            'name' => 'oathLogin',
             'title' => $translation['title'],
             'descriptions' => [
-                'live' => $section,
-                'sandbox' => $section,
+                'live' => [
+                    'description' => $translation['description'],
+                    'link_create_account' => [
+                        'text' => $translation['register'],
+                        'url' => $register_link,
+                        'target' => '_blank',
+                    ],
+                    'content_description' => $translation['text'],
+                    'already_have_account' => $translation['connect'],
+                    'portal' => [
+                        'text' => $translation['portal']['text'],
+                        'button' => $translation['portal']['button'],
+                    ],
+                ],
+                'sandbox' => [
+                    'description' => $translation['description'],
+                    'link_create_account' => [
+                        'text' => $translation['register'],
+                        'url' => $register_link,
+                        'target' => '_blank',
+                    ],
+                    'content_description' => $translation['text'],
+                    'already_have_account' => $translation['connect'],
+                    'portal' => [
+                        'text' => $translation['portal']['text'],
+                        'button' => $translation['portal']['button'],
+                    ],
+                ],
+
             ],
         ];
     }
