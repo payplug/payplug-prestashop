@@ -63,6 +63,7 @@ class SmsLinkPaymentMethod extends StandardPaymentMethod
         $payment_tab['billing']['landline_phone_number'] = $payment_tab['billing']['landline_phone_number'] ?: $payment_tab['shipping']['landline_phone_number'];
         $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['mobile_phone_number'] ?: $payment_tab['shipping']['mobile_phone_number'];
         $payment_tab['hosted_payment']['sent_by'] = 'SMS';
+        $payment_tab['metadata']['Order'] = $this->tools->tool('getValue', 'id_order');
 
         // If one click is activated, we disable it in the payment link process
         if (isset($payment_tab['allow_save_card']) && $payment_tab['allow_save_card']) {
