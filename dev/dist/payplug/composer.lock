@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "80f66e7b7d9163a5cbd50ac71341b15e",
+    "content-hash": "2054e373eb011fd9bfd7e18dd787e314",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -128,16 +128,16 @@
         },
         {
             "name": "payplug/payplug-php",
-            "version": "3.6.0",
+            "version": "v3.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "c85ed7efa93f3395b4d644429451c374c3d41c5f"
+                "reference": "9ca5efa199f537e75ca9aa02fa705cca5302bff6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/c85ed7efa93f3395b4d644429451c374c3d41c5f",
-                "reference": "c85ed7efa93f3395b4d644429451c374c3d41c5f",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/9ca5efa199f537e75ca9aa02fa705cca5302bff6",
+                "reference": "9ca5efa199f537e75ca9aa02fa705cca5302bff6",
                 "shasum": ""
             },
             "require": {
@@ -170,6 +170,10 @@
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
+            "support": {
+                "issues": "https://github.com/payplug/payplug-php/issues",
+                "source": "https://github.com/payplug/payplug-php/tree/v3.7.0"
+            },
             "time": "2015-05-06T00:00:00+00:00"
         },
         {
@@ -3547,5 +3551,5 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.1.0"
 }
