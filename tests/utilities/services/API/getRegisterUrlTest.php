@@ -56,11 +56,7 @@ class getRegisterUrlTest extends BaseApi
     public function testWhenRegisterUrlIsGot()
     {
         $this->authentication->shouldReceive([
-            'getRegisterUrl' => [
-                'httpResponse' => [
-                    'redirect_to' => $this->callback_uri,
-                ],
-            ],
+            'getRegisterUrl' => $this->callback_uri,
         ]);
         $this->assertSame(
             [
