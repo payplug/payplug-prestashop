@@ -171,20 +171,11 @@ class ApiRest
             ->getPlugin()
             ->getConfigurationClass();
 
-        $userHelper = $this->helpers['user'];
         $jwt = json_decode($configuration->getValue('jwt'), true);
-        $jwt_test = isset($jwt['test']) ? $jwt['test'] : '';
         $is_email = $this->validators['account']->isEmail(
             $configuration->getValue('email')
         );
-        $logged = false;
-        if ($is_email['result'] && $jwt_test) {
-            $logged = $userHelper->isLogged(
-                $is_email['result'],
-                $jwt_test
-            )['result'];
-        }
-
+        $logged = !empty($jwt) && $is_email['result'];
         if (!$logged) {
             $this->dependencies
                 ->getPlugin()
@@ -496,39 +487,33 @@ class ApiRest
             ->getRoutes()
             ->getExternalUrl()['signup'];
 
+        $api = $this->module->getService('payplug.utilities.service.api');
+        $context = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get();
+        $register_url = $api->getRegisterUrl($context->link->getAdminLink('AdminPayplug'));
+        $content = [
+            'description' => $translation['description'],
+            'link_create_account' => [
+                'text' => $translation['register'],
+                'url' => $register_link,
+                'target' => '_blank',
+            ],
+            'content_description' => $translation['text'],
+            'already_have_account' => $translation['connect'],
+            'link_portal' => [
+                'text' => $translation['portal']['button'],
+                'url' => $register_url['redirection'],
+            ],
+        ];
+
         return [
-            'name' => 'oathLogin',
+            'name' => 'oauthLogin',
             'title' => $translation['title'],
             'descriptions' => [
-                'live' => [
-                    'description' => $translation['description'],
-                    'link_create_account' => [
-                        'text' => $translation['register'],
-                        'url' => $register_link,
-                        'target' => '_blank',
-                    ],
-                    'content_description' => $translation['text'],
-                    'already_have_account' => $translation['connect'],
-                    'portal' => [
-                        'text' => $translation['portal']['text'],
-                        'button' => $translation['portal']['button'],
-                    ],
-                ],
-                'sandbox' => [
-                    'description' => $translation['description'],
-                    'link_create_account' => [
-                        'text' => $translation['register'],
-                        'url' => $register_link,
-                        'target' => '_blank',
-                    ],
-                    'content_description' => $translation['text'],
-                    'already_have_account' => $translation['connect'],
-                    'portal' => [
-                        'text' => $translation['portal']['text'],
-                        'button' => $translation['portal']['button'],
-                    ],
-                ],
-
+                'live' => $content,
+                'sandbox' => $content,
             ],
         ];
     }

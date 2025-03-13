@@ -689,12 +689,11 @@ class API
         try {
             $this->setParameters();
             $this->setUserAgent();
-            $api_response = Authentication::getRegisterUrl($callback_uri, $callback_uri);
-            $json_answer = $api_response['httpResponse'];
+            $register_url = Authentication::getRegisterUrl($callback_uri, $callback_uri);
             $response = [
                 'result' => true,
                 'code' => 200,
-                'redirection' => $json_answer['redirect_to'],
+                'redirection' => $register_url,
             ];
         } catch (\Exception $e) {
             $response = [
