@@ -3,7 +3,7 @@
 namespace PayPlug\Tests\utilities\helpers\AmountHelper;
 
 use PayPlug\src\utilities\helpers\AmountHelper;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**

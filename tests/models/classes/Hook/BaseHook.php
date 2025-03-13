@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\classes\Hook;
 
 use PayPlug\src\models\classes\Hook;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseHook extends TestCase

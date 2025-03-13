@@ -2,8 +2,8 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\PaymentMethod;
 
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
+use PayPlug\tests\traits\FormatDataProvider;
 
 /**
  * @group unit

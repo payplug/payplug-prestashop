@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPlug\tests;
+namespace PayPlug\tests\traits;
 
 trait FormatDataProvider
 {

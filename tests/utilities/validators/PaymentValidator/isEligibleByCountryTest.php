@@ -3,7 +3,7 @@
 namespace PayPlug\tests\utilities\validators\PaymentValidator;
 
 use PayPlug\src\utilities\validators\paymentValidator;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -3,8 +3,8 @@
 namespace PayPlug\tests\actions\QueueAction;
 
 use PayPlug\src\actions\QueueAction;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseQueueAction extends TestCase

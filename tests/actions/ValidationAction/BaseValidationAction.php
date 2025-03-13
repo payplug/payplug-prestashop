@@ -3,10 +3,10 @@
 namespace PayPlug\tests\actions\ValidationAction;
 
 use PayPlug\src\actions\ValidationAction;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseValidationAction extends TestCase

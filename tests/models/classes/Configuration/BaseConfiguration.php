@@ -3,8 +3,8 @@
 namespace PayPlug\tests\models\classes\Configuration;
 
 use PayPlug\src\models\classes\Configuration;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseConfiguration extends TestCase

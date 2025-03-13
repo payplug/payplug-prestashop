@@ -3,9 +3,9 @@
 namespace PayPlug\tests\actions\OrderAction;
 
 use PayPlug\src\actions\OrderAction;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseOrderAction extends TestCase

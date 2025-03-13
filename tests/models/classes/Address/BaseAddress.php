@@ -3,8 +3,8 @@
 namespace PayPlug\tests\models\classes\Address;
 
 use PayPlug\src\models\classes\Address;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseAddress extends TestCase

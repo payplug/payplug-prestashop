@@ -11,10 +11,10 @@ use PayPlug\src\utilities\helpers\PhoneHelper;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\paymentValidator;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\AddressMock;
 use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BasePaymentMethod extends TestCase

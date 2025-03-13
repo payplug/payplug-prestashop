@@ -2,7 +2,7 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 
 /**
  * @group unit

@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\entities\PaymentEntity;
 
 use PayPlug\src\models\entities\PaymentEntity;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BasePaymentEntity extends TestCase

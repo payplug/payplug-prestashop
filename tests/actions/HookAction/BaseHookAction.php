@@ -3,8 +3,8 @@
 namespace PayPlug\tests\actions\HookAction;
 
 use PayPlug\src\actions\HookAction;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseHookAction extends TestCase

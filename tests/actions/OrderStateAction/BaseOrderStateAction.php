@@ -4,8 +4,8 @@ namespace PayPlug\tests\actions\OrderStateAction;
 
 use PayPlug\src\actions\OrderStateAction;
 use PayPlug\src\models\classes\Translation;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseOrderStateAction extends TestCase

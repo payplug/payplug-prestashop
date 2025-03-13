@@ -2,9 +2,9 @@
 
 namespace PayPlug\tests\repositories\OneyRepository;
 
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PayPlug\tests\mock\OneySimulationsMock;
+use PayPlug\tests\traits\FormatDataProvider;
 
 /**
  * @group unit

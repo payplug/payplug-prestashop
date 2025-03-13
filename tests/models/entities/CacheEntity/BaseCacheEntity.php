@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\entities\CacheEntity;
 
 use PayPlug\src\models\entities\CacheEntity;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseCacheEntity extends TestCase

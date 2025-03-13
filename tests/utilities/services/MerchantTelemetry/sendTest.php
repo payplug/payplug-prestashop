@@ -3,7 +3,7 @@
 namespace PayPlug\tests\utilities\services\MerchantTelemetry;
 
 use PayPlug\src\utilities\services\MerchantTelemetry;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**

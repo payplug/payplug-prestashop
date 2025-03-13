@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\entities\LockEntity;
 
 use PayPlug\src\models\entities\LockEntity;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseLockEntity extends TestCase

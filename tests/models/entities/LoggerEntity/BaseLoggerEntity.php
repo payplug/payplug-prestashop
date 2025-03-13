@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\entities\LoggerEntity;
 
 use PayPlug\src\models\entities\LoggerEntity;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseLoggerEntity extends TestCase

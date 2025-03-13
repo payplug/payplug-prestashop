@@ -5,9 +5,9 @@ namespace PayPlug\tests\actions\PaymentAction;
 use PayPlug\src\actions\PaymentAction;
 use PayPlug\src\models\classes\Configuration;
 use PayPlug\src\models\classes\paymentMethod\PaymentMethod;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BasePaymentAction extends TestCase

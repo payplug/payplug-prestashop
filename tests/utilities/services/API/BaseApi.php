@@ -5,8 +5,8 @@ namespace PayPlug\tests\utilities\services\API;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PayPlug\src\utilities\services\API;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 
 /**
  * @internal

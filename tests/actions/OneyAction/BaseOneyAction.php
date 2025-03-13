@@ -4,9 +4,9 @@ namespace PayPlug\tests\actions\OneyAction;
 
 use PayPlug\src\actions\OneyAction;
 use PayPlug\src\models\classes\Translation;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseOneyAction extends TestCase

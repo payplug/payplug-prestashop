@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\classes\Merchant;
 
 use PayPlug\src\models\classes\Merchant;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseMerchant extends TestCase

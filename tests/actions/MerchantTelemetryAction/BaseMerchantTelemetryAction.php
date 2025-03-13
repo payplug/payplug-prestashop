@@ -4,8 +4,8 @@ namespace PayPlug\tests\actions\MerchantTelemetryAction;
 
 use PayPlug\src\actions\MerchantTelemetryAction;
 use PayPlug\src\models\classes\Configuration;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseMerchantTelemetryAction extends TestCase

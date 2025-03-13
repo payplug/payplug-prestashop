@@ -3,7 +3,7 @@
 namespace PayPlug\tests\models\entities\QueueEntity;
 
 use PayPlug\src\models\entities\QueueEntity;
-use PayPlug\tests\FormatDataProvider;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseQueueEntity extends TestCase

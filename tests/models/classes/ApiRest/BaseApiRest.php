@@ -10,9 +10,9 @@ use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\ConfigurationHelper;
 use PayPlug\src\utilities\services\Routes;
 use PayPlug\src\utilities\validators\moduleValidator;
-use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\AddressMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\traits\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BaseApiRest extends TestCase
