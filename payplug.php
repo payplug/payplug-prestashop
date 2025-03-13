@@ -22,6 +22,9 @@
  */
 // Check if prestashop Context
 use PayPlug\classes\DependenciesClass;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -164,13 +167,21 @@ class Payplug extends PaymentModule
             return $this->getContainer()->get($name);
         }
 
-        $env = _PS_MODE_DEV_ ? 'dev' : 'prod';
-        $debug = _PS_MODE_DEV_ ? true : false;
-        $kernel = new \AppKernel($env, $debug);
-        $kernel->boot();
-        $this->kernel = $kernel;
+        return $this->getServiceFromFileLoader($name);
+    }
 
-        return $this->kernel->getContainer()->has($name) ? $this->kernel->getContainer()->get($name) : null;
+    public function getServiceFromFileLoader($name = '')
+    {
+        if (!is_string($name) || '' == $name) {
+            return null;
+        }
+
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
+        $loader->load('services.yml');
+        $container->compile();
+
+        return $container->has($name) ? $container->get($name) : null;
     }
 
     /**
@@ -513,6 +524,9 @@ class Payplug extends PaymentModule
             }
             $flag = $flag && $installation['result'];
         }
+
+        // Clear symf cache to ensure the service are correctly load
+        \Tools::clearSf2Cache();
 
         return $flag;
     }
