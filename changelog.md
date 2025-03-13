@@ -3,7 +3,8 @@
 ## Version 4.18.0
 - Feature :
   - [PRE-2725](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2647): Register user client id through the portal
-  - [PRE-2727](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2648): Create jwt from unify authentication
+  - [PRE-2730](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2664): Unified authent admin ui
+  - [PRE-2814](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2667): Fix double auth
   
 ## Version 4.17.2
 - Bugfix :
