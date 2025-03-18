@@ -11,9 +11,9 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class GetAccountTest extends BaseApi
 {
-    private $api_key;
-    private $sandbox;
-    private $treat_account;
+    public $api_key;
+    public $sandbox;
+    public $treat_account;
 
     public function setUp()
     {
