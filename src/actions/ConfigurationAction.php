@@ -62,9 +62,19 @@ class ConfigurationAction
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         if ($sandbox_mode) {
-            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $configuration->getValue('test_api_key'), true);
+            $permissions = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
+                ->getAccount((string) $configuration->getValue('test_api_key'), true);
         } else {
-            $permissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $configuration->getValue('live_api_key'), false);
+            $permissions = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
+                ->getAccount((string) $configuration->getValue('live_api_key'), false);
         }
 
         $allowed_methods = [
@@ -432,7 +442,12 @@ class ConfigurationAction
             ];
         }
 
-        if (!$this->dependencies->getPlugin()->getApiService()->login($email, $password)) {
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->login($email, $password)) {
             $logger->addLog('ConfigurationAction::loginAction: invalid email and/or password.');
 
             return [
@@ -451,7 +466,9 @@ class ConfigurationAction
         // Update global configuration
         $permissions = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->getAccount((string) $configuration->getValue('live_api_key'), false);
 
         if (empty($permissions)) {
@@ -470,6 +487,122 @@ class ConfigurationAction
         }
 
         return $this->renderConfiguration();
+    }
+
+    /**
+     * @description Login and generate jwt from a given session
+     *
+     * @param string $authorization_code
+     *
+     * @return array
+     */
+    public function oauthLoginAction($authorization_code = '')
+    {
+        if (!is_string($authorization_code) || '' == $authorization_code) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ConfigurationAction::OauthLoginAction - Invalid parameter given, $authorization_code must be a non empty string.');
+
+            return [
+                'message' => 'ConfigurationAction::OauthLoginAction - Invalid parameter given, $authorization_code must be a non empty string.',
+                'result' => false,
+            ];
+        }
+
+        // Set usage variable
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $context = $this->dependencies->getPlugin()->getContext()->get();
+        $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+        $api = $module->getService('payplug.utilities.service.api');
+
+        // Get the JWT one shot
+        $jwt = $api->generateJWTOneShot(
+            $authorization_code,
+            $context->link->getAdminLink('AdminPayplug'),
+            $configuration->getValue('oauth_client_id'),
+            $configuration->getValue('oauth_code_verifier')
+        );
+
+        if (empty($jwt) || !$jwt['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ConfigurationAction::OauthLoginAction - JWT one shot can\'t be got.');
+
+            return [
+                'message' => 'ConfigurationAction::OauthLoginAction - JWT one shot can\'t be got.',
+                'result' => false,
+            ];
+        }
+
+        // Get the client data
+        $merchant = $module->getService('payplug.models.classes.merchant');
+        $company_id = $configuration->getValue('oauth_company_id');
+        $client_data = $merchant->getClientData($jwt['data'], $company_id);
+        if (empty($client_data) || !$client_data['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ConfigurationAction::OauthLoginAction - Client data shot can\'t be got.');
+
+            return [
+                'message' => 'ConfigurationAction::OauthLoginAction - Client data shot can\'t be got.',
+                'result' => false,
+            ];
+        }
+        $configuration->set('client_data', json_encode($client_data['data']));
+
+        // If jwt doesn't exists, we generate one.
+        $jwt = $merchant->generateJWT($client_data['data']);
+        if (empty($jwt) || !$jwt['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ConfigurationAction::OauthLoginAction - JWT can\'t be got.');
+
+            return [
+                'message' => 'ConfigurationAction::OauthLoginAction - JWT can\'t be got.',
+                'result' => false,
+            ];
+        }
+        $configuration->set('jwt', json_encode($jwt['data']));
+
+        // Finalize the login
+        /*
+        // todo: Finalize this section bellow during task PRE-2730 to ensure that the merchant is well connected
+        $configuration->set('email', 'admin+oauth2@payplug.com'); // todo: email company should be gotten in id_token given with the jwt one shot
+        $configuration->set('enable', 1);
+
+        // Update global configuration
+        $permissions = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->getAccount();
+
+        if (empty($permissions)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ConfigurationAction::OauthLoginAction: No permissions found for this account');
+
+            return [
+                'message' => 'No permissions found for this account.',
+                'result' => false,
+            ];
+        }
+
+        if (empty($jwt['data']['live'])) {
+            $configuration->set('sandbox_mode', 0);
+        }
+        //*/
+
+        return [
+            'message' => 'User connected',
+            'result' => true,
+        ];
     }
 
     /**
@@ -493,6 +626,51 @@ class ConfigurationAction
                 'subscribe' => $api_rest->getSubscribeSection(),
             ],
         ];
+    }
+
+    /**
+     * @description Register merchant information to log through unify authentication
+     *
+     * @param string $client_id
+     * @param string $company_id
+     *
+     * @return bool
+     */
+    public function registerOauthRequestAction($client_id = '', $company_id = '')
+    {
+        if (!is_string($client_id) || '' == $client_id) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ConfigurationAction::registerOauthAction - Invalid parameter given, $client_id must be a non empty string.');
+
+            return false;
+        }
+
+        if (!is_string($company_id) || '' == $company_id) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ConfigurationAction::registerOauthAction - Invalid parameter given, $company_id must be a non empty string.');
+
+            return false;
+        }
+
+        // Set usage variable
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+        $api = $module->getService('payplug.utilities.service.api');
+
+        $configuration->set('oauth_client_id', $client_id);
+        $configuration->set('oauth_company_id', $company_id);
+        $code_verifier = bin2hex(openssl_random_pseudo_bytes(50));
+        $configuration->set('oauth_code_verifier', $code_verifier);
+
+        return $api->initiateOAuth(
+            $client_id,
+            $this->dependencies->getPlugin()->getContext()->get()->link->getAdminLink('AdminPayplug'),
+            $code_verifier
+        );
     }
 
     /**
@@ -816,7 +994,12 @@ class ConfigurationAction
             ];
         }
 
-        $this->dependencies->getPlugin()->getApiService()->initialize(!(bool) $configuration->getValue('sandbox_mode'));
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
 
         return [
             'success' => true,
@@ -873,7 +1056,12 @@ class ConfigurationAction
 
         $password = base64_decode($datas->payplug_password);
 
-        if (!$this->dependencies->getPlugin()->getApiService()->login($email, $password)) {
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->login($email, $password)) {
             $logger->addLog('ConfigurationAction::submitSandboxAction: invalid email and/or password.');
 
             return [

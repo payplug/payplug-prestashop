@@ -11,14 +11,14 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class InitializeTest extends BaseApi
 {
-    private $configuration_class;
-    private $merchant;
-    private $module;
-    private $module_adapter;
-    private $jwt;
-    private $logger;
-    private $token;
-    private $client_data;
+    public $configuration_class;
+    public $merchant;
+    public $module;
+    public $module_adapter;
+    public $jwt;
+    public $logger;
+    public $token;
+    public $client_data;
 
     public function setUp()
     {
@@ -26,11 +26,11 @@ class InitializeTest extends BaseApi
         $this->jwt = [
             'test' => [
                 'access_token' => 'JWT_Token',
-                'expires_date' => 1729753256,
+                'expires_in' => 1729753256,
             ],
             'live' => [
                 'access_token' => 'JWT_Token',
-                'expires_date' => 1729753256,
+                'expires_in' => 1729753256,
             ],
         ];
         $this->client_data = [
@@ -116,7 +116,7 @@ class InitializeTest extends BaseApi
         );
     }
 
-    public function testWhenJWTIsExpiredAndCantBeGetted()
+    public function testWhenJWTIsExpiredAndCantBeGot()
     {
         $this->configuration_class
             ->shouldReceive('getValue')
@@ -157,9 +157,7 @@ class InitializeTest extends BaseApi
             ->with('client_data')
             ->andReturn(json_encode($this->client_data));
         $this->merchant->shouldReceive([
-            'generateJWT' => [
-                'data' => $this->jwt,
-            ],
+            'generateJWT' => $this->jwt,
             'registerJWT' => false,
         ]);
 
@@ -185,9 +183,7 @@ class InitializeTest extends BaseApi
             ->with('client_data')
             ->andReturn(json_encode($this->client_data));
         $this->merchant->shouldReceive([
-            'generateJWT' => [
-                'data' => $this->jwt,
-            ],
+            'generateJWT' => $this->jwt,
             'registerJWT' => true,
         ]);
 

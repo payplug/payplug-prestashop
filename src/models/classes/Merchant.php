@@ -45,7 +45,7 @@ class Merchant
      *
      * @return array
      */
-    public function generateJWT($client_datas)
+    public function generateJWT($client_datas = [])
     {
         if (!is_array($client_datas) || empty($client_datas)) {
             $this->dependencies
@@ -61,9 +61,17 @@ class Merchant
 
         $jwt = [];
         foreach ($client_datas as $key => $data) {
+            if (empty($data)) {
+                $jwt[$key] = [];
+
+                continue;
+            }
+
             $generated_jwt = $this->dependencies
                 ->getPlugin()
-                ->getApiService()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
                 ->generateJWT($data['client_id'], $data['client_secret']);
 
             if (!$generated_jwt['result']) {
@@ -117,30 +125,31 @@ class Merchant
         }
 
         $data = [];
+        $client_name = 'Prestashop';
 
         // Get the client id and secret for test mode
         $client_data_test = $this->dependencies
             ->getPlugin()
-            ->getApiService()
-            ->getClientData($session, $company_id, 'test');
-        $data['test'] = $client_data_test['result']
-            ? $client_data_test['data']
-            : [
-                'client_id' => '',
-                'client_secret' => '',
-            ];
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->getClientData($company_id, $client_name, 'test', $session);
+        $data['test'] = $client_data_test['result'] ? [
+            'client_id' => $client_data_test['data']['client_id'],
+            'client_secret' => $client_data_test['data']['client_secret'],
+        ] : [];
 
         // Get the client id and secret for live mode
-        $client_data_test = $this->dependencies
+        $client_data_live = $this->dependencies
             ->getPlugin()
-            ->getApiService()
-            ->getClientData($session, $company_id, 'live');
-        $data['live'] = $client_data_test['result']
-            ? $client_data_test['data']
-            : [
-                'client_id' => '',
-                'client_secret' => '',
-            ];
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->getClientData($company_id, $client_name, 'live', $session);
+        $data['live'] = $client_data_live['result'] ? [
+            'client_id' => $client_data_live['data']['client_id'],
+            'client_secret' => $client_data_live['data']['client_secret'],
+        ] : [];
 
         return [
             'result' => true,
@@ -149,7 +158,8 @@ class Merchant
     }
 
     /**
-     * @description Register client data given getted from API
+     * @description Register client data given got from API
+     * todo: remove this method
      *
      * @param array $client_data
      *
@@ -174,6 +184,7 @@ class Merchant
 
     /**
      * @description Register JWT got from API
+     * todo: remove this method
      *
      * @param array $jwt
      *

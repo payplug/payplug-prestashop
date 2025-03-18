@@ -12,7 +12,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneClickPaymentMethod;
  */
 class getPaymentOptionTest extends BaseOneClickPaymentMethod
 {
-    private $card;
+    public $card;
 
     public function setUp()
     {

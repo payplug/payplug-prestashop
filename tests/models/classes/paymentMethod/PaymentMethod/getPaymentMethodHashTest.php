@@ -14,7 +14,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class getPaymentMethodHashTest extends BasePaymentMethod
 {
-    private $payment_tab;
+    public $payment_tab;
 
     public function setUp()
     {

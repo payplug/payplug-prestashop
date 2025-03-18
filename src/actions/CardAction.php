@@ -96,7 +96,9 @@ class CardAction
         if ($validate_expiration['result']) {
             $delete = $this->dependencies
                 ->getPlugin()
-                ->getApiService()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
                 ->deleteCard($card['id_card']);
             if ($delete['result']) {
                 $json_answer = $delete['resource']['httpResponse'];

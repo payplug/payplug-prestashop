@@ -47,7 +47,7 @@ class getOptionCollectionTest extends BasePaymentMethod
      *
      * @param mixed $payment_method
      */
-    public function testWhenPaymentMethodGettedIsntAnObject($payment_method)
+    public function testWhenPaymentMethodGotIsntAnObject($payment_method)
     {
         $this->class->shouldReceive([
             'getAvailablePaymentMethod' => [
