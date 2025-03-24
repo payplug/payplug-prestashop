@@ -2,12 +2,13 @@
     "name": "payplug/payplug-prestashop",
     "moduleName": "payplug",
     "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "4.17.0",
+    "version": "4.17.1",
     "require": {
-        "php": "5.6.*",
+        "php": ">=5.6.0",
         "giggsey/libphonenumber-for-php": "^8.12",
         "payplug/payplug-php": "3.*",
-        "symfony/dotenv": "3.4.*"
+        "symfony/dotenv": "3.4.*",
+        "symfony/dependency-injection": "4.4.0"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*",
