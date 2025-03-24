@@ -1,5 +1,9 @@
 # Payplug module changelog
-## Version 4.17.0
+## Version 4.17.1
+- Bugfix :
+  - [SMP-3111](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2666): Add symf vendor for retrocompatibility
+
+# Version 4.17.0
 - Feature :
     - [PRE-2700](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2636): Create order from payment link
     - [PRE-2699](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2635/): Activate Payment Link in BO
