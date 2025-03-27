@@ -1098,7 +1098,7 @@ class paymentValidator
             $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
-            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
+            if (!in_array($iso_code, $phone_util->getRegionCodesForCountryCode($parsed->getCountryCode()))) {
                 return [
                     'result' => false,
                     'message' => '$iso_code is wrong',
