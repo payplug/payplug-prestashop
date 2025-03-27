@@ -2,6 +2,8 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 
+use PayPlug\tests\mock\CurrencyMock;
+
 /**
  * @group unit
  * @group class
@@ -24,6 +26,7 @@ final class FormatOneyResourceTest extends BaseOneyPaymentMethod
         parent::setUp();
 
         $this->context = \Mockery::mock('Context');
+        $this->context->currency = CurrencyMock::get();
     }
 
     /**
@@ -109,6 +112,7 @@ final class FormatOneyResourceTest extends BaseOneyPaymentMethod
 
         $this->class->shouldReceive([
             'getOperations' => ['x3_with_fees'],
+            'formatPrice' => 15,
         ]);
 
         $this->helpers['amount']->shouldReceive([
