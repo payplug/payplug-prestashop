@@ -175,6 +175,21 @@ class Translation
         ];
     }
 
+    public function getOauthLoginTranslations()
+    {
+        return [
+            'title' => $this->l('oauth.title', 'translation'),
+            'description' => $this->l('oauth.description', 'translation'),
+            'text' => $this->l('oauth.text', 'translation'),
+            'register' => $this->l('oauth.register', 'translation'),
+            'connect' => $this->l('oauth.connect', 'translation'),
+            'portal' => [
+                'text' => $this->l('login.portal.text', 'translation'),
+                'button' => $this->l('login.portal.button', 'translation'),
+            ],
+        ];
+    }
+
     /**
      * @return array
      */

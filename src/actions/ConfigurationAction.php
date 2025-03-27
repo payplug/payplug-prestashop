@@ -524,6 +524,8 @@ class ConfigurationAction
             $configuration->getValue('oauth_code_verifier')
         );
 
+        $email = $jwt['email'];
+
         if (empty($jwt) || !$jwt['result']) {
             $this->dependencies
                 ->getPlugin()
@@ -566,12 +568,11 @@ class ConfigurationAction
                 'result' => false,
             ];
         }
+
         $configuration->set('jwt', json_encode($jwt['data']));
 
         // Finalize the login
-        /*
-        // todo: Finalize this section bellow during task PRE-2730 to ensure that the merchant is well connected
-        $configuration->set('email', 'admin+oauth2@payplug.com'); // todo: email company should be gotten in id_token given with the jwt one shot
+        $configuration->set('email', $email);
         $configuration->set('enable', 1);
 
         // Update global configuration
@@ -594,10 +595,9 @@ class ConfigurationAction
             ];
         }
 
-        if (empty($jwt['data']['live'])) {
+        if (!empty($jwt['data']['live'])) {
             $configuration->set('sandbox_mode', 0);
         }
-        //*/
 
         return [
             'message' => 'User connected',
@@ -692,16 +692,16 @@ class ConfigurationAction
         $is_logged = isset($current_configuration['logged']) ? $current_configuration['logged'] : false;
 
         $logged_section = [];
+
         if ((bool) $is_logged) {
             $logged_section = $api_rest->getLoggedSection($current_configuration);
         }
-
         if (!empty($logged_section)) {
             $datas = [
                 'payplug_wooc_settings' => $current_configuration,
                 'settings' => $setting,
                 'header' => $header,
-                'login' => $api_rest->getLoginSection(),
+                'oauth_login' => $api_rest->getOAuthSection(),
                 'logged' => $logged_section,
                 'payment_methods' => $api_rest->getPaymentMethodsSection($current_configuration),
                 'payment_paylater' => $api_rest->getPaylaterSection($current_configuration),
@@ -712,7 +712,7 @@ class ConfigurationAction
             $datas = [
                 'settings' => $api_rest->getSettingsSection(),
                 'header' => $header,
-                'login' => $api_rest->getLoginSection(),
+                'oauth_login' => $api_rest->getOAuthSection(),
                 'subscribe' => $api_rest->getSubscribeSection(),
                 'payment_paylater' => $api_rest->getPaylaterSection(),
                 'status' => $api_rest->getRequirementsSection(),

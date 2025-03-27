@@ -181,29 +181,4 @@ class Merchant
             ->getConfigurationClass()
             ->set('client_data', json_encode($client_data));
     }
-
-    /**
-     * @description Register JWT got from API
-     * todo: remove this method
-     *
-     * @param array $jwt
-     *
-     * @return bool
-     */
-    public function registerJWT($jwt = [])
-    {
-        if (!is_array($jwt) || empty($jwt)) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('Merchant::registerJWT - Invalid argument, jwt must be an array.', 'error');
-
-            return false;
-        }
-
-        return $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass()
-            ->set('jwt', json_encode($jwt));
-    }
 }
