@@ -757,9 +757,7 @@ class OneyPaymentMethod extends PaymentMethod
             'payplug_oney_required_field' => false,
             'payplug_oney_amount' => [
                 'amount' => $amount,
-                'value' => $context
-                    ->currentLocale
-                    ->formatPrice($amount, $this->context->currency->iso_code),
+                'value' => $this->formatPrice($amount, $this->context->currency),
             ],
             'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
             'payplug_oney_error' => $error,
@@ -815,13 +813,13 @@ class OneyPaymentMethod extends PaymentMethod
         $this->context->getContext()->smarty->assign([
             'learnMoreLink' => (bool) $learnMoreLink,
             'oneyWithFees' => (bool) $this->configuration->getValue('oney_fees'),
-            'oneyMinAmounts' => $this->context->currentLocale->formatPrice(
+            'oneyMinAmounts' => $this->formatPrice(
                 $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
-                $this->context->currency->iso_code
+                $this->context->currency
             ),
-            'oneyMaxAmounts' => $this->context->currentLocale->formatPrice(
+            'oneyMaxAmounts' => $this->formatPrice(
                 $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result'],
-                $this->context->currency->iso_code
+                $this->context->currency
             ),
             'oneyUrl' => 'https://www.oney.' . $this->context->language->iso_code,
         ]);
@@ -929,36 +927,30 @@ class OneyPaymentMethod extends PaymentMethod
 
         $resource['total_cost'] = [
             'amount' => number_format($total_cost, 2),
-            'value' => $context
-                ->currentLocale
-                ->formatPrice(
-                    $total_cost,
-                    $context->currency->iso_code
-                ),
+            'value' => $this->formatPrice(
+                $total_cost,
+                $context->currency
+            ),
         ];
         $down_payment_amount = $this->dependencies
             ->getHelpers()['amount']
             ->convertAmount($resource['down_payment_amount'], true);
         $resource['down_payment_amount'] = [
             'amount' => number_format($down_payment_amount, 2),
-            'value' => $context
-                ->currentLocale
-                ->formatPrice(
-                    $down_payment_amount,
-                    $context->currency->iso_code
-                ),
+            'value' => $this->formatPrice(
+                $down_payment_amount,
+                $context->currency
+            ),
         ];
         foreach ($resource['installments'] as &$installment) {
             $amount = $this->dependencies
                 ->getHelpers()['amount']
                 ->convertAmount($installment['amount'], true);
             $installment['amount'] = number_format($amount, 2);
-            $installment['value'] = $context
-                ->currentLocale
-                ->formatPrice(
-                    $amount,
-                    $context->currency->iso_code
-                );
+            $installment['value'] = $this->formatPrice(
+                $amount,
+                $context->currency
+            );
         }
 
         $total_amount = $this->dependencies
@@ -967,12 +959,10 @@ class OneyPaymentMethod extends PaymentMethod
         $total_amount += $total_cost;
         $resource['total_amount'] = [
             'amount' => number_format($total_amount, 2),
-            'value' => $context
-                ->currentLocale
-                ->formatPrice(
-                    $total_amount,
-                    $context->currency->iso_code
-                ),
+            'value' => $this->formatPrice(
+                $total_amount,
+                $context->currency
+            ),
         ];
 
         return $resource;
@@ -1981,6 +1971,40 @@ class OneyPaymentMethod extends PaymentMethod
         $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
 
         return $this->tools->tool('redirectAdmin', $link_order);
+    }
+
+    /**
+     * @description Handle retrocompatibility on price display for prestashop 1.7.6-
+     *
+     * @param float $price
+     * @param object $currency
+     *
+     * return string
+     */
+    protected function formatPrice($price = 0, $currency = null)
+    {
+        if (!is_numeric($price) || !$price) {
+            return '';
+        }
+
+        if (!is_object($currency) || !$currency) {
+            return '';
+        }
+
+        if (isset($this->context->currentLocale) && is_object($this->context->currentLocale)) {
+            $price_formated = $this->context->currentLocale->formatPrice(
+                $price,
+                $currency->iso_code
+            );
+        } else {
+            $price_formated = $this->tools->tool(
+                'displayPrice',
+                $price,
+                $currency->iso_code
+            );
+        }
+
+        return $price_formated;
     }
 
     /**
