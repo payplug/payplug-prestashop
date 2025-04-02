@@ -49,11 +49,12 @@
     "autoload": {
         "psr-4": {
             "PayPlug\\": "./",
-            "libphonenumberlight\\": "vendor/giggsey/libphonenumberlight"
+            "libphonenumber\\": "vendor/giggsey/libphonenumber"
         }
     },
     "config": {
-        "prepend-autoloader": false
+        "prepend-autoloader": false,
+        "platform-check": false
     },
     "scripts": {
         "post-install-cmd": [
