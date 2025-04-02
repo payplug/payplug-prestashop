@@ -1,4 +1,8 @@
 # Payplug module changelog
+## Version 4.17.3
+- Bugfix :
+  - [SMP-3105](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2669): Use defaut carrier set in Prestashop as ApplePay cart default carrier
+  
 ## Version 4.17.2
 - Bugfix :
   - [SMP-3074](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2665): Fix retrocompatibility on price display for oney
