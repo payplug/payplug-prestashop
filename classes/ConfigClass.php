@@ -23,7 +23,7 @@
 
 namespace PayPlug\classes;
 
-use libphonenumberlight;
+use PayPlug\lib\libphonenumber;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -538,7 +538,7 @@ class ConfigClass
                 return '';
             }
 
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             if (!$phone_util->isValidNumber($parsed)) {
@@ -547,8 +547,8 @@ class ConfigClass
                 return '';
             }
 
-            return $phone_util->format($parsed, libphonenumberlight\PhoneNumberFormat::E164);
-        } catch (libphonenumberlight\NumberParseException $e) {
+            return $phone_util->format($parsed, libphonenumber\PhoneNumberFormat::E164);
+        } catch (libphonenumber\NumberParseException $e) {
             $this->logger->addLog('ConfigClass::formatPhoneNumber() - Exception thrown: ' . $e->getMessage());
 
             return '';

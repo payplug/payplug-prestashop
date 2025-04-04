@@ -40,7 +40,7 @@ class PhoneHelper
         }
 
         try {
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
@@ -50,7 +50,7 @@ class PhoneHelper
             $is_mobile = $phone_util->getNumberType($parsed);
 
             return (bool) in_array($is_mobile, [1, 2], true);
-        } catch (libphonenumberlight\NumberParseException $e) {
+        } catch (libphonenumber\NumberParseException $e) {
             // @todo : Add Log
             return false;
         }
