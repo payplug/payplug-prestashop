@@ -3,6 +3,7 @@
 - Bugfix :
   - [SMP-3074](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2665): Fix retrocompatibility on price display for oney
   - [PRE-2785](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2659): Fix Oney mobile phone check for Mayotte
+  - [PRE-2850](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2668):  Fix address in apple pay order create on cart
   
 ## Version 4.17.1
 - Bugfix :

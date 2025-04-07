@@ -497,7 +497,12 @@ class ApplepayPaymentMethod extends PaymentMethod
                     ->getPlugin()
                     ->getAddressClass()
                     ->checkAndSaveAddress($formated_address);
+
+                // We stack here the context cart address id to prevent update of the cart
+                $current_delivery_id = $this->context->cart->id_address_delivery;
+                $current_invoice_id = $this->context->cart->id_address_invoice;
                 $cart_adapter->updateAddresses($this->context->cart, $new_address_id, $new_address_id);
+
                 // update context iun order to update carrier information, taxes ...
                 $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
             }
@@ -530,11 +535,7 @@ class ApplepayPaymentMethod extends PaymentMethod
 
             // delete newly created address
             if (isset($new_address_id)) {
-                $cart_adapter->updateAddresses(
-                    $this->context->cart,
-                    $this->context->cart->id_address_delivery,
-                    $this->context->cart->id_address_invoice
-                );
+                $cart_adapter->updateAddresses($this->context->cart, $current_delivery_id, $current_invoice_id);
                 $tmp_address = $address_adapter->get((int) $new_address_id);
                 if (!$tmp_address->id_customer) {
                     $address_adapter->delete($tmp_address);

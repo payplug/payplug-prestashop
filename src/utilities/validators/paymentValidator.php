@@ -23,7 +23,7 @@
 
 namespace PayPlug\src\utilities\validators;
 
-use libphonenumberlight;
+use PayPlug\lib\libphonenumber;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -1095,7 +1095,7 @@ class paymentValidator
         }
 
         try {
-            $phone_util = libphonenumberlight\PhoneNumberUtil::getInstance();
+            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
             $parsed = $phone_util->parse($phone_number, $iso_code);
 
             if (!in_array($iso_code, $phone_util->getRegionCodesForCountryCode($parsed->getCountryCode()))) {
@@ -1111,7 +1111,7 @@ class paymentValidator
                 'result' => in_array($is_mobile, [1, 2], true),
                 'message' => '',
             ];
-        } catch (libphonenumberlight\NumberParseException $e) {
+        } catch (libphonenumber\NumberParseException $e) {
             // todo : Add error Log
             return [
                 'result' => false,
