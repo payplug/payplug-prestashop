@@ -34,7 +34,7 @@ function upgrade_module_2_0_0($object)
     // sql
     $req_payplug_lock = '
       DROP TABLE IF EXISTS ' . _DB_PREFIX_ . $object->name . '_lock';
-    $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
+    $res_payplug_lock = Db::getInstance()->Execute($req_payplug_lock);
 
     // Configurations
     if (!Configuration::deleteByName('PAYPLUG_MODULE_KEY')

@@ -56,7 +56,7 @@ function upgrade_module_2_16_0($object)
             ) ENGINE=' . _MYSQL_ENGINE_;
 
     try {
-        $res_payplug_installment_cart = DB::getInstance()->Execute($req_payplug_installment_cart);
+        $res_payplug_installment_cart = Db::getInstance()->Execute($req_payplug_installment_cart);
         if (!$res_payplug_installment_cart) {
             $flag = false;
         }

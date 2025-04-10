@@ -55,7 +55,7 @@ function upgrade_module_2_18_0($object)
             ) ENGINE=' . _MYSQL_ENGINE_;
 
     try {
-        $res_payplug_installment = DB::getInstance()->Execute($req_payplug_installment);
+        $res_payplug_installment = Db::getInstance()->Execute($req_payplug_installment);
         if (!$res_payplug_installment) {
             $flag = false;
         }

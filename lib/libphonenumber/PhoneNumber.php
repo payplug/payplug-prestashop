@@ -1,8 +1,33 @@
 <?php
+/**
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of Payplug SAS
+ */
 
 namespace PayPlug\lib\libphonenumber;
 
-class PhoneNumber implements \Serializable
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+class PhoneNumber
 {
     /**
      * The country calling code for this number, as defined by the International Telecommunication Union
@@ -121,18 +146,6 @@ class PhoneNumber implements \Serializable
         }
 
         return $outputString;
-    }
-
-    public function __serialize()
-    {
-        return get_object_vars($this);
-    }
-
-    public function __unserialize($data)
-    {
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
     }
 
     /**
@@ -574,64 +587,42 @@ class PhoneNumber implements \Serializable
     {
         $sameType = get_class($other) == get_class($this);
         $sameCountry = $this->hasCountryCode() == $other->hasCountryCode()
-            && (!$this->hasCountryCode() || $this->getCountryCode() == $other->getCountryCode());
+            && (
+                !$this->hasCountryCode()
+                || $this->getCountryCode() == $other->getCountryCode()
+            );
         $sameNational = $this->hasNationalNumber() == $other->hasNationalNumber()
-            && (!$this->hasNationalNumber() || $this->getNationalNumber() == $other->getNationalNumber());
+            && (
+                !$this->hasNationalNumber()
+                || $this->getNationalNumber() == $other->getNationalNumber()
+            );
         $sameExt = $this->hasExtension() == $other->hasExtension()
-            && (!$this->hasExtension() || $this->hasExtension() == $other->hasExtension());
+            && (
+                !$this->hasExtension()
+                || $this->hasExtension() == $other->hasExtension()
+            );
         $sameLead = $this->hasItalianLeadingZero() == $other->hasItalianLeadingZero()
-            && (!$this->hasItalianLeadingZero() || $this->isItalianLeadingZero() == $other->isItalianLeadingZero());
+            && (
+                !$this->hasItalianLeadingZero()
+                || $this->isItalianLeadingZero() == $other->isItalianLeadingZero()
+            );
         $sameZeros = $this->getNumberOfLeadingZeros() == $other->getNumberOfLeadingZeros();
         $sameRaw = $this->hasRawInput() == $other->hasRawInput()
-            && (!$this->hasRawInput() || $this->getRawInput() == $other->getRawInput());
+            && (
+                !$this->hasRawInput()
+                || $this->getRawInput() == $other->getRawInput()
+            );
         $sameCountrySource = $this->hasCountryCodeSource() == $other->hasCountryCodeSource()
-            && (!$this->hasCountryCodeSource() || $this->getCountryCodeSource() == $other->getCountryCodeSource());
+            && (
+                !$this->hasCountryCodeSource()
+                || $this->getCountryCodeSource() == $other->getCountryCodeSource()
+            );
         $samePrefCar = $this->hasPreferredDomesticCarrierCode() == $other->hasPreferredDomesticCarrierCode()
-            && (!$this->hasPreferredDomesticCarrierCode() || $this->getPreferredDomesticCarrierCode(
-                ) == $other->getPreferredDomesticCarrierCode());
+            && (
+                !$this->hasPreferredDomesticCarrierCode()
+                || $this->getPreferredDomesticCarrierCode() == $other->getPreferredDomesticCarrierCode()
+            );
 
         return $sameType && $sameCountry && $sameNational && $sameExt && $sameLead && $sameZeros && $sameRaw && $sameCountrySource && $samePrefCar;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function serialize()
-    {
-        return __serialize(
-            [
-                $this->countryCode,
-                $this->nationalNumber,
-                $this->extension,
-                $this->italianLeadingZero,
-                $this->numberOfLeadingZeros,
-                $this->rawInput,
-                $this->countryCodeSource,
-                $this->preferredDomesticCarrierCode,
-            ]
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unserialize($serialized)
-    {
-        $data = __unserialize($serialized);
-
-        list(
-            $this->countryCode,
-            $this->nationalNumber,
-            $this->extension,
-            $this->italianLeadingZero,
-            $this->numberOfLeadingZeros,
-            $this->rawInput,
-            $this->countryCodeSource,
-            $this->preferredDomesticCarrierCode
-        ) = $data;
-
-        if ($this->numberOfLeadingZeros > 1) {
-            $this->hasNumberOfLeadingZeros = true;
-        }
     }
 }

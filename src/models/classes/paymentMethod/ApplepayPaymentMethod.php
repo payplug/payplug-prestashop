@@ -450,6 +450,10 @@ class ApplepayPaymentMethod extends PaymentMethod
         $cart_adapter = $this->dependencies->getPlugin()->getCart();
         $cart_rule_adapter = $this->dependencies->getPlugin()->getCartRule();
         $address_adapter = $this->dependencies->getPlugin()->getAddress();
+        $current_delivery_id = null;
+        $current_invoice_id = null;
+        $delivery_options = null;
+        $carrier = null;
 
         // Check if this an appelpay 'product' shopping page
         // check empty_cart this double check since we go through this condition twice on js side
