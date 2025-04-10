@@ -38,7 +38,7 @@ function upgrade_module_2_11_0($object)
         AFTER `id_cart`';
 
     try {
-        $res_payplug_payment_cart = DB::getInstance()->Execute($req_payplug_payment_cart);
+        $res_payplug_payment_cart = Db::getInstance()->Execute($req_payplug_payment_cart);
     } catch (PrestaShopDatabaseException $e) {
         return true;
     }

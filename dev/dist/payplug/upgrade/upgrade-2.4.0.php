@@ -37,5 +37,5 @@ function upgrade_module_2_4_0($object)
         ADD COLUMN `date_upd` DATETIME NULL
         AFTER `id_cart`';
 
-    return DB::getInstance()->Execute($req_payplug_payment_cart);
+    return Db::getInstance()->Execute($req_payplug_payment_cart);
 }

@@ -1,6 +1,31 @@
 <?php
+/**
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of Payplug SAS
+ */
 
 namespace PayPlug\lib\libphonenumber;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use libphonenumber\Leniency\AbstractLeniency;
 
@@ -23,7 +48,7 @@ use libphonenumber\Leniency\AbstractLeniency;
 class PhoneNumberUtil
 {
     /** Flags to use when compiling regular expressions for phone numbers */
-    const REGEX_FLAGS = 'ui'; //Unicode and case insensitive
+    const REGEX_FLAGS = 'ui'; // Unicode and case insensitive
     // The minimum and maximum length of the national significant number.
     const MIN_LENGTH_FOR_NSN = 2;
     // The ITU says the maximum length should be 15, but we have found longer numbers in Germany.
@@ -759,9 +784,9 @@ class PhoneNumberUtil
         }
 
         return PhoneNumberType::FIXED_LINE == $phoneNumberObjOrType
-        || PhoneNumberType::FIXED_LINE_OR_MOBILE == $phoneNumberObjOrType
-        || (in_array($countryCallingCode, static::$GEO_MOBILE_COUNTRIES)
-            && PhoneNumberType::MOBILE == $phoneNumberObjOrType);
+            || PhoneNumberType::FIXED_LINE_OR_MOBILE == $phoneNumberObjOrType
+            || (in_array($countryCallingCode, static::$GEO_MOBILE_COUNTRIES)
+                && PhoneNumberType::MOBILE == $phoneNumberObjOrType);
     }
 
     /**
@@ -1292,10 +1317,7 @@ class PhoneNumberUtil
         }
         if (CountryCodeSource::FROM_DEFAULT_COUNTRY != $countryCodeSource) {
             if (mb_strlen($fullNumber) <= static::MIN_LENGTH_FOR_NSN) {
-                throw new NumberParseException(
-                    NumberParseException::TOO_SHORT_AFTER_IDD,
-                    'Phone number had an IDD, but after this was not long enough to be a viable phone number.'
-                );
+                throw new NumberParseException(NumberParseException::TOO_SHORT_AFTER_IDD, 'Phone number had an IDD, but after this was not long enough to be a viable phone number.');
             }
             $potentialCountryCode = $this->extractCountryCode($fullNumber, $nationalNumber);
 
@@ -1307,10 +1329,7 @@ class PhoneNumberUtil
 
             // If this fails, they must be using a strange country calling code that we don't recognize,
             // or that doesn't exist.
-            throw new NumberParseException(
-                NumberParseException::INVALID_COUNTRY_CODE,
-                'Country calling code supplied was not recognised.'
-            );
+            throw new NumberParseException(NumberParseException::INVALID_COUNTRY_CODE, 'Country calling code supplied was not recognised.');
         }
 
         if (null !== $defaultRegionMetadata) {
@@ -2904,11 +2923,11 @@ class PhoneNumberUtil
         // Canonical-equivalence doesn't seem to be an option with Android java, so we allow two options
         // for representing the accented o - the character itself, and one in the unicode decomposed
         // form with the combining acute accent.
-        return (static::RFC3966_EXTN_PREFIX . static::$CAPTURING_EXTN_DIGITS . '|' . "[ \xC2\xA0\\t,]*" .
+        return static::RFC3966_EXTN_PREFIX . static::$CAPTURING_EXTN_DIGITS . '|' . "[ \xC2\xA0\\t,]*" .
             "(?:e?xt(?:ensi(?:o\xCC\x81?|\xC3\xB3))?n?|(?:\xEF\xBD\x85)?\xEF\xBD\x98\xEF\xBD\x94(?:\xEF\xBD\x8E)?|" .
-            'доб|' . '[' . $singleExtnSymbols . "]|int|\xEF\xBD\x89\xEF\xBD\x8E\xEF\xBD\x94|anexo)" .
+            'доб|[' . $singleExtnSymbols . "]|int|\xEF\xBD\x89\xEF\xBD\x8E\xEF\xBD\x94|anexo)" .
             "[:\\.\xEF\xBC\x8E]?[ \xC2\xA0\\t,-]*" . static::$CAPTURING_EXTN_DIGITS . '\\#?|' .
-            '[- ]+(' . static::DIGITS . '{1,5})\\#');
+            '[- ]+(' . static::DIGITS . '{1,5})\\#';
     }
 
     protected static function initExtnPattern()
@@ -3273,29 +3292,20 @@ class PhoneNumberUtil
         $numberToParse = trim($numberToParse);
 
         if (mb_strlen($numberToParse) > static::MAX_INPUT_STRING_LENGTH) {
-            throw new NumberParseException(
-                NumberParseException::TOO_LONG,
-                'The string supplied was too long to parse.'
-            );
+            throw new NumberParseException(NumberParseException::TOO_LONG, 'The string supplied was too long to parse.');
         }
 
         $nationalNumber = '';
         $this->buildNationalNumberForParsing($numberToParse, $nationalNumber);
 
         if (!static::isViablePhoneNumber($nationalNumber)) {
-            throw new NumberParseException(
-                NumberParseException::NOT_A_NUMBER,
-                'The string supplied did not seem to be a phone number.'
-            );
+            throw new NumberParseException(NumberParseException::NOT_A_NUMBER, 'The string supplied did not seem to be a phone number.');
         }
 
         // Check the region supplied is valid, or that the extracted number starts with some sort of +
         // sign so the number's region can be determined.
         if ($checkRegion && !$this->checkRegionForParsing($nationalNumber, $defaultRegion)) {
-            throw new NumberParseException(
-                NumberParseException::INVALID_COUNTRY_CODE,
-                'Missing or invalid default region.'
-            );
+            throw new NumberParseException(NumberParseException::INVALID_COUNTRY_CODE, 'Missing or invalid default region.');
         }
 
         if ($keepRawInput) {
@@ -3336,10 +3346,7 @@ class PhoneNumberUtil
                     $phoneNumber
                 );
                 if (0 == $countryCode) {
-                    throw new NumberParseException(
-                        NumberParseException::INVALID_COUNTRY_CODE,
-                        'Could not interpret numbers after plus-sign.'
-                    );
+                    throw new NumberParseException(NumberParseException::INVALID_COUNTRY_CODE, 'Could not interpret numbers after plus-sign.');
                 }
             } else {
                 throw new NumberParseException($e->getErrorType(), $e->getMessage(), $e);
@@ -3364,10 +3371,7 @@ class PhoneNumberUtil
             }
         }
         if (mb_strlen($normalizedNationalNumber) < static::MIN_LENGTH_FOR_NSN) {
-            throw new NumberParseException(
-                NumberParseException::TOO_SHORT_NSN,
-                'The string supplied is too short to be a phone number.'
-            );
+            throw new NumberParseException(NumberParseException::TOO_SHORT_NSN, 'The string supplied is too short to be a phone number.');
         }
         if (null !== $regionMetadata) {
             $carrierCode = '';
@@ -3388,16 +3392,10 @@ class PhoneNumberUtil
         }
         $lengthOfNationalNumber = mb_strlen($normalizedNationalNumber);
         if ($lengthOfNationalNumber < static::MIN_LENGTH_FOR_NSN) {
-            throw new NumberParseException(
-                NumberParseException::TOO_SHORT_NSN,
-                'The string supplied is too short to be a phone number.'
-            );
+            throw new NumberParseException(NumberParseException::TOO_SHORT_NSN, 'The string supplied is too short to be a phone number.');
         }
         if ($lengthOfNationalNumber > static::MAX_LENGTH_FOR_NSN) {
-            throw new NumberParseException(
-                NumberParseException::TOO_LONG,
-                'The string supplied is too long to be a phone number.'
-            );
+            throw new NumberParseException(NumberParseException::TOO_LONG, 'The string supplied is too long to be a phone number.');
         }
         static::setItalianLeadingZerosForPhoneNumber($normalizedNationalNumber, $phoneNumber);
 
@@ -3752,7 +3750,7 @@ class PhoneNumberUtil
         $secondNumberNationalNumber = trim((string) $secondNumber->getNationalNumber());
 
         return $this->stringEndsWithString($firstNumberNationalNumber, $secondNumberNationalNumber)
-        || $this->stringEndsWithString($secondNumberNationalNumber, $firstNumberNationalNumber);
+            || $this->stringEndsWithString($secondNumberNationalNumber, $firstNumberNationalNumber);
     }
 
     protected function stringEndsWithString($hayStack, $needle)
