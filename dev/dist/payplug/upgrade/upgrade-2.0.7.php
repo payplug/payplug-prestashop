@@ -36,7 +36,7 @@ function upgrade_module_2_0_7($object)
         ALTER TABLE ' . _DB_PREFIX_ . $object->name . '_lock 
         ADD COLUMN `id_order` VARCHAR(100) 
         AFTER `id_cart`';
-    $res_payplug_lock = DB::getInstance()->Execute($req_payplug_lock);
+    $res_payplug_lock = Db::getInstance()->Execute($req_payplug_lock);
 
     // files
     // $suppr_files = true;

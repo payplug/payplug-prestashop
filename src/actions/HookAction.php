@@ -128,7 +128,7 @@ class HookAction
         // If the configuration differe the order state, we force the configuration to comply before create the payment
         $is_live_mode = !(bool) $this->configuration->getValue('sandbox_mode');
         if ($is_live_order_state != $is_live_mode) {
-            $this->configuration->set('sandbox_mode', ($is_live_order_state ? 0 : 1));
+            $this->configuration->set('sandbox_mode', $is_live_order_state ? 0 : 1);
         }
 
         // We create payment resource
@@ -144,7 +144,7 @@ class HookAction
 
         // ...then we reset the configuration in case of needs
         if ($is_live_order_state != $is_live_mode) {
-            $this->configuration->set('sandbox_mode', ($is_live_mode ? 0 : 1));
+            $this->configuration->set('sandbox_mode', $is_live_mode ? 0 : 1);
         }
 
         return true;
