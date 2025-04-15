@@ -60,6 +60,7 @@ class BaseApiRest extends TestCase
                 switch ($key) {
                     case '_PS_VERSION_':
                         return '1.7.0.0';
+
                     default:
                         return $key;
                 }

@@ -30,8 +30,11 @@ class formatOneyAmountTest extends TestCase
     public function invalidFormatOneyAmountDataProvider()
     {
         yield [null, '$amount must be a int type'];
+
         yield ['test', '$amount must be a int type'];
+
         yield [['key' => 'value'], '$amount must be a int type'];
+
         yield [false, '$amount must be a int type'];
     }
 

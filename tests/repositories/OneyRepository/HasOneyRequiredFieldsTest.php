@@ -30,8 +30,11 @@ final class HasOneyRequiredFieldsTest extends BaseOneyRepository
     public function invalidPaymentDataProvider()
     {
         yield [false];
+
         yield [[]];
+
         yield ['wrong_parameters'];
+
         yield [42];
     }
 

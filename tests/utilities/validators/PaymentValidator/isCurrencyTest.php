@@ -24,24 +24,33 @@ class isCurrencyTest extends TestCase
     public function invalidStringFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [''];
     }
 
     public function invalidArrayFormatDataProvider()
     {
         yield [42];
+
         yield [[]];
+
         yield [false];
+
         yield ['lorem ipsum'];
     }
 
     public function invalidIsoCodeFormatDataProvider()
     {
         yield ['A']; // shorter
+
         yield ['AA']; // shorter
+
         yield ['AAAA']; // longer
+
         yield ['?A!']; // wrong characters - !? tested
     }
 

@@ -30,8 +30,11 @@ class hasPermissionsTest extends TestCase
     {
         // invalid $permissions
         yield [[]];
+
         yield [false];
+
         yield [300];
+
         yield [null];
 //        yield [['is_live' => ''], 1, ];
 //        yield [['' => ''], 1];
@@ -48,9 +51,13 @@ class hasPermissionsTest extends TestCase
     {
         // invalid $permissions
         yield [[]];
+
         yield [false];
+
         yield [300];
+
         yield [null];
+
         yield [''];
     }
 

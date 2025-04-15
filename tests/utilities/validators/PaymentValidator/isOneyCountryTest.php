@@ -24,15 +24,20 @@ class isOneyCountryTest extends TestCase
     public function invalidStringFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [''];
     }
 
     public function invalidIsoCodeFormatDataProvider()
     {
         yield ['F'];
+
         yield ['FRA'];
+
         yield ['F5'];
     }
 

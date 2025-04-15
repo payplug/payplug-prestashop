@@ -29,9 +29,13 @@ class isPasswordTest extends TestCase
     public function invalidStringFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [''];
+
         yield [null];
     }
 

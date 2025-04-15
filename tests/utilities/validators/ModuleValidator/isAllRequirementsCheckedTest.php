@@ -24,8 +24,11 @@ class isAllRequirementsCheckedTest extends TestCase
     public function invalidDataProvider()
     {
         yield [42];
+
         yield ['lorem Ipsum'];
+
         yield [false];
+
         yield [[]];
     }
 

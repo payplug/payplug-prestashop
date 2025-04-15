@@ -24,8 +24,11 @@ class isValidExpirationTest extends TestCase
     public function invalidFormatDataProvider()
     {
         yield ['string'];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [null];
     }
 

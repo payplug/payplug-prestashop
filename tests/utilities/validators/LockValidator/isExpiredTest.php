@@ -29,8 +29,11 @@ class isExpiredTest extends TestCase
     public function invalidStringFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [''];
     }
 
@@ -42,7 +45,9 @@ class isExpiredTest extends TestCase
     public function invalidDateTimeFormatDataProvider()
     {
         yield ['1970-01-01'];
+
         yield ['00:00:00 1970-01-01'];
+
         yield ['01-01-1970 00:00:00'];
     }
 

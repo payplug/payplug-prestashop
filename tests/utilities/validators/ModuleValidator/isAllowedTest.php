@@ -25,13 +25,19 @@ class isAllowedTest extends TestCase
     public function invalidDataProvider()
     {
         yield [42, true];
+
         yield ['lorem Ipsum', true];
+
         yield [null, true];
+
         yield [['key' => 'value'], true];
 
         yield [true, 42];
+
         yield [true, 'lorem Ipsum'];
+
         yield [true, null];
+
         yield [true, ['key' => 'value']];
     }
 

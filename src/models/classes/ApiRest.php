@@ -65,10 +65,12 @@ class ApiRest
                 $json = $configurationAction->loginAction($datas);
 
                 break;
+
             case 'logout':
                 $json = $configurationAction->logoutAction();
 
                 break;
+
             case 'american_express_permissions':
             case 'applepay_permissions':
             case 'bancontact_permissions':
@@ -85,6 +87,7 @@ class ApiRest
                 $json = $configurationAction->checkPermissionAction($payment_method, (bool) $datas->env);
 
                 break;
+
             case 'check_requirements':
                 $json = [
                     'status' => $this->getRequirementsSection(),
@@ -97,11 +100,13 @@ class ApiRest
                 $json = $configurationAction->submitSandboxAction($datas);
 
                 break;
+
             case 'save':
                 $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->saveAction($datas);
 
                 break;
+
             case 'send_telemetry':
                 $render_telemetry = $this->dependencies
                     ->getPlugin()
@@ -118,6 +123,7 @@ class ApiRest
                 ];
 
                 break;
+
             case 'init':
             default:
                 $json = $configurationAction->renderConfiguration();
@@ -616,6 +622,7 @@ class ApiRest
         $php_error = $curl_error = $openssl_error = false;
         if (!$is_requirements_checked['result']) {
             $error_code = $is_requirements_checked['code'];
+
             switch ($error_code) {
                 case 'format':
                     $php_error = true;
@@ -623,16 +630,19 @@ class ApiRest
                     $openssl_error = true;
 
                     break;
+
                 case 'php_format':
                 case 'php_requirements':
                     $php_error = true;
 
                     break;
+
                 case 'openssl_format':
                 case 'openssl_requirements':
                     $openssl_error = true;
 
                     break;
+
                 case 'curl_format':
                 case 'curl_requirements':
                     $curl_error = true;

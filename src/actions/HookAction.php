@@ -84,6 +84,7 @@ class HookAction
                 $method = 'email_link';
 
                 break;
+
             case $order_state_id == $this->configuration->getValue('order_state_sms_link'):
                 $is_live_order_state = true;
                 // no break
@@ -91,6 +92,7 @@ class HookAction
                 $method = 'sms_link';
 
                 break;
+
             default:
                 $method = '';
 

@@ -27,8 +27,10 @@ class getSettingsSectionTest extends BaseApiRest
                 switch ($key) {
                     case 'email':
                         return '';
+
                     case 'sandbox_mode':
                         return 1;
+
                     default:
                         return $key;
                 }

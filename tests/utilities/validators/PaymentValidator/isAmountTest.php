@@ -24,24 +24,33 @@ class isAmountTest extends TestCase
     public function invalidAmountFormatDataProvider()
     {
         yield ['lorem Ipsum'];
+
         yield [true];
+
         yield [0];
+
         yield [['key' => 'value']];
     }
 
     public function invalidLimitsFormatDataProvider()
     {
         yield ['lorem Ipsum'];
+
         yield [true];
+
         yield [42];
+
         yield [[]];
     }
 
     public function invalidIntegerFormatDataProvider()
     {
         yield ['lorem Ipsum'];
+
         yield [true];
+
         yield ['42'];
+
         yield [['key' => 'value']];
     }
 

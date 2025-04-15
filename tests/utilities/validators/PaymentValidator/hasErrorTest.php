@@ -30,14 +30,20 @@ class hasErrorTest extends TestCase
     {
         // invalid $payment array
         yield [[], '$payment must be a non empty array.'];
+
         yield [false, '$payment must be a non empty array.'];
+
         yield [1, '$payment must be a non empty array.'];
+
         yield [null, '$payment must be a non empty array.'];
 
         //invalid $payment['result']
         yield [['result' => ''], 'result argument inside payment array must be a non empty boolean.'];
+
         yield [['result' => ['key' => 'value']], 'result argument inside payment array must be a non empty boolean.'];
+
         yield [['result' => null], 'result argument inside payment array must be a non empty boolean.'];
+
         yield [['result' => 300], 'result argument inside payment array must be a non empty boolean.'];
     }
 

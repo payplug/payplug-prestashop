@@ -24,8 +24,11 @@ class canBeShownTest extends TestCase
     public function invalidDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [null];
+
         yield [''];
     }
 

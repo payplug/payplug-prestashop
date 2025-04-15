@@ -36,8 +36,10 @@ class BaseOneyRepository extends RepositoryBase
                 switch ($key) {
                     case 'PS_CURRENCY_DEFAULT':
                         return 1;
+
                     case 'PS_SHOP_NAME':
                         return 'Payplug';
+
                     default:
                         return true;
                 }

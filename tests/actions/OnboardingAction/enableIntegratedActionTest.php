@@ -14,8 +14,11 @@ class enableIntegratedActionTest extends BaseOnboardingAction
     public function invalidJSONFormatDataProvider()
     {
         yield [''];
+
         yield ['{"feature": \'value\'}'];
+
         yield ['{"feature": "value", }'];
+
         yield ['{{}}'];
     }
 
@@ -61,8 +64,10 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return '{}';
+
                     case 'embedded_mode':
                         return 'popup';
+
                     default:
                         break;
                 }
@@ -73,8 +78,10 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return false;
+
                     case 'embedded_mode':
                         return true;
+
                     default:
                         break;
                 }
@@ -96,6 +103,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return '{}';
+
                     case 'embedded_mode':
                         return 'popup';
                 }
@@ -106,6 +114,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return true;
+
                     case 'embedded_mode':
                         return false;
                 }
@@ -127,6 +136,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return '{}';
+
                     case 'embedded_mode':
                         return 'popup';
                 }
@@ -137,6 +147,7 @@ class enableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return true;
+
                     case 'embedded_mode':
                         return true;
                 }

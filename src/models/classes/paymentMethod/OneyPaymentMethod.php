@@ -203,18 +203,22 @@ class OneyPaymentMethod extends PaymentMethod
                 $order_tab['module_name'] = $translation['module_name']['oney']['x3_with_fees'];
 
                 break;
+
             case 'oney_x3_without_fees':
                 $order_tab['module_name'] = $translation['module_name']['oney']['x3_without_fees'];
 
                 break;
+
             case 'oney_x4_with_fees':
                 $order_tab['module_name'] = $translation['module_name']['oney']['x4_with_fees'];
 
                 break;
+
             case 'oney_x4_without_fees':
                 $order_tab['module_name'] = $translation['module_name']['oney']['x4_without_fees'];
 
                 break;
+
             default:
                 $order_tab['module_name'] = $translation['module_name']['oney']['default'];
 
@@ -1528,20 +1532,24 @@ class OneyPaymentMethod extends PaymentMethod
         $is_oney_email = $this->validators['payment']->isOneyEmail($email);
         if (!$is_oney_email['result']) {
             $code = isset($is_oney_email['code']) ? $is_oney_email['code'] : 'invalid';
+
             switch ($code) {
                 case 'length-char':
                     $error = $this->oney_translations['email_length_char_error'];
                     $error .= $this->oney_translations['email_message'];
 
                     break;
+
                 case 'char':
                     $error = $this->oney_translations['email_char_error'];
 
                     break;
+
                 case 'length':
                     $error = $this->oney_translations['email_length_error'];
 
                     break;
+
                 case 'format':
                 default:
                     $error = $this->oney_translations['email_invalid'];
@@ -1867,6 +1875,7 @@ class OneyPaymentMethod extends PaymentMethod
                 $err_label = $this->oney_translations['address_invalid'];
 
                 break;
+
             case 'amount':
                 $limits = $this->getOneyPriceLimit(true);
                 $err_label = sprintf(
@@ -1876,14 +1885,17 @@ class OneyPaymentMethod extends PaymentMethod
                 );
 
                 break;
+
             case 'invalid_carrier':
                 $err_label = $this->oney_translations['invalid_carrier'];
 
                 break;
+
             case 'product_quantity':
                 $err_label = $this->oney_translations['invalid_cart'];
 
                 break;
+
             default:
                 $err_label = $this->oney_translations['payment_option_error'];
 

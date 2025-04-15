@@ -14,8 +14,11 @@ class loginActionTest extends BaseConfigurationAction
     public function invalidObjectFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [true];
+
         yield ['lorem ipsum'];
     }
 

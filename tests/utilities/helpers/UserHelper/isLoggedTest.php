@@ -29,13 +29,19 @@ class isLoggedTest extends TestCase
     public function loggedDataProvider()
     {
         yield [null, false, '$isEmail must be a bool type'];
+
         yield ['test', false, '$isEmail must be a bool type'];
+
         yield [['key' => 'value'], false, '$isEmail must be a bool type'];
+
         yield [42, false, '$isEmail must be a bool type'];
 
         yield [true, ['key' => 'value'], '$isApiKey must be a bool type'];
+
         yield [true, 'lorem ipsum', '$isApiKey must be a bool type'];
+
         yield [true, null, '$isApiKey must be a bool type'];
+
         yield [true, 42, '$isApiKey must be a bool type'];
     }
 

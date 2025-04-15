@@ -31,6 +31,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once dirname(__FILE__) . '/vendor/autoload.php';
+
 require_once dirname(__FILE__) . '/../../app/AppKernel.php';
 
 class Payplug extends PaymentModule

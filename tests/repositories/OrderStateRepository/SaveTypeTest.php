@@ -27,17 +27,26 @@ final class SaveTypeTest extends BaseOrderStateRepository
     {
         // test invalid id_order_state
         yield [['wrong_value'], 'nothing'];
+
         yield ['wrong_value', 'nothing'];
+
         yield [0, 'nothing'];
+
         yield ['', 'nothing'];
+
         yield [false, 'nothing'];
+
         yield [null, 'nothing'];
 
         // test invalid type
         yield [42, ['wrong_value']];
+
         yield [42, 42];
+
         yield [42, ''];
+
         yield [42, false];
+
         yield [42, null];
     }
 

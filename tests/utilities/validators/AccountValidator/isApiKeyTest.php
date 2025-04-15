@@ -24,25 +24,35 @@ class isApiKeyTest extends TestCase
     public function invalidTypeApiKeyDataProvider()
     {
         yield [42, 'Invalid argument given, $api_key must be a non empty string'];
+
         yield [['key' => 'value'], 'Invalid argument given, $api_key must be a non empty string'];
+
         yield [false, 'Invalid argument given, $api_key must be a non empty string'];
+
         yield ['', 'Invalid argument given, $api_key must be a non empty string'];
     }
 
     public function invalidDataCharacterApiKeyDataProvider()
     {
         yield ['sk-live-azerty', 'Invalid argument given, $api_key contained invalid characters'];
+
         yield ['sk/live/azerty', 'Invalid argument given, $api_key contained invalid characters'];
+
         yield ['"sk_live_azerty"', 'Invalid argument given, $api_key contained invalid characters'];
+
         yield ['<sk/live/azerty>', 'Invalid argument given, $api_key contained invalid characters'];
     }
 
     public function invalidDataApiKeyDataProvider()
     {
         yield ['live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
+
         yield ['azerty_sk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
+
         yield ['azerty_pk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
+
         yield ['azerty_sk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
+
         yield ['azerty_pk_live_azertyuiopqsdfghjklmwtyu', 'Invalid argument given, $api_key is not allowed'];
     }
 
