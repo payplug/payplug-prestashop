@@ -30,8 +30,11 @@ class isFeatureTest extends TestCase
     public function invalidFeaturesDataProvider()
     {
         yield [42];
+
         yield ['lorem Ipsum'];
+
         yield [false];
+
         yield [[]];
     }
 
@@ -55,8 +58,11 @@ class isFeatureTest extends TestCase
     public function invalidNameDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [''];
     }
 

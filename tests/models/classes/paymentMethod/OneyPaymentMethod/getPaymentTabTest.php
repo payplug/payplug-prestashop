@@ -48,6 +48,7 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
                 switch ($method) {
                     case 'getShopDomainSsl':
                         return true;
+
                     default:
                         if ('payplugOney_type' == $arg) {
                             return '2';

@@ -47,8 +47,11 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
     public function validListDataProvider()
     {
         yield [15000, null];
+
         yield [15000, false];
+
         yield [15000, ''];
+
         yield [15000, 'FR'];
     }
 
@@ -155,8 +158,11 @@ final class GetOneyPaymentOptionsListTest extends BaseOneyRepository
     public function invalidListDataProvider()
     {
         yield [0, 'FR'];
+
         yield [false, 'FR'];
+
         yield [null, 'FR'];
+
         yield ['wrong params', 'FR'];
     }
 

@@ -120,6 +120,7 @@ class MediaClass
             'inst_id' => $inst_id,
         ]);
         $html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
+
         exit(json_encode(['content' => $html]));
     }
 

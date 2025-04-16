@@ -24,8 +24,11 @@ class hasLiveKeyTest extends TestCase
     public function hasInvalideTypeApiKeyDataProvider()
     {
         yield [42, 'The account does not have LIVE API key'];
+
         yield [['key' => 'value'], 'The account does not have LIVE API key'];
+
         yield [false, 'The account does not have LIVE API key'];
+
         yield ['', 'The account does not have LIVE API key'];
     }
 

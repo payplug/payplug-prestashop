@@ -24,8 +24,11 @@ class isOneyElligibleTest extends TestCase
     public function invalidBooleanFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [null];
+
         yield ['lorem ipsum'];
     }
 

@@ -29,13 +29,19 @@ class isAllowedCountryTest extends TestCase
     public function invalidDataProvider()
     {
         yield [42, 'FR', 'Invalid allowed countries format'];
+
         yield [['key' => 'value'], 'FR', 'Invalid allowed countries format'];
+
         yield [false, 'FR', 'Invalid allowed countries format'];
+
         yield ['', 'FR', 'Invalid allowed countries format'];
 
         yield ['FR', 42, 'Invalid country format'];
+
         yield ['FR', ['key' => 'value'], 'Invalid country format'];
+
         yield ['FR', false, 'Invalid country format'];
+
         yield ['FR', '', 'Invalid country format'];
     }
 

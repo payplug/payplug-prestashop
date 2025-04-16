@@ -25,9 +25,13 @@ class isExpiredTest extends TestCase
     public function invalidPaymentDataProvider()
     {
         yield [false];
+
         yield ['a string'];
+
         yield [1000];
+
         yield [null];
+
         yield [[]];
     }
 

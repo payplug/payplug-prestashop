@@ -52,14 +52,20 @@ final class CreateTest extends BaseOrderStateRepository
     {
         // test invalid name
         yield ['', ['key' => 'value']];
+
         yield [false, ['key' => 'value']];
+
         yield [null, ['key' => 'value']];
+
         yield [42, ['key' => 'value']];
+
         yield [['key' => 'value'], ['key' => 'value']];
 
         // test invalid state
         yield ['name', []];
+
         yield ['name', 'wrong_params'];
+
         yield ['name', 42];
     }
 

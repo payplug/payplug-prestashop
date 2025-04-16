@@ -24,16 +24,22 @@ class isCachedPaymentTest extends TestCase
     public function invalidStringFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [''];
     }
 
     public function invalidHashFormatDataProvider()
     {
         yield ['1234567890azertyuiop']; // shorter
+
         yield ['1234567890azertyuiop1234567890azertyuiop1234567890azertyuiop12345678990']; // longer
+
         yield ['1234567890AZERTYUIOP1234567890AZERTYUIOP1234567890AZERTYUIOP1234']; // wrong characters
+
         yield ['1234567890azertyuio?1234567890azertyuiop1234567890azertyuiop123!']; // wrong characters - !? tested
     }
 

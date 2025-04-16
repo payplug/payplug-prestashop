@@ -14,8 +14,11 @@ class disableIntegratedActionTest extends BaseOnboardingAction
     public function invalidJSONFormatDataProvider()
     {
         yield [''];
+
         yield ['{"feature": \'value\'}'];
+
         yield ['{"feature": "value", }'];
+
         yield ['{{}}'];
     }
 
@@ -61,8 +64,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return '{"embedded_mode": "redirect"}';
+
                     case 'embedded_mode':
                         return 'integrated';
+
                     default:
                         break;
                 }
@@ -92,8 +97,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return '{"embedded_mode": "redirect"}';
+
                     case 'embedded_mode':
                         return 'redirect';
+
                     default:
                         break;
                 }
@@ -123,8 +130,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return '{"embedded_mode": "redirect"}';
+
                     case 'embedded_mode':
                         return 'integrated';
+
                     default:
                         break;
                 }
@@ -139,8 +148,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return true;
+
                     case 'embedded_mode':
                         return false;
+
                     default:
                         break;
                 }
@@ -162,8 +173,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return '{"embedded_mode": "redirect"}';
+
                     case 'embedded_mode':
                         return 'integrated';
+
                     default:
                         break;
                 }
@@ -178,8 +191,10 @@ class disableIntegratedActionTest extends BaseOnboardingAction
                 switch ($key) {
                     case 'onboarding_states':
                         return true;
+
                     case 'embedded_mode':
                         return true;
+
                     default:
                         break;
                 }

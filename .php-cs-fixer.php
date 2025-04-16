@@ -5,8 +5,7 @@ $finder = (new PhpCsFixer\Finder())
     ->exclude('vendor')
     ->exclude('translations')
     ->exclude('.tmp_staging')
-    ->in(__DIR__)
-;
+    ->in(__DIR__);
 
 return (new PhpCsFixer\Config())
     ->setUsingCache(true)
@@ -26,9 +25,9 @@ return (new PhpCsFixer\Config())
         'binary_operator_spaces' => true,
         'no_unneeded_control_parentheses' => false,
         'cast_spaces' => true,
-        'blank_line_before_statement' => true,
+        'blank_line_before_statement' => ['statements' => ['break', 'case', 'continue', 'declare', 'default', 'exit', 'goto', 'include', 'include_once', 'require', 'require_once', 'return', 'switch', 'throw', 'try', 'yield', 'yield_from']],
         'no_alias_language_construct_call' => true,
-        'no_extra_blank_lines' => true,
+        'no_extra_blank_lines' => ['tokens' => ['break', 'case', 'continue', 'curly_brace_block', 'default', 'extra', 'parenthesis_brace_block', 'return', 'square_brace_block', 'switch', 'throw', 'use', 'use_trait']],
         'array_syntax' => ['syntax' => 'short'],
         'phpdoc_separation' => true,
         'no_superfluous_elseif' => false,
@@ -42,5 +41,4 @@ return (new PhpCsFixer\Config())
         'php_unit_test_class_requires_covers' => false,
         'phpdoc_types_order' => ['sort_algorithm' => 'alpha', 'null_adjustment' => 'always_last'],
     ])
-    ->setFinder($finder)
-;
+    ->setFinder($finder);

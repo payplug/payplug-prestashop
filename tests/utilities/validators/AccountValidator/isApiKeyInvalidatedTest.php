@@ -24,16 +24,22 @@ class isApiKeyInvalidatedTest extends TestCase
     public function invalidAccountApiKeyDataProvider()
     {
         yield [42, 'Invalid argument given, $api_key_account must be a non empty string'];
+
         yield [['key' => 'value'], 'Invalid argument given, $api_key_account must be a non empty string'];
+
         yield [false, 'Invalid argument given, $api_key_account must be a non empty string'];
+
         yield ['', 'Invalid argument given, $api_key_account must be a non empty string'];
     }
 
     public function invalidDatabaseApiKeyDataProvider()
     {
         yield [42, 'Invalid argument given, $api_key_database must be a non empty string'];
+
         yield [['key' => 'value'], 'Invalid argument given, $api_key_database must be a non empty string'];
+
         yield [false, 'Invalid argument given, $api_key_database must be a non empty string'];
+
         yield ['', 'Invalid argument given, $api_key_database must be a non empty string'];
     }
 

@@ -188,15 +188,18 @@ class Matcher
     protected function doMatch($type = 'find', $offset = 0)
     {
         $final_pattern = '(?:' . $this->pattern . ')';
+
         switch ($type) {
             case 'matches':
                 $final_pattern = '^' . $final_pattern . '$';
 
                 break;
+
             case 'lookingAt':
                 $final_pattern = '^' . $final_pattern;
 
                 break;
+
             case 'find':
             default:
                 // no changes

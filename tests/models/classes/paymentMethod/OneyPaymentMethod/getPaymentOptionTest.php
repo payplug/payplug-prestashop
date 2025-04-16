@@ -143,7 +143,6 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             'isOneyElligible' => [
                 'result' => false,
                 'code' => 'product_quantity',
-
             ],
         ]);
 

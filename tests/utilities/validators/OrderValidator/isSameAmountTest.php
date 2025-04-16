@@ -24,8 +24,11 @@ class isSameAmountTest extends TestCase
     public function invalidFloatFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield ['string'];
     }
 

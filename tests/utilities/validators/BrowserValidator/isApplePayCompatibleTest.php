@@ -28,9 +28,13 @@ class isApplePayCompatibleTest extends TestCase
     public function invalidBrowserDataProvider()
     {
         yield [[]];
+
         yield [''];
+
         yield [null];
+
         yield [['key' => 'value']];
+
         yield [300];
     }
 
@@ -42,12 +46,19 @@ class isApplePayCompatibleTest extends TestCase
     public function nonSafariBrowserDataProvider()
     {
         yield ['Opera'];
+
         yield ['Edge'];
+
         yield ['Chrome'];
+
         yield ['Firefox'];
+
         yield ['MSIE'];
+
         yield ['Trident'];
+
         yield ['Brave'];
+
         yield ['Vivaldi'];
     }
 

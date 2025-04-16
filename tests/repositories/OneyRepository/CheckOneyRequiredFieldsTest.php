@@ -83,10 +83,15 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function validPaymentDataProvider()
     {
         yield ['mobile_phone_number'];
+
         yield ['first_name'];
+
         yield ['last_name'];
+
         yield ['address1'];
+
         yield ['postcode'];
+
         yield ['city'];
     }
 
@@ -132,10 +137,15 @@ final class CheckOneyRequiredFieldsTest extends BaseOneyRepository
     public function invalidPaymentDataProvider()
     {
         yield ['mobile_phone_number', 'Please enter your mobile phone number.'];
+
         yield ['first_name', 'Please enter your %s firstname.'];
+
         yield ['last_name', 'Please enter your %s lastname.'];
+
         yield ['address1', 'Please enter your %s address.'];
+
         yield ['postcode', 'Please enter your %s postcode.'];
+
         yield ['city', 'Please enter your %s city.'];
     }
 

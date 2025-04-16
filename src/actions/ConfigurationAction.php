@@ -116,6 +116,7 @@ class ConfigurationAction
         $message = $translation['premium']['description']['unavailable'];
         $target_blank = '" target="_blank">';
         $link_prefix = '<a href="';
+
         switch ($payment_method) {
             case 'oney':
                 $message .= sprintf(
@@ -126,6 +127,7 @@ class ConfigurationAction
                 $message = str_replace('$link', $link, $message);
 
                 break;
+
             case 'applepay':
                 $has_permission = $has_permission ? $this->dependencies
                     ->getValidators()['payment']
@@ -655,6 +657,7 @@ class ConfigurationAction
         foreach ($configuration_keys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};
+
                 switch ($config) {
                     case 'payplug_oney':
                     case 'enable_oney_product_animation':
@@ -671,6 +674,7 @@ class ConfigurationAction
                         }
 
                         break;
+
                     case 'payplug_inst_min_amount':
                     case 'payplug_inst_mode':
                         if ((int) $datas->payplug_inst_min_amount >= 4
@@ -687,6 +691,7 @@ class ConfigurationAction
                         }
 
                         break;
+
                     case 'oney_min_amounts':
                     case 'oney_max_amounts':
                         if ((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) {
@@ -718,6 +723,7 @@ class ConfigurationAction
                         }
 
                         break;
+
                     case 'enable_bancontact_country':
                         if ((bool) $datas->enable_bancontact && !$configuration->set($key, (int) $value)) {
                             return [
@@ -730,6 +736,7 @@ class ConfigurationAction
                         }
 
                         break;
+
                     case 'enable_applepay':
                         $applepay_display = [
                             'cart' => (bool) $applepay_cart,
@@ -747,6 +754,7 @@ class ConfigurationAction
                         }
 
                         break;
+
                     case 'applepay_carriers':
                         if ((bool) $datas->enable_applepay && !$configuration->set($key, json_encode($value))) {
                             return [
@@ -759,12 +767,14 @@ class ConfigurationAction
                         }
 
                         break;
+
                     default:
                         switch ($configuration->getType($key)) {
                             case 'integer':
                                 $value = (int) $value;
 
                                 break;
+
                             default:
                             case 'string':
                                 $value = (string) $value;

@@ -22,6 +22,7 @@ class getHeaderSectionTest extends BaseApiRest
                 switch ($key) {
                     case 'enable':
                         return 1;
+
                     default:
                         return $key;
                 }

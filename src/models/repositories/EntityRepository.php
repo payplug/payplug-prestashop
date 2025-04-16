@@ -71,6 +71,7 @@ class EntityRepository extends QueryRepository
             }
 
             $value = $fields[$name];
+
             switch ($field['type']) {
                 case 'string':
                     if (!is_string($value) || !$value) {
@@ -78,18 +79,21 @@ class EntityRepository extends QueryRepository
                     }
 
                     break;
+
                 case 'integer':
                     if (!is_int($value)) {
                         $has_error = true;
                     }
 
                     break;
+
                 case 'boolean':
                     if (!is_bool($value)) {
                         $has_error = true;
                     }
 
                     break;
+
                 default:
                     break;
             }
@@ -108,18 +112,21 @@ class EntityRepository extends QueryRepository
                         }
 
                         break;
+
                     case 'integer':
                         if (is_int($value)) {
                             $this->fields($key)->values((int) $value);
                         }
 
                         break;
+
                     case 'boolean':
                         if (is_bool($value)) {
                             $this->fields($key)->values($value ? 1 : 0);
                         }
 
                         break;
+
                     default:
                         break;
                 }
@@ -452,18 +459,21 @@ class EntityRepository extends QueryRepository
                         }
 
                         break;
+
                     case 'integer':
                         if (is_int($field_value)) {
                             $this->set($field_key . ' = ' . (int) $field_value);
                         }
 
                         break;
+
                     case 'boolean':
                         if (is_bool($field_value)) {
                             $this->set($field_key . ' = ' . ($field_value ? 1 : 0));
                         }
 
                         break;
+
                     default:
                         break;
                 }
@@ -520,18 +530,21 @@ class EntityRepository extends QueryRepository
                         }
 
                         break;
+
                     case 'integer':
                         if (is_int($value)) {
                             $this->set($key . ' = ' . (int) $value);
                         }
 
                         break;
+
                     case 'boolean':
                         if (is_bool($value)) {
                             $this->set($key . ' = ' . ($value ? 1 : 0));
                         }
 
                         break;
+
                     default:
                         break;
                 }
@@ -649,14 +662,17 @@ class EntityRepository extends QueryRepository
                 }
 
                 break;
+
             case is_int($value):
                 $this->where('`' . $key . '` = ' . (int) $value);
 
                 break;
+
             case is_bool($value):
                 $this->where('`' . $key . '` = ' . ($value ? 1 : 0));
 
                 break;
+
             default:
                 return false;
         }

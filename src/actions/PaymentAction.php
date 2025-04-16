@@ -406,6 +406,7 @@ class PaymentAction
         switch ($method) {
             case 'applepay':
                 return $resource;
+
             case 'installment':
                 $payment_method->addInstallmentSchedules($resource);
                 // no break
@@ -460,6 +461,7 @@ class PaymentAction
                             . '&def=' . (int) $payment_methods['deferred']
                             . '&modulename=' . $this->dependencies->name,
                     ];
+
                 case 'amex':
                 case 'installment':
                 case 'standard':
@@ -476,6 +478,7 @@ class PaymentAction
                     }
 
                     break;
+
                 default:
                     break;
             }

@@ -754,6 +754,7 @@ class Configuration
                 }
 
                 break;
+
             default:
             case 'string':
                 if (!is_string($value) && null != $value) {
