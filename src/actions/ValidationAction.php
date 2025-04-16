@@ -401,12 +401,14 @@ class ValidationAction
                     'url' => $this->getOrderLinks()['error'],
                     'message' => 'Invalid argument ps given',
                 ];
+
             case 2 == $ps:
                 return [
                     'result' => false,
                     'url' => $this->getOrderLinks()['cancel'],
                     'message' => 'Order has been cancelled on PayPlug page',
                 ];
+
             default:
                 break;
         }

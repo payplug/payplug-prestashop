@@ -101,10 +101,12 @@ class Hook
                 $hook_exec = (bool) $this->hook_action->createPaymentLinkAction((int) $order_State_id, (int) $cart_id);
 
                 break;
+
             case $order_State_id == $configuration->getValue('deferred_state'):
                 $hook_exec = (bool) $this->hook_action->autoCapturePaymentAction($order);
 
                 break;
+
             default:
                 $hook_exec = true;
 

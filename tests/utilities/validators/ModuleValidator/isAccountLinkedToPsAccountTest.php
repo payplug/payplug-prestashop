@@ -24,8 +24,11 @@ class isAccountLinkedToPsAccountTest extends TestCase
     public function invalidFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield ['string'];
     }
 

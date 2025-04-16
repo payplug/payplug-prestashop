@@ -15,7 +15,9 @@ final class SetCacheKeyTest extends BaseCacheRepository
     public function invalidDataProvider()
     {
         yield [15000, 'FR', 'not a array', 'Operations is not a valid array'];
+
         yield ['not numeric', 'FR', ['operation'], 'Amount is not a valid int'];
+
         yield [15000, false, ['operation'], 'Country is not a valid string'];
     }
 

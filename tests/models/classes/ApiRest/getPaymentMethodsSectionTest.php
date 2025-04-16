@@ -67,11 +67,17 @@ class getPaymentMethodsSectionTest extends BaseApiRest
     public function expectedPaymentMethods()
     {
         yield ['feature_standard', 'standard'];
+
         yield ['feature_amex', 'american_express'];
+
         yield ['feature_applepay', 'applepay'];
+
         yield ['feature_bancontact', 'bancontact'];
+
         yield ['feature_satispay', 'satispay'];
+
         yield ['feature_ideal', 'ideal'];
+
         yield ['feature_mybank', 'mybank'];
     }
 

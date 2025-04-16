@@ -24,8 +24,11 @@ class getExternalUrlTest extends TestCase
     public function invalidStringFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [null];
     }
 

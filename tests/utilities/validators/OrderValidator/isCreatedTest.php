@@ -27,8 +27,11 @@ class isCreatedTest extends TestCase
     public function invalidObjectFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield ['string'];
     }
 
@@ -49,7 +52,9 @@ class isCreatedTest extends TestCase
     public function invalidIntegerFormatDataProvider()
     {
         yield [['key' => 'value']];
+
         yield [false];
+
         yield ['string'];
     }
 

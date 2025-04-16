@@ -47,6 +47,7 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
                 switch ($method) {
                     case 'getShopDomainSsl':
                         return true;
+
                     default:
                         if ('io' == $arg) {
                             return '2';

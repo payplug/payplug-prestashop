@@ -193,15 +193,18 @@ class PrestashopAdapter17
         $integrated['extra_classes'] = 'payplug integrated';
 
         $translation = $this->dependencies->getPlugin()->getTranslationClass()->getFrontIntegratedPaymentTranslations();
+
         switch ($this->context->language->iso_code) {
             case 'fr':
                 $privacyLink = 'https://www.payplug.com/fr/politique-de-confidentialite/';
 
                 break;
+
             case 'it':
                 $privacyLink = 'https://www.payplug.com/it/politica-di-confidenzialita/';
 
                 break;
+
             default:
                 $privacyLink = 'https://www.payplug.com/privacy-policy/';
 

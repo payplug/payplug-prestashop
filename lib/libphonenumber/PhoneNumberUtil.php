@@ -1262,35 +1262,13 @@ class PhoneNumberUtil
 
     /**
      * Tries to extract a country calling code from a number. This method will return zero if no
-     * country calling code is considered to be present. Country calling codes are extracted in the
-     * following ways:
-     * <ul>
-     *  <li> by stripping the international dialing prefix of the region the person is dialing from,
-     *       if this is present in the number, and looking at the next digits
-     *  <li> by stripping the '+' sign if present and then looking at the next digits
-     *  <li> by comparing the start of the number and the country calling code of the default region.
-     *       If the number is not considered possible for the numbering plan of the default region
-     *       initially, but starts with the country calling code of this region, validation will be
-     *       reattempted after stripping this country calling code. If this number is considered a
-     *       possible number, then the first digits will be considered the country calling code and
-     *       removed as such.
-     * </ul>
-     * It will throw a NumberParseException if the number starts with a '+' but the country calling
-     * code supplied after this does not match that of any known region.
+     * country calling code is considered to be present.
      *
-     * @param string $number non-normalized telephone number that we wish to extract a country calling
-     *                       code from - may begin with '+'
+     * @param string $number non-normalized telephone number that we wish to extract a country calling code from - may begin with '+'
      * @param PhoneMetadata $defaultRegionMetadata metadata about the region this number may be from
-     * @param string $nationalNumber a string buffer to store the national significant number in, in the case
-     *                               that a country calling code was extracted. The number is appended to any existing contents.
-     *                               If no country calling code was extracted, this will be left unchanged.
-     * @param bool $keepRawInput true if the country_code_source and preferred_carrier_code fields of
-     *                           phoneNumber should be populated
-     * @param PhoneNumber $phoneNumber the PhoneNumber object where the country_code and country_code_source need
-     *                                 to be populated. Note the country_code is always populated, whereas country_code_source is
-     *                                 only populated when keepCountryCodeSource is true.
-     *
-     * @throws NumberParseException
+     * @param string $nationalNumber a string buffer to store the national significant number in, in the case that a country calling code was extracted. The number is appended to any existing contents. If no country calling code was extracted, this will be left unchanged.
+     * @param bool $keepRawInput true if the country_code_source and preferred_carrier_code fields of phoneNumber should be populated
+     * @param PhoneNumber $phoneNumber the PhoneNumber object where the country_code and country_code_source need to be populated. Note the country_code is always populated, whereas country_code_source is only populated when keepCountryCodeSource is true.
      *
      * @return int the country calling code extracted or 0 if none could be extracted
      */
@@ -2097,23 +2075,26 @@ class PhoneNumberUtil
         if (!$number->hasCountryCodeSource()) {
             return $this->format($number, PhoneNumberFormat::NATIONAL);
         }
+
         switch ($number->getCountryCodeSource()) {
             case CountryCodeSource::FROM_NUMBER_WITH_PLUS_SIGN:
                 $formattedNumber = $this->format($number, PhoneNumberFormat::INTERNATIONAL);
 
                 break;
+
             case CountryCodeSource::FROM_NUMBER_WITH_IDD:
                 $formattedNumber = $this->formatOutOfCountryCallingNumber($number, $regionCallingFrom);
 
                 break;
+
             case CountryCodeSource::FROM_NUMBER_WITHOUT_PLUS_SIGN:
                 $formattedNumber = substr($this->format($number, PhoneNumberFormat::INTERNATIONAL), 1);
 
                 break;
+
             case CountryCodeSource::FROM_DEFAULT_COUNTRY:
                 // Fall-through to default case.
             default:
-
                 $regionCode = $this->getRegionCodeForCountryCode($number->getCountryCode());
                 // We strip non-digits from the NDD here, and from the raw input later, so that we can
                 // compare them easily.
@@ -2291,31 +2272,11 @@ class PhoneNumberUtil
      * interpreted with the defaultRegion supplied. It also attempts to convert any alpha characters
      * into digits if it thinks this is a vanity number of the type "1800 MICROSOFT".
      *
-     * <p> This method will throw a {@link NumberParseException} if the number is not considered to
-     * be a possible number. Note that validation of whether the number is actually a valid number
-     * for a particular region is not performed. This can be done separately with {@link #isValidNumber}.
+     * @param $numberToParse
+     * @param null $defaultRegion
+     * @param false $keepRawInput
      *
-     * <p> Note this method canonicalizes the phone number such that different representations can be
-     * easily compared, no matter what form it was originally entered in (e.g. national,
-     * international). If you want to record context about the number being parsed, such as the raw
-     * input that was entered, how the country code was derived etc. then call {@link * #parseAndKeepRawInput} instead.
-     *
-     * @param string $numberToParse number that we are attempting to parse. This can contain formatting
-     *                              such as +, ( and -, as well as a phone number extension.
-     * @param string|null $defaultRegion region that we are expecting the number to be from. This is only used
-     *                                   if the number being parsed is not written in international format.
-     *                                   The country_code for the number in this case would be stored as that
-     *                                   of the default region supplied. If the number is guaranteed to
-     *                                   start with a '+' followed by the country calling code, then
-     *                                   "ZZ" or null can be supplied.
-     * @param bool $keepRawInput
-     *
-     * @throws NumberParseException if the string is not considered to be a viable phone number (e.g.
-     *                              too few or too many digits) or if no default region was supplied
-     *                              and the number is not in international format (does not start
-     *                              with +)
-     *
-     * @return PhoneNumber a phone number proto buffer filled with the parsed number
+     * @return PhoneNumber|null
      */
     public function parse($numberToParse, $defaultRegion = null, PhoneNumber $phoneNumber = null, $keepRawInput = false)
     {
@@ -2566,24 +2527,8 @@ class PhoneNumberUtil
     /**
      * Takes two phone numbers and compares them for equality.
      *
-     * <p>Returns EXACT_MATCH if the country_code, NSN, presence of a leading zero
-     * for Italian numbers and any extension present are the same. Returns NSN_MATCH
-     * if either or both has no region specified, and the NSNs and extensions are
-     * the same. Returns SHORT_NSN_MATCH if either or both has no region specified,
-     * or the region specified is the same, and one NSN could be a shorter version
-     * of the other number. This includes the case where one has an extension
-     * specified, and the other does not. Returns NO_MATCH otherwise. For example,
-     * the numbers +1 345 657 1234 and 657 1234 are a SHORT_NSN_MATCH. The numbers
-     * +1 345 657 1234 and 345 657 are a NO_MATCH.
-     *
-     * @param $firstNumberIn PhoneNumber|string First number to compare. If it is a
-     * string it can contain formatting, and can have country calling code specified
-     * with + at the start.
-     * @param $secondNumberIn PhoneNumber|string Second number to compare. If it is a
-     * string it can contain formatting, and can have country calling code specified
-     * with + at the start.
-     *
-     * @throws \InvalidArgumentException
+     * @param $firstNumberIn PhoneNumber|string First number to compare. If it is a string it can contain formatting, and can have country calling code specified with + at the start.
+     * @param $secondNumberIn PhoneNumber|string Second number to compare. If it is a string it can contain formatting, and can have country calling code specified with + at the start.
      *
      * @return int {MatchType} NOT_A_NUMBER, NO_MATCH,
      */
@@ -3153,14 +3098,17 @@ class PhoneNumberUtil
                 $formattedNumber = static::PLUS_SIGN . $countryCallingCode . $formattedNumber;
 
                 return;
+
             case PhoneNumberFormat::INTERNATIONAL:
                 $formattedNumber = static::PLUS_SIGN . $countryCallingCode . ' ' . $formattedNumber;
 
                 return;
+
             case PhoneNumberFormat::RFC3966:
                 $formattedNumber = static::RFC3966_PREFIX . static::PLUS_SIGN . $countryCallingCode . '-' . $formattedNumber;
 
                 return;
+
             case PhoneNumberFormat::NATIONAL:
             default:
                 return;
@@ -3644,8 +3592,6 @@ class PhoneNumberUtil
      *
      * @param string $regionCode the region that we want to get the country calling code for
      *
-     * @throws \InvalidArgumentException if the region is invalid
-     *
      * @return int the country calling code for the region denoted by regionCode
      */
     protected function getCountryCodeForValidRegion($regionCode)
@@ -3715,25 +3661,35 @@ class PhoneNumberUtil
         switch ($type) {
             case PhoneNumberType::PREMIUM_RATE:
                 return $metadata->getPremiumRate();
+
             case PhoneNumberType::TOLL_FREE:
                 return $metadata->getTollFree();
+
             case PhoneNumberType::MOBILE:
                 return $metadata->getMobile();
+
             case PhoneNumberType::FIXED_LINE:
             case PhoneNumberType::FIXED_LINE_OR_MOBILE:
                 return $metadata->getFixedLine();
+
             case PhoneNumberType::SHARED_COST:
                 return $metadata->getSharedCost();
+
             case PhoneNumberType::VOIP:
                 return $metadata->getVoip();
+
             case PhoneNumberType::PERSONAL_NUMBER:
                 return $metadata->getPersonalNumber();
+
             case PhoneNumberType::PAGER:
                 return $metadata->getPager();
+
             case PhoneNumberType::UAN:
                 return $metadata->getUan();
+
             case PhoneNumberType::VOICEMAIL:
                 return $metadata->getVoicemail();
+
             default:
                 return $metadata->getGeneralDesc();
         }

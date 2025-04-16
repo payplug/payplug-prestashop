@@ -17,7 +17,9 @@ final class IsValidOneyCartTest extends BaseOneyRepository
     public function invalidCartDataProvider()
     {
         yield ['wrong cart'];
+
         yield [['cart array']];
+
         yield [null];
     }
 

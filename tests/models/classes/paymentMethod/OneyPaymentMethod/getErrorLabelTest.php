@@ -15,9 +15,13 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
     public function errorMessageDataProvider()
     {
         yield ['address', 'payplug.getPaymentOptions.invalidAddresses'];
+
         yield ['amount', 'payplug.getPaymentOptions.invalidAmount'];
+
         yield ['invalid_carrier', 'payplug.getPaymentOptions.invalidCarrier'];
+
         yield ['product_quantity', 'payplug.getPaymentOptions.invalidCart'];
+
         yield ['default', 'payplug.getPaymentOptions.errorOccurred'];
     }
 

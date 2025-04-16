@@ -43,9 +43,13 @@ class getLoggedSectionTest extends BaseApiRest
     public function unOnboardedMerchantDataProvider()
     {
         yield ['payplug', null, true];
+
         yield ['payplug', null, false];
+
         yield ['pspaylater', 'sk_live_4fuIk4dSh7Kkyu3sP78', false];
+
         yield ['pspaylater', null, false];
+
         yield ['pspaylater', null, true];
     }
 
@@ -57,7 +61,9 @@ class getLoggedSectionTest extends BaseApiRest
     public function OnboardedMerchantDataProvider()
     {
         yield ['payplug', 'sk_live_4fuIk4dSh7Kkyu3sP78', false];
+
         yield ['payplug', 'sk_live_4fuIk4dSh7Kkyu3sP78', true];
+
         yield ['pspaylater', 'sk_live_4fuIk4dSh7Kkyu3sP78', true];
     }
 
@@ -199,7 +205,6 @@ class getLoggedSectionTest extends BaseApiRest
                 'password_label' => 'logged.inactive.modal.password_label',
                 'cancel' => 'logged.inactive.modal.cancel',
                 'ok' => 'logged.inactive.modal.ok',
-
             ],
             $response['inactive_modal']
         );
@@ -242,7 +247,6 @@ class getLoggedSectionTest extends BaseApiRest
                 'password_label' => 'logged.inactive.modal.password_label',
                 'cancel' => 'logged.inactive.modal.cancel',
                 'ok' => 'logged.inactive.modal.ok',
-
             ],
             $response['inactive_modal']
         );

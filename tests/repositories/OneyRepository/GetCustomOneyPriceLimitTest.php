@@ -42,12 +42,16 @@ final class GetCustomOneyPriceLimitTest extends BaseOneyRepository
                 switch ($key) {
                     case 'amounts':
                         return '{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:99","max":"EUR:2000000"},"ideal":{"min":"EUR:99","max":"EUR:2000000"},"mybank":{"min":"EUR:99","max":"EUR:2000000"},"satispay":{"min":"EUR:99","max":"EUR:2000000"}}';
+
                     case 'countries':
                         return '{"oney_x3_with_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x4_with_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x3_without_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"oney_x4_without_fees":["MQ","YT","NC","PF","GP","GF","RE","FR","MF","BL"],"ideal":["NL"],"mybank":["IT"],"satispay":["AT","BE","CY","DE","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","MT","NL","PT","SI","SK"]}';
+
                     case 'oney_custom_max_amounts':
                         return 'EUR:300000';
+
                     case 'oney_custom_min_amounts':
                         return 'EUR:10000';
+
                     default:
                         return $this->configuration->getDefault($key);
                 }
@@ -92,9 +96,13 @@ final class GetCustomOneyPriceLimitTest extends BaseOneyRepository
     public function validDataProvider()
     {
         yield ['wrong_parameter'];
+
         yield [''];
+
         yield [1];
+
         yield [null];
+
         yield [false];
     }
 

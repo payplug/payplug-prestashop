@@ -14,19 +14,28 @@ class submitSandboxActionTest extends BaseConfigurationAction
     public function invalidObjectFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [true];
+
         yield [null];
+
         yield ['lorem ipsum'];
     }
 
     public function invaliPasswordFormatDataProvider()
     {
         yield [null];
+
         yield [['key' => 'value']];
+
         yield [true];
+
         yield [''];
+
         yield ['7bJ'];
+
         yield ['P2wc10BrYGtILSUuEHU6nZzxastNZmdwLHT12fLAAuy91CwQomiUBjB1NG3RR2hr5UO6KuaWk'];
     }
 

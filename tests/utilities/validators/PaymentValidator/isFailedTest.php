@@ -25,9 +25,13 @@ class isFailedTest extends TestCase
     public function invalidObjectFormatDataProvider()
     {
         yield ['lorem Ipsum'];
+
         yield [true];
+
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [null];
     }
 

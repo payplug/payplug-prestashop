@@ -69,6 +69,7 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 ->getPlugin()
                 ->getValidationAction()
                 ->checkAction((int) $this->cart_id, (bool) $last_try);
+
             exit(json_encode($check));
         }
 

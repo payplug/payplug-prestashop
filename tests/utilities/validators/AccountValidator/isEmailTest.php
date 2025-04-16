@@ -29,9 +29,13 @@ class isEmailTest extends TestCase
     public function invalidStringFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [''];
+
         yield [null];
     }
 
@@ -43,7 +47,9 @@ class isEmailTest extends TestCase
     public function invalidEmailFormatDataProvider()
     {
         yield ['@test.com'];
+
         yield ['email@test'];
+
         yield ['emailtest.com'];
     }
 

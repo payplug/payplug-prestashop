@@ -24,8 +24,11 @@ class isValidProductionQuantityTest extends TestCase
     public function invalidIntegerFormatDataProvider()
     {
         yield [0];
+
         yield [['key' => 'value']];
+
         yield [true];
+
         yield ['lorem ipsum'];
     }
 

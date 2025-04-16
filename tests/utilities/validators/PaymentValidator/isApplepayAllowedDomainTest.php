@@ -24,16 +24,22 @@ class isApplepayAllowedDomainTest extends TestCase
     public function invalidStringFormatDataProvider()
     {
         yield [42];
+
         yield [['key' => 'value']];
+
         yield [false];
+
         yield [''];
     }
 
     public function invalidArrayFormatDataProvider()
     {
         yield [42];
+
         yield [[]];
+
         yield [false];
+
         yield ['lorem ipsum'];
     }
 
