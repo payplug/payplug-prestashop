@@ -376,7 +376,7 @@ class OneyPaymentMethod extends PaymentMethod
         if ('paid' == $resource_details['status_code']) {
             $order_id = $this->tools->tool('getValue', 'id_order');
             $is_live = 'TEST' != $resource_details['mode'];
-            $this->updateOrderStateFromPendingToPaid((int) $order_id, (bool) $is_live);
+            $this->updateOrderStateIfPending((int) $order_id, (bool) $is_live);
         }
 
         $translation = $this->dependencies
@@ -1933,7 +1933,7 @@ class OneyPaymentMethod extends PaymentMethod
      *
      * @return bool
      */
-    protected function updateOrderStateFromPendingToPaid($order_id = 0, $is_live = true)
+    protected function updateOrderStateIfPending($order_id = 0, $is_live = true)
     {
         $this->setParameters();
 
