@@ -268,9 +268,12 @@ class PrestashopAdapter17
         $switch = [];
 
         // defined if user is connected
-        $connected = !empty($configurations['email'])
-            && (!empty($configurations['test_api_key'])
-                || !empty($configurations['live_api_key']));
+        $connected = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.models.classes.merchant')
+            ->isLogged();
 
         // show module to the customer
         $switch['show'] = [

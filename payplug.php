@@ -572,12 +572,9 @@ class Payplug extends PaymentModule
             $helpers['files']::clean();
 
             // Call getAccount method to update countries and amounts configurations from merchant account
-            $api_key = $this
-                ->getService('payplug.utilities.service.api')
-                ->getCurrentApiKey();
             $permissions = $this
                 ->getService('payplug.utilities.service.api')
-                ->getAccount((string) $api_key, false);
+                ->getAccount();
         }
 
         return parent::runUpgradeModule();

@@ -41,26 +41,26 @@ class Merchant
     /**
      * @description Generate JWT
      *
-     * @param array $client_datas
+     * @param array $oauth_client_data
      *
      * @return array
      */
-    public function generateJWT($client_datas = [])
+    public function generateJWT($oauth_client_data = [])
     {
-        if (!is_array($client_datas) || empty($client_datas)) {
+        if (!is_array($oauth_client_data) || empty($oauth_client_data)) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
-                ->addLog('Merchant::generateJWT - Invalid argument, $client_datas must be a non empty array.', 'error');
+                ->addLog('Merchant::generateJWT - Invalid argument, $oauth_client_data must be a non empty array.', 'error');
 
             return [
                 'result' => false,
-                'message' => 'Wrong $client_datas given',
+                'message' => 'Wrong $oauth_client_data given',
             ];
         }
 
         $jwt = [];
-        foreach ($client_datas as $key => $data) {
+        foreach ($oauth_client_data as $key => $data) {
             if (empty($data)) {
                 $jwt[$key] = [];
 
@@ -165,13 +165,13 @@ class Merchant
      *
      * @return bool
      */
-    public function registerClientData($client_data = [])
+    public function registerOauthClientData($client_data = [])
     {
         if (!is_array($client_data) || empty($client_data)) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
-                ->addLog('Merchant::registerClientData - Invalid argument, $client_data must be an array.', 'error');
+                ->addLog('Merchant::registerOauthClientData - Invalid argument, $client_data must be an array.', 'error');
 
             return false;
         }
@@ -180,5 +180,46 @@ class Merchant
             ->getPlugin()
             ->getConfigurationClass()
             ->set('client_data', json_encode($client_data));
+    }
+
+    /**
+     * @description Check if merchant is logged
+     *
+     * @return bool
+     */
+    public function isLogged()
+    {
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+        $token = $configuration->getValue('test_api_key');
+        $jwt = json_decode($configuration->getValue('jwt'), true);
+        if (!empty($jwt)) {
+            $token = isset($jwt['test']['access_token']) ? $jwt['test']['access_token'] : '';
+        }
+        $email = $configuration->getValue('email');
+
+        return is_string($token)
+            && (bool) $token
+            && $this->dependencies->getValidators()['account']->isEmail($email)['result'];
+    }
+
+    /**
+     * @description Check if merchant is onboarded
+     *
+     * @return bool
+     */
+    public function isOnboarded()
+    {
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+        $token = $configuration->getValue('live_api_key');
+        $jwt = json_decode($configuration->getValue('jwt'), true);
+        if (!empty($jwt)) {
+            $token = isset($jwt['live']['access_token']) ? $jwt['live']['access_token'] : '';
+        }
+
+        return (bool) $token;
     }
 }
