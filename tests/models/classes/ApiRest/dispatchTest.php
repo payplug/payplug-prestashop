@@ -7,7 +7,7 @@ use PayPlug\src\models\classes\ApiRest;
 /**
  * @group unit
  * @group class
- * @group apirest_classe
+ * @group apirest_class
  *
  * @runTestsInSeparateProcesses
  */

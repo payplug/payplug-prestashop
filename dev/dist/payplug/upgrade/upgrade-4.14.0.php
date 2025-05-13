@@ -45,7 +45,7 @@ function upgrade_module_4_14_0($object)
         $logger->addLog($e->getMessage(), 'error');
     }
 
-    $flag = $flag && Configuration::updateValue('PAYPLUG_CLIENT_DATA', '{}');
+    $flag = $flag && Configuration::updateValue('PAYPLUG_OAUTH_CLIENT_DATA', '{}');
 
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
     unset($payment_methods['sofort']);

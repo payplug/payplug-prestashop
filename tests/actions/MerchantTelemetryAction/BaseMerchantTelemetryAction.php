@@ -13,6 +13,7 @@ class BaseMerchantTelemetryAction extends TestCase
     use FormatDataProvider;
 
     public $action;
+    public $api_service;
     public $configuration;
     public $constant;
     public $dependencies;
@@ -82,6 +83,15 @@ class BaseMerchantTelemetryAction extends TestCase
         $this->module->shouldReceive([
             'getInstanceByName' => $instance,
         ]);
+
+        $this->api_service = \Mockery::mock('ApiService');
+        $this->api_service->shouldReceive([
+            'initialize' => true,
+        ]);
+        $instance
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.api')
+            ->andReturn($this->api_service);
 
         $this->constant = \Mockery::mock('Constant');
         $this->constant->shouldReceive('get')

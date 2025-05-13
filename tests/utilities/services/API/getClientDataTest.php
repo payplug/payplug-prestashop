@@ -24,7 +24,7 @@ class getClientDataTest extends BaseApi
         $this->company_id = 'company_id';
         $this->mode = 'mode';
         $this->client_name = 'Client Name';
-        $this->client_data = [
+        $this->oauth_client_data = [
             'test' => [
                 'client_id' => 'test_client_id',
                 'client_secret' => 'test_client_secret',
@@ -138,7 +138,7 @@ class getClientDataTest extends BaseApi
 
         $this->authentication->shouldReceive([
             'createClientIdAndSecret' => [
-                'httpResponse' => $this->client_data,
+                'httpResponse' => $this->oauth_client_data,
             ],
         ]);
 
@@ -146,7 +146,7 @@ class getClientDataTest extends BaseApi
             [
                 'result' => true,
                 'code' => 200,
-                'data' => $this->client_data,
+                'data' => $this->oauth_client_data,
             ],
             $this->service->getClientData($this->company_id, $this->client_name, $this->mode, $this->session)
         );

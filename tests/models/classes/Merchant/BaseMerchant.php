@@ -10,6 +10,7 @@ class BaseMerchant extends TestCase
 {
     use FormatDataProvider;
 
+    protected $configuration_class;
     protected $dependencies;
     protected $logger_adapter;
     protected $class;
@@ -29,6 +30,7 @@ class BaseMerchant extends TestCase
             'addLog' => true,
         ]);
 
+        $this->configuration_class = \Mockery::mock('ConfigurationClass');
         $this->api_service = \Mockery::mock('ApiService');
         $this->module = \Mockery::mock('Module');
         $this->module_adapter = \Mockery::mock('ModuleAdapter');
@@ -41,6 +43,7 @@ class BaseMerchant extends TestCase
             ->andReturn($this->api_service);
 
         $this->plugin->shouldReceive([
+            'getConfigurationClass' => $this->configuration_class,
             'getLogger' => $this->logger_adapter,
             'getModule' => $this->module_adapter,
         ]);

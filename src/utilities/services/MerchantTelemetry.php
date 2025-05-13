@@ -31,20 +31,19 @@ use Payplug\PluginTelemetry;
 
 class MerchantTelemetry
 {
-    public function send($api_key = '', $datas = '')
+    /**
+     * @description Send data to mpdc
+     *
+     * @param string $datas
+     *
+     * @return array
+     */
+    public function send($datas = '')
     {
-        if (!is_string($api_key) || !$api_key) {
-            return [
-                'code' => null,
-                'result' => false,
-                'message' => 'Invalid argument given, $api_key must be a non empty string',
-            ];
-        }
-
         if (!is_string($datas) || !$datas) {
             return [
-                'code' => null,
                 'result' => false,
+                'code' => null,
                 'message' => 'Invalid argument given, $datas must be a non empty string',
             ];
         }
@@ -52,14 +51,14 @@ class MerchantTelemetry
         try {
             $send = PluginTelemetry::Send($datas);
             $response = [
-                'code' => $send['httpStatus'],
                 'result' => 201 == (int) $send['httpStatus'] ? true : false,
+                'code' => $send['httpStatus'],
                 'message' => '',
             ];
         } catch (\Exception $e) {
             $response = [
-                'code' => (int) $e->getCode(),
                 'result' => false,
+                'code' => (int) $e->getCode(),
                 'message' => $e->getMessage(),
             ];
         }
