@@ -494,20 +494,12 @@ class API
     /**
      * @description Get account permission from Payplug API
      *
-     * @param $api_key
-     * @param bool $sandbox
      * @param bool $treat_account
      *
      * @return array
      */
-    public function getAccount($api_key = '', $sandbox = true, $treat_account = true)
+    public function getAccount($treat_account = true)
     {
-        if (!is_string($api_key)) {
-            return [];
-        }
-        if (!is_bool($sandbox)) {
-            return [];
-        }
         if (!is_bool($treat_account)) {
             return [];
         }
@@ -536,7 +528,7 @@ class API
             return $json_answer;
         }
 
-        return $this->treatAccountResponse($json_answer, $sandbox);
+        return $this->treatAccountResponse($json_answer);
     }
 
     /**
@@ -1100,24 +1092,6 @@ class API
     }
 
     /**
-     * @description Get the current api key from database
-     *
-     * @return string
-     */
-    public function getCurrentApiKey()
-    {
-        $sandbox_mode = (bool) $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass()
-            ->getValue('sandbox_mode');
-
-        return (string) $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass()
-            ->getValue($sandbox_mode ? 'test_api_key' : 'live_api_key');
-    }
-
-    /**
      * @description Check current environment to defined the api route
      */
     protected function checkEnvironment()
@@ -1244,11 +1218,10 @@ class API
      * @description Read API response and return permissions
      *
      * @param array $json_answer
-     * @param bool $is_sandbox
      *
      * @return array
      */
-    protected function treatAccountResponse($json_answer = [], $is_sandbox = true)
+    protected function treatAccountResponse($json_answer = [])
     {
         if (!is_array($json_answer) || empty($json_answer)) {
             return [];

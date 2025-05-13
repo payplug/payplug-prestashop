@@ -42,6 +42,7 @@ class BaseApiRest extends TestCase
     protected $validate_adapter;
     protected $module;
     protected $module_adapter;
+    protected $merchant_class;
 
     public function setUp()
     {
@@ -108,6 +109,7 @@ class BaseApiRest extends TestCase
         $this->country = \Mockery::mock('Country');
 
         $this->api_service = \Mockery::mock('ApiService');
+        $this->merchant_class = \Mockery::mock('MerchantClass');
         $this->module = \Mockery::mock('Module');
         $this->module_adapter = \Mockery::mock('ModuleAdapter');
         $this->module_adapter->shouldReceive([
@@ -117,6 +119,10 @@ class BaseApiRest extends TestCase
             ->shouldReceive('getService')
             ->with('payplug.utilities.service.api')
             ->andReturn($this->api_service);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.models.classes.merchant')
+            ->andReturn($this->merchant_class);
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin->shouldReceive([

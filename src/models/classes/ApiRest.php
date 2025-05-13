@@ -86,6 +86,7 @@ class ApiRest
                 }
 
                 break;
+
             case 'login':
                 $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $json = $configurationAction->loginAction($datas);
@@ -171,11 +172,13 @@ class ApiRest
             ->getPlugin()
             ->getConfigurationClass();
 
-        $jwt = json_decode($configuration->getValue('jwt'), true);
-        $is_email = $this->validators['account']->isEmail(
-            $configuration->getValue('email')
-        );
-        $logged = !empty($jwt) && $is_email['result'];
+        $logged = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.models.classes.merchant')
+            ->isLogged();
+
         if (!$logged) {
             $this->dependencies
                 ->getPlugin()
@@ -337,13 +340,14 @@ class ApiRest
             ->getPlugin()
             ->getConfigurationClass();
 
-        $live_api_key = $configuration->getValue('live_api_key');
-        $permissions = $this->dependencies
+        $this->module = $this->dependencies
             ->getPlugin()
             ->getModule()
-            ->getInstanceByName($this->dependencies->name)
+            ->getInstanceByName($this->dependencies->name);
+
+        $permissions = $this->module
             ->getService('payplug.utilities.service.api')
-            ->getAccount((string) $live_api_key, false);
+            ->getAccount();
         if (!$permissions) {
             return [];
         }
@@ -362,11 +366,9 @@ class ApiRest
             ->getRoutes()
             ->getExternalUrl($iso_code);
 
-        if ('pspaylater' == $this->dependencies->name) {
-            $active = $live_api_key && $permissions['onboarding_oney_completed'];
-        } else {
-            $active = is_null($live_api_key) ? false : $live_api_key;
-        }
+        $active = $this->module
+            ->getService('payplug.models.classes.merchant')
+            ->isOnboarded();
 
         $default_configuration = [
             'sandbox_mode' => $configuration->getDefault('sandbox_mode'),

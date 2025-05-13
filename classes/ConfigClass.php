@@ -221,8 +221,6 @@ class ConfigClass
     public $version;
     public $warning;
 
-    private $api_live;
-    private $api_test;
     private $configuration;
     private $configurationAdapter;
     private $context;
@@ -232,7 +230,6 @@ class ConfigClass
     private $media;
     private $module_adapter;
     private $oney;
-    private $payment_status;
     private $ssl_enable;
     private $tools;
     private $validate;
@@ -294,14 +291,10 @@ class ConfigClass
         if (!$this->isAllowed()) {
             return [];
         }
-        $api_key = $this->module_adapter
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.utilities.service.api')
-            ->getCurrentApiKey();
         $permissions = $this->module_adapter
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
-            ->getAccount((string) $api_key, false);
+            ->getAccount();
 
         // in case if API is not available or not returning permissions
         if (empty($permissions)) {
@@ -448,7 +441,7 @@ class ConfigClass
         $livepermissions = $this->module_adapter
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
-            ->getAccount((string) $live_api_key);
+            ->getAccount();
 
         return $livepermissions ? $livepermissions : [];
     }
@@ -735,8 +728,6 @@ class ConfigClass
      */
     private function setConfigurationProperties()
     {
-        $this->api_live = $this->configuration->getValue('live_api_key');
-        $this->api_test = $this->configuration->getValue('test_api_key');
         $this->email = $this->configuration->getValue('email');
 
         $available_img_lang = [
@@ -748,7 +739,7 @@ class ConfigClass
         $this->img_lang = in_array($this->context->language->iso_code, $available_img_lang)
             ? $this->context->language->iso_code : 'default';
 
-        if (!isset($this->email) || (!isset($this->api_live) && empty($this->api_test))) {
+        if (!isset($this->email)) {
             $this->warning = $this->dependencies
                 ->getPlugin()
                 ->getTranslationClass()

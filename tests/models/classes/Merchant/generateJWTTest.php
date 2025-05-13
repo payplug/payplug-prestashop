@@ -5,13 +5,13 @@ namespace PayPlug\tests\models\classes\Merchant;
 /**
  * @group unit
  * @group class
- * @group merchant_classe
+ * @group merchant_class
  *
  * @runTestsInSeparateProcesses
  */
 class generateJWTTest extends BaseMerchant
 {
-    public $client_datas;
+    public $oauth_client_data;
     public $client_id;
     public $generated_jwt;
     public $jwt;
@@ -19,7 +19,7 @@ class generateJWTTest extends BaseMerchant
     public function setUp()
     {
         parent::setUp();
-        $this->client_datas = [
+        $this->oauth_client_data = [
             'test' => [
                 'client_id' => 'some_client_id_test',
                 'client_secret' => 'some_client_secret_test',
@@ -59,16 +59,16 @@ class generateJWTTest extends BaseMerchant
     /**
      * @dataProvider invalidArrayFormatDataProvider
      *
-     * * @param mixed $client_datas
+     * * @param mixed $oauth_client_data
      */
-    public function testWhenGivenClientDatasIsNotValidArray($client_datas)
+    public function testWhenGivenClientDatasIsNotValidArray($oauth_client_data)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Wrong $client_datas given',
+                'message' => 'Wrong $oauth_client_data given',
             ],
-            $this->class->generateJWT($client_datas)
+            $this->class->generateJWT($oauth_client_data)
         );
     }
 
@@ -86,7 +86,7 @@ class generateJWTTest extends BaseMerchant
                 'result' => false,
                 'message' => 'Error during JWT generation',
             ],
-            $this->class->generateJWT($this->client_datas)
+            $this->class->generateJWT($this->oauth_client_data)
         );
     }
 
@@ -100,7 +100,7 @@ class generateJWTTest extends BaseMerchant
                 'result' => true,
                 'data' => $this->jwt,
             ],
-            $this->class->generateJWT($this->client_datas)
+            $this->class->generateJWT($this->oauth_client_data)
         );
     }
 }
