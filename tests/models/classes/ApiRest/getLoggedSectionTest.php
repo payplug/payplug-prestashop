@@ -20,11 +20,24 @@ class getLoggedSectionTest extends BaseApiRest
     {
         parent::setUp();
         $context = \Mockery::mock('Context');
+        $context_mock = ContextMock::get();
+        $link = \Mockery::mock('link');
+        $link->shouldReceive([
+            'getAdminLink' => 'admin_link',
+        ]);
+        $context_mock->link = $link;
         $context->shouldReceive([
-            'get' => ContextMock::get(),
+            'get' => $context_mock,
         ]);
         $this->plugin->shouldReceive([
             'getContext' => $context,
+        ]);
+
+        $this->api_service->shouldReceive([
+            'getRegisterUrl' => [
+                'result' => true,
+                'redirection' => 'oauth_register_url',
+            ],
         ]);
 
         $this->given_configuration = [
@@ -80,10 +93,11 @@ class getLoggedSectionTest extends BaseApiRest
         $expected = [
             'inactive' => true,
             'title' => 'logged.inactive.modal.title',
-            'description' => 'logged.inactive.modal.description',
-            'password_label' => 'logged.inactive.modal.password_label',
+            'description_1' => 'logged.inactive.modal.description_1',
+            'description_2' => 'logged.inactive.modal.description_2',
             'cancel' => 'logged.inactive.modal.cancel',
-            'ok' => 'logged.inactive.modal.ok',
+            'oauth' => 'logged.inactive.modal.oauth',
+            'oauth_url' => 'oauth_register_url',
         ];
         $this->assertSame(
             $expected,
@@ -105,10 +119,11 @@ class getLoggedSectionTest extends BaseApiRest
         $expected = [
             'inactive' => false,
             'title' => 'logged.inactive.modal.title',
-            'description' => 'logged.inactive.modal.description',
-            'password_label' => 'logged.inactive.modal.password_label',
+            'description_1' => 'logged.inactive.modal.description_1',
+            'description_2' => 'logged.inactive.modal.description_2',
             'cancel' => 'logged.inactive.modal.cancel',
-            'ok' => 'logged.inactive.modal.ok',
+            'oauth' => 'logged.inactive.modal.oauth',
+            'oauth_url' => 'oauth_register_url',
         ];
         $this->assertSame(
             $expected,

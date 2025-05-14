@@ -588,11 +588,11 @@ class API
                 'secretKey' => $session,
                 'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
             ]);
-            $client_data = Authentication::createClientIdAndSecret($company_id, $client_name, $mode);
+            $oauth_client_data = Authentication::createClientIdAndSecret($company_id, $client_name, $mode);
             $response = [
                 'result' => true,
                 'code' => 200,
-                'data' => $client_data['httpResponse'],
+                'data' => $oauth_client_data['httpResponse'],
             ];
         } catch (\Exception $e) {
             $response = [
@@ -734,13 +734,13 @@ class API
         if ($jwt && !empty($jwt)) {
             $current_date = time();
             if ($jwt[$mode]['expires_date'] < $current_date) {
-                $client_data = json_decode($configuration->getValue('client_data'), true);
+                $oauth_client_data = json_decode($configuration->getValue('oauth_client_data'), true);
 
                 // Renew the token
                 $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
                 $merchant = $module->getService('payplug.models.classes.merchant');
 
-                $jwt = $merchant->generateJWT($client_data);
+                $jwt = $merchant->generateJWT($oauth_client_data);
                 if (!$jwt) {
                     $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be generated', 'error');
 
