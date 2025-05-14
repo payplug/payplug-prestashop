@@ -13,7 +13,7 @@ class generateJWTTest extends BaseApi
 {
     public $client_id;
     public $client_secret;
-    public $client_data;
+    public $oauth_client_data;
     public $jwt;
 
     public function setUp()

@@ -11,7 +11,7 @@ namespace PayPlug\tests\models\classes\Merchant;
  */
 class registerOauthClientDataTest extends BaseMerchant
 {
-    protected $client_data;
+    protected $oauth_client_data;
 
     public function setUp()
     {
@@ -31,11 +31,11 @@ class registerOauthClientDataTest extends BaseMerchant
     /**
      * @dataProvider invalidArrayFormatDataProvider
      *
-     * * @param mixed $client_data
+     * * @param mixed $oauth_client_data
      */
-    public function testWhenGivenClientDataIsntValidArray($client_data)
+    public function testWhenGivenClientDataIsntValidArray($oauth_client_data)
     {
-        $this->assertFalse($this->class->registerOauthClientData($client_data));
+        $this->assertFalse($this->class->registerOauthClientData($oauth_client_data));
     }
 
     public function testWhenClientDataCantBeRegistered()
