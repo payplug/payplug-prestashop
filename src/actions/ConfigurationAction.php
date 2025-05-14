@@ -533,8 +533,8 @@ class ConfigurationAction
         // Get the client data
         $merchant = $module->getService('payplug.models.classes.merchant');
         $company_id = $configuration->getValue('oauth_company_id');
-        $client_data = $merchant->getClientData($jwt['data'], $company_id);
-        if (empty($client_data) || !$client_data['result']) {
+        $oauth_client_data = $merchant->getClientData($jwt['data'], $company_id);
+        if (empty($oauth_client_data) || !$oauth_client_data['result']) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
@@ -545,10 +545,10 @@ class ConfigurationAction
                 'result' => false,
             ];
         }
-        $configuration->set('client_data', json_encode($client_data['data']));
+        $configuration->set('oauth_client_data', json_encode($oauth_client_data['data']));
 
         // If jwt doesn't exists, we generate one.
-        $jwt = $merchant->generateJWT($client_data['data']);
+        $jwt = $merchant->generateJWT($oauth_client_data['data']);
         if (empty($jwt) || !$jwt['result']) {
             $this->dependencies
                 ->getPlugin()

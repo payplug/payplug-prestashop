@@ -128,27 +128,27 @@ class Merchant
         $client_name = 'Prestashop';
 
         // Get the client id and secret for test mode
-        $client_data_test = $this->dependencies
+        $oauth_client_data_test = $this->dependencies
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
             ->getClientData($company_id, $client_name, 'test', $session);
-        $data['test'] = $client_data_test['result'] ? [
-            'client_id' => $client_data_test['data']['client_id'],
-            'client_secret' => $client_data_test['data']['client_secret'],
+        $data['test'] = $oauth_client_data_test['result'] ? [
+            'client_id' => $oauth_client_data_test['data']['client_id'],
+            'client_secret' => $oauth_client_data_test['data']['client_secret'],
         ] : [];
 
         // Get the client id and secret for live mode
-        $client_data_live = $this->dependencies
+        $oauth_client_data_live = $this->dependencies
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
             ->getClientData($company_id, $client_name, 'live', $session);
-        $data['live'] = $client_data_live['result'] ? [
-            'client_id' => $client_data_live['data']['client_id'],
-            'client_secret' => $client_data_live['data']['client_secret'],
+        $data['live'] = $oauth_client_data_live['result'] ? [
+            'client_id' => $oauth_client_data_live['data']['client_id'],
+            'client_secret' => $oauth_client_data_live['data']['client_secret'],
         ] : [];
 
         return [
@@ -161,17 +161,17 @@ class Merchant
      * @description Register client data given got from API
      * todo: remove this method
      *
-     * @param array $client_data
+     * @param array $oauth_client_data
      *
      * @return bool
      */
-    public function registerOauthClientData($client_data = [])
+    public function registerOauthClientData($oauth_client_data = [])
     {
-        if (!is_array($client_data) || empty($client_data)) {
+        if (!is_array($oauth_client_data) || empty($oauth_client_data)) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
-                ->addLog('Merchant::registerOauthClientData - Invalid argument, $client_data must be an array.', 'error');
+                ->addLog('Merchant::registerOauthClientData - Invalid argument, $oauth_client_data must be an array.', 'error');
 
             return false;
         }
@@ -179,7 +179,7 @@ class Merchant
         return $this->dependencies
             ->getPlugin()
             ->getConfigurationClass()
-            ->set('client_data', json_encode($client_data));
+            ->set('oauth_client_data', json_encode($oauth_client_data));
     }
 
     /**

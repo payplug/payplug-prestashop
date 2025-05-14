@@ -139,7 +139,7 @@ class oauthLoginActionTest extends BaseConfigurationAction
         $this->merchant->shouldReceive([
             'getClientData' => [
                 'result' => true,
-                'data' => 'some_client_data_array',
+                'data' => 'some_oauth_client_data_array',
             ],
             'generateJWT' => [
                 'result' => false,
@@ -169,7 +169,7 @@ class oauthLoginActionTest extends BaseConfigurationAction
         $this->merchant->shouldReceive([
             'getClientData' => [
                 'result' => true,
-                'data' => 'some_client_data_array',
+                'data' => 'some_oauth_client_data_array',
             ],
             'generateJWT' => [
                 'result' => true,

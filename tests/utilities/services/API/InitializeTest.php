@@ -18,7 +18,7 @@ class InitializeTest extends BaseApi
     public $jwt;
     public $logger;
     public $token;
-    public $client_data;
+    public $oauth_client_data;
 
     public function setUp()
     {
@@ -129,7 +129,7 @@ class InitializeTest extends BaseApi
             ->andReturn(json_encode($this->jwt));
         $this->configuration_class
             ->shouldReceive('getValue')
-            ->with('client_data')
+            ->with('oauth_client_data')
             ->andReturn(json_encode($this->oauth_client_data));
         $this->merchant->shouldReceive([
             'generateJWT' => false,
@@ -154,7 +154,7 @@ class InitializeTest extends BaseApi
             ->andReturn(json_encode($this->jwt));
         $this->configuration_class
             ->shouldReceive('getValue')
-            ->with('client_data')
+            ->with('oauth_client_data')
             ->andReturn(json_encode($this->oauth_client_data));
         $this->configuration_class->shouldReceive([
             'set' => false,
@@ -183,7 +183,7 @@ class InitializeTest extends BaseApi
             ->andReturn(json_encode($this->jwt));
         $this->configuration_class
             ->shouldReceive('getValue')
-            ->with('client_data')
+            ->with('oauth_client_data')
             ->andReturn(json_encode($this->oauth_client_data));
         $this->configuration_class->shouldReceive([
             'set' => false,

@@ -15,7 +15,7 @@ class getClientDataTest extends BaseApi
     public $client_name;
     public $mode;
     public $session;
-    public $client_data;
+    public $oauth_client_data;
 
     public function setUp()
     {
