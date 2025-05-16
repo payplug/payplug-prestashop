@@ -422,5 +422,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 exit(json_encode($cancel));
             }
         }
+
+        exit(json_encode([
+            'result' => true,
+            'message' => 'No ajax call',
+        ]));
     }
 }
