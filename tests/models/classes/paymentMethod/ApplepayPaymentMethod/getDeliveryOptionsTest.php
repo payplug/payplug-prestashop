@@ -30,6 +30,11 @@ class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
         $this->validate_adapter->shouldReceive([
             'validate' => false,
         ]);
+
+        $this->configuration_adapter->shouldReceive('get')
+            ->with('PS_CARRIER_DEFAULT')
+            ->andReturn('5');
+
         $this->assertSame([], $this->class->getDeliveryOptions());
     }
 
@@ -43,6 +48,10 @@ class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
         $this->validate_adapter->shouldReceive([
             'validate' => true,
         ]);
+
+        $this->configuration_adapter->shouldReceive('get')
+            ->with('PS_CARRIER_DEFAULT')
+            ->andReturn('5');
 
         $cart = \Mockery::mock('Cart');
         $cart->shouldReceive([

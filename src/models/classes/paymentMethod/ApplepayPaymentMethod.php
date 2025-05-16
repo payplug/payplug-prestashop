@@ -679,18 +679,32 @@ class ApplepayPaymentMethod extends PaymentMethod
             $this->context->country = $this->country_adapter->get((int) $address->id_country);
         }
 
+        $default_carrier = (int) $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->getValue('PS_CARRIER_DEFAULT');
         foreach ($carriers_list as $id_carrier) {
             $carrier = $carrier_adapter->get((int) $id_carrier, (int) $this->context->language->id);
             if (!$this->validate_adapter->validate('isLoadedObject', $carrier)) {
                 continue;
             }
 
-            $shipping_methods[] = [
+            $shipping_infos = [
                 'identifier' => $carrier->id,
                 'label' => $carrier->name,
                 'detail' => $carrier->delay,
                 'amount' => $this->context->cart->getPackageShippingCost($carrier->id),
             ];
+            if ($default_carrier == $id_carrier
+                && !empty($shipping_methods)) {
+                $temp_shipping = $shipping_methods[0];
+                $shipping_methods[0] = $shipping_infos;
+                $shipping_methods[] = $temp_shipping;
+
+                continue;
+            }
+
+            $shipping_methods[] = $shipping_infos;
         }
 
         return $shipping_methods;
