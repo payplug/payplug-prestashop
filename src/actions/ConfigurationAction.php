@@ -60,22 +60,12 @@ class ConfigurationAction
             ];
         }
 
-        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
-        if ($sandbox_mode) {
-            $permissions = $this->dependencies
-                ->getPlugin()
-                ->getModule()
-                ->getInstanceByName($this->dependencies->name)
-                ->getService('payplug.utilities.service.api')
-                ->getAccount((string) $configuration->getValue('test_api_key'), true);
-        } else {
-            $permissions = $this->dependencies
-                ->getPlugin()
-                ->getModule()
-                ->getInstanceByName($this->dependencies->name)
-                ->getService('payplug.utilities.service.api')
-                ->getAccount((string) $configuration->getValue('live_api_key'), false);
-        }
+        $permissions = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->getAccount();
 
         $allowed_methods = [
             'american_express' => 'can_use_american_express',
@@ -471,7 +461,7 @@ class ConfigurationAction
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
-            ->getAccount((string) $configuration->getValue('live_api_key'), false);
+            ->getAccount();
 
         if (empty($permissions)) {
             $logger->addLog('ConfigurationAction::loginAction: No permissions found for this account');

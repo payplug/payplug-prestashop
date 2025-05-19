@@ -33,7 +33,7 @@ class InitializeTest extends BaseApi
                 'expires_date' => 1729753256,
             ],
         ];
-        $this->client_data = [
+        $this->oauth_client_data = [
             'test' => [
                 'client_id' => 'client_id_test',
                 'client_secret' => 'client_secret_test',
@@ -130,7 +130,7 @@ class InitializeTest extends BaseApi
         $this->configuration_class
             ->shouldReceive('getValue')
             ->with('client_data')
-            ->andReturn(json_encode($this->client_data));
+            ->andReturn(json_encode($this->oauth_client_data));
         $this->merchant->shouldReceive([
             'generateJWT' => false,
         ]);
@@ -155,7 +155,7 @@ class InitializeTest extends BaseApi
         $this->configuration_class
             ->shouldReceive('getValue')
             ->with('client_data')
-            ->andReturn(json_encode($this->client_data));
+            ->andReturn(json_encode($this->oauth_client_data));
         $this->configuration_class->shouldReceive([
             'set' => false,
         ]);
@@ -184,7 +184,7 @@ class InitializeTest extends BaseApi
         $this->configuration_class
             ->shouldReceive('getValue')
             ->with('client_data')
-            ->andReturn(json_encode($this->client_data));
+            ->andReturn(json_encode($this->oauth_client_data));
         $this->configuration_class->shouldReceive([
             'set' => false,
         ]);
