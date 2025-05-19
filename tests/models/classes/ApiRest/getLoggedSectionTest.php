@@ -8,12 +8,14 @@ use PayPlug\tests\mock\ContextMock;
 /**
  * @group unit
  * @group class
- * @group apirest_classe
+ * @group apirest_class
  *
  * @runTestsInSeparateProcesses
  */
 class getLoggedSectionTest extends BaseApiRest
 {
+    public $given_configuration;
+
     public function setUp()
     {
         parent::setUp();
@@ -25,7 +27,12 @@ class getLoggedSectionTest extends BaseApiRest
             'getContext' => $context,
         ]);
 
-        $this->configuration_class->shouldReceive('getDefault')
+        $this->given_configuration = [
+            'sandbox_mode' => false,
+        ];
+
+        $this->configuration_class
+            ->shouldReceive('getDefault')
             ->andReturnUsing(function ($key) {
                 switch ($key) {
                     case 'sandbox_mode':
@@ -33,38 +40,6 @@ class getLoggedSectionTest extends BaseApiRest
                 }
             })
         ;
-    }
-
-    /**
-     * @description  generate Not onborded merchant datas
-     *
-     * @return \Generator
-     */
-    public function unOnboardedMerchantDataProvider()
-    {
-        yield ['payplug', null, true];
-
-        yield ['payplug', null, false];
-
-        yield ['pspaylater', 'sk_live_4fuIk4dSh7Kkyu3sP78', false];
-
-        yield ['pspaylater', null, false];
-
-        yield ['pspaylater', null, true];
-    }
-
-    /**
-     * @description  generate onborded merchant datas
-     *
-     * @return \Generator
-     */
-    public function OnboardedMerchantDataProvider()
-    {
-        yield ['payplug', 'sk_live_4fuIk4dSh7Kkyu3sP78', false];
-
-        yield ['payplug', 'sk_live_4fuIk4dSh7Kkyu3sP78', true];
-
-        yield ['pspaylater', 'sk_live_4fuIk4dSh7Kkyu3sP78', true];
     }
 
     /**
@@ -80,175 +55,64 @@ class getLoggedSectionTest extends BaseApiRest
         );
     }
 
-    public function testWhenNoSandboxModeIsGiven()
+    public function testWhenNoPermissionsGiven()
     {
-        $current_configuration = [];
-        $this->api_service->shouldReceive(
-            [
-                'getAccount' => ['onboarding_oney_completed' => true],
-            ]
-        );
-        $response = $this->class->getLoggedSection($current_configuration);
+        $this->api_service->shouldReceive([
+            'getAccount' => [],
+        ]);
         $this->assertSame(
-            [
-                [
-                    'name' => 'payplug_sandbox',
-                    'label' => 'logged.mode.options.sandbox',
-                    'value' => 1,
-                    'checked' => true,
-                ],
-                [
-                    'name' => 'payplug_sandbox',
-                    'label' => 'logged.mode.options.live',
-                    'value' => 0,
-                    'checked' => false,
-                ],
-            ],
-            $response['options']
+            [],
+            $this->class->getLoggedSection($this->given_configuration)
         );
     }
 
-    public function testWhenModuleIsConfiguredOnSandboxMode()
+    public function testWhenMerchantIsNotOnboarded()
     {
-        $current_configuration = [
-            'sandbox_mode' => true,
-        ];
-        $this->api_service->shouldReceive(
-            [
-                'getAccount' => ['onboarding_oney_completed' => true],
-            ]
-        );
-        $response = $this->class->getLoggedSection($current_configuration);
-        $this->assertSame(
-            [
-                [
-                    'name' => 'payplug_sandbox',
-                    'label' => 'logged.mode.options.sandbox',
-                    'value' => 1,
-                    'checked' => true,
-                ],
-                [
-                    'name' => 'payplug_sandbox',
-                    'label' => 'logged.mode.options.live',
-                    'value' => 0,
-                    'checked' => false,
-                ],
+        $this->api_service->shouldReceive([
+            'getAccount' => [
+                'merchant_permission' => true,
             ],
-            $response['options']
+        ]);
+        $this->merchant_class->shouldReceive([
+            'isOnboarded' => false,
+        ]);
+
+        $expected = [
+            'inactive' => true,
+            'title' => 'logged.inactive.modal.title',
+            'description' => 'logged.inactive.modal.description',
+            'password_label' => 'logged.inactive.modal.password_label',
+            'cancel' => 'logged.inactive.modal.cancel',
+            'ok' => 'logged.inactive.modal.ok',
+        ];
+        $this->assertSame(
+            $expected,
+            $this->class->getLoggedSection($this->given_configuration)['inactive_modal']
         );
     }
 
-    public function testWhenModuleIsConfiguredOnLiveMode()
+    public function testWhenMerchantIsOnboarded()
     {
-        $current_configuration = [
-            'sandbox_mode' => false,
-        ];
-        $this->api_service->shouldReceive(
-            [
-                'getAccount' => ['onboarding_oney_completed' => true],
-            ]
-        );
-        $response = $this->class->getLoggedSection($current_configuration);
-        $this->assertSame(
-            [
-                [
-                    'name' => 'payplug_sandbox',
-                    'label' => 'logged.mode.options.sandbox',
-                    'value' => 1,
-                    'checked' => false,
-                ],
-                [
-                    'name' => 'payplug_sandbox',
-                    'label' => 'logged.mode.options.live',
-                    'value' => 0,
-                    'checked' => true,
-                ],
+        $this->api_service->shouldReceive([
+            'getAccount' => [
+                'merchant_permission' => true,
             ],
-            $response['options']
-        );
-    }
+        ]);
+        $this->merchant_class->shouldReceive([
+            'isOnboarded' => true,
+        ]);
 
-    /**
-     * @dataProvider unOnboardedMerchantDataProvider
-     * @description test the cas of the merchant is not onboarded for both modules
-     *
-     * @param $module_name
-     * @param $live_api_key
-     * @param $onboarding_oney_completed
-     */
-    public function testWhenMerchantIsntOnboarded($module_name, $live_api_key, $onboarding_oney_completed)
-    {
-        $current_configuration = [
-            'sandbox_mode' => false,
+        $expected = [
+            'inactive' => false,
+            'title' => 'logged.inactive.modal.title',
+            'description' => 'logged.inactive.modal.description',
+            'password_label' => 'logged.inactive.modal.password_label',
+            'cancel' => 'logged.inactive.modal.cancel',
+            'ok' => 'logged.inactive.modal.ok',
         ];
-        $this->dependencies->name = $module_name;
-        $this->configuration_class->shouldReceive('getValue')
-            ->andReturnUsing(function ($key) use ($live_api_key) {
-                switch ($key) {
-                    case 'live_api_key':
-                        return $live_api_key;
-                }
-            })
-        ;
-
-        $this->api_service->shouldReceive(
-            [
-                'getAccount' => ['onboarding_oney_completed' => $onboarding_oney_completed],
-            ]
-        );
-        $response = $this->class->getLoggedSection($current_configuration);
         $this->assertSame(
-            [
-                'inactive' => true,
-                'title' => 'logged.inactive.modal.title',
-                'description' => 'logged.inactive.modal.description',
-                'password_label' => 'logged.inactive.modal.password_label',
-                'cancel' => 'logged.inactive.modal.cancel',
-                'ok' => 'logged.inactive.modal.ok',
-            ],
-            $response['inactive_modal']
-        );
-    }
-
-    /**
-     * @dataProvider OnboardedMerchantDataProvider
-     * @description test the cas of the merchant is onboarded for both modules
-     *
-     * @param $module_name
-     * @param $live_api_key
-     * @param $onboarding_oney_completed
-     */
-    public function testWhenMerchantIsOnboarded($module_name, $live_api_key, $onboarding_oney_completed)
-    {
-        $current_configuration = [
-            'sandbox_mode' => false,
-        ];
-        $this->dependencies->name = $module_name;
-        $this->configuration_class->shouldReceive('getValue')
-            ->andReturnUsing(function ($key) use ($live_api_key) {
-                switch ($key) {
-                    case 'live_api_key':
-                        return $live_api_key;
-                }
-            })
-        ;
-
-        $this->api_service->shouldReceive(
-            [
-                'getAccount' => ['onboarding_oney_completed' => $onboarding_oney_completed],
-            ]
-        );
-        $response = $this->class->getLoggedSection($current_configuration);
-        $this->assertSame(
-            [
-                'inactive' => false,
-                'title' => 'logged.inactive.modal.title',
-                'description' => 'logged.inactive.modal.description',
-                'password_label' => 'logged.inactive.modal.password_label',
-                'cancel' => 'logged.inactive.modal.cancel',
-                'ok' => 'logged.inactive.modal.ok',
-            ],
-            $response['inactive_modal']
+            $expected,
+            $this->class->getLoggedSection($this->given_configuration)['inactive_modal']
         );
     }
 }

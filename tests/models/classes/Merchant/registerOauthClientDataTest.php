@@ -5,23 +5,18 @@ namespace PayPlug\tests\models\classes\Merchant;
 /**
  * @group unit
  * @group class
- * @group merchant_classe
+ * @group merchant_class
  *
  * @runTestsInSeparateProcesses
  */
-class registerClientDataTest extends BaseMerchant
+class registerOauthClientDataTest extends BaseMerchant
 {
-    protected $configuration_class;
     protected $client_data;
 
     public function setUp()
     {
         parent::setUp();
-        $this->configuration_class = \Mockery::mock('ConfigurationClass');
-        $this->plugin->shouldReceive([
-            'getConfigurationClass' => $this->configuration_class,
-        ]);
-        $this->client_data = [
+        $this->oauth_client_data = [
             'test' => [
                 'client_id' => 'test_client_id',
                 'client_secret' => 'test_client_secret',
@@ -40,7 +35,7 @@ class registerClientDataTest extends BaseMerchant
      */
     public function testWhenGivenClientDataIsntValidArray($client_data)
     {
-        $this->assertFalse($this->class->registerClientData($client_data));
+        $this->assertFalse($this->class->registerOauthClientData($client_data));
     }
 
     public function testWhenClientDataCantBeRegistered()
@@ -48,7 +43,7 @@ class registerClientDataTest extends BaseMerchant
         $this->configuration_class->shouldReceive([
             'set' => false,
         ]);
-        $this->assertFalse($this->class->registerClientData($this->client_data));
+        $this->assertFalse($this->class->registerOauthClientData($this->oauth_client_data));
     }
 
     public function testWhenClientDataIsRegistered()
@@ -56,6 +51,6 @@ class registerClientDataTest extends BaseMerchant
         $this->configuration_class->shouldReceive([
             'set' => true,
         ]);
-        $this->assertTrue($this->class->registerClientData($this->client_data));
+        $this->assertTrue($this->class->registerOauthClientData($this->oauth_client_data));
     }
 }
