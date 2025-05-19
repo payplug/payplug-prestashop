@@ -390,41 +390,39 @@ class ApiRest
             . '</span>';
         $inactive_description = str_replace('$trigger', $live_trigger, $inactive_description);
 
+        $description = [
+            'description' => $translation['description'],
+            'logout' => $translation['user']['logout'],
+            'mode' => $translation['mode']['title'],
+            'mode_description' => $translation['mode']['description']['live'],
+            'link_learn_more' => [
+                'text' => $translation['mode']['link']['live'],
+                'url' => $external_url['sandbox'],
+                'target' => '_blank',
+            ],
+            'link_access_portal' => [
+                'text' => $translation['user']['link'],
+                'url' => $external_url['portal'],
+                'target' => '_blank',
+            ],
+        ];
+        $inactive_modal = [
+            'inactive' => !$active,
+            'title' => $translation['inactive']['modal']['title'],
+            'description_1' => $translation['inactive']['modal']['description_1'],
+            'description_2' => $translation['inactive']['modal']['description_2'],
+            'cancel' => $translation['inactive']['modal']['cancel'],
+            'oauth' => $translation['inactive']['modal']['oauth'],
+            'oauth_url' => $this->module
+                ->getService('payplug.utilities.service.api')
+                ->getRegisterUrl($context->link->getAdminLink('AdminPayplug'))['redirection'],
+        ];
+
         return [
             'title' => $translation['title'],
             'descriptions' => [
-                'live' => [
-                    'description' => $translation['description'],
-                    'logout' => $translation['user']['logout'],
-                    'mode' => $translation['mode']['title'],
-                    'mode_description' => $translation['mode']['description']['live'],
-                    'link_learn_more' => [
-                        'text' => $translation['mode']['link']['live'],
-                        'url' => $external_url['sandbox'],
-                        'target' => '_blank',
-                    ],
-                    'link_access_portal' => [
-                        'text' => $translation['user']['link'],
-                        'url' => $external_url['portal'],
-                        'target' => '_blank',
-                    ],
-                ],
-                'sandbox' => [
-                    'description' => $translation['description'],
-                    'logout' => $translation['user']['logout'],
-                    'mode' => $translation['mode']['title'],
-                    'mode_description' => $translation['mode']['description']['sandbox'],
-                    'link_learn_more' => [
-                        'text' => $translation['mode']['link']['sandbox'],
-                        'url' => $external_url['sandbox'],
-                        'target' => '_blank',
-                    ],
-                    'link_access_portal' => [
-                        'text' => $translation['user']['link'],
-                        'url' => $external_url['portal'],
-                        'target' => '_blank',
-                    ],
-                ],
+                'live' => $description,
+                'sandbox' => $description,
             ],
             'options' => [
                 [
@@ -441,14 +439,7 @@ class ApiRest
                 ],
             ],
             'can_be_disabled' => true,
-            'inactive_modal' => [
-                'inactive' => !$active,
-                'title' => $translation['inactive']['modal']['title'],
-                'description' => $translation['inactive']['modal']['description'],
-                'password_label' => $translation['inactive']['modal']['password_label'],
-                'cancel' => $translation['inactive']['modal']['cancel'],
-                'ok' => $translation['inactive']['modal']['ok'],
-            ],
+            'inactive_modal' => $inactive_modal,
             'payment_link' => [
                 'active' => true,
                 'info' => [

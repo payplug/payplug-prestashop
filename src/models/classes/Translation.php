@@ -128,10 +128,10 @@ class Translation
             'inactive' => [
                 'modal' => [
                     'title' => $this->l('logged.inactive.modal.title', 'translation'),
-                    'description' => $this->l('logged.inactive.modal.description', 'translation'),
-                    'password_label' => $this->l('logged.inactive.modal.password_label', 'translation'),
+                    'description_1' => $this->l('logged.inactive.modal.description_1', 'translation'),
+                    'description_2' => $this->l('logged.inactive.modal.description_2', 'translation'),
                     'cancel' => $this->l('logged.inactive.modal.cancel', 'translation'),
-                    'ok' => $this->l('logged.inactive.modal.ok', 'translation'),
+                    'oauth' => $this->l('logged.inactive.modal.oauth', 'translation'),
                     'error' => $this->l('logged.inactive.modal.error', 'translation'),
                 ],
                 'account' => [

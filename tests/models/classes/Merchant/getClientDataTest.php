@@ -74,22 +74,22 @@ class getClientDataTest extends BaseMerchant
 
     public function testWhenClientDataAreGot()
     {
-        $client_data = [
+        $oauth_client_data = [
             'client_id' => 'client_id',
             'client_secret' => 'client_secret',
         ];
         $this->api_service->shouldReceive([
             'getClientData' => [
                 'result' => true,
-                'data' => $client_data,
+                'data' => $oauth_client_data,
             ],
         ]);
         $this->assertSame(
             [
                 'result' => true,
                 'data' => [
-                    'test' => $client_data,
-                    'live' => $client_data,
+                    'test' => $oauth_client_data,
+                    'live' => $oauth_client_data,
                 ],
             ],
             $this->class->getClientData($this->session, $this->company_id)
@@ -134,27 +134,27 @@ class getClientDataTest extends BaseMerchant
         $client_name = 'Prestashop';
 
         // Get the client id and secret for test mode
-        $client_data_test = $this->dependencies
+        $oauth_client_data_test = $this->dependencies
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
             ->getClientData($company_id, $client_name, 'test', $session);
-        $data['test'] = $client_data_test['result'] ? [
-            'client_id' => $client_data_test['data']['client_id'],
-            'client_secret' => $client_data_test['data']['client_secret'],
+        $data['test'] = $oauth_client_data_test['result'] ? [
+            'client_id' => $oauth_client_data_test['data']['client_id'],
+            'client_secret' => $oauth_client_data_test['data']['client_secret'],
         ] : [];
 
         // Get the client id and secret for live mode
-        $client_data_live = $this->dependencies
+        $oauth_client_data_live = $this->dependencies
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.service.api')
             ->getClientData($company_id, $client_name, 'live', $session);
-        $data['live'] = $client_data_live['result'] ? [
-            'client_id' => $client_data_live['data']['client_id'],
-            'client_secret' => $client_data_live['data']['client_secret'],
+        $data['live'] = $oauth_client_data_live['result'] ? [
+            'client_id' => $oauth_client_data_live['data']['client_id'],
+            'client_secret' => $oauth_client_data_live['data']['client_secret'],
         ] : [];
 
         return [

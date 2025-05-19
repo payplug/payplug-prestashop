@@ -9,7 +9,7 @@ namespace PayPlug\tests\utilities\services\API;
  *
  * @runTestsInSeparateProcesses
  */
-class getRegisterUrlTest extends BaseApi
+class GetRegisterUrlTest extends BaseApi
 {
     public $callback_uri;
 
