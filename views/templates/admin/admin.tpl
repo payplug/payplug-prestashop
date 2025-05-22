@@ -20,18 +20,7 @@
 *  International Registered Trademark & Property of Payplug SAS
 *}
 
-{if 'pspaylater' == $module_name}
-    <div class="{$module_name|escape:'htmlall':'UTF-8'}_content">
-        {* Banner *}
-        {include file='./../api/molecules/banner.tpl'}
-
-        {if isset($ps_account_isActivated) && $ps_account_isActivated}
-            {include file='./panel/ps_account.tpl'}
-        {/if}
-    </div>
-{/if}
-
 <div id="payplug_admin"></div>
 
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-1.7.10.js"></script>
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-1.7.10.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-1.7.11.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-1.7.11.js"></script>
