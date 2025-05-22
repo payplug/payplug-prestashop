@@ -627,7 +627,7 @@ class Payplug extends PaymentModule
      */
     public function getHookList()
     {
-        return [
+        $hooks_list = [
             'actionAdminControllerSetMedia',
             'actionAdminLanguagesControllerSaveAfter',
             'actionClearCompileCache',
@@ -638,9 +638,7 @@ class Payplug extends PaymentModule
             'actionObjectOrderStateUpdateAfter',
             'actionObjectOrderStateDeleteAfter',
             'actionUpdateLangAfter',
-            'adminOrder',
             'displayCustomerAccount',
-            'displayAdminOrderMain',
             'displayAdminStatusesForm',
             'displayExpressCheckout',
             'displayPaymentReturn',
@@ -649,6 +647,14 @@ class Payplug extends PaymentModule
             'displayHeader',
             'paymentOptions',
         ];
+
+        if (\version_compare(_PS_VERSION_, '1.7.7.0', '<')) {
+            array_push($hooks_list, 'adminOrder');
+        } else {
+            array_push($hooks_list, 'displayAdminOrderMain');
+        }
+
+        return $hooks_list;
     }
 
     private function setModule()

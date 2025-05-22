@@ -3,6 +3,7 @@
 - Bugfix :
   - [SMP-3105](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2669): Use defaut carrier set in Prestashop as ApplePay cart default carrier
   - [SMP-3087](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2672): Fix Ajax default call
+  - [SMP-3153](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2677): Fix hook installation on OrderAdmin for Prestashop 1.7
 
 ## Version 4.17.2
 - Bugfix :
