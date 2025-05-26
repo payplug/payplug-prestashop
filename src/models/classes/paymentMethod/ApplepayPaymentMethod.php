@@ -530,10 +530,15 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'supports3DS',
             ],
             'supportedNetworks' => [
+                'cartesBancaires',
                 'visa',
                 'masterCard',
                 // 'amex', Amex is not supported yet by PayPlug
                 'discover',
+            ],
+            'supportedTypes' => [
+                'debit',
+                'credit',
             ],
             'total' => [
                 'label' => $this->context->shop->name,

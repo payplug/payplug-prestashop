@@ -744,7 +744,7 @@ var $document, $window, __moduleName__Module = {
             }
 
             // Create ApplePaySession
-            applepay.props.session = new ApplePaySession(3, request);
+            applepay.props.session = new ApplePaySession(4, request);
 
             if (applepay.props.query != null) {
                 applepay.props.query.abort();
