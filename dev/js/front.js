@@ -645,7 +645,6 @@ var $document, $window, __moduleName__Module = {
             query: null,
             workflow: 'checkout',
             session: null,
-            datas: null,
             request: null,
             address: {
                 locality: null,
@@ -661,13 +660,18 @@ var $document, $window, __moduleName__Module = {
                 label: null
             },
         },
-        set: function (key, value) {
-            this.props[key] = value;
+        set: (key, value) => {
+            const {applepay} = __moduleName__Module;
+            applepay.props[key] = value;
         },
-        init: function () {
-            let {applepay} = __moduleName__Module,
+        init: () => {
+            const {applepay} = __moduleName__Module;
+            applepay.display();
+            applepay.handler();
+        },
+        handler: () => {
+            const {applepay} = __moduleName__Module,
                 {workflow} = applepay.props;
-
             $('apple-pay-button, #payment-confirmation button').click(function (event) {
                 $(this).fadeOut(10).fadeIn(10);
                 let payment_method_id = $('input[name="payment-option"]:checked').attr('id'),
@@ -676,11 +680,139 @@ var $document, $window, __moduleName__Module = {
                 if ('applepay' == payment_method || 'checkout' != workflow) {
                     event.preventDefault();
                     event.stopPropagation();
-                    applepay.trigger();
+                    applepay.createSession();
                 }
             });
         },
-        trigger: function () {
+        display: () => {
+            let {applepay} = __moduleName__Module,
+                {identifier, workflow} = applepay.props,
+                $wrapper = $('.' + identifier + '_wrapper');
+
+            if ($wrapper.lenght) {
+                return;
+            }
+
+            const applepay_allowed = typeof window.ApplePaySession == 'function' && window.ApplePaySession.canMakePayments();
+
+            switch (workflow) {
+                case 'shopping-cart':
+                case 'product':
+                    if (applepay_allowed) {
+                        $wrapper.addClass('-visible');
+                    }
+                    break;
+                case 'checkout':
+                default:
+                    const paymentOptionId = $wrapper
+                            .parents('.additional-information')
+                            .eq(0)
+                            .attr('id')
+                            .replace('payment-option-', '')
+                            .replace('-additional-information', ''),
+                        $paymentOption = $('#payment-option-' + paymentOptionId + '-container').eq(0);
+                    if (!applepay_allowed) {
+                        $paymentOption.addClass('-hidden');
+                    }
+                    break;
+            }
+        },
+        createSession: async () => {
+            // Get PaymentRequest data
+            const {applepay} = __moduleName__Module,
+                {worflow} = applepay.props;
+
+            if (!ApplePaySession) {
+                return;
+            }
+
+            const request = applepay.getRequestDatas();
+
+            // Define the default carrier
+            if (typeof request.carriers != 'undefined' && request.carriers.length) {
+                applepay.props.carrier = request.carriers[0];
+            }
+
+            // Create ApplePaySession
+            let apple_pay_request = {
+                "countryCode": request.country_code,
+                "currencyCode": request.currency_code,
+                "merchantCapabilities": [
+                    "supports3DS"
+                ],
+                "supportedNetworks": [
+                    "visa",
+                    "masterCard"
+                ],
+                "total": {
+                    "label": request.total.label,
+                    "type": "final",
+                    "amount": request.total.amount
+                },
+                'applicationData': btoa(JSON.stringify({
+                    'apple_pay_domain': request.apple_pay_domain
+                })),
+            }
+
+            if ('checkout' != worflow) {
+                apple_pay_request.shippingMethods = request.carriers;
+                apple_pay_request.lineItems = request.line_items;
+                apple_pay_request.requiredBillingContactFields = [
+                    'postalAddress',
+                    'name',
+                ];
+                apple_pay_request.requiredShippingContactFields = [
+                    "postalAddress",
+                    "name",
+                    "phone",
+                    "email"
+                ];
+            }
+
+            const session = new ApplePaySession(4, apple_pay_request);
+            applepay.props.session = session;
+            applepay.getPaymentRequest();
+        },
+        beginSession: (request) => {
+            let {applepay} = __moduleName__Module;
+            if (typeof request == 'undefined') {
+                return applepay.error();
+            }
+            applepay.props.request = request;
+            applepay.props.session.onvalidatemerchant = applepay.sessionHandler.onvalidatemerchant;
+            applepay.props.session.onshippingcontactselected = applepay.sessionHandler.onshippingcontactselected;
+            applepay.props.session.onshippingmethodselected = applepay.sessionHandler.onshippingmethodselected;
+            applepay.props.session.onpaymentauthorized = applepay.sessionHandler.onpaymentauthorized;
+            applepay.props.session.oncancel = applepay.sessionHandler.oncancel;
+            applepay.props.session.begin();
+        },
+        getPaymentRequest: () => {
+            const {applepay} = __moduleName__Module,
+                {workflow, query} = applepay.props;
+            if (query != null) {
+                query.abort();
+            }
+            applepay.props.query = $.ajax({
+                method: "POST",
+                url: applePayMerchantSessionAjaxURL,
+                data: {
+                    workflow: workflow,
+                    method: 'applepay',
+                    id_cart: applePayIdCart
+                },
+                beforeSend: () => {
+                    $('#apple-pay-button').css('pointer-events', 'none');
+                },
+                success: (result) => {
+                    const request = JSON.parse(result);
+                    return applepay.beginSession(request);
+                },
+                error: () => {
+                    return applepay.error();
+                }
+            });
+        },
+        getRequestDatas: () => {
             let {applepay} = __moduleName__Module,
                 {workflow} = applepay.props;
 
@@ -706,91 +838,28 @@ var $document, $window, __moduleName__Module = {
                 data.quantity = $('#quantity_wanted').val();
                 data.empty_cart = true;
             }
-            let applepay_datas;
+            let response_data;
             applepay.props.query = $.ajax({
                 method: "POST",
                 url: applePayPaymentRequestAjaxURL,
                 async: false,
                 data: data,
                 success: function (result) {
-                    applepay_datas = JSON.parse(result);
+                    response_data = JSON.parse(result);
                 },
                 error: function () {
-                    __moduleName__Module.applepay.error();
+                    response_data = null;
                 }
             });
-
-            applepay.create(applepay_datas);
+            return response_data;
         },
-        create: function (data) {
-            let {applepay} = __moduleName__Module,
-                {workflow} = applepay.props;
-
-            if (!workflow) {
-                return;
+        getUpdatedRequest: () => {
+            const {applepay} = __moduleName__Module,
+                {workflow, carrier, address, query} = applepay.props;
+            if (query != null) {
+                query.abort();
             }
-
-            if (typeof data.applePayPaymentRequest == 'undefined') {
-                return;
-            }
-
-            const request = data.applePayPaymentRequest;
-            applepay.props.request = request;
-
-            // Define the default carrier
-            if (typeof request.shippingMethods != 'undefined'
-                && request.shippingMethods.length) {
-                applepay.props.carrier = request.shippingMethods[0];
-            }
-
-            // Create ApplePaySession
-            applepay.props.session = new ApplePaySession(3, request);
-
-            if (applepay.props.query != null) {
-                applepay.props.query.abort();
-                applepay.props.query = null;
-            }
-
-            applepay.props.query = $.ajax({
-                method: "POST",
-                url: applePayMerchantSessionAjaxURL,
-                data: {
-                    workflow: workflow,
-                    method: 'applepay',
-                    id_cart: applePayIdCart
-                },
-                beforeSend: function () {
-                    $('#apple-pay-button').css('pointer-events', 'none');
-                },
-                success: function (result) {
-                    var datas = JSON.parse(result);
-                    if (!datas.result) {
-                        console.log(datas.error_message);
-                        return __moduleName__Module.applepay.error();
-                    }
-
-                    applepay.props.datas = datas;
-                    applepay.props.session.onvalidatemerchant = applepay.session.validatemerchant;
-                    applepay.props.session.onshippingmethodselected = applepay.session.shippingmethodselected;
-                    applepay.props.session.onshippingcontactselected = applepay.session.shippingcontactselected;
-                    applepay.props.session.onpaymentauthorized = applepay.session.paymentauthorized;
-                    applepay.props.session.oncancel = applepay.session.cancel;
-                    applepay.props.session.begin();
-                },
-                error: function () {
-                    __moduleName__Module.applepay.error();
-                }
-            });
-        },
-        update: function () {
-            let {applepay} = __moduleName__Module,
-                {workflow, carrier, address} = applepay.props,
-                request = null;
-
-            if (applepay.props.query != null) {
-                applepay.props.query.abort();
-                applepay.props.query = null;
-            }
+            let request = null;
             applepay.props.query = $.ajax({
                 method: "POST",
                 url: payplug_ajax_url,
@@ -803,31 +872,51 @@ var $document, $window, __moduleName__Module = {
                     carrier: carrier,
                     address: address,
                 },
-                success: function (datas) {
-                    if (!datas.result) {
-                        return __moduleName__Module.applepay.error();
-                    }
-                    request = datas.request;
+                success: (datas) => {
+                    request = !datas.result ? null : datas.request;
                 },
-                error: function () {
-                    __moduleName__Module.applepay.error();
+                error: () => {
+                    request = null;
                 }
             });
-
             return request;
         },
-        session: {
-            validatemerchant: async () => {
-                let {applepay} = __moduleName__Module,
-                    {datas, session} = applepay.props;
+        sessionHandler: {
+            onvalidatemerchant: async (event) => {
+                const {applepay} = __moduleName__Module,
+                    {session, request} = applepay.props;
                 try {
-                    session.completeMerchantValidation(datas.apiResponse.merchant_session);
+                    const merchantSession = await request.apiResponse.merchant_session;
+                    session.completeMerchantValidation(merchantSession);
                 } catch (err) {
-                    console.log(err);
+                    console.log('onvalidatemerchant: ', err);
                 }
             },
-            shippingcontactselected: (event) => {
-                let {applepay} = __moduleName__Module,
+            onshippingmethodselected: (event) => {
+                const {applepay} = __moduleName__Module,
+                    {session} = applepay.props,
+                    {shippingMethod} = event;
+
+                applepay.props.carrier = shippingMethod;
+
+                const request = applepay.getUpdatedRequest();
+                const update = {
+                    'newTotal': {
+                        "label": request.total.label,
+                        "type": "final",
+                        "amount": request.total.amount
+                    },
+                    'newLineItems': request.line_items,
+                };
+
+                try {
+                    session.completeShippingMethodSelection(update);
+                } catch (err) {
+                    console.log('onshippingmethodselected: ', err);
+                }
+            },
+            onshippingcontactselected: (event) => {
+                const {applepay} = __moduleName__Module,
                     {session} = applepay.props,
                     {shippingContact} = event;
 
@@ -839,32 +928,24 @@ var $document, $window, __moduleName__Module = {
                     countryCode: shippingContact.countryCode,
                 };
 
-                const request = applepay.update();
+                const request = applepay.getUpdatedRequest();
                 const update = {
-                    'newTotal': request.total,
-                    'newLineItems': request.lineItems,
-                    'newShippingMethods': request.shippingMethods,
+                    'newTotal': {
+                        "label": request.total.label,
+                        "type": "final",
+                        "amount": request.total.amount
+                    },
+                    'newLineItems': request.line_items,
+                    'newShippingMethods': request.carriers,
                 };
-
-                session.completeShippingContactSelection(update);
+                try {
+                    session.completeShippingContactSelection(update);
+                } catch (err) {
+                    console.log('onshippingcontactselected: ', err);
+                }
             },
-            shippingmethodselected: (event) => {
-                let {applepay} = __moduleName__Module,
-                    {session} = applepay.props,
-                    {shippingMethod} = event;
-
-                applepay.props.carrier = shippingMethod;
-
-                const request = applepay.update();
-                const update = {
-                    'newTotal': request.total,
-                    'newLineItems': request.lineItems,
-                };
-
-                session.completeShippingMethodSelection(update);
-            },
-            paymentauthorized: (event) => {
-                let {applepay} = __moduleName__Module,
+            onpaymentauthorized: (event) => {
+                const {applepay} = __moduleName__Module,
                     {session, carrier} = applepay.props,
                     {payment} = event;
 
@@ -880,11 +961,11 @@ var $document, $window, __moduleName__Module = {
                             shipping: payment.shippingContact,
                         },
                         carrier: carrier,
-                        pay_id: applepay.props.datas.idPayment,
+                        pay_id: applepay.props.request.idPayment,
                         patchPayment: 1,
                         workflow: applepay.props.workflow,
                     },
-                    success: function (json) {
+                    success: (json) => {
                         var result = JSON.parse(json);
 
                         if (!result.result) {
@@ -895,12 +976,14 @@ var $document, $window, __moduleName__Module = {
                         session.completePayment({"status": ApplePaySession.STATUS_SUCCESS});
                         window.location.replace(result.return_url);
                     },
-                    error: function () {
+                    error: () => {
+                        console.log('onpaymentauthorized: An error occured');
                         __moduleName__Module.applepay.error();
                     }
                 })
             },
-            cancel: (event) => {
+            oncancel: (event) => {
+                // Payment canceled by WebKit
                 let {applepay} = __moduleName__Module;
                 if (applepay.props.query != null) {
                     applepay.props.query.abort();
@@ -915,12 +998,14 @@ var $document, $window, __moduleName__Module = {
                         _ajax: 1,
                         applepayCancel: 1,
                         workflow: applepay.props.workflow,
-                    }
+                    },
+                    success: () => {
+                        applepay.error();
+                    },
                 });
-                return __moduleName__Module.applepay.error();
-            }
+            },
         },
-        error: function () {
+        error: () => {
             let {applepay} = __moduleName__Module;
             $('#apple-pay-button').css('pointer-events', 'auto');
             applepay.props.session = null;
