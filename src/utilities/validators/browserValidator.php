@@ -78,32 +78,4 @@ class browserValidator
             'message' => 'Current device is a mobile device.',
         ];
     }
-
-    /**
-     * @description check if the device is ApplePay compatible
-     *
-     * @param string $browser
-     *
-     * @return array
-     */
-    public function isApplePayCompatible($browser = '')
-    {
-        if (!is_string($browser) || !$browser) {
-            return [
-                'result' => false,
-                'message' => 'Invalid parameter given, $browser must be a non empty string.',
-            ];
-        }
-        if ('Safari' != $browser) {
-            return [
-                'result' => false,
-                'message' => 'This browser is not applepay compatible.',
-            ];
-        }
-
-        return [
-            'result' => true,
-            'message' => 'This browser is applepay compatible.',
-        ];
-    }
 }

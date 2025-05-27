@@ -33,7 +33,6 @@ class renderApplePayCheckoutTest extends BaseCartAction
         $this->link = \Mockery::mock('Link');
         $this->plugin->shouldReceive([
             'getAssign' => $this->assign,
-            'getBrowser' => $browser,
             'getMedia' => $this->media,
             'getPaymentMethodClass' => $this->payment_method_class,
             'getRoutes' => $this->routes,
@@ -52,23 +51,6 @@ class renderApplePayCheckoutTest extends BaseCartAction
         $this->assertFalse($this->action->renderApplePayCheckout());
     }
 
-    public function testWhenApplePayCartWhenBrowserIsNotSafari()
-    {
-        $this->configuration->shouldReceive('getValue')
-            ->with('PS_GUEST_CHECKOUT_ENABLED')
-            ->andReturn(false);
-        $this->customer_adapter->shouldReceive([
-            'get' => (object) ['id' => 42],
-        ]);
-        $this->browser_validator->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => false,
-                'message' => 'This browser is not applepay compatible.',
-            ],
-        ]);
-        $this->assertFalse($this->action->renderApplePayCheckout());
-    }
-
     public function testWhenNoAvailableCarriersFound()
     {
         $this->configuration->shouldReceive('getValue')
@@ -76,12 +58,6 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn(false);
         $this->customer_adapter->shouldReceive([
             'get' => (object) ['id' => 42],
-        ]);
-        $this->browser_validator->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => true,
-                'message' => '',
-            ],
         ]);
         $this->payment_method->shouldReceive([
             'getCarriersList' => [],
@@ -105,12 +81,6 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn(false);
         $this->customer_adapter->shouldReceive([
             'get' => (object) ['id' => 42],
-        ]);
-        $this->browser_validator->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => true,
-                'message' => '',
-            ],
         ]);
         $controller = $this->instance->shouldReceive([
             'getController' => 'cart',
@@ -158,13 +128,6 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->andReturn(false);
         $this->customer_adapter->shouldReceive([
             'get' => (object) ['id' => 42],
-        ]);
-        // Mock the browser compatibility check
-        $this->browser_validator->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => true,
-                'message' => '',
-            ],
         ]);
 
         // Mock the controller to return 'product'

@@ -50,9 +50,6 @@ class PluginEntity
     private $api_service;
 
     /** @var object */
-    private $browser;
-
-    /** @var object */
     private $cache;
 
     /** @var object */
@@ -296,14 +293,6 @@ class PluginEntity
     public function getAssign()
     {
         return $this->assign;
-    }
-
-    /**
-     * @return object
-     */
-    public function getBrowser()
-    {
-        return $this->browser;
     }
 
     /**
@@ -926,22 +915,6 @@ class PluginEntity
         }
 
         $this->assign = $assign;
-
-        return $this;
-    }
-
-    /**
-     * @param object $browser
-     *
-     * @return self
-     */
-    public function setBrowser($browser)
-    {
-        if (!is_object($browser)) {
-            throw new BadParameterException('Invalid argument, $browser must be a Services/Browser');
-        }
-
-        $this->browser = $browser;
 
         return $this;
     }

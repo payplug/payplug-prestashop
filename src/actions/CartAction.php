@@ -97,19 +97,6 @@ class CartAction
             return false;
         }
 
-        $browser = $this->dependencies
-            ->getPlugin()
-            ->getBrowser()
-            ->getName();
-        $isApplePayCompatible = $this->dependencies
-            ->getValidators()['browser']
-            ->isApplePayCompatible($browser);
-
-        // If browser is not safari, no appelpay on cart page
-        if (!$isApplePayCompatible['result']) {
-            return false;
-        }
-
         // Get Carrier list
         $carriers_list = $this->dependencies
             ->getPlugin()
