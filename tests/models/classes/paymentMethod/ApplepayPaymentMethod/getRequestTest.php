@@ -56,9 +56,14 @@ class getRequestTest extends BaseApplepayPaymentMethod
                 'supports3DS',
             ],
             'supportedNetworks' => [
+                'cartesBancaires',
                 'visa',
                 'masterCard',
                 'discover',
+            ],
+            'supportedTypes' => [
+                'debit',
+                'credit',
             ],
             'total' => [
                 'label' => 'my mock',
@@ -134,9 +139,14 @@ class getRequestTest extends BaseApplepayPaymentMethod
                 'supports3DS',
             ],
             'supportedNetworks' => [
+                'cartesBancaires',
                 'visa',
                 'masterCard',
                 'discover',
+            ],
+            'supportedTypes' => [
+                'debit',
+                'credit',
             ],
             'total' => [
                 'label' => 'my mock',
@@ -225,9 +235,14 @@ class getRequestTest extends BaseApplepayPaymentMethod
                 'supports3DS',
             ],
             'supportedNetworks' => [
+                'cartesBancaires',
                 'visa',
                 'masterCard',
                 'discover',
+            ],
+            'supportedTypes' => [
+                'debit',
+                'credit',
             ],
             'total' => [
                 'label' => 'my mock',
