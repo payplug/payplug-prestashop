@@ -1,4 +1,8 @@
 # Payplug module changelog
+## Version 4.18.0
+- Feature :
+    - [PRE-2700](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2678): Enable CB by default and expose brand selector in Apple Pay
+
 ## Version 4.17.3
 - Bugfix :
   - [SMP-3105](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2669): Use defaut carrier set in Prestashop as ApplePay cart default carrier
