@@ -20,7 +20,6 @@ class BaseCartAction extends TestCase
     protected $dependencies;
     protected $dispatcher;
     protected $instance;
-    protected $browser_validator;
     protected $plugin;
     protected $tools_adapter;
 
@@ -69,12 +68,8 @@ class BaseCartAction extends TestCase
 
         $this->dependencies->name = 'payplug';
 
-        $this->browser_validator = \Mockery::mock('BrowserValidator');
         $this->dependencies->shouldReceive([
             'getPlugin' => $this->plugin,
-            'getValidators' => [
-                'browser' => $this->browser_validator,
-            ],
         ]);
 
         $this->action = \Mockery::mock(CartAction::class, [$this->dependencies])->makePartial();
