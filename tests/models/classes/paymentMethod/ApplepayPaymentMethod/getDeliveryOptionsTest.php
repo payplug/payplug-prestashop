@@ -62,10 +62,10 @@ class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
 
         $carriers = [
             [
-                'identifier' => 1,
+                'identifier' => '1',
                 'label' => 'Carrier name',
                 'detail' => 'fast or not',
-                'amount' => 42,
+                'amount' => '42',
             ],
         ];
         $this->assertSame(
