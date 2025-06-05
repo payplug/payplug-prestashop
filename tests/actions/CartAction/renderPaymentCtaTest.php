@@ -28,14 +28,6 @@ class renderPaymentCtaTest extends BaseCartAction
             'getBrowser' => $browser,
             'getPaymentMethodClass' => $this->payment_method_class,
         ]);
-
-        $this->browser_validator->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => true,
-                'message' => '',
-            ],
-        ]);
-
         $this->action->shouldReceive([
             'renderApplepayCheckout' => 'applepay_template',
         ]);

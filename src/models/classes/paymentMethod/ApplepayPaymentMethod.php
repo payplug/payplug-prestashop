@@ -809,13 +809,6 @@ class ApplepayPaymentMethod extends PaymentMethod
             return $payment_options;
         }
 
-        $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
-        $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
-        if (!$isApplePayCompatible['result']) {
-            unset($payment_options[$this->name]);
-
-            return $payment_options;
-        }
         $payment_options[$this->name]['action'] = 'javascript:void(0)';
         $applepay_js_url = $this->dependencies
             ->getPlugin()

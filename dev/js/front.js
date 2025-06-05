@@ -679,6 +679,40 @@ var $document, $window, __moduleName__Module = {
                     applepay.trigger();
                 }
             });
+            this.display();
+        },
+        display: function() {
+            let {applepay} = __moduleName__Module,
+                {identifier, workflow} = applepay.props,
+                $wrapper = $('.'+identifier+'_wrapper');
+
+            if ($wrapper.lenght) {
+                return;
+            }
+
+            const applepay_allowed = typeof window.ApplePaySession == 'function' && window.ApplePaySession.canMakePayments();
+
+            switch(workflow) {
+                case 'shopping-cart':
+                case 'product':
+                    if (applepay_allowed) {
+                        $wrapper.addClass('-visible');
+                    }
+                    break;
+                case 'checkout':
+                default:
+                    const paymentOptionId = $wrapper
+                            .parents('.additional-information')
+                            .eq(0)
+                            .attr('id')
+                            .replace('payment-option-', '')
+                            .replace('-additional-information', ''),
+                        $paymentOption = $('#payment-option-'+paymentOptionId+'-container').eq(0);
+                    if (!applepay_allowed) {
+                        $paymentOption.addClass('-hidden');
+                    }
+                    break;
+            }
         },
         trigger: function () {
             let {applepay} = __moduleName__Module,
