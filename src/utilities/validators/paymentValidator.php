@@ -693,7 +693,7 @@ class paymentValidator
      */
     public function isExpired($payment)
     {
-        if (empty($payment) || !is_object($payment)) {
+        if (!is_object($payment) || !$payment) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $payment must be a non null object.',

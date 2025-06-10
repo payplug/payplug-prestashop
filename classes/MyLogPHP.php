@@ -116,12 +116,9 @@ class MyLogPHP
     private function log($errorlevel = 'INFO', $value = '', $tag = '', $line_n = null)
     {
         $datetime = @date('Y-m-d H:i:s');
-        if (!file_exists($this->LOGFILENAME)) {
-            $headers = $this->HEADERS . "\n";
-        }
         if ($fd = @fopen($this->LOGFILENAME, 'a')) {
-            if (@$headers) {
-                fwrite($fd, $headers);
+            if (!file_exists($this->LOGFILENAME)) {
+                fwrite($fd, $this->HEADERS . "\n");
             }
             $debugBacktrace = debug_backtrace();
             if (null === $line_n) {
