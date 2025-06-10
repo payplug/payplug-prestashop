@@ -62,11 +62,11 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
      *
      * @param mixed $token
      */
-    public function testWhenGivenTokenIsInvalidStringFormat($token)
+    public function testWhenGivenTokenIsInvalidArrayFormat($token)
     {
         $this->assertSame([
             'result' => false,
-            'message' => 'Invalid argument, $token must be a non empty string.',
+            'message' => 'Invalid argument, $token must be a non empty array.',
         ], $this->class->patchPaymentResource($this->resource_id, $token));
     }
 

@@ -286,7 +286,7 @@ class ApplepayPaymentMethod extends PaymentMethod
 
             return [
                 'result' => false,
-                'message' => 'Invalid argument, $token must be a non empty string.',
+                'message' => 'Invalid argument, $token must be a non empty array.',
             ];
         }
         if (!is_string($workflow) || !$workflow) {
