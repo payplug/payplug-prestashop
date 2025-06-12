@@ -36,8 +36,6 @@ class PayplugApplePayPaymentRequestModuleFrontController extends ModuleFrontCont
             ->getPaymentMethod('applepay')
             ->getRequest();
 
-        exit(json_encode([
-            'applePayPaymentRequest' => $request,
-        ]));
+        exit(json_encode($request));
     }
 }

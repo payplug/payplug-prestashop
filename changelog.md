@@ -1,4 +1,11 @@
 # Payplug module changelog
+
+## Version 4.18.0
+- Feature :
+  - [PRE-2758](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2678): Enable CB by default and expose brand selector in Apple Pay
+  - [PRE-2804](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2679): Enable Apple Pay on desktop
+  - [PRE-2805](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2680): Place order from ApplePay SDK
+
 ## Version 4.17.4
 - Bugfix :
   - [SMP-3156](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2680): Check getContainer avaibility to ensure symf service usage

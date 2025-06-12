@@ -440,7 +440,6 @@ class ApplepayPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        $additionalPaymentRequestDatas = [];
         $currency = $this->dependencies
             ->getPlugin()
             ->getCurrency()
@@ -524,50 +523,27 @@ class ApplepayPaymentMethod extends PaymentMethod
         $this->context->cart->id_carrier = $id_carrier;
 
         $applePayPaymentRequest = [
-            'countryCode' => $this->context->country->iso_code,
-            'currencyCode' => $currency->iso_code,
-            'merchantCapabilities' => [
-                'supports3DS',
-            ],
-            'supportedNetworks' => [
-                'visa',
-                'masterCard',
-                // 'amex', Amex is not supported yet by PayPlug
-                'discover',
-            ],
+            'country_code' => $this->context->country->iso_code,
+            'currency_code' => $currency->iso_code,
             'total' => [
                 'label' => $this->context->shop->name,
-                'type' => 'final',
                 'amount' => $this->dependencies
                     ->getPlugin()
                     ->getCart()
                     ->getOrderTotal((int) $this->context->cart->id, true, (int) $id_carrier),
             ],
-            'applicationData' => base64_encode(json_encode([
-                'apple_pay_domain' => $this->context->shop->domain_ssl,
-            ])),
+            'apple_pay_domain' => $this->context->shop->domain_ssl,
         ];
 
         // This assertion must be handled after to ensure that the updateAddresses method is correctly used
         // and the cart will be updated with the correct carrier ID.
         if ('checkout' != $workflow) {
             if (!empty($delivery_options)) {
-                $additionalPaymentRequestDatas['shippingMethods'] = $delivery_options;
+                $applePayPaymentRequest['carriers'] = $delivery_options;
             }
 
-            $additionalPaymentRequestDatas['requiredBillingContactFields'] = [
-                'postalAddress',
-                'name',
-            ];
-            $additionalPaymentRequestDatas['requiredShippingContactFields'] = [
-                'email',
-                'name',
-                'phone',
-                'postalAddress',
-            ];
-
             $lineItems = $this->getLinesItems($carrier ? [$carrier] : $delivery_options);
-            $additionalPaymentRequestDatas['lineItems'] = $lineItems;
+            $applePayPaymentRequest['line_items'] = $lineItems;
 
             // delete newly created address
             if (isset($new_address_id)) {
@@ -580,7 +556,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             }
         }
 
-        return array_merge($applePayPaymentRequest, $additionalPaymentRequestDatas);
+        return $applePayPaymentRequest;
     }
 
     /**
@@ -690,10 +666,10 @@ class ApplepayPaymentMethod extends PaymentMethod
             }
 
             $shipping_infos = [
-                'identifier' => $carrier->id,
-                'label' => $carrier->name,
-                'detail' => $carrier->delay,
-                'amount' => $this->context->cart->getPackageShippingCost($carrier->id),
+                'identifier' => (string) $carrier->id,
+                'label' => (string) $carrier->name,
+                'detail' => (string) $carrier->delay,
+                'amount' => (string) $this->context->cart->getPackageShippingCost($carrier->id),
             ];
             if ($default_carrier == $id_carrier
                 && !empty($shipping_methods)) {
@@ -804,13 +780,6 @@ class ApplepayPaymentMethod extends PaymentMethod
             return $payment_options;
         }
 
-        $browser = $this->dependencies->getPlugin()->getBrowser()->getName();
-        $isApplePayCompatible = $this->dependencies->getValidators()['browser']->isApplePayCompatible($browser);
-        if (!$isApplePayCompatible['result']) {
-            unset($payment_options[$this->name]);
-
-            return $payment_options;
-        }
         $payment_options[$this->name]['action'] = 'javascript:void(0)';
         $applepay_js_url = $this->dependencies
             ->getPlugin()
