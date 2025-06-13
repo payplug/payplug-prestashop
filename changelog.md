@@ -6,6 +6,8 @@
   - [PRE-2727](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2648): Create jwt from unify authentication
   - [PRE-2730](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2664): Unified authent admin ui
   - [PRE-2814](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2667): Fix double auth
+  - [PRE-2884](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2684): Display both connexion ways
+
 
 ## Version 4.18.0
 - Feature :
