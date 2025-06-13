@@ -180,12 +180,25 @@ class Translation
         return [
             'title' => $this->l('oauth.title', 'translation'),
             'description' => $this->l('oauth.description', 'translation'),
-            'text' => $this->l('oauth.text', 'translation'),
-            'register' => $this->l('oauth.register', 'translation'),
-            'connect' => $this->l('oauth.connect', 'translation'),
-            'portal' => [
-                'text' => $this->l('login.portal.text', 'translation'),
-                'button' => $this->l('login.portal.button', 'translation'),
+            'form' => [
+                'email' => [
+                    'label' => $this->l('oauth.form.email.label', 'translation'),
+                    'placeholder' => $this->l('oauth.form.email.placeholder', 'translation'),
+                ],
+                'password' => [
+                    'label' => $this->l('oauth.form.password.label', 'translation'),
+                    'placeholder' => $this->l('oauth.form.password.placeholder', 'translation'),
+                ],
+                'connexion' => $this->l('oauth.form.connexion', 'translation'),
+                'create_account' => $this->l('oauth.form.create_account', 'translation'),
+                'forgot_password' => $this->l('oauth.form.forgot_password', 'translation'),
+                'error' => $this->l('oauth.form.error', 'translation'),
+            ],
+            'sso' => [
+                'title' => $this->l('oauth.sso.title', 'translation'),
+                'description' => $this->l('oauth.sso.description', 'translation'),
+                'information' => $this->l('oauth.sso.information', 'translation'),
+                'button' => $this->l('oauth.sso.button', 'translation'),
             ],
         ];
     }

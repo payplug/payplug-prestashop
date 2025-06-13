@@ -475,38 +475,28 @@ class ApiRest
             ->getPlugin()
             ->getTranslationClass()
             ->getOauthLoginTranslations();
-        $register_link = $this->dependencies
-            ->getPlugin()
-            ->getRoutes()
-            ->getExternalUrl()['signup'];
-
-        $api = $this->module->getService('payplug.utilities.service.api');
         $context = $this->dependencies
             ->getPlugin()
             ->getContext()
             ->get();
-        $register_url = $api->getRegisterUrl($context->link->getAdminLink('AdminPayplug'));
-        $content = [
-            'description' => $translation['description'],
-            'link_create_account' => [
-                'text' => $translation['register'],
-                'url' => $register_link,
-                'target' => '_blank',
-            ],
-            'content_description' => $translation['text'],
-            'already_have_account' => $translation['connect'],
-            'link_portal' => [
-                'text' => $translation['portal']['button'],
-                'url' => $register_url['redirection'],
-            ],
-        ];
+        $title = $translation['title'];
+        unset($translation['title']);
+        $external_urls = $this->dependencies
+            ->getPlugin()
+            ->getRoutes()
+            ->getExternalUrl();
+        $translation['form']['create_account_url'] = $external_urls['signup'];
+        $translation['form']['forgot_password_url'] = $external_urls['forgot_password'];
+        $translation['sso']['button_url'] = $this->module
+            ->getService('payplug.utilities.service.api')
+            ->getRegisterUrl($context->link->getAdminLink('AdminPayplug'))['redirection'];
 
         return [
             'name' => 'oauthLogin',
-            'title' => $translation['title'],
+            'title' => $title,
             'descriptions' => [
-                'live' => $content,
-                'sandbox' => $content,
+                'live' => $translation,
+                'sandbox' => $translation,
             ],
         ];
     }
