@@ -132,7 +132,7 @@ class Routes
             'refund' => $default . '/articles/360022214692',
             'sandbox' => $default . '/articles/360021142492',
             'satispay' => $default . '/articles/8089121532700',
-            'signup' => 'https://portal.payplug.com/signup',
+            'signup' => 'https://portal.payplug.com/auth/signup',
         ];
     }
 }

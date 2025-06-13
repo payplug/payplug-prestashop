@@ -67,7 +67,6 @@ class Payplug extends PaymentModule
 
         parent::__construct();
 
-        $this->module = false;
         $this->controllers = [
             'AdminPayplug',
             'AdminPayPlugInstallment',
@@ -90,7 +89,6 @@ class Payplug extends PaymentModule
 
         if ($this->isValidPHPVersion()) {
             $this->setDependencies();
-            $this->setModule();
         }
     }
 
@@ -103,11 +101,9 @@ class Payplug extends PaymentModule
      */
     public function disable($force_all = false)
     {
-        if ($this->module) {
-            $dependencies = new DependenciesClass();
-
+        if ($this->payplug_dependencies) {
             return parent::disable($force_all)
-                && $dependencies
+                && $this->payplug_dependencies
                     ->getPlugin()
                     ->getConfigurationAction()
                     ->disableAction();
@@ -122,8 +118,7 @@ class Payplug extends PaymentModule
     public function getContent()
     {
         if (!$this->isValidInstallation()) {
-            $dependencies = new DependenciesClass();
-            $dependencies
+            $this->payplug_dependencies
                 ->getPlugin()
                 ->getConfigurationAction()
                 ->installAction();
@@ -188,7 +183,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionAdminControllerSetMedia()
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->actionAdminControllerSetMedia();
         }
     }
@@ -203,7 +198,7 @@ class Payplug extends PaymentModule
     public function hookActionClearCompileCache($params)
     {
         // todo: Rajouter le test de la table payplug cache avant d'executer ce code
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->actionClearCompileCache($params);
         }
     }
@@ -215,7 +210,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionDeleteGDPRCustomer($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->actionDeleteGDPRCustomer($params);
         }
     }
@@ -227,7 +222,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionExportGDPRData($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->actionExportGDPRData($params);
         }
     }
@@ -239,7 +234,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionObjectOrderHistoryAddAfter($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this
                 ->getService('payplug.models.classes.hook')
                 ->actionObjectOrderHistoryAddAfter($params);
@@ -253,15 +248,13 @@ class Payplug extends PaymentModule
      */
     public function hookActionObjectOrderStateAddAfter($params)
     {
-        if ($this->module) {
-            $dependencies = new DependenciesClass();
-
-            $type = $dependencies
+        if ($this->payplug_dependencies) {
+            $type = $this->payplug_dependencies
                 ->getPlugin()
                 ->getTools()
                 ->tool('getValue', 'order_state_type');
 
-            return $dependencies
+            return $this->payplug_dependencies
                 ->getPlugin()
                 ->getOrderStateAction()
                 ->saveTypeAction((int) $params['object']->id, $type);
@@ -270,22 +263,20 @@ class Payplug extends PaymentModule
 
     public function hookActionAdminLanguagesControllerSaveAfter($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->actionAdminLanguagesControllerSaveAfter($params);
         }
     }
 
     public function hookActionObjectOrderStateUpdateAfter($params)
     {
-        if ($this->module) {
-            $dependencies = new DependenciesClass();
-
-            $type = $dependencies
+        if ($this->payplug_dependencies) {
+            $type = $this->payplug_dependencies
                 ->getPlugin()
                 ->getTools()
                 ->tool('getValue', 'order_state_type');
 
-            return $dependencies
+            return $this->payplug_dependencies
                 ->getPlugin()
                 ->getOrderStateAction()
                 ->saveTypeAction((int) $params['object']->id, $type);
@@ -294,10 +285,8 @@ class Payplug extends PaymentModule
 
     public function hookActionObjectOrderStateDeleteAfter($params)
     {
-        if ($this->module) {
-            $dependencies = new DependenciesClass();
-
-            return $dependencies
+        if ($this->payplug_dependencies) {
+            return $this->payplug_dependencies
                 ->getPlugin()
                 ->getOrderStateAction()
                 ->deleteTypeAction($params);
@@ -311,7 +300,7 @@ class Payplug extends PaymentModule
      */
     public function hookActionUpdateLangAfter($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->actionUpdateLangAfter($params);
         }
     }
@@ -325,7 +314,7 @@ class Payplug extends PaymentModule
      */
     public function hookAdminOrder($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->adminOrder($params);
         }
     }
@@ -337,7 +326,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayCustomerAccount($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->customerAccount($params);
         }
     }
@@ -349,7 +338,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayAdminOrderMain($params)
     {
-        if ($this->module && $this->active) {
+        if ($this->payplug_dependencies && $this->active) {
             return $this->payplug_dependencies->hookClass->displayAdminOrderMain($params);
         }
     }
@@ -365,10 +354,8 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayAdminStatusesForm()
     {
-        if ($this->module) {
-            $dependencies = new DependenciesClass();
-
-            return $dependencies
+        if ($this->payplug_dependencies) {
+            return $this->payplug_dependencies
                 ->getPlugin()
                 ->getOrderStateAction()
                 ->renderOption();
@@ -382,7 +369,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayProductAdditionalInfo()
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->dependencies
                 ->getPlugin()
                 ->getCartAction()
@@ -398,9 +385,10 @@ class Payplug extends PaymentModule
     public function hookDisplayExpressCheckout()
     {
         $oneyCTA = '';
-        if ($this->module) {
-            $dependencies = new DependenciesClass();
-            $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
+        if ($this->payplug_dependencies) {
+            $configuration = $this->payplug_dependencies
+                ->getPlugin()
+                ->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_cart_cta')) {
                 // todo: this function should be splitted renderCartCTA and renderProductCTA
                 $oneyCTA = $dependencies
@@ -408,7 +396,7 @@ class Payplug extends PaymentModule
                     ->getOneyAction()
                     ->renderCTA();
             }
-            $paymentCTA = $dependencies
+            $paymentCTA = $this->payplug_dependencies
                 ->getPlugin()
                 ->getCartAction()
                 ->renderPaymentCTA();
@@ -424,12 +412,12 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayProductPriceBlock($params)
     {
-        if ($this->module) {
-            $configuration = $this->payplug_dependencies->dependencies->getPlugin()->getConfigurationClass();
+        if ($this->payplug_dependencies) {
+            $configuration = $this->payplug_dependencies
+                ->getPlugin()
+                ->getConfigurationClass();
             if ((bool) $configuration->getValue('oney_product_cta')) {
-                $dependencies = new DependenciesClass();
-
-                return $dependencies
+                return $this->payplug_dependencies
                     ->getPlugin()
                     ->getOneyAction()
                     ->renderCTA($params);
@@ -444,7 +432,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayHeader($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->displayHeader($params);
         }
     }
@@ -456,11 +444,13 @@ class Payplug extends PaymentModule
      */
     public function hookPaymentOptions()
     {
-        if ($this->module) {
-            $dependencies = new DependenciesClass();
-            $context = $dependencies->getPlugin()->getContext()->get();
+        if ($this->payplug_dependencies) {
+            $context = $this->payplug_dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get();
 
-            if (!$dependencies->configClass->isAllowed()) {
+            if (!$this->payplug_dependencies->configClass->isAllowed()) {
                 return false;
             }
 
@@ -471,13 +461,13 @@ class Payplug extends PaymentModule
             ]);
 
             // Données sous forme de tableau
-            $payment_options = $dependencies
+            $payment_options = $this->payplug_dependencies
                 ->getPlugin()
                 ->getPaymentMethodClass()
                 ->getPaymentOptionCollection();
 
             // Transforme tableau en object
-            return $dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);
+            return $this->payplug_dependencies->loadAdapterPresta()->displayPaymentOption($payment_options);
         }
     }
 
@@ -488,7 +478,7 @@ class Payplug extends PaymentModule
      */
     public function hookDisplayPaymentReturn($params)
     {
-        if ($this->module) {
+        if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->paymentReturn($params);
         }
     }
@@ -506,15 +496,14 @@ class Payplug extends PaymentModule
     {
         $flag = parent::install();
 
-        if ($this->module && $flag) {
-            $dependencies = new DependenciesClass();
-            $installation = $dependencies
+        if ($this->payplug_dependencies && $flag) {
+            $installation = $this->payplug_dependencies
                 ->getPlugin()
                 ->getConfigurationAction()
                 ->installAction();
 
             if (!$installation['result']) {
-                $this->errors[] = $dependencies
+                $this->errors[] = $this->payplug_dependencies
                     ->getPlugin()
                     ->getTools()
                     ->tool('displayError', $installation['message']);
@@ -565,9 +554,12 @@ class Payplug extends PaymentModule
      */
     public function runUpgradeModule()
     {
-        if ($this->module) {
-            $this->payplug_dependencies->getDependency('install')->checkOrderStates();
-            $helpers = $this->module->getHelpers();
+        if ($this->payplug_dependencies) {
+            $this->payplug_dependencies
+                ->getPlugin()
+                ->getInstall()
+                ->checkOrderStates();
+            $helpers = $this->payplug_dependencies->getHelpers();
             $helpers['files']::clean();
 
             // Call getAccount method to update countries and amounts configurations from merchant account
@@ -590,7 +582,7 @@ class Payplug extends PaymentModule
             'prices-drop',
         ];
         if (!in_array($page_name, $excluded_controllers)) {
-            $this->payplug_dependencies = new PayPlug\classes\PayPlugDependencies();
+            $this->payplug_dependencies = new DependenciesClass();
         }
     }
 
@@ -603,9 +595,8 @@ class Payplug extends PaymentModule
      */
     public function uninstall()
     {
-        if ($this->module) {
-            $dependencies = new DependenciesClass();
-            $uninstall = $dependencies
+        if ($this->payplug_dependencies) {
+            $uninstall = $this->payplug_dependencies
                 ->getPlugin()
                 ->getConfigurationAction()
                 ->uninstallAction();
@@ -644,12 +635,5 @@ class Payplug extends PaymentModule
             'displayHeader',
             'paymentOptions',
         ];
-    }
-
-    private function setModule()
-    {
-        if ($this->payplug_dependencies) {
-            $this->module = $this->payplug_dependencies->dependencies;
-        }
     }
 }
