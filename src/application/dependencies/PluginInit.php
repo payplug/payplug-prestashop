@@ -82,7 +82,6 @@ use PayPlug\src\repositories\OrderStateRepository;
 use PayPlug\src\repositories\SQLtableRepository;
 use PayPlug\src\repositories\TranslationsRepository;
 use PayPlug\src\utilities\services\API;
-use PayPlug\src\utilities\services\Browser;
 use PayPlug\src\utilities\services\MerchantTelemetry;
 use PayPlug\src\utilities\services\Routes;
 
@@ -172,7 +171,6 @@ class PluginInit extends BaseClass
 
     // Utilities services
     private $api;
-    private $browser;
     private $routes;
     private $merchant_telemetry;
 
@@ -191,7 +189,6 @@ class PluginInit extends BaseClass
         $this->plugin
             ->setApiVersion('2019-08-06')
             ->setApiService($this->api)
-            ->setBrowser($this->browser)
             ->setCache($this->cache)
             ->setMerchantTelemetry($this->merchant_telemetry)
             ->setInstall($this->install)
@@ -409,7 +406,6 @@ class PluginInit extends BaseClass
     private function setServices()
     {
         $this->api = new API($this->dependencies);
-        $this->browser = new Browser();
         $this->routes = new Routes();
         $this->merchant_telemetry = new MerchantTelemetry();
     }

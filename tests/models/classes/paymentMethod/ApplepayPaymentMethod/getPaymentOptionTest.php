@@ -22,48 +22,9 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
         $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
-    public function testWhenCurrentBrowserIsInvalid()
+    public function testWhenPaymentOptionIsGetted()
     {
         $payment_options = [];
-        $browser = \Mockery::mock('Browser');
-        $browser->shouldReceive([
-            'getName' => 'browser',
-        ]);
-        $this->plugin->shouldReceive([
-            'getBrowser' => $browser,
-        ]);
-        $this->validators['browser']->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => false,
-            ],
-        ]);
-
-        $this->configuration->shouldReceive('getValue')
-            ->with('countries')
-            ->andReturn('{}');
-        $this->configuration->shouldReceive('getValue')
-            ->with('applepay_display')
-            ->andReturn('{"checkout":true,"cart":false,"product":false}');
-
-        $this->assertSame([], $this->class->getPaymentOption($payment_options));
-    }
-
-    public function testWhenCurrentBrowserIsValid()
-    {
-        $payment_options = [];
-        $browser = \Mockery::mock('Browser');
-        $browser->shouldReceive([
-            'getName' => 'browser',
-        ]);
-        $this->plugin->shouldReceive([
-            'getBrowser' => $browser,
-        ]);
-        $this->validators['browser']->shouldReceive([
-            'isApplePayCompatible' => [
-                'result' => true,
-            ],
-        ]);
-
         $this->configuration->shouldReceive('getValue')
             ->with('countries')
             ->andReturn('{}');

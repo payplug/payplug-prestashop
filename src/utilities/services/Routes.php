@@ -81,7 +81,7 @@ class Routes
     public function getSourceUrl()
     {
         return [
-            'applepay' => 'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
+            'applepay' => 'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js',
             'embedded' => $this->getApiUrl() . '/js/1/form.latest.js',
             'integrated' => $this->getCDNUrl() . '/js/integrated-payment/v1@1/index.js',
         ];
