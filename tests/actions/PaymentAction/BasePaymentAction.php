@@ -22,6 +22,8 @@ class BasePaymentAction extends TestCase
     protected $context;
     protected $dependencies;
     protected $logger;
+    protected $module;
+    protected $module_adapter;
     protected $order_class;
     protected $payment_method;
     protected $payment_method_class;
@@ -64,6 +66,16 @@ class BasePaymentAction extends TestCase
             'addLog' => true,
         ]);
 
+        $this->module = \Mockery::mock('Module');
+        $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->module_adapter->shouldReceive([
+            'getInstanceByName' => $this->module,
+        ]);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.api')
+            ->andReturn($this->api_service);
+
         $this->order_class = \Mockery::mock('OrderClass');
 
         $this->payment_method_class = \Mockery::mock(PaymentMethod::class, [$this->dependencies])->makePartial();
@@ -74,12 +86,12 @@ class BasePaymentAction extends TestCase
         $this->payment_repository = \Mockery::mock('PaymentRepository');
 
         $this->plugin->shouldReceive([
-            'getApiService' => $this->api_service,
             'getCart' => $this->cartAdapter,
             'getContext' => $this->context,
             'getLogger' => $this->logger,
             'getTools' => $this->toolsAdapter,
             'getConfigurationClass' => $this->configuration,
+            'getModule' => $this->module_adapter,
             'getOrderClass' => $this->order_class,
             'getPaymentMethodClass' => $this->payment_method_class,
             'getPaymentRepository' => $this->payment_repository,

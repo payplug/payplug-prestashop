@@ -5,15 +5,15 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
 /**
  * @group unit
  * @group class
- * @group payment_method_classe
- * @group oney_payment_method_classe
+ * @group payment_method_class
+ * @group oney_payment_method_class
  *
  * @runTestsInSeparateProcesses
  */
 class getPaymentTabTest extends BaseOneyPaymentMethod
 {
-    private $expected_tab;
-    private $oney;
+    public $expected_tab;
+    public $oney;
 
     public function setUp()
     {

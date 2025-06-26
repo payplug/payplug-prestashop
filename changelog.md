@@ -1,5 +1,10 @@
 # Payplug module changelog
 
+## Version 4.19.0
+- Feature :
+  - [PRE-2835](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2685): Display oney on checkout in if cart is elligible
+  - [PRE-2987](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2697): Deploy Unify authentication
+
 ## Version 4.18.0
 - Feature :
   - [PRE-2758](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2678): Enable CB by default and expose brand selector in Apple Pay

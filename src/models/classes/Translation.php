@@ -128,10 +128,10 @@ class Translation
             'inactive' => [
                 'modal' => [
                     'title' => $this->l('logged.inactive.modal.title', 'translation'),
-                    'description' => $this->l('logged.inactive.modal.description', 'translation'),
-                    'password_label' => $this->l('logged.inactive.modal.password_label', 'translation'),
+                    'description_1' => $this->l('logged.inactive.modal.description_1', 'translation'),
+                    'description_2' => $this->l('logged.inactive.modal.description_2', 'translation'),
                     'cancel' => $this->l('logged.inactive.modal.cancel', 'translation'),
-                    'ok' => $this->l('logged.inactive.modal.ok', 'translation'),
+                    'oauth' => $this->l('logged.inactive.modal.oauth', 'translation'),
                     'error' => $this->l('logged.inactive.modal.error', 'translation'),
                 ],
                 'account' => [
@@ -168,6 +168,38 @@ class Translation
             'connect' => $this->l('login.connect', 'translation'),
             'forgot_password' => $this->l('login.forgot_password', 'translation'),
             'login_error' => $this->l('login.error', 'translation'),
+            'portal' => [
+                'text' => $this->l('login.portal.text', 'translation'),
+                'button' => $this->l('login.portal.button', 'translation'),
+            ],
+        ];
+    }
+
+    public function getOauthLoginTranslations()
+    {
+        return [
+            'title' => $this->l('oauth.title', 'translation'),
+            'description' => $this->l('oauth.description', 'translation'),
+            'form' => [
+                'email' => [
+                    'label' => $this->l('oauth.form.email.label', 'translation'),
+                    'placeholder' => $this->l('oauth.form.email.placeholder', 'translation'),
+                ],
+                'password' => [
+                    'label' => $this->l('oauth.form.password.label', 'translation'),
+                    'placeholder' => $this->l('oauth.form.password.placeholder', 'translation'),
+                ],
+                'connexion' => $this->l('oauth.form.connexion', 'translation'),
+                'create_account' => $this->l('oauth.form.create_account', 'translation'),
+                'forgot_password' => $this->l('oauth.form.forgot_password', 'translation'),
+                'error' => $this->l('oauth.form.error', 'translation'),
+            ],
+            'sso' => [
+                'title' => $this->l('oauth.sso.title', 'translation'),
+                'description' => $this->l('oauth.sso.description', 'translation'),
+                'information' => $this->l('oauth.sso.information', 'translation'),
+                'button' => $this->l('oauth.sso.button', 'translation'),
+            ],
         ];
     }
 

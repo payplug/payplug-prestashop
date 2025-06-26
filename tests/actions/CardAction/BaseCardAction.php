@@ -20,6 +20,8 @@ class BaseCardAction extends TestCase
     public $dependencies;
     public $logger;
     public $plugin;
+    public $module;
+    public $module_adapter;
 
     public function setUp()
     {
@@ -37,12 +39,23 @@ class BaseCardAction extends TestCase
         ]);
 
         $this->plugin = \Mockery::mock('Plugin');
+
+        $this->module = \Mockery::mock('Module');
+        $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->module_adapter->shouldReceive([
+            'getInstanceByName' => $this->module,
+        ]);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.api')
+            ->andReturn($this->api_service);
+
         $this->plugin->shouldReceive([
-            'getApiService' => $this->api_service,
             'getCardRepository' => $this->card_repository,
             'getConfigurationClass' => $this->configuration_class,
             'getContext' => $this->context,
             'getLogger' => $this->logger,
+            'getModule' => $this->module_adapter,
         ]);
 
         $this->card_validator = \Mockery::mock('CardValidator');

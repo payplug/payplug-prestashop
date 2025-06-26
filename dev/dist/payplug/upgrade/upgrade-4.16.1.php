@@ -28,7 +28,7 @@ function upgrade_module_4_16_1($object)
 {
     $flag = true;
 
-    $logger = $object->module->getPlugin()->getLogger();
+    $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.16.1');
 
     $new_hooks = [
