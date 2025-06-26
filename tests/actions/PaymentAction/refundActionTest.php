@@ -17,7 +17,6 @@ class refundActionTest extends BasePaymentAction
     public $amount;
     public $id_customer;
     public $id_order;
-    public $update_order_state;
 
     public function setUp()
     {
@@ -27,7 +26,6 @@ class refundActionTest extends BasePaymentAction
         $this->amount = 4242;
         $this->id_customer = 1;
         $this->id_order = 2;
-        $this->update_order_state = false;
 
         $this->translation = \Mockery::mock(Translation::class, [$this->dependencies])->makePartial();
         $this->translation->shouldReceive('l')
@@ -52,7 +50,7 @@ class refundActionTest extends BasePaymentAction
                 'result' => false,
                 'message' => 'refund.error.format',
             ],
-            $this->action->refundAction($resource_id, $this->amount, $this->id_customer, $this->id_order, $this->update_order_state)
+            $this->action->refundAction($resource_id, $this->amount, $this->id_customer, $this->id_order)
         );
     }
 
@@ -68,7 +66,7 @@ class refundActionTest extends BasePaymentAction
                 'result' => false,
                 'message' => 'refund.error.format',
             ],
-            $this->action->refundAction($this->resource_id, $amount, $this->id_customer, $this->id_order, $this->update_order_state)
+            $this->action->refundAction($this->resource_id, $amount, $this->id_customer, $this->id_order)
         );
     }
 
@@ -84,7 +82,7 @@ class refundActionTest extends BasePaymentAction
                 'result' => false,
                 'message' => 'refund.error.default',
             ],
-            $this->action->refundAction($this->resource_id, $this->amount, $id_customer, $this->id_order, $this->update_order_state)
+            $this->action->refundAction($this->resource_id, $this->amount, $id_customer, $this->id_order)
         );
     }
 
@@ -100,23 +98,7 @@ class refundActionTest extends BasePaymentAction
                 'result' => false,
                 'message' => 'refund.error.default',
             ],
-            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $id_order, $this->update_order_state)
-        );
-    }
-
-    /**
-     * @dataProvider invalidBoolFormatDataProvider
-     *
-     * @param mixed $update_order_state
-     */
-    public function testWhenGivenUpdateOrderStateIsntValidInteger($update_order_state)
-    {
-        $this->assertSame(
-            [
-                'result' => false,
-                'message' => 'refund.error.default',
-            ],
-            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order, $update_order_state)
+            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $id_order)
         );
     }
 
@@ -130,7 +112,7 @@ class refundActionTest extends BasePaymentAction
                 'result' => false,
                 'message' => 'refund.error.default',
             ],
-            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order, $this->update_order_state)
+            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order)
         );
     }
 
@@ -162,7 +144,7 @@ class refundActionTest extends BasePaymentAction
                 'result' => false,
                 'message' => 'refund.error.format',
             ],
-            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order, $this->update_order_state)
+            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order)
         );
     }
 
@@ -198,7 +180,7 @@ class refundActionTest extends BasePaymentAction
                 'result' => false,
                 'message' => 'refund.error.default',
             ],
-            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order, $this->update_order_state)
+            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order)
         );
     }
 
@@ -234,6 +216,10 @@ class refundActionTest extends BasePaymentAction
             ->shouldReceive('getValue')
             ->with('order_state_refund')
             ->andReturn('42');
+        $this->configuration
+            ->shouldReceive('getValue')
+            ->with('PS_CHECKOUT_STATE_PARTIALLY_REFUNDED')
+            ->andReturn('43');
         $order_adapter = \Mockery::mock('OrderAdapter');
         $order_adapter->shouldReceive([
             'get' => OrderMock::get(),
@@ -310,7 +296,7 @@ class refundActionTest extends BasePaymentAction
                 'modal' => 'render_modal_template',
                 'reload' => false,
             ],
-            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order, $this->update_order_state)
+            $this->action->refundAction($this->resource_id, $this->amount, $this->id_customer, $this->id_order)
         );
     }
 }

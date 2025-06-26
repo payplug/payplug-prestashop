@@ -135,7 +135,7 @@ class OrderStateRepository extends BaseClass
 
         // Get order state id with given configuration key
         if (!$id_order_state && !$sandbox && isset($state['cfg']) && $state['cfg']) {
-            $id_order_state = $this->dependencies->getPlugin()->getConfiguration()->get($state['cfg']);
+            $id_order_state = $this->configuration->getValue($state['cfg']);
             if ($id_order_state) {
                 // Valide order state
                 $os = $this->order_state_adapter->get((int) $id_order_state);
@@ -171,6 +171,17 @@ class OrderStateRepository extends BaseClass
         if (!$this->validate->validate('isLoadedObject', $order_state)
             || (isset($order_state->deleted) && $order_state->deleted)) {
             $id_order_state = $this->add($name, $state, $sandbox);
+        }
+
+        // If state is relate to a missing "native" configuration
+        if (isset($state['cfg']) && $state['cfg'] && !$sandbox) {
+            $id_order_state_cfg = $this->configuration->getValue($state['cfg']);
+            if (!$id_order_state_cfg) {
+                $this->dependencies
+                    ->getPlugin()
+                    ->getConfiguration()
+                    ->updateValue($state['cfg'], (string) $id_order_state);
+            }
         }
 
         return $this->configuration->set($key_config, (string) $id_order_state);

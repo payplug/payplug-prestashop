@@ -98,7 +98,6 @@ class AdminPayplugController extends ModuleAdminController
                 $resource_id = $this->tools->tool('getValue', 'resource_id');
                 $id_customer = $this->tools->tool('getValue', 'id_customer');
                 $id_order = $this->tools->tool('getValue', 'id_order');
-                $update_order_state = $this->tools->tool('getValue', 'update_order_state');
                 $refund = $this->dependencies
                     ->getPlugin()
                     ->getPaymentAction()
@@ -106,8 +105,7 @@ class AdminPayplugController extends ModuleAdminController
                         (string) $resource_id,
                         (int) $amount_formated,
                         (int) $id_customer,
-                        (int) $id_order,
-                        (bool) $update_order_state
+                        (int) $id_order
                     );
 
                 exit(json_encode($refund));

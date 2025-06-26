@@ -227,6 +227,7 @@ class OrderStateAction
             'PS_OS_SHIPPING' => 'nothing',
             'PS_OS_REFUND' => 'refund',
             'PS_OS_WS_PAYMENT' => 'nothing',
+            'PS_CHECKOUT_STATE_PARTIALLY_REFUNDED' => 'refund',
         ];
         foreach ($prestashop_order_states as $config_key => $type) {
             $id_order_state = $configuration->getValue($config_key);
