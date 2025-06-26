@@ -24,7 +24,7 @@ class deleteEntityTest extends BaseEntityRepository
         $this->assertFalse($this->repository->deleteEntity($this->entity_id));
     }
 
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([

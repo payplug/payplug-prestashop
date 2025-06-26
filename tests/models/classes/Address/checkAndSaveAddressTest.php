@@ -11,7 +11,7 @@ use PayPlug\tests\mock\AddressMock;
  */
 class checkAndSaveAddressTest extends BaseAddress
 {
-    private $user_address;
+    public $user_address;
 
     public function setUp()
     {

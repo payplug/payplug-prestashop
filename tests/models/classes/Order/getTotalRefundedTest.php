@@ -11,10 +11,10 @@ use PayPlug\tests\mock\OrderMock;
  */
 class getTotalRefundedTest extends BaseOrder
 {
-    private $id_order;
-    private $order_adapter;
-    private $order_slip_adapter;
-    private $validate_adapter;
+    public $id_order;
+    public $order_adapter;
+    public $order_slip_adapter;
+    public $validate_adapter;
 
     public function setUp()
     {
@@ -43,7 +43,7 @@ class getTotalRefundedTest extends BaseOrder
         $this->assertSame(0, $this->class->getTotalRefunded($id_order));
     }
 
-    public function testWhenGettedOrderIsNotValidate()
+    public function testWhenGotOrderIsNotValidate()
     {
         $this->validate_adapter->shouldReceive([
             'validate' => false,

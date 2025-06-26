@@ -23,24 +23,16 @@ class uninstallTabActionTest extends BaseConfigurationAction
 
     public function testWhenRetrieveModuleHasntAdminController()
     {
-        $module = new \stdClass();
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
         $this->assertTrue($this->action->installTabAction());
     }
 
     public function testWhenAdminControllerCantBeFound()
     {
-        $module = new \stdClass();
-        $module->adminControllers = [
+        $this->module->adminControllers = [
             [
                 'className' => 'AdminController',
             ],
         ];
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
         $this->tab_adapter->shouldReceive([
             'getIdFromClassName' => false,
         ]);
@@ -49,15 +41,11 @@ class uninstallTabActionTest extends BaseConfigurationAction
 
     public function testWhenTabCantBeFound()
     {
-        $module = new \stdClass();
-        $module->adminControllers = [
+        $this->module->adminControllers = [
             [
                 'className' => 'AdminController',
             ],
         ];
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
         $this->tab_adapter->shouldReceive([
             'getIdFromClassName' => true,
         ]);
@@ -73,15 +61,11 @@ class uninstallTabActionTest extends BaseConfigurationAction
 
     public function testWhenTabCantBeDeleted()
     {
-        $module = new \stdClass();
-        $module->adminControllers = [
+        $this->module->adminControllers = [
             [
                 'className' => 'AdminController',
             ],
         ];
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
         $this->tab_adapter->shouldReceive([
             'getIdFromClassName' => true,
         ]);
@@ -100,15 +84,11 @@ class uninstallTabActionTest extends BaseConfigurationAction
 
     public function testWhenTabIsUninstalled()
     {
-        $module = new \stdClass();
-        $module->adminControllers = [
+        $this->module->adminControllers = [
             [
                 'className' => 'AdminController',
             ],
         ];
-        $this->module->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
         $this->tab_adapter->shouldReceive([
             'getIdFromClassName' => true,
         ]);

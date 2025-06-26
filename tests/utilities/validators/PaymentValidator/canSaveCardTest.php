@@ -16,7 +16,7 @@ class canSaveCardTest extends TestCase
 {
     use FormatDataProvider;
 
-    private $validator;
+    public $validator;
 
     public function setUp()
     {

@@ -37,7 +37,7 @@ class renderDetailTest extends BaseOrderAction
         );
     }
 
-    public function testWhenRelatedOrderCantBeGetted()
+    public function testWhenRelatedOrderCantBeGot()
     {
         $order_id = 42;
         $this->order_adapter->shouldReceive([

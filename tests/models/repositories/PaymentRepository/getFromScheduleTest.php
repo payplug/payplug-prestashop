@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\repositories\PaymentRepository;
  */
 class getFromScheduleTest extends BasePaymentRepository
 {
-    private $resource_id;
+    public $resource_id;
 
     public function setUp()
     {

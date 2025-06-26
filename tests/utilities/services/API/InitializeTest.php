@@ -9,14 +9,14 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class InitializeTest extends BaseApi
 {
-    private $configuration_class;
-    private $merchant;
-    private $module;
-    private $module_adapter;
-    private $jwt;
-    private $logger;
-    private $token;
-    private $client_data;
+    public $configuration_class;
+    public $merchant;
+    public $module;
+    public $module_adapter;
+    public $jwt;
+    public $logger;
+    public $token;
+    public $oauth_client_data;
 
     public function setUp()
     {
@@ -31,7 +31,7 @@ class InitializeTest extends BaseApi
                 'expires_date' => 1729753256,
             ],
         ];
-        $this->client_data = [
+        $this->oauth_client_data = [
             'test' => [
                 'client_id' => 'client_id_test',
                 'client_secret' => 'client_secret_test',
@@ -114,7 +114,7 @@ class InitializeTest extends BaseApi
         );
     }
 
-    public function testWhenJWTIsExpiredAndCantBeGetted()
+    public function testWhenJWTIsExpiredAndCantBeGot()
     {
         $this->configuration_class
             ->shouldReceive('getValue')
@@ -127,8 +127,8 @@ class InitializeTest extends BaseApi
             ->andReturn(json_encode($this->jwt));
         $this->configuration_class
             ->shouldReceive('getValue')
-            ->with('client_data')
-            ->andReturn(json_encode($this->client_data));
+            ->with('oauth_client_data')
+            ->andReturn(json_encode($this->oauth_client_data));
         $this->merchant->shouldReceive([
             'generateJWT' => false,
         ]);
@@ -152,12 +152,13 @@ class InitializeTest extends BaseApi
             ->andReturn(json_encode($this->jwt));
         $this->configuration_class
             ->shouldReceive('getValue')
-            ->with('client_data')
-            ->andReturn(json_encode($this->client_data));
+            ->with('oauth_client_data')
+            ->andReturn(json_encode($this->oauth_client_data));
+        $this->configuration_class->shouldReceive([
+            'set' => false,
+        ]);
         $this->merchant->shouldReceive([
-            'generateJWT' => [
-                'data' => $this->jwt,
-            ],
+            'generateJWT' => ['data' => $this->jwt],
             'registerJWT' => false,
         ]);
 
@@ -180,12 +181,13 @@ class InitializeTest extends BaseApi
             ->andReturn(json_encode($this->jwt));
         $this->configuration_class
             ->shouldReceive('getValue')
-            ->with('client_data')
-            ->andReturn(json_encode($this->client_data));
+            ->with('oauth_client_data')
+            ->andReturn(json_encode($this->oauth_client_data));
+        $this->configuration_class->shouldReceive([
+            'set' => false,
+        ]);
         $this->merchant->shouldReceive([
-            'generateJWT' => [
-                'data' => $this->jwt,
-            ],
+            'generateJWT' => ['data' => $this->jwt],
             'registerJWT' => true,
         ]);
 

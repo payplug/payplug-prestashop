@@ -10,8 +10,8 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
  */
 class getPaymentTabTest extends BaseOneyPaymentMethod
 {
-    private $expected_tab;
-    private $oney;
+    public $expected_tab;
+    public $oney;
 
     public function setUp()
     {

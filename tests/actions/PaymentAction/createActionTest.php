@@ -11,9 +11,9 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class createActionTest extends BasePaymentAction
 {
-    private $method;
-    private $payment_tab;
-    private $stored_resource;
+    public $method;
+    public $payment_tab;
+    public $stored_resource;
 
     public function setUp()
     {

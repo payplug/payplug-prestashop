@@ -53,6 +53,14 @@ class getReturnUrlTest extends BaseInstallmentPaymentMethod
     public function testWhenReturnUrlIsReturned()
     {
         $this->class->set('name', 'installment');
+        $regex_validator = \Mockery::mock('RegexValidator');
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.validator.regex')
+            ->andReturn($regex_validator);
+        $regex_validator->shouldReceive([
+            'isMobileDevice' => false,
+        ]);
         $this->payment_repository->shouldReceive([
             'getBy' => [
                 'id_payplug_payment' => 42,

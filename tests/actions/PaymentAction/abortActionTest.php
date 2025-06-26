@@ -266,7 +266,7 @@ class abortActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenNoStoredPaymentCantBeGetted()
+    public function testWhenNoStoredPaymentCantBeGot()
     {
         $order_id = 42;
         $resource_id = 'inst_azerty';

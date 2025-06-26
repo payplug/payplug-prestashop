@@ -34,7 +34,7 @@ class updateEntityTest extends BaseEntityRepository
         $this->assertFalse($this->repository->updateEntity($this->entity_id, $this->entity_fields));
     }
 
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([

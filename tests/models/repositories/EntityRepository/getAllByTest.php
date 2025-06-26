@@ -34,7 +34,7 @@ class getAllByTest extends BaseEntityRepository
         $this->assertSame([], $this->repository->getAllBy($this->entity_key, $this->entity_value));
     }
 
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([
@@ -53,7 +53,7 @@ class getAllByTest extends BaseEntityRepository
         $this->assertSame([], $this->repository->getAllBy($entity_key, $this->entity_value));
     }
 
-    public function testWhenEntityCollectionCantBeGetted()
+    public function testWhenEntityCollectionCantBeGot()
     {
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([
@@ -68,7 +68,7 @@ class getAllByTest extends BaseEntityRepository
         $this->assertSame([], $this->repository->getAllBy($this->entity_key, $this->entity_value));
     }
 
-    public function testWhenEntityCollectionIsGetted()
+    public function testWhenEntityCollectionIsGot()
     {
         $this->repository->entity_name = 'EntityObject';
         $collection = [

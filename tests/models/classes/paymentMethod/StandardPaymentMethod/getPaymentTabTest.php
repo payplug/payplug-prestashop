@@ -10,7 +10,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
  */
 class getPaymentTabTest extends BaseStandardPaymentMethod
 {
-    private $expected_tab;
+    public $expected_tab;
 
     public function setUp()
     {

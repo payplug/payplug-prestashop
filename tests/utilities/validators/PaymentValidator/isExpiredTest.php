@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class isExpiredTest extends TestCase
 {
-    private $validator;
+    public $validator;
 
     public function setUp()
     {

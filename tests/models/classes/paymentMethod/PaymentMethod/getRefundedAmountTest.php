@@ -13,7 +13,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class getRefundedAmountTest extends BasePaymentMethod
 {
-    private $resource_id;
+    public $resource_id;
 
     public function setUp()
     {

@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class deleteFromDateTest extends BaseLoggerRepository
 {
-    private $date;
+    public $date;
 
     public function setUp()
     {
@@ -33,7 +33,7 @@ class deleteFromDateTest extends BaseLoggerRepository
         $this->assertFalse($this->repository->deleteFromDate($this->date));
     }
 
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->shouldReceive([
             'getEntityObject' => null,

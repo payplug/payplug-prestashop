@@ -12,7 +12,7 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class addInstallmentSchedulesTest extends BaseInstallmentPaymentMethod
 {
-    private $retrieve;
+    public $retrieve;
 
     public function setUp()
     {

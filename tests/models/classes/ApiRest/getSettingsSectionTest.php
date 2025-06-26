@@ -59,16 +59,10 @@ class getSettingsSectionTest extends BaseApiRest
 
     public function testWhenGivenEmailIsFalse()
     {
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive([
-            'checkPsAccount' => true,
-        ]);
-        $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => '',
             'logged' => true,
             'mode' => 1,
-            'psaccount' => true,
         ];
         $this->assertSame(
             $current_configuration,
@@ -78,11 +72,6 @@ class getSettingsSectionTest extends BaseApiRest
 
     public function testWhenNoEmailGiven()
     {
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive([
-            'checkPsAccount' => true,
-        ]);
-        $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'logged' => true,
             'mode' => 1,
@@ -92,7 +81,6 @@ class getSettingsSectionTest extends BaseApiRest
                 'email' => '',
                 'logged' => true,
                 'mode' => 1,
-                'psaccount' => true,
             ],
             $this->class->getSettingsSection($current_configuration)
         );
@@ -100,16 +88,10 @@ class getSettingsSectionTest extends BaseApiRest
 
     public function testWhenGivenLoggedIsFalse()
     {
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive([
-            'checkPsAccount' => true,
-        ]);
-        $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
             'logged' => false,
             'mode' => 1,
-            'psaccount' => true,
         ];
         $this->assertSame(
             $current_configuration,
@@ -119,11 +101,6 @@ class getSettingsSectionTest extends BaseApiRest
 
     public function testWhenNoLoggedGiven()
     {
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive([
-            'checkPsAccount' => true,
-        ]);
-        $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
             'mode' => 1,
@@ -134,7 +111,6 @@ class getSettingsSectionTest extends BaseApiRest
                 'email' => 'unit.test@payplug.com',
                 'logged' => false,
                 'mode' => 1,
-                'psaccount' => true,
             ],
             $this->class->getSettingsSection($current_configuration)
         );
@@ -145,16 +121,10 @@ class getSettingsSectionTest extends BaseApiRest
      */
     public function testWhenPsaccountIsntConnected()
     {
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive([
-            'checkPsAccount' => false,
-        ]);
-        $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
             'logged' => false,
             'mode' => 1,
-            'psaccount' => false,
         ];
         $this->assertSame(
             $current_configuration,
@@ -167,16 +137,10 @@ class getSettingsSectionTest extends BaseApiRest
      */
     public function testWhenPsaccountIsConnected()
     {
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive([
-            'checkPsAccount' => true,
-        ]);
-        $this->dependencies->configClass = $configClass;
         $current_configuration = [
             'email' => 'unit.test@payplug.com',
             'logged' => false,
             'mode' => 1,
-            'psaccount' => true,
         ];
         $this->assertSame(
             $current_configuration,
@@ -189,14 +153,6 @@ class getSettingsSectionTest extends BaseApiRest
      */
     public function testNotLoggedWhenPsaccountIsntConnected()
     {
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive(
-            [
-                'checkPsAccount' => false,
-            ]
-        );
-        $this->dependencies->configClass = $configClass;
-
         $configurationClass = \Mockery::mock('ConfigurationClass');
         $current_configuration = [
         ];

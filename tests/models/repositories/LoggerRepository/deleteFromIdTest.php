@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class deleteFromIdTest extends BaseLoggerRepository
 {
-    private $last_id;
+    public $last_id;
 
     public function setUp()
     {
@@ -33,7 +33,7 @@ class deleteFromIdTest extends BaseLoggerRepository
         $this->assertFalse($this->repository->deleteFromId($this->last_id));
     }
 
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->shouldReceive([
             'getEntityObject' => null,

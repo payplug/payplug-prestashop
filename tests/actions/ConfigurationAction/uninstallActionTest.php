@@ -11,9 +11,9 @@ use PayPlug\classes\MyLogPHP;
  */
 class uninstallActionTest extends BaseConfigurationAction
 {
-    private $card_action;
-    private $constant;
-    private $entity_repository;
+    public $card_action;
+    public $constant;
+    public $entity_repository;
 
     public function setUp()
     {

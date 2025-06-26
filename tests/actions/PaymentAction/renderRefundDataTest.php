@@ -9,8 +9,8 @@ namespace PayPlug\tests\actions\PaymentAction;
  */
 class renderRefundDataTest extends BasePaymentAction
 {
-    private $amount_refunded_payplug;
-    private $amount_available;
+    public $amount_refunded_payplug;
+    public $amount_available;
 
     public function setUp()
     {

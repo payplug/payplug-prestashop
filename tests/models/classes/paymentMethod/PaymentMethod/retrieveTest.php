@@ -13,7 +13,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class retrieveTest extends BasePaymentMethod
 {
-    private $stored_payment;
+    public $stored_payment;
 
     public function setUp()
     {

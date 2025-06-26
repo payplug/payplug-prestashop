@@ -7,10 +7,27 @@ use PayPlug\src\models\classes\ApiRest;
 /**
  * @group unit
  * @group class
- * @group apirest_classe
+ * @group apirest_class
  */
 class dispatchTest extends BaseApiRest
 {
+    public $module;
+    public $module_adapter;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->module = \Mockery::mock('Module');
+        $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->module_adapter->shouldReceive([
+            'getInstanceByName' => $this->module,
+        ]);
+        $this->plugin->shouldReceive([
+            'getModule' => $this->module_adapter,
+        ]);
+    }
+
     /**
      * @dataProvider invalidStringFormatDataProvider
      *

@@ -12,11 +12,15 @@ use PHPUnit\Framework\TestCase;
  */
 class getExternalUrlTest extends TestCase
 {
-    protected $service;
+    public $service;
+    public $dependencies;
 
     public function setUp()
     {
-        $this->service = new Routes();
+        $this->service = \Mockery::mock(Routes::class)
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $this->service->dependencies = $this->dependencies;
     }
 
     public function invalidStringFormatDataProvider()

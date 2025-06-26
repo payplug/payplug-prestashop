@@ -41,6 +41,8 @@ class BasePaymentMethod extends TestCase
     protected $dependencies;
     protected $helpers;
     protected $logger;
+    protected $module;
+    protected $module_adapter;
     protected $parent;
     protected $payment_method;
     protected $payment_method_class;
@@ -139,6 +141,16 @@ class BasePaymentMethod extends TestCase
             'getPaymentMethod' => $this->payment_method,
         ]);
 
+        $this->module = \Mockery::mock('PrestashopModule');
+        $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->module_adapter->shouldReceive([
+            'getInstanceByName' => $this->module,
+        ]);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.api')
+            ->andReturn($this->api_service);
+
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
         $this->country_adapter = \Mockery::mock('Country');
@@ -150,7 +162,6 @@ class BasePaymentMethod extends TestCase
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin->shouldReceive([
             'getAddress' => $this->address_adapter,
-            'getApiService' => $this->api_service,
             'getAssign' => $this->assign_adapter,
             'getCardRepository' => $this->card_repository,
             'getCarrier' => $this->carrier_adapter,
@@ -163,6 +174,7 @@ class BasePaymentMethod extends TestCase
             'getCountry' => $this->country_adapter,
             'getCurrency' => $this->currency_adapter,
             'getLogger' => $this->logger,
+            'getModule' => $this->module_adapter,
             'getPaymentMethodClass' => $this->payment_method_class,
             'getPaymentRepository' => $this->payment_repository,
             'getRoutes' => $this->routes,

@@ -11,7 +11,7 @@ use PayPlug\tests\mock\OneySimulationsMock;
  */
 class GetOneySimulationsTest extends BaseApi
 {
-    private $data;
+    public $data;
 
     public function setUp()
     {
@@ -73,7 +73,7 @@ class GetOneySimulationsTest extends BaseApi
         );
     }
 
-    public function testWhenOneyOperationAreGetted()
+    public function testWhenOneyOperationAreGot()
     {
         $this->service->shouldReceive([
             'initialize' => true,

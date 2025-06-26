@@ -5,21 +5,19 @@ namespace PayPlug\tests\models\classes\Merchant;
 /**
  * @group unit
  * @group class
- * @group merchant_classe
+ * @group merchant_class
  */
 class generateJWTTest extends BaseMerchant
 {
-    private $api_service;
-    private $client_datas;
-    private $client_id;
-    private $generated_jwt;
-    private $jwt;
+    public $oauth_client_data;
+    public $client_id;
+    public $generated_jwt;
+    public $jwt;
 
     public function setUp()
     {
         parent::setUp();
-        $this->api_service = \Mockery::mock('ApiService');
-        $this->client_datas = [
+        $this->oauth_client_data = [
             'test' => [
                 'client_id' => 'some_client_id_test',
                 'client_secret' => 'some_client_secret_test',
@@ -54,24 +52,21 @@ class generateJWTTest extends BaseMerchant
                 'token_type' => 'bearer',
             ],
         ];
-        $this->plugin->shouldReceive([
-            'getApiService' => $this->api_service,
-        ]);
     }
 
     /**
      * @dataProvider invalidArrayFormatDataProvider
      *
-     * * @param mixed $client_datas
+     * * @param mixed $oauth_client_data
      */
-    public function testWhenGivenClientDatasIsNotValidArray($client_datas)
+    public function testWhenGivenClientDatasIsNotValidArray($oauth_client_data)
     {
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Wrong $client_datas given',
+                'message' => 'Wrong $oauth_client_data given',
             ],
-            $this->class->generateJWT($client_datas)
+            $this->class->generateJWT($oauth_client_data)
         );
     }
 
@@ -89,7 +84,7 @@ class generateJWTTest extends BaseMerchant
                 'result' => false,
                 'message' => 'Error during JWT generation',
             ],
-            $this->class->generateJWT($this->client_datas)
+            $this->class->generateJWT($this->oauth_client_data)
         );
     }
 
@@ -103,7 +98,7 @@ class generateJWTTest extends BaseMerchant
                 'result' => true,
                 'data' => $this->jwt,
             ],
-            $this->class->generateJWT($this->client_datas)
+            $this->class->generateJWT($this->oauth_client_data)
         );
     }
 }

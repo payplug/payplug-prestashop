@@ -32,7 +32,7 @@ class getEntityTest extends BaseEntityRepository
     /**
      * Test case for handling scenario when entity object cannot be retrieved.
      */
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->entity_name = 'EntityObject';
         $this->repository->shouldReceive([

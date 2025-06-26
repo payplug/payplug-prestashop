@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class hasPermissionsTest extends TestCase
 {
-    private $paymentValidator;
+    public $paymentValidator;
 
     public function setUp()
     {

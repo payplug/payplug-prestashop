@@ -79,6 +79,15 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
             ->with('embedded_mode')
             ->andReturn('integrated');
 
+        $regex_validator = \Mockery::mock('RegexValidator');
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.validator.regex')
+            ->andReturn($regex_validator);
+        $regex_validator->shouldReceive([
+            'isMobileDevice' => false,
+        ]);
+
         $this->assertSame(
             [
                 'return_url' => 'https://secure-qa.payplug.com/pay/5ktNvd3BNCp6GPcqIZvY9j',
@@ -93,6 +102,15 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
     public function testWhenReturnUrlIsReturned()
     {
         $this->class->set('name', 'standard');
+        $regex_validator = \Mockery::mock('RegexValidator');
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.validator.regex')
+            ->andReturn($regex_validator);
+        $regex_validator->shouldReceive([
+            'isMobileDevice' => false,
+        ]);
+
         $this->payment_repository->shouldReceive([
             'getBy' => [
                 'id_payplug_payment' => 42,

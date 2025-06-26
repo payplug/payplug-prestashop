@@ -46,7 +46,7 @@ class captureActionTest extends BasePaymentAction
         );
     }
 
-    public function testWhenNoStoredPaymentCantBeGetted()
+    public function testWhenNoStoredPaymentCantBeGot()
     {
         $order_id = 42;
         $resource_id = 'pay_azerty12345';

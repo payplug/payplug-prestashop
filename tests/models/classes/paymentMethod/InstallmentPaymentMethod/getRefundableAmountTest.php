@@ -12,7 +12,7 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class getRefundableAmountTest extends BaseInstallmentPaymentMethod
 {
-    private $resource_id;
+    public $resource_id;
 
     public function setUp()
     {
