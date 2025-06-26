@@ -525,11 +525,10 @@ class PaymentAction
      * @param int $amount
      * @param int $id_customer
      * @param int $id_order
-     * @param bool $update_order_state
      *
      * @return array
      */
-    public function refundAction($resource_id = '', $amount = 0, $id_customer = 0, $id_order = 0, $update_order_state = false)
+    public function refundAction($resource_id = '', $amount = 0, $id_customer = 0, $id_order = 0)
     {
         $this->setParameters();
 
@@ -566,15 +565,6 @@ class PaymentAction
 
         if (!is_int($id_order) || !$id_order) {
             $this->logger->addLog('PaymentAction::refundAction - Invalid argument, $id_order must be a non null integer.', 'error');
-
-            return [
-                'result' => false,
-                'message' => $translations['error']['default'],
-            ];
-        }
-
-        if (!is_bool($update_order_state)) {
-            $this->logger->addLog('PaymentAction::refundAction - Invalid argument, $update_order_state must be valid boolean.', 'error');
 
             return [
                 'result' => false,
@@ -633,33 +623,58 @@ class PaymentAction
         $remaining_refundable_amount = $payment_method->getRefundableAmount($stored_resource['resource_id']);
         $refunded_amount = $payment_method->getRefundedAmount($stored_resource['resource_id']);
 
-        // If there is no remain amount, and so we considere the resource fully refund, or $update_order_state is true
+        // If there is no remain amount, and so we considere the resource fully refund
         // and a refund has been done
         // then we update the current order
         $reload = false;
         $refund_error = isset($refund['resource']->object) && 'error' == $refund['resource']->object;
-        if ((!$remaining_refundable_amount || $update_order_state) && !$refund_error) {
-            $state_addons = $refund['resource']->is_live ? '' : '_test';
-            $new_state = (int) $this->plugin->getConfigurationClass()->getValue('order_state_refund' . $state_addons);
-            $order = $this->plugin
-                ->getOrder()
-                ->get((int) $id_order);
-
-            if ($this->plugin->getValidate()->validate('isLoadedObject', $order)) {
-                $reload = $this->plugin
-                    ->getOrderClass()
-                    ->updateOrderState($order, $new_state);
-            } else {
-                $this->logger->addLog('PaymentAction::refundAction - The related Order object is not valid.', 'error');
-            }
+        if ($refund_error) {
+            return [
+                'result' => true,
+                'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount),
+                'template' => $this->renderTemplate($id_order),
+                'message' => $translations['success'], // todo: check if appropriate wording
+                'modal' => $this->renderModalTemplate(),
+                'reload' => $reload,
+            ];
         }
+
+        $state_addons = $refund['resource']->is_live ? '' : '_test';
+        $order = $this->plugin
+            ->getOrder()
+            ->get((int) $id_order);
+
+        if (!$this->plugin->getValidate()->validate('isLoadedObject', $order)) {
+            $this->logger->addLog('PaymentAction::refundAction - The related Order object is not valid.', 'error');
+
+            return [
+                'result' => true,
+                'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount),
+                'template' => $this->renderTemplate($id_order),
+                'message' => $translations['success'], // todo: check if appropriate wording
+                'modal' => '',
+                'reload' => $reload,
+            ];
+        }
+
+        if (!$remaining_refundable_amount) {
+            $new_state = (int) $this->plugin->getConfigurationClass()->getValue('order_state_refund' . $state_addons);
+        } else {
+            $new_state = $refund['resource']->is_live
+                ? (int) $this->plugin->getConfigurationClass()->getValue('PS_CHECKOUT_STATE_PARTIALLY_REFUNDED')
+                : (int) $this->plugin->getConfigurationClass()->getValue('order_state_partial_refund' . $state_addons);
+        }
+
+        $reload = $order->current_state != $new_state && $this->plugin
+            ->getOrderClass()
+            ->updateOrderState($order, $new_state);
 
         return [
             'result' => true,
             'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount),
             'template' => $this->renderTemplate($id_order),
             'message' => $translations['success'],
-            'modal' => $refund_error ? $this->renderModalTemplate() : '',
+            'modal' => '',
             'reload' => $reload,
         ];
     }
