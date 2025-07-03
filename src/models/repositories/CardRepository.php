@@ -39,9 +39,8 @@ class CardRepository extends EntityRepository
     /**
      * @description Check if a card is already register in the database
      *
-     * @param string $payment_id
      * @param int $company_id
-     * @param false $is_sandbox
+     * @param bool $is_sandbox
      * @param mixed $id_card
      *
      * @return bool

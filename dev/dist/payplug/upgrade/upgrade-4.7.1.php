@@ -26,15 +26,13 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_7_1($object)
 {
-    $flag = true;
-
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.7.1');
 
     $sql = 'UPDATE ' . _DB_PREFIX_ . $object->name . '_payment 
             SET `method` = "standard" 
             WHERE `method` = "integrated"';
-    $flag = $flag && Db::getInstance()->execute($sql);
+    $flag = Db::getInstance()->execute($sql);
 
     $logger->addLog('End upgrade script 4.7.1, result: ' . ($flag ? 'ok' : 'ko'));
 

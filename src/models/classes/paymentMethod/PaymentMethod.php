@@ -291,7 +291,7 @@ class PaymentMethod
             return [];
         }
 
-        if (!isset($this->name) || !$this->name) {
+        if (!is_string($this->name) || '' == $this->name) {
             $this->logger->addLog('PaymentMethod::getOption: Can\'t load option the name is missing.');
 
             return [];
@@ -381,13 +381,13 @@ class PaymentMethod
         $this->setParameters();
 
         if (!is_array($retrieve) || empty($retrieve)) {
-            $this->logger->addLog('PaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
+            $this->logger->addLog('PaymentMethod::getOrderTab() - Invalid argument given, $retrieve must be a non empty array.');
 
             return [];
         }
 
         $resource = $retrieve['resource'];
-        if (!is_object($resource) || !$resource) {
+        if (!is_object($resource) || null == $resource) {
             $this->logger->addLog('PaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
@@ -530,7 +530,7 @@ class PaymentMethod
     /**
      * @description Get the current payment status
      *
-     * @param null $resource
+     * @param object $resource
      *
      * @return array
      * @todo: add coverage to this method
@@ -539,7 +539,7 @@ class PaymentMethod
     {
         $this->setParameters();
 
-        if (!is_object($resource) || !$resource) {
+        if (null == $resource) {
             $this->logger->addLog('PaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
 
             return [];
@@ -609,7 +609,7 @@ class PaymentMethod
     {
         $this->setParameters();
 
-        if (!isset($this->name) || !$this->name) {
+        if (!is_string($this->name) || '' == $this->name) {
             $this->logger->addLog('PaymentMethod::getPaymentTab() - Invalid object prop, $name must be a non empty string.');
 
             return [];
@@ -749,7 +749,7 @@ class PaymentMethod
                 'country' => $billing_iso,
                 'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
             ];
-            $billing['company_name'] = empty($billing['company_name']) || !$billing['company_name']
+            $billing['company_name'] = empty($billing['company_name']) || !is_string($billing['company_name'])
                 ? $billing['first_name'] . ' ' . $billing['last_name']
                 : $billing['company_name'];
             $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: null;
@@ -784,7 +784,7 @@ class PaymentMethod
                 'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
                 'delivery_type' => $delivery_type,
             ];
-            $shipping['company_name'] = empty($shipping['company_name']) || !$shipping['company_name']
+            $shipping['company_name'] = empty($shipping['company_name']) || !is_string($shipping['company_name'])
                 ? $shipping['first_name'] . ' ' . $shipping['last_name']
                 : $shipping['company_name'];
             $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: null;
@@ -1028,7 +1028,7 @@ class PaymentMethod
     public function getReturnUrl()
     {
         $this->setParameters();
-        if (!isset($this->name) || !$this->name) {
+        if (!is_string($this->name) || '' == $this->name) {
             $this->logger->addLog('PaymentMethod::getReturnUrl() - Context Cart object must be a valid object.');
 
             return [];
@@ -1148,7 +1148,7 @@ class PaymentMethod
 
         $resource = $retrieve['resource'];
 
-        if (!is_object($resource) || !$resource) {
+        if (!is_object($resource) || null == $resource) {
             $this->logger->addLog('PaymentMethod::postProcessOrder() - Invalid argument given, $resource must be a non null object.');
 
             return false;
@@ -1227,7 +1227,7 @@ class PaymentMethod
     {
         $this->setParameters();
 
-        if (!isset($this->name) || !$this->name) {
+        if (!is_string($this->name)) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
@@ -1543,7 +1543,7 @@ class PaymentMethod
         }
 
         $this->setParameters();
-        if (!isset($this->name) || !$this->name) {
+        if (!is_string($this->name) || '' == $this->name) {
             $this->logger->addLog('PaymentMethod::getPaymentOption: Can\'t load option the name is missing.');
 
             return [];
@@ -1624,76 +1624,76 @@ class PaymentMethod
      */
     protected function setParameters()
     {
-        if (!$this->api_service) {
+        if (null == $this->api_service) {
             $this->api_service = $this->dependencies
                 ->getPlugin()
                 ->getApiService();
         }
-        if (!$this->configuration) {
+        if (null == $this->configuration) {
             $this->configuration = $this->dependencies
                 ->getPlugin()
                 ->getConfigurationClass();
         }
-        if (!$this->configuration_adapter) {
+        if (null == $this->configuration_adapter) {
             $this->configuration_adapter = $this->dependencies
                 ->getPlugin()
                 ->getConfiguration();
         }
-        if (!$this->context) {
+        if (null == $this->context) {
             $this->context = $this->dependencies
                 ->getPlugin()
                 ->getContext()
                 ->get();
         }
-        if (!$this->country_adapter) {
+        if (null == $this->country_adapter) {
             $this->country_adapter = $this->dependencies->getPlugin()->getCountry();
         }
-        if (!$this->currency_adapter) {
+        if (null == $this->currency_adapter) {
             $this->currency_adapter = $this->dependencies
                 ->getPlugin()
                 ->getCurrency();
         }
-        if (!$this->iso_code) {
+        if (!is_string($this->iso_code)) {
             $this->iso_code = $this->dependencies
                 ->getPlugin()
                 ->getContext()
                 ->get()->language->iso_code;
         }
-        if (!$this->external_url) {
+        if (empty($this->external_url)) {
             $this->external_url = $this->dependencies
                 ->getPlugin()
                 ->getRoutes()
                 ->getExternalUrl($this->iso_code);
         }
-        if (!$this->img_path) {
+        if (!is_string($this->img_path)) {
             $this->img_path = $this->dependencies
                 ->getPlugin()
                 ->getConstant()
                 ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/';
         }
-        if (!$this->link) {
+        if (null == $this->link) {
             $this->link = $this->dependencies
                 ->getPlugin()
                 ->getContext()
                 ->get()->link;
         }
-        if (!$this->logger) {
+        if (null == $this->logger) {
             $this->logger = $this->dependencies
                 ->getPlugin()
                 ->getLogger();
         }
-        if (!$this->tools) {
+        if (null == $this->tools) {
             $this->tools = $this->dependencies
                 ->getPlugin()
                 ->getTools();
         }
-        if (!$this->translation) {
+        if (empty($this->translation)) {
             $this->translation = $this->dependencies
                 ->getPlugin()
                 ->getTranslationClass()
                 ->getPaymentMethodsTranslations();
         }
-        if (!$this->validate_adapter) {
+        if (null == $this->validate_adapter) {
             $this->validate_adapter = $this->dependencies
                 ->getPlugin()
                 ->getValidate();

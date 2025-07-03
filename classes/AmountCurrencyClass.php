@@ -29,10 +29,8 @@ if (!defined('_PS_VERSION_')) {
 
 class AmountCurrencyClass
 {
-    private $config;
     private $currency;
     private $dependencies;
-    private $order;
     private $tools;
     private $validators;
     private $validate;
@@ -41,9 +39,7 @@ class AmountCurrencyClass
     {
         $this->dependencies = $dependencies;
         $this->validators = $this->dependencies->getValidators();
-        $this->config = $this->dependencies->getPlugin()->getConfiguration();
         $this->currency = $this->dependencies->getPlugin()->getCurrency();
-        $this->order = $this->dependencies->getPlugin()->getOrder();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
     }
@@ -107,7 +103,7 @@ class AmountCurrencyClass
      *
      * @param int $amount
      *
-     * @return string
+     * @return bool
      */
     public function checkAmountToRefund($amount)
     {

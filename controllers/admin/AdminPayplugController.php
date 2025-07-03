@@ -30,11 +30,11 @@ if (!defined('_PS_VERSION_')) {
 
 class AdminPayplugController extends ModuleAdminController
 {
+    public $module;
     private $dependencies;
     private $api_rest;
     private $configuration;
     private $constant;
-    private $logger;
     private $media;
     private $tools;
 
@@ -48,8 +48,8 @@ class AdminPayplugController extends ModuleAdminController
         $this->api_rest = $this->dependencies->getPlugin()->getApiRestClass();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
-        $this->logger = $this->dependencies->getPlugin()->getLogger();
         $this->media = $this->dependencies->getPlugin()->getMedia();
+        $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->tools = $this->dependencies->getPlugin()->getTools();
 
         // If referer is from development server, trigger api rest renderer

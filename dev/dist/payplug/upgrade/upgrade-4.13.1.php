@@ -34,7 +34,7 @@ function upgrade_module_4_13_1($object)
     $hook_name = 'displayHeader';
     $is_register_in_hook = $object->isRegisteredInHook($hook_name);
     if (!$is_register_in_hook) {
-        $flag = $flag && $object->registerHook($hook_name);
+        $flag = $object->registerHook($hook_name);
     }
 
     $logger->addLog('End upgrade script 4.13.1, result: ' . ($flag ? 'ok' : 'ko'));

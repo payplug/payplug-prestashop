@@ -44,8 +44,8 @@ class paymentValidator
      *
      * @param $pay_id
      * @param $data
-     * @param false $truly_refundable_amount
-     * @param false $total_amount
+     * @param float $truly_refundable_amount
+     * @param float $total_amount
      *
      * @return array
      */
@@ -104,14 +104,13 @@ class paymentValidator
     /**
      * @description Check if given resource can save a card
      *
-     * @param null $payment
      * @param mixed|null $resource
      *
      * @return bool
      */
     public function canSaveCard($resource = null)
     {
-        if (!is_object($resource) || !$resource) {
+        if (!is_object($resource) || null == $resource) {
             return false;
         }
 
@@ -146,7 +145,7 @@ class paymentValidator
                 'message' => '$payment must be a non empty array.',
             ];
         }
-        if (!is_bool($payment['result']) || !isset($payment['result'])) {
+        if (!is_bool($payment['result'])) {
             return [
                 'result' => true,
                 'message' => 'result argument inside payment array must be a non empty boolean.',
@@ -481,7 +480,7 @@ class paymentValidator
      */
     public function isDeferred($payment = null)
     {
-        if (!is_object($payment) || !$payment) {
+        if (!is_object($payment) || null == $payment) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $payment must be a non null object',
@@ -693,7 +692,7 @@ class paymentValidator
      */
     public function isExpired($payment)
     {
-        if (!is_object($payment) || !$payment) {
+        if (!is_object($payment) || null == $payment) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument, $payment must be a non null object.',
@@ -730,13 +729,13 @@ class paymentValidator
     /**
      * @description Check if given payment has failure
      *
-     * @param null $payment
+     * @param object $payment
      *
      * @return array
      */
-    public function isFailed($payment = null)
+    public function isFailed($payment)
     {
-        if (!is_object($payment) || !$payment) {
+        if (!is_object($payment) || null == $payment) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $payment must be a non null object',
@@ -971,13 +970,13 @@ class paymentValidator
     /**
      * @description Check if given payment is paid
      *
-     * @param null $payment
+     * @param object $payment
      *
      * @return array
      */
-    public function isPaid($payment = null)
+    public function isPaid($payment)
     {
-        if (!is_object($payment) || !$payment) {
+        if (!is_object($payment) || null == $payment) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $payment must be a non null object',
@@ -1013,7 +1012,7 @@ class paymentValidator
      */
     public function isPayment($payment = null)
     {
-        if (!is_object($payment) || !$payment) {
+        if (!is_object($payment) || null == $payment) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $payment must be a non null object',
@@ -1073,14 +1072,14 @@ class paymentValidator
     /**
      * @description Check if given phone number is valid mobile phone number.
      *
-     * @param $iso_code
-     * @param false $phone_number
+     * @param string $iso_code
+     * @param string $phone_number
      *
      * @return array
      */
     public function isValidMobilePhoneNumber($phone_number = '', $iso_code = '')
     {
-        if (!is_string($phone_number) || !$phone_number || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
+        if (!is_string($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $phone_number must be a valid phone number',

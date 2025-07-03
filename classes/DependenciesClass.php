@@ -58,10 +58,8 @@ class DependenciesClass
     public $payplugLock;
     public $version;
 
-    private $classes;
     private $plugin;
     private $helpers;
-    private $repositories;
     private $validators;
 
     public function __construct()
@@ -104,15 +102,15 @@ class DependenciesClass
     /**
      * @description Return translation for a given string and context (optional)
      *
-     * @param false $string
-     * @param false $name
+     * @param string $string
+     * @param string $name
      *
      * @return string
      */
-    public function l($string = false, $name = false)
+    public function l($string = '', $name = '')
     {
-        if (!$string || !$this->getPlugin()->getValidate()->validate('isString', $string)) {
-            return false;
+        if (!$this->getPlugin()->getValidate()->validate('isString', $string)) {
+            return '';
         }
 
         return TranslationAdapter::translate($this->name, $string, $name);
@@ -154,11 +152,6 @@ class DependenciesClass
     public function getHelpers()
     {
         return $this->helpers;
-    }
-
-    public function getClasses()
-    {
-        return $this->classes;
     }
 
     private function setvalidators()

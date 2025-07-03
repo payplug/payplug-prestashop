@@ -72,7 +72,6 @@ class AdminClass
 
     /**
      * @param string $controller_name
-     * @param int $id_order
      * @param mixed $params
      *
      * @return string
@@ -80,7 +79,7 @@ class AdminClass
     public function getAdminUrl($controller_name = 'AdminModules', $params = [])
     {
         if (!empty($params) && !is_array($params)) {
-            return false;
+            return '';
         }
 
         $admin_url = $this->context->link->getAdminLink($controller_name);

@@ -115,8 +115,6 @@ class Address
      */
     protected function setParameters()
     {
-        if (!$this->address_adapter) {
-            $this->address_adapter = $this->dependencies->getPlugin()->getAddress();
-        }
+        $this->address_adapter = $this->dependencies->getPlugin()->getAddress();
     }
 }

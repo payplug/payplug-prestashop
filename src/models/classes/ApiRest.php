@@ -508,7 +508,6 @@ class ApiRest
     /**
      * @description build paylater section for api usage
      *
-     * @param array $options
      * @param mixed $current_configuration
      *
      * @return array

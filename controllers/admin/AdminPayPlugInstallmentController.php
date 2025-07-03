@@ -34,12 +34,10 @@ include_once _PS_MODULE_DIR_ . 'payplug/classes/DependenciesClass.php';
 class AdminPayPlugInstallmentController extends ModuleAdminController
 {
     private $dependencies;
-    private $orderClass;
 
     public function __construct()
     {
         $this->dependencies = new PayPlug\classes\DependenciesClass();
-        $this->orderClass = $this->dependencies->orderClass;
 
         $this->bootstrap = true;
         $this->table = $this->dependencies->name . '_payment';
@@ -50,7 +48,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         $this->deleted = false;
         $this->context = Context::getContext();
 
-        $this->_use_found_rows = true;
+        $this->_use_found_rows = false;
 
         parent::__construct();
 
@@ -281,6 +279,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
         }
 
         $filters = explode('AND ', $this->_filter);
+
         $wheres = [];
         foreach ($filters as $k => &$filter) {
             $filter = trim($filter);

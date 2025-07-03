@@ -318,11 +318,9 @@ class PluginInit extends BaseClass
 
         $this->cache = new CacheRepository(
             $this->cacheEntity,
-            $this->query_repository,
             $this->configuration_class,
             $this->dependencies,
-            $this->logger,
-            $this->constant_adapter
+            $this->logger
         );
 
         $this->order_state = new OrderStateRepository(
@@ -331,7 +329,6 @@ class PluginInit extends BaseClass
             $this->dependencies,
             $this->language_adapter,
             $this->order_state_adapter,
-            $this->query_repository,
             $this->tools_adapter,
             $this->validate_adapter,
             $this->myLogPhp

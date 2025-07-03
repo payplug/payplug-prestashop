@@ -106,7 +106,7 @@ class CardEntity
     }
 
     /**
-     * @return bool
+     * @return int
      */
     public function getIsSandbox()
     {
@@ -233,7 +233,7 @@ class CardEntity
     public function setIsSandbox($is_sandbox)
     {
         if (!is_bool($is_sandbox)) {
-            throw new BadParameterException('Invalid is_sandbox, must be a boolean.');
+            throw new BadParameterException('Invalid is_sandbox, must be an boolean.');
         }
 
         $this->is_sandbox = $is_sandbox;
@@ -306,14 +306,14 @@ class CardEntity
     }
 
     /**
-     * @param string|null $brand
+     * @param string $brand
      *
      * @return $this
      */
-    public function setBrand($brand)
+    public function setBrand($brand = '')
     {
-        if (null !== $brand && !is_string($brand)) {
-            throw new BadParameterException('Invalid brand, must be a string or null.');
+        if (!is_string($brand)) {
+            throw new BadParameterException('Invalid brand, must be a string.');
         }
 
         $this->brand = $brand;
@@ -338,14 +338,14 @@ class CardEntity
     }
 
     /**
-     * @param string|null $metadata
+     * @param string $metadata
      *
      * @return $this
      */
-    public function setMetadata($metadata)
+    public function setMetadata($metadata = '')
     {
-        if (null !== $metadata && !is_string($metadata)) {
-            throw new BadParameterException('Invalid metadata, must be a string or null.');
+        if (!is_string($metadata)) {
+            throw new BadParameterException('Invalid metadata, must be a string.');
         }
 
         $this->metadata = $metadata;

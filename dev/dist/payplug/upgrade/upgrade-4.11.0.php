@@ -26,14 +26,12 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_11_0($object)
 {
-    $flag = true;
-
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.11.0');
 
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
     unset($payment_methods['giropay']);
-    $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
+    $flag = Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
 
     $logger->addLog('End upgrade script 4.11.0, result: ' . ($flag ? 'ok' : 'ko'));
 

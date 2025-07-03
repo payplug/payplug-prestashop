@@ -26,12 +26,10 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_15_0($object)
 {
-    $flag = true;
-
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.15.0');
 
-    $flag = $flag && Configuration::updateValue('PAYPLUG_JWT', '{}');
+    $flag = Configuration::updateValue('PAYPLUG_JWT', '{}');
 
     $logger->addLog('End upgrade script 4.15.0, result: ' . ($flag ? 'ok' : 'ko'));
 

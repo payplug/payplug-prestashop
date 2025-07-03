@@ -26,10 +26,8 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_15_0()
 {
-    $flag = true;
-
     // Delete publishable key usage, no longer needed for integrated payment
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST');
+    $flag = Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY_TEST');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_PUBLISHABLE_KEY');
     // update PAYPLUG_ONEY_FEES value to fix SMP-1390
     $flag = $flag && Configuration::updateValue('PAYPLUG_ONEY_FEES', 1);

@@ -58,7 +58,7 @@ class Payplug extends PaymentModule
         $this->description = $this->l('The online payment solution combining simplicity and first-rate support to boost your sales.');
         $this->displayName = 'Payplug';
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
-        $this->need_instance = true;
+        $this->need_instance = 0;
         $this->tab = 'payments_gateways';
         $this->version = '4.18.0';
 
@@ -147,7 +147,7 @@ class Payplug extends PaymentModule
                     $idtab = Tab::getIdFromClassName($adminControllers['className']);
                     $tab = new Tab($idtab);
                     $tab->module = 'payplug';
-                    $tab->active = 1;
+                    $tab->active = true;
                     $tab->save();
                 }
             }
@@ -501,8 +501,6 @@ class Payplug extends PaymentModule
     /**
      * @description Install plugin
      *
-     * @param bool $soft_install
-     *
      * @return bool
      *
      * @see Module::install()
@@ -525,7 +523,7 @@ class Payplug extends PaymentModule
                     ->tool('displayError', $installation['message']);
                 $this->uninstall();
             }
-            $flag = $flag && $installation['result'];
+            $flag = $installation['result'];
         }
 
         // Clear symf cache to ensure the service are correctly load
@@ -551,7 +549,7 @@ class Payplug extends PaymentModule
     /**
      * @description test if php requiremnt is valid
      *
-     * @return array
+     * @return bool
      */
     public function isValidPHPVersion()
     {
@@ -559,7 +557,7 @@ class Payplug extends PaymentModule
 
         if (!defined('PHP_VERSION_ID')) {
             $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', $php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]);
+            define('PHP_VERSION_ID', (int) $php_version[0] * 10000 + (int) $php_version[1] * 100 + (int) $php_version[2]);
         }
 
         return PHP_VERSION_ID >= $php_min_version;
@@ -587,7 +585,7 @@ class Payplug extends PaymentModule
 
     public function setDependencies()
     {
-        $page_name = Context::getContext()->controller ? Context::getContext()->controller->php_self : '';
+        $page_name = Context::getContext()->controller;
         $excluded_controllers = [
             'index',
             'category',

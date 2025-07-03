@@ -93,6 +93,10 @@ final class CreateTest extends BaseOrderStateRepository
             'get' => $this->orderStateMock,
         ]);
 
+        $this->tools->shouldReceive([
+            'validate' => true,
+        ]);
+
         $this->assertSame(
             $this->configKey . '-' . $this->orderStateMock->id,
             $this->repo->create($this->state['name'], $this->state, false)
@@ -115,6 +119,10 @@ final class CreateTest extends BaseOrderStateRepository
 
         $this->order_state_adapter->shouldReceive([
             'get' => $this->orderStateMock,
+        ]);
+
+        $this->tools->shouldReceive([
+            'validate' => true,
         ]);
 
         $this->assertSame(
@@ -140,6 +148,10 @@ final class CreateTest extends BaseOrderStateRepository
 
         $this->order_state_repository->shouldReceive([
             'getOrderStateByTemplate' => 42,
+        ]);
+
+        $this->tools->shouldReceive([
+            'validate' => true,
         ]);
 
         $this->assertSame(
@@ -168,6 +180,10 @@ final class CreateTest extends BaseOrderStateRepository
             'getOrderStateByTemplate' => 42,
         ]);
 
+        $this->tools->shouldReceive([
+            'validate' => true,
+        ]);
+
         $this->assertSame(
             $this->configKey . '-' . $this->orderStateMock->id,
             $this->repo->create($this->state['name'], $this->state, false)
@@ -194,6 +210,10 @@ final class CreateTest extends BaseOrderStateRepository
 
         $this->order_state_repository->shouldReceive([
             'getOrderStateByTemplate' => 42,
+        ]);
+
+        $this->tools->shouldReceive([
+            'validate' => true,
         ]);
 
         $this->assertSame(
@@ -225,6 +245,10 @@ final class CreateTest extends BaseOrderStateRepository
             'get' => $this->orderStateMock,
         ]);
 
+        $this->tools->shouldReceive([
+            'validate' => true,
+        ]);
+
         $this->assertSame(
             $this->configKey . '-' . $new_order_state,
             $this->repo->create($this->state['name'], $this->state, false)
@@ -251,6 +275,10 @@ final class CreateTest extends BaseOrderStateRepository
 
         $this->order_state_adapter->shouldReceive([
             'get' => $this->orderStateMock,
+        ]);
+
+        $this->tools->shouldReceive([
+            'validate' => true,
         ]);
 
         $this->assertSame(

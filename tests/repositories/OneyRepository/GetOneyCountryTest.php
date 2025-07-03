@@ -23,10 +23,10 @@ final class GetOneyCountryTest extends BaseOneyRepository
      *
      * @param mixed $iso_country
      */
-    public function testWhenGivenPaymentIsInvalidIntegerFormat($iso_country)
+    public function testWhenGivenIsoCountryIsInvalidStringFormat($iso_country)
     {
         $this->assertSame(
-            false,
+            'FR',
             $this->repo->getOneyCountry($iso_country)
         );
     }
@@ -38,7 +38,7 @@ final class GetOneyCountryTest extends BaseOneyRepository
     public function testWithEmptyIsoCode()
     {
         $this->assertSame(
-            false,
+            'FR',
             $this->repo->getOneyCountry(null)
         );
     }
@@ -50,7 +50,7 @@ final class GetOneyCountryTest extends BaseOneyRepository
     public function testWithWrongIsoCode()
     {
         $this->assertSame(
-            false,
+            'FR',
             $this->repo->getOneyCountry(42)
         );
     }

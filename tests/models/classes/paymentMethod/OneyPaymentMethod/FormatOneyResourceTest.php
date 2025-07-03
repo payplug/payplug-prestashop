@@ -30,21 +30,21 @@ final class FormatOneyResourceTest extends BaseOneyPaymentMethod
     }
 
     /**
-     * @dataProvider invalidArrayFormatDataProvider
+     * @dataProvider invalidStringFormatDataProvider
      *
      * @param mixed $operation
      */
-    public function testWhenGivenOperationIsNotValidBooleanFormat($operation)
+    public function testWhenGivenOperationIsNotValidStringFormat($operation)
     {
         $resource = ['resource'];
-        $total_amount = false;
+        $total_amount = 4;
 
         $this->class->shouldReceive([
             'getOperations' => [],
         ]);
 
         $this->assertSame(
-            false,
+            [],
             $this->class->formatOneyResource($operation, $resource, $total_amount)
         );
     }
@@ -57,14 +57,14 @@ final class FormatOneyResourceTest extends BaseOneyPaymentMethod
     public function testWhenGivenResourceIsNotValidArrayFormat($resource)
     {
         $operation = 'x3_with_fees';
-        $total_amount = false;
+        $total_amount = 1500;
 
         $this->class->shouldReceive([
             'getOperations' => ['x3_with_fees'],
         ]);
 
         $this->assertSame(
-            false,
+            [],
             $this->class->formatOneyResource($operation, $resource, $total_amount)
         );
     }
@@ -84,7 +84,7 @@ final class FormatOneyResourceTest extends BaseOneyPaymentMethod
         ]);
 
         $this->assertSame(
-            false,
+            [],
             $this->class->formatOneyResource($operation, $resource, $total_amount)
         );
     }

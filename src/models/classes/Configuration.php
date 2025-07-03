@@ -538,7 +538,7 @@ class Configuration
      *
      * @param string $key
      *
-     * @return false
+     * @return bool
      */
     public function delete($key = '')
     {
@@ -573,7 +573,7 @@ class Configuration
             if (!$flag) {
                 continue;
             }
-            $flag = $flag && $this->delete($key);
+            $flag = $this->delete($key);
         }
 
         return $flag;
@@ -602,9 +602,7 @@ class Configuration
     /**
      * @description get the current module configuration
      *
-     * @param string $key
-     *
-     * @return false|mixed
+     * @return array
      */
     public function getCurrentConfigurations()
     {
@@ -718,7 +716,7 @@ class Configuration
                 continue;
             }
             if ($config['setConf']) {
-                $flag = $flag && $this->set($key, $config['defaultValue']);
+                $flag = $this->set($key, (string) $config['defaultValue']);
             }
         }
 
@@ -747,21 +745,8 @@ class Configuration
             return false;
         }
 
-        switch ($type) {
-            case 'integer':
-                if (!is_int($value)) {
-                    return false;
-                }
-
-                break;
-
-            default:
-            case 'string':
-                if (!is_string($value) && null != $value) {
-                    return false;
-                }
-
-                break;
+        if (!is_string($value) && null != $value) {
+            return false;
         }
 
         return $this->dependencies

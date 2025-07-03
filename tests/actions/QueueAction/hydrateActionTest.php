@@ -75,7 +75,7 @@ class hydrateActionTest extends BaseQueueAction
     {
         $this->repository->shouldReceive([
             'getFirstNotTreatedEntry' => false,
-            'createEntity' => true,
+            'createEntity' => 72,
         ]);
         $this->assertSame(
             [
@@ -95,11 +95,7 @@ class hydrateActionTest extends BaseQueueAction
         $this->repository->shouldReceive([
             'getFirstNotTreatedEntry' => $entry,
             'updateEntity' => false,
-            'createEntity' => true,
-        ]);
-        $this->repository->shouldReceive([
-            'getFirstNotTreatedEntry' => $entry,
-            'createEntity' => true,
+            'createEntity' => 72,
         ]);
         $this->assertSame(
             [
@@ -123,7 +119,7 @@ class hydrateActionTest extends BaseQueueAction
         $this->repository->shouldReceive([
             'getFirstNotTreatedEntry' => false,
             'updateEntity' => true,
-            'createEntity' => true,
+            'createEntity' => 72,
         ]);
         $expected = [
             'exists' => false,
@@ -144,7 +140,7 @@ class hydrateActionTest extends BaseQueueAction
         $this->repository->shouldReceive([
             'getFirstNotTreatedEntry' => $entry,
             'updateEntity' => false,
-            'createEntity' => true,
+            'createEntity' => 72,
         ]);
         $expected = [
             'exists' => true,

@@ -25,11 +25,11 @@ class formatPriceTest extends BaseOneyPaymentMethod
     }
 
     /**
-     * @dataProvider invalidIntegerFormatDataProvider
+     * @dataProvider invalidFloatFormatDataProvider
      *
      * @param mixed $price
      */
-    public function testWhenGivenPriceIsInvalidIntegerFormat($price)
+    public function testWhenGivenPriceIsInvalidFloatFormat($price)
     {
         $this->assertSame(
             '',

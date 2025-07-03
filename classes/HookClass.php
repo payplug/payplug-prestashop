@@ -34,27 +34,19 @@ class HookClass
     private $assign;
     private $cache;
     private $cart;
-    private $configurationAdapter;
     private $configuration;
     private $constant;
     private $context;
-    private $currency;
     private $dependencies;
     private $dispatcher;
     private $html;
-    private $language;
     private $media;
     private $module;
-    private $oney;
     private $orderAdapter;
-    private $orderHistory;
-    private $orderState;
     private $orderStateAdapter;
-    private $product;
     private $sql;
     private $tools;
     private $validate;
-    private $validators;
 
     public function __construct($dependencies)
     {
@@ -62,25 +54,17 @@ class HookClass
         $this->assign = $this->dependencies->getPlugin()->getAssign();
         $this->cache = $this->dependencies->getPlugin()->getCache();
         $this->cart = $this->dependencies->getPlugin()->getCart();
-        $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
-        $this->currency = $this->dependencies->getPlugin()->getCurrency();
         $this->dispatcher = $this->dependencies->getPlugin()->getDispatcher();
-        $this->language = $this->dependencies->getPlugin()->getLanguage();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
-        $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->orderAdapter = $this->dependencies->getPlugin()->getOrder();
-        $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
-        $this->orderState = $this->dependencies->getPlugin()->getOrderState();
         $this->orderStateAdapter = $this->dependencies->getPlugin()->getOrderStateAdapter();
-        $this->product = $this->dependencies->getPlugin()->getProduct();
         $this->sql = $this->dependencies->getPlugin()->getSql();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
-        $this->validators = $this->dependencies->getValidators();
     }
 
     public function actionAdminLanguagesControllerSaveAfter($params)
@@ -194,7 +178,7 @@ class HookClass
     public function customerAccount()
     {
         if (!$this->dependencies->configClass->isAllowed()) {
-            return false;
+            return '';
         }
 
         $payplug_cards_url = $this->context->link->getModuleLink(

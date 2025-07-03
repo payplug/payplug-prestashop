@@ -58,6 +58,9 @@ class PaymentEntity
     /** @var int */
     private $id_cart;
 
+    /** @var bool */
+    private $is_live;
+
     /** @var string */
     private $method;
 
@@ -105,6 +108,14 @@ class PaymentEntity
     public function getIdCart()
     {
         return $this->id_cart;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsLive()
+    {
+        return $this->is_live;
     }
 
     /**
@@ -191,6 +202,22 @@ class PaymentEntity
         }
 
         $this->id_cart = $id_cart;
+
+        return $this;
+    }
+
+    /**
+     * @param $is_live
+     *
+     * @return $this
+     */
+    public function setIsLive($is_live)
+    {
+        if (!is_bool($is_live)) {
+            throw new BadParameterException('Invalid argument, $is_live must be a boolean');
+        }
+
+        $this->is_live = $is_live;
 
         return $this;
     }

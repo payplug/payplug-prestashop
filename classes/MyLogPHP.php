@@ -121,7 +121,7 @@ class MyLogPHP
                 fwrite($fd, $this->HEADERS . "\n");
             }
             $debugBacktrace = debug_backtrace();
-            if (null === $line_n) {
+            if (null == $line_n) {
                 $line = $debugBacktrace[1]['line'];
             } else {
                 $line = $line_n;

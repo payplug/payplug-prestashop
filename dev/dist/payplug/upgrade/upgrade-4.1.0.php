@@ -26,8 +26,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_1_0()
 {
-    $flag = true;
-
     $payment_methods = [
         'amex' => (bool) Configuration::get('PAYPLUG_AMEX'),
         'applepay' => (bool) Configuration::get('PAYPLUG_APPLEPAY'),
@@ -44,7 +42,7 @@ function upgrade_module_4_1_0()
         'standard' => (bool) Configuration::get('PAYPLUG_STANDARD'),
     ];
 
-    $flag = $flag && Configuration::deleteByName('PAYPLUG_AMEX');
+    $flag = Configuration::deleteByName('PAYPLUG_AMEX');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_APPLEPAY');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_BANCONTACT');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_DEFERRED');

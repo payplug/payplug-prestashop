@@ -31,8 +31,6 @@ function upgrade_module_2_26_2($object)
         return true;
     }
 
-    $flag = true;
-
     // install table `payplug_logger`
     $sql = '
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_logger` (
@@ -43,5 +41,5 @@ function upgrade_module_2_26_2($object)
             `date_upd` DATETIME NULL
             ) ENGINE=' . _MYSQL_ENGINE_;
 
-    return $flag && Db::getInstance()->execute($sql);
+    return Db::getInstance()->execute($sql);
 }

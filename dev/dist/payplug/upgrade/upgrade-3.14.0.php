@@ -26,10 +26,8 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_14_0()
 {
-    $flag = true;
-
     // Update PayPlug configuration variable `show` to `enable`
-    $flag = $flag && Configuration::updateValue(
+    $flag = Configuration::updateValue(
         'PAYPLUG_ENABLE',
         Configuration::get('PAYPLUG_SHOW')
     );

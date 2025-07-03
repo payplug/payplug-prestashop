@@ -312,12 +312,12 @@ class StandardPaymentMethod extends PaymentMethod
      *
      * @return array
      */
-    public function getOrderTab($retrieve = null)
+    public function getOrderTab($retrieve = [])
     {
         $this->setParameters();
 
         $resource = $retrieve['resource'];
-        if (!is_object($resource) || !$resource) {
+        if (null == $resource) {
             $this->logger->addLog('StandardPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];

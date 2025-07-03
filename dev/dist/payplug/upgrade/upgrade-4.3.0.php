@@ -26,16 +26,14 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_3_0()
 {
-    $flag = true;
-
     $payplug_amounts = Configuration::get('PAYPLUG_AMOUNTS');
     if ('{}' == $payplug_amounts) {
-        $flag = $flag && Configuration::updateValue('PAYPLUG_AMOUNTS', '{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"}}');
+        $flag = Configuration::updateValue('PAYPLUG_AMOUNTS', '{"default":{"min":"EUR:99","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"}}');
     }
 
     $payplug_countries = Configuration::get('PAYPLUG_COUNTRIES');
     if ('{}' == $payplug_countries) {
-        $flag = $flag && Configuration::updateValue('PAYPLUG_COUNTRIES', '{"oney_x3_with_fees":["YT","PF","MF","GF","FR","MQ","BL","NC","GP","RE"],"oney_x4_with_fees":["YT","PF","MF","GF","FR","MQ","BL","NC","GP","RE"],"oney_x3_without_fees":["YT","PF","MF","GF","FR","MQ","BL","NC","GP","RE"],"oney_x4_without_fees":["YT","PF","MF","GF","FR","MQ","BL","NC","GP","RE"]}');
+        $flag = Configuration::updateValue('PAYPLUG_COUNTRIES', '{"oney_x3_with_fees":["YT","PF","MF","GF","FR","MQ","BL","NC","GP","RE"],"oney_x4_with_fees":["YT","PF","MF","GF","FR","MQ","BL","NC","GP","RE"],"oney_x3_without_fees":["YT","PF","MF","GF","FR","MQ","BL","NC","GP","RE"],"oney_x4_without_fees":["YT","PF","MF","GF","FR","MQ","BL","NC","GP","RE"]}');
     }
 
     return $flag;
