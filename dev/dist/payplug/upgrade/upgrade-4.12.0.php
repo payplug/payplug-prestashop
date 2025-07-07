@@ -28,7 +28,7 @@ function upgrade_module_4_12_0($object)
 {
     $flag = true;
 
-    $logger = $object->module->getPlugin()->getLogger();
+    $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.12.0');
 
     $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_queue` (
