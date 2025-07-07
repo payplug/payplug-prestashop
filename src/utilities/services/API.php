@@ -38,7 +38,6 @@ use Payplug\OneySimulation;
 use Payplug\Payment;
 use Payplug\Payplug;
 use Payplug\Refund;
-use PayPlug\src\exceptions\BadParameterException;
 use Symfony\Component\Dotenv\Dotenv;
 
 if (!defined('_PS_VERSION_')) {

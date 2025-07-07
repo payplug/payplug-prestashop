@@ -28,7 +28,7 @@ function upgrade_module_4_14_2($object)
 {
     $flag = true;
 
-    $logger = $object->module->getPlugin()->getLogger();
+    $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.14.2');
 
     try {
