@@ -741,7 +741,6 @@ var $document, $window, __moduleName__Module = {
                     "supports3DS"
                 ],
                 "supportedNetworks": [
-                    'cartesBancaires',
                     "visa",
                     "masterCard"
                 ],
