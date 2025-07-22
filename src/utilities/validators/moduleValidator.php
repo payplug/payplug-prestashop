@@ -32,7 +32,7 @@ class moduleValidator
     /**
      * @description Check if the module can be shown
      *
-     * @param false $configuration
+     * @param bool $configuration
      *
      * @return array
      */
@@ -67,7 +67,7 @@ class moduleValidator
      */
     public function isAccountLinkedToPsAccount($module = null)
     {
-        if (!is_object($module) || !$module) {
+        if (!is_object($module) || null == $module) {
             return [
                 'result' => false,
                 'message' => 'Invalid parameters given, $module must be an non null object',
@@ -103,8 +103,8 @@ class moduleValidator
     /**
      * @description Check if the usage of the module is available
      *
-     * @param false $enable
-     * @param false $shown
+     * @param bool $enable
+     * @param bool $shown
      *
      * @return array
      */

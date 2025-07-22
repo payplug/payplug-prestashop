@@ -26,10 +26,8 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_2_1()
 {
-    $flag = true;
-
     if (Configuration::hasKey('PAYPLUG_ONEY_TOS')) {
-        $flag = $flag && Configuration::deleteByName('PAYPLUG_ONEY_TOS');
+        $flag = Configuration::deleteByName('PAYPLUG_ONEY_TOS');
     }
 
     return $flag;

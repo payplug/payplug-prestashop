@@ -26,8 +26,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_12_0($object)
 {
-    $flag = true;
-
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.12.0');
 
@@ -42,7 +40,7 @@ function upgrade_module_4_12_0($object)
             CONSTRAINT payplug_queue_unique UNIQUE (id_payplug_queue)) ENGINE=' . _MYSQL_ENGINE_;
 
     try {
-        $flag = $flag && Db::getInstance()->Execute($sql);
+        $flag = Db::getInstance()->Execute($sql);
     } catch (PrestaShopDatabaseException $e) {
         $flag = false;
     }

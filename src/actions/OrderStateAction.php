@@ -188,7 +188,7 @@ class OrderStateAction
      *
      * @param $param
      *
-     * @return string
+     * @return bool
      */
     public function installTypeAction()
     {

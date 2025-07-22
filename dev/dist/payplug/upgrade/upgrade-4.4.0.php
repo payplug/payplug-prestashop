@@ -54,7 +54,7 @@ function upgrade_module_4_4_0($object)
             if (!$exec) {
                 $logger->addLog('An error occured while executing sql: ' . $alter_table_sql);
             }
-            $flag = $flag && $exec;
+            $flag = $exec;
         }
     }
 
@@ -84,7 +84,7 @@ function upgrade_module_4_4_0($object)
                 if (!$exec) {
                     $logger->addLog('An error occured while executing sql: ' . $hydrate_sql);
                 }
-                $flag = $flag && $exec;
+                $flag = $exec;
             }
         }
     }
@@ -101,7 +101,7 @@ function upgrade_module_4_4_0($object)
             if (!$exec) {
                 $logger->addLog('An error occured while executing sql: ' . $sql);
             }
-            $flag = $flag && $exec;
+            $flag = $exec;
         }
     }
 

@@ -52,7 +52,7 @@ class OneClickPaymentMethod extends PaymentMethod
      * @description Get order tab for given resource to create the order
      * @todo: add coverage to this method
      *
-     * @param array $retrieve
+     * @param object $retrieve
      *
      * @return array
      */
@@ -61,7 +61,7 @@ class OneClickPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         $resource = $retrieve['resource'];
-        if (!is_object($resource) || !$resource) {
+        if (null == $resource) {
             $this->logger->addLog('OneClickPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
@@ -225,7 +225,7 @@ class OneClickPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        if (!is_object($resource) || !$resource) {
+        if (null == $resource) {
             $this->logger->addLog('OneClickPaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
 
             return [];

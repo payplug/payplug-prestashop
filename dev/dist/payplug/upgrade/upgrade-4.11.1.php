@@ -26,13 +26,11 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_11_1($object)
 {
-    $flag = true;
-
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.11.1');
 
     // Delete payplug_order_payment table
-    $flag = $flag && Db::getInstance()->execute('DROP TABLE IF EXISTS ' . _DB_PREFIX_ . $object->name . '_order_payment');
+    $flag = Db::getInstance()->execute('DROP TABLE IF EXISTS ' . _DB_PREFIX_ . $object->name . '_order_payment');
 
     $logger->addLog('End upgrade script 4.11.1, result: ' . ($flag ? 'ok' : 'ko'));
 

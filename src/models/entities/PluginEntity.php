@@ -288,7 +288,7 @@ class PluginEntity
     }
 
     /**
-     * @return string
+     * @return object
      */
     public function getAssign()
     {
@@ -1314,7 +1314,6 @@ class PluginEntity
     }
 
     /**
-     * @param object $module
      * @param mixed $media
      *
      * @return self
@@ -1892,8 +1891,7 @@ class PluginEntity
     }
 
     /**
-     * @param object $translation_adatper
-     * @param mixed $translation_adapter
+     * @param object $translation_adapter
      *
      * @return self
      */

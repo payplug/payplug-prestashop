@@ -30,12 +30,10 @@ if (!defined('_PS_VERSION_')) {
 class QueueAction
 {
     private $dependencies;
-    private $queue_time;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->queue_time = 5;
     }
 
     /**
@@ -135,16 +133,16 @@ class QueueAction
             'type' => $type,
             'date_add' => $current_date,
             'date_upd' => $current_date,
-            'treated' => false,
         ];
-        $create = (bool) $this->dependencies
+
+        $id_entity = $this->dependencies
             ->getPlugin()
             ->getQueueRepository()
             ->createEntity($fields);
 
         return [
             'exists' => $exists,
-            'result' => $create,
+            'result' => is_numeric($id_entity) && $id_entity > 0,
         ];
     }
 

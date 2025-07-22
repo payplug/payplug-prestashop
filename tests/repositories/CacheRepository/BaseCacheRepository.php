@@ -22,11 +22,9 @@ class BaseCacheRepository extends RepositoryBase
 
         $this->repo = \Mockery::mock(CacheRepository::class, [
             $this->cacheEntity,
-            $this->query,
             $this->configuration,
             $this->dependencies,
             $this->logger,
-            $this->constant,
         ])->makePartial();
 
         $this->arrayCache = [];

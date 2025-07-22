@@ -26,10 +26,8 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_13_0()
 {
-    $flag = true;
-
     // Update PayPlug tab name to Payplug
     $sql = 'UPDATE `' . _DB_PREFIX_ . 'tab_lang` SET name = "Payplug" WHERE `name` = "PayPlug"';
 
-    return $flag && Db::getInstance()->execute($sql);
+    return Db::getInstance()->execute($sql);
 }

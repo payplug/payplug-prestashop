@@ -51,11 +51,11 @@ class OneyAction
     /**
      * @description This function display the Oney CTA
      *
-     * @param null $params
+     * @param array $params
      *
      * @return bool
      */
-    public function renderCTA($params = null)
+    public function renderCTA($params = [])
     {
         $this->setParameters();
         if (!isset($params['type'])

@@ -32,26 +32,20 @@ use PayPlug\src\application\dependencies\BaseClass;
 class CacheRepository extends BaseClass
 {
     public $cacheEntity;
-    private $query;
     private $config;
     private $dependencies;
     private $logger;
-    private $constant;
 
     public function __construct(
         $cacheEntity,
-        $query,
         $config,
         $dependencies,
-        $logger,
-        $constant
+        $logger
     ) {
         $this->cacheEntity = $cacheEntity;
         $this->config = $config;
         $this->dependencies = $dependencies;
         $this->logger = $logger;
-        $this->query = $query;
-        $this->constant = $constant;
 
         $this->logger->setProcess('cache');
     }

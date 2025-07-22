@@ -41,7 +41,7 @@ class CartRuleAdapter implements CartRuleInterface
     /**
      * @description  get a CartRule object
      *
-     * @param false $id_cart_rule
+     * @param int $id_cart_rule
      *
      * @return \CartRule
      */

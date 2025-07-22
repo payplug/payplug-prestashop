@@ -133,7 +133,7 @@ class EntityRepository extends QueryRepository
             }
         }
 
-        return (bool) $this->build() ? $this->lastId() : 0;
+        return $this->build() ? $this->lastId() : 0;
     }
 
     /**
@@ -167,7 +167,7 @@ class EntityRepository extends QueryRepository
      * @param string $key
      * @param null $value
      *
-     * @return array
+     * @return bool
      */
     public function deleteBy($key = '', $value = null)
     {
@@ -404,7 +404,7 @@ class EntityRepository extends QueryRepository
 
         foreach ($repositories as $repository) {
             if ($flag) {
-                $flag = $flag && $repository->initialize($engine);
+                $flag = $repository->initialize($engine);
             }
         }
 
@@ -590,7 +590,7 @@ class EntityRepository extends QueryRepository
                 continue;
             }
 
-            $flag = $flag && $this
+            $flag = $this
                 ->drop()
                 ->table($table_name)
                 ->build();
@@ -642,7 +642,7 @@ class EntityRepository extends QueryRepository
      * @description Format where request from the value type
      *
      * @param string $key
-     * @param null $value
+     * @param mixed $value
      *
      * @return bool
      */

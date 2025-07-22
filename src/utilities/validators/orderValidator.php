@@ -39,7 +39,7 @@ class orderValidator
      */
     public function isCreated($order = null, $id_cart = 0)
     {
-        if (!is_object($order) || !$order) {
+        if (!is_object($order) || null == $order) {
             return [
                 'result' => false,
                 'message' => 'Invalid argument given, $order must be a non null object',

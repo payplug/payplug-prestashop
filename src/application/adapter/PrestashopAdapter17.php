@@ -38,7 +38,6 @@ class PrestashopAdapter17
     private $constant;
     private $context;
     private $dependencies;
-    private $oney;
 
     public function __construct()
     {
@@ -46,7 +45,6 @@ class PrestashopAdapter17
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
-        $this->oney = $this->dependencies->getPlugin()->getOney();
     }
 
     public function displayHeader()

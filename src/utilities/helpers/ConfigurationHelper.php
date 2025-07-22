@@ -63,7 +63,7 @@ class ConfigurationHelper
         if (!defined('PHP_VERSION_ID')) {
             $report['php']['version'] = PHP_VERSION;
             $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', $php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]);
+            define('PHP_VERSION_ID', (int) $php_version[0] * 10000 + (int) $php_version[1] * 100 + (int) $php_version[2]);
         }
         $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
 

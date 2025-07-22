@@ -225,16 +225,11 @@ class ConfigClass
     private $api_test;
     private $configuration;
     private $configurationAdapter;
-    private $constant;
     private $context;
     private $country;
     private $dependencies;
     private $img_lang;
-    private $media;
     private $module;
-    private $oney;
-    private $payment_status;
-    private $ssl_enable;
     private $tools;
     private $validate;
     private $validators = [];
@@ -246,12 +241,9 @@ class ConfigClass
         $this->api_rest = $this->dependencies->getPlugin()->getApiRestClass();
         $this->configurationAdapter = $this->dependencies->getPlugin()->getConfiguration();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
-        $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
-        $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule();
-        $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
         $this->validators = $this->dependencies->getValidators();
@@ -277,8 +269,6 @@ class ConfigClass
     }
 
     /**
-     * @param bool $force_all
-     *
      * @return bool
      */
     public function disable()
@@ -296,7 +286,7 @@ class ConfigClass
     public function getAvailableOptions($cart)
     {
         if (!$this->isAllowed()) {
-            return false;
+            return [];
         }
         $api_key = $this->module
             ->getPlugin()
@@ -309,7 +299,7 @@ class ConfigClass
 
         // in case if API is not available or not returning permissions
         if (empty($permissions)) {
-            return $available_options = [];
+            return [];
         }
 
         $configurationClass = $this->dependencies->getPlugin()->getConfigurationClass();
@@ -446,7 +436,7 @@ class ConfigClass
     public function getIsoFromLanguageCode($language)
     {
         if (!$this->validate->validate('isLoadedObject', $language)) {
-            return false;
+            return '';
         }
         $parse = explode('-', $language->language_code);
 
@@ -570,7 +560,7 @@ class ConfigClass
             ->getPlugin()
             ->getCountryClass()
             ->getIsoCodeList();
-        if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
+        if (empty($iso_code_list)) {
             return '';
         }
         if (!$this->validate->validate('isInt', $country_id)) {
@@ -599,7 +589,7 @@ class ConfigClass
      */
     public function gdprCardExport($id_customer)
     {
-        if (!is_int($id_customer) || null === $id_customer) {
+        if (!is_int($id_customer)) {
             return [];
         }
 
@@ -677,7 +667,7 @@ class ConfigClass
         if (!defined('PHP_VERSION_ID')) {
             $report['php']['version'] = PHP_VERSION;
             $php_version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', $php_version[0] * 10000 + $php_version[1] * 100 + $php_version[2]);
+            define('PHP_VERSION_ID', (int) $php_version[0] * 10000 + (int) $php_version[1] * 100 + (int) $php_version[2]);
         }
         $report['php']['up2date'] = PHP_VERSION_ID >= $php_min_version ? true : false;
 
@@ -766,7 +756,6 @@ class ConfigClass
         ];
         $this->img_lang = in_array($this->context->language->iso_code, $available_img_lang)
             ? $this->context->language->iso_code : 'default';
-        $this->ssl_enable = $this->configurationAdapter->get('PS_SSL_ENABLED');
 
         if (!isset($this->email) || (!isset($this->api_live) && empty($this->api_test))) {
             $this->warning = $this->dependencies

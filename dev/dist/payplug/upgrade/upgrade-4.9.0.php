@@ -26,8 +26,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_9_0($object)
 {
-    $flag = true;
-
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.9.0');
 
@@ -37,7 +35,7 @@ function upgrade_module_4_9_0($object)
         'checkout' => Configuration::get('PAYPLUG_APPLEPAY_CHECKOUT'),
         'product' => false,
     ];
-    $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_DISPLAY', json_encode($applepay_display));
+    $flag = Configuration::updateValue('PAYPLUG_APPLEPAY_DISPLAY', json_encode($applepay_display));
 
     $flag = $flag && Configuration::deleteByName('PAYPLUG_APPLEPAY_CART');
     $flag = $flag && Configuration::deleteByName('PAYPLUG_APPLEPAY_CHECKOUT');

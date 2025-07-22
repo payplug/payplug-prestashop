@@ -26,8 +26,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_3_0($object)
 {
-    $flag = true;
-
     // Create new table to qualify order state
     $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_order_state` (
                 `id_' . $object->name . '_order_state` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -38,7 +36,7 @@ function upgrade_module_3_3_0($object)
                 CONSTRAINT order_state_unique UNIQUE (id_order_state)
             ) ENGINE=' . _MYSQL_ENGINE_;
 
-    $flag = $flag && Db::getInstance()->execute($sql);
+    $flag = Db::getInstance()->execute($sql);
     unset($sql);
 
     // Create default payplug order state
@@ -71,11 +69,9 @@ function upgrade_module_3_3_0($object)
             VALUES (' . $id_order_state . ', "' . $type . '", "' . $date . '", "' . $date . '")';
     }
 
-    if ($payplug_order_states_sql) {
-        foreach ($payplug_order_states_sql as $sql) {
-            $flag = $flag && Db::getInstance()->execute($sql);
-            unset($sql);
-        }
+    foreach ($payplug_order_states_sql as $sql) {
+        $flag = $flag && Db::getInstance()->execute($sql);
+        unset($sql);
     }
 
     // plug module on the hook actionObjectOrderStateAddAfter

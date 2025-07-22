@@ -39,7 +39,7 @@ class Order
     /**
      * @description Get the appropriate order state for a given resource
      *
-     * @param null $resource
+     * @param object $resource
      *
      * @return array
      */
@@ -122,7 +122,7 @@ class Order
     /**
      * @description Update the current state of an order
      *
-     * @param null $order
+     * @param object $order
      * @param int $new_order_state
      *
      * @return bool

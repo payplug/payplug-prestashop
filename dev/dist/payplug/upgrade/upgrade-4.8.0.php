@@ -26,14 +26,12 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_8_0($object)
 {
-    $flag = true;
-
     $logger = $object->module->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.8.0');
 
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
     $is_applepay = (bool) $payment_methods['applepay'];
-    $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CARRIERS', '[]');
+    $flag = Configuration::updateValue('PAYPLUG_APPLEPAY_CARRIERS', '[]');
     $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CART', !$is_applepay);
     $flag = $flag && Configuration::updateValue('PAYPLUG_APPLEPAY_CHECKOUT', $is_applepay);
 

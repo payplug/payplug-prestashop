@@ -3,6 +3,7 @@
 namespace PayPlug\tests\utilities\validators\LoggerValidator;
 
 use PayPlug\src\utilities\validators\cardValidator;
+use PayPlug\tests\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,6 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class isValidExpirationTest extends TestCase
 {
+    use FormatDataProvider;
     protected $validator;
 
     public function setUp()
@@ -33,7 +35,7 @@ class isValidExpirationTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidFormatDataProvider
+     * @dataProvider invalidStringFormatDataProvider
      *
      * @param mixed $month
      */
@@ -42,28 +44,28 @@ class isValidExpirationTest extends TestCase
         $year = 2050;
         $this->assertSame([
             'result' => false,
-            'message' => 'Invalid argument, $month must be a non null integer',
+            'message' => 'Invalid argument, $month must be a string',
         ], $this->validator->isValidExpiration($month, $year));
     }
 
     /**
-     * @dataProvider invalidFormatDataProvider
+     * @dataProvider invalidStringFormatDataProvider
      *
      * @param mixed $year
      */
     public function testWithInvalidYearFormat($year)
     {
-        $month = 1;
+        $month = '1';
         $this->assertSame([
             'result' => false,
-            'message' => 'Invalid argument, $year must be a non null integer',
+            'message' => 'Invalid argument, $year must be a string',
         ], $this->validator->isValidExpiration($month, $year));
     }
 
     public function testWhenMonthIsntAValidDigit()
     {
-        $month = 123;
-        $year = 2050;
+        $month = '123';
+        $year = '2050';
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument format for $month given',
@@ -72,8 +74,8 @@ class isValidExpirationTest extends TestCase
 
     public function testWhenYearIsntAValidDigit()
     {
-        $month = 12;
-        $year = 20500;
+        $month = '12';
+        $year = '20500';
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid argument format for $year given',
@@ -82,8 +84,8 @@ class isValidExpirationTest extends TestCase
 
     public function testWhenGivenDateIsInvalid()
     {
-        $month = 42;
-        $year = 2050;
+        $month = '42';
+        $year = '2050';
         $this->assertSame([
             'result' => false,
             'message' => 'Invalid date given through $month and/or $year',
@@ -92,8 +94,8 @@ class isValidExpirationTest extends TestCase
 
     public function testWhenGivenDateIsExpired()
     {
-        $month = 1;
-        $year = 2010;
+        $month = '1';
+        $year = '2010';
         $this->assertSame([
             'result' => false,
             'message' => 'This card is expired',
@@ -102,8 +104,8 @@ class isValidExpirationTest extends TestCase
 
     public function testWhenGivenDateIsntExpired()
     {
-        $month = 1;
-        $year = 2030;
+        $month = '1';
+        $year = '2030';
         $this->assertSame([
             'result' => true,
             'message' => '',

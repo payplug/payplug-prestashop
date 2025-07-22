@@ -73,7 +73,7 @@ class SatispayPaymentMethod extends PaymentMethod
      * it logs a message indicating an abandoned order
      * and returns an empty array.
      *
-     * @param null $retrieve
+     * @param array $retrieve
      *
      * @return array
      */
@@ -82,13 +82,13 @@ class SatispayPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         if (!is_array($retrieve) || empty($retrieve)) {
-            $this->logger->addLog('SatispayPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
+            $this->logger->addLog('SatispayPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non empty array.');
 
             return [];
         }
 
         $resource = $retrieve['resource'];
-        if (!is_object($resource) || !$resource) {
+        if (!is_object($resource) || null == $resource) {
             $this->logger->addLog('SatispayPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];

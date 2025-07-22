@@ -88,7 +88,7 @@ class renderListTest extends BaseCardAction
             'id_card' => 'card_azerty12345',
             'last4' => '4242',
             'exp_month' => '12',
-            'exp_year' => '2030',
+            'exp_year' => '2024',
             'brand' => 'CB',
             'country' => 'GB',
             'metadata' => 'N;',
@@ -102,12 +102,8 @@ class renderListTest extends BaseCardAction
             ],
         ]);
 
-        $card['expired'] = true;
-        $card['expiry_date'] = '12 / 30';
-        unset($card['is_sandbox'], $card['id_card']);
-
         $this->assertSame(
-            [$card],
+            [],
             $this->action->renderList()
         );
     }
@@ -136,7 +132,6 @@ class renderListTest extends BaseCardAction
             ],
         ]);
 
-        $card['expired'] = false;
         $card['expiry_date'] = '12 / 30';
         unset($card['is_sandbox'], $card['id_card']);
 

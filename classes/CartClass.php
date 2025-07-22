@@ -31,12 +31,10 @@ class CartClass
 {
     private $logger;
     private $dependencies;
-    private $constant;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->constant = $this->dependencies->getPlugin()->getConstant();
     }
 
     /**

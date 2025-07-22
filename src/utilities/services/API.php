@@ -313,13 +313,13 @@ class API
     /**
      * @description Delete Card from api for given id
      *
-     * @param false $card_id
+     * @param string $card_id
      *
      * @return array
      */
-    public function deleteCard($card_id = false)
+    public function deleteCard($card_id = '')
     {
-        if (!$card_id || !is_string($card_id)) {
+        if ('' == $card_id || !is_string($card_id)) {
             return [
                 'result' => false,
                 'code' => null,
@@ -715,7 +715,6 @@ class API
      *
      * @param string $resource_id
      * @param array $attributes
-     * @param mixed $page
      *
      * @return array
      */
@@ -980,7 +979,7 @@ class API
      *
      * @param $json_answer
      *
-     * @return bool
+     * @return Payplug\Payplug|null
      */
     protected function setApiKeysbyJsonResponse($json_answer)
     {
@@ -1051,7 +1050,7 @@ class API
             $this->site_url = 'https://www.payplug.com';
         }
 
-        if (isset($_ENV['PAYPLUG_PORTAL_URL']) && !empty(['PAYPLUG_PORTAL_URL'])) {
+        if (isset($_ENV['PAYPLUG_PORTAL_URL']) && !empty($_ENV['PAYPLUG_PORTAL_URL'])) {
             $this->portal_url = $_ENV['PAYPLUG_PORTAL_URL'];
         } else {
             $this->portal_url = 'https://portal.payplug.com';

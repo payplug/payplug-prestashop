@@ -32,8 +32,8 @@ class UserHelper
     /**
      * @description check if user is logged or not
      *
-     * @param $isEmail
-     * @param $isApiKey
+     * @param bool $isEmail
+     * @param bool $isApiKey
      *
      * @return array
      */
@@ -66,7 +66,7 @@ class UserHelper
         }
 
         return [
-            'result' => $isEmail && $isApiKey,
+            'result' => true,
             'message' => '$user is logged',
         ];
     }

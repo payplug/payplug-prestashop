@@ -67,12 +67,7 @@ class PayPlugNotifications
     private $shopAdapter;
     private $toolsAdapter;
     private $validateAdapter;
-
-    private $amountCurrencyClass;
     private $configuration;
-    private $module;
-    private $orderClass;
-    private $paymentClass;
     private $payplugLock;
     private $validators;
 
@@ -105,8 +100,6 @@ class PayPlugNotifications
         // Notification identification
         $this->logger->addLog('Notification treatment and authenticity verification:');
 
-        $this->logger->addLog('OK');
-
         if ($this->resource instanceof Payment) {
             $this->processPayment();
         } elseif ($this->resource instanceof Refund) {
@@ -114,25 +107,6 @@ class PayPlugNotifications
         } elseif ($this->resource instanceof InstallmentPlan) {
             $this->processInstallment();
         }
-    }
-
-    /**
-     * @descrition Check if the resource allow to save the payment card
-     *
-     * @return bool
-     */
-    private function canSaveCard()
-    {
-        $this->logger->addLog('Notification: canSaveCard');
-        $can_save_card = $this->validators['payment']->isInstallment($this->payment->id)['result'] ? false : true;
-
-        return $can_save_card && (
-            $this->payment->save_card
-                || (
-                    $this->payment->card->id
-                    && $this->payment->hosted_payment
-                )
-        );
     }
 
     /**
@@ -582,13 +556,9 @@ class PayPlugNotifications
         $this->validators = $this->dependencies->getValidators();
         $this->setAdapters();
 
-        $this->orderClass = $this->dependencies->orderClass;
-        $this->paymentClass = $this->dependencies->paymentClass;
-        $this->amountCurrencyClass = $this->dependencies->amountCurrencyClass;
         $this->payplugLock = $this->dependencies->payplugLock;
 
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
-        $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->sandbox = $this->configuration->getValue('sandbox_mode');
         $this->query = $this->dependencies->getPlugin()->getQueryRepository();
 

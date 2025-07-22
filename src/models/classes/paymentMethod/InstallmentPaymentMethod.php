@@ -165,7 +165,7 @@ class InstallmentPaymentMethod extends PaymentMethod
     /**
      * @description Get the current payment status from the resource
      *
-     * @param null $resource
+     * @param object $resource
      *
      * @return array
      */
@@ -471,7 +471,7 @@ class InstallmentPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        if (!isset($this->name) || !$this->name) {
+        if (!is_string($this->name) || '' == $this->name) {
             $this->logger->addLog('InstallmentPaymentMethod::getReturnUrl() - Invalid object prop, $name must be a non empty string.');
 
             return [];
@@ -739,7 +739,7 @@ class InstallmentPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        if (!isset($this->name) || !$this->name) {
+        if (!is_string($this->name)) {
             $this->logger->addLog('InstallmentPaymentMethod::saveResource - Invalid argument, the method name must be defined.', 'error');
 
             return [

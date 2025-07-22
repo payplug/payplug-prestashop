@@ -36,8 +36,6 @@ class OrderStateAdapter implements OrderStateInterface
     public function __construct($id = null)
     {
         $this->orderState = new \OrderState($id);
-
-        return $this;
     }
 
     public function delete()

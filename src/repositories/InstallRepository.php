@@ -136,19 +136,19 @@ class InstallRepository extends BaseClass
 
     private function loadDependencies()
     {
-        $this->configuration = $this->configuration ?: $this->dependencies
+        $this->configuration = $this->dependencies
             ->getPlugin()
             ->getConfigurationClass();
-        $this->order_state = $this->order_state ?: $this->dependencies
+        $this->order_state = $this->dependencies
             ->getPlugin()
             ->getOrderState();
-        $this->order_state_adapter = $this->order_state_adapter ?: $this->dependencies
+        $this->order_state_adapter = $this->dependencies
             ->getPlugin()
             ->getOrderStateAdapter();
-        $this->tools = $this->tools ?: $this->dependencies
+        $this->tools = $this->dependencies
             ->getPlugin()
             ->getTools();
-        $this->validate = $this->validate ?: $this->dependencies
+        $this->validate = $this->dependencies
             ->getPlugin()
             ->getValidate();
     }

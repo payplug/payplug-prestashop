@@ -32,17 +32,17 @@ class cardValidator
     /**
      * @description Check the expiration for given year and month
      *
-     * @param int $month
-     * @param int $year
+     * @param string $month
+     * @param string $year
      *
      * @return array
      */
-    public function isValidExpiration($month = 0, $year = 0)
+    public function isValidExpiration($month = '', $year = '')
     {
-        if (!is_int($month) || !$month) {
+        if (!is_string($month)) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument, $month must be a non null integer',
+                'message' => 'Invalid argument, $month must be a string',
             ];
         }
         if (!(bool) preg_match('/^[0-9]{1,2}$/', $month)) {
@@ -52,10 +52,10 @@ class cardValidator
             ];
         }
 
-        if (!is_int($year) || !$year) {
+        if (!is_string($year)) {
             return [
                 'result' => false,
-                'message' => 'Invalid argument, $year must be a non null integer',
+                'message' => 'Invalid argument, $year must be a string',
             ];
         }
         if (!(bool) preg_match('/^[0-9]{4}$/', $year)) {

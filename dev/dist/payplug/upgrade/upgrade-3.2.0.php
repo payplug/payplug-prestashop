@@ -26,10 +26,8 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_2_0()
 {
-    $flag = true;
-
     // Add new conf var for Oney with/without fees
-    $flag = $flag && Configuration::updateValue('PAYPLUG_ONEY_FEES', 1);
+    $flag = Configuration::updateValue('PAYPLUG_ONEY_FEES', 1);
 
     // Add new conf var for company country iso
     return $flag && Configuration::updateValue('PAYPLUG_COMPANY_ISO', 1);

@@ -40,8 +40,6 @@ function upgrade_module_2_29_0($object)
         return true;
     }
 
-    $flag = true;
-
     // install table `payplug_cache`
     $sql = '
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $object->name . '_cache` (
@@ -52,5 +50,5 @@ function upgrade_module_2_29_0($object)
             `date_upd` DATETIME NULL
             ) ENGINE=' . _MYSQL_ENGINE_;
 
-    return $flag && Db::getInstance()->execute($sql);
+    return Db::getInstance()->execute($sql);
 }

@@ -26,7 +26,5 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_16_2()
 {
-    $flag = true;
-
-    return $flag && Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO');
+    return Configuration::deleteByName('PAYPLUG_DEFERRED_AUTO');
 }
