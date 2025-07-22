@@ -26,10 +26,8 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_3_8_1()
 {
-    $flag = true;
-
     // add  PAYPLUG_APPLEPAY to database
-    $flag = $flag && Configuration::updateValue(
+    $flag = Configuration::updateValue(
         'PAYPLUG_APPLEPAY',
         null
     );

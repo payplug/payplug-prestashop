@@ -168,7 +168,7 @@ class CardAction
     /**
      * @description Render the cards list.
      *
-     * @param false $active_only
+     * @param bool $active_only
      *
      * @return array
      */
@@ -206,17 +206,11 @@ class CardAction
         foreach ($cards as $key => &$card) {
             $is_expired = $this->dependencies
                 ->getValidators()['card']
-                ->isValidExpiration((int) $card['exp_month'], (int) $card['exp_year']);
+                ->isValidExpiration((string) $card['exp_month'], (string) $card['exp_year']);
             if (!$is_expired['result']) {
-                if ($active_only) {
-                    unset($cards[$key]);
+                unset($cards[$key]);
 
-                    continue;
-                }
-
-                $card['expired'] = true;
-            } else {
-                $card['expired'] = false;
+                continue;
             }
             $card['expiry_date'] = date(
                 'm / y',
@@ -231,7 +225,7 @@ class CardAction
     /**
      * @description Render card information for order detail.
      *
-     * @param null $payment
+     * @param object $payment
      *
      * @return array
      */

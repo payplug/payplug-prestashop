@@ -51,33 +51,6 @@ class QueryRepository
         'lastId' => [],
     ];
 
-    private $data_type_text = [
-        'char',
-        'varchar',
-        'nchar',
-        'nvarchar',
-        'binary',
-        'varbinary',
-        'tinyblob',
-        'tinytext',
-        'text',
-        'blob',
-        'mediumtext',
-        'longtext',
-        'longblob',
-        'enum',
-        'set',
-    ];
-
-    private $data_type_length = [
-        'char',
-        'varchar',
-        'nchar',
-        'nvarchar',
-        'binary',
-        'varbinary',
-    ];
-
     public function __construct($dependencies = null)
     {
         $this->dependencies = $dependencies;
@@ -160,9 +133,7 @@ class QueryRepository
 
     public function values($values)
     {
-        if (!empty($values) || 0 == $values) {
-            $this->query['values'][] = '\'' . $values . '\'';
-        }
+        $this->query['values'][] = '\'' . $values . '\'';
 
         return $this;
     }

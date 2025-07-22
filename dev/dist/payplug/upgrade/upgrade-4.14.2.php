@@ -41,6 +41,7 @@ function upgrade_module_4_14_2($object)
     } catch (Exception $e) {
         $logger->addLog('An error occured while executing sql: ' . $sql, 'error');
         $logger->addLog($e->getMessage(), 'error');
+        $flag = false;
     }
 
     $logger->addLog('End upgrade script 4.14.2, result: ' . ($flag ? 'ok' : 'ko'));

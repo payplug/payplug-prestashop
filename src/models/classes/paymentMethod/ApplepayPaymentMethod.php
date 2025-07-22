@@ -92,10 +92,9 @@ class ApplepayPaymentMethod extends PaymentMethod
     /**
      * @description Retrieves the list of compatible carriers for a given product.
      *
-     * @param $product_id
-     * @param $carriers_list
+     * @param int $product_id
      *
-     * @return array
+     * @return bool
      */
     public function hasCompatibleCarriersForProduct($product_id)
     {
@@ -262,7 +261,7 @@ class ApplepayPaymentMethod extends PaymentMethod
      * @description Patch the payement resource
      *
      * @param string $resource_id
-     * @param string $token
+     * @param array $token
      * @param string $workflow
      * @param array $carrier
      * @param array $user
@@ -595,8 +594,8 @@ class ApplepayPaymentMethod extends PaymentMethod
     /**
      * @description  hydrate $cart_data array
      *
-     * @param $address_data
-     * @param null $shipping_email
+     * @param array $address_data
+     * @param string $shipping_email
      *
      * @return array
      */

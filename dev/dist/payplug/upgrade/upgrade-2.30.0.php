@@ -67,7 +67,7 @@ function upgrade_module_2_30_0($object)
                 if ($res_describe) {
                     foreach ($res_describe as $field) {
                         if ('id_cart' == $field['Field'] && 'UNI' == $field['Key']) {
-                            $flag = $flag && true;
+                            $flag = true;
                         }
                     }
                 } else {

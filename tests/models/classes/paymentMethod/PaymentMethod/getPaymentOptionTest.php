@@ -26,6 +26,8 @@ class getPaymentOptionTest extends BasePaymentMethod
 
     public function testWhenNoNameFoundForPaymentMethod()
     {
+        $this->class->set('name', '');
+
         $this->assertSame([], $this->class->getPaymentOption([]));
     }
 

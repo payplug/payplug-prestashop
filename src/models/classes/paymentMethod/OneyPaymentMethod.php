@@ -175,12 +175,12 @@ class OneyPaymentMethod extends PaymentMethod
      *
      * @return array
      */
-    public function getOrderTab($retrieve = null)
+    public function getOrderTab($retrieve = [])
     {
         $this->setParameters();
 
         $resource = $retrieve['resource'];
-        if (!is_object($resource) || !$resource) {
+        if (null == $resource) {
             $this->logger->addLog('OneyPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
@@ -396,7 +396,7 @@ class OneyPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        if (!is_object($resource) || !$resource) {
+        if (null == $resource) {
             $this->logger->addLog('OneyPaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
 
             return [];
@@ -833,11 +833,11 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Get Oney payment options
      *
      * @param int $amount
-     * @param false $country
+     * @param string $country
      *
      * @return array
      */
-    public function getOneyPaymentOptionsList($amount = 0, $country = false)
+    public function getOneyPaymentOptionsList($amount = 0, $country = '')
     {
         $this->setParameters();
 
@@ -851,7 +851,7 @@ class OneyPaymentMethod extends PaymentMethod
             ->getHelpers()['amount']
             ->convertAmount($amount);
 
-        if (!$country) {
+        if (!is_string($country)) {
             $iso_code_list = $this->configuration->getValue('oney_allowed_countries');
             if (!$iso_code_list) {
                 return $payment_list;
@@ -892,23 +892,24 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Format Oney simulation from resource
      *
-     * @param bool $operation
+     * @param string $operation
      * @param array $resource
-     * @param bool $total_amount
+     * @param int $total_amount
      *
      * @return array
      */
-    public function formatOneyResource($operation = false, $resource = [], $total_amount = false)
+    public function formatOneyResource($operation = '', $resource = [], $total_amount = 0)
     {
-        if (!in_array($operation, $this->getOperations()) || !$operation) {
-            return false;
-        }
-        if (!is_array($resource) || empty($resource)) {
-            return false;
+        if (!in_array($operation, $this->getOperations()) || !is_string($operation)) {
+            return [];
         }
 
-        if (!$total_amount || !is_int($total_amount)) {
-            return false;
+        if (!is_array($resource) || empty($resource)) {
+            return [];
+        }
+
+        if (!is_int($total_amount)) {
+            return [];
         }
 
         $context = $this->dependencies
@@ -1083,11 +1084,10 @@ class OneyPaymentMethod extends PaymentMethod
      */
     public function getOneyCountry($iso_country = '')
     {
-        if (!$iso_country || !is_string($iso_country)) {
-            return false;
-        }
         $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
-        if (in_array($iso_country, $overseas_iso, true)) {
+        if (in_array($iso_country, $overseas_iso, true)
+            || !is_string($iso_country)
+            || '' == $iso_country) {
             return 'FR';
         }
 
@@ -1110,7 +1110,7 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Get Oney price limit
      *
      * @param bool $custom
-     * @param false $id_currency
+     * @param int $id_currency
      *
      * @return array
      */
@@ -1676,7 +1676,7 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Get cart page CTA
      *
-     * @param false $active
+     * @param bool $active
      *
      * @return array
      */
@@ -1705,7 +1705,7 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Get Product page CTA
      *
-     * @param false $active
+     * @param bool $active
      *
      * @return array
      */
@@ -1734,7 +1734,7 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Get Oney schedule
      *
-     * @param false $active
+     * @param bool $active
      *
      * @return array
      */
@@ -1995,11 +1995,11 @@ class OneyPaymentMethod extends PaymentMethod
      */
     protected function formatPrice($price = 0, $currency = null)
     {
-        if (!is_numeric($price) || !$price) {
+        if (!is_float($price)) {
             return '';
         }
 
-        if (!is_object($currency) || !$currency) {
+        if (!is_object($currency) || null == $currency) {
             return '';
         }
 

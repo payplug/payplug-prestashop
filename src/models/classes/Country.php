@@ -74,7 +74,7 @@ class Country
     public function getIsoCodeByCountryId($country_id)
     {
         $iso_code_list = $this->getIsoCodeList();
-        if (!is_array($iso_code_list) || empty($iso_code_list) || !count($iso_code_list)) {
+        if (empty($iso_code_list)) {
             return '';
         }
 

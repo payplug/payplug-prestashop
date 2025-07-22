@@ -25,10 +25,8 @@
 
 function upgrade_module_3_10_0()
 {
-    $flag = true;
-
     // add  PAYPLUG_APPLEPAY to database
-    return $flag && Configuration::updateValue(
+    return Configuration::updateValue(
         'PAYPLUG_AMEX',
         null
     );

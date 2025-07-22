@@ -31,19 +31,13 @@ if (!defined('_PS_VERSION_')) {
 
 class OrderClass
 {
-    private $constant;
     private $context;
     private $dependencies;
-    private $query;
-    private $orderState;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
-        $this->query = $this->dependencies->getPlugin()->getQueryRepository();
-        $this->orderState = $this->dependencies->getPlugin()->getOrderState();
     }
 
     /**
@@ -67,7 +61,7 @@ class OrderClass
      *
      * @return array
      */
-    public function getUndefinedOrderHistory($orderId = false)
+    public function getUndefinedOrderHistory($orderId)
     {
         if (!$orderId || !is_int($orderId)) {
             return [];

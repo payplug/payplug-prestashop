@@ -49,9 +49,6 @@ class OrderStateRepository extends BaseClass
     private $order_state_adapter;
 
     /** @var object */
-    private $query;
-
-    /** @var object */
     private $tools;
 
     /** @var object */
@@ -63,7 +60,6 @@ class OrderStateRepository extends BaseClass
         $dependencies,
         $language,
         $order_state_adapter,
-        $query,
         $tools,
         $validate,
         $myLogPhp
@@ -73,7 +69,6 @@ class OrderStateRepository extends BaseClass
         $this->dependencies = $dependencies;
         $this->language = $language;
         $this->order_state_adapter = $order_state_adapter;
-        $this->query = $query;
         $this->tools = $tools;
         $this->validate = $validate;
         $this->log = $myLogPhp;
@@ -126,10 +121,10 @@ class OrderStateRepository extends BaseClass
         return false;
     }
 
-    public function create($name = false, $state = [], $sandbox = true, $force = false)
+    public function create($name = '', $state = [], $sandbox = true, $force = false)
     {
         if (!is_string($name)
-            || !$name
+            || '' == $name
             || !is_array($state)
             || empty($state)) {
             return false;
@@ -145,7 +140,7 @@ class OrderStateRepository extends BaseClass
                 // Valide order state
                 $os = $this->order_state_adapter->get((int) $id_order_state);
                 if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
-                    return $this->configuration->set($key_config, (int) $os->id);
+                    return $this->configuration->set($key_config, (string) $os->id);
                 }
             }
         }
@@ -178,7 +173,7 @@ class OrderStateRepository extends BaseClass
             $id_order_state = $this->add($name, $state, $sandbox);
         }
 
-        return $this->configuration->set($key_config, (int) $id_order_state);
+        return $this->configuration->set($key_config, (string) $id_order_state);
     }
 
     public function getConfigKey($name = false, $sandbox = false)

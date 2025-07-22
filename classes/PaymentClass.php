@@ -29,11 +29,9 @@ if (!defined('_PS_VERSION_')) {
 
 class PaymentClass
 {
-    private $assign;
     private $configuration;
     private $dependencies;
     private $logger;
-    private $oney;
     private $order;
     private $orderHistory;
     private $validate;
@@ -42,10 +40,8 @@ class PaymentClass
     {
         $this->dependencies = $dependencies;
 
-        $this->assign = $this->dependencies->getPlugin()->getAssign();
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->logger = $this->dependencies->getPlugin()->getLogger();
-        $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->order = $this->dependencies->getPlugin()->getOrder();
         $this->orderHistory = $this->dependencies->getPlugin()->getOrderHistory();
         $this->validate = $this->dependencies->getPlugin()->getValidate();

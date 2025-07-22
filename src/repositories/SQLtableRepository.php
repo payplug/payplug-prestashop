@@ -103,7 +103,7 @@ class SQLtableRepository
                 $logger->addLog('$table value : ' . json_encode($table), 'error');
             }
 
-            if ($log) {
+            if (null != $log) {
                 $log->error('[SQLtableRepository] checkExistingTable() : parameter $table is not a string');
                 $log->error('$table value : ' . json_encode($table), 'error');
             }
@@ -116,7 +116,7 @@ class SQLtableRepository
             ->table($table)
         ;
         if (!$this->query->build()) {
-            if ($log) {
+            if (null != $log) {
                 $log->error('[SQLtableRepository] checkExistingTable() : '
                     . 'Error during send request in DB for given table ' . $table);
             }

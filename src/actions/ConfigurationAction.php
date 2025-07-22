@@ -344,7 +344,7 @@ class ConfigurationAction
                         }
                     }
                 } else {
-                    $tab->name = array_fill_keys($languages_adatper->getIDs(false), $module->displayName);
+                    $tab->name = array_fill_keys($languages_adatper->getIDs(false), $this->dependencies->name);
                 }
 
                 if (isset($adminController['parent'])) {
@@ -357,7 +357,7 @@ class ConfigurationAction
 
                 $tab->class_name = $adminController['className'];
                 $tab->active = true;
-                $tab->module = $module->name;
+                $tab->module = $this->dependencies->name;
                 $installed = $installed && $tab->add();
             }
         }
@@ -380,7 +380,7 @@ class ConfigurationAction
             ->getLoginTranslations();
         $logger = $this->dependencies->getPlugin()->getLogger();
 
-        if (!is_object($datas) || !$datas) {
+        if (!$datas) {
             $logger->addLog('ConfigurationAction::loginAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
@@ -448,7 +448,7 @@ class ConfigurationAction
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $configuration->set('email', $email);
-        $configuration->set('enable', 1);
+        $configuration->set('enable', '1');
 
         // Update global configuration
         $permissions = $this->dependencies
@@ -571,7 +571,7 @@ class ConfigurationAction
 
         $logger = $this->dependencies->getPlugin()->getLogger();
 
-        if (!is_object($datas) || !$datas) {
+        if (!$datas) {
             $logger->addLog('ConfigurationAction::saveAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
@@ -663,7 +663,7 @@ class ConfigurationAction
                     case 'enable_oney_product_animation':
                     case 'enable_oney_cart_animation':
                     case 'enable_oney_schedule':
-                        if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) && !$configuration->set($key, (int) $value)) {
+                        if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) && !$configuration->set($key, (string) $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -680,7 +680,7 @@ class ConfigurationAction
                         if ((int) $datas->payplug_inst_min_amount >= 4
                             && (int) $datas->payplug_inst_mode < 5
                             && (int) $datas->payplug_inst_mode > 1
-                            && !$configuration->set($key, (int) $value)) {
+                            && !$configuration->set($key, (string) $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -725,7 +725,7 @@ class ConfigurationAction
                         break;
 
                     case 'enable_bancontact_country':
-                        if ((bool) $datas->enable_bancontact && !$configuration->set($key, (int) $value)) {
+                        if ((bool) $datas->enable_bancontact && !$configuration->set($key, (string) $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -769,19 +769,7 @@ class ConfigurationAction
                         break;
 
                     default:
-                        switch ($configuration->getType($key)) {
-                            case 'integer':
-                                $value = (int) $value;
-
-                                break;
-
-                            default:
-                            case 'string':
-                                $value = (string) $value;
-
-                                break;
-                        }
-                        if (!$configuration->set($key, $value)) {
+                        if (!$configuration->set($key, (string) $value)) {
                             return [
                                 'success' => false,
                                 'data' => [
@@ -790,6 +778,8 @@ class ConfigurationAction
                                 ],
                             ];
                         }
+
+                        break;
                 }
             }
 
@@ -842,7 +832,7 @@ class ConfigurationAction
     /**
      * @description Check merchant is onboarded
      *
-     * @param $datas
+     * @param object $datas
      *
      * @return array
      */
@@ -853,7 +843,7 @@ class ConfigurationAction
             ->getTranslationClass()
             ->getLoggedTranslations();
         $logger = $this->dependencies->getPlugin()->getLogger();
-        if (!is_object($datas) || !$datas) {
+        if (!is_object($datas) || null == $datas) {
             $logger->addLog('ConfigurationAction::submitSandboxAction: Invalid parameter given, $datas must be a non null object.');
 
             return [
@@ -1002,7 +992,9 @@ class ConfigurationAction
         }
         foreach ($hook_list as $hook) {
             if ($hook_install) {
-                $hook_install = $hook_install && $module->registerHook($hook);
+                $hook_install = $module->registerHook($hook);
+            } else {
+                break;
             }
         }
 
@@ -1025,13 +1017,15 @@ class ConfigurationAction
 
         foreach ($order_states_list as $key => $state) {
             if ($install_order_state) {
-                $install_order_state = $install_order_state && $order_state->create($key, $state, true);
+                $install_order_state = $order_state->create($key, $state, true);
                 $install_order_state = $install_order_state && $order_state->create($key, $state, false);
+            } else {
+                break;
             }
         }
 
         if ($install_order_state) {
-            $install_order_state = $install_order_state && $order_state->removeIdsUnusedByPayPlug();
+            $install_order_state = $order_state->removeIdsUnusedByPayPlug();
         }
 
         return $install_order_state;

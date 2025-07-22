@@ -73,7 +73,7 @@ class setTest extends BaseConfiguration
     public function testWhenConfigurationIsUpdated()
     {
         $key = 'enable';
-        $value = 1;
+        $value = '1';
         $this->configuration->shouldReceive([
             'updateValue' => true,
         ]);

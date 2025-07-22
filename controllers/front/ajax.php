@@ -30,21 +30,14 @@ if (!defined('_PS_VERSION_')) {
  */
 class PayplugAjaxModuleFrontController extends ModuleFrontController
 {
-    private $cart_adapter;
     private $configurationAdapter;
-    private $configurationClass;
     private $contextAdapter;
-    private $country;
     private $logger;
-    private $oney;
     private $dependencies;
-    private $paymentClass;
     private $plugin;
     private $productAdapter;
     private $tools_adapter;
-    private $translate;
     private $validators;
-    private $address_class;
 
     /**
      * @description
@@ -59,24 +52,17 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
     {
         $this->dependencies = new PayPlug\classes\DependenciesClass();
         $this->validators = $this->dependencies->getValidators();
-        $this->paymentClass = $this->dependencies->paymentClass;
         $this->plugin = $this->dependencies->getPlugin();
         $this->logger = $this->plugin->getLogger();
-        $this->cart_adapter = $this->plugin->getCart();
         $this->tools_adapter = $this->plugin->getTools();
-        $this->country = $this->dependencies->getPlugin()->getCountry();
 
         if (1 == $this->tools_adapter->tool('getValue', '_ajax')) {
             $this->configurationAdapter = $this->plugin->getConfiguration();
-            $this->configurationClass = $this->plugin->getConfigurationClass();
 
             $this->contextAdapter = $this->plugin->getContext(); // get ContextAdapter Repository object
-            $this->oney = $this->plugin->getOney();
             $this->productAdapter = $this->plugin->getProduct();
-            $this->translate = $this->plugin->getTranslate();
             $context = $this->contextAdapter->get(); // get the method
             $tools = $this->tools_adapter;
-            $this->address_class = $this->plugin->getAddressClass();
 
             // todo: Create a ajaxDispatcher to avoid this "infinite" list of condition
             if ($tools->tool('getIsset', 'pc')) {

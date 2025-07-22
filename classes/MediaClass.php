@@ -33,13 +33,11 @@ class MediaClass
 {
     private $dependencies;
     private $context;
-    private $media;
 
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
-        $this->media = $this->dependencies->getPlugin()->getMedia();
     }
 
     /**

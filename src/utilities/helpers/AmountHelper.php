@@ -87,7 +87,7 @@ class AmountHelper
      * @description Check is given amount is valid with price limit
      *
      * @param array $price_limit
-     * @param int $amount
+     * @param float $amount
      *
      * @return array
      */
@@ -100,7 +100,7 @@ class AmountHelper
             ];
         }
 
-        if (!is_float($amount) || !$amount) {
+        if (!is_float($amount)) {
             return [
                 'result' => false,
                 'message' => 'Wrong paramaters given, $amount must be a non null float',

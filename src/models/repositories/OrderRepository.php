@@ -108,9 +108,9 @@ class OrderRepository extends EntityRepository
      *
      * @return int
      */
-    public function getCurrentOrderState($order_id = false)
+    public function getCurrentOrderState($order_id)
     {
-        if (!is_int($order_id) || !$order_id) {
+        if (!is_int($order_id)) {
             return 0;
         }
 
