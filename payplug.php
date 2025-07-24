@@ -128,7 +128,7 @@ class Payplug extends PaymentModule
         // Check if controller name exist then if linked to the right module
         $idtab = Tab::getIdFromClassName($controllerName);
         if (!$idtab) {
-            $this->payplug_dependencies->dependencies
+            $this->payplug_dependencies
                 ->getPlugin()
                 ->getConfigurationAction()
                 ->installTabAction();
@@ -371,7 +371,7 @@ class Payplug extends PaymentModule
     public function hookDisplayProductAdditionalInfo()
     {
         if ($this->payplug_dependencies) {
-            return $this->payplug_dependencies->dependencies
+            return $this->payplug_dependencies
                 ->getPlugin()
                 ->getCartAction()
                 ->renderPaymentCTA();
