@@ -169,15 +169,21 @@ class OneyPaymentMethod extends PaymentMethod
 
     /**
      * @description Get order tab for given resource to create the order
-     * @todo: add coverage to this method
      *
      * @param array $retrieve
      *
      * @return array
+     * @todo: add coverage to this method
      */
     public function getOrderTab($retrieve = [])
     {
         $this->setParameters();
+
+        if (!is_array($retrieve) || !$retrieve) {
+            $this->logger->addLog('OneyPaymentMethod::getOrderTab() - Invalid argument given, $retrieve must be a non empty array.');
+
+            return [];
+        }
 
         $resource = $retrieve['resource'];
         if (null == $resource) {
@@ -243,17 +249,20 @@ class OneyPaymentMethod extends PaymentMethod
         $payment_tab['authorized_amount'] = $payment_tab['amount'];
 
         // Check if oney was elligible then return if not
-        $is_valid_cart = $this->isValidOneyCart($this->context->cart)['result'];
+        $is_valid_cart = $this->isValidOneyCartQty($this->context->cart)['result'];
         $use_taxes = (bool) $this->dependencies
             ->getPlugin()
             ->getConfiguration()
             ->get('PS_TAX');
         $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
-        $is_valid_addresses = $this->isValidOneyAddresses($this->context->cart->id_address_delivery, $this->context->cart->id_address_invoice);
+        $is_valid_addresses = $this->isValidOneyAddresses(
+            (int) $this->context->cart->id_address_delivery,
+            (int) $this->context->cart->id_address_invoice
+        );
         $is_valid_amount = $this->isValidOneyAmount($cart_amount);
         $is_elligible = $this->validators['payment']->isOneyElligible(
             $is_valid_cart,
-            $is_valid_addresses,
+            $is_valid_addresses['result'],
             $is_valid_amount['result']
         );
 
@@ -725,8 +734,11 @@ class OneyPaymentMethod extends PaymentMethod
         if ($this->validate_adapter->validate('isLoadedObject', $cart)
             && $cart->id_address_invoice
             && $cart->id_address_delivery) {
-            $is_valid_cart = $this->isValidOneyCart($cart)['result'];
-            $is_valid_addresses = $this->isValidOneyAddresses($cart->id_address_delivery, $cart->id_address_invoice);
+            $is_valid_cart = $this->isValidOneyCartQty($cart)['result'];
+            $is_valid_addresses = $this->isValidOneyAddresses(
+                (int) $cart->id_address_delivery,
+                (int) $cart->id_address_invoice
+            );
             $is_valid_amount = $this->isValidOneyAmount($amount ? $amount : $cart->getOrderTotal(true))['result'];
 
             $is_elligible = $this->validators['payment']
@@ -746,8 +758,8 @@ class OneyPaymentMethod extends PaymentMethod
             ->getOrderStateActionRenderTranslations();
         $error = isset($is_elligible['error']) ? $is_elligible['error'] : (
             $oney_payment_options
-                ? false
-                : $this->oney_translations['schedules_unavailable']
+            ? false
+            : $this->oney_translations['schedules_unavailable']
         );
 
         $withFirstSchedule = 'it' == $this->context->language->iso_code;
@@ -813,7 +825,7 @@ class OneyPaymentMethod extends PaymentMethod
 
         $limits = $this->getOneyPriceLimit();
         $learnMoreLink = 'IT' == $this->configuration->getValue('company_iso')
-        && 'it' == $this->tools->tool('strtolower', $this->context->language->iso_code);
+            && 'it' == $this->tools->tool('strtolower', $this->context->language->iso_code);
         $this->context->getContext()->smarty->assign([
             'learnMoreLink' => (bool) $learnMoreLink,
             'oneyWithFees' => (bool) $this->configuration->getValue('oney_fees'),
@@ -1186,15 +1198,17 @@ class OneyPaymentMethod extends PaymentMethod
      * @param object $cart
      *
      * @return array
+     *
+     * @todo Add coverage to this method
      */
-    public function isValidOneyCart($cart = null)
+    public function isValidOneyCartQty($cart = null)
     {
         $this->setParameters();
 
         if (!$this->validate_adapter->validate('isLoadedObject', $cart)) {
             return [
                 'result' => false,
-                'error' => $this->oney_translations['cart_error'],
+                'message' => $this->oney_translations['cart_error'],
             ];
         }
 
@@ -1205,11 +1219,11 @@ class OneyPaymentMethod extends PaymentMethod
         if (!$is_valid_cart_quantity['result']) {
             return [
                 'result' => false,
-                'error' => 'The payment with Oney is not available because you have more than 1000 items in your cart.',
+                'message' => 'The payment with Oney is not available because you have more than 1000 items in your cart.',
             ];
         }
 
-        return ['result' => true, 'error' => false];
+        return ['result' => true, 'message' => ''];
     }
 
     /**
@@ -1218,10 +1232,36 @@ class OneyPaymentMethod extends PaymentMethod
      * @param int $id_shipping
      * @param int $id_billing
      *
-     * @return bool
+     * @return array
+     *
+     * @todo Add coverage to this method
      */
     public function isValidOneyAddresses($id_shipping = 0, $id_billing = 0)
     {
+        if (!is_int($id_shipping) || !$id_shipping) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OneyPaymentMethod::isValidOneyAddresses - Invalid argument, $id_shipping must be a non null integer.', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Invalid id shipping given',
+            ];
+        }
+
+        if (!is_int($id_billing) || !$id_billing) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OneyPaymentMethod::isValidOneyAddresses - Invalid argument, $id_billing must be a non null integer.', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Invalid id billing given',
+            ];
+        }
+
         $this->setParameters();
 
         $shipping = $this->address_adapter->get((int) $id_shipping);
@@ -1236,7 +1276,17 @@ class OneyPaymentMethod extends PaymentMethod
             ->configClass
             ->getIsoCodeByCountryId((int) $billing->id_country);
 
-        return $shipping_iso_code == $billing_iso_code;
+        if ($shipping_iso_code != $billing_iso_code) {
+            return [
+                'result' => false,
+                'message' => 'Shipping iso code and billing iso code does not matches.',
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => '',
+        ];
     }
 
     /**
@@ -1245,6 +1295,8 @@ class OneyPaymentMethod extends PaymentMethod
      * @param float $amount
      *
      * @return array
+     *
+     * @todo Add coverage to this method
      */
     public function isValidOneyAmount($amount = 0)
     {
@@ -1268,7 +1320,7 @@ class OneyPaymentMethod extends PaymentMethod
         if (!$is_valid_amount['result']) {
             return [
                 'result' => false,
-                'error' => sprintf(
+                'message' => sprintf(
                     $this->oney_translations['amount_error'],
                     $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
                     $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result']
@@ -1276,7 +1328,7 @@ class OneyPaymentMethod extends PaymentMethod
             ];
         }
 
-        return ['result' => true, 'error' => false];
+        return ['result' => true, 'message' => ''];
     }
 
     /**
@@ -1579,31 +1631,52 @@ class OneyPaymentMethod extends PaymentMethod
     protected function getPaymentOption($payment_options = [])
     {
         if (!is_array($payment_options)) {
-            return [];
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OneyPaymentMethod::getPaymentOption - Invalid argument, $resource_id must be a non empty array.', 'error');
+
+            return $payment_options;
         }
 
         $this->setParameters();
 
-        $use_taxes = (bool) $this->dependencies
-            ->getPlugin()
-            ->getConfiguration()
-            ->get('PS_TAX');
+        $is_valid_cart = $this->isValidOneyCartQty($this->context->cart);
+        if (!$is_valid_cart['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OneyPaymentMethod::getPaymentOption - ' . $is_valid_cart['message'], 'error');
+
+            return $payment_options;
+        }
+        $use_taxes = (bool) $this->configuration->getValue('PS_TAX');
         $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
-
-        $is_valid_cart = $this->isValidOneyCart($this->context->cart)['result'];
         $cart_amount = $cart_amount ?: $this->context->cart->getOrderTotal(true);
-        $is_valid_amount = $this->isValidOneyAmount($cart_amount)['result'];
-        $is_valid_addresses = $this->isValidOneyAddresses($this->context->cart->id_address_delivery, $this->context->cart->id_address_invoice);
+        $is_valid_amount = $this->isValidOneyAmount($cart_amount);
+        if (!$is_valid_amount['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OneyPaymentMethod::getPaymentOption - ' . $is_valid_amount['message'], 'error');
 
-        $is_elligible = $this->validators['payment']
-            ->isOneyElligible($is_valid_cart, $is_valid_addresses, $is_valid_amount);
+            return $payment_options;
+        }
 
-        $error = isset($is_elligible['result']) && false === $is_elligible['result'] ? $is_elligible['code'] : false;
+        $is_valid_addresses = $this->isValidOneyAddresses(
+            (int) $this->context->cart->id_address_delivery,
+            (int) $this->context->cart->id_address_invoice
+        );
+        if (!$is_valid_addresses['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OneyPaymentMethod::getPaymentOption - ' . $is_valid_addresses['message'], 'error');
 
-        $err_label = $this->getErrorLabel($error);
+            return $payment_options;
+        }
 
-        $optimized = $this->configuration->getValue('oney_optimized') && !$error;
-
+        $optimized = $this->configuration->getValue('oney_optimized');
         $use_fees = (bool) $this->configuration->getValue('oney_fees');
         $delivery_address = $this->dependencies
             ->getPlugin()
@@ -1620,57 +1693,58 @@ class OneyPaymentMethod extends PaymentMethod
 
         $available_oney_payments = $this->getOperations();
 
+        $payment_options = $this->getParentPaymentOption($payment_options);
+        if (!isset($payment_options[$this->name])) {
+            return $payment_options;
+        }
+
         foreach ($available_oney_payments as $oney_payment) {
             $with_fees = false !== (bool) strpos($oney_payment, 'with_fees');
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 continue;
             }
-
-            $this->name = 'oney_' . $oney_payment;
-            $payment_options = parent::getPaymentOption($payment_options);
-
-            if (!isset($payment_options[$this->name])) {
-                continue;
-            }
-
+            $oney_option_name = 'oney_' . $oney_payment;
+            $oney_option = $payment_options[$this->name];
             $type = explode('_', $oney_payment);
             $split = (int) str_replace('x', '', $type[0]);
-
-            $oneyLogo = $oney_payment . (!$use_fees ? '_side_' . $iso : '') . ($error ? '_alt' : '') . '.svg';
-            $text = $use_fees
-                ? $this->oney_translations['pay_with_fee']
-                : $this->oney_translations['pay_without_fee'];
-
-            $oneyLabel = $error ? $err_label : sprintf($text, $split);
-
-            $payment_options[$this->name]['name'] = 'oney';
-            $payment_options[$this->name]['inputs']['method']['value'] = 'oney';
-            $payment_options[$this->name]['is_optimized'] = $optimized;
-            $payment_options[$this->name]['type'] = $oney_payment;
-            $payment_options[$this->name]['amount'] = $cart_amount;
-            $payment_options[$this->name]['iso_code'] = $this->dependencies
-                ->configClass
-                ->getIsoCodeByCountryId((int) $delivery_address->id_country);
-            $payment_options[$this->name]['inputs']['oney_type'] = [
+            $text = $use_fees ? $this->oney_translations['pay_with_fee'] : $this->oney_translations['pay_without_fee'];
+            $oney_option['name'] = 'oney';
+            $oney_option['inputs']['method']['value'] = 'oney';
+            $oney_option['is_optimized'] = $optimized;
+            $oney_option['type'] = $oney_payment;
+            $oney_option['amount'] = $cart_amount;
+            $oney_option['iso_code'] = $this->dependencies->configClass->getIsoCodeByCountryId((int) $delivery_address->id_country);
+            $oney_option['inputs']['oney_type'] = [
                 'name' => $this->dependencies->name . 'Oney_type',
                 'type' => 'hidden',
                 'value' => $oney_payment,
             ];
-            $payment_options[$this->name]['extra_classes'] = sprintf('oney%sx', $split);
-            $payment_options[$this->name]['payment_controller_url'] = $this->context
-                ->link
-                ->getModuleLink($this->dependencies->name, 'payment', [
-                    'type' => 'oney',
-                    'io' => sprintf('%s', $split),
-                ], true);
-            $payment_options[$this->name]['logo'] = $this->img_path . 'oney/' . $oneyLogo;
-            $payment_options[$this->name]['callToActionText'] = $oneyLabel;
-            $payment_options[$this->name]['err_label'] = $err_label;
+            $oney_option['extra_classes'] = sprintf('oney%sx', $split);
+            $oney_option['payment_controller_url'] = $this->context->link->getModuleLink($this->dependencies->name, 'payment', [
+                'type' => 'oney',
+                'io' => sprintf('%s', $split),
+            ], true);
+            $oney_option['logo'] = $this->img_path . 'oney/' . $oney_payment . (!$use_fees ? '_side_' . $iso : '') . '.svg';
+            $oney_option['callToActionText'] = sprintf($text, $split);
+
+            $payment_options[$oney_option_name] = $oney_option;
         }
 
-        unset($payment_options['oney']);
+        unset($payment_options[$this->name]);
 
         return $payment_options;
+    }
+
+    /**
+     * @description Get parent Payment option to get default data from current payment method
+     *
+     * @param $payment_options
+     *
+     * @return array
+     */
+    protected function getParentPaymentOption($payment_options = [])
+    {
+        return parent::getPaymentOption($payment_options);
     }
 
     /**
