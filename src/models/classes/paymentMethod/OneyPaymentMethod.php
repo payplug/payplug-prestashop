@@ -725,11 +725,11 @@ class OneyPaymentMethod extends PaymentMethod
      *
      * @param object $cart
      * @param int $amount
-     * @param false $country
+     * @param string $country
      *
      * @return array
      */
-    public function getOneyPriceAndPaymentOptions($cart = null, $amount = 0, $country = false)
+    public function getOneyPriceAndPaymentOptions($cart = null, $amount = 0, $country = '')
     {
         $this->setParameters();
 
