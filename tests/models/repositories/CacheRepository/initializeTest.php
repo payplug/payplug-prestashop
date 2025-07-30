@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\repositories\CacheRepository;
  * @group unit
  * @group repository
  * @group cache_repository
- *
- * @runTestsInSeparateProcesses
  */
 class initializeTest extends BaseCacheRepository
 {

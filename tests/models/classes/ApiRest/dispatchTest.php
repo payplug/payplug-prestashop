@@ -8,8 +8,6 @@ use PayPlug\src\models\classes\ApiRest;
  * @group unit
  * @group class
  * @group apirest_classe
- *
- * @runTestsInSeparateProcesses
  */
 class dispatchTest extends BaseApiRest
 {

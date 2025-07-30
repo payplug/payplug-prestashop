@@ -7,8 +7,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group validator
  * @group module_validator
- *
- * @runTestsInSeparateProcesses
  */
 class isMobileDeviceTest extends TestCase
 {

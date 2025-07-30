@@ -8,8 +8,6 @@ use PayPlug\tests\mock\RefundMock;
  * @group unit
  * @group service
  * @group api_service
- *
- * @runTestsInSeparateProcesses
  */
 class RefundPaymentTest extends BaseApi
 {

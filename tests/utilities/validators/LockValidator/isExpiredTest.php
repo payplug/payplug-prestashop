@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group validator
  * @group lock_validator
- *
- * @runTestsInSeparateProcesses
  */
 class isExpiredTest extends TestCase
 {

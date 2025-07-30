@@ -9,8 +9,6 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group class
  * @group payment_method_class
  * @group oney_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
 class formatPriceTest extends BaseOneyPaymentMethod
 {

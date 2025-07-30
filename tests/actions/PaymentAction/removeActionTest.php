@@ -8,8 +8,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group action
  * @group payment_action
- *
- * @runTestsInSeparateProcesses
  */
 class removeActionTest extends BasePaymentAction
 {

@@ -426,6 +426,7 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Get the Oney required fields from Context
      *
      * todo: rework this function
+     * todo: add coverage to this method
      *
      * @return array
      */
@@ -605,6 +606,7 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Check Oney required fields in form
      *
      * todo: to clean or update
+     * todo: add coverage to this method
      *
      * @param mixed $payment_data
      *
@@ -844,6 +846,8 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Get Oney payment options
      *
+     * todo: add coverage to this method
+     *
      * @param int $amount
      * @param string $country
      *
@@ -988,6 +992,8 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Get Oney Payment Simulations
      *
+     * todo: add coverage to this method
+     *
      * @param int $amount
      * @param string $country
      * @param array $operation
@@ -1089,6 +1095,7 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Temp get valid iso code for french overseas,
      * todo: remove when it's fix in API
+     * todo: add coverage to this method
      *
      * @param string $iso_country
      *
@@ -1120,6 +1127,8 @@ class OneyPaymentMethod extends PaymentMethod
 
     /**
      * @description Get Oney price limit
+     *
+     * todo: add coverage to this method
      *
      * @param bool $custom
      * @param int $id_currency
@@ -1334,6 +1343,8 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Get Oney Delivery Context
      *
+     * todo: add coverage to this method
+     *
      * @return array
      */
     public function getOneyDeliveryContext()
@@ -1455,6 +1466,8 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Get the Oney required fields from Context
      *
+     * todo: add coverage to this method
+     *
      * @param array $payment_data
      *
      * @return bool
@@ -1565,6 +1578,8 @@ class OneyPaymentMethod extends PaymentMethod
 
     /**
      * @description Check given email is valid to use Oney payment
+     *
+     * todo: add coverage to this method
      *
      * @param string $email
      *

@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group helper
  * @group amount_helper
- *
- * @runTestsInSeparateProcesses
  */
 class formatOneyAmountTest extends TestCase
 {

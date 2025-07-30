@@ -8,8 +8,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group class
  * @group order_classe
- *
- * @runTestsInSeparateProcesses
  */
 class getOrderStateFromResourceTest extends BaseOrder
 {

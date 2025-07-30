@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\CartAction;
  * @group unit
  * @group action
  * @group cart_action
- *
- * @runTestsInSeparateProcesses
  */
 class renderApplePayCheckoutTest extends BaseCartAction
 {

@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\repositories\QueueRepository;
  * @group unit
  * @group repository
  * @group queue_repository
- *
- * @runTestsInSeparateProcesses
  */
 class getFirstNotTreatedEntryTest extends BaseQueueRepository
 {

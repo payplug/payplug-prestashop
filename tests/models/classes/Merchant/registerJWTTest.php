@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\classes\Merchant;
  * @group unit
  * @group class
  * @group merchant_classe
- *
- * @runTestsInSeparateProcesses
  */
 class registerJWTTest extends BaseMerchant
 {

@@ -9,8 +9,6 @@ use PayPlug\tests\mock\OrderMock;
  * @group unit
  * @group class
  * @group configuration_class
- *
- * @runTestsInSeparateProcesses
  */
 class actionObjectOrderHistoryAddAfterTest extends BaseHook
 {

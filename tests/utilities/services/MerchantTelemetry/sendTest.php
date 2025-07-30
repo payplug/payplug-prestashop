@@ -10,8 +10,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group service
  * @group merchant_telemetry_service
- *
- * @runTestsInSeparateProcesses
  */
 class sendTest extends TestCase
 {
