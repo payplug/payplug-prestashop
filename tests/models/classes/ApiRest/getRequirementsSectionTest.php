@@ -6,7 +6,6 @@ namespace PayPlug\tests\models\classes\ApiRest;
  * @group unit
  * @group class
  * @group apirest_class
- * @group debug
  */
 class getRequirementsSectionTest extends BaseApiRest
 {
