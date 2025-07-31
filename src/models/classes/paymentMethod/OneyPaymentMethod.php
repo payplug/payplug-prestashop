@@ -1053,7 +1053,6 @@ class OneyPaymentMethod extends PaymentMethod
             ->getOneySimulations($data);
 
         if (!$simulations['result']) {
-            $this->logger->setProcess('oney');
             $this->logger->addLog($simulations['message'], 'error');
 
             return [
@@ -1079,7 +1078,6 @@ class OneyPaymentMethod extends PaymentMethod
             // $cache_id = cache_key in db
             // $to_cache = cache_value in db
             if (!$cacheRepository->setCache($cache_key['result'], $to_cache)) {
-                $this->logger->setProcess('oney');
                 $error_message = 'Error during setting Oney Simulation in DB cache [OneyRepository]';
                 $error_level = 'error';
                 $this->logger->addLog($error_message, $error_level);
