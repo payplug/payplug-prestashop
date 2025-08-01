@@ -13,7 +13,7 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class DeleteCardTest extends BaseApi
 {
-    private $card_id;
+    public $card_id;
 
     public function setUp()
     {

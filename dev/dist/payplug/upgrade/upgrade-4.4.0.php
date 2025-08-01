@@ -28,7 +28,7 @@ function upgrade_module_4_4_0($object)
 {
     $flag = true;
 
-    $logger = $object->module->getPlugin()->getLogger();
+    $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.4.0');
 
     $payment_table = _DB_PREFIX_ . $object->name . '_payment';

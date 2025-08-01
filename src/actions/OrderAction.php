@@ -295,7 +295,7 @@ class OrderAction
 
         $id_order = isset($resource->metadata['Order']) ? (int) $resource->metadata['Order'] : 0;
 
-        // if no order getted from the payment metadatas, get the one from the database
+        // if no order got from the payment metadatas, get the one from the database
         if (!$id_order) {
             $id_order = $this->dependencies
                 ->getPlugin()

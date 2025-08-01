@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class hasErrorTest extends TestCase
 {
-    private $paymentValidator;
+    public $paymentValidator;
 
     public function setUp()
     {

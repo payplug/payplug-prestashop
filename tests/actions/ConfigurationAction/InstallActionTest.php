@@ -13,11 +13,11 @@ use PayPlug\classes\MyLogPHP;
  */
 class installActionTest extends BaseConfigurationAction
 {
-    private $configuration_helper;
-    private $constant;
-    private $files_helper;
-    private $order_state_action;
-    private $entity_repository;
+    public $configuration_helper;
+    public $constant;
+    public $files_helper;
+    public $order_state_action;
+    public $entity_repository;
 
     public function setUp()
     {

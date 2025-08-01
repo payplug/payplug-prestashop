@@ -25,6 +25,7 @@ namespace PayPlug\src\utilities\services;
 
 use Payplug\Authentication;
 use Payplug\Card;
+use PayPlug\classes\DependenciesClass;
 use Payplug\Core\APIRoutes;
 use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
@@ -37,7 +38,6 @@ use Payplug\OneySimulation;
 use Payplug\Payment;
 use Payplug\Payplug;
 use Payplug\Refund;
-use PayPlug\src\exceptions\BadParameterException;
 use Symfony\Component\Dotenv\Dotenv;
 
 if (!defined('_PS_VERSION_')) {
@@ -46,20 +46,17 @@ if (!defined('_PS_VERSION_')) {
 
 class API
 {
-    private $current_api_key = '';
+    public $dependencies;
 
-    private $dependencies;
+    private $current_api_key = '';
     private $site_url = '';
     private $portal_url = '';
     private $api_url = '';
     private $api;
 
-    public function __construct($dependencies)
+    public function __construct()
     {
-        $this->dependencies = $dependencies;
-
-        $this->checkEnvironment();
-        $this->setEnvironment();
+        $this->dependencies = new DependenciesClass();
     }
 
     /**
@@ -395,17 +392,92 @@ class API
         }
 
         try {
-            if (!$this->api) {
-                $this->api = Payplug::init([
-                    'secretKey' => base64_encode($client_id . ':' . $client_secret),
-                    'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
-                ]);
+            $this->setParameters();
+            $jwt_response = Authentication::generateJWT($client_id, $client_secret);
+
+            if (!isset($jwt_response['httpResponse']) || empty($jwt_response['httpResponse'])) {
+                return [
+                    'result' => false,
+                    'code' => null,
+                    'message' => 'Wrong httpResponse got',
+                ];
             }
+
+            $jwt_response['httpResponse']['expires_date'] = time() + $jwt_response['httpResponse']['expires_in'];
 
             $response = [
                 'result' => true,
                 'code' => 200,
-                'data' => Authentication::generateJWT($client_id),
+                'data' => $jwt_response['httpResponse'],
+            ];
+        } catch (\Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => (int) $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * @description Generate the JWT OneShot from the API
+     *
+     * @param string $authorization_code
+     * @param string $redirect_uri
+     * @param string $client_id
+     * @param string $code_verifier
+     *
+     * @return array
+     */
+    public function generateJWTOneShot($authorization_code = '', $redirect_uri = '', $client_id = '', $code_verifier = '')
+    {
+        if (!is_string($authorization_code) || !$authorization_code) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $authorization_code given',
+            ];
+        }
+
+        if (!is_string($redirect_uri) || !$redirect_uri) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $redirect_uri given',
+            ];
+        }
+
+        if (!is_string($client_id) || !$client_id) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $client_id given',
+            ];
+        }
+
+        if (!is_string($code_verifier) || !$code_verifier) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $code_verifier given',
+            ];
+        }
+
+        try {
+            $this->setParameters();
+            $api_response = Authentication::generateJWTOneShot($authorization_code, $redirect_uri, $client_id, $code_verifier);
+            $id_token = $api_response['httpResponse']['id_token'];
+            $id_token_split = explode('.', $id_token);
+            $payload = base64_decode($id_token_split[1]);
+            $payload_decode = json_decode($payload, true);
+            $email = $payload_decode['email'];
+            $response = [
+                'result' => true,
+                'code' => 200,
+                'data' => $api_response['httpResponse']['access_token'],
+                'email' => $email,
             ];
         } catch (\Exception $e) {
             $response = [
@@ -421,20 +493,12 @@ class API
     /**
      * @description Get account permission from Payplug API
      *
-     * @param $api_key
-     * @param bool $sandbox
      * @param bool $treat_account
      *
      * @return array
      */
-    public function getAccount($api_key = '', $sandbox = true, $treat_account = true)
+    public function getAccount($treat_account = true)
     {
-        if (!is_string($api_key)) {
-            return [];
-        }
-        if (!is_bool($sandbox)) {
-            return [];
-        }
         if (!is_bool($treat_account)) {
             return [];
         }
@@ -463,7 +527,7 @@ class API
             return $json_answer;
         }
 
-        return $this->treatAccountResponse($json_answer, $sandbox);
+        return $this->treatAccountResponse($json_answer);
     }
 
     /**
@@ -479,26 +543,27 @@ class API
     /**
      * @description Get the client data from API
      *
-     * @param string $session
      * @param string $company_id
+     * @param string $client_name
      * @param string $mode
+     * @param string $session
      *
      * @return array
      */
-    public function getClientData($session = '', $company_id = '', $mode = '')
+    public function getClientData($company_id = '', $client_name = '', $mode = '', $session = '')
     {
-        if (!is_string($session) || !$session) {
-            return [
-                'result' => false,
-                'code' => null,
-                'message' => 'Wrong $session given',
-            ];
-        }
         if (!is_string($company_id) || !$company_id) {
             return [
                 'result' => false,
                 'code' => null,
                 'message' => 'Wrong $company_id given',
+            ];
+        }
+        if (!is_string($client_name) || !$client_name) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $client_name given',
             ];
         }
         if (!is_string($mode) || !$mode) {
@@ -508,12 +573,25 @@ class API
                 'message' => 'Wrong $mode given',
             ];
         }
+        if (!is_string($session) || !$session) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $session given',
+            ];
+        }
 
         try {
+            $this->setParameters();
+            Payplug::init([
+                'secretKey' => $session,
+                'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
+            ]);
+            $oauth_client_data = Authentication::createClientIdAndSecret($company_id, $client_name, $mode);
             $response = [
                 'result' => true,
                 'code' => 200,
-                'data' => Authentication::createClientIdAndSecret($session, $company_id, $mode),
+                'data' => $oauth_client_data['httpResponse'],
             ];
         } catch (\Exception $e) {
             $response = [
@@ -583,6 +661,43 @@ class API
     }
 
     /**
+     * @description get the portal url to register user
+     *
+     * @param string $callback_uri
+     *
+     * @return array
+     */
+    public function getRegisterUrl($callback_uri = '')
+    {
+        if (!$callback_uri || !is_string($callback_uri)) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $callback_uri given',
+            ];
+        }
+
+        try {
+            $this->setParameters();
+            $this->setUserAgent();
+            $register_url = Authentication::getRegisterUrl($callback_uri, $callback_uri);
+            $response = [
+                'result' => true,
+                'code' => 200,
+                'redirection' => $register_url,
+            ];
+        } catch (\Exception $e) {
+            $response = [
+                'result' => false,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
      * @description  get the site url
      *
      * @return mixed
@@ -601,6 +716,8 @@ class API
      */
     public function initialize($is_live = null)
     {
+        $this->setParameters();
+
         $configuration = $this->dependencies
             ->getPlugin()
             ->getConfigurationClass();
@@ -613,29 +730,23 @@ class API
         $configuration_key = $mode . '_api_key';
         $token = $configuration->getValue($configuration_key);
         $jwt = json_decode($configuration->getValue('jwt'), true);
-        if (!empty($jwt)) {
+        if ($jwt && !empty($jwt)) {
             $current_date = time();
             if ($jwt[$mode]['expires_date'] < $current_date) {
-                $client_data = json_decode($configuration->getValue('client_data'), true);
+                $oauth_client_data = json_decode($configuration->getValue('oauth_client_data'), true);
 
                 // Renew the token
                 $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
                 $merchant = $module->getService('payplug.models.classes.merchant');
 
-                $jwt = $merchant->generateJWT($client_data);
+                $jwt = $merchant->generateJWT($oauth_client_data);
                 if (!$jwt) {
-                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be generated');
+                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be generated', 'error');
 
                     return null;
                 }
 
-                $renew = $merchant->registerJWT($jwt['data']);
-                if (!$renew) {
-                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be registered');
-
-                    return null;
-                }
-
+                $configuration->set('jwt', json_encode($jwt['data']));
                 $jwt = $jwt['data'];
             }
             $token = $jwt[$mode]['access_token'];
@@ -650,12 +761,57 @@ class API
                 'apiVersion' => $this->dependencies->getPlugin()->getApiVersion(),
             ]);
         } catch (\Exception $e) {
-            $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - API can\'t be setted');
+            $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - API can\'t be set', 'error');
 
             $this->api = null;
         }
 
         return $this->api;
+    }
+
+    /**
+     * @description initiate the authentication
+     *
+     * @param string $client_id
+     * @param string $redirect_uri
+     * @param string $code_verifier
+     */
+    public function initiateOAuth($client_id = '', $redirect_uri = '', $code_verifier = '')
+    {
+        if (!is_string($client_id) || !$client_id) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $client_id given',
+            ];
+        }
+
+        if (!is_string($redirect_uri) || !$redirect_uri) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $redirect_uri given',
+            ];
+        }
+
+        if (!is_string($code_verifier) || !$code_verifier) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $code_verifier given',
+            ];
+        }
+
+        try {
+            $this->setParameters();
+            Authentication::initiateOAuth($client_id, $redirect_uri, $code_verifier);
+        } catch (\Exception $e) {
+            $this->dependencies->getPlugin()->getLogger()->addLog('Api::initiateOAuth - Can\'t initiate OAuth : ' . $e->getMessage(), 'error');
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -677,6 +833,7 @@ class API
         }
 
         try {
+            $this->setParameters();
             $this->setUserAgent();
             $response = Authentication::getKeysByLogin($email, $password);
             $json_answer = $response['httpResponse'];
@@ -934,24 +1091,6 @@ class API
     }
 
     /**
-     * @description Get the current api key from database
-     *
-     * @return string
-     */
-    public function getCurrentApiKey()
-    {
-        $sandbox_mode = (bool) $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass()
-            ->getValue('sandbox_mode');
-
-        return (string) $this->dependencies
-            ->getPlugin()
-            ->getConfigurationClass()
-            ->getValue($sandbox_mode ? 'test_api_key' : 'live_api_key');
-    }
-
-    /**
      * @description Check current environment to defined the api route
      */
     protected function checkEnvironment()
@@ -969,8 +1108,8 @@ class API
         if (isset($_ENV['API_BASE_URL'])) {
             APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
-        if (isset($_ENV['MERCHANT_PLUGINS_DATA_COLLECTOR_RESOURCE'])) {
-            APIRoutes::setMerchantPluginsDataCollectorService($_ENV['MERCHANT_PLUGINS_DATA_COLLECTOR_RESOURCE']);
+        if (isset($_ENV['SERVICE_BASE_URL'])) {
+            APIRoutes::setServiceBaseUrl($_ENV['SERVICE_BASE_URL']);
         }
     }
 
@@ -1024,10 +1163,12 @@ class API
      */
     protected function setApiUrl($api_url = '')
     {
-        if (!is_string($api_url)
-            || !preg_match('/http(s?):\/\/api(-\w+|\.\w+)?.(payplug|notpayplug).(com|test)/', $api_url)) {
-            throw new BadParameterException('Invalid argument, $api_url must be a a valid api url format');
-        }
+        $regex_validator = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.validator.regex');
+
         $this->api_url = $api_url;
 
         return $this;
@@ -1044,17 +1185,12 @@ class API
             $this->setApiUrl('https://api.payplug.com');
         }
 
-        if (isset($_ENV['PAYPLUG_SITE_URL']) && !empty($_ENV['PAYPLUG_SITE_URL'])) {
-            $this->site_url = $_ENV['PAYPLUG_SITE_URL'];
-        } else {
-            $this->site_url = 'https://www.payplug.com';
-        }
-
-        if (isset($_ENV['PAYPLUG_PORTAL_URL']) && !empty($_ENV['PAYPLUG_PORTAL_URL'])) {
-            $this->portal_url = $_ENV['PAYPLUG_PORTAL_URL'];
-        } else {
-            $this->portal_url = 'https://portal.payplug.com';
-        }
+        $this->site_url = !$this->site_url && isset($_ENV['PAYPLUG_SITE_URL']) && !empty($_ENV['PAYPLUG_SITE_URL'])
+            ? $_ENV['PAYPLUG_SITE_URL']
+            : 'https://www.payplug.com';
+        $this->portal_url = !$this->portal_url && isset($_ENV['PAYPLUG_PORTAL_URL']) && !empty($_ENV['PAYPLUG_PORTAL_URL'])
+            ? $_ENV['PAYPLUG_PORTAL_URL']
+            : 'https://portal.payplug.com';
     }
 
     /**
@@ -1071,15 +1207,20 @@ class API
         }
     }
 
+    protected function setParameters()
+    {
+        $this->checkEnvironment();
+        $this->setEnvironment();
+    }
+
     /**
      * @description Read API response and return permissions
      *
      * @param array $json_answer
-     * @param bool $is_sandbox
      *
      * @return array
      */
-    protected function treatAccountResponse($json_answer = [], $is_sandbox = true)
+    protected function treatAccountResponse($json_answer = [])
     {
         if (!is_array($json_answer) || empty($json_answer)) {
             return [];
