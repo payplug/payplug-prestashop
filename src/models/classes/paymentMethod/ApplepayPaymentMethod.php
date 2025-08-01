@@ -332,7 +332,9 @@ class ApplepayPaymentMethod extends PaymentMethod
 
         $patchPayment = $this->dependencies
             ->getPlugin()
-            ->getApiService()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
             ->patchPayment($resource_id, $data);
 
         if (!$patchPayment['result']) {

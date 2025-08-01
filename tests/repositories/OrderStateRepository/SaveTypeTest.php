@@ -12,8 +12,8 @@ namespace PayPlug\tests\repositories\OrderStateRepository;
  */
 final class SaveTypeTest extends BaseOrderStateRepository
 {
-    private $idOrderState;
-    private $type;
+    public $idOrderState;
+    public $type;
 
     public function setUp()
     {

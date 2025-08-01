@@ -11,16 +11,15 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class generateJWTTest extends BaseApi
 {
-    protected $plugin;
-    private $client_id;
-    private $client_secret;
-    private $client_data;
-    private $jwt;
+    public $client_id;
+    public $client_secret;
+    public $oauth_client_data;
+    public $jwt;
 
     public function setUp()
     {
         parent::setUp();
-        $this->client_data = [
+        $this->oauth_client_data = [
             'test' => [
                 'client_id' => 'test_client_id',
                 'client_secret' => 'test_client_secret',
@@ -32,11 +31,13 @@ class generateJWTTest extends BaseApi
         ];
         $this->client_id = 'some_client_id';
         $this->client_secret = 'some_client_secret';
+        $life_time = 298;
         $this->jwt = [
             'access_token' => 'JWT_Token',
-            'expires_in' => 3599,
+            'expires_in' => $life_time,
             'scope' => '',
             'token_type' => 'bearer',
+            'expires_date' => time() + $life_time,
         ];
         $this->plugin->shouldReceive([
             'getApiVersion' => 'api_version',
@@ -107,7 +108,9 @@ class generateJWTTest extends BaseApi
         ]);
 
         $this->authentication->shouldReceive([
-            'generateJWT' => $this->jwt,
+            'generateJWT' => [
+                'httpResponse' => $this->jwt,
+            ],
         ]);
 
         $this->assertSame(

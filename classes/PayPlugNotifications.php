@@ -277,7 +277,9 @@ class PayPlugNotifications
         try {
             $this->dependencies
                 ->getPlugin()
-                ->getApiService()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
                 ->initialize((bool) $is_live);
             $this->resource = Notification::treat($body);
 
@@ -387,7 +389,7 @@ class PayPlugNotifications
         }
 
         if (empty($stored_resource)) {
-            $message = 'Stored resource cannot be getted';
+            $message = 'Stored resource cannot be got';
             $this->logger->addLog($message, 'error');
             $this->exitProcess($message, 500);
         }
@@ -409,7 +411,9 @@ class PayPlugNotifications
         if ($this->payment->installment_plan_id) {
             $retrieved_installment = $this->dependencies
                 ->getPlugin()
-                ->getApiService()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
                 ->retrieveInstallment($this->payment->installment_plan_id);
             if (!$retrieved_installment['result']) {
                 $this->logger->addLog('Installment cannot be retrieved: ' . $retrieved_installment['message'], 'error');
@@ -684,9 +688,12 @@ class PayPlugNotifications
 
         if (!$retrieve['result']) {
             $this->logger->addLog('Can\'t retrieve payment with pay id: ' . $this->resource->id, 'debug');
+
             $this->dependencies
                 ->getPlugin()
-                ->getApiService()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
                 ->initialize(!(bool) $this->sandbox);
             $this->payment = null;
         } else {

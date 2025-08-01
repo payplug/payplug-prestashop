@@ -15,7 +15,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class abortTest extends BasePaymentMethod
 {
-    private $stored_payment;
+    public $stored_payment;
 
     public function setUp()
     {

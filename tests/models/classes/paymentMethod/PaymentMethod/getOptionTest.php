@@ -31,7 +31,7 @@ class getOptionTest extends BasePaymentMethod
         $this->assertSame([], $this->class->getOption($configuration));
     }
 
-    public function testWhenDefaultConfigurationIsGettedAsTrue()
+    public function testWhenDefaultConfigurationIsGotAsTrue()
     {
         $configuration = [];
         $this->class->set('name', 'standard');
@@ -42,7 +42,7 @@ class getOptionTest extends BasePaymentMethod
         $this->assertTrue($this->class->getOption($configuration)['checked']);
     }
 
-    public function testWhenDefaultConfigurationIsGettedAsFalse()
+    public function testWhenDefaultConfigurationIsGotAsFalse()
     {
         $configuration = [];
         $this->class->set('name', 'standard');
