@@ -63,20 +63,27 @@ class AdminPayplugController extends ModuleAdminController
      */
     public function initContent()
     {
-        if ($session = $this->tools->tool('getValue', 'session')
-            && $company_id = $this->tools->tool('getValue', '$company_id')) {
-            $merchant = $this->module
-                ->getService('payplug.models.classes.merchant');
-            $client_data = $merchant->getClientData($session, $company_id);
-            if ($client_data['result']) {
-                $merchant->registerClientData($client_data['data']);
+        if ($this->tools->tool('getValue', 'client_id')
+            && $this->tools->tool('getValue', 'company_id')) {
+            $client_id = $this->tools->tool('getValue', 'client_id');
+            $company_id = $this->tools->tool('getValue', 'company_id');
+            $this->dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->registerOauthRequestAction($client_id, $company_id);
+        }
 
-                $storedJWT = $this->configuration->getValue('jwt');
+        if ($this->tools->tool('getValue', 'code')) {
+            $authorization_code = $this->tools->tool('getValue', 'code');
+            $auth = $this->dependencies
+                ->getPlugin()
+                ->getConfigurationAction()
+                ->OauthLoginAction($authorization_code);
 
-                if (!$storedJWT) {
-                    $jwt = $merchant->generateJWT($client_data['data']);
-                    $merchant->registerJWT($jwt['data']);
-                }
+            // todo: return error in previous method return a false result,
+            // Or reload the page to avoid user to see unify auth get params
+            if ($auth['result']) {
+                Tools::redirectAdmin($this->context->link->getAdminLink('AdminPayplug'));
             }
         }
 

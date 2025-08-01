@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\LoggerEntity;
  */
 final class GetLimitNumberTest extends BaseLoggerEntity
 {
-    private $limit_number;
+    public $limit_number;
 
     public function setUp()
     {

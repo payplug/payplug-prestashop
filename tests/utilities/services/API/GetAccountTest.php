@@ -11,42 +11,14 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class GetAccountTest extends BaseApi
 {
-    private $api_key;
-    private $sandbox;
-    private $treat_account;
+    public $api_key;
+    public $treat_account;
 
     public function setUp()
     {
         parent::setUp();
         $this->api_key = 'live_api_key';
-        $this->sandbox = true;
         $this->treat_account = true;
-    }
-
-    /**
-     * @dataProvider invalidStringFormatDataProvider
-     *
-     * @param mixed $api_key
-     */
-    public function testWhenGivenApiKeyIsntValidStringFormat($api_key)
-    {
-        $this->assertSame(
-            [],
-            $this->service->getAccount($api_key, $this->sandbox, $this->treat_account)
-        );
-    }
-
-    /**
-     * @dataProvider invalidBoolFormatDataProvider
-     *
-     * @param mixed $sandbox
-     */
-    public function testWhenGivenSandboxIsntValidBooleanFormat($sandbox)
-    {
-        $this->assertSame(
-            [],
-            $this->service->getAccount($this->api_key, $sandbox, $this->treat_account)
-        );
     }
 
     /**
@@ -58,7 +30,7 @@ class GetAccountTest extends BaseApi
     {
         $this->assertSame(
             [],
-            $this->service->getAccount($this->api_key, $this->sandbox, $treat_account)
+            $this->service->getAccount($treat_account)
         );
     }
 
@@ -69,7 +41,7 @@ class GetAccountTest extends BaseApi
         ]);
         $this->assertSame(
             [],
-            $this->service->getAccount($this->api_key, $this->sandbox, $this->treat_account)
+            $this->service->getAccount($this->treat_account)
         );
     }
 
@@ -92,7 +64,7 @@ class GetAccountTest extends BaseApi
 
         $this->assertSame(
             [],
-            $this->service->getAccount($this->api_key, $this->sandbox, $this->treat_account)
+            $this->service->getAccount($this->treat_account)
         );
     }
 
@@ -113,7 +85,7 @@ class GetAccountTest extends BaseApi
 
         $this->assertSame(
             $expected,
-            $this->service->getAccount($this->api_key, $this->sandbox, false)
+            $this->service->getAccount(false)
         );
     }
 
@@ -138,7 +110,7 @@ class GetAccountTest extends BaseApi
 
         $this->assertSame(
             [],
-            $this->service->getAccount($this->api_key, $this->sandbox, $this->treat_account)
+            $this->service->getAccount($this->treat_account)
         );
     }
 
@@ -163,7 +135,7 @@ class GetAccountTest extends BaseApi
 
         $this->assertSame(
             $expected,
-            $this->service->getAccount($this->api_key, $this->sandbox, $this->treat_account)
+            $this->service->getAccount($this->treat_account)
         );
     }
 }

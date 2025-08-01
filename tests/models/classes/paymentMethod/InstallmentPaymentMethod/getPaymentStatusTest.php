@@ -15,15 +15,6 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class getPaymentStatusTest extends BaseInstallmentPaymentMethod
 {
-    public function setUp()
-    {
-        parent::setUp();
-//        $this->api_service = \Mockery::mock('ApiService');
-        $this->plugin->shouldReceive([
-            'getApiService' => $this->api_service,
-        ]);
-    }
-
     /**
      * @dataProvider invalidObjectFormatDataProvider
      *
