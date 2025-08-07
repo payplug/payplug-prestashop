@@ -11,7 +11,7 @@ namespace PayPlug\tests\models\repositories\LoggerRepository;
  */
 class getLastLimitLogTest extends BaseLoggerRepository
 {
-    private $limit;
+    public $limit;
 
     public function setUp()
     {
@@ -35,7 +35,7 @@ class getLastLimitLogTest extends BaseLoggerRepository
         $this->assertSame([], $this->repository->getLastLimitLog($this->limit));
     }
 
-    public function testWhenEntityObjectCantBeGetted()
+    public function testWhenEntityObjectCantBeGot()
     {
         $this->repository->shouldReceive([
             'getEntityObject' => null,

@@ -221,15 +221,16 @@ class ConfigClass
     public $version;
     public $warning;
 
-    private $api_live;
-    private $api_test;
     private $configuration;
     private $configurationAdapter;
     private $context;
     private $country;
     private $dependencies;
     private $img_lang;
-    private $module;
+    private $media;
+    private $module_adapter;
+    private $oney;
+    private $ssl_enable;
     private $tools;
     private $validate;
     private $validators = [];
@@ -243,7 +244,9 @@ class ConfigClass
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
-        $this->module = $this->dependencies->getPlugin()->getModule();
+        $this->media = $this->dependencies->getPlugin()->getMedia();
+        $this->module_adapter = $this->dependencies->getPlugin()->getModule();
+        $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
         $this->validators = $this->dependencies->getValidators();
@@ -288,14 +291,10 @@ class ConfigClass
         if (!$this->isAllowed()) {
             return [];
         }
-        $api_key = $this->module
-            ->getPlugin()
-            ->getApiService()
-            ->getCurrentApiKey();
-        $permissions = $this->module
-            ->getPlugin()
-            ->getApiService()
-            ->getAccount((string) $api_key, false);
+        $permissions = $this->module_adapter
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->getAccount();
 
         // in case if API is not available or not returning permissions
         if (empty($permissions)) {
@@ -388,7 +387,7 @@ class ConfigClass
             (bool) $this->configuration->getValue('enable')
         );
         $is_allowed = $this->validators['module']->isAllowed(
-            (bool) $this->module->isEnabled($this->dependencies->name),
+            (bool) $this->module_adapter->isEnabled($this->dependencies->name),
             $is_shown['result']
         );
 
@@ -407,23 +406,6 @@ class ConfigClass
         );
 
         return $state['result'];
-    }
-
-    /**
-     * @description check if account is linked to Psaccount
-     *
-     * @return bool
-     */
-    public function checkPsAccount()
-    {
-        if ('pspaylater' == $this->dependencies->name) {
-            $module = $this->module->getInstanceByName($this->dependencies->name);
-            $check_ps_account = $this->validators['module']->isAccountLinkedToPsAccount($module);
-
-            return $check_ps_account['result'];
-        }
-
-        return true;
     }
 
     /**
@@ -456,7 +438,10 @@ class ConfigClass
     public function getLivePermissions()
     {
         $live_api_key = $this->configuration->getValue('live_api_key');
-        $livepermissions = $this->dependencies->getPlugin()->getApiService()->getAccount((string) $live_api_key);
+        $livepermissions = $this->module_adapter
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->getAccount();
 
         return $livepermissions ? $livepermissions : [];
     }
@@ -712,8 +697,7 @@ class ConfigClass
             'module_name' => $this->dependencies->name,
         ]);
 
-        return $this
-            ->module
+        return $this->module_adapter
             ->getInstanceByName($this->dependencies->name)
             ->display(_PS_MODULE_DIR_ . $this->dependencies->name . '/' . $this->dependencies->name . '.php', $file);
     }
@@ -744,8 +728,6 @@ class ConfigClass
      */
     private function setConfigurationProperties()
     {
-        $this->api_live = $this->configuration->getValue('live_api_key');
-        $this->api_test = $this->configuration->getValue('test_api_key');
         $this->email = $this->configuration->getValue('email');
 
         $available_img_lang = [
@@ -757,7 +739,7 @@ class ConfigClass
         $this->img_lang = in_array($this->context->language->iso_code, $available_img_lang)
             ? $this->context->language->iso_code : 'default';
 
-        if (!isset($this->email) || (!isset($this->api_live) && empty($this->api_test))) {
+        if (!isset($this->email)) {
             $this->warning = $this->dependencies
                 ->getPlugin()
                 ->getTranslationClass()

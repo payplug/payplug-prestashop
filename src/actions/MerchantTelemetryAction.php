@@ -66,12 +66,17 @@ class MerchantTelemetryAction
         }
 
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
-        $this->dependencies->getPlugin()->getApiService()->initialize(!(bool) $configuration->getValue('sandbox_mode'));
-        $api_key = $configuration->getValue('live_api_key');
+
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
         $send = $this->dependencies
             ->getPlugin()
             ->getMerchantTelemetry()
-            ->send($api_key, json_encode($telemetries['telemetries']));
+            ->send(json_encode($telemetries['telemetries']));
 
         return $send['result'];
     }
@@ -114,7 +119,12 @@ class MerchantTelemetryAction
         $protected_configurations_keys = [
             'company_id_test',
             'email',
+            'jwt',
             'live_api_key',
+            'oauth_client_data',
+            'oauth_client_id',
+            'oauth_code_verifier',
+            'oauth_company_id',
             'order_state_auth',
             'order_state_auth_test',
             'order_state_cancelled',

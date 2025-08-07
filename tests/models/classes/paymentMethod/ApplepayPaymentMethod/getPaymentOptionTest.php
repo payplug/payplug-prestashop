@@ -72,6 +72,11 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
                 'additionalInformation' => 'template.tpl',
             ],
         ];
+        $this->routes->shouldReceive([
+            'getSourceUrl' => [
+                'applepay' => 'apple_pay_route',
+            ],
+        ]);
 
         $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }

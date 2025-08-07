@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\LoggerEntity;
  */
 final class GetIdTest extends BaseLoggerEntity
 {
-    private $id;
+    public $id;
 
     public function setUp()
     {

@@ -60,12 +60,6 @@ class Configuration
             'defaultValue' => 0,
             'setConf' => 1,
         ],
-        'client_data' => [
-            'type' => 'string',
-            'name' => 'CLIENT_DATA',
-            'defaultValue' => '{}',
-            'setConf' => 1,
-        ],
         'company_id' => [
             'type' => 'string',
             'name' => 'COMPANY_ID',
@@ -148,6 +142,30 @@ class Configuration
             'type' => 'string',
             'name' => 'LIVE_API_KEY',
             'defaultValue' => null,
+            'setConf' => 1,
+        ],
+        'oauth_client_data' => [
+            'type' => 'string',
+            'name' => 'OAUTH_CLIENT_DATA',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
+        'oauth_client_id' => [
+            'type' => 'string',
+            'name' => 'OAUTH_CLIENT_ID',
+            'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'oauth_code_verifier' => [
+            'type' => 'string',
+            'name' => 'OAUTH_CODE_VERIFIER',
+            'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'oauth_company_id' => [
+            'type' => 'string',
+            'name' => 'OAUTH_COMPANY_ID',
+            'defaultValue' => '',
             'setConf' => 1,
         ],
         'onboarding_states' => [

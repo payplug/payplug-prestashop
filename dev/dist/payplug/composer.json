@@ -42,7 +42,14 @@
             "*.zip",
             "webpack.config.js",
             "upgrade/upgrade-methods.php",
-            "changelog.md"
+            "changelog.md",
+            "CODEOWNERS",
+            "gl-dependency-scanning-report.json",
+            "gl-sast-report.json",
+            "gl-secret-detection-report.json",
+            "renovate.json",
+            "variables.artifact",
+            "reports"
         ]
     },
     "autoload": {

@@ -11,7 +11,7 @@ namespace PayPlug\tests\utilities\services\API;
  */
 class SetApiKeysbyJsonResponseTest extends BaseApi
 {
-    private $json_answer;
+    public $json_answer;
 
     public function setUp()
     {

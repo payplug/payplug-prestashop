@@ -25,6 +25,8 @@ class BaseOneyRepository extends RepositoryBase
     protected $helpers;
     protected $loggerRepository;
     protected $routes;
+    protected $module;
+    protected $module_adapter;
 
     public function setUp()
     {
@@ -90,9 +92,19 @@ class BaseOneyRepository extends RepositoryBase
             'addLog' => true,
         ]);
         $this->routes = \Mockery::mock(Routes::class)->makePartial();
+
+        $this->module = \Mockery::mock('Module');
+        $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->module_adapter->shouldReceive([
+            'getInstanceByName' => $this->module,
+        ]);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.api')
+            ->andReturn($this->api_service);
+
         $this->plugin->shouldReceive([
             'getAddress' => $this->address_adapter,
-            'getApiService' => $this->api_service,
             'getAssign' => $this->assign_adapter,
             'getCache' => $this->cache_adapter,
             'getCarrier' => $this->carrier,
@@ -104,6 +116,7 @@ class BaseOneyRepository extends RepositoryBase
             'getLogger' => $this->logger,
             'getRoutes' => $this->routes,
             'getTools' => $this->tools,
+            'getModule' => $this->module_adapter,
         ]);
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
