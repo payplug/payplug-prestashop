@@ -10,7 +10,7 @@ use PayPlug\tests\mock\PaymentTabMock;
  * @group payment_method_class
  * @group oney_payment_method_class
  */
-final class CheckOneyRequiredFieldsTest extends BaseOneyPaymentMethod
+final class checkOneyRequiredFieldsTest extends BaseOneyPaymentMethod
 {
     public function setUp()
     {

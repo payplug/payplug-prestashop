@@ -12,7 +12,7 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group payment_method_class
  * @group oney_payment_method_class
  */
-final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
+final class getOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
 {
     private $cartMock;
 
