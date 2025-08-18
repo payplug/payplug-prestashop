@@ -516,9 +516,7 @@ class ConfigurationAction
             $configuration->getValue('oauth_code_verifier')
         );
 
-        $email = $jwt['email'];
-
-        if (empty($jwt) || !$jwt['result']) {
+        if (empty($jwt) || !isset($jwt['result']) || !isset($jwt['data'])) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
@@ -529,6 +527,8 @@ class ConfigurationAction
                 'result' => false,
             ];
         }
+
+        $email = $jwt['email'];
 
         // Get the client data
         $merchant = $module->getService('payplug.models.classes.merchant');
