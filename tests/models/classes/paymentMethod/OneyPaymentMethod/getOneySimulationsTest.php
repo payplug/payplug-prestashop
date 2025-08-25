@@ -31,6 +31,9 @@ class getOneySimulationsTest extends BaseOneyPaymentMethod
         $this->plugin->shouldReceive([
             'getCache' => $this->cache,
         ]);
+        $this->class->shouldReceive([
+            'formatOverseaCountryIso' => 'FR',
+        ]);
     }
 
     /**
