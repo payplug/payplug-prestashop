@@ -1044,7 +1044,7 @@ class OneyPaymentMethod extends PaymentMethod
 
         $data = [
             'amount' => $amount,
-            'country' => $this->getOneyCountry($country),
+            'country' => $this->formatOverseaCountryIso($country),
             'operations' => $operation,
         ];
         $simulations = $this->dependencies
@@ -1632,6 +1632,27 @@ class OneyPaymentMethod extends PaymentMethod
             'result' => true,
             'message' => '',
         ];
+    }
+
+    /**
+     * @description Format oney country iso code in case of oversea
+     *
+     * @param $country
+     *
+     * @return string
+     */
+    public function formatOverseaCountryIso($country = '')
+    {
+        if (!is_string($country) || !$country) {
+            return '';
+        }
+
+        $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
+        if (in_array($country, $overseas_iso, true)) {
+            $country = 'FR';
+        }
+
+        return $country;
     }
 
     /**
