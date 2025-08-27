@@ -9,6 +9,7 @@ use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\src\utilities\helpers\CookiesHelper;
 use PayPlug\src\utilities\helpers\PhoneHelper;
 use PayPlug\src\utilities\services\Routes;
+use PayPlug\src\utilities\validators\accountValidator;
 use PayPlug\src\utilities\validators\browserValidator;
 use PayPlug\src\utilities\validators\paymentValidator;
 use PayPlug\tests\FormatDataProvider;
@@ -194,6 +195,7 @@ class BasePaymentMethod extends TestCase
         $this->validators = [
             'browser' => \Mockery::mock(browserValidator::class)->makePartial(),
             'payment' => \Mockery::mock(paymentValidator::class)->makePartial(),
+            'account' => \Mockery::mock(accountValidator::class)->makePartial(),
         ];
 
         $this->dependencies->shouldReceive([
