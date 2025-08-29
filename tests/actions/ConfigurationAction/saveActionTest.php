@@ -15,14 +15,8 @@ class saveActionTest extends BaseConfigurationAction
     {
         parent::setUp();
 
-        $module = \Mockery::mock('PrestashopModule');
-        $module->shouldReceive([
-            'enable' => true,
-        ]);
-
-        $this->module = \Mockery::mock('Module');
         $this->module->shouldReceive([
-            'getInstanceByName' => $module,
+            'enable' => true,
         ]);
     }
 

@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\LoggerEntity;
  */
 final class GetDateUpdTest extends BaseLoggerEntity
 {
-    private $date;
+    public $date;
 
     public function setUp()
     {

@@ -14,9 +14,9 @@ use PayPlug\tests\mock\OrderStateMock;
  */
 final class CreateTest extends BaseOrderStateRepository
 {
-    private $configKey;
-    private $orderStateMock;
-    private $state;
+    public $configKey;
+    public $orderStateMock;
+    public $state;
 
     public function setUp()
     {

@@ -66,7 +66,12 @@ class HookAction
         }
 
         // Check if merchant is logged
-        $is_logged = (bool) $this->configuration->getValue('test_api_key') && (bool) $this->configuration->getValue('email');
+        $is_logged = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.models.classes.merchant')
+            ->isLogged();
         if (!$is_logged) {
             $this->logger->addLog('HookAction::createPaymentLinkAction() - Merchant should be logged to create payment link');
 

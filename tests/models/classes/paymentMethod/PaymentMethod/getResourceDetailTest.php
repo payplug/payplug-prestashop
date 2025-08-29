@@ -8,15 +8,15 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 /**
  * @group unit
  * @group class
- * @group payment_method_classe
+ * @group payment_method_class
  * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
 class getResourceDetailTest extends BasePaymentMethod
 {
-    private $resource_id;
-    private $retrieve;
+    public $resource_id;
+    public $retrieve;
 
     public function setUp()
     {
@@ -54,7 +54,7 @@ class getResourceDetailTest extends BasePaymentMethod
         );
     }
 
-    public function testWhenPaymentStatusCantBeGetted()
+    public function testWhenPaymentStatusCantBeGot()
     {
         $this->class->shouldReceive([
             'retrieve' => $this->retrieve,
@@ -66,7 +66,7 @@ class getResourceDetailTest extends BasePaymentMethod
         );
     }
 
-    public function testWhenResourceDetailIsGetted()
+    public function testWhenResourceDetailIsGot()
     {
         $this->class->shouldReceive([
             'retrieve' => $this->retrieve,

@@ -89,7 +89,7 @@ class OneClickPaymentMethod extends PaymentMethod
         $payment_tab['initiator'] = 'PAYER';
         $id_cart = $this->tools->tool('getValue', 'pc', 'new_card');
 
-        // Check if getted card correspond to the current customer
+        // Check if got card correspond to the current customer
         $card = $this->dependencies
             ->getPlugin()
             ->getCardRepository()

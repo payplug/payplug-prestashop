@@ -15,9 +15,9 @@ use PayPlug\tests\mock\RefundMock;
  */
 class refundTest extends BaseInstallmentPaymentMethod
 {
-    private $resource_id;
-    private $amount;
-    private $metadata;
+    public $resource_id;
+    public $amount;
+    public $metadata;
 
     public function setUp()
     {
