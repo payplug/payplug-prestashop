@@ -8,14 +8,14 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 /**
  * @group unit
  * @group class
- * @group payment_method_classe
+ * @group payment_method_class
  * @group parent_payment_method_classe
  *
  * @runTestsInSeparateProcesses
  */
 class getRefundableAmountTest extends BasePaymentMethod
 {
-    private $resource_id;
+    public $resource_id;
 
     public function setUp()
     {

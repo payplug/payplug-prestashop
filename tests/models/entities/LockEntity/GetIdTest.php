@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\LockEntity;
  */
 final class GetIdTest extends BaseLockEntity
 {
-    private $id;
+    public $id;
 
     public function setUp()
     {

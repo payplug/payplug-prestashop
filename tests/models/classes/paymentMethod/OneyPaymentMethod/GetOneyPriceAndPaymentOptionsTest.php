@@ -16,7 +16,7 @@ use PayPlug\tests\mock\CurrencyMock;
  */
 final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
 {
-    private $cartMock;
+    public $cartMock;
 
     public function setUp()
     {
@@ -78,7 +78,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
         $this->class->shouldReceive([
             'isValidOneyAmount' => ['result' => true, 'error' => false],
             'getOneyPaymentOptionsList' => ['payment_option_list'],
-            'isValidOneyCart' => ['result' => true, 'error' => false],
+            'isValidOneyCartQty' => ['result' => true, 'error' => false],
             'isValidOneyAddresses' => true,
         ])
         ;
@@ -113,7 +113,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
         $this->class->shouldReceive([
             'isValidOneyAmount' => ['result' => true, 'error' => false],
             'getOneyPaymentOptionsList' => ['payment_option_list'],
-            'isValidOneyCart' => ['result' => true, 'error' => false],
+            'isValidOneyCartQty' => ['result' => true, 'error' => false],
             'isValidOneyAddresses' => true,
         ])
         ;
@@ -148,7 +148,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
         $this->class->shouldReceive([
             'isValidOneyAmount' => ['result' => false, 'error' => 'invalid_amount'],
             'getOneyPaymentOptionsList' => ['payment_option_list'],
-            'isValidOneyCart' => ['result' => true, 'error' => false],
+            'isValidOneyCartQty' => ['result' => true, 'error' => false],
             'isValidOneyAddresses' => true,
         ])
         ;
@@ -176,7 +176,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
         $this->class->shouldReceive([
             'isValidOneyAmount' => ['result' => true, 'error' => false],
             'getOneyPaymentOptionsList' => [],
-            'isValidOneyCart' => ['result' => true, 'error' => false],
+            'isValidOneyCartQty' => ['result' => true, 'error' => false],
             'isValidOneyAddresses' => true,
         ])
         ;
