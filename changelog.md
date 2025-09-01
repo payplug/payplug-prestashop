@@ -4,6 +4,7 @@
 - Feature :
   - [PRE-2835](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2685): Display oney on checkout in if cart is elligible
   - [PRE-2987](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2697): Deploy Unify authentication
+  - [PRE-3010](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2703): Fix enable mode on unify authentication
 
 ## Version 4.18.0
 - Feature :
