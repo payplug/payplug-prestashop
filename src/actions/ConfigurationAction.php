@@ -565,7 +565,7 @@ class ConfigurationAction
 
         // Finalize the login
         $configuration->set('email', $email);
-        $configuration->set('enable', 1);
+        $configuration->set('enable', '1');
 
         // Update global configuration
         $permissions = $this->dependencies
