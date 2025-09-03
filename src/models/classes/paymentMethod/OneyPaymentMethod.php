@@ -262,10 +262,9 @@ class OneyPaymentMethod extends PaymentMethod
         $is_valid_amount = $this->isValidOneyAmount($cart_amount);
         $is_elligible = $this->validators['payment']->isOneyElligible(
             $is_valid_cart,
-            $is_valid_addresses,
+            $is_valid_addresses['result'],
             $is_valid_amount['result']
         );
-
         if (!$is_elligible['result']) {
             $error = $is_elligible['code'];
             $err_label = $this->getErrorLabel($error);
