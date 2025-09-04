@@ -296,7 +296,6 @@ $_MODULE['<{payplug}prestashop>refund_6837a3317937d8a516a12466eb60ef7e'] = 'You 
 $_MODULE['<{payplug}prestashop>refund_76f0ed934de85cc7131910b32ede7714'] = 'Refund';
 $_MODULE['<{payplug}prestashop>refund_a60852f204ed8028c1c58808b746d115'] = 'Ok';
 $_MODULE['<{payplug}prestashop>refund_ab066b3292d8ab61ef3b5c77169cdd19'] = 'More information';
-$_MODULE['<{payplug}prestashop>refund_abdd50149fb40a1e973593bf5cd40878'] = 'Change Prestashop order state to "Refunded"';
 $_MODULE['<{payplug}prestashop>refund_data_01ddb6831cdf22a0055a2a42a09482d6'] = 'Amount still refundable with Payplug : ';
 $_MODULE['<{payplug}prestashop>refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Amount already refunded with Payplug : ';
 $_MODULE['<{payplug}prestashop>refund_e162d1554608fdf9b48de943cc875208'] = 'The automatic refund is not available from your back-office. Please contact [1]support@payplug.com[/1]';

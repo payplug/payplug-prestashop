@@ -170,10 +170,6 @@ var $document, $window, __moduleName__Module = {
             $('#pppanel form p.pperror').hide();
             $('#pppanel form p.ppsuccess').hide();
 
-            if ($('#pppanel input[name=change_order_state]').is(":checked")) {
-                data['update_order_state'] = true;
-            }
-
             $.ajax({
                 type: 'POST',
                 url: url,

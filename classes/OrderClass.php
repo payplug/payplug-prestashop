@@ -76,15 +76,14 @@ class OrderClass
             return [];
         }
 
+        $undefined_history_states = [];
         foreach ($order_history_states as $key => &$state) {
             $order_state = $this->dependencies
                 ->getPlugin()
                 ->getStateRepository()
                 ->getBy('id_order_state', (int) $state['id_order_state']);
-            $state['type'] = $order_state['type'];
-            if (!$order_state['type'] || 'undefined' != $order_state['type']) {
-                unset($order_history_states[$key]);
-
+            $state['type'] = isset($order_state['type']) && $order_state['type'] ? $order_state['type'] : 'undefined';
+            if (!$state['type'] || 'undefined' != $state['type']) {
                 continue;
             }
             $update_link_params = [
@@ -92,8 +91,9 @@ class OrderClass
                 'id_order_state' => $state['id_order_state'],
             ];
             $state['updateLink'] = $this->dependencies->adminClass->getAdminUrl('AdminStatuses', $update_link_params);
+            $undefined_history_states[$state['id_order_state']] = $state;
         }
 
-        return $order_history_states;
+        return $undefined_history_states;
     }
 }

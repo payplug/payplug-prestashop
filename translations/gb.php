@@ -158,7 +158,6 @@ $_MODULE['<{payplug}prestashop>refund_4bf290898e0226ffb1041cd114347e4d'] = 'Refu
 $_MODULE['<{payplug}prestashop>refund_554cd9e547629109b77e4c60ddd44da3'] = 'Amount to be refunded';
 $_MODULE['<{payplug}prestashop>refund_76f0ed934de85cc7131910b32ede7714'] = 'Refund';
 $_MODULE['<{payplug}prestashop>refund_a60852f204ed8028c1c58808b746d115'] = 'Ok';
-$_MODULE['<{payplug}prestashop>refund_abdd50149fb40a1e973593bf5cd40878'] = 'Change Prestashop order state to "Refunded"';
 $_MODULE['<{payplug}prestashop>refund_d943de5fa8b4e1102d3eef70156cb21d'] = 'Refund recorded. It will be processed manually by our team.[1] For more information, [2]please visit our help center[/2].';
 $_MODULE['<{payplug}prestashop>refund_data_01ddb6831cdf22a0055a2a42a09482d6'] = 'Amount still refundable with Payplug : ';
 $_MODULE['<{payplug}prestashop>refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Amount already refunded with Payplug : ';
