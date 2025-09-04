@@ -115,7 +115,7 @@ class BasePaymentMethod extends TestCase
         $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->configuration->shouldReceive('getValue')
             ->with('amounts')
-            ->andReturn('{"default":{"min":"EUR:99","max":"EUR:2000000"}}');
+            ->andReturn('{"default":{"min":"EUR:30","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:30","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"ideal":{"min":"EUR:30","max":"EUR:2000000"},"mybank":{"min":"EUR:30","max":"EUR:2000000"},"satispay":{"min":"EUR:30","max":"EUR:2000000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}');
 
         $this->configuration_adapter = \Mockery::mock('ConfigurationAdapter');
 

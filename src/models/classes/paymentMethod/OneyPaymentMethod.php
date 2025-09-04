@@ -1129,32 +1129,20 @@ class OneyPaymentMethod extends PaymentMethod
      * todo: add coverage to this method
      *
      * @param bool $custom
-     * @param int $id_currency
      *
      * @return array
      */
-    public function getOneyPriceLimit($custom = true, $id_currency = false)
+    public function getOneyPriceLimit($custom = true)
     {
         $this->setParameters();
-
-        if ($this->validate_adapter->validate('isLoadedObject', $id_currency)) {
-            $currency = $id_currency;
-        } else {
-            if (!is_int($id_currency) && $this->validate_adapter->validate('isLanguageIsoCode', $id_currency)) {
-                $id_currency = $this->country->getByIso($id_currency);
-            }
-            if (!$id_currency) {
-                $id_currency = $this->configuration_adapter->get('PS_CURRENCY_DEFAULT');
-            }
-
-            $currency = $this->currency_adapter->get((int) $id_currency);
-        }
 
         $limits = [
             'min' => false,
             'max' => false,
         ];
 
+        $id_currency = $this->configuration->getValue('PS_CURRENCY_DEFAULT');
+        $currency = $this->currency_adapter->get((int) $id_currency);
         if (!$this->validate_adapter->validate('isLoadedObject', $currency)) {
             return $limits;
         }
@@ -1163,16 +1151,13 @@ class OneyPaymentMethod extends PaymentMethod
         $amounts = json_decode($this->configuration->getValue('amounts'), true);
 
         if ((bool) $custom) {
-            $oney_min_amounts = explode(
-                ',',
-                $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_min_amounts'))
-            );
+            $oney_min_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_min_amounts')));
+            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_max_amounts')));
         } else {
-            $oney_min_amounts = explode(
-                ',',
-                $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['min'])
-            );
+            $oney_min_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['min']));
+            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['max']));
         }
+
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
@@ -1180,12 +1165,6 @@ class OneyPaymentMethod extends PaymentMethod
 
                 break;
             }
-        }
-        if ($custom) {
-            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_max_amounts')));
-        } else {
-            $amounts = json_decode($this->configuration->getValue('amounts'), true);
-            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['max']));
         }
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
