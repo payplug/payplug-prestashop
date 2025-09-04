@@ -6,6 +6,7 @@
   - [PRE-2987](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2697): Deploy Unify authentication
   - [PRE-3010](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2703): Fix enable mode on unify authentication
   - [PRE-2953](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2700): Add partial refund status
+  - [PRE-3018](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2706): Enable CB network with Appelpay
 
 ## Version 4.18.0
 - Feature :
