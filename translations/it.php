@@ -158,7 +158,6 @@ $_MODULE['<{payplug}prestashop>refund_4bf290898e0226ffb1041cd114347e4d'] = 'Rimb
 $_MODULE['<{payplug}prestashop>refund_554cd9e547629109b77e4c60ddd44da3'] = 'Totale da rimborsare';
 $_MODULE['<{payplug}prestashop>refund_76f0ed934de85cc7131910b32ede7714'] = 'Rimborsato';
 $_MODULE['<{payplug}prestashop>refund_a60852f204ed8028c1c58808b746d115'] = 'Ok';
-$_MODULE['<{payplug}prestashop>refund_abdd50149fb40a1e973593bf5cd40878'] = 'Cambia lo stato d\'ordine di Prestashop in "Rimborsato"';
 $_MODULE['<{payplug}prestashop>refund_d943de5fa8b4e1102d3eef70156cb21d'] = 'Rimborso registrato. Verrà elaborato manualmente dal nostro team.[1] Per maggiori informazioni, [2]consulta il nostro centro assistenza[/2].';
 $_MODULE['<{payplug}prestashop>refund_data_01ddb6831cdf22a0055a2a42a09482d6'] = 'Importo disponibile per effettuare un rimborso con Payplug:';
 $_MODULE['<{payplug}prestashop>refund_data_1666e5c37779e7041dd51aa3d10eff61'] = 'Importo già rimborsato con Payplug:';

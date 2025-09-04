@@ -203,7 +203,7 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: exitProcess');
         if (is_string($str) && $str) {
-            $this->logger->addLog($str);
+            $this->logger->addLog('PayPlugNotifications::exitProcess - ' . $str, (500 == $http_code ? 'error' : ''));
         }
         // check if queuing system is enabled
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
@@ -426,79 +426,77 @@ class PayPlugNotifications
             $meta = $this->payment->metadata;
         }
 
-        $is_totaly_refunded = $this->payment->is_refunded;
-        if ($is_totaly_refunded) {
-            $this->logger->addLog('TOTAL REFUND MODE');
-            $cart_id = '';
+        // Get the cart from metadata
+        $cart_id = 0;
+        if (isset($meta['Cart'])) {
+            $cart_id = (int) $meta['Cart'];
+            $this->logger->addLog('Cart ID : ' . $cart_id);
+        } elseif (isset($meta['ID Cart'])) {
+            $cart_id = (int) $meta['ID Cart'];
+            $this->logger->addLog('Cart ID : ' . $cart_id);
+        } else {
+            $this->logger->addLog(
+                'Can\'t be refunded, because there is an error during retrieving Cart ID.',
+                'error'
+            );
+            $this->exitProcess('Can\'t be refunded, because there is an error during retrieving Cart ID.', 500);
+        }
+        $this->cart = $this->cartAdapter->get((int) $cart_id);
+        if (!$this->validateAdapter->validate('isLoadedObject', $this->cart)) {
+            $this->logger->addLog('Cart cannot be loaded.', 'error');
+            $this->logger->addLog('$cart_id : ' . $cart_id, 'debug');
+            $this->exitProcess('Cart cannot be loaded.', 500);
+        }
 
-            if (isset($meta['Cart'])) {
-                $cart_id = (int) $meta['Cart'];
-                $this->logger->addLog('Cart ID : ' . $cart_id);
-            } elseif (isset($meta['ID Cart'])) {
-                $cart_id = (int) $meta['ID Cart'];
-                $this->logger->addLog('Cart ID : ' . $cart_id);
-            } else {
-                $this->logger->addLog(
-                    'Can\'t be refunded, because there is an error during retrieving Cart ID.',
-                    'error'
-                );
-                $this->exitProcess('Can\'t be refunded, because there is an error during retrieving Cart ID.', 500);
-            }
+        // Get the order
+        $id_order = (int) $this->orderAdapter->getIdByCartId((int) $cart_id);
+        $this->order = $this->orderAdapter->get((int) $id_order);
+        $this->logger->addLog('Order ID : ' . $this->order->id);
+        if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
+            $this->logger->addLog('Order cannot be loaded.', 'error');
+            $this->exitProcess('Order cannot be loaded.', 500);
+        }
 
-            $this->cart = $this->cartAdapter->get((int) $cart_id);
+        // Then get the current order state
+        $current_state = (int) $this->dependencies
+            ->getPlugin()
+            ->getOrderRepository()
+            ->getCurrentOrderState((int) $this->order->id);
+        $this->logger->addLog('Current state: ' . $current_state);
 
-            if (!$this->validateAdapter->validate('isLoadedObject', $this->cart)) {
-                $this->logger->addLog('Cart cannot be loaded.', 'error');
-                $this->logger->addLog('$cart_id : ' . $cart_id, 'debug');
-                $this->exitProcess('Cart cannot be loaded.', 500);
-            }
-
-            $id_order = (int) $this->orderAdapter->getIdByCartId((int) $cart_id);
-            $this->order = $this->orderAdapter->get((int) $id_order);
-            $this->logger->addLog('Order ID : ' . $this->order->id);
-            if (!$this->validateAdapter->validate('isLoadedObject', $this->order)) {
-                $this->logger->addLog('Order cannot be loaded.', 'error');
-                $this->exitProcess('Order cannot be loaded.', 500);
-            }
-
-            // Set lock Lock the process with id_cart from order object
-            if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
-                $this->logger->addLog('Notification: Attempting to set queue for Cart ID: ' . $this->cart->id, 'notice');
-                $create_queue = $this->dependencies
-                    ->getPlugin()
-                    ->getQueueAction()
-                    ->hydrateAction($this->cart->id, $this->resource->id);
-                if (!$create_queue['result']) {
-                    $this->exitProcess('Error: Queue cannot be created for Cart ID: ' . $this->cart->id, 500);
-                }
-                if ($create_queue['exists']) {
-                    $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
-                }
-
-                $this->logger->addLog('Queue created successfully for Cart ID: ' . $this->cart->id, 'notice');
-            } else {
-                do {
-                    $cart_lock = $this->payplugLock->createLockG2((int) $this->cart->id, 'ipn');
-                    if (!$cart_lock) {
-                        $checkReturn = $this->payplugLock->check((int) $this->cart->id);
-                        if ('stop ipn' == $checkReturn) {
-                            $this->exitProcess('Lock cannot be created.', 500);
-                        }
-                    } else {
-                        $this->logger->addLog('Lock created', 'notice');
-                        $this->lock_key = $this->cart->id;
-                    }
-                } while (!$cart_lock);
-            }
-
-            $new_order_state = $this->order_states['refund'];
-            $current_state = (int) $this->dependencies
+        // Set lock the process with id_cart from order object
+        if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+            $this->logger->addLog('Notification: Attempting to set queue for Cart ID: ' . $this->cart->id, 'notice');
+            $create_queue = $this->dependencies
                 ->getPlugin()
-                ->getOrderRepository()
-                ->getCurrentOrderState((int) $this->order->id);
+                ->getQueueAction()
+                ->hydrateAction($this->cart->id, $this->resource->id);
+            if (!$create_queue['result']) {
+                $this->exitProcess('Error: Queue cannot be created for Cart ID: ' . $this->cart->id, 500);
+            }
+            if ($create_queue['exists']) {
+                $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
+            }
 
-            $this->logger->addLog('Current state: ' . $current_state);
+            $this->logger->addLog('Queue created successfully for Cart ID: ' . $this->cart->id, 'notice');
+        } else {
+            do {
+                $cart_lock = $this->payplugLock->createLockG2((int) $this->cart->id, 'ipn');
+                if (!$cart_lock) {
+                    $checkReturn = $this->payplugLock->check((int) $this->cart->id);
+                    if ('stop ipn' == $checkReturn) {
+                        $this->exitProcess('Lock cannot be created.', 500);
+                    }
+                } else {
+                    $this->logger->addLog('Lock created', 'notice');
+                    $this->lock_key = $this->cart->id;
+                }
+            } while (!$cart_lock);
+        }
 
+        if ($this->payment->is_refunded) {
+            $this->logger->addLog('TOTAL REFUND MODE');
+            $new_order_state = $this->order_states['refund'];
             if ($current_state != $new_order_state) {
                 $update = $this->dependencies
                     ->getPlugin()
@@ -515,7 +513,20 @@ class PayPlugNotifications
             }
         } else {
             $this->logger->addLog('PARTIAL REFUND');
-            $this->exitProcess('PARTIAL REFUND');
+            $new_order_state = $this->order_states['partial_refund'];
+            if ($current_state != $new_order_state) {
+                $update = $this->dependencies
+                    ->getPlugin()
+                    ->getOrderClass()
+                    ->updateOrderState($this->order, (int) $new_order_state);
+                if (!$update) {
+                    $this->exitProcess('Order status can\'t be updated \'partial_refund\'');
+                }
+
+                $this->exitProcess('Order status is update with status \'partial_refund\'');
+            } else {
+                $this->exitProcess('Order status is already \'partial_refund\'');
+            }
         }
     }
 
@@ -650,6 +661,9 @@ class PayPlugNotifications
             'paid' => $this->configuration->getValue('order_state_paid' . $state_addons),
             'pending' => $this->configuration->getValue('order_state_pending' . $state_addons),
             'refund' => $this->configuration->getValue('order_state_refund' . $state_addons),
+            'partial_refund' => $this->payment->is_live
+                ? $this->configuration->getValue('PS_CHECKOUT_STATE_PARTIALLY_REFUNDED')
+                : $this->configuration->getValue('order_state_partial_refund' . $state_addons),
         ];
     }
 
