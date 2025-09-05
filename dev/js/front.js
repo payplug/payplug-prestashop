@@ -689,7 +689,7 @@ var $document, $window, __moduleName__Module = {
                 {identifier, workflow} = applepay.props,
                 $wrapper = $('.' + identifier + '_wrapper');
 
-            if ($wrapper.lenght) {
+            if ($wrapper.length) {
                 return;
             }
 
@@ -741,6 +741,7 @@ var $document, $window, __moduleName__Module = {
                     "supports3DS"
                 ],
                 "supportedNetworks": [
+                    "cartesBancaires",
                     "visa",
                     "masterCard"
                 ],
