@@ -192,7 +192,7 @@ class OneyPaymentMethod extends PaymentMethod
             return [];
         }
 
-        $order_tab = parent::getOrderTab($retrieve);
+        $order_tab = $this->getParentOrderTab($retrieve);
 
         if (!$resource->is_paid) {
             $state_addons = $resource->is_live ? '' : '_test';
@@ -1759,6 +1759,16 @@ class OneyPaymentMethod extends PaymentMethod
     protected function getParentPaymentOption($payment_options = [])
     {
         return parent::getPaymentOption($payment_options);
+    }
+
+    /**
+     * @param $retrieve
+     *
+     * @return array
+     */
+    protected function getParentOrderTab($retrieve = [])
+    {
+        return parent::getOrderTab($retrieve);
     }
 
     /**
