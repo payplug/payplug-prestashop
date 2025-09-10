@@ -1694,17 +1694,18 @@ class OneyPaymentMethod extends PaymentMethod
 
         $available_oney_payments = $this->getOperations();
 
-        $payment_options = $this->getParentPaymentOption($payment_options);
-        if (!isset($payment_options[$this->name])) {
-            return $payment_options;
-        }
-
         foreach ($available_oney_payments as $oney_payment) {
             $with_fees = false !== (bool) strpos($oney_payment, 'with_fees');
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 continue;
             }
-            $oney_option_name = 'oney_' . $oney_payment;
+
+            $this->name = 'oney_' . $oney_payment;
+            $payment_options = $this->getParentPaymentOption($payment_options);
+            if (!isset($payment_options[$this->name])) {
+                continue;
+            }
+
             $oney_option = $payment_options[$this->name];
             $type = explode('_', $oney_payment);
             $split = (int) str_replace('x', '', $type[0]);
@@ -1728,10 +1729,8 @@ class OneyPaymentMethod extends PaymentMethod
             $oney_option['logo'] = $this->img_path . 'oney/' . $oney_payment . (!$use_fees ? '_side_' . $iso : '') . '.svg';
             $oney_option['callToActionText'] = sprintf($text, $split);
 
-            $payment_options[$oney_option_name] = $oney_option;
+            $payment_options[$this->name] = $oney_option;
         }
-
-        unset($payment_options[$this->name]);
 
         return $payment_options;
     }

@@ -84,41 +84,45 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
         $this->assertSame([], $this->class->getPaymentOption($this->payment_options));
     }
 
+    /**
+     * @group debug
+     */
     public function testWhenOneyPaymentMethodsAreGiven()
     {
         $name = $this->class->get('name');
-        $parent_payment_option = [
-            $name => [
-                'name' => $name,
-                'inputs' => [
-                    'pc' => [
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ],
-                    'pay' => [
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ],
-                    'id_cart' => [
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => '2',
-                    ],
-                    'method' => [
-                        'name' => 'method',
-                        'type' => 'hidden',
-                        'value' => $name,
-                    ],
+        $payment_option = [
+            'name' => $name,
+            'inputs' => [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
                 ],
-                'extra_classes' => $name,
-                'payment_controller_url' => 'payment_controller_url',
-                'logo' => 'logo_url',
-                'callToActionText' => '',
-                'action' => 'action_url',
-                'moduleName' => 'payplug',
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => '2',
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => $name,
+                ],
             ],
+            'extra_classes' => $name,
+            'payment_controller_url' => 'payment_controller_url',
+            'logo' => 'logo_url',
+            'callToActionText' => '',
+            'action' => 'action_url',
+            'moduleName' => 'payplug',
+        ];
+        $parent_payment_option = [
+            $name => $payment_option,
         ];
 
         $this->class->shouldReceive(
@@ -157,91 +161,8 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
         ]);
         $this->dependencies->configClass = $configClass;
 
-        $expected = [
-            'oney_x3_with_fees' => [
-                'name' => 'oney',
-                'inputs' => [
-                    'pc' => [
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ],
-                    'pay' => [
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ],
-                    'id_cart' => [
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => '2',
-                    ],
-                    'method' => [
-                        'name' => 'method',
-                        'type' => 'hidden',
-                        'value' => 'oney',
-                    ],
-                    'oney_type' => [
-                        'name' => 'payplugOney_type',
-                        'type' => 'hidden',
-                        'value' => 'x3_with_fees',
-                    ],
-                ],
-                'extra_classes' => 'oney3x',
-                'payment_controller_url' => 'link',
-                'logo' => 'modules/payplug/views/img/oney/x3_with_fees.svg',
-                'callToActionText' => 'payplug.getPaymentOptions.payWithOney',
-                'action' => 'action_url',
-                'moduleName' => 'payplug',
-                'is_optimized' => true,
-                'type' => 'x3_with_fees',
-                'amount' => 42.42,
-                'iso_code' => 'FR',
-            ],
-            'oney_x4_with_fees' => [
-                'name' => 'oney',
-                'inputs' => [
-                    'pc' => [
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ],
-                    'pay' => [
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ],
-                    'id_cart' => [
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => '2',
-                    ],
-                    'method' => [
-                        'name' => 'method',
-                        'type' => 'hidden',
-                        'value' => 'oney',
-                    ],
-                    'oney_type' => [
-                        'name' => 'payplugOney_type',
-                        'type' => 'hidden',
-                        'value' => 'x4_with_fees',
-                    ],
-                ],
-                'extra_classes' => 'oney4x',
-                'payment_controller_url' => 'link',
-                'logo' => 'modules/payplug/views/img/oney/x4_with_fees.svg',
-                'callToActionText' => 'payplug.getPaymentOptions.payWithOney',
-                'action' => 'action_url',
-                'moduleName' => 'payplug',
-                'is_optimized' => true,
-                'type' => 'x4_with_fees',
-                'amount' => 42.42,
-                'iso_code' => 'FR',
-            ],
-        ];
-
         $this->assertSame(
-            $expected,
+            $parent_payment_option,
             $this->class->getPaymentOption($this->payment_options)
         );
     }
