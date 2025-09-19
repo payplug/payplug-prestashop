@@ -64,6 +64,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $context = $this->contextAdapter->get(); // get the method
             $tools = $this->tools_adapter;
 
+            $request = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.action.request');
+
             // todo: Create a ajaxDispatcher to avoid this "infinite" list of condition
             if ($tools->tool('getIsset', 'pc')) {
                 if (1 == (int) $tools->tool('getValue', 'delete')) {
@@ -351,28 +357,6 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'return_url' => $return_url,
                     'message' => 'Success',
                 ]));
-            } elseif ($tools->tool('getIsset', 'patchPayment')) {
-                $resource_id = $tools->tool('getValue', 'pay_id');
-                $token = $tools->tool('getValue', 'token');
-                $workflow = $tools->tool('getValue', 'workflow');
-                $carrier = $tools->tool('getValue', 'carrier');
-                $user = $tools->tool('getValue', 'user');
-
-                $patch = $this->dependencies
-                    ->getPlugin()
-                    ->getPaymentMethodClass()
-                    ->getPaymentMethod('applepay')
-                    ->patchPaymentResource($resource_id, $token, $workflow, $carrier, $user);
-
-                if (!$patch['result']) {
-                    exit(json_encode($patch));
-                }
-
-                exit(json_encode([
-                    'result' => true,
-                    'return_url' => $patch['return_url'],
-                    'message' => 'Success',
-                ]));
             } elseif ($tools->tool('getIsset', 'addLogger')) {
                 $message = $tools->tool('getValue', 'message');
                 if (!$message || !is_string($message)) {
@@ -387,25 +371,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'result' => true,
                     'message' => $message, // adapter error
                 ]));
-            } elseif ($tools->tool('getIsset', 'applepayUpdate')) {
-                $request = $this->dependencies
-                    ->getPlugin()
-                    ->getPaymentMethodClass()
-                    ->getPaymentMethod('applepay')
-                    ->getRequest();
+            } elseif ($tools->tool('getValue', 'method')) {
+                $method = $tools->tool('getValue', 'method');
+                $params = $tools->tool('getValue', 'params', []);
+                $result = $request->dispatchAction($method, $params);
 
-                exit(json_encode([
-                    'result' => true,
-                    'request' => $request,
-                ]));
-            } elseif ($tools->tool('getIsset', 'applepayCancel')) {
-                $cancel = $this->dependencies
-                    ->getPlugin()
-                    ->getPaymentMethodClass()
-                    ->getPaymentMethod('applepay')
-                    ->cancelPaymentResource();
-
-                exit(json_encode($cancel));
+                exit(json_encode($result));
             }
         }
 
