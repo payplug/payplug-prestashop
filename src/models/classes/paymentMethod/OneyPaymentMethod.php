@@ -234,7 +234,11 @@ class OneyPaymentMethod extends PaymentMethod
         return $order_tab;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get payment tab
+     *
+     * @return array
+     */
     public function getPaymentTab()
     {
         $this->setParameters();
