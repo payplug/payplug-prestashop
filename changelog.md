@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.19.1
+- Bugfix :
+  - [SMP-3222](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2711): Fix Oney 4x display on checkout page
+
 ## Version 4.19.0
 - Feature :
   - [PRE-2835](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2685): Display oney on checkout in if cart is elligible

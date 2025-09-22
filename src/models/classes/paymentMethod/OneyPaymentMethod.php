@@ -1732,8 +1732,6 @@ class OneyPaymentMethod extends PaymentMethod
             $payment_options[$this->name] = $oney_option;
         }
 
-        unset($payment_options[$this->name]);
-
         return $payment_options;
     }
 
