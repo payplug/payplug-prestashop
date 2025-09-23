@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\repositories\OrderRepository;
  * @group unit
  * @group repository
  * @group order_repository
- *
- * @runTestsInSeparateProcesses
  */
 class getCurrentOrderStateTest extends BaseOrderRepository
 {

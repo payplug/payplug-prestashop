@@ -11,8 +11,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group validator
  * @group payment_validator
- *
- * @runTestsInSeparateProcesses
  */
 class canSaveCardTest extends TestCase
 {

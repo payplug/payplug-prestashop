@@ -8,8 +8,6 @@ use PayPlug\classes\MyLogPHP;
  * @group unit
  * @group action
  * @group configuration_action
- *
- * @runTestsInSeparateProcesses
  */
 class uninstallActionTest extends BaseConfigurationAction
 {

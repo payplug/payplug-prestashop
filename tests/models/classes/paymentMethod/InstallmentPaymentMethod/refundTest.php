@@ -10,8 +10,6 @@ use PayPlug\tests\mock\RefundMock;
  * @group class
  * @group payment_method_class
  * @group installment_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
 class refundTest extends BaseInstallmentPaymentMethod
 {

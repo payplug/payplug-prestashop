@@ -7,8 +7,6 @@ namespace PayPlug\tests\models\classes\paymentMethod\IdealPaymentMethod;
  * @group class
  * @group payment_method_class
  * @group ideal_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
 class getPaymentTabTest extends BaseIdealPaymentMethod
 {

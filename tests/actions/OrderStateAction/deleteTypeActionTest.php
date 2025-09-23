@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\OrderStateAction;
  * @group unit
  * @group action
  * @group order_state_action
- *
- * @runTestsInSeparateProcesses
  */
 class deleteTypeActionTest extends BaseOrderStateAction
 {

@@ -9,8 +9,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group class
  * @group payment_method_class
  * @group installment_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
 class updateInstallmentSchedulesTest extends BaseInstallmentPaymentMethod
 {

@@ -7,8 +7,6 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
  * @group class
  * @group payment_method_class
  * @group applepay_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
 class getDeliveryOptionsTest extends BaseApplepayPaymentMethod
 {

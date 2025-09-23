@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\repositories\StateRepository;
  * @group unit
  * @group repository
  * @group state_repository
- *
- * @runTestsInSeparateProcesses
  */
 class initializeTest extends BaseStateRepository
 {
