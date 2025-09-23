@@ -609,7 +609,6 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Check Oney required fields in form
      *
      * todo: to clean or update
-     * todo: add coverage to this method
      *
      * @param mixed $payment_data
      *
@@ -1447,8 +1446,6 @@ class OneyPaymentMethod extends PaymentMethod
 
     /**
      * @description Get the Oney required fields from Context
-     *
-     * todo: add coverage to this method
      *
      * @param array $payment_data
      *
