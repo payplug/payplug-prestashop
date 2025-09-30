@@ -412,8 +412,6 @@ class ValidationAction
             default:
                 break;
         }
-        // this is temporary, sleep 1 second in order to wait for notification
-        sleep(1);
 
         // ...then check if an order exists this related cart before redirect user
         $id_order = $this->dependencies
@@ -430,40 +428,6 @@ class ValidationAction
                 'result' => true,
                 'url' => $this->getOrderLinks($id_order)['confirm'],
                 'message' => 'Redirecting to order-confirmation page',
-            ];
-        }
-
-        // ... then create order form cart id
-        $order_create = $this->createOrder((int) $cart->id);
-
-        if (!$order_create['result']) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('ValidationAction::validateAction - No stored payment get from given id cart.');
-
-            return [
-                'result' => false,
-                'url' => $this->getOrderLinks()['error'],
-                'message' => 'No stored payment get from given id cart.',
-            ];
-        }
-
-        // If an order has beed created,  return confirmation link
-        if (isset($order_create['id_order'])) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('ValidationAction::validateAction - Order created: ' . $order_create['id_order']);
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('ValidationAction::validateAction - Redirecting to order-confirmation page.');
-
-            return [
-                'result' => true,
-                'url' => $this->getOrderLinks((int) $order_create['id_order'])['confirm'],
-                'message' => 'Redirecting to order-confirmation page.',
             ];
         }
 
