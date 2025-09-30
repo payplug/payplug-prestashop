@@ -183,59 +183,6 @@ class validateActionTest extends BaseValidationAction
         );
     }
 
-    public function testWhenOrderCantBeCreated()
-    {
-        $this->cart_adapter->shouldReceive([
-            'get' => CartMock::get(),
-        ]);
-        $this->validate_adapter->shouldReceive([
-            'validate' => true,
-        ]);
-        $this->order->shouldReceive([
-            'getIdByCartId' => false,
-        ]);
-        $this->action->shouldReceive([
-            'createOrder' => [
-                'result' => false,
-            ],
-        ]);
-        $this->assertSame(
-            [
-                'result' => false,
-                'url' => $this->links['error'],
-                'message' => 'No stored payment get from given id cart.',
-            ],
-            $this->action->validateAction($this->ps, $this->cart_id)
-        );
-    }
-
-    public function testWhenOrderIsCreated()
-    {
-        $this->cart_adapter->shouldReceive([
-            'get' => CartMock::get(),
-        ]);
-        $this->validate_adapter->shouldReceive([
-            'validate' => true,
-        ]);
-        $this->order->shouldReceive([
-            'getIdByCartId' => false,
-        ]);
-        $this->action->shouldReceive([
-            'createOrder' => [
-                'result' => true,
-                'id_order' => 42,
-            ],
-        ]);
-        $this->assertSame(
-            [
-                'result' => true,
-                'url' => $this->links['confirm'],
-                'message' => 'Redirecting to order-confirmation page.',
-            ],
-            $this->action->validateAction($this->ps, $this->cart_id)
-        );
-    }
-
     public function testWhenNoOrdersAreCreatedAndNoErrorsOccured()
     {
         $this->cart_adapter->shouldReceive([
@@ -246,11 +193,6 @@ class validateActionTest extends BaseValidationAction
         ]);
         $this->order->shouldReceive([
             'getIdByCartId' => false,
-        ]);
-        $this->action->shouldReceive([
-            'createOrder' => [
-                'result' => true,
-            ],
         ]);
         $this->assertSame(
             [
