@@ -1682,7 +1682,7 @@ class OneyPaymentMethod extends PaymentMethod
         $delivery_address = $this->dependencies
             ->getPlugin()
             ->getAddress()
-            ->get($this->context->cart->id_address_delivery);
+            ->get((int) $this->context->cart->id_address_delivery);
         $iso = $this->dependencies
             ->getPlugin()
             ->getTools()
