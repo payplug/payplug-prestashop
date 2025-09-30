@@ -688,8 +688,7 @@ var $document, $window, __moduleName__Module = {
             let {applepay} = __moduleName__Module,
                 {identifier, workflow} = applepay.props,
                 $wrapper = $('.' + identifier + '_wrapper');
-
-            if ($wrapper.length) {
+            if (!$wrapper.length) {
                 return;
             }
 
@@ -872,6 +871,7 @@ var $document, $window, __moduleName__Module = {
                 dataType: 'json',
                 data: {
                     _ajax: 1,
+                    method: 'applepayUpdate',
                     applepayUpdate: 1,
                     workflow: workflow,
                     carrier: carrier,
@@ -960,15 +960,18 @@ var $document, $window, __moduleName__Module = {
                     url: payplug_ajax_url,
                     data: {
                         _ajax: 1,
-                        token: payment.token,
-                        user: {
-                            billing: payment.billingContact,
-                            shipping: payment.shippingContact,
+                        params: {
+                            token: payment.token,
+                            user: {
+                                billing: payment.billingContact,
+                                shipping: payment.shippingContact,
+                            },
+                            carrier: carrier,
+                            pay_id: applepay.props.request.idPayment,
+                            workflow: applepay.props.workflow,
                         },
-                        carrier: carrier,
-                        pay_id: applepay.props.request.idPayment,
                         patchPayment: 1,
-                        workflow: applepay.props.workflow,
+                        method: 'applepayPatch',
                     },
                     success: (json) => {
                         var result = JSON.parse(json);
@@ -1002,6 +1005,7 @@ var $document, $window, __moduleName__Module = {
                     data: {
                         _ajax: 1,
                         applepayCancel: 1,
+                        method: 'applepayCancel',
                         workflow: applepay.props.workflow,
                     },
                     success: () => {

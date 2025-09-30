@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.20.0
+- Feature :
+  - [SMP-2967](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2715): Activate Apple Pay on product page
+
 ## Version 4.19.1
 - Bugfix :
   - [SMP-3222](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2711): Fix Oney 4x display on checkout page

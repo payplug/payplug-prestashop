@@ -57,7 +57,7 @@ class autoCapturePaymentActionTest extends BaseHookAction
      *
      * @param mixed $order
      */
-    public function atestWhenGivenIdCartIsInvalidIntegerFormat($order)
+    public function testWhenGivenIdCartIsInvalidIntegerFormat($order)
     {
         $this->assertFalse($this->action->autoCapturePaymentAction($order));
     }
@@ -235,60 +235,5 @@ class autoCapturePaymentActionTest extends BaseHookAction
             ],
         ]);
         $this->assertTrue($this->action->autoCapturePaymentAction($this->order));
-    }
-
-    public function autoCapturePaymentAction($order = null)
-    {
-        $this->setParameters();
-
-        if (!is_object($order) || $order->id) {
-            $this->logger->addLog('HookAction::autoCapturePaymentAction() - Invalid argument given, $order must be a non null object.', 'critical');
-
-            return false;
-        }
-
-        $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
-        $can_use_deferred = (bool) $payment_methods['deferred'];
-
-        if (!$can_use_deferred) {
-            $this->logger->addLog('HookAction::autoCapturePaymentAction() - deferred must be active to allow auto capture');
-
-            return true;
-        }
-
-        $stored_resource = $this->dependencies
-            ->getPlugin()
-            ->getPaymentRepository()
-            ->getBy('id_cart', (int) $order->id_cart);
-
-        if ('installment' == $stored_resource['method']) {
-            $this->logger->addLog('HookAction::autoCapturePaymentAction() - auto capture is not compatible with installment plan.');
-
-            return true;
-        }
-
-        // Check if resource can be capture
-        $retrieve = $this->dependencies
-            ->getPlugin()
-            ->getPaymentMethodClass()
-            ->getPaymentMethod($stored_resource['method'])
-            ->retrieve($stored_resource['resource_id']);
-        $resource = $retrieve['resource'];
-        $payment_validator = $this->dependencies->getValidators()['payment'];
-        $can_be_captured = empty($resource->failure)
-            && !$resource->is_paid
-            && $payment_validator->isDeferred($resource)['result']
-            && !$payment_validator->isExpired($resource)['result'];
-
-        if (!$can_be_captured) {
-            $this->logger->addLog('HookAction::autoCapturePaymentAction() - given resource can\'t be captured');
-
-            return true;
-        }
-
-        return (bool) $this->dependencies
-            ->getPlugin()
-            ->getPaymentAction()
-            ->captureAction($resource->id, (int) $order->id)['result'];
     }
 }
