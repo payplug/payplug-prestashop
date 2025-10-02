@@ -29,12 +29,15 @@ class PayplugApplePayPaymentRequestModuleFrontController extends ModuleFrontCont
     public function postProcess()
     {
         $dependencies = new PayPlug\classes\DependenciesClass();
-
+        $workflow = $dependencies
+            ->getPlugin()
+            ->getTools()
+            ->tool('getValue', 'workflow');
         $request = $dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
             ->getPaymentMethod('applepay')
-            ->getRequest();
+            ->getRequest($workflow);
 
         exit(json_encode($request));
     }
