@@ -63,11 +63,24 @@ class RequestAction
         }
 
         // If $parameters given return method using them.
-        if (!empty($parameters)) {
-            return $this->{$method_name}($parameters);
+        try {
+            if (!empty($parameters)) {
+                $return = $this->{$method_name}($parameters);
+            } else {
+                $return = $this->{$method_name}();
+            }
+        } catch (\Exception $exception) {
+            $this->dependencies->getPlugin()
+                ->getLogger()
+                ->addLog('RequestAction::dispatchAction - Exception thrown: ' . $exception->getMessage(), 'error');
+
+            $return = [
+                'result' => false,
+                'message' => 'Exception thrown: ' . $exception->getMessage(),
+            ];
         }
 
-        return $this->{$method_name}();
+        return $return;
     }
 
     /**
@@ -78,11 +91,15 @@ class RequestAction
      */
     public function applepayUpdateAction()
     {
+        $workflow = $this->dependencies
+            ->getPlugin()
+            ->getTools()
+            ->tool('getValue', 'workflow');
         $request = $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
             ->getPaymentMethod('applepay')
-            ->getRequest();
+            ->getRequest($workflow);
 
         return [
             'result' => is_array($request) && !empty($request),

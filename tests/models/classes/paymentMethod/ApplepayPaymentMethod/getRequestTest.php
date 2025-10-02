@@ -2,6 +2,7 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
 
+use PayPlug\tests\mock\CartMock;
 use PayPlug\tests\mock\CurrencyMock;
 
 /**
@@ -14,6 +15,14 @@ use PayPlug\tests\mock\CurrencyMock;
  */
 class getRequestTest extends BaseApplepayPaymentMethod
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+    }
+
     public function testWhenWorkflowIsntFromCheckout()
     {
         $this->currency_adapter->shouldReceive([
@@ -76,7 +85,7 @@ class getRequestTest extends BaseApplepayPaymentMethod
 
         $this->assertSame(
             $expected,
-            $this->class->getRequest()
+            $this->class->getRequest('cart')
         );
     }
 
