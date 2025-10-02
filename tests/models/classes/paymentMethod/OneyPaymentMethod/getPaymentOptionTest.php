@@ -84,9 +84,6 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
         $this->assertSame([], $this->class->getPaymentOption($this->payment_options));
     }
 
-    /**
-     * @group debug
-     */
     public function testWhenOneyPaymentMethodsAreGiven()
     {
         $name = $this->class->get('name');

@@ -435,9 +435,11 @@ class ApplepayPaymentMethod extends PaymentMethod
     /**
      * @description Get the request to create applepay resource
      *
+     * @param mixed $workflow
+     *
      * @return array
      */
-    public function getRequest()
+    public function getRequest($workflow = 'checkout')
     {
         $this->setParameters();
 
@@ -446,7 +448,6 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->getCurrency()
             ->get((int) $this->context->cart->id_currency);
 
-        $workflow = $this->tools->tool('getValue', 'workflow');
         $cart_adapter = $this->dependencies->getPlugin()->getCart();
         $cart_rule_adapter = $this->dependencies->getPlugin()->getCartRule();
         $address_adapter = $this->dependencies->getPlugin()->getAddress();
@@ -454,6 +455,9 @@ class ApplepayPaymentMethod extends PaymentMethod
         $current_invoice_id = null;
         $delivery_options = null;
         $carrier = null;
+
+        // Reload cart to ensure to get any update
+        $current_cart = $cart_adapter->get((int) $this->context->cart->id);
 
         // Check if this an appelpay 'product' shopping page
         // check empty_cart this double check since we go through this condition twice on js side
@@ -464,23 +468,23 @@ class ApplepayPaymentMethod extends PaymentMethod
             $this->context->cookie->previous_cart_id = $this->context->cart->id;
 
             // ...Then create a new cart and add it to the context.
-            $this->context->cart = $cart_adapter->createNewCart($this->context, $id_customer_id);
+            $current_cart = $cart_adapter->createNewCart($this->context, $id_customer_id);
             $cart_rule_adapter->autoAddToCart($this->context);
 
             // Update the cookie with the new cart ID
-            $this->context->cookie->id_cart = $this->context->cart->id;
+            $this->context->cookie->id_cart = $current_cart->id;
             $this->context->cookie->write();
 
             $id_product = (int) $this->tools->tool('getValue', 'id_product');
             $quantity = (int) $this->tools->tool('getValue', 'quantity');
             // add product to cart
-            $cart_adapter->updateQty((int) $this->context->cart->id, $quantity, $id_product);
-            $current_address_delivery = (int) $this->context->cart->id_address_delivery;
-            $cart_adapter->update($this->context->cart);
-            $cart_adapter->updateAddressId((int) $this->context->cart->id, $current_address_delivery, (int) $this->context->cart->id_address_delivery);
+            $cart_adapter->updateQty((int) $current_cart->id, $quantity, $id_product);
+            $current_address_delivery = (int) $current_cart->id_address_delivery;
+            $cart_adapter->update($current_cart);
+            $cart_adapter->updateAddressId((int) $current_cart->id, $current_address_delivery, (int) $this->context->cart->id_address_delivery);
 
             // Reload cart in context after update
-            $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
+            $this->context->cart = $cart_adapter->get((int) $current_cart->id);
         }
 
         if ('checkout' != $workflow) {
@@ -503,12 +507,12 @@ class ApplepayPaymentMethod extends PaymentMethod
                     ->checkAndSaveAddress($formated_address);
 
                 // We stack here the context cart address id to prevent update of the cart
-                $current_delivery_id = $this->context->cart->id_address_delivery;
-                $current_invoice_id = $this->context->cart->id_address_invoice;
-                $cart_adapter->updateAddresses($this->context->cart, $new_address_id, $new_address_id);
+                $current_delivery_id = $current_cart->id_address_delivery;
+                $current_invoice_id = $current_cart->id_address_invoice;
+                $cart_adapter->updateAddresses($current_cart, $new_address_id, $new_address_id);
 
-                // update context iun order to update carrier information, taxes ...
-                $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
+                // update context in order to update carrier information, taxes ...
+                $current_cart = $cart_adapter->get((int) $current_cart->id);
             }
 
             $carrier = $this->tools->tool('getValue', 'carrier');
@@ -519,9 +523,10 @@ class ApplepayPaymentMethod extends PaymentMethod
                 $id_carrier = $delivery_options[0]['identifier'];
             }
         } else {
-            $id_carrier = (int) $this->context->cart->id_carrier;
+            $id_carrier = (int) $current_cart->id_carrier;
         }
-        $this->context->cart->id_carrier = $id_carrier;
+
+        $current_cart->id_carrier = $id_carrier;
 
         $applePayPaymentRequest = [
             'country_code' => $this->context->country->iso_code,
@@ -531,7 +536,7 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'amount' => $this->dependencies
                     ->getPlugin()
                     ->getCart()
-                    ->getOrderTotal((int) $this->context->cart->id, true, (int) $id_carrier),
+                    ->getOrderTotal((int) $current_cart->id, true, (int) $id_carrier),
             ],
             'apple_pay_domain' => $this->context->shop->domain_ssl,
         ];
@@ -548,14 +553,16 @@ class ApplepayPaymentMethod extends PaymentMethod
 
             // delete newly created address
             if (isset($new_address_id)) {
-                $cart_adapter->updateAddresses($this->context->cart, $current_delivery_id, $current_invoice_id);
+                $cart_adapter->updateAddresses($current_cart, $current_delivery_id, $current_invoice_id);
                 $tmp_address = $address_adapter->get((int) $new_address_id);
                 if (!$tmp_address->id_customer) {
                     $address_adapter->delete($tmp_address);
                 }
-                $this->context->cart = $cart_adapter->get((int) $this->context->cart->id);
             }
         }
+
+        // Always reload cart in case of update
+        $this->context->cart = $cart_adapter->get((int) $current_cart->id);
 
         return $applePayPaymentRequest;
     }
@@ -926,6 +933,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             'city' => $cart_data['billing']['city'],
             'id_country' => $this->country_adapter->getByIso($cart_data['billing']['country']),
         ];
+
         // check if country if active on merchant's shop
         $is_active = $this->country_adapter->isCountryActiveByCountryId($user_shipping_address['id_country']);
         if (!$is_active) {

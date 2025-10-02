@@ -8,6 +8,7 @@
   - [SMP-3222](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2711): Fix Oney 4x display on checkout page
   - [SMP-3155](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2716): Remove order creation on validation postprocessing to avoid concurrence
   - [SMP-3224](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2717): Fix schedules display on checkout
+  - [PRE-3051](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2718): Fix update carrier on applepay product & cart
 
 ## Version 4.19.0
 - Feature :

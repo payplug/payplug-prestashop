@@ -6,6 +6,7 @@ namespace PayPlug\tests\actions\RequestAction;
  * @group unit
  * @group action
  * @group request_action
+ * @group debug
  *
  * @runTestsInSeparateProcesses
  */
@@ -19,6 +20,13 @@ class applepayUpdateActionTest extends BaseRequestAction
         $this->request = [
             'key' => 'value',
         ];
+        $tool = \Mockery::mock('ToolsAdapter');
+        $tool->shouldReceive('tool')
+            ->with('getValue', 'workflow')
+            ->andReturn('product');
+        $this->plugin->shouldReceive([
+            'getTools' => $tool,
+        ]);
     }
 
     /**
