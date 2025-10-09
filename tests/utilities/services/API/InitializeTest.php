@@ -122,7 +122,6 @@ class InitializeTest extends BaseApi
             ->shouldReceive('getValue')
             ->with('live_api_key')
             ->andReturn($this->token);
-
         $this->configuration_class
             ->shouldReceive('getValue')
             ->with('jwt')
@@ -131,8 +130,13 @@ class InitializeTest extends BaseApi
             ->shouldReceive('getValue')
             ->with('oauth_client_data')
             ->andReturn(json_encode($this->oauth_client_data));
-        $this->merchant->shouldReceive([
-            'generateJWT' => false,
+
+        $this->authentication->shouldReceive([
+            'validateJWT' => [
+                'result' => false,
+                'token' => null,
+                'need_update' => false,
+            ],
         ]);
 
         $this->assertSame(
@@ -159,9 +163,12 @@ class InitializeTest extends BaseApi
         $this->configuration_class->shouldReceive([
             'set' => false,
         ]);
-        $this->merchant->shouldReceive([
-            'generateJWT' => ['data' => $this->jwt],
-            'registerJWT' => false,
+        $this->authentication->shouldReceive([
+            'validateJWT' => [
+                'result' => true,
+                'token' => $this->jwt['live'],
+                'need_update' => false,
+            ],
         ]);
 
         $this->assertSame(
@@ -188,9 +195,12 @@ class InitializeTest extends BaseApi
         $this->configuration_class->shouldReceive([
             'set' => false,
         ]);
-        $this->merchant->shouldReceive([
-            'generateJWT' => ['data' => $this->jwt],
-            'registerJWT' => true,
+        $this->authentication->shouldReceive([
+            'validateJWT' => [
+                'result' => true,
+                'token' => $this->jwt['live'],
+                'need_update' => true,
+            ],
         ]);
 
         $resource = \Mockery::mock('PayPlugAPI');
