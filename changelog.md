@@ -1,4 +1,7 @@
 # Payplug module changelog
+## Version 4.20.1
+- Bugfix :
+  - [SMP-3042](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2722): Fix Oney simulation when is elligible
 
 ## Version 4.20.0
 - Feature :
