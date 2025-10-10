@@ -29,7 +29,6 @@ if (!defined('_PS_VERSION_')) {
 
 use PayPlug\classes\DependenciesClass;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-use Symfony\Component\Dotenv\Dotenv;
 
 class PrestashopAdapter17
 {
@@ -38,6 +37,7 @@ class PrestashopAdapter17
     private $constant;
     private $context;
     private $dependencies;
+    private $media;
 
     public function __construct()
     {
@@ -45,6 +45,7 @@ class PrestashopAdapter17
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
+        $this->media = $this->dependencies->getPlugin()->getMedia();
     }
 
     public function displayHeader()
@@ -83,12 +84,29 @@ class PrestashopAdapter17
      */
     public function displayPaymentOption($payment_options)
     {
+        $multi_account = json_decode($this->configuration->getValue('multi_account'), true);
+        $currency = $this->context->currency;
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
             && $this->dependencies->configClass->isValidFeature('feature_integrated')
+            && empty($multi_account['identifier_' . strtolower($currency->iso_code)])
             && array_key_exists('standard', $payment_options)
             && 'integrated' == (string) $this->configuration->getvalue('embedded_mode')
         ) {
-            $payment_options = $this->setIntegratedPaymentOption($payment_options);
+            $payment_options = $this->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('standard')
+                ->buildEmbeddedPaymentOption($payment_options, 'integrated');
+        } elseif ($this->dependencies->configClass->isValidFeature('feature_standard')
+            && !empty($multi_account['identifier_' . strtolower($currency->iso_code)])
+            && array_key_exists('standard', $payment_options)
+            && 'integrated' == (string) $this->configuration->getvalue('embedded_mode')
+        ) {
+            $payment_options = $this->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('standard')
+                ->buildEmbeddedPaymentOption($payment_options, 'hosted_fields');
         }
 
         $paymentOptions = [];
@@ -147,101 +165,6 @@ class PrestashopAdapter17
         }
 
         return $paymentOptions;
-    }
-
-    /**
-     * @description  creation payment option
-     * for integreated payment
-     *
-     * @param $payment_options
-     *
-     * @return mixed
-     */
-    public function setIntegratedPaymentOption($payment_options)
-    {
-        if (empty($payment_options)) {
-            return [];
-        }
-        $dotenv = new Dotenv();
-        $dotenvFile = dirname(__FILE__, 5) . '/payplugroutes/.env';
-        if (file_exists($dotenvFile)) {
-            $dotenv->load($dotenvFile);
-            $integrated_payment_js_url = $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
-        } else {
-            $integrated_payment_js_url = $this->dependencies
-                ->getPlugin()
-                ->getRoutes()
-                ->getSourceUrl()['integrated'];
-        }
-        $integrated = [];
-        $integrated['name'] = 'integrated';
-        $integrated['inputs']['method'] = [
-            'name' => 'method',
-            'type' => 'hidden',
-            'value' => 'integrated',
-        ];
-        $integrated['action'] = 'javascript:payplugModule.integrated.form.validate();';
-        $integrated['logo'] = $payment_options['standard']['logo'];
-        $integrated['moduleName'] = 'payplug';
-        $integrated['callToActionText'] = $this->dependencies
-            ->getPlugin()
-            ->getTranslationClass()
-            ->l('specific17.setIntegratedPaymentOption.name', 'prestashopadapter17');
-        $integrated['tpl'] = 'integrated_payment.tpl';
-        $integrated['extra_classes'] = 'payplug integrated';
-
-        $translation = $this->dependencies->getPlugin()->getTranslationClass()->getFrontIntegratedPaymentTranslations();
-
-        switch ($this->context->language->iso_code) {
-            case 'fr':
-                $privacyLink = 'https://www.payplug.com/fr/politique-de-confidentialite/';
-
-                break;
-
-            case 'it':
-                $privacyLink = 'https://www.payplug.com/it/politica-di-confidenzialita/';
-
-                break;
-
-            default:
-                $privacyLink = 'https://www.payplug.com/privacy-policy/';
-
-                break;
-        }
-
-        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
-
-        $this->context->smarty->assign([
-            'integrated_payment_js_url' => $integrated_payment_js_url,
-            'is_one_click_activated' => (bool) $payment_methods['one_click'],
-            'is_deferred_activated' => (bool) $payment_methods['deferred'],
-            'placeholderCardholder' => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
-            'placeholderPan' => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
-            'placeholderExp' => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
-            'placeholderCvv' => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopadapter17'),
-            'privacy' => $translation['privacy'],
-            'secure' => $translation['secure'],
-            'privacyLink' => $privacyLink,
-        ]);
-
-        $integrated['additionalInformation'] =
-            $this->dependencies->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
-
-        $payment_options['standard'] = $integrated;
-
-        return $payment_options;
     }
 
     /**

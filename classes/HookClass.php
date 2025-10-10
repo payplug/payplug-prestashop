@@ -268,14 +268,18 @@ class HookClass
         } else {
             $payplug_domain = 'https://secure.payplug.com';
         }
-
+        $multi_account = json_decode($this->configuration->getValue('multi_account'), true);
+        $currency = $this->context->currency;
+        $is_hosted_fields = !empty($multi_account['identifier_' . strtolower($currency->iso_code)]);
         $this->media->addJsDef(
             [
                 $this->dependencies->name . '_ajax_url' => $payplug_ajax_url,
                 'PAYPLUG_DOMAIN' => $payplug_domain,
                 'is_sandbox_mode' => (bool) $this->configuration->getValue('sandbox_mode'),
+                'is_hosted_fields' => $is_hosted_fields,
             ]
         );
+
 
         $moduleName = $this->tools->tool('getValue', 'modulename');
 

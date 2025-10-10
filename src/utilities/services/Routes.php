@@ -78,6 +78,8 @@ class Routes
             'applepay' => 'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js',
             'embedded' => $this->getApiUrl() . '/js/1/form.latest.js',
             'integrated' => $this->getCDNUrl() . '/js/integrated-payment/v1@1/index.js',
+            //todo: update with prod url
+            'hosted_fields' => 'https://staging-internal-payment.gcp.dlns.io/ui/hosted-fields-lib/hosted-fields/v2.1.0/hosted-fields.min.js',
         ];
     }
 
@@ -134,5 +136,38 @@ class Routes
             'satispay' => $default . '/articles/8089121532700',
             'signup' => 'https://portal.payplug.com/auth/signup',
         ];
+    }
+
+    /**
+     * load JS url from .env  for HF and IP.
+     * todo: add tu.
+     *
+     * @param mixed $mode
+     */
+    public function loadEmbeddedJsUrl($mode)
+    {
+        $dotenv = new Dotenv();
+
+        $dotenvFile = dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (file_exists($dotenvFile)) {
+            $dotenv->load($dotenvFile);
+        }
+
+        if ('integrated' === $mode) {
+            if (!empty($_ENV['INTEGRATED_PAYMENT_DOMAIN'])) {
+                return $_ENV['INTEGRATED_PAYMENT_DOMAIN'];
+            }
+            $routes = $this->getSourceUrl();
+
+            return $routes['integrated'];
+        }
+        if ('hosted_fields' === $mode) {
+            if (!empty($_ENV['HOSTED_FIELDS_URL'])) {
+                return $_ENV['HOSTED_FIELDS_URL'];
+            }
+            $routes = $this->getSourceUrl();
+
+            return $routes['hosted_fields'];
+        }
     }
 }
