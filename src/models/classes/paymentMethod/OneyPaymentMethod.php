@@ -741,7 +741,7 @@ class OneyPaymentMethod extends PaymentMethod
             $is_valid_amount = $this->isValidOneyAmount($amount ? $amount : $cart->getOrderTotal(true))['result'];
 
             $is_elligible = $this->validators['payment']
-                ->isOneyElligible($is_valid_cart, $is_valid_amount, $is_valid_addresses);
+                ->isOneyElligible($is_valid_cart, $is_valid_amount, $is_valid_addresses['result']);
         } else {
             $is_elligible = $this->isValidOneyAmount($amount);
         }
@@ -778,7 +778,6 @@ class OneyPaymentMethod extends PaymentMethod
             'payplug_oney_error' => $error,
             'withFirstSchedule' => $withFirstSchedule,
         ]);
-
         if ($oney_payment_options) {
             $this->assign_adapter->assign([
                 'oney_payment_options' => $oney_payment_options,
