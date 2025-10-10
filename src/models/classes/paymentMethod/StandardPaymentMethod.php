@@ -580,6 +580,80 @@ class StandardPaymentMethod extends PaymentMethod
     }
 
     /**
+     * Build Payment options  for integrated payment or hosted fields.
+     *
+     * @param array $payment_options
+     * @param string $mode 'integrated'|'hosted_fields'
+     *
+     * @return array
+     */
+    public function buildEmbeddedPaymentOption($payment_options, $mode)
+    {
+        if (empty($payment_options) || !isset($payment_options['standard'])) {
+            return $payment_options;
+        }
+        $payment_data = [
+            'integrated' => [
+                'name' => 'integrated',
+                'action' => 'javascript:payplugModule.integrated.form.validate();',
+                'tpl' => 'integrated_payment.tpl',
+                'additionalTpl' => 'checkout/payment/integrated_payment.tpl',
+                'jsUrl' => 'integrated_payment_js_url',
+                'extra_classes' => 'payplug integrated',
+            ],
+            'hosted_fields' => [
+                'name' => 'hosted_fields',
+                'action' => 'javascript:payplugModule.hostedField.form.validate();',
+                'tpl' => 'hosted_fields.tpl',
+                'additionalTpl' => 'checkout/payment/hosted_fields.tpl',
+                'jsUrl' => 'hosted_fields_js_url',
+                'extra_classes' => 'payplug hosted_fields',
+            ],
+        ];
+        if (!isset($payment_data[$mode])) {
+            return $payment_options;
+        }
+
+        $embedded_option = $payment_data[$mode];
+        $js_url = $this->dependencies->getPlugin()->getRoutes()->loadEmbeddedJsUrl($mode);
+        $translation = $this->dependencies->getPlugin()->getTranslationClass()->getFrontIntegratedPaymentTranslations();
+        $privacyLink = $this->getPrivacyLink();
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $this->context->smarty->assign([
+            $embedded_option['jsUrl'] => $js_url,
+            'is_one_click_activated' => !empty($payment_methods['one_click']),
+            'is_deferred_activated' => !empty($payment_methods['deferred']),
+            'placeholderCardholder' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
+            'placeholderPan' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
+            'placeholderExp' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
+            'placeholderCvv' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopadapter17'),
+            'privacy' => isset($translation['privacy']) ? $translation['privacy'] : '',
+            'secure' => isset($translation['secure']) ? $translation['secure'] : '',
+            'privacyLink' => $privacyLink,
+        ]);
+        $option = [
+            'name' => $embedded_option['name'],
+            'inputs' => [
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => $embedded_option['name'],
+                ],
+            ],
+            'action' => $embedded_option['action'],
+            'logo' => $payment_options['standard']['logo'],
+            'moduleName' => 'payplug',
+            'callToActionText' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.name', 'prestashopadapter17'),
+            'tpl' => $embedded_option['tpl'],
+            'extra_classes' => $embedded_option['extra_classes'],
+            'additionalInformation' => $this->dependencies->configClass->fetchTemplate($embedded_option['additionalTpl']),
+        ];
+        $payment_options['standard'] = $option;
+
+        return $payment_options;
+    }
+
+    /**
      * @description Get deffered state for configuration usage
      *
      * @param int $deferred_state
@@ -659,5 +733,25 @@ class StandardPaymentMethod extends PaymentMethod
             . $this->dependencies->configClass->getImgLang() . '.svg';
 
         return $payment_options;
+    }
+
+    /**
+     * build privacy policy link.
+     */
+    protected function getPrivacyLink()
+    {
+        $this->setParameters();
+        $iso = isset($this->context->language->iso_code) ? $this->context->language->iso_code : '';
+
+        switch ($iso) {
+            case 'fr':
+                return 'https://www.payplug.com/fr/politique-de-confidentialite/';
+
+            case 'it':
+                return 'https://www.payplug.com/it/politica-di-confidenzialita/';
+
+            default:
+                return 'https://www.payplug.com/privacy-policy/';
+        }
     }
 }
