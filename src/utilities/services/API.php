@@ -403,8 +403,6 @@ class API
                 ];
             }
 
-            $jwt_response['httpResponse']['expires_date'] = time() + $jwt_response['httpResponse']['expires_in'];
-
             $response = [
                 'result' => true,
                 'code' => 200,
@@ -731,23 +729,21 @@ class API
         $token = $configuration->getValue($configuration_key);
         $jwt = json_decode($configuration->getValue('jwt'), true);
         if ($jwt && !empty($jwt)) {
-            $current_date = time();
-            if ($jwt[$mode]['expires_date'] < $current_date) {
-                $oauth_client_data = json_decode($configuration->getValue('oauth_client_data'), true);
+            $oauth_client_data = json_decode($configuration->getValue('oauth_client_data'), true);
+            $validate_jwt = Authentication::validateJWT($oauth_client_data[$mode], $jwt[$mode]);
+            if (empty($validate_jwt['token'])) {
+                $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be validated', 'error');
 
-                // Renew the token
-                $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-                $merchant = $module->getService('payplug.models.classes.merchant');
+                return null;
+            }
 
-                $jwt = $merchant->generateJWT($oauth_client_data);
-                if (!$jwt) {
-                    $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be generated', 'error');
+            // todo: This calculation should be done in payplug-php
+            $validate_jwt['token']['expires_date'] -= 30;
 
-                    return null;
-                }
+            $jwt[$mode] = $validate_jwt['token'];
 
-                $configuration->set('jwt', json_encode($jwt['data']));
-                $jwt = $jwt['data'];
+            if ($validate_jwt['need_update']) {
+                $configuration->set('jwt', json_encode($jwt));
             }
             $token = $jwt[$mode]['access_token'];
         }
