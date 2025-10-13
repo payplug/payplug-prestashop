@@ -3,6 +3,10 @@
 - Bugfix :
   - [SMP-3042](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2722): Fix Oney simulation when is elligible
 
+## Version 4.20.1
+- Bugfix :
+  - [PRE-3064](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2721): Update JWT experacy date
+
 ## Version 4.20.0
 - Feature :
   - [SMP-2967](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2715): Activate Apple Pay on product page
