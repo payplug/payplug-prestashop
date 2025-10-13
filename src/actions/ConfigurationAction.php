@@ -700,6 +700,12 @@ class ConfigurationAction
                 'status' => $api_rest->getRequirementsSection(),
                 'footer' => $footer,
             ];
+
+            // Show multi account only if currencies configured on the shop does not contain EURO
+            $multi_account_section = $api_rest->getMultiAccountSection($current_configuration);
+            if (!empty($multi_account_section)) {
+                $datas['multi_account'] = $multi_account_section;
+            }
         } else {
             $datas = [
                 'settings' => $api_rest->getSettingsSection(),
@@ -820,17 +826,30 @@ class ConfigurationAction
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
+            'identifier' => 'payplug_identifier',
+            'account_key' => 'payplug_account_key',
+            'api_key' => 'payplug_api_key',
+            'api_key_id' => 'payplug_api_key_id',
         ];
+
+        $currencies = $this->dependencies
+            ->getPlugin()
+            ->getCurrency()
+            ->findAll();
+        foreach ($currencies as $currency) {
+            $name = 'identifier_' . strtolower($currency['iso_code']);
+            $configuration_keys[$name] = 'payplug_' . $name;
+        }
+
+        $multi_account = json_decode($configuration->getValue('multi_account'), true);
 
         foreach ($configuration_keys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};
 
-                switch ($config) {
-                    case 'payplug_oney':
-                    case 'enable_oney_product_animation':
-                    case 'enable_oney_cart_animation':
-                    case 'enable_oney_schedule':
+                switch (true) {
+                    case 'payplug_oney' == $config:
+                    case 0 === strpos($config, 'enable_oney_'):
                         if (((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) && !$configuration->set($key, (string) $value)) {
                             return [
                                 'success' => false,
@@ -843,8 +862,7 @@ class ConfigurationAction
 
                         break;
 
-                    case 'payplug_inst_min_amount':
-                    case 'payplug_inst_mode':
+                    case 0 === strpos($config, 'payplug_inst_'):
                         if ((int) $datas->payplug_inst_min_amount >= 4
                             && (int) $datas->payplug_inst_mode < 5
                             && (int) $datas->payplug_inst_mode > 1
@@ -860,8 +878,8 @@ class ConfigurationAction
 
                         break;
 
-                    case 'oney_min_amounts':
-                    case 'oney_max_amounts':
+                    case 'oney_min_amounts' == $config:
+                    case 'oney_max_amounts' == $config:
                         if ((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) {
                             $limit_oney = $this->dependencies
                                 ->getPlugin()
@@ -892,7 +910,7 @@ class ConfigurationAction
 
                         break;
 
-                    case 'enable_bancontact_country':
+                    case 'enable_bancontact_country' == $config:
                         if ((bool) $datas->enable_bancontact && !$configuration->set($key, (string) $value)) {
                             return [
                                 'success' => false,
@@ -905,7 +923,7 @@ class ConfigurationAction
 
                         break;
 
-                    case 'enable_applepay':
+                    case 'enable_applepay' == $config:
                         $applepay_display = [
                             'cart' => (bool) $applepay_cart,
                             'checkout' => (bool) $applepay_checkout,
@@ -923,8 +941,24 @@ class ConfigurationAction
 
                         break;
 
-                    case 'applepay_carriers':
+                    case 'applepay_carriers' == $config:
                         if ((bool) $datas->enable_applepay && !$configuration->set($key, json_encode($value))) {
+                            return [
+                                'success' => false,
+                                'data' => [
+                                    // todo: add translation
+                                    'message' => 'An error has occurred while register ' . $config,
+                                ],
+                            ];
+                        }
+
+                        break;
+
+                    case 0 === strpos($config, 'payplug_identifier'):
+                    case 'payplug_api_key' == $config:
+                    case 'payplug_api_key_id' == $config:
+                        $multi_account[$key] = (string) $value;
+                        if (!$configuration->set('multi_account', json_encode($multi_account, JSON_HEX_TAG))) {
                             return [
                                 'success' => false,
                                 'data' => [
