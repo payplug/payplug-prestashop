@@ -49,4 +49,9 @@ class CurrencyAdapter implements CurrencyInterface
     {
         return \Currency::getIdByIsoCode($isoCode);
     }
+
+    public function findAll($active = true, $groupBy = false, $currentShopOnly = true)
+    {
+        return \Currency::findAll($active, $groupBy, $currentShopOnly);
+    }
 }
