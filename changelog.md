@@ -1,12 +1,11 @@
 # Payplug module changelog
 
 ## Version 4.22.0
-- Bugfix :
-  - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet
-
-## Version 4.21.0
 - Feature :
   - [PRE-3033](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/): Add new payment method: Wero & Bizum
+
+- Bugfix :
+  - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet
 
 ## Version 4.21.0
 - Refactor :
