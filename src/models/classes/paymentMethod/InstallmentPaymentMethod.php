@@ -780,9 +780,10 @@ class InstallmentPaymentMethod extends PaymentMethod
             $this->resetPaymentMethodFromPermission($permissions);
         }
 
-        // If the payment resource can\'t be created due to bad credential, we log out the merchand
+        // If the payment resource can't be created due to bad credential, we log out the merchand
         if (401 == (int) $payment['code']) {
-            $this->logger->addLog('InstallmentPaymentMethod::saveResource - Bad credential error is returned by API.', 'error');
+            $this->logger
+                ->addLog('InstallmentPaymentMethod::saveResource: The merchant will be logout due to bad credential error returned by API.');
             $this->dependencies
                 ->getPlugin()
                 ->getConfigurationAction()

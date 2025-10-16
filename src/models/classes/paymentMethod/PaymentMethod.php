@@ -1266,6 +1266,10 @@ class PaymentMethod
         if (401 == (int) $payment['code']) {
             $this->dependencies
                 ->getPlugin()
+                ->getLogger()
+                ->addLog('PaymentMethod::saveResource: The merchant will be logout due to bad credential error returned by API.');
+            $this->dependencies
+                ->getPlugin()
                 ->getConfigurationAction()
                 ->logoutAction();
         }

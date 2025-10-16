@@ -19,6 +19,14 @@ class GetAccountTest extends BaseApi
         parent::setUp();
         $this->api_key = 'live_api_key';
         $this->treat_account = true;
+
+        $this->logger_adapter = \Mockery::mock('LoggerAdapter');
+        $this->logger_adapter->shouldReceive([
+            'addLog' => true,
+        ]);
+        $this->plugin->shouldReceive([
+            'getLogger' => $this->logger_adapter,
+        ]);
     }
 
     /**
