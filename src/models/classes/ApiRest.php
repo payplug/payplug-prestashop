@@ -195,35 +195,36 @@ class ApiRest
         $amounts = json_decode($configuration->getValue('amounts'), true);
 
         return [
-            'logged' => $logged,
-            'email' => $configuration->getValue('email'),
-            'enable' => $enable,
-            'sandbox_mode' => (bool) $configuration->getValue('sandbox_mode'),
-            'embedded_mode' => $configuration->getValue('embedded_mode'),
-            'standard' => (bool) $payment_methods['standard'],
-            'one_click' => (bool) $payment_methods['one_click'],
-            'installment' => (bool) $payment_methods['installment'],
-            'inst_mode' => $configuration->getValue('inst_mode'),
-            'inst_min_amount' => $configuration->getValue('inst_min_amount'),
-            'deferred' => (bool) $payment_methods['deferred'],
-            'deferred_state' => $configuration->getValue('deferred_state'),
-            'oney' => (bool) $payment_methods['oney'],
-            'oney_fees' => (bool) $configuration->getValue('oney_fees'),
-            'oney_schedule' => (bool) $configuration->getValue('oney_optimized'),
-            'oney_product_animation' => (bool) $configuration->getValue('oney_product_cta'),
-            'oney_cart_animation' => (bool) $configuration->getValue('oney_cart_cta'),
-            'oney_min_amounts' => isset($amounts['oney_x3_with_fees']['min']) ? $amounts['oney_x3_with_fees']['min'] : '',
-            'oney_max_amounts' => isset($amounts['oney_x3_with_fees']['max']) ? $amounts['oney_x3_with_fees']['max'] : '',
-            'oney_custom_min_amounts' => $configuration->getValue('oney_custom_min_amounts'),
-            'oney_custom_max_amounts' => $configuration->getValue('oney_custom_max_amounts'),
-            'bancontact' => (bool) $payment_methods['bancontact'],
-            'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
+            'amex' => (bool) $payment_methods['amex'],
             'applepay' => (bool) $payment_methods['applepay'],
             'applepay_display' => $configuration->getValue('applepay_display'),
-            'amex' => (bool) $payment_methods['amex'],
-            'satispay' => (bool) $payment_methods['satispay'],
+            'bancontact' => (bool) $payment_methods['bancontact'],
+            'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
+            'deferred' => (bool) $payment_methods['deferred'],
+            'deferred_state' => $configuration->getValue('deferred_state'),
+            'email' => $configuration->getValue('email'),
+            'embedded_mode' => $configuration->getValue('embedded_mode'),
+            'enable' => $enable,
             'ideal' => (bool) $payment_methods['ideal'],
+            'inst_min_amount' => $configuration->getValue('inst_min_amount'),
+            'inst_mode' => $configuration->getValue('inst_mode'),
+            'installment' => (bool) $payment_methods['installment'],
+            'logged' => $logged,
+            'multi_account' => $configuration->getValue('multi_account'),
             'mybank' => (bool) $payment_methods['mybank'],
+            'one_click' => (bool) $payment_methods['one_click'],
+            'oney' => (bool) $payment_methods['oney'],
+            'oney_cart_animation' => (bool) $configuration->getValue('oney_cart_cta'),
+            'oney_custom_max_amounts' => $configuration->getValue('oney_custom_max_amounts'),
+            'oney_custom_min_amounts' => $configuration->getValue('oney_custom_min_amounts'),
+            'oney_max_amounts' => isset($amounts['oney_x3_with_fees']['max']) ? $amounts['oney_x3_with_fees']['max'] : '',
+            'oney_min_amounts' => isset($amounts['oney_x3_with_fees']['min']) ? $amounts['oney_x3_with_fees']['min'] : '',
+            'oney_fees' => (bool) $configuration->getValue('oney_fees'),
+            'oney_product_animation' => (bool) $configuration->getValue('oney_product_cta'),
+            'oney_schedule' => (bool) $configuration->getValue('oney_optimized'),
+            'sandbox_mode' => (bool) $configuration->getValue('sandbox_mode'),
+            'satispay' => (bool) $payment_methods['satispay'],
+            'standard' => (bool) $payment_methods['standard'],
         ];
     }
 
@@ -460,6 +461,88 @@ class ApiRest
                     'title' => $translation['inactive']['account']['success']['title'],
                     'description' => $translation['inactive']['account']['success']['description'],
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @description build multi account section for api usage
+     *
+     * @param $current_configuration
+     *
+     * @return array
+     */
+    public function getMultiAccountSection($current_configuration = [])
+    {
+        if (!is_array($current_configuration)) {
+            return [];
+        }
+
+        $translation = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->getMultiAccountTranslations();
+
+        // If available currencies on the current shop contain EUR currency, then multi account can't be configured.
+        $currencies = $this->dependencies
+            ->getPlugin()
+            ->getCurrency()
+            ->findAll();
+        $can_use_multi_account = false;
+        foreach ($currencies as $currency) {
+            if ($can_use_multi_account) {
+                continue;
+            }
+            $can_use_multi_account = 'EUR' != $currency['iso_code'];
+        }
+        if (!$can_use_multi_account) {
+            return [];
+        }
+
+        $multi_account = json_decode($current_configuration['multi_account'], true);
+        $description = $translation['description'];
+        $inputs_identifiers = [];
+        foreach ($currencies as $currency) {
+            $name = 'identifier_' . strtolower($currency['iso_code']);
+            $inputs_identifiers[] = [
+                'name' => $name,
+                'label' => $translation['inputs']['identifier']['label'] . ' ' . $currency['iso_code'],
+                'placeholder' => $translation['inputs']['identifier']['placeholder'] . ' ' . $currency['iso_code'],
+                'value' => isset($multi_account[$name]) && $multi_account[$name]
+                    ? $multi_account[$name]
+                    : '',
+            ];
+        }
+        $inputs = [
+            [
+                'name' => 'api_key_id',
+                'label' => $translation['inputs']['api_key_id']['label'],
+                'placeholder' => $translation['inputs']['api_key_id']['placeholder'],
+                'value' => isset($multi_account['api_key_id']) && $multi_account['api_key_id']
+                    ? $multi_account['api_key_id']
+                    : '',
+            ],
+            [
+                'name' => 'api_key',
+                'label' => $translation['inputs']['api_key']['label'],
+                'placeholder' => $translation['inputs']['api_key']['placeholder'],
+                'value' => isset($multi_account['api_key']) && $multi_account['api_key']
+                    ? $multi_account['api_key']
+                    : '',
+            ],
+        ];
+        $inputs = array_merge($inputs_identifiers, $inputs);
+
+        return [
+            'name' => 'multiAccountBlock',
+            'title' => $translation['title'],
+            'descriptions' => [
+                'live' => $description,
+                'sandbox' => $description,
+            ],
+            'inputs' => [
+                'live' => $inputs,
+                'sandbox' => $inputs,
             ],
         ];
     }
