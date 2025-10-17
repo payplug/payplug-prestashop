@@ -1,0 +1,503 @@
+/**
+ * 2013 - COPYRIGHT_YEAR Payplug SAS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ *  @author    PayPlug SAS
+ *  @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
+ *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of PayPlug SAS
+ */
+@import "less/include";
+@import "less/component/payplug/admin/alert";
+@import "less/component/payplug/admin/popup";
+@import "less/component/payplug/button";
+
+#pppanel .pp_list {
+  padding: 0 0 10px 0;
+}
+
+#pppanel .pp_list ul {
+  padding: 0;
+}
+
+#pppanel label {
+  float: none;
+}
+
+#pppanel .btn {
+  margin: 0 0 0 100px;
+  display: block;
+  float: left;
+}
+
+#pppanel .btn.open_installment_information {
+  margin: 0;
+}
+
+#pppanel input[type="submit"].green-button.button {
+  margin-top: 20px;
+}
+
+#pppanel input[type="submit"].green-button.abort-button {
+  margin-top: 0;
+}
+
+#pppanel input[type="submit"].green-button {
+  background: #colorMap[primary];
+  color: #ffffff;
+  border: none;
+  /*margin: 15px 0 20px 0;*/
+  text-transform: uppercase;
+  font-weight: bold;
+  margin: 0 0 0 60px;
+  padding: 0;
+  width: 150px;
+  height: 27px;
+  line-height: 27px;
+}
+
+#pppanel input[type="submit"].green-button.abort-button.btn[disabled] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+#pppanel input[type="submit"].green-button:hover {
+  background: #49a482;
+}
+
+#pppanel form {
+  position: relative;
+  overflow: hidden;
+}
+
+#pppanel img.loader {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 11px;
+  opacity: 1;
+  z-index: 9999;
+  margin-top: 6px;
+  position: relative;
+  background: none;
+}
+
+#pppanel .table-responsive.half-width {
+  max-width: 50%;
+}
+
+#pppanel .table-responsive td.actions {
+  width: 100px;
+}
+
+#pppanel .table-responsive .open_payment_information {
+  margin: 0;
+}
+
+#pppanel .table-responsive .payment_information {
+  display: none;
+  &.-show {
+    display: table-row;
+  }
+}
+
+#pppanel table {
+  margin: 0 0 15px 0;
+}
+
+.pp_admin_ajax_url {
+  display: none;
+}
+
+#payplug_popin {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  left: 50%;
+  margin-left: -10em;
+  position: fixed;
+  top: 50%;
+  width: 326px;
+  z-index: 101;
+  font-size: 12px;
+}
+
+#payplug_popin .status_bar {
+  border-bottom: 1px solid #e5e5e5;
+  border: none;
+  font-size: 12px;
+  border-bottom: solid 1px #eee;
+  padding: 10px 0 10px 20px;
+}
+
+span.ppclose {
+  position: absolute;
+  right: 11px;
+  top: 10px;
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.4;
+  filter: alpha(opacity=50);
+  text-transform: initial;
+  font-size: 14px;
+}
+
+#payplug_popin form {
+  padding: 20px 20px 15px 20px;
+  text-align: center;
+  overflow: hidden;
+}
+
+#payplug_popin p {
+  color: #000000;
+  padding: 0 0 20px 0;
+  margin: 0;
+}
+
+#payplug_popin input {
+  border: 0.1em solid #bbbbbb;
+  border-radius: 0;
+  display: block;
+  height: 2em;
+  margin: 0 auto;
+}
+
+#payplug_popin input[name=pwd] {
+  margin: 15px auto 20px;
+}
+
+#payplug_popin .popin-button {
+  width: 6.5em;
+  height: 2.5em;
+  border-radius: 0.25em;
+  border: 0.1em solid #bbbbbb;
+  display: inline-block;
+  cursor: pointer;
+  margin: 15px 0 0 0;
+  text-transform: uppercase;
+}
+
+#payplug_popin .popin-button.no-width {
+  width: auto;
+}
+
+#payplug_popin .white-button {
+  float: left;
+  background-color: #fff;
+  font-weight: normal;
+}
+
+#payplug_popin .green-button {
+  float: right;
+  color: #ffffff;
+  background: none repeat scroll 0 0;
+  background-color: #colorMap[primary];
+  font-weight: 700;
+}
+
+#payplug_popin input.green-button:hover {
+  background: #49a482;
+}
+
+#payplug_popin input.white-button:hover {
+  background: #ccc;
+  color: #ffffff;
+}
+
+
+#payplug_popin a.green-button {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  padding: 1em 1em 1em 1em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: 11em;
+}
+
+#payplug_popin .center-button {
+  float: initial;
+}
+
+#payplug_popin a.green-button:hover,
+#payplug_popin a.green-button:active,
+#payplug_popin a.green-button:visited,
+#payplug_popin a.green-button:focus {
+  text-decoration: none;
+}
+
+#payplug_popin .block-button {
+  border: none;
+  font-weight: bold;
+  line-height: 2.2em;
+  border-top: solid 1px #eee;
+  margin: 0;
+  padding: 15px 0 20px 0;
+}
+
+#payplug_popin .block-button {
+  padding: 0 0 0 0;
+  margin: 0 0 0 0;
+}
+
+.ppoverlay {
+  background: #000000 none repeat scroll 0 0;
+  height: 100%;
+  left: 0;
+  opacity: 0.5;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+#payplug_popin p.ppoc {
+  padding: 0 0 20px 0;
+}
+
+#payplug_popin p {
+  text-align: left;
+}
+
+#payplug_popin a {
+  color: #colorMap[primary];
+}
+
+#payplug_popin ul {
+  padding: 20px 0 20px 0;
+  margin: 0;
+  text-align: left;
+  list-style: none;
+}
+
+.ppbold {
+  font-weight: bold;
+}
+
+#payplug_popin .panel-heading {
+  font-weight: bold;
+  text-align: left;
+}
+
+#pppanel .logo {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  margin: 12px 0;
+
+  img {
+    display: block;
+    width: 150px;
+    height: auto;
+  }
+  span {
+    display: block;
+    width: 1px;
+    height: 100%;
+    background: #colorMap[borderMain];
+    margin: 0 19px;
+  }
+}
+
+#pppanel .form-group {
+  overflow: hidden;
+  margin-bottom: 0;
+
+  & + .form-group {
+    margin-top: 1rem;
+  }
+}
+
+#pppanel.panel-1-6 .form-group input,
+#pppanel.panel-1-6 .form-group label {
+  float: left;
+  /*padding: 0;*/
+  margin: 0;
+}
+
+#pppanel.panel-1-6 input[name=pp_amount2refund] {
+  width: 100px;
+  margin-top: 3px;
+}
+
+#pppanel.panel-1-6 label[for=pp_amount2refund] {
+  padding: 5px 10px 0 0;
+}
+
+#pppanel .pperror {
+  color: #dd2525;
+  padding: 26px 0 0 10px;
+  float: left;
+  margin: 0;
+}
+
+#pppanel.panel-1-6 .pperror {
+  padding: 5px 0 0 10px;
+}
+
+#pppanel .ppsuccess {
+  color: #colorMap[primary];
+  padding: 26px 0 0 10px;
+  float: left;
+  margin: 0;
+}
+
+#pppanel.panel-1-6 .ppsuccess {
+  padding: 5px 0 0 10px;
+}
+
+#pppanel p.refunded_amount {
+  font-weight: bold;
+}
+
+#formAddPayment table td:nth-child(3) {
+  overflow: hidden;
+  max-width: 10px;
+}
+
+#pppanel ul li {
+  list-style-type: none;
+}
+
+#pppanel .ppred {
+  color: #dd2525;
+}
+
+#pppanel hr {
+  -moz-border-bottom-colors: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  border-color: #ddd -moz-use-text-color -moz-use-text-color;
+  border-image: none;
+  border-style: solid none none;
+  border-width: 1px 0 0;
+  margin-bottom: 17px;
+  margin-top: 17px;
+}
+
+#pppanel .pp_fixed_height {
+  height: 38px;
+}
+
+#pppanel td.pp_success {
+  color: #colorMap[primary];
+  font-weight: bold;
+}
+
+#pppanel td.pp_error {
+  color: #dd2525;
+  font-weight: bold;
+}
+
+.pp_inst_status {
+  font-weight: bold;
+}
+
+#pppanel .ppwarning {
+  width: auto;
+  margin: 0;
+}
+
+#pppanel .ppwarning {
+  background: url("../img/admin/icon-warning.png") no-repeat center left #fff3d7;
+  border-left: solid 3px #f7a000;
+  margin: 0 0 1em 0;
+  color: #d2a63c;
+  padding: 0.7em 3em;
+}
+
+/*
+* Payment Details
+*/
+.pp_payment_details {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pp_payment_details li {
+  display: flex;
+  flex-direction: row;
+}
+
+.pp_payment_details .pp_col1,
+.pp_payment_detail .pp_col2 {
+  display: flex;
+}
+
+.pp_payment_details .pp_col1 {
+  color: #000000;
+  font-weight: bold;
+  width: auto;
+  white-space: nowrap;
+}
+
+.pp_payment_details .pp_col2 {
+  flex-direction: column;
+  width: calc(100% - 215px);
+  padding: 0 0 0 10px;
+}
+
+.pp_payment_details .pp_col2 span {
+  display: block;
+}
+
+#pppanel .pp_success {
+  color: #colorMap[primary];
+  font-weight: bold;
+}
+
+#pppanel .pp_warning {
+  color: #ff8d34;
+  font-weight: bold;
+}
+
+#pppanel .pp_error {
+  color: #dd2525;
+  font-weight: bold;
+}
+
+#pppanel.panel-1-6 .ppaction.pperror, #pppanel.panel-1-6 .ppaction.ppsuccess {
+  padding: 4px 0 0 10px;
+}
+
+.panel-footer .payplugButton {
+  margin: 10px 0 0;
+}
+
+.__moduleName__Order {
+  width: 100%;
+  flex-direction: column;
+  clear: both;
+}
+
+.__moduleName__Order_delay {
+  margin-left: 140px;
+  @media (@screen-mobile) {
+    padding: 0;
+  }
+}
+
+
+.payplugButton {
+  font-size: 13px;
+}

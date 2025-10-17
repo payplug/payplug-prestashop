@@ -1,0 +1,25 @@
+<?php
+
+namespace PayPlug\tests\models\repositories\OrderRepository;
+
+use PayPlug\src\models\repositories\OrderRepository;
+use PayPlug\tests\models\repositories\BaseRepository;
+
+class BaseOrderRepository extends BaseRepository
+{
+    public function setUp()
+    {
+        parent::setUp();
+        $this->repository = \Mockery::mock(OrderRepository::class, [$this->dependencies])
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $this->repository->shouldReceive('escape')
+            ->andReturnUsing(function ($arg) {
+                return (string) $arg;
+            });
+        $this->repository->shouldReceive('getTableName')
+            ->andReturnUsing(function ($value) {
+                return $value;
+            });
+    }
+}

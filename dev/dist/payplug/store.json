@@ -1,0 +1,910 @@
+{
+  "success": true,
+  "data": {
+    "payplug_wooc_settings": {
+      "logged": true,
+      "email": "hdelaforce@payplug.com",
+      "enable": true,
+      "sandbox_mode": "0",
+      "embedded_mode": "redirect",
+      "standard": "1",
+      "one_click": "1",
+      "inst": "1",
+      "inst_mode": "3",
+      "inst_min_amount": "66",
+      "deferred": "1",
+      "deferred_state": "0",
+      "oney": false,
+      "oney_fees": true,
+      "oney_schedule": false,
+      "oney_product_animation": true,
+      "oney_cart_animation": true,
+      "oney_thresholds_min": "EUR:10000",
+      "oney_thresholds_max": "EUR:300000",
+      "oney_custom_thresholds_min": "EUR:10000",
+      "oney_custom_thresholds_max": "EUR:300000",
+      "bancontact": false,
+      "bancontact_country": false,
+      "applepay": false,
+      "amex": false
+    },
+    "settings": {
+      "email": "hdelaforce@payplug.com",
+      "logged": true,
+      "mode": 0
+    },
+    "header": {
+      "title": "La solution de paiement qui augmente vos ventes.",
+      "descriptions": {
+        "live": {
+          "description": "PayPlug, c'est la solution de paiement francaise des PME. Faites decoller votre performance grace e nos outils orientes conversion parfaitement cles en main.",
+          "plugin_version": "3.12.0"
+        },
+        "sandbox": {
+          "description": "PayPlug, c'est la solution de paiement francaise des PME. Faites decoller votre performance grace e nos outils orientes conversion parfaitement cles en main.",
+          "plugin_version": "3.12.0"
+        }
+      },
+      "options": {
+        "type": "select",
+        "name": "payplug_enable",
+        "disabled": false,
+        "options": [
+          {
+            "value": 1,
+            "label": "Module visible",
+            "checked": true
+          },
+          {
+            "value": 0,
+            "label": "Module masque",
+            "checked": false
+          }
+        ]
+      }
+    },
+    "login": {
+      "name": "generalLogin",
+      "title": "General",
+      "descriptions": {
+        "live": {
+          "description": "Connectez-vous e votre compte PayPlug.",
+          "not_registered": "Pas encore de compte PayPlug ?",
+          "connect": "Connexion",
+          "email_label": "Adresse E-mail",
+          "email_placeholder": "Adresse E-mail",
+          "password_label": "Mot de passe",
+          "password_placeholder": "Mot de passe",
+          "link_forgot_password": {
+            "text": "Mot de passe oublie ?",
+            "url": "https://www.payplug.com/portal/forgot_password",
+            "target": "_blank"
+          }
+        },
+        "sandbox": {
+          "description": "Connectez-vous e votre compte PayPlug.",
+          "not_registered": "Pas encore de compte PayPlug ?",
+          "connect": "Connexion",
+          "email_label": "Adresse E-mail",
+          "email_placeholder": "Adresse E-mail",
+          "password_label": "Mot de passe",
+          "password_placeholder": "Mot de passe",
+          "link_forgot_password": {
+            "text": "Mot de passe oublie ?",
+            "url": "https://www.payplug.com/portal/forgot_password",
+            "target": "_blank"
+          }
+        }
+      }
+    },
+    "logged": {
+      "title": "General",
+      "descriptions": {
+        "live": {
+          "description": "Configurations generales du module.",
+          "logout": "Se deconnecter",
+          "mode": "Mode",
+          "mode_description": "En mode LIVE, vous acceptez des paiements reels.",
+          "link_learn_more": {
+            "text": "En savoir plus",
+            "url": "https://support.payplug.com/hc/fr/articles/360021142492",
+            "target": "_blank"
+          },
+          "link_access_portal": {
+            "text": "Acceder e mon portail PayPlug",
+            "url": "https://www.payplug.com/portal",
+            "target": "_blank"
+          }
+        },
+        "sandbox": {
+          "description": "Configurations generales du module.",
+          "logout": "Se deconnecter",
+          "mode": "Mode",
+          "mode_description": "En mode TEST, tous les paiements sont des simulations et ne genereront pas de transactions reelles.",
+          "link_learn_more": {
+            "text": "En savoir plus",
+            "url": "https://support.payplug.com/hc/fr/articles/360021142492",
+            "target": "_blank"
+          },
+          "link_access_portal": {
+            "text": "Acceder e mon portail PayPlug",
+            "url": "https://www.payplug.com/portal",
+            "target": "_blank"
+          }
+        }
+      },
+      "options": [
+        {
+          "name": "payplug_sandbox",
+          "label": "Test",
+          "value": 1,
+          "checked": false
+        },
+        {
+          "name": "payplug_sandbox",
+          "label": "Live",
+          "value": 0,
+          "checked": true
+        }
+      ],
+      "can_be_disabled": true,
+      "inactive_modal": {
+        "inactive": false,
+        "title": "Mode LIVE",
+        "description": "Veuillez saisir votre mot de passe de votre compte PayPlug",
+        "password_label": "Mot de passe",
+        "cancel": "Annuler",
+        "ok": "Ok"
+      },
+      "inactive_account": {
+        "warning": {
+          "title": "Felicitations, votre compte est connecte !",
+          "description": "Pendant l'etude de votre dossier, vous pouvez utiliser le <a href='https://support.payplug.com/hc/fr/articles/360021142492' target='_blank'>mode TEST</a> pour decouvrir notre module. <span id='inactiveModalClick'>Cliquez-ici</span> pour passer au mode LIVE et encaisser les paiements de vos clients."
+        },
+        "error": {
+          "title": "Votre dossier est en cours de traitement.",
+          "description": "Si vous souhaitez plus d'informations, contactez-nous e l'adresse support@payplug.com"
+        }
+      }
+    },
+    "payment_methods": {
+      "name": "paymentMethodsBlock",
+      "title": "Moyens de paiement",
+      "descriptions": {
+        "live": {
+          "description": "Choisissez les moyens de paiement que vous souhaitez proposer e vos clients."
+        },
+        "sandbox": {
+          "description": "Choisissez les moyens de paiement que vous souhaitez proposer e vos clients."
+        }
+      },
+      "options": [
+        {
+          "type": "payment_method",
+          "name": "standard",
+          "title": "Paiement par carte",
+          "image": "/modules/payplug/views/img/svg/payment/standard.svg",
+          "checked": "1",
+          "available_test_mode": true,
+          "descriptions": {
+            "live": {
+              "description": "Proposez le paiement par carte bancaire e vos clients.",
+              "advanced_options": "Parametrages avances"
+            },
+            "sandbox": {
+              "description": "Proposez le paiement par carte bancaire e vos clients.",
+              "advanced_options": "Parametrages avances"
+            }
+          },
+          "options": [
+            {
+              "type": "payment_option",
+              "sub_type": "IOptions",
+              "name": "embeded",
+              "title": "Presentation de la page de paiement",
+              "descriptions": {
+                "live": {
+                  "description_popup": "Vos clients verront apparaitre le formulaire de paiement directement dans la page de checkout de votre boutique.",
+                  "description_redirect": "Vos clients seront rediriges vers une page de paiement personnalisable hebergee par PayPlug.",
+                  "link_know_more": {
+                    "text": "En savoir plus.",
+                    "url": "https://support.payplug.com/hc/fr/articles/4409698334098",
+                    "target": "_blank"
+                  }
+                },
+                "sandbox": {
+                  "description_popup": "Vos clients verront apparaitre le formulaire de paiement directement dans la page de checkout de votre boutique.",
+                  "description_redirect": "Vos clients seront rediriges vers une page de paiement personnalisable hebergee par PayPlug.",
+                  "link_know_more": {
+                    "text": "En savoir plus.",
+                    "url": "https://support.payplug.com/hc/fr/articles/4409698334098",
+                    "target": "_blank"
+                  }
+                }
+              },
+              "options": [
+                {
+                  "name": "payplug_embedded",
+                  "label": "Pop-up",
+                  "value": "popup",
+                  "checked": false
+                },
+                {
+                  "name": "payplug_embedded",
+                  "label": "Redirige",
+                  "value": "redirect",
+                  "checked": true
+                }
+              ]
+            },
+            {
+              "type": "payment_option",
+              "sub_type": "switch",
+              "name": "one_click",
+              "title": "Activer le paiement en un clic",
+              "descriptions": {
+                "live": {
+                  "description": "Vos clients pourront enregistrer leur carte et effectuer leurs prochains achats en un clic.",
+                  "link_know_more": {
+                    "text": "En savoir plus.",
+                    "url": "https://support.payplug.com/hc/fr/articles/360022213892",
+                    "target": "_blank"
+                  }
+                },
+                "sandbox": {
+                  "description": "Vos clients pourront enregistrer leur carte et effectuer leurs prochains achats en un clic.",
+                  "link_know_more": {
+                    "text": "En savoir plus.",
+                    "url": "https://support.payplug.com/hc/fr/articles/360022213892",
+                    "target": "_blank"
+                  }
+                }
+              },
+              "checked": "1"
+            }
+          ],
+          "advanced_settings": {
+            "title": "Parametrages avances",
+            "options": [
+              {
+                "name": "fractional",
+                "title": "Activer les paiements fractionnes non garantis",
+                "class": "-installment",
+                "enabled": {
+                  "name": "payplug_inst",
+                  "checked": "1"
+                },
+                "descriptions": {
+                  "live": {
+                    "description_1": "Proposez e vos clients de regler leurs commandes en",
+                    "text_from": "a partir de",
+                    "description_2": "Vous pourrez consulter toutes vos echeances de paiement (passees et e venir) dans ce ",
+                    "links": [
+                      {
+                        "text": "menu dedie.",
+                        "url": "#some_url",
+                        "target": "_blank"
+                      },
+                      {
+                        "text": "En savoir plus.",
+                        "url": "https://support.payplug.com/hc/fr/articles/360022447972",
+                        "target": "_blank"
+                      }
+                    ],
+                    "notes": {
+                      "type": "-warning",
+                      "description": "Attention : ce type de paiement n'est pas garanti. &lt;br/&gt;Si un defaut de paiement survient sur une des futures echeances alors ce montant sera perdu."
+                    }
+                  },
+                  "sandbox": {
+                    "description_1": "Proposez e vos clients de regler leurs commandes en",
+                    "text_from": "a partir de",
+                    "description_2": "Vous pourrez consulter toutes vos echeances de paiement (passees et e venir) dans ce ",
+                    "links": [
+                      {
+                        "text": "menu dedie.",
+                        "url": "#some_url",
+                        "target": "_blank"
+                      },
+                      {
+                        "text": "En savoir plus.",
+                        "url": "https://support.payplug.com/hc/fr/articles/360022447972",
+                        "target": "_blank"
+                      }
+                    ],
+                    "notes": {
+                      "type": "-warning",
+                      "description": "Attention : ce type de paiement n'est pas garanti. &lt;br/&gt;Si un defaut de paiement survient sur une des futures echeances alors ce montant sera perdu."
+                    }
+                  }
+                },
+                "options": [
+                  {
+                    "name": "payplug_inst_mode",
+                    "type": "select",
+                    "disabled": false,
+                    "options": [
+                      {
+                        "value": 2,
+                        "label": "2 fois",
+                        "checked": false
+                      },
+                      {
+                        "value": 3,
+                        "label": "3 fois",
+                        "checked": true
+                      },
+                      {
+                        "value": 4,
+                        "label": "4 fois",
+                        "checked": false
+                      }
+                    ]
+                  },
+                  {
+                    "type": "input",
+                    "name": "payplug_inst_min_amount",
+                    "disabled": false,
+                    "value": 66,
+                    "min": 4,
+                    "step": 1,
+                    "max": 20000,
+                    "out_of_bound_msg": "Le montant doit etre superieur e 4e et inferieur e 20000e."
+                  }
+                ],
+                "notes": {
+                  "type": "-warning",
+                  "description": "Attention : ce type de paiement n'est pas garanti. &lt;br/&gt;Si un defaut de paiement survient sur une des futures echeances alors ce montant sera perdu."
+                }
+              },
+              {
+                "name": "deferred",
+                "title": "Differer le declenchement du paiement",
+                "class": "-deferred",
+                "enabled": {
+                  "name": "payplug_deferred",
+                  "checked": "1"
+                },
+                "descriptions": {
+                  "live": {
+                    "description_1": "Vous disposez d'un delai de 7 jours maximum pour capturer le paiement (e compter de la date d'autorisation).",
+                    "description_2": "Comment souhaitez vous declencher la capture du paiement :",
+                    "links": [
+                      {
+                        "text": "En savoir plus.",
+                        "url": "https://support.payplug.com/hc/fr/articles/360010088420",
+                        "target": "_blank"
+                      }
+                    ]
+                  },
+                  "sandbox": {
+                    "description_1": "Vous disposez d'un delai de 7 jours maximum pour capturer le paiement (e compter de la date d'autorisation).",
+                    "description_2": "Comment souhaitez vous declencher la capture du paiement :",
+                    "links": [
+                      {
+                        "text": "En savoir plus.",
+                        "url": "https://support.payplug.com/hc/fr/articles/360010088420",
+                        "target": "_blank"
+                      }
+                    ]
+                  }
+                },
+                "options": {
+                  "disabled": false,
+                  "name": "payplug_deferred_state",
+                  "type": "select",
+                  "options": {
+                    "0": {
+                      "value": 0,
+                      "label": "Capture manuelle",
+                      "checked": true
+                    },
+                    "1": {
+                      "value": 1,
+                      "label": "Capture automatique au statut : En attente du paiement par cheque",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;En attente du paiement par cheque&quot; devront etre capturees manuellement."
+                    },
+                    "2": {
+                      "value": 2,
+                      "label": "Capture automatique au statut : Paiement accepte",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement accepte&quot; devront etre capturees manuellement."
+                    },
+                    "3": {
+                      "value": 3,
+                      "label": "Capture automatique au statut : En cours de preparation",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;En cours de preparation&quot; devront etre capturees manuellement."
+                    },
+                    "4": {
+                      "value": 4,
+                      "label": "Capture automatique au statut : Expedie",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Expedie&quot; devront etre capturees manuellement."
+                    },
+                    "5": {
+                      "value": 5,
+                      "label": "Capture automatique au statut : Livre",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Livre&quot; devront etre capturees manuellement."
+                    },
+                    "6": {
+                      "value": 6,
+                      "label": "Capture automatique au statut : Annule",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Annule&quot; devront etre capturees manuellement."
+                    },
+                    "7": {
+                      "value": 7,
+                      "label": "Capture automatique au statut : Rembourse",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Rembourse&quot; devront etre capturees manuellement."
+                    },
+                    "8": {
+                      "value": 8,
+                      "label": "Capture automatique au statut : Erreur de paiement",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Erreur de paiement&quot; devront etre capturees manuellement."
+                    },
+                    "9": {
+                      "value": 9,
+                      "label": "Capture automatique au statut : En attente de reapprovisionnement (paye)",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;En attente de reapprovisionnement (paye)&quot; devront etre capturees manuellement."
+                    },
+                    "10": {
+                      "value": 10,
+                      "label": "Capture automatique au statut : En attente de virement bancaire",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;En attente de virement bancaire&quot; devront etre capturees manuellement."
+                    },
+                    "11": {
+                      "value": 11,
+                      "label": "Capture automatique au statut : Paiement e distance accepte",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement e distance accepte&quot; devront etre capturees manuellement."
+                    },
+                    "12": {
+                      "value": 12,
+                      "label": "Capture automatique au statut : En attente de reapprovisionnement (non paye)",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;En attente de reapprovisionnement (non paye)&quot; devront etre capturees manuellement."
+                    },
+                    "13": {
+                      "value": 13,
+                      "label": "Capture automatique au statut : En attente de paiement e la livraison",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;En attente de paiement e la livraison&quot; devront etre capturees manuellement."
+                    },
+                    "14": {
+                      "value": 14,
+                      "label": "Capture automatique au statut : Paiement effectue [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement effectue [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "15": {
+                      "value": 15,
+                      "label": "Capture automatique au statut : Rembourse [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Rembourse [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "26": {
+                      "value": 26,
+                      "label": "Capture automatique au statut : Paiement effectue [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement effectue [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "27": {
+                      "value": 27,
+                      "label": "Capture automatique au statut : Rembourse [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Rembourse [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "28": {
+                      "value": 28,
+                      "label": "Capture automatique au statut : Paiement en cours [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement en cours [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "29": {
+                      "value": 29,
+                      "label": "Capture automatique au statut : Paiement en cours [PayPlug]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement en cours [PayPlug]&quot; devront etre capturees manuellement."
+                    },
+                    "30": {
+                      "value": 30,
+                      "label": "Capture automatique au statut : Paiement echoue [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement echoue [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "31": {
+                      "value": 31,
+                      "label": "Capture automatique au statut : Paiement annule [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement annule [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "32": {
+                      "value": 32,
+                      "label": "Capture automatique au statut : Paiement autorise [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement autorise [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "33": {
+                      "value": 33,
+                      "label": "Capture automatique au statut : Paiement autorise [PayPlug]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement autorise [PayPlug]&quot; devront etre capturees manuellement."
+                    },
+                    "34": {
+                      "value": 34,
+                      "label": "Capture automatique au statut : Autorisation expiree [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Autorisation expiree [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "35": {
+                      "value": 35,
+                      "label": "Capture automatique au statut : Autorisation expiree [PayPlug]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Autorisation expiree [PayPlug]&quot; devront etre capturees manuellement."
+                    },
+                    "36": {
+                      "value": 36,
+                      "label": "Capture automatique au statut : Oney - En attente [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Oney - En attente [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "37": {
+                      "value": 37,
+                      "label": "Capture automatique au statut : Oney - En attente [PayPlug]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Oney - En attente [PayPlug]&quot; devront etre capturees manuellement."
+                    },
+                    "38": {
+                      "value": 38,
+                      "label": "Capture automatique au statut : Paiement effectue [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement effectue [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "39": {
+                      "value": 39,
+                      "label": "Capture automatique au statut : Rembourse [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Rembourse [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "40": {
+                      "value": 40,
+                      "label": "Capture automatique au statut : Paiement en cours [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement en cours [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "41": {
+                      "value": 41,
+                      "label": "Capture automatique au statut : Paiement en cours [PayPlug]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement en cours [PayPlug]&quot; devront etre capturees manuellement."
+                    },
+                    "42": {
+                      "value": 42,
+                      "label": "Capture automatique au statut : Paiement echoue [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement echoue [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "43": {
+                      "value": 43,
+                      "label": "Capture automatique au statut : Paiement annule [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement annule [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "44": {
+                      "value": 44,
+                      "label": "Capture automatique au statut : Paiement autorise [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement autorise [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "45": {
+                      "value": 45,
+                      "label": "Capture automatique au statut : Paiement autorise [PayPlug]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Paiement autorise [PayPlug]&quot; devront etre capturees manuellement."
+                    },
+                    "46": {
+                      "value": 46,
+                      "label": "Capture automatique au statut : Autorisation expiree [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Autorisation expiree [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "47": {
+                      "value": 47,
+                      "label": "Capture automatique au statut : Autorisation expiree [PayPlug]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Autorisation expiree [PayPlug]&quot; devront etre capturees manuellement."
+                    },
+                    "48": {
+                      "value": 48,
+                      "label": "Capture automatique au statut : Oney - En attente [TEST]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Oney - En attente [TEST]&quot; devront etre capturees manuellement."
+                    },
+                    "49": {
+                      "value": 49,
+                      "label": "Capture automatique au statut : Oney - En attente [PayPlug]",
+                      "checked": false,
+                      "warning_msg": "Attention : les commandes en differe qui sont actuellement au statut &quot;Oney - En attente [PayPlug]&quot; devront etre capturees manuellement."
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "payment_method",
+          "name": "american_express",
+          "title": "Paiement AmEx",
+          "image": "/modules/payplug/views/img/svg/payment/amex.svg",
+          "checked": false,
+          "available_test_mode": false,
+          "descriptions": {
+            "live": {
+              "description": "Permettez e vos clients de payer avec leurs cartes American Express.",
+              "link_know_more": {
+                "text": "En savoir plus.",
+                "url": "https://support.payplug.com/hc/fr/articles/5701208563996",
+                "target": "_blank"
+              }
+            },
+            "sandbox": {
+              "description": "American Express n'est pas disponible en mode TEST. Pour l'activer, vous devez passer votre module PayPlug en mode LIVE.",
+              "link_know_more": {
+                "text": "En savoir plus.",
+                "url": "https://support.payplug.com/hc/fr/articles/5701208563996",
+                "target": "_blank"
+              }
+            }
+          }
+        },
+        {
+          "type": "payment_method",
+          "name": "applepay",
+          "title": "Paiement Apple Pay",
+          "image": "/modules/payplug/views/img/svg/payment/apple_pay.svg",
+          "checked": false,
+          "available_test_mode": false,
+          "descriptions": {
+            "live": {
+              "description": "Afficher le bouton de paiement Apple Pay sur votre boutique.",
+              "link_know_more": {
+                "text": "En savoir plus.",
+                "url": "https://support.payplug.com/hc/fr/articles/5149384347292",
+                "target": "_blank"
+              }
+            },
+            "sandbox": {
+              "description": "Apple Pay n'est pas disponible en mode TEST. Pour l'activer vous devez passer votre module PayPlug en mode LIVE.",
+              "link_know_more": {
+                "text": "En savoir plus.",
+                "url": "https://support.payplug.com/hc/fr/articles/5149384347292",
+                "target": "_blank"
+              }
+            }
+          }
+        },
+        {
+          "type": "payment_method",
+          "name": "bancontact",
+          "title": "Paiement Bancontact",
+          "image": "/modules/payplug/views/img/svg/payment/bancontact.svg",
+          "checked": false,
+          "available_test_mode": false,
+          "descriptions": {
+            "live": {
+              "description": "Permettez e vos clients de payer avec leurs cartes Bancontact.",
+              "link_know_more": {
+                "text": "En savoir plus.",
+                "url": "https://support.payplug.com/hc/fr/articles/4408157435794",
+                "target": "_blank"
+              }
+            },
+            "sandbox": {
+              "description": "Bancontact n'est pas disponible en mode TEST. Pour l'activer vous devez passer votre module PayPlug en mode LIVE.",
+              "link_know_more": {
+                "text": "En savoir plus.",
+                "url": "https://support.payplug.com/hc/fr/articles/4408157435794",
+                "target": "_blank"
+              }
+            }
+          },
+          "options": [
+            {
+              "type": "payment_option",
+              "sub_type": "switch",
+              "name": "bancontact_country",
+              "title": "Autoriser le paiement Bancontact pour vos clients belges uniquement",
+              "descriptions": {
+                "live": {
+                  "description": "Vos clients residents en Belgique seront les seuls e pouvoir commander et payer avec Bancontact sur votre boutique.",
+                  "link_know_more": {
+                    "text": "En savoir plus.",
+                    "url": "https://support.payplug.com/hc/fr/articles/360022213892",
+                    "target": "_blank"
+                  }
+                },
+                "sandbox": {
+                  "description": "Vos clients residents en Belgique seront les seuls e pouvoir commander et payer avec Bancontact sur votre boutique.",
+                  "link_know_more": {
+                    "text": "En savoir plus.",
+                    "url": "https://support.payplug.com/hc/fr/articles/360022213892",
+                    "target": "_blank"
+                  }
+                }
+              },
+              "checked": false
+            }
+          ]
+        }
+      ]
+    },
+    "payment_paylater": {
+      "name": "paymentMethodsBlock",
+      "title": "PayLater",
+      "descriptions": {
+        "live": {
+          "description": "Selectionnez vos preferences de parametrage du PayLater pour afficher le 3x 4x Oney sur votre boutique."
+        },
+        "sandbox": {
+          "description": "Selectionnez vos preferences de parametrage du PayLater pour afficher le 3x 4x Oney sur votre boutique."
+        }
+      },
+      "options": {
+        "name": "oney",
+        "title": "Paiements 3x 4x Oney",
+        "image": "assets/images/lg-oney.png",
+        "checked": false,
+        "descriptions": {
+          "live": {
+            "description": "Vos clients pourront choisir de payer leurs commandes en 3 ou 4 echeances. Vous pouvez prendre (ou non) l'ensemble des frais e votre charge.",
+            "link_know_more": {
+              "text": "En savoir plus.",
+              "url": "https://support.payplug.com/hc/fr/articles/360013071080",
+              "target": "_blank"
+            }
+          },
+          "sandbox": {
+            "description": "Vos clients pourront choisir de payer leurs commandes en 3 ou 4 echeances. Vous pouvez prendre (ou non) l'ensemble des frais e votre charge.",
+            "link_know_more": {
+              "text": "En savoir plus.",
+              "url": "https://support.payplug.com/hc/fr/articles/360013071080",
+              "target": "_blank"
+            }
+          },
+          "advanced": {
+            "description": "Parametrages avances"
+          }
+        },
+        "options": [
+          {
+            "name": "payplug_oney_type",
+            "className": "_paylaterLabel",
+            "label": "Avec frais",
+            "subText": "Les frais sont repartis entre vous et vos clients. ",
+            "value": "with_fees",
+            "checked": true
+          },
+          {
+            "name": "payplug_oney_type",
+            "className": "_paylaterLabel",
+            "label": "Sans frais",
+            "subText": "Les frais sont e votre charge.",
+            "value": "without_fees",
+            "checked": false
+          }
+        ],
+        "advanced_options": [
+          {
+            "name": "thresholds",
+            "image_url": "/modules/payplug/views/img/oney/payplug-thresholds.jpg",
+            "title": "Personnalisez votre offre de paiement fractionne",
+            "descriptions": {
+              "description": "Proposer le paiement fractionne garanti pour des montants entre",
+              "min_amount": {
+                "name": "oney_min_amounts",
+                "value": 100,
+                "placeholder": 100,
+                "min": 100,
+                "max": 3000
+              },
+              "inter": "et",
+              "max_amount": {
+                "name": "oney_max_amounts",
+                "value": 3000,
+                "placeholder": 3000
+              },
+              "error": {
+                "text": "Le montant doit etre compris entre 100e et 3000e."
+              }
+            },
+            "switch": false
+          },
+          {
+            "name": "oney_schedule",
+            "image_url": "/modules/payplug/views/img/oney/payplug-optimized.jpg",
+            "title": "Afficher les echeanciers sur le checkout",
+            "descriptions": [
+              {
+                "description": "Vos clients pourront voir le detail de leurs echeances en 3 ou 4 fois.",
+                "link_know_more": {
+                  "text": "En savoir plus.",
+                  "url": "https://support.payplug.com/hc/fr/articles/360013071080#h_2595dd3d-a281-43ab-a51a-4986fecde5ee",
+                  "target": "_blank"
+                }
+              }
+            ],
+            "switch": true,
+            "checked": false
+          },
+          {
+            "name": "oney_product_animation",
+            "image_url": "/modules/payplug/views/img/oney/payplug-productOneyCta.jpg",
+            "title": "Afficher le logo Oney sur la page produit",
+            "switch": true,
+            "checked": true
+          },
+          {
+            "name": "oney_cart_animation",
+            "image_url": "/modules/payplug/views/img/oney/payplug-cartOneyCta.jpg",
+            "title": "Afficher le logo Oney sur la page panier",
+            "switch": true,
+            "checked": true
+          }
+        ]
+      }
+    },
+    "status": {
+      "error": false,
+      "title": "Etat",
+      "descriptions": {
+        "live": {
+          "description": "Controlez votre environnement pour assurer le fonctionnement optimal du module.",
+          "errorMessage": "La configuration requise pour utiliser le module PayPlug n'est pas satisfaite. Une fois les problemes corriges, actualisez la page ou cliquez sur verifier.",
+          "check": "Verifier",
+          "check_success": "La verification a ete realisee avec succes."
+        },
+        "sandbox": {
+          "description": "Controlez votre environnement pour assurer le fonctionnement optimal du module.",
+          "errorMessage": "La configuration requise pour utiliser le module PayPlug n'est pas satisfaite. Une fois les problemes corriges, actualisez la page ou cliquez sur verifier.",
+          "check": "Verifier",
+          "check_success": "La verification a ete realisee avec succes."
+        }
+      },
+      "requirements": [
+        {
+          "status": true,
+          "text": "Votre serveur doit disposer d'une version 1.0.1 ou superieure d'OpenSSL."
+        },
+        {
+          "status": true,
+          "text": "La version PHP de votre serveur doit etre la version 5.6 au minimum."
+        },
+        {
+          "status": true,
+          "text": "L'extension PHP cURL est installee et activee."
+        }
+      ],
+      "enable_debug_check": false
+    },
+    "footer": {
+      "save_changes_text": "Mettre e jour les parametres",
+      "description": [
+        "Un probleme ? Une question ?",
+        "Rendez-vous sur notre "
+      ],
+      "link_help": {
+        "text": "centre d'assistance",
+        "url": "https://support.payplug.com/hc/fr/requests/new",
+        "target": "_blank"
+      }
+    }
+  }
+}

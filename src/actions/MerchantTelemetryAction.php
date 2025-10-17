@@ -1,0 +1,180 @@
+<?php
+/**
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of Payplug SAS
+ */
+
+namespace PayPlug\src\actions;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+class MerchantTelemetryAction
+{
+    private $dependencies;
+
+    public function __construct($dependencies)
+    {
+        $this->dependencies = $dependencies;
+    }
+
+    public function sendAction($source = '')
+    {
+        if (!$source || !is_string($source)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('MerchantTelemetryAction::sendAction - Invalid argument, given source must be non empty string', 'error');
+
+            return false;
+        }
+
+        if (!$this->dependencies->configClass->isValidFeature('feature_merchant_telemetry')) {
+            return true;
+        }
+
+        $telemetries = $this->renderTelemetries($source);
+        if (!$telemetries['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('MerchantTelemetryAction::sendAction - Can\'t get the merchant telemetries', 'error');
+
+            return false;
+        }
+
+        if (!isset($telemetries['telemetries'])) {
+            return true;
+        }
+
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
+        $send = $this->dependencies
+            ->getPlugin()
+            ->getMerchantTelemetry()
+            ->send(json_encode($telemetries['telemetries']));
+
+        return $send['result'];
+    }
+
+    public function renderTelemetries($source = '')
+    {
+        if (!$source || !is_string($source)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('MerchantTelemetryAction::renderTelemetries - Invalid argument, given source must be non empty string', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Invalid parameter given, $source must be a non empty string.',
+            ];
+        }
+
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+
+        // We get the needed telemetries of the merchant platform
+        $current_configurations = [];
+        foreach ($configuration->getCurrentConfigurations() as $name => $value) {
+            $current_configurations[] = [
+                'name' => $name,
+                'value' => $value,
+            ];
+        }
+        $telemetries = [
+            'version' => $module->version,
+            'php_version' => $this->dependencies->getPlugin()->getConstant()->get('PHP_VERSION'),
+            'name' => $this->dependencies->name,
+            'configurations' => $current_configurations ?: [],
+            'domains' => $this->dependencies->getPlugin()->getShopRepository()->getActiveShopUrl(),
+            'modules' => $this->dependencies->getPlugin()->getModuleRepository()->getActiveModule(),
+        ];
+
+        // Clean of the configuration keys we don't want to send
+        $protected_configurations_keys = [
+            'company_id_test',
+            'email',
+            'jwt',
+            'live_api_key',
+            'oauth_client_data',
+            'oauth_client_id',
+            'oauth_code_verifier',
+            'oauth_company_id',
+            'order_state_auth',
+            'order_state_auth_test',
+            'order_state_cancelled',
+            'order_state_cancelled_test',
+            'order_state_error',
+            'order_state_error_test',
+            'order_state_exp',
+            'order_state_exp_test',
+            'order_state_oney_pg',
+            'order_state_oney_pg_test',
+            'order_state_paid',
+            'order_state_paid_test',
+            'order_state_email_link',
+            'order_state_email_link_test',
+            'order_state_sms_link',
+            'order_state_sms_link_test',
+            'order_state_pending',
+            'order_state_pending_test',
+            'order_state_refund',
+            'order_state_refund_test',
+            'test_api_key',
+            'telemetry_hash',
+        ];
+        foreach ($telemetries['configurations'] as $key => $cfg) {
+            if (in_array($cfg['name'], $protected_configurations_keys)) {
+                unset($telemetries['configurations'][$key]);
+            }
+        }
+        // get the right structure of configurations list
+        $telemetries['configurations'] = array_values($telemetries['configurations']);
+
+        // Then through an hash, we check if the send of the datas is required
+        $hash = hash('sha256', 'merchant_telemetry_' . json_encode($telemetries));
+
+        // If the hash is the same, we don't continue the process
+        if ($hash == $configuration->getValue('telemetry_hash')) {
+            return [
+                'result' => true,
+                'message' => 'Current configuration correspond to previous hash.',
+            ];
+        }
+
+        // Else, we update the new hash in database before implement the datas to send the value.
+        $configuration->set('telemetry_hash', $hash);
+
+        $telemetries['source'] = $source;
+
+        return [
+            'result' => true,
+            'telemetries' => $telemetries,
+        ];
+    }
+}

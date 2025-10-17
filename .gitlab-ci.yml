@@ -1,0 +1,252 @@
+# Adaptation of the Gitlab CI/CD pipeline for the PayPlug Prestashop module
+include:
+  - project: "dalenys/protected/cicd/live"
+    ref: "gitlab-ci-template"
+    file:
+      - "ci/ci.gitlab-ci.yml"
+
+.setup_version_scripts:
+  parse_project_version:
+    - export ARTIFACT_VERSION=$( jq -r '.version' dev/dist/payplug/composer.json )
+    - export TAG_NAME=${ARTIFACT_VERSION}
+
+# --- CI/CD pipeline ---
+
+.inject_artefact_version: &inject_artefact_version |
+  echo "Injecting version in artefact"
+  set -a
+  source ./variables.artifact
+  echo "ARTIFACT_VERSION: ${ARTIFACT_VERSION}"
+  echo "ARTIFACT_VERSION_JS: ${ARTIFACT_VERSION_JS}"
+  # ARTEFACT_VERSION is set by the setup_version job
+  echo "Injecting version in payplug.php"
+  sed -i -e 's/$this->version = '\''0.0.0'\'';/$this->version = '\'''${ARTIFACT_VERSION}''\'';/g' ./payplug.php
+  echo "Injecting version in composer.json"
+  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION}'",/g' ./dev/dist/payplug/composer.json
+  echo "Injecting version in package.json"
+  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION}'",/g' ./dev/dist/payplug/package.json
+  echo "Injecting version in package-lock.json"
+  sed -i -e 's/"version": "0.0.0",/"version": "'${ARTIFACT_VERSION}'",/g' ./dev/dist/payplug/package-lock.json
+
+setup_vendor:
+  image: docker.io/composer:1.9
+  stage: setup
+  needs:
+    - setup_version
+  tags:
+    - general-retail-amd64
+  script:
+    - *inject_artefact_version
+    - ./dev/ci/dist_files.sh -b payplug
+    - composer install
+  artifacts:
+    paths:
+      - vendor
+
+linter:
+  image: docker.io/composer:1.9
+  stage: pre_build
+  tags:
+    - general-retail-amd64
+  script:
+    - *inject_artefact_version
+    - vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no
+
+check_php_version:
+  image: docker.io/php:8.0-alpine
+  stage: pre_build
+  tags:
+    - general-retail-amd64
+  script:
+    - *inject_artefact_version
+    - >
+      RED='\033[0;31m';
+      ORANGE='\033[0;33m';
+      sh dev/ci/check_php_syntax.sh || exit_code=$?;
+      if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING DETECTED!! \n"; exit 126 ; fi;
+      if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR DETECTED!!!\n"; exit 1;
+      elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
+  allow_failure:
+    exit_codes: 126
+
+test_php_unit:
+  image: docker.io/php:7.2.1
+  stage: pre_build
+  tags:
+    - general-retail-amd64
+  coverage: '/^\s*Lines:\s*(\d+\.\d+)\%/'
+  before_script:
+    - *inject_artefact_version
+    - pecl install xdebug-3.1.0
+    - docker-php-ext-enable xdebug
+  script:
+    - echo 'xdebug.mode=coverage' >> /usr/local/etc/php/php.ini
+    - echo 'error_reporting=22527' > /usr/local/etc/php/conf.d/ci.ini
+    - ls -l ./vendor/bin
+    - ./vendor/bin/phpunit tests --bootstrap tests/bootstrap.php  --coverage-text --colors=never -d memory_limit=-1
+
+build_translations:
+  image: docker.io/composer:1.9
+  stage: build
+  tags:
+    - general-retail-amd64
+  script:
+    - *inject_artefact_version
+    - ./dev/ci/dist_files.sh -b payplug
+    - >
+      RED='\033[0;31m';
+      ORANGE='\033[0;33m';
+      exit_code=0; php dev/ci/generate-translations.php $CI_MERGE_REQUEST_TARGET_BRANCH_NAME || exit_code=$?;
+      if [ $exit_code -eq 137 ]; then echo -e "\n${ORANGE}WARNING: MISSING TRANSLATION !! :O\n"; exit 126 ; fi;
+      if [ $exit_code -eq 1 ]; then echo -e "\n${RED}ERROR : MISSING MANDATORY TRANSLATION !!!\n"; exit 1;
+      elif [ $exit_code -ne 0 ]; then echo -e "\n${RED}FATAL ERROR : SOMETHING UNEXPECTED HAPPENED... EXIT CODE: $exit_code\n"; exit 1; fi;
+  allow_failure:
+    exit_codes: 126
+  artifacts:
+    paths:
+      - dev/dist/payplug/translations.csv
+
+build_static_assets:
+  image: docker.io/node:16
+  stage: build
+  tags:
+    - general-retail-amd64
+  before_script:
+    - *inject_artefact_version
+    - ./dev/ci/dist_files.sh -b payplug
+    - npm --version
+    - npm init -y
+    - npm install --save-dev webpack
+  script:
+    - npm run build
+    - ./dev/ci/set_licenses.sh -b payplug
+    - echo "Moving file in build dir"
+    - mkdir ./views/build
+    - mkdir ./views/build/css
+    - mkdir ./views/build/js
+    - mv ./views/css/*.css ./views/build/css
+    - cp ./views/templates/index.php ./views/build/css
+    - mv ./views/js/* ./views/build/js
+    - ls -l ./views/build/css/*.css
+    - ls -l ./views/build/css/*.php
+    - ls -l ./views/build/js/*.js
+  artifacts:
+    paths:
+      - views/build/*
+    expire_in: 1 day
+
+package_and_publish:
+  image: docker.io/composer:1.9
+  stage: publish
+  tags:
+    - general-retail-amd64
+  before_script:
+    - *inject_artefact_version
+    - ./dev/ci/dist_files.sh -b payplug
+    - rm -rf ./vendor
+    - composer install --no-dev
+    - rm webpack.config.js
+    - ./dev/ci/secure_directories.sh
+    - git status
+    - ./dev/ci/assets_revision.sh -b payplug
+    - ./dev/ci/update_year.sh
+    - php ./dev/ci/import-translations.php
+  script:
+    - *inject_artefact_version
+    - shopt -s extglob
+    - ./dev/ci/build.sh -n payplug -c ${ARTIFACT_VERSION}
+    - |
+      if [[ -z "${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" ]]; then
+        cp payplug_qa_${ARTIFACT_VERSION}.zip payplug_qa_${CI_COMMIT_BRANCH}.zip
+      else
+        cp payplug_qa_${ARTIFACT_VERSION}.zip payplug_qa_${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}.zip
+      fi
+  artifacts:
+    paths:
+      - payplug_*.zip
+      - payplug_qa_*.zip
+
+run_test:
+  image: docker.io/composer:1.9
+  stage: post_publish
+  tags:
+    - general-retail-amd64
+  rules:
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /smokes/
+        || $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]$/'
+      when: always
+    - when: never
+  script:
+    - echo $CI_MERGE_REQUEST_LABELS
+    - echo "The smoke test label is defined. The functional tests will be triggered"
+    - curl -s
+      -X POST
+      -F token=$CI_JOB_TOKEN
+      -F ref=master
+      -F "variables[PS_SOURCE_BRANCH]=${CI_COMMIT_REF_NAME}"
+      -F "variables[STAGES_TO_RUN]=smoke_presta_16, smoke_presta_17"
+      https://git.payplug.com/api/v4/projects/41/trigger/pipeline
+
+scan_sonar:
+  image:
+    name: docker.io/sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  stage: build
+  needs:
+    - job: test_php_unit
+      optional: true
+  variables:
+    # FORCE SONAR TO USE THIS PATH
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0" # Tells git to fetch all the branches of the project, required by the analysis task
+  before_script:
+    - !reference [.log_utils, script]
+  script:
+    - export SONAR_PROJECT_KEY="${CI_PROJECT_PATH_SLUG}-${CI_PROJECT_NAME}"
+    - |
+      export SONAR_PROJECT_NAME="${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}: ${CI_PROJECT_NAME}"
+    - |
+      for dir in application src public vendors library configs config; do
+        if [[ -d "$CI_PROJECT_DIR/$dir" ]]; then
+          SONAR_SOURCE_FOLDER="${SONAR_SOURCE_FOLDER:+$SONAR_SOURCE_FOLDER,}$CI_PROJECT_DIR/$dir"
+        fi
+      done
+    - |
+      [[ -d "$CI_PROJECT_DIR/tests" ]] && SONAR_TEST_FOLDER="$CI_PROJECT_DIR/tests"
+    - echo "source folders ${SONAR_SOURCE_FOLDER}"
+    - |
+      sonar-scanner \
+        -Dsonar.organization="${SONAR_ORGANIZATION}" \
+        -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
+        -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
+        ${SONAR_SOURCE_FOLDER:+-Dsonar.sources="$SONAR_SOURCE_FOLDER"} \
+        ${SONAR_TEST_FOLDER:+-Dsonar.tests="$SONAR_TEST_FOLDER"} \
+        -Dsonar.php.tests.reportPath="$CI_PROJECT_DIR/report/junit-tests.xml" \
+        -Dsonar.php.coverage.reportPaths="$CI_PROJECT_DIR/report/coverage.xml" \
+        -Dsonar.host.url="https://sonarcloud.io" || (echo_error "if the error is \"Could not find a default branch to fall back on\", you should consider to execute a pipeline on branch master with CREATE_SONAR_PROJECT set to true" && false)
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master" && $SONAR_TOKEN
+    - if: $CI_COMMIT_BRANCH == "develop" && $SONAR_TOKEN
+    - if: $CI_MERGE_REQUEST_ID && $SONAR_TOKEN
+  allow_failure: true
+
+tag_repository:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master" && $RUN_FOR_RELEASE == "true"
+
+trigger_release:
+  stage: finalize
+  when: manual
+  variables:
+    RUN_FOR_RELEASE: "true"
+  trigger:
+    include:
+      - local: .gitlab-ci.yml
+  rules:
+      - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "parent_pipeline"
+
+variables:
+  VERSION_FORMAT: "php"
+  SEMANTIC_BRANCHES: "master_and_develop"
+  SONAR_ENABLED: "true"
+  RUN_FOR_RELEASE: "false"

@@ -1,0 +1,92 @@
+/* Oney cta */
+.__moduleName__OneyCta {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  max-width: 100%;
+
+  &_button {
+    .Poppins();
+    .transition(~"color @{dur}");
+    display: flex;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+    text-transform: uppercase;
+    color: #2F2930;
+    cursor: pointer;
+    font-size: 11px;
+    max-width: 100%;
+
+    &:hover {
+      color: #colorMap[oney];
+    }
+
+    &:focus {
+      outline: 0;
+    }
+
+    @media (@screen-mobile) {
+      position: relative;
+    }
+
+    &.-disabled {
+      color: #colorMap[grey];
+
+      &:hover {
+        color: #colorMap[grey];
+      }
+    }
+
+    span {
+      font: inherit;
+      white-space: nowrap;
+    }
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  &_logo {
+    width: 140px;
+    height: 30px;
+    background-size: 110%;
+    margin: 0 0 0 5px;
+
+    &.-withoutFees {
+      width: 150px;
+      margin: 0.5em .25em 0.5em 0.75em;
+      min-height: 40px;
+    }
+  }
+
+  &_tooltip {
+    width: 14px;
+    height: 14px;
+  }
+
+  &_field {
+    height: 46px;
+    background: rgba(128, 188, 0, 0.1);
+    text-align: right;
+    padding: 0 8px !important;
+
+    @media (@screen-mobile) {
+      height: auto;
+      background: transparent;
+    }
+  }
+
+  &.-checkout {
+    margin-top: 8px;
+  }
+
+  &.-open {
+    z-index: 4;
+  }
+}

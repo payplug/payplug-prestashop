@@ -1,0 +1,280 @@
+/* Oney Form */
+.__moduleName__OneyRequired {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    background: transparent;
+    font-size: 15px;
+    padding: 0;
+    width: 100%;
+
+    @media (@screen-mobile) {
+      width: calc(100vw - 30px);
+      max-width: 100%;
+    }
+
+    &:focus {
+      outline: 0;
+    }
+
+    &_overlay {
+      .transition(~"max-height @{dur}");
+      background: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      overflow: hidden;
+      padding: 0 16px;
+      max-height: 0;
+
+      &.-show {
+        max-height: 10000vh;
+      }
+    }
+
+    &_wrapper {
+      position: relative;
+      padding: 24px 0 0;
+
+      &:before {
+        .border(#colorMap[oney], t);
+        .transform(translateX(-50%));
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        height: 0;
+        width: 150px;
+      }
+    }
+
+    &_close {
+      display: block;
+      width: 100px;
+      height: 24px;
+      line-height: 24px;
+      background: none;
+      border: none;
+      text-align: center;
+      color: #colorMap[oney];
+      margin: 0 0 15px;
+      cursor: pointer;
+
+      &:focus {
+        outline: 0;
+      }
+
+      &.-button {
+        .borderRadius(2px);
+        background: #colorMap[oney];
+        width: auto;
+        height: 32px;
+        padding: 0 16px;
+        color: #fff;
+        border: none;
+        font-size: 15px;
+        outline: none;
+        margin: 15px 0 0;
+        cursor: pointer;
+      }
+    }
+
+    &_title {
+      display: block;
+      padding: 8px 0 16px;
+      color: #colorMap[oney];
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    &_content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      position: relative;
+      width: 100%;
+    }
+
+    &_fieldset {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      position: relative;
+      max-width: calc(~"50% - 30px");
+      padding: 0 15px;
+      margin: 0 0 15px;
+
+      &.-same {
+        margin: auto;
+        max-width: 100%;
+      }
+
+      @media (@screen-mobile) {
+        max-width: 100%;
+      }
+
+      .__moduleName__Popin & {
+        @media (@screen-mobile) {
+          padding: 16px 0 0;
+        }
+      }
+    }
+
+    &_sectionName {
+      margin: 0 0 4px;
+      font-size: 15px;
+      color: #colorMap[primary];
+      text-align: center;
+    }
+
+    &_group {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      p {
+        width: 100%;
+        font-weight: 400;
+        font-size: 12px;
+        margin: 0 0 3px;
+      }
+
+      & + .__moduleName__OneyRequired_group {
+        margin: 10px 0 0;
+      }
+    }
+
+    &_field {
+      width: 100%;
+
+      &.-firstname,
+      &.-lastname,
+      &.-postcode,
+      &.-city {
+        width: calc(~"50% - 2.5px");
+      }
+    }
+
+    &_input {
+      .border(#colorMap[grey]);
+      .borderRadius(2px);
+      font-size: 12px;
+      padding: 0 8px;
+      margin: 0 0 5px;
+      width: 100%;
+      height: 36px;
+
+      &,
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus,
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus,
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus {
+      }
+
+      &.-error {
+        .border(#colorMap[error]);
+      }
+    }
+
+    &_validate {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    &_button {
+      .borderRadius(2px);
+      background: #colorMap[oney];
+      width: 200px;
+      height: 50px;
+      color: #fff;
+      border: none;
+      font-size: 15px;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+
+    &_submit {
+      .borderRadius(2px);
+      background: #colorMap[oney];
+      width: 200px;
+      height: 50px;
+      color: #fff;
+      border: none;
+      font-size: 15px;
+      margin: 16px 0 8px;
+      outline: none;
+    }
+
+    &_message {
+      text-align: center;
+      font-size: 13px;
+      margin: 10px 0 0;
+      display: none;
+
+      &.-error {
+        display: block;
+        color: #colorMap[error];
+      }
+
+      &.-success {
+        display: block;
+        color: #colorMap[primary];
+      }
+    }
+
+    &_validation {
+      .transition(opacity @dur);
+      opacity: 0;
+      position: absolute;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+
+      span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        font-size: 15px;
+
+        &:first-child {
+          color: #colorMap[oney];
+          font-size: 12px;
+          margin: 0 0 15px;
+
+          &:before {
+            .border(#colorMap[oney], bl, 4px);
+            .rotate(-45deg);
+            display: block;
+            width: 30px;
+            height: 15px;
+            content: "";
+            margin: 0 0 15px;
+          }
+        }
+      }
+
+      &.-show {
+        display: flex;
+      }
+
+      &.-appear {
+        opacity: 1;
+      }
+    }
+}

@@ -1,0 +1,51 @@
+/* Payplug message */
+.__moduleName__Msg {
+  &_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  &_error {
+    color: #colorMap[error];
+    text-align: center;
+    @media (@screen-mobile) {
+      // todo: we should use a modifier
+      .__moduleName__Popin & {
+        width: calc(100vw - 30px);
+        max-width: 100%;
+      }
+    }
+  }
+
+  &_button {
+    .borderRadius(2px);
+    background: #colorMap[primary];
+    width: auto;
+    height: 32px;
+    padding: 0 16px;
+    color: #fff;
+    border: none;
+    font-size: 15px;
+    outline: none;
+    margin: 5px 0 0;
+    cursor: pointer;
+  }
+  &_declineButton {
+    .borderRadius(2px);
+    background:#696969;
+    width:61.15px;
+    margin-left:7.5px;
+  }
+  &_confirmButton {
+    .borderRadius(2px);
+    width:61.15px;
+    margin-right:7.5px;
+  }
+
+  &_text {
+    margin-top: 10px;
+    text-align: center;
+  }
+}

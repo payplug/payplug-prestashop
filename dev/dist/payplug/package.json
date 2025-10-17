@@ -1,0 +1,40 @@
+{
+  "name": "payplug",
+  "version": "4.21.0",
+  "description": "======================================== Prestashop paiement module using Payplug ========================================",
+  "private": true,
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js",
+    "watch": "webpack --config webpack.config.js -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.payplug.com:plugins/prestashop_v2_1.7.git"
+  },
+  "keywords": [],
+  "author": "payplug",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^6.5.1",
+    "css-minimizer-webpack-plugin": "^4.0.0",
+    "less": "^4.1.2",
+    "less-loader": "^11.0.0",
+    "mini-css-extract-plugin": "^2.4.5",
+    "prestashop_accounts_vue_components": "^4.0.0",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.3.10",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.0.0",
+    "webpack-fix-style-only-entries": "^0.6.1"
+  },
+  "dependencies": {
+    "replace-in-file-webpack-plugin": "^1.0.6",
+    "webpack-remove-empty-scripts": "^1.0.0"
+  },
+  "main": "index.js"
+}

@@ -1,0 +1,347 @@
+/* Oney popin */
+.__moduleName__OneyPopin {
+  .Poppins;
+  .transition(~"opacity @{dur}");
+  color: #777;
+  display: none;
+  position: absolute;
+  right: 35px;
+  top: 0;
+  border: 2px solid @color-oney;
+  background: #fff;
+  width: 350px;
+  padding: 15px;
+  opacity: 0;
+  text-align: left;
+  .transform(translateY(-15%));
+
+  &:after {
+    .transform(translate(50%, -50%) rotate(45deg));
+    position: absolute;
+    border: 2px solid @color-oney;
+    border-bottom: none;
+    border-left: none;
+    background: #fff;
+    width: 24px;
+    height: 24px;
+    content: "";
+    top: 17.5%;
+    right: -2px;
+    z-index: -1;
+
+    .-error& {
+      border-color: #colorMap[grey];
+    }
+
+    @media (@screen-mobile) {
+      display: none;
+    }
+  }
+
+  @media (@screen-mobile) {
+    .transition(~"max-height @{dur}, border @{dur}, padding @{dur}");
+    .transform;
+    .border(transparent);
+    display: block;
+    position: relative;
+    right: auto;
+    width: 100%;
+    background: transparent;
+    padding: 0 15px;
+    max-height: 0;
+    overflow: hidden;
+
+    .__moduleName__OneyLoader {
+      margin: 15px 0;
+      display: none;
+
+      .-open & {
+        display: flex;
+      }
+    }
+  }
+
+  &.-open {
+    display: block;
+
+    @media (@screen-mobile) {
+      .border(#colorMap[oney]);
+      max-height: 750px;
+      background: #fff;
+    }
+  }
+
+  &.-show {
+    opacity: 1;
+  }
+
+  &.-error {
+    .transform(translateY(-50%));
+    top: 50%;
+    width: auto;
+    padding: 8px;
+    border-color: #colorMap[grey];
+    width: 100vw;
+    max-width: 300px;
+
+    &:after {
+      top: 50%;
+    }
+
+    @media (@screen-mobile) {
+      .transform;
+      .border(transparent);
+      top: 0;
+      width: 100%;
+      padding: 0 8px;
+      background: transparent;
+
+      .__moduleName__OneyPopin-open& {
+        padding: 8px;
+        border-color: #colorMap[grey];
+        background: rgba(178, 178, 178, 0.1);
+      }
+    }
+  }
+
+  &.-loading {
+    .transform(translateY(-50%));
+    top: 50%;
+    width: auto;
+    height: auto;
+
+    &:after {
+      top: 50%;
+    }
+
+    @media (@screen-mobile) {
+      .transform;
+      top: 0;
+      display: flex;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  &.-isItalian.-withoutFees {
+    .__moduleName__OneyPopin_title {
+      background: url(~"@{img-oney}logo_it_withoutfees.svg") 0px 5px no-repeat;
+    }
+  }
+
+  &_title {
+    display: block;
+    background: url(~"@{img-oney}logo.svg") -11px 0 no-repeat;
+    -webkit-background-size: auto 38px;
+    background-size: auto 36px;
+    padding: 36px 0 0;
+    color: #colorMap[oney];
+    font-size: 18px;
+    line-height: 20px;
+    margin: 0 0 18px;
+
+    strong {
+      display: block;
+      text-transform: uppercase;
+    }
+
+    @media (@screen-mobile) {
+      margin: 15px 0 24px;
+    }
+  }
+
+  ul&_navigation {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      .border(lighten(#colorMap[grey], 20%));
+      .transition;
+      padding: 0;
+      margin: 0;
+
+      &:first-child {
+        .borderRadius(2px 2px 0 0);
+      }
+
+      &:last-child {
+        .borderRadius(0 0 2px 2px);
+      }
+
+      &:before {
+        display: none;
+      }
+
+      & + li {
+        margin: -1px 0 0;
+      }
+
+      button {
+        background: transparent;
+        border: none;
+        width: 100%;
+        height: 32px;
+        text-align: left;
+        padding: 0 16px;
+        outline: 0;
+        color: #colorMap[grey];
+        cursor: pointer;
+      }
+
+      &:hover,
+      &.selected {
+        .border(#colorMap[oney]);
+        z-index: 2;
+
+        button {
+          //color: #colorMap[grey];
+          font-weight: bold;
+          color: #777;
+        }
+      }
+
+      &.selected {
+        background: fade(#colorMap[oney], 15);
+      }
+    }
+  }
+
+  &_option {
+    display: none;
+    position: relative;
+    padding: 4px;
+    font-size: 12px;
+    line-height: 17px;
+    width: 100%;
+
+    &.-show {
+      display: block;
+    }
+
+    ul, p {
+      margin: 0;
+    }
+
+    ul {
+      padding: 0;
+
+      li {
+        padding: 0;
+        margin: 0;
+
+        &:before {
+          display: none;
+        }
+      }
+    }
+
+    p {
+      padding: 4px 0;
+    }
+
+    p,
+    li {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      flex-wrap: wrap;
+      line-height: 17px;
+
+      &:first-child,
+      &:last-child {
+        padding: 4px 0;
+      }
+
+      small {
+        display: block;
+        width: 100%;
+      }
+    }
+
+    &[data-type="3x"] {
+      ul {
+        li {
+          &:last-child {
+            padding: 21px 0 4px;
+          }
+        }
+      }
+    }
+  }
+
+  &_legal {
+    .border(#colorMap[oney], t);
+    display: block;
+    font-size: 10px;
+    line-height: 1.2em;
+    color: #8a8a8a;
+    padding: 8px 0 0;
+    white-space: normal;
+
+    a {
+      color: #colorMap[oney];
+    }
+
+    @media (@screen-mobile) {
+      padding: 10px 0 15px;
+    }
+  }
+
+  &_close {
+    display: block;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-indent: 24px;
+    background: none;
+    border: none;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+
+    &:focus {
+      outline: 0;
+    }
+
+    &:before,
+    &:after {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      content: "";
+      background: #colorMap[oney];
+    }
+
+    &:before {
+      .transform(translate(-50%, -50%) rotate(45deg));
+    }
+
+    &:after {
+      .transform(translate(-50%, -50%) rotate(-45deg));
+    }
+  }
+
+  &_error {
+    margin: 0;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 400;
+    white-space: normal;
+  }
+
+  &_external {
+    display: block;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+}

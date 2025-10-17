@@ -1,0 +1,27 @@
+/* Payplug payment option */
+.__moduleName__PaymentOption {
+  line-height: 2rem;
+  label {
+    margin: 0;
+    text-align: left;
+  }
+  img {
+    margin: 0 12px 0 5px;
+    max-height: 30px;
+
+    @media (@screen-tablet) {
+      display: none;
+    }
+  }
+  &.without_fees {
+    img {
+      width: 200px;
+    }
+  }
+  .custom-radio {
+    margin-top: 0.5rem;
+  }
+  &.-hidden {
+    display: none;
+  }
+}

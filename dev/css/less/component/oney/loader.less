@@ -1,0 +1,73 @@
+/* Oney Loader */
+.__moduleName__OneyLoader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    &_spinner {
+      display: flex;
+      font-size: 30px;
+      width: 1em;
+      height: 1em;
+      position: relative;
+      justify-content: center;
+      align-items: center;
+
+      span,
+      &:before,
+      &:after {
+        .borderRadius();
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 90%;
+        height: 90%;
+        border: .1em solid @color-oney;
+        border-color: @color-oney transparent transparent transparent;
+        animation: pp-rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      }
+
+      &:before,
+      &:after {
+        content: "";
+      }
+
+      &:before {
+        animation-delay: -0.45s;
+      }
+
+      span {
+        animation-delay: -0.30s;
+      }
+
+      &:after {
+        animation-delay: -0.15s;
+      }
+    }
+
+    &_message {
+      display: flex;
+      justify-content: center;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      padding: 8px 8px 0;
+      font-size: 16px;
+
+      i {
+        animation: pp-opacity 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
+
+        &:nth-child(1) {
+          animation-delay: -0.6s;
+        }
+
+        &:nth-child(2) {
+          animation-delay: -0.4s;
+        }
+
+        &:nth-child(3) {
+          animation-delay: -0.2s;
+        }
+      }
+    }
+  }

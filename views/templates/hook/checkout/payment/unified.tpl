@@ -1,0 +1,34 @@
+{*
+* 2023 Payplug
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0).
+* It is available through the world-wide-web at this URL:
+* https://opensource.org/licenses/osl-3.0.php
+* If you are unable to obtain it through the world-wide-web, please send an email
+* to contact@payplug.com so we can send you a copy immediately.
+*
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+*
+*  @author Payplug SAS
+*  @copyright 2023 Payplug SAS
+*  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*  International Registered Trademark & Property of Payplug SAS
+*}
+{assign var=parse_3x_4x value="_"|explode:$payplug_payment_option.logo_url}
+<div class="row">
+    <div class="col-xs-12">
+        <p class="payment_module {$module_name|escape:'htmlall':'UTF-8'}Payment {$module_name|escape:'htmlall':'UTF-8'}OneyPayment">
+            <a href="{$payplug_payment_option.payment_url|escape:'htmlall':'UTF-8'}" title="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}">
+                <img src="{$payplug_payment_option.logo_url|escape:'htmlall':'UTF-8'}" alt="{$payplug_payment_option.label|escape:'htmlall':'UTF-8'}"
+                     class="{$payplug_payment_option.extra_classes|escape:'htmlall':'UTF-8'} {$module_name|escape:'htmlall':'UTF-8'}OneyLogo  -with{if isset($use_fees) && !$use_fees}out{/if}Fees {if $payplug_payment_option.oney_error}{$payplug_payment_option.oney_error|escape:'htmlall':'UTF-8'}{/if}"/>
+                {$payplug_payment_option.label|escape:'htmlall':'UTF-8'}
+            </a>
+        </p>
+        <p class="{$module_name|escape:'htmlall':'UTF-8'}Payment_error{if isset($method) && $method} -{$method|escape:'htmlall':'UTF-8'}{/if}"></p>
+    </div>
+</div>

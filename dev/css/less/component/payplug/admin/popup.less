@@ -1,0 +1,156 @@
+/* Payplug Admin Popup */
+.__moduleName__Popup {
+  .transform(translate(-50%, -50%));
+  .transition(opacity @dur);
+  opacity: 0;
+  position: fixed;
+  display: none;
+  top: 50%;
+  left: 50%;
+  max-width: 80vw;
+  z-index: 5004;
+
+  @media (@screen-mobile) {
+    max-width: 98vw;
+  }
+
+  &:before {
+    .transform(translate(-50%, -50%));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    content: "";
+    background: rgba(0, 0, 0, .2);
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+  }
+
+  &_content {
+    .borderRadius(3px);
+    z-index: 1;
+    background: #fff;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 0;
+
+    @media (@screen-mobile) {
+      max-height: 98vh;
+    }
+  }
+
+  &_close {
+    z-index: 1;
+    display: block;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 30px;
+    height: 30px;
+    line-height: 24px;
+    text-indent: 24px;
+    background: none;
+    border: none;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+
+    &:focus {
+      outline: 0;
+    }
+
+    &:before,
+    &:after {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50%;
+      height: 2px;
+      content: "";
+      background: #colorMap[dark];
+    }
+
+    &:before {
+      .transform(translate(-50%, -50%) rotate(45deg));
+    }
+
+    &:after {
+      .transform(translate(-50%, -50%) rotate(-45deg));
+    }
+  }
+
+  &.-open {
+    display: block;
+  }
+
+  &.-show {
+    opacity: 1;
+  }
+
+  &_heading {
+    .border(lighten(#colorMap[stroke], 10%), b);
+    padding: 10px 20px;
+    font-weight: 700;
+  }
+
+  &_row {
+    text-align: center;
+    padding: 15px 20px;
+
+    ul {
+      padding: 20px 0;
+      margin: 0;
+      text-align: left;
+      list-style: none;
+    }
+
+    input {
+      &[type=email],
+      &[type=password],
+      &[type=search],
+      &[type=tel],
+      &[type=text] {
+        .borderRadius(3px);
+        .border(#colorMap[stroke]);
+        max-width: 100%;
+        background: transparent;
+        margin: 0;
+        display: inline-block;
+        height: 22px;
+
+        &:focus {
+          background: transparent;
+        }
+      }
+    }
+
+    &.-refund{
+      padding: 25px 40px;
+      p {
+        margin-bottom: 25px;
+      }
+    }
+  }
+  &_error {
+    margin: 0 0 8px;
+    color: #colorMap[error];
+    &.-confirm {
+      margin: -8px 0 16px;
+    }
+  }
+
+  &_footer {
+    .border(lighten(#colorMap[stroke], 10%), t);
+    padding: 15px 0 0;
+    display: flex;
+    justify-content: space-between;
+
+    &.-center {
+      justify-content: center;
+    }
+  }
+  &_text {
+    padding-bottom: 15px;
+  }
+}

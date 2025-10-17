@@ -1,0 +1,75 @@
+{
+    "name": "payplug/payplug-prestashop",
+    "moduleName": "payplug",
+    "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
+    "version": "4.21.0",
+    "require": {
+        "php": ">=5.6.0",
+        "payplug/payplug-php": "^4.0",
+        "symfony/dotenv": "3.4.*",
+        "symfony/dependency-injection": "4.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.*",
+        "ccinn/composer-husky-plugin": "^0.2.0",
+        "ccinn/husky-php": "^0.1.0",
+        "friendsofphp/php-cs-fixer": "^2.18",
+        "squizlabs/php_codesniffer": "^3.5",
+        "mockery/mockery": "1.3.3"
+    },
+    "archive": {
+        "exclude": [
+            ".*",
+            "!vendor/*",
+            "!upgrade/*",
+            "!features.json",
+            "!payplug/composer.json",
+            "!payplug/module_files.csv",
+            "!views/css/*.css",
+            "!views/js/*.js",
+            "!views/img/*.svg",
+            "!views/img/*.png",
+            "!.htaccess",
+            "dev",
+            "test",
+            "tests",
+            "controllers/admin/AdminPsPayLaterController.php",
+            "controllers/tools",
+            "views/build",
+            "views/build-bnpl",
+            "views/templates/front/tools",
+            "pspaylater.php",
+            "*.zip",
+            "webpack.config.js",
+            "upgrade/upgrade-methods.php",
+            "changelog.md",
+            "CODEOWNERS",
+            "gl-dependency-scanning-report.json",
+            "gl-sast-report.json",
+            "gl-secret-detection-report.json",
+            "renovate.json",
+            "variables.artifact",
+            "reports"
+        ]
+    },
+    "autoload": {
+        "psr-4": {
+            "PayPlug\\": "./"
+        }
+    },
+    "config": {
+        "prepend-autoloader": false,
+        "platform-check": false
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "./dev/ci/composer.sh"
+        ],
+        "post-update-cmd": [
+            "./dev/ci/composer.sh"
+        ],
+        "install-dev": [
+            "./dev/ci/composer_dev.sh"
+        ]
+    }
+}

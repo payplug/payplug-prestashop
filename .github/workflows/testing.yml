@@ -1,0 +1,84 @@
+#name: Testing Pipeline
+#
+#on:
+#  push:
+#    branches: [master, develop]
+#  pull_request:
+#
+#jobs:
+#  check_php_version:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Vérifier la syntaxe PHP
+#        run: |
+#          set +e
+#          sh dev/ci/check_php_syntax.sh
+#          exit_code=$?
+#          if [ $exit_code -eq 137 ]; then exit 126; fi
+#          if [ $exit_code -eq 1 ]; then exit 1; fi
+#          if [ $exit_code -ne 0 ]; then exit 1; fi
+#
+#  test_php_unit:
+#    runs-on: ubuntu-latest
+#    needs: check_php_version
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Installer Xdebug
+#        run: sudo pecl install xdebug
+#      - name: Activer Xdebug
+#        run: echo 'zend_extension=xdebug.so' >> /etc/php/7.4/cli/php.ini
+#      - name: PHPUnit
+#        run: ./vendor/bin/phpunit tests --bootstrap tests/bootstrap.php --coverage-text --colors=never -d memory_limit=-1
+#      - name: Upload JUnit report
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: junit-tests
+#          path: report/junit-tests.xml
+#      - name: Upload couverture
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: coverage
+#          path: report/coverage.xml
+#
+#  run_test:
+#    runs-on: ubuntu-latest
+#    needs: test_php_unit
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Afficher info tests fonctionnels
+#        run: |
+#          echo "Les tests fonctionnels seraient déclenchés ici (ex: via une API ou un script)."
+#          # Adapter ici selon la logique de déclenchement souhaitée
+#
+#  scan_sonar:
+#    runs-on: ubuntu-latest
+#    needs: test_php_unit
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Télécharger les rapports
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: junit-tests
+#          path: report/
+#      - uses: actions/download-artifact@v4
+#        with:
+#          name: coverage
+#          path: report/
+#      - name: Scanner SonarCloud
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+#        run: |
+#          sonar-scanner \
+#            -Dsonar.organization="${SONAR_ORGANIZATION}" \
+#            -Dsonar.projectKey="payplug-prestashop" \
+#            -Dsonar.projectName="payplug-prestashop" \
+#            -Dsonar.sources="src" \
+#            -Dsonar.tests="tests" \
+#            -Dsonar.php.tests.reportPath="report/junit-tests.xml" \
+#            -Dsonar.php.coverage.reportPaths="report/coverage.xml" \
+#            -Dsonar.host.url="https://sonarcloud.io" \
+#            -Dsonar.login="${SONAR_TOKEN}"

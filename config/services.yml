@@ -1,0 +1,25 @@
+# payplug/config/services.yml
+services:
+  _defaults:
+    public: true
+
+  payplug.dependencies_class:
+    class: PayPlug\classes\DependenciesClass
+
+  payplug.action.hook:
+    class: PayPlug\src\actions\HookAction
+
+  payplug.action.request:
+    class: PayPlug\src\actions\RequestAction
+
+  payplug.models.classes.hook:
+    class: PayPlug\src\models\classes\Hook
+
+  payplug.models.classes.merchant:
+    class: PayPlug\src\models\classes\Merchant
+
+  payplug.utilities.service.api:
+    class: PayPlug\src\utilities\services\API
+
+  payplug.utilities.validator.regex:
+    class: PayPlug\src\utilities\validators\RegexValidator

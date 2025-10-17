@@ -1,0 +1,149 @@
+<?php
+
+namespace PayPlug\tests\utilities\services\API;
+
+/**
+ * @group unit
+ * @group service
+ * @group api_service
+ *
+ * @runTestsInSeparateProcesses
+ */
+class GetAccountTest extends BaseApi
+{
+    public $api_key;
+    public $treat_account;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->api_key = 'live_api_key';
+        $this->treat_account = true;
+
+        $this->logger_adapter = \Mockery::mock('LoggerAdapter');
+        $this->logger_adapter->shouldReceive([
+            'addLog' => true,
+        ]);
+        $this->plugin->shouldReceive([
+            'getLogger' => $this->logger_adapter,
+        ]);
+    }
+
+    /**
+     * @dataProvider invalidBoolFormatDataProvider
+     *
+     * @param mixed $treat_account
+     */
+    public function testWhenGivenTreatAccountIsntValidBooleanFormat($treat_account)
+    {
+        $this->assertSame(
+            [],
+            $this->service->getAccount($treat_account)
+        );
+    }
+
+    public function testWhenAPiCantBeInitialize()
+    {
+        $this->service->shouldReceive([
+            'initialize' => null,
+        ]);
+        $this->assertSame(
+            [],
+            $this->service->getAccount($this->treat_account)
+        );
+    }
+
+    public function testWhenExceptionIsThrownThenUserLogout()
+    {
+        $this->service->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->authentication
+            ->shouldReceive('getAccount')
+            ->andThrow(new \Exception('An error occured during the process', 401));
+
+        $configuration_action = \Mockery::mock('getConfigurationAction');
+        $configuration_action->shouldReceive([
+            'logoutAction' => true,
+        ]);
+        $this->plugin->shouldReceive([
+            'getConfigurationAction' => $configuration_action,
+        ]);
+
+        $this->assertSame(
+            [],
+            $this->service->getAccount($this->treat_account)
+        );
+    }
+
+    public function testWhenNoTreatmentAsked()
+    {
+        $this->service->shouldReceive([
+            'initialize' => true,
+        ]);
+
+        $expected = [
+            'key' => 'value',
+        ];
+        $this->authentication->shouldReceive([
+            'getAccount' => [
+                'httpResponse' => $expected,
+            ],
+        ]);
+
+        $this->assertSame(
+            $expected,
+            $this->service->getAccount(false)
+        );
+    }
+
+    public function testWhenAccountRequestCantBeTreated()
+    {
+        $this->service->shouldReceive([
+            'initialize' => true,
+        ]);
+
+        $expected = [
+            'key' => 'value',
+        ];
+        $this->authentication->shouldReceive([
+            'getAccount' => [
+                'httpResponse' => $expected,
+            ],
+        ]);
+
+        $this->service->shouldReceive([
+            'treatAccountResponse' => [],
+        ]);
+
+        $this->assertSame(
+            [],
+            $this->service->getAccount($this->treat_account)
+        );
+    }
+
+    public function testWhenAccountRequestIsTreated()
+    {
+        $this->service->shouldReceive([
+            'initialize' => true,
+        ]);
+
+        $expected = [
+            'key' => 'value',
+        ];
+        $this->authentication->shouldReceive([
+            'getAccount' => [
+                'httpResponse' => $expected,
+            ],
+        ]);
+
+        $this->service->shouldReceive([
+            'treatAccountResponse' => $expected,
+        ]);
+
+        $this->assertSame(
+            $expected,
+            $this->service->getAccount($this->treat_account)
+        );
+    }
+}
