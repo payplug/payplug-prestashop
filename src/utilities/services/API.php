@@ -512,6 +512,10 @@ class API
             if (401 == (int) $e->getCode()) {
                 $this->dependencies
                     ->getPlugin()
+                    ->getLogger()
+                    ->addLog('API::getAccount: The merchant will be logout due to bad credential error returned by API.');
+                $this->dependencies
+                    ->getPlugin()
                     ->getConfigurationAction()
                     ->logoutAction();
             }
