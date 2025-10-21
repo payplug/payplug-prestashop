@@ -94,6 +94,11 @@ class ApiRest
                 break;
 
             case 'logout':
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('ApiRest::dispatch: LogoutAction trigger by action from customer.');
+
                 $json = $configurationAction->logoutAction();
 
                 break;
@@ -180,6 +185,10 @@ class ApiRest
             ->isLogged();
 
         if (!$logged) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ApiRest::getDataFields: The requirements to consider the merchant as logged in are not met.');
             $this->dependencies
                 ->getPlugin()
                 ->getConfigurationAction()
