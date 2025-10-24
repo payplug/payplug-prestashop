@@ -280,7 +280,6 @@ class HookClass
             ]
         );
 
-
         $moduleName = $this->tools->tool('getValue', 'modulename');
 
         if ($this->tools->tool('getValue', 'has_error')

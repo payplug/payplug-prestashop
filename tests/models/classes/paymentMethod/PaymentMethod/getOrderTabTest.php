@@ -73,4 +73,27 @@ class getOrderTabTest extends BasePaymentMethod
         ];
         $this->assertSame($expected, $this->class->getOrderTab($retrieve));
     }
+
+    public function testWhenResourceIdIsNotPayPrefix()
+    {
+        $resource = (object) [
+            'id' => 'A24211934',
+            'amount' => 123.45,
+            'is_live' => true,
+            'is_paid' => false,
+        ];
+        $retrieve = [
+            'result' => true,
+            'resource' => $resource,
+        ];
+        $this->configuration->shouldReceive('getValue')
+            ->with('order_state_pending')
+            ->andReturn('6');
+        $expected = [
+            'order_state' => '6',
+            'amount' => 123.45,
+            'module_name' => 'order.module.default',
+        ];
+        $this->assertSame($expected, $this->class->getOrderTab($retrieve));
+    }
 }

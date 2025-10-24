@@ -71,8 +71,7 @@
         <br/>
         <a href="{$privacyLink|escape:'htmlall':'UTF-8'}" target="_blank">{$privacy|escape:'htmlall':'UTF-8'}</a>
     </div>
-{*    <input type="hidden" name="hf-token" id="hf-token">*}
-{*    <input type="hidden" name="selected-brand" id="selected-brand" />*}
+    <input type="hidden" name="hf-token" id="hf-token">
 </form>
 <script type="text/javascript">
     {literal}
