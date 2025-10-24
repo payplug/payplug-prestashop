@@ -173,7 +173,6 @@ class OneyPaymentMethod extends PaymentMethod
      * @param array $retrieve
      *
      * @return array
-     * @todo: add coverage to this method
      */
     public function getOrderTab($retrieve = [])
     {
@@ -192,7 +191,7 @@ class OneyPaymentMethod extends PaymentMethod
             return [];
         }
 
-        $order_tab = parent::getOrderTab($retrieve);
+        $order_tab = $this->getParentOrderTab($retrieve);
 
         if (!$resource->is_paid) {
             $state_addons = $resource->is_live ? '' : '_test';
@@ -234,7 +233,11 @@ class OneyPaymentMethod extends PaymentMethod
         return $order_tab;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get payment tab
+     *
+     * @return array
+     */
     public function getPaymentTab()
     {
         $this->setParameters();
@@ -359,8 +362,6 @@ class OneyPaymentMethod extends PaymentMethod
     /**
      * @description Get the resource detail
      *
-     * todo: add coverage to this method
-     *
      * @param string $resource_id
      *
      * @return array
@@ -425,6 +426,7 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Get the Oney required fields from Context
      *
      * todo: rework this function
+     * todo: add coverage to this method
      *
      * @return array
      */
@@ -722,11 +724,11 @@ class OneyPaymentMethod extends PaymentMethod
      *
      * @param object $cart
      * @param int $amount
-     * @param false $country
+     * @param string $country
      *
      * @return array
      */
-    public function getOneyPriceAndPaymentOptions($cart = null, $amount = 0, $country = false)
+    public function getOneyPriceAndPaymentOptions($cart = null, $amount = 0, $country = '')
     {
         $this->setParameters();
 
@@ -1036,7 +1038,7 @@ class OneyPaymentMethod extends PaymentMethod
 
         $data = [
             'amount' => $amount,
-            'country' => $this->getOneyCountry($country),
+            'country' => $this->formatOverseaCountryIso($country),
             'operations' => $operation,
         ];
         $simulations = $this->dependencies
@@ -1047,7 +1049,6 @@ class OneyPaymentMethod extends PaymentMethod
             ->getOneySimulations($data);
 
         if (!$simulations['result']) {
-            $this->logger->setProcess('oney');
             $this->logger->addLog($simulations['message'], 'error');
 
             return [
@@ -1073,7 +1074,6 @@ class OneyPaymentMethod extends PaymentMethod
             // $cache_id = cache_key in db
             // $to_cache = cache_value in db
             if (!$cacheRepository->setCache($cache_key['result'], $to_cache)) {
-                $this->logger->setProcess('oney');
                 $error_message = 'Error during setting Oney Simulation in DB cache [OneyRepository]';
                 $error_level = 'error';
                 $this->logger->addLog($error_message, $error_level);
@@ -1084,26 +1084,6 @@ class OneyPaymentMethod extends PaymentMethod
             'result' => true,
             'simulations' => $simulations,
         ];
-    }
-
-    /**
-     * @description Temp get valid iso code for french overseas,
-     * todo: remove when it's fix in API
-     *
-     * @param string $iso_country
-     *
-     * @return string
-     */
-    public function getOneyCountry($iso_country = '')
-    {
-        $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
-        if (in_array($iso_country, $overseas_iso, true)
-            || !is_string($iso_country)
-            || '' == $iso_country) {
-            return 'FR';
-        }
-
-        return $iso_country;
     }
 
     public function getOperations()
@@ -1122,32 +1102,20 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Get Oney price limit
      *
      * @param bool $custom
-     * @param int $id_currency
      *
      * @return array
      */
-    public function getOneyPriceLimit($custom = true, $id_currency = false)
+    public function getOneyPriceLimit($custom = true)
     {
         $this->setParameters();
-
-        if ($this->validate_adapter->validate('isLoadedObject', $id_currency)) {
-            $currency = $id_currency;
-        } else {
-            if (!is_int($id_currency) && $this->validate_adapter->validate('isLanguageIsoCode', $id_currency)) {
-                $id_currency = $this->country->getByIso($id_currency);
-            }
-            if (!$id_currency) {
-                $id_currency = $this->configuration_adapter->get('PS_CURRENCY_DEFAULT');
-            }
-
-            $currency = $this->currency_adapter->get((int) $id_currency);
-        }
 
         $limits = [
             'min' => false,
             'max' => false,
         ];
 
+        $id_currency = $this->configuration->getValue('PS_CURRENCY_DEFAULT');
+        $currency = $this->currency_adapter->get((int) $id_currency);
         if (!$this->validate_adapter->validate('isLoadedObject', $currency)) {
             return $limits;
         }
@@ -1156,16 +1124,13 @@ class OneyPaymentMethod extends PaymentMethod
         $amounts = json_decode($this->configuration->getValue('amounts'), true);
 
         if ((bool) $custom) {
-            $oney_min_amounts = explode(
-                ',',
-                $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_min_amounts'))
-            );
+            $oney_min_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_min_amounts')));
+            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_max_amounts')));
         } else {
-            $oney_min_amounts = explode(
-                ',',
-                $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['min'])
-            );
+            $oney_min_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['min']));
+            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['max']));
         }
+
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
@@ -1173,12 +1138,6 @@ class OneyPaymentMethod extends PaymentMethod
 
                 break;
             }
-        }
-        if ($custom) {
-            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_max_amounts')));
-        } else {
-            $amounts = json_decode($this->configuration->getValue('amounts'), true);
-            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['max']));
         }
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
@@ -1340,27 +1299,24 @@ class OneyPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        $cart = $this->cart_adapter->get((int) $this->cart_adapter->get()->id);
+        $shop_name = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->getValue('PS_SHOP_NAME');
 
+        $cart = $this->cart_adapter->get((int) $this->cart_adapter->get()->id);
         if ($this->cart_adapter->isVirtualCart($cart)) {
             return [
-                'delivery_label' => $this->dependencies
-                    ->getPlugin()
-                    ->getConfiguration()
-                    ->get('PS_SHOP_NAME'),
+                'delivery_label' => $shop_name,
                 'expected_delivery_date' => date('Y-m-d'),
                 'delivery_type' => 'edelivery',
             ];
         }
 
         $carrier = $this->carrier_adapter->get((int) $cart->id_carrier);
-
         if ($this->validate_adapter->validate('isLoadedObject', $carrier)) {
             return [
-                'delivery_label' => $carrier->name ? $carrier->name : $this->dependencies
-                    ->getPlugin()
-                    ->getConfiguration()
-                    ->get('PS_SHOP_NAME'),
+                'delivery_label' => $carrier->name ? $carrier->name : $shop_name,
                 'expected_delivery_date' => date(
                     'Y-m-d',
                     strtotime('+' . $this->carrier_adapter->getDefaultDelay() . ' day')
@@ -1370,10 +1326,7 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         return [
-            'delivery_label' => $this->dependencies
-                ->getPlugin()
-                ->getConfiguration()
-                ->get('PS_SHOP_NAME'),
+            'delivery_label' => $shop_name,
             'expected_delivery_date' => date('Y-m-d'),
             'delivery_type' => 'edelivery',
         ];
@@ -1622,6 +1575,27 @@ class OneyPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @description Format oney country iso code in case of oversea
+     *
+     * @param $country
+     *
+     * @return string
+     */
+    public function formatOverseaCountryIso($country = '')
+    {
+        if (!is_string($country) || !$country) {
+            return '';
+        }
+
+        $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
+        if (in_array($country, $overseas_iso, true)) {
+            $country = 'FR';
+        }
+
+        return $country;
+    }
+
+    /**
      * @description Get payment option
      *
      * @param array $payment_options
@@ -1744,6 +1718,16 @@ class OneyPaymentMethod extends PaymentMethod
     protected function getParentPaymentOption($payment_options = [])
     {
         return parent::getPaymentOption($payment_options);
+    }
+
+    /**
+     * @param $retrieve
+     *
+     * @return array
+     */
+    protected function getParentOrderTab($retrieve = [])
+    {
+        return parent::getOrderTab($retrieve);
     }
 
     /**

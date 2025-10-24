@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\classes\Merchant;
  * @group unit
  * @group class
  * @group merchant_class
- *
- * @runTestsInSeparateProcesses
  */
 class registerOauthClientDataTest extends BaseMerchant
 {

@@ -158,4 +158,10 @@ class BaseApiRest extends TestCase
 
         $this->class = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();
     }
+
+    protected function tearDown()
+    {
+        \Mockery::close();
+        parent::tearDown();
+    }
 }

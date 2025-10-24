@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\OneyAction;
  * @group unit
  * @group action
  * @group oney_action
- *
- * @runTestsInSeparateProcesses
  */
 class renderCTATest extends BaseOneyAction
 {

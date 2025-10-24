@@ -8,8 +8,6 @@ use PayPlug\tests\mock\CartMock;
  * @group unit
  * @group action
  * @group validation_action
- *
- * @runTestsInSeparateProcesses
  */
 class validateActionTest extends BaseValidationAction
 {

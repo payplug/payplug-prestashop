@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\repositories\LockRepository;
  * @group unit
  * @group repository
  * @group lock_repository
- *
- * @runTestsInSeparateProcesses
  */
 class initializeTest extends BaseLockRepository
 {

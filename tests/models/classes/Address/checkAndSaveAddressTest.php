@@ -8,8 +8,6 @@ use PayPlug\tests\mock\AddressMock;
  * @group unit
  * @group class
  * @group address_classe
- *
- * @runTestsInSeparateProcesses
  */
 class checkAndSaveAddressTest extends BaseAddress
 {

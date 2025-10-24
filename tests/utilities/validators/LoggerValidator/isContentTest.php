@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group validator
  * @group logger_validator
- *
- * @runTestsInSeparateProcesses
  */
 class isContentTest extends TestCase
 {
