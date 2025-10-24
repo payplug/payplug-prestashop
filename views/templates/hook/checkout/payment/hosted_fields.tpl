@@ -1,0 +1,104 @@
+{*
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
+ * @author    Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of Payplug SAS
+*}
+
+<form class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields -loaded">
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -cardHolder" >
+        <input type="text" name="cardholder" id="cardholder" placeholder="{$placeholderCardholder|escape:'htmlall':'UTF-8'}" autocomplete="cc-name" />
+    </div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -cardHolder">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardholder.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    </div>
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -scheme">
+        <div>{l s='hook.integratedPayment.scheme' mod='payplug'}</div>
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_schemes">
+            <label class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_scheme -visa">
+                <input type="radio" name="schemeOptions" value="visa" />
+                <span></span>
+            </label>
+            <label class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_scheme -mastercard">
+                <input type="radio" name="schemeOptions" value="mastercard" />
+                <span></span>
+            </label>
+            <label class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_scheme -cb">
+                <input type="radio" name="schemeOptions" value="cb" />
+                <span></span>
+            </label>
+        </div>
+    </div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -pan" id="card-container"></div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -pan">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardpan.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    </div>
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -exp" id="expiry-container"></div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -cvv" id="cvv-container"></div>
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -exp">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardexp.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    </div>
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_error -cvv">
+        <span class="-hide invalidField">{l s='hook.checkout.payment.integrated.cardcvv.error' mod='payplug'}</span>
+        <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
+    </div>
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_privacy_policy">
+        <img class="-lock" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/integrated/lock.svg"/>
+        <span>{$secure|escape:'htmlall':'UTF-8'}</span>
+        <img class="-logo" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/payplug.svg"/>
+        <br/>
+        <a href="{$privacyLink|escape:'htmlall':'UTF-8'}" target="_blank">{$privacy|escape:'htmlall':'UTF-8'}</a>
+    </div>
+{*    <input type="hidden" name="hf-token" id="hf-token">*}
+{*    <input type="hidden" name="selected-brand" id="selected-brand" />*}
+</form>
+<script type="text/javascript">
+    {literal}
+    var placeholderCardholder = '{/literal}{$placeholderCardholder|escape:'javascript':'UTF-8'}{literal}';
+    var placeholderPan = '{/literal}{$placeholderPan|escape:'javascript':'UTF-8'}{literal}';
+    var placeholderCvv = '{/literal}{$placeholderCvv|escape:'javascript':'UTF-8'}{literal}';
+    var placeholderExp = '{/literal}{$placeholderExp|escape:'javascript':'UTF-8'}{literal}';
+    var loadHostedFields = function() {
+        if (typeof window['payplug_utilities'] != 'undefined') {
+            console.log('Loading script: {/literal}{$hosted_fields_js_url|escape:'javascript':'UTF-8'}{literal}');
+            window['payplug_utilities'].loadScript('{/literal}{$hosted_fields_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
+                if(typeof window['payplugModule'] != 'undefined') {
+                    console.log('Initializing hosted fields');
+                    window['payplugModule'].hosted_fields.init();
+                } else {
+                    console.log('Type of payplugModule : ' + typeof window['payplugModule']);
+                }
+            });
+        } else {
+            console.log('Type of payplug_utilities : ' + typeof window['payplug_utilities']);
+        }
+    }
+    if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplugModule'] != 'undefined') {
+        loadHostedFields();
+    } else {
+        window.addEventListener("load", loadHostedFields);
+    }
+    {/literal}
+</script>
