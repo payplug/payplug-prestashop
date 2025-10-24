@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\repositories\CardRepository;
  * @group unit
  * @group repository
  * @group card_repository
- *
- * @runTestsInSeparateProcesses
  */
 class initializeTest extends BaseCardRepository
 {

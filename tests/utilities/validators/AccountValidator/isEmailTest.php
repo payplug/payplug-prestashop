@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group validator
  * @group account_validator
- *
- * @runTestsInSeparateProcesses
  */
 class isEmailTest extends TestCase
 {

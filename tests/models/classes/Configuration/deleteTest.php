@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\classes\Configuration;
  * @group unit
  * @group class
  * @group configuration_classe
- *
- * @runTestsInSeparateProcesses
  */
 class deleteTest extends BaseConfiguration
 {

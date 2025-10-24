@@ -1,13 +1,12 @@
-name: Testing Pipeline
-
-on:
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
-
-#  check-php-syntax:
+#name: Testing Pipeline
+#
+#on:
+#  push:
+#    branches: [master, develop]
+#  pull_request:
+#
+#jobs:
+#  check_php_version:
 #    runs-on: ubuntu-latest
 #    steps:
 #      - uses: actions/checkout@v4
@@ -22,29 +21,32 @@ on:
 jobs:
   test_php_unit:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        default: '7.2'
+        php-versions: [ '7.2', '8.0' ]
     steps:
       - uses: actions/checkout@v4
       - name: Setup PHP
+        id: setup-php
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: ${{ matrix.php-versions }}
           extensions: xdebug
       - name: Récupération des fichiers dist payplug
         run: ./dev/ci/dist_files.sh -b payplug
       - name: Installer les dépendances Composer
         run: composer install --prefer-dist --no-interaction --no-progress
-      - name: Installer les dépendances Composer
-        run: composer install --prefer-dist --no-interaction --no-progress
       - name: PHPUnit
         run: ./vendor/bin/phpunit tests --bootstrap tests/bootstrap.php --coverage-text --colors=never -d memory_limit=-1
       - name: Upload JUnit report
-        if: always()
+        if: matrix.php-versions == matrix.default
         uses: actions/upload-artifact@v4
         with:
           name: junit-tests
           path: report/junit-tests.xml
       - name: Upload couverture
-        if: always()
+        if: matrix.php-versions == matrix.default
         uses: actions/upload-artifact@v4
         with:
           name: coverage

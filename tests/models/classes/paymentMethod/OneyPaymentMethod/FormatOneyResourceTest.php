@@ -9,10 +9,8 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group class
  * @group payment_method_class
  * @group oney_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
-final class FormatOneyResourceTest extends BaseOneyPaymentMethod
+final class formatOneyResourceTest extends BaseOneyPaymentMethod
 {
     protected $repo;
     protected $tab;

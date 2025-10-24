@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\PaymentAction;
  * @group unit
  * @group action
  * @group payment_action
- *
- * @runTestsInSeparateProcesses
  */
 class renderPaymentErrorsTest extends BasePaymentAction
 {

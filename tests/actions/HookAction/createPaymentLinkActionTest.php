@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\HookAction;
  * @group unit
  * @group action
  * @group hook_action
- *
- * @runTestsInSeparateProcesses
  */
 class createPaymentLinkActionTest extends BaseHookAction
 {

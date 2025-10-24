@@ -6,8 +6,6 @@ namespace PayPlug\tests\utilities\validators\RegexValidator;
  * @group unit
  * @group validator
  * @group regex_validator
- *
- * @runTestsInSeparateProcesses
  */
 class isMobileDeviceTest extends BaseRegexValidator
 {

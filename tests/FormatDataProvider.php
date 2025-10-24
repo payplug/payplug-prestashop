@@ -95,4 +95,13 @@ trait FormatDataProvider
 
         yield [null];
     }
+
+    public function invalidEmailFormatDataProvider()
+    {
+        yield ['@test.com'];
+
+        yield ['email@test'];
+
+        yield ['emailtest.com'];
+    }
 }

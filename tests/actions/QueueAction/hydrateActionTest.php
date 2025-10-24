@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\QueueAction;
  * @group unit
  * @group action
  * @group queue_action
- *
- * @runTestsInSeparateProcesses
  */
 class hydrateActionTest extends BaseQueueAction
 {
