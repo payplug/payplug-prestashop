@@ -173,12 +173,14 @@ class AdminPayplugController extends ModuleAdminController
 
         $this->context->smarty->assign([
             'module_name' => $this->dependencies->name,
+            'plugin_version' => $this->dependencies->version,
         ]);
 
         $lib_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
         $this->media->addJsDef([
             'payplug_admin_config' => [
                 'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
+                'rest_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&rest_route=',
                 'img_path' => $lib_path,
             ],
         ]);
@@ -187,7 +189,7 @@ class AdminPayplugController extends ModuleAdminController
             'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/views/',
         ]);
 
-        $this->context->controller->addCSS($lib_path . '/css/app.css');
+        $this->context->controller->addCSS($lib_path . '/css/app-' . $this->dependencies->version . '.css');
 
         $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
 

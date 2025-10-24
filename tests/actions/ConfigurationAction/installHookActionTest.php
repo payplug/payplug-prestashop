@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  * @group unit
  * @group action
  * @group configuration_action
- *
- * @runTestsInSeparateProcesses
  */
 class installHookActionTest extends BaseConfigurationAction
 {

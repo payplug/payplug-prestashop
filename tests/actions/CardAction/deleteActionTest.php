@@ -1,13 +1,12 @@
 <?php
 
 namespace PayPlug\tests\actions\CardAction;
+use PayPlug\tests\actions\CardAction\BaseCardAction;
 
 /**
  * @group unit
  * @group action
  * @group card_action
- *
- * @runTestsInSeparateProcesses
  */
 class deleteActionTest extends BaseCardAction
 {

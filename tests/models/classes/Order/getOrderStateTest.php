@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\classes\Order;
  * @group unit
  * @group class
  * @group order_classe
- *
- * @runTestsInSeparateProcesses
  */
 class getOrderStatesTest extends BaseOrder
 {

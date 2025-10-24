@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\repositories\EntityRepository;
  * @group unit
  * @group repository
  * @group entity_repository
- *
- * @runTestsInSeparateProcesses
  */
 class deleteByTest extends BaseEntityRepository
 {

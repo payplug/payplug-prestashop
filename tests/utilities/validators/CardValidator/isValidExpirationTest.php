@@ -10,8 +10,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group validator
  * @group card_validator
- *
- * @runTestsInSeparateProcesses
  */
 class isValidExpirationTest extends TestCase
 {

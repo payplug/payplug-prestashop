@@ -72,7 +72,7 @@ class OneyPaymentMethod extends PaymentMethod
         $amounts = json_decode($this->configuration->getDefault('amounts'), true);
         $payment_methods = json_decode($this->configuration->getDefault('payment_methods'), true);
         $default_configuration = [
-            'oney' => (bool) $payment_methods['oney'],
+            'oney' => (bool)$payment_methods['oney'],
             'oney_min_amounts' => isset($amounts['oney_x3_with_fees']) ? $amounts['oney_x3_with_fees']['min'] : '',
             'oney_max_amounts' => isset($amounts['oney_x3_with_fees']) ? $amounts['oney_x3_with_fees']['max'] : '',
             'oney_custom_min_amounts' => isset($amounts['oney_x3_with_fees']) ? $amounts['oney_x3_with_fees']['min'] : '',
@@ -93,16 +93,16 @@ class OneyPaymentMethod extends PaymentMethod
         if (!empty($thresholds)) {
             $advanced_options[] = $thresholds;
         }
-        $schedules = $this->getSchedule((bool) $current_configuration['oney_schedule']);
+        $schedules = $this->getSchedule((bool)$current_configuration['oney_schedule']);
         if (!empty($schedules)) {
             $advanced_options[] = $schedules;
         }
 
-        $product = $this->getProductCallToAction((bool) $current_configuration['oney_product_animation']);
+        $product = $this->getProductCallToAction((bool)$current_configuration['oney_product_animation']);
         if (!empty($product)) {
             $advanced_options[] = $product;
         }
-        $cart = $this->getCartCallToAction((bool) $current_configuration['oney_cart_animation']);
+        $cart = $this->getCartCallToAction((bool)$current_configuration['oney_cart_animation']);
         if (!empty($cart)) {
             $advanced_options[] = $cart;
         }
@@ -173,7 +173,6 @@ class OneyPaymentMethod extends PaymentMethod
      * @param array $retrieve
      *
      * @return array
-     * @todo: add coverage to this method
      */
     public function getOrderTab($retrieve = [])
     {
@@ -192,7 +191,7 @@ class OneyPaymentMethod extends PaymentMethod
             return [];
         }
 
-        $order_tab = parent::getOrderTab($retrieve);
+        $order_tab = $this->getParentOrderTab($retrieve);
 
         if (!$resource->is_paid) {
             $state_addons = $resource->is_live ? '' : '_test';
@@ -234,7 +233,11 @@ class OneyPaymentMethod extends PaymentMethod
         return $order_tab;
     }
 
-    // todo: add coverage to this method
+    /**
+     * @description Get payment tab
+     *
+     * @return array
+     */
     public function getPaymentTab()
     {
         $this->setParameters();
@@ -250,14 +253,14 @@ class OneyPaymentMethod extends PaymentMethod
 
         // Check if oney was elligible then return if not
         $is_valid_cart = $this->isValidOneyCartQty($this->context->cart)['result'];
-        $use_taxes = (bool) $this->dependencies
+        $use_taxes = (bool)$this->dependencies
             ->getPlugin()
             ->getConfiguration()
             ->get('PS_TAX');
         $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
         $is_valid_addresses = $this->isValidOneyAddresses(
-            (int) $this->context->cart->id_address_delivery,
-            (int) $this->context->cart->id_address_invoice
+            (int)$this->context->cart->id_address_delivery,
+            (int)$this->context->cart->id_address_invoice
         );
         $is_valid_amount = $this->isValidOneyAmount($cart_amount);
         $is_elligible = $this->validators['payment']->isOneyElligible(
@@ -278,17 +281,17 @@ class OneyPaymentMethod extends PaymentMethod
         $is_valid_phone = $this->validators['payment']
             ->isPhoneNumber($payment_tab['billing']['mobile_phone_number'])['result'];
         if (!$is_valid_phone || !$this->dependencies
-            ->getHelpers()['phone']::isMobilePhoneNumber(
-                $payment_tab['billing']['country'],
-                $payment_tab['billing']['mobile_phone_number']
-            )) {
+                ->getHelpers()['phone']::isMobilePhoneNumber(
+                    $payment_tab['billing']['country'],
+                    $payment_tab['billing']['mobile_phone_number']
+                )) {
             $is_valid_phone = $this->validators['payment']
                 ->isPhoneNumber($payment_tab['billing']['landline_phone_number'])['result'];
             if ($is_valid_phone && $this->dependencies
-                ->getHelpers()['phone']::isMobilePhoneNumber(
-                    $payment_tab['billing']['country'],
-                    $payment_tab['billing']['landline_phone_number']
-                )) {
+                    ->getHelpers()['phone']::isMobilePhoneNumber(
+                        $payment_tab['billing']['country'],
+                        $payment_tab['billing']['landline_phone_number']
+                    )) {
                 $payment_tab['billing']['mobile_phone_number'] = $payment_tab['billing']['landline_phone_number'];
             }
         }
@@ -297,17 +300,17 @@ class OneyPaymentMethod extends PaymentMethod
         $is_valid_phone = $this->validators['payment']
             ->isPhoneNumber($payment_tab['shipping']['mobile_phone_number'])['result'];
         if (!$is_valid_phone || !$this->dependencies
-            ->getHelpers()['phone']::isMobilePhoneNumber(
-                $payment_tab['shipping']['country'],
-                $payment_tab['shipping']['mobile_phone_number']
-            )) {
+                ->getHelpers()['phone']::isMobilePhoneNumber(
+                    $payment_tab['shipping']['country'],
+                    $payment_tab['shipping']['mobile_phone_number']
+                )) {
             $is_valid_phone = $this->validators['payment']
                 ->isPhoneNumber($payment_tab['shipping']['landline_phone_number'])['result'];
             if ($is_valid_phone && $this->dependencies
-                ->getHelpers()['phone']::isMobilePhoneNumber(
-                    $payment_tab['shipping']['country'],
-                    $payment_tab['shipping']['landline_phone_number']
-                )) {
+                    ->getHelpers()['phone']::isMobilePhoneNumber(
+                        $payment_tab['shipping']['country'],
+                        $payment_tab['shipping']['landline_phone_number']
+                    )) {
                 $payment_tab['shipping']['mobile_phone_number'] = $payment_tab['shipping']['landline_phone_number'];
             }
         }
@@ -319,7 +322,7 @@ class OneyPaymentMethod extends PaymentMethod
                 $payment_data = $this->tools->tool('getValue', 'oney_form');
             }
 
-            if ((bool) $payment_data) {
+            if ((bool)$payment_data) {
                 // hydrate with payment data
                 $payment_tab = $this->hydratePaymentTabFromPaymentData($payment_tab, $payment_data);
 
@@ -345,7 +348,7 @@ class OneyPaymentMethod extends PaymentMethod
             'validation',
             [
                 'ps' => 1,
-                'cartid' => (int) $this->context->cart->id,
+                'cartid' => (int)$this->context->cart->id,
                 'isoney' => $this->tools->tool('getValue', 'io'),
             ],
             true
@@ -358,8 +361,6 @@ class OneyPaymentMethod extends PaymentMethod
 
     /**
      * @description Get the resource detail
-     *
-     * todo: add coverage to this method
      *
      * @param string $resource_id
      *
@@ -384,7 +385,7 @@ class OneyPaymentMethod extends PaymentMethod
         if ('paid' == $resource_details['status_code']) {
             $order_id = $this->tools->tool('getValue', 'id_order');
             $is_live = 'TEST' != $resource_details['mode'];
-            $this->updateOrderStateFromPendingToPaid((int) $order_id, (bool) $is_live);
+            $this->updateOrderStateFromPendingToPaid((int)$order_id, (bool)$is_live);
         }
 
         $translation = $this->dependencies
@@ -411,7 +412,7 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         if (isset($resource->payment_method, $payment->payment_method['is_pending'])
-            && (bool) $resource->payment_method['is_pending']) {
+            && (bool)$resource->payment_method['is_pending']) {
             return [
                 'id_status' => 10,
                 'code' => 'oney_pending',
@@ -425,6 +426,7 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Get the Oney required fields from Context
      *
      * todo: rework this function
+     * todo: add coverage to this method
      *
      * @return array
      */
@@ -442,7 +444,7 @@ class OneyPaymentMethod extends PaymentMethod
         $is_same = $id_address_delivery == $id_address_invoice;
 
         $shipping_fields = [];
-        $shipping_address = $this->address_adapter->get((int) $id_address_delivery);
+        $shipping_address = $this->address_adapter->get((int)$id_address_delivery);
 
         if (!$this->validate_adapter->validate('isLoadedObject', $shipping_address)) {
             return $fields;
@@ -521,7 +523,7 @@ class OneyPaymentMethod extends PaymentMethod
             }
 
             $billing_fields = [];
-            $billing_address = $this->address_adapter->get((int) $id_address_invoice);
+            $billing_address = $this->address_adapter->get((int)$id_address_invoice);
 
             if (!$this->validate_adapter->validate('isLoadedObject', $billing_address)) {
                 return $fields;
@@ -640,7 +642,7 @@ class OneyPaymentMethod extends PaymentMethod
                     $id_address = 'shipping' == $type ?
                         $this->context->cart->id_address_delivery :
                         $this->context->cart->id_address_invoice;
-                    $address = $this->address_adapter->get((int) $id_address);
+                    $address = $this->address_adapter->get((int)$id_address);
                     $country = $this->country->getCountry($address->id_country);
                     $is_valid_phone = $this->validators['payment']
                         ->isPhoneNumber($data)['result'];
@@ -722,21 +724,19 @@ class OneyPaymentMethod extends PaymentMethod
      *
      * @param object $cart
      * @param int $amount
-     * @param false $country
+     * @param string $country
      *
      * @return array
      */
-    public function getOneyPriceAndPaymentOptions($cart = null, $amount = 0, $country = false)
+    public function getOneyPriceAndPaymentOptions($cart = null, $amount = 0, $country = '')
     {
         $this->setParameters();
 
-        if ($this->validate_adapter->validate('isLoadedObject', $cart)
-            && $cart->id_address_invoice
-            && $cart->id_address_delivery) {
+        if ($this->validate_adapter->validate('isLoadedObject', $cart) && $cart->id_address_invoice && $cart->id_address_delivery) {
             $is_valid_cart = $this->isValidOneyCartQty($cart)['result'];
             $is_valid_addresses = $this->isValidOneyAddresses(
-                (int) $cart->id_address_delivery,
-                (int) $cart->id_address_invoice
+                (int)$cart->id_address_delivery,
+                (int)$cart->id_address_invoice
             );
             $is_valid_amount = $this->isValidOneyAmount($amount ? $amount : $cart->getOrderTotal(true))['result'];
 
@@ -752,22 +752,12 @@ class OneyPaymentMethod extends PaymentMethod
             $oney_payment_options = false;
         }
 
-        $translations = $this->dependencies->getPlugin()->getTranslationClass();
-        $types = $translations
-            ->getOrderStateActionRenderTranslations();
-        $error = isset($is_elligible['error']) ? $is_elligible['error'] : (
-            $oney_payment_options
+        $error = $is_elligible['error'] ?? ($oney_payment_options
             ? false
             : $this->oney_translations['schedules_unavailable']
         );
 
         $withFirstSchedule = 'it' == $this->context->language->iso_code;
-
-        $context = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get();
-
         $this->assign_adapter->assign([
             'payplug_oney_required_field' => false,
             'payplug_oney_amount' => [
@@ -804,7 +794,7 @@ class OneyPaymentMethod extends PaymentMethod
 
         $this->assignLegalNotice();
         $this->context->getContext()->smarty->assign([
-            'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
+            'use_fees' => (bool)$this->configuration->getValue('oney_fees'),
             'iso_code' => $this->tools->tool(
                 'strtoupper',
                 $this->context->language->iso_code
@@ -825,8 +815,8 @@ class OneyPaymentMethod extends PaymentMethod
         $learnMoreLink = 'IT' == $this->configuration->getValue('company_iso')
             && 'it' == $this->tools->tool('strtolower', $this->context->language->iso_code);
         $this->context->getContext()->smarty->assign([
-            'learnMoreLink' => (bool) $learnMoreLink,
-            'oneyWithFees' => (bool) $this->configuration->getValue('oney_fees'),
+            'learnMoreLink' => (bool)$learnMoreLink,
+            'oneyWithFees' => (bool)$this->configuration->getValue('oney_fees'),
             'oneyMinAmounts' => $this->formatPrice(
                 $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
                 $this->context->currency
@@ -878,10 +868,10 @@ class OneyPaymentMethod extends PaymentMethod
             return $payment_list;
         }
 
-        $use_fees = (bool) $this->configuration->getValue('oney_fees');
+        $use_fees = (bool)$this->configuration->getValue('oney_fees');
 
         foreach (array_keys($oney_simulations['simulations']) as $key) {
-            $with_fees = false !== (bool) strpos($key, 'with_fees');
+            $with_fees = false !== (bool)strpos($key, 'with_fees');
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 unset($oney_simulations['simulations'][$key]);
             }
@@ -932,7 +922,7 @@ class OneyPaymentMethod extends PaymentMethod
         $resource['nominal_annual_percentage_rate'] = number_format($resource['nominal_annual_percentage_rate'], 2);
         $resource['effective_annual_percentage_rate'] = number_format($resource['effective_annual_percentage_rate'], 2);
 
-        $resource['split'] = (int) str_replace('x', '', $type[0]);
+        $resource['split'] = (int)str_replace('x', '', $type[0]);
         $resource['title'] = sprintf($this->oney_translations['percentage'], $resource['split']);
 
         // format price
@@ -1036,7 +1026,7 @@ class OneyPaymentMethod extends PaymentMethod
 
         $data = [
             'amount' => $amount,
-            'country' => $this->getOneyCountry($country),
+            'country' => $this->formatOverseaCountryIso($country),
             'operations' => $operation,
         ];
         $simulations = $this->dependencies
@@ -1047,7 +1037,6 @@ class OneyPaymentMethod extends PaymentMethod
             ->getOneySimulations($data);
 
         if (!$simulations['result']) {
-            $this->logger->setProcess('oney');
             $this->logger->addLog($simulations['message'], 'error');
 
             return [
@@ -1073,7 +1062,6 @@ class OneyPaymentMethod extends PaymentMethod
             // $cache_id = cache_key in db
             // $to_cache = cache_value in db
             if (!$cacheRepository->setCache($cache_key['result'], $to_cache)) {
-                $this->logger->setProcess('oney');
                 $error_message = 'Error during setting Oney Simulation in DB cache [OneyRepository]';
                 $error_level = 'error';
                 $this->logger->addLog($error_message, $error_level);
@@ -1084,26 +1072,6 @@ class OneyPaymentMethod extends PaymentMethod
             'result' => true,
             'simulations' => $simulations,
         ];
-    }
-
-    /**
-     * @description Temp get valid iso code for french overseas,
-     * todo: remove when it's fix in API
-     *
-     * @param string $iso_country
-     *
-     * @return string
-     */
-    public function getOneyCountry($iso_country = '')
-    {
-        $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
-        if (in_array($iso_country, $overseas_iso, true)
-            || !is_string($iso_country)
-            || '' == $iso_country) {
-            return 'FR';
-        }
-
-        return $iso_country;
     }
 
     public function getOperations()
@@ -1122,32 +1090,20 @@ class OneyPaymentMethod extends PaymentMethod
      * @description Get Oney price limit
      *
      * @param bool $custom
-     * @param int $id_currency
      *
      * @return array
      */
-    public function getOneyPriceLimit($custom = true, $id_currency = false)
+    public function getOneyPriceLimit($custom = true)
     {
         $this->setParameters();
-
-        if ($this->validate_adapter->validate('isLoadedObject', $id_currency)) {
-            $currency = $id_currency;
-        } else {
-            if (!is_int($id_currency) && $this->validate_adapter->validate('isLanguageIsoCode', $id_currency)) {
-                $id_currency = $this->country->getByIso($id_currency);
-            }
-            if (!$id_currency) {
-                $id_currency = $this->configuration_adapter->get('PS_CURRENCY_DEFAULT');
-            }
-
-            $currency = $this->currency_adapter->get((int) $id_currency);
-        }
 
         $limits = [
             'min' => false,
             'max' => false,
         ];
 
+        $id_currency = $this->configuration->getValue('PS_CURRENCY_DEFAULT');
+        $currency = $this->currency_adapter->get((int)$id_currency);
         if (!$this->validate_adapter->validate('isLoadedObject', $currency)) {
             return $limits;
         }
@@ -1155,35 +1111,26 @@ class OneyPaymentMethod extends PaymentMethod
         $iso_code = $this->tools->tool('strtoupper', $currency->iso_code);
         $amounts = json_decode($this->configuration->getValue('amounts'), true);
 
-        if ((bool) $custom) {
-            $oney_min_amounts = explode(
-                ',',
-                $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_min_amounts'))
-            );
+        if ((bool)$custom) {
+            $oney_min_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_min_amounts')));
+            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_max_amounts')));
         } else {
-            $oney_min_amounts = explode(
-                ',',
-                $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['min'])
-            );
+            $oney_min_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['min']));
+            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['max']));
         }
+
         foreach ($oney_min_amounts as $min_amount) {
             $min = explode(':', $min_amount);
             if ($min[0] == $iso_code) {
-                $limits['min'] = (int) $min[1];
+                $limits['min'] = (int)$min[1];
 
                 break;
             }
         }
-        if ($custom) {
-            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_max_amounts')));
-        } else {
-            $amounts = json_decode($this->configuration->getValue('amounts'), true);
-            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['max']));
-        }
         foreach ($oney_max_amounts as $max_amount) {
             $max = explode(':', $max_amount);
             if ($max[0] == $iso_code) {
-                $limits['max'] = (int) $max[1];
+                $limits['max'] = (int)$max[1];
 
                 break;
             }
@@ -1264,17 +1211,17 @@ class OneyPaymentMethod extends PaymentMethod
 
         $this->setParameters();
 
-        $shipping = $this->address_adapter->get((int) $id_shipping);
-        $billing = $this->address_adapter->get((int) $id_billing);
+        $shipping = $this->address_adapter->get((int)$id_shipping);
+        $billing = $this->address_adapter->get((int)$id_billing);
         $shipping_iso_code = $this
             ->dependencies
             ->configClass
-            ->getIsoCodeByCountryId((int) $shipping->id_country);
+            ->getIsoCodeByCountryId((int)$shipping->id_country);
 
         $billing_iso_code = $this
             ->dependencies
             ->configClass
-            ->getIsoCodeByCountryId((int) $billing->id_country);
+            ->getIsoCodeByCountryId((int)$billing->id_country);
 
         if ($shipping_iso_code != $billing_iso_code) {
             return [
@@ -1340,27 +1287,24 @@ class OneyPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        $cart = $this->cart_adapter->get((int) $this->cart_adapter->get()->id);
+        $shop_name = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->getValue('PS_SHOP_NAME');
 
+        $cart = $this->cart_adapter->get((int)$this->cart_adapter->get()->id);
         if ($this->cart_adapter->isVirtualCart($cart)) {
             return [
-                'delivery_label' => $this->dependencies
-                    ->getPlugin()
-                    ->getConfiguration()
-                    ->get('PS_SHOP_NAME'),
+                'delivery_label' => $shop_name,
                 'expected_delivery_date' => date('Y-m-d'),
                 'delivery_type' => 'edelivery',
             ];
         }
 
-        $carrier = $this->carrier_adapter->get((int) $cart->id_carrier);
-
+        $carrier = $this->carrier_adapter->get((int)$cart->id_carrier);
         if ($this->validate_adapter->validate('isLoadedObject', $carrier)) {
             return [
-                'delivery_label' => $carrier->name ? $carrier->name : $this->dependencies
-                    ->getPlugin()
-                    ->getConfiguration()
-                    ->get('PS_SHOP_NAME'),
+                'delivery_label' => $carrier->name ? $carrier->name : $shop_name,
                 'expected_delivery_date' => date(
                     'Y-m-d',
                     strtotime('+' . $this->carrier_adapter->getDefaultDelay() . ' day')
@@ -1370,10 +1314,7 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         return [
-            'delivery_label' => $this->dependencies
-                ->getPlugin()
-                ->getConfiguration()
-                ->get('PS_SHOP_NAME'),
+            'delivery_label' => $shop_name,
             'expected_delivery_date' => date('Y-m-d'),
             'delivery_type' => 'edelivery',
         ];
@@ -1389,7 +1330,7 @@ class OneyPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         $cart_context = [];
-        $cart = $this->cart_adapter->get((int) $this->context->cart->id);
+        $cart = $this->cart_adapter->get((int)$this->context->cart->id);
         if (!$this->validate_adapter->validate('isLoadedObject', $cart)) {
             return ['cart' => $cart_context];
         }
@@ -1401,16 +1342,16 @@ class OneyPaymentMethod extends PaymentMethod
             $unit_price = $this->dependencies
                 ->getHelpers()['amount']
                 ->convertAmount($product['price_wt']);
-            $productName = (string) $product['name'] . (isset($product['attributes'])
+            $productName = (string)$product['name'] . (isset($product['attributes'])
                     ? ' - ' . $product['attributes']
                     : '');
 
             $item = [
-                'merchant_item_id' => (string) $product['id_product'],
+                'merchant_item_id' => (string)$product['id_product'],
                 'name' => $this->tools->substr($productName, 0, 250),
-                'price' => (int) $unit_price,
-                'quantity' => (int) $product['cart_quantity'],
-                'total_amount' => (string) $unit_price * $product['cart_quantity'],
+                'price' => (int)$unit_price,
+                'quantity' => (int)$product['cart_quantity'],
+                'total_amount' => (string)$unit_price * $product['cart_quantity'],
                 'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
                     $this->tools->substr($product['manufacturer_name'], 0, 250) :
                     $this->dependencies
@@ -1440,7 +1381,7 @@ class OneyPaymentMethod extends PaymentMethod
             ->getPlugin()
             ->getConfiguration()
             ->get('PS_CURRENCY_DEFAULT');
-        $currency = $this->currency_adapter->get((int) $id_currency);
+        $currency = $this->currency_adapter->get((int)$id_currency);
 
         $iso_code = $this->tools->tool('strtoupper', $currency->iso_code);
 
@@ -1480,10 +1421,10 @@ class OneyPaymentMethod extends PaymentMethod
         $is_valid_phone = $this->validators['payment']
             ->isPhoneNumber($shipping['mobile_phone_number'])['result'];
         $valid_shipping_mobile = $is_valid_phone && $this->validators['payment']
-            ->isValidMobilePhoneNumber(
-                $shipping['mobile_phone_number'],
-                $shipping['country']
-            )['result'];
+                ->isValidMobilePhoneNumber(
+                    $shipping['mobile_phone_number'],
+                    $shipping['country']
+                )['result'];
 
         if (!$valid_shipping_mobile) {
             return true;
@@ -1501,10 +1442,10 @@ class OneyPaymentMethod extends PaymentMethod
         $is_valid_phone = $this->validators['payment']
             ->isPhoneNumber($billing['mobile_phone_number'])['result'];
         $valid_billing_mobile = $is_valid_phone && $this->validators['payment']
-            ->isValidMobilePhoneNumber(
-                $shipping['mobile_phone_number'],
-                $shipping['country']
-            )['result'];
+                ->isValidMobilePhoneNumber(
+                    $shipping['mobile_phone_number'],
+                    $shipping['country']
+                )['result'];
 
         if (!$valid_billing_mobile) {
             return true;
@@ -1559,7 +1500,7 @@ class OneyPaymentMethod extends PaymentMethod
         $payment_methods = json_decode($this->configuration->getValue('payment_methods'), true);
 
         return $this->dependencies->configClass->isAllowed()
-            && (bool) $payment_methods['oney']
+            && (bool)$payment_methods['oney']
             && $this->isOneyAllowedCurrency($this->context->currency);
     }
 
@@ -1622,6 +1563,27 @@ class OneyPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @description Format oney country iso code in case of oversea
+     *
+     * @param $country
+     *
+     * @return string
+     */
+    public function formatOverseaCountryIso($country = '')
+    {
+        if (!is_string($country) || !$country) {
+            return '';
+        }
+
+        $overseas_iso = ['GP', 'MQ', 'GF', 'RE', 'YT'];
+        if (in_array($country, $overseas_iso, true)) {
+            $country = 'FR';
+        }
+
+        return $country;
+    }
+
+    /**
      * @description Get payment option
      *
      * @param array $payment_options
@@ -1650,7 +1612,7 @@ class OneyPaymentMethod extends PaymentMethod
 
             return $payment_options;
         }
-        $use_taxes = (bool) $this->configuration->getValue('PS_TAX');
+        $use_taxes = (bool)$this->configuration->getValue('PS_TAX');
         $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
         $cart_amount = $cart_amount ?: $this->context->cart->getOrderTotal(true);
         $is_valid_amount = $this->isValidOneyAmount($cart_amount);
@@ -1664,8 +1626,8 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $is_valid_addresses = $this->isValidOneyAddresses(
-            (int) $this->context->cart->id_address_delivery,
-            (int) $this->context->cart->id_address_invoice
+            (int)$this->context->cart->id_address_delivery,
+            (int)$this->context->cart->id_address_invoice
         );
         if (!$is_valid_addresses['result']) {
             $this->dependencies
@@ -1677,11 +1639,11 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $optimized = $this->configuration->getValue('oney_optimized');
-        $use_fees = (bool) $this->configuration->getValue('oney_fees');
+        $use_fees = (bool)$this->configuration->getValue('oney_fees');
         $delivery_address = $this->dependencies
             ->getPlugin()
             ->getAddress()
-            ->get((int) $this->context->cart->id_address_delivery);
+            ->get((int)$this->context->cart->id_address_delivery);
         $iso = $this->dependencies
             ->getPlugin()
             ->getTools()
@@ -1694,7 +1656,7 @@ class OneyPaymentMethod extends PaymentMethod
         $available_oney_payments = $this->getOperations();
 
         foreach ($available_oney_payments as $oney_payment) {
-            $with_fees = false !== (bool) strpos($oney_payment, 'with_fees');
+            $with_fees = false !== (bool)strpos($oney_payment, 'with_fees');
             if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
                 continue;
             }
@@ -1707,14 +1669,14 @@ class OneyPaymentMethod extends PaymentMethod
 
             $oney_option = $payment_options[$this->name];
             $type = explode('_', $oney_payment);
-            $split = (int) str_replace('x', '', $type[0]);
+            $split = (int)str_replace('x', '', $type[0]);
             $text = $use_fees ? $this->oney_translations['pay_with_fee'] : $this->oney_translations['pay_without_fee'];
             $oney_option['name'] = 'oney';
             $oney_option['inputs']['method']['value'] = 'oney';
             $oney_option['is_optimized'] = $optimized;
             $oney_option['type'] = $oney_payment;
             $oney_option['amount'] = $cart_amount;
-            $oney_option['iso_code'] = $this->dependencies->configClass->getIsoCodeByCountryId((int) $delivery_address->id_country);
+            $oney_option['iso_code'] = $this->dependencies->configClass->getIsoCodeByCountryId((int)$delivery_address->id_country);
             $oney_option['inputs']['oney_type'] = [
                 'name' => $this->dependencies->name . 'Oney_type',
                 'type' => 'hidden',
@@ -1747,6 +1709,16 @@ class OneyPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @param $retrieve
+     *
+     * @return array
+     */
+    protected function getParentOrderTab($retrieve = [])
+    {
+        return parent::getOrderTab($retrieve);
+    }
+
+    /**
      * @description Get cart page CTA
      *
      * @param bool $active
@@ -1762,9 +1734,9 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
+                ->getPlugin()
+                ->getConstant()
+                ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
 
         return [
             'name' => 'oney_cart_animation',
@@ -1791,9 +1763,9 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
+                ->getPlugin()
+                ->getConstant()
+                ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
 
         return [
             'name' => 'oney_product_animation',
@@ -1820,9 +1792,9 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $img_path = $this->dependencies
-            ->getPlugin()
-            ->getConstant()
-            ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
+                ->getPlugin()
+                ->getConstant()
+                ->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/oney/';
 
         $iso_code = $this->dependencies
             ->getPlugin()
@@ -1884,7 +1856,7 @@ class OneyPaymentMethod extends PaymentMethod
             }
 
             $amount = explode(':', $config);
-            $amount = (int) $amount[1];
+            $amount = (int)$amount[1];
             $amount = $this->dependencies->getHelpers()['amount']->formatOneyAmount($amount)['result'];
             $thresholds[$amount_key] = $amount;
         }
@@ -2024,7 +1996,7 @@ class OneyPaymentMethod extends PaymentMethod
 
         $order = $this->dependencies->getPlugin()
             ->getOrder()
-            ->get((int) $order_id);
+            ->get((int)$order_id);
 
         if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
             $this->logger->addLog('OneyPaymentMethod::updateOrderState() - Invalid argument given, $order got must be a valid object.', 'error');
@@ -2043,7 +2015,7 @@ class OneyPaymentMethod extends PaymentMethod
         $update_order_history = $this->dependencies
             ->getPlugin()
             ->getOrderClass()
-            ->updateOrderState($order, (int) $paid_os);
+            ->updateOrderState($order, (int)$paid_os);
 
         // If order history well update, then we force the reload
         if (!$update_order_history) {
@@ -2052,7 +2024,7 @@ class OneyPaymentMethod extends PaymentMethod
             return false;
         }
 
-        $parameters = ['vieworder' => 1, 'id_order' => (int) $order->id];
+        $parameters = ['vieworder' => 1, 'id_order' => (int)$order->id];
         $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
 
         return $this->tools->tool('redirectAdmin', $link_order);
@@ -2119,7 +2091,7 @@ class OneyPaymentMethod extends PaymentMethod
                 switch ($type) {
                     case 'billing':
                         $id_country = $this->country->getByIso($payment_tab['billing']['country']);
-                        $billing_country = $this->country->get((int) $id_country);
+                        $billing_country = $this->country->get((int)$id_country);
                         $field = $this->dependencies->configClass->formatPhoneNumber($field, $billing_country);
 
                         break;
@@ -2128,7 +2100,7 @@ class OneyPaymentMethod extends PaymentMethod
                     case 'shipping':
                     default:
                         $id_country = $this->country->getByIso($payment_tab['shipping']['country']);
-                        $shipping_country = $this->country->get((int) $id_country);
+                        $shipping_country = $this->country->get((int)$id_country);
                         $field = $this->dependencies->configClass->formatPhoneNumber($field, $shipping_country);
 
                         break;

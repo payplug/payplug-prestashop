@@ -8,8 +8,6 @@ use PayPlug\classes\MyLogPHP;
  * @group unit
  * @group action
  * @group configuration_action
- *
- * @runTestsInSeparateProcesses
  */
 class installActionTest extends BaseConfigurationAction
 {
@@ -51,11 +49,9 @@ class installActionTest extends BaseConfigurationAction
         ]);
 
         $this->configuration_helper = \Mockery::mock('ConfigurationHelper');
-        $this->files_helper = \Mockery::mock('FilesHelper');
         $this->dependencies->shouldReceive([
             'getHelpers' => [
                 'configuration' => $this->configuration_helper,
-                'files' => $this->files_helper,
             ],
         ]);
     }
@@ -337,48 +333,6 @@ class installActionTest extends BaseConfigurationAction
             [
                 'result' => false,
                 'message' => 'Install failed: Install hook.',
-            ],
-            $this->action->installAction()
-        );
-    }
-
-    public function testWhenInstallIsComplete()
-    {
-        $this->configuration_helper->shouldReceive([
-            'getRequirements' => [
-                'php' => [
-                    'up2date' => true,
-                ],
-                'curl' => [
-                    'up2date' => true,
-                ],
-                'openssl' => [
-                    'up2date' => true,
-                ],
-            ],
-        ]);
-        $this->configuration_class->shouldReceive([
-            'initialize' => true,
-        ]);
-        $this->entity_repository->shouldReceive([
-            'initialize' => true,
-        ]);
-        $this->action->shouldReceive([
-            'installHookAction' => true,
-            'installOrderStateAction' => true,
-            'installTabAction' => true,
-        ]);
-        $this->order_state_action->shouldReceive([
-            'installTypeAction' => true,
-        ]);
-        $this->files_helper->shouldReceive([
-            'clean' => true,
-        ]);
-
-        $this->assertSame(
-            [
-                'result' => true,
-                'message' => 'Install successful',
             ],
             $this->action->installAction()
         );

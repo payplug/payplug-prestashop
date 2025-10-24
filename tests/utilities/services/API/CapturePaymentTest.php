@@ -8,8 +8,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group service
  * @group api_service
- *
- * @runTestsInSeparateProcesses
  */
 class CapturePaymentTest extends BaseApi
 {

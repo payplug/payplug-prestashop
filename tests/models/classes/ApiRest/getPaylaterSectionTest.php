@@ -8,8 +8,6 @@ use PayPlug\tests\mock\ContextMock;
  * @group unit
  * @group class
  * @group apirest_class
- *
- * @runTestsInSeparateProcesses
  */
 class getPaylaterSectionTest extends BaseApiRest
 {

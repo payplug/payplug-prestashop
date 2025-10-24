@@ -11,10 +11,8 @@ use PayPlug\tests\mock\CurrencyMock;
  * @group class
  * @group payment_method_class
  * @group oney_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
-final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
+final class getOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
 {
     public $cartMock;
 
@@ -79,7 +77,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
             'isValidOneyAmount' => ['result' => true, 'error' => false],
             'getOneyPaymentOptionsList' => ['payment_option_list'],
             'isValidOneyCartQty' => ['result' => true, 'error' => false],
-            'isValidOneyAddresses' => true,
+            'isValidOneyAddresses' => ['result' => true],
         ])
         ;
 
@@ -114,7 +112,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
             'isValidOneyAmount' => ['result' => true, 'error' => false],
             'getOneyPaymentOptionsList' => ['payment_option_list'],
             'isValidOneyCartQty' => ['result' => true, 'error' => false],
-            'isValidOneyAddresses' => true,
+            'isValidOneyAddresses' => ['result' => true],
         ])
         ;
 
@@ -149,7 +147,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
             'isValidOneyAmount' => ['result' => false, 'error' => 'invalid_amount'],
             'getOneyPaymentOptionsList' => ['payment_option_list'],
             'isValidOneyCartQty' => ['result' => true, 'error' => false],
-            'isValidOneyAddresses' => true,
+            'isValidOneyAddresses' => ['result' => true],
         ])
         ;
 
@@ -177,7 +175,7 @@ final class GetOneyPriceAndPaymentOptionsTest extends BaseOneyPaymentMethod
             'isValidOneyAmount' => ['result' => true, 'error' => false],
             'getOneyPaymentOptionsList' => [],
             'isValidOneyCartQty' => ['result' => true, 'error' => false],
-            'isValidOneyAddresses' => true,
+            'isValidOneyAddresses' => ['result' => true],
         ])
         ;
 

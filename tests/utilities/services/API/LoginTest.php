@@ -6,8 +6,6 @@ namespace PayPlug\tests\utilities\services\API;
  * @group unit
  * @group service
  * @group api_service
- *
- * @runTestsInSeparateProcesses
  */
 class LoginTest extends BaseApi
 {

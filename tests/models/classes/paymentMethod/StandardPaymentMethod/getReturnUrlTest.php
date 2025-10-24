@@ -9,8 +9,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group class
  * @group payment_method_class
  * @group standard_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
 class getReturnUrlTest extends BaseStandardPaymentMethod
 {
@@ -87,7 +85,9 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
             ->with('payplug.utilities.validator.regex')
             ->andReturn($regex_validator);
         $regex_validator->shouldReceive([
-            'isMobileDevice' => false,
+            'isMobileDevice' => [
+                'result' => false,
+            ],
         ]);
 
         $this->assertSame(
@@ -110,7 +110,9 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
             ->with('payplug.utilities.validator.regex')
             ->andReturn($regex_validator);
         $regex_validator->shouldReceive([
-            'isMobileDevice' => false,
+            'isMobileDevice' => [
+                'result' => false,
+            ],
         ]);
 
         $this->payment_repository->shouldReceive([

@@ -8,8 +8,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group action
  * @group card_action
- *
- * @runTestsInSeparateProcesses
  */
 class saveActionTest extends BaseCardAction
 {
