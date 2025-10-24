@@ -1,23 +1,101 @@
-#name: Testing Pipeline
-#
-#on:
-#  push:
-#    branches: [master, develop]
-#  pull_request:
-#
-#jobs:
-#  check_php_version:
+name: Testing Pipeline
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+
+#  check-php-syntax:
 #    runs-on: ubuntu-latest
 #    steps:
 #      - uses: actions/checkout@v4
-#      - name: Vérifier la syntaxe PHP
+#      - name: Installer PHP 7.2
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: '7.2'
+#      - name: Vérifier la syntaxe de tous les fichiers PHP
 #        run: |
-#          set +e
-#          sh dev/ci/check_php_syntax.sh
-#          exit_code=$?
-#          if [ $exit_code -eq 137 ]; then exit 126; fi
-#          if [ $exit_code -eq 1 ]; then exit 1; fi
-#          if [ $exit_code -ne 0 ]; then exit 1; fi
+#          find . -type f -name "*.php" ! -name "index.php" -print0 | xargs -0 -n1 php -l
+
+jobs:
+  test_php_unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: xdebug
+      - name: Récupération des fichiers dist payplug
+        run: ./dev/ci/dist_files.sh -b payplug
+      - name: Installer les dépendances Composer
+        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Installer les dépendances Composer
+        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: PHPUnit
+        run: ./vendor/bin/phpunit tests --bootstrap tests/bootstrap.php --coverage-text --colors=never -d memory_limit=-1
+      - name: Upload JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-tests
+          path: report/junit-tests.xml
+      - name: Upload couverture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: report/coverage.xml
+
+#  tests_unit:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        php-versions: [ '7.2' ]
+#    name: Php Version ${{ matrix.php-versions }}
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Setup PHP
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: ${{ matrix.php-versions }}
+#          tools: phpunit:5.7.27
+#      - name: Afficher la version de PHP
+#        run: php -v
+#      - name: Setup composer
+#        run: ./dev/ci/dist_files.sh -b payplug && composer dump-autoload
+#      - name: Lancer les tests PHPUnit
+#        run: phpunit --bootstrap tests/bootstrap.php tests -d memory_limit=-1
+
+
+
+#  sonarcloud:
+#    runs-on: ubuntu-latest
+#    continue-on-error: true
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          # Disabling shallow clone is recommended for improving relevancy of reporting
+#          fetch-depth: 0
+#      - name: SonarCloud Scan
+#        uses: sonarsource/sonarcloud-github-action@master
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        with:
+#          projectBaseDir: .
+#          args: >
+#            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+#            -Dsonar.projectKey=github-payplug-payplug-php
+#            -Dsonar.sources=lib/
+#            -Dsonar.test.exclusions=tests/**
+#            -Dsonar.tests=tests/
+#            -Dsonar.verbose=true
+
+
+
 #
 #  test_php_unit:
 #    runs-on: ubuntu-latest
@@ -42,16 +120,6 @@
 #        with:
 #          name: coverage
 #          path: report/coverage.xml
-#
-#  run_test:
-#    runs-on: ubuntu-latest
-#    needs: test_php_unit
-#    steps:
-#      - uses: actions/checkout@v4
-#      - name: Afficher info tests fonctionnels
-#        run: |
-#          echo "Les tests fonctionnels seraient déclenchés ici (ex: via une API ou un script)."
-#          # Adapter ici selon la logique de déclenchement souhaitée
 #
 #  scan_sonar:
 #    runs-on: ubuntu-latest
