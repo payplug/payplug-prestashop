@@ -1,102 +1,90 @@
-name: Publish Pipeline
-
-on:
-  push:
-    branches: [master, develop]
-  pull_request:
-
-jobs:
-  setup_vendor:
-    runs-on: ubuntu-latest
-    outputs:
-      artifact_version: ${{ steps.get_version.outputs.artifact_version }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup PHP 7.4
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.4'
-      - id: get_version
-        run: |
-          ARTIFACT_VERSION=$(jq -r '.version' dev/dist/payplug/composer.json)
-          echo "artifact_version=$ARTIFACT_VERSION" >> $GITHUB_OUTPUT
-      - name: Récupération des fichiers dist payplug
-        run: ./dev/ci/dist_files.sh -b payplug
-      - name: Composer install
-        run: composer install
-      - uses: actions/upload-artifact@v4
-        with:
-          name: vendor
-          path: vendor
-
-  build_translations:
-    runs-on: ubuntu-latest
-    needs: setup_vendor
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup PHP 7.4
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.4'
-      - name: Récupération des fichiers dist payplug
-        run: ./dev/ci/dist_files.sh -b payplug
-      - name: Générer les traductions
-        run: |
-          php dev/ci/generate-translations.php ${{ github.base_ref || github.ref_name }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: translations
-          path: dev/dist/payplug/translations.csv
-
-  build_static_assets:
-    runs-on: ubuntu-latest
-    needs: build_translations
-    steps:
-      - uses: actions/checkout@v4
-      - name: Récupération des fichiers dist payplug
-        run: ./dev/ci/dist_files.sh -b payplug
-      - name: Installer Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-      - name: Installer les dépendances
-        run: npm ci
-      - name: Build assets
-        run: npm run build
-      - name: Déplacer les assets
-        run: |
-          mkdir -p ./views/build/css ./views/build/js
-          mv ./views/css/*.css ./views/build/css
-          cp ./views/templates/index.php ./views/build/css
-          mv ./views/js/* ./views/build/js
-      - uses: actions/upload-artifact@v4
-        with:
-          name: build-assets
-          path: views/build/
-
-  package_and_publish:
-    runs-on: ubuntu-latest
-    needs: [setup_vendor, build_static_assets]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup PHP 7.4
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.4'
-      - uses: actions/download-artifact@v4
-        with:
-          name: build-assets
-          path: temp_build_assets
-      - name: Copier les assets buildés
-        run: cp -r temp_build_assets/* payplug/views/build/
-      - name: Récupération des fichiers dist payplug
-        run: ./dev/ci/dist_files.sh -b payplug
-      - name: Composer install --no-dev
-        run: composer install --no-dev
-      - name: Build package
-        run: ./dev/ci/build.sh -n payplug -c ${{ needs.setup_vendor.outputs.artifact_version }}
-      - name: Upload package
-        uses: actions/upload-artifact@v4
-        with:
-          name: payplug-package
-          path: payplug_*.zip
+#name: publish-workflow
+#on:
+#  push:
+#    branches:
+#      - master
+#      - develop
+#  pull_request:
+#
+#jobs:
+#  define-package-version:
+#    runs-on: ubuntu-latest
+#    outputs:
+#      artifact_version: ${{ steps.get_version.outputs.artifact_version }}
+#    steps:
+#      - uses: actions/checkout@v4
+#      - id: get_version
+#        run: |
+#          ARTIFACT_VERSION=$(jq -r '.version' dev/dist/payplug/composer.json)
+#          echo "artifact_version=$ARTIFACT_VERSION" >> $GITHUB_OUTPUT
+#
+#  build-package:
+#    runs-on: ubuntu-latest
+#    needs: [define-package-version]
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Setup PHP 7.4
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: '7.4'
+#
+#      - name: Récupération des fichiers dist payplug
+#        run: ./dev/ci/dist_files.sh -b payplug
+#
+#      - name: Générer les traductions
+#        run: |
+#          php dev/ci/generate-translations.php ${{ github.base_ref || github.ref_name }}
+#
+#      - name: Installer Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: '16'
+#
+#      - name: Installer les dépendances && build les assets
+#        run: |
+#          npm ci
+#          echo "Install dependencies"
+#          npm install --save-dev webpack
+#          npm run build
+#          echo "Get files from node module payplug-ui-plugins-bo"
+#          mkdir -p ./views/js ./views/css ./views/img
+#          cp ./node_modules/payplug-ui-plugins-bo/js/* ./views/js/
+#          cp ./node_modules/payplug-ui-plugins-bo/css/* ./views/css/
+#          cp ./node_modules/payplug-ui-plugins-bo/img/* ./views/img/
+#
+#      - name: Composer install --no-dev
+#        run: composer install --no-dev
+#
+#      - name: Build the package
+#        run: |
+#          echo "Set files licenses"
+#          ./dev/ci/set_licenses.sh -b payplug
+#
+#          echo "Create empty log files for installation"
+#          echo "" > log/install-log.csv
+#
+#          echo "Creating the package zip file"
+#          php dev/ci/list_module_files.php .
+#
+#          echo "Remove unnecessary files"
+#          rm -rf node_modules dev tests
+#
+#          echo "Generating plugin dir then move file in created folder"
+#          mkdir payplug
+#          find . -maxdepth 1 ! -name payplug ! -name '.' -exec mv {} payplug/ \;
+#
+#          echo "Check the content"
+#          ls -la
+#
+#          echo "and plugin dir"
+#          ls -la payplug
+#
+#          echo "Zipping payplug directory"
+#          zip -r payplug-${{ needs.define-package-version.outputs.artifact_version }}.zip payplug
+#
+#      - name: Upload package
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: payplug-${{ needs.define-package-version.outputs.artifact_version }}
+#          path: payplug-${{ needs.define-package-version.outputs.artifact_version }}.zip
