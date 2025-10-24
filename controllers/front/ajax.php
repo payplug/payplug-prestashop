@@ -371,6 +371,99 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'result' => true,
                     'message' => $message, // adapter error
                 ]));
+            } elseif (($tools->tool('getIsset', 'createHF'))) {
+                $hf_token = $tools->tool('getValue', 'hfToken');
+                if (false == $hf_token) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => 'Missing hosted fields token',
+                    ]));
+                }
+
+                $payment = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentAction()
+                    ->dispatchAction('standard', true);
+
+                $payment['force_reload'] = false;
+
+                if (empty($payment) || !isset($payment['resource_id']) || !isset($payment['cart_id'])) {
+                    $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
+                        $this->dependencies
+                            ->getPlugin()
+                            ->getTranslationClass()
+                            ->l('The transaction was not completed and your card was not charged.', 'ajax'),
+                    ]);
+                    $payment = [
+                        'result' => false,
+                        'force_reload' => true,
+                        'return_url' => $context->link->getPageLink('order', true, $context->language->id, [
+                            'step' => '3',
+                            'has_error' => '1',
+                            'modulename' => $this->dependencies->name,
+                        ]),
+                        'message' => 'Payment creation failed',
+                    ];
+
+                    exit(json_encode($payment));
+                }
+
+                // Retrieve stored resource from repository using cart id
+                $stored_resource = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentRepository()
+                    ->getBy('id_cart', (int) $payment['cart_id']);
+
+                if (empty($stored_resource) || $stored_resource['resource_id'] !== $payment['resource_id']) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => 'Hosted fields payment resource mismatch',
+                        'force_reload' => true,
+                        'return_url' => $context->link->getPageLink('order', true, $context->language->id, [
+                            'step' => '3',
+                            'has_error' => '1',
+                            'modulename' => $this->dependencies->name,
+                        ]),
+                    ]));
+                }
+
+                // Retrieve payment status via API
+                $retrieve = $this->dependencies
+                    ->getPlugin()
+                    ->getPaymentMethodClass()
+                    ->getPaymentMethod($stored_resource['method'])
+                    ->retrieve($stored_resource['resource_id']);
+
+                if (!$retrieve['result']) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => $retrieve['message'],
+                    ]));
+                }
+                $retrieved_payment = $retrieve['resource'];
+
+                // Failure check
+                if ($this->validators['payment']->isFailed($retrieved_payment)['result']) {
+                    exit(json_encode([
+                        'result' => false,
+                        'message' => $retrieved_payment->failure->message,
+                    ]));
+                }
+
+                $return_url = $context->link->getModuleLink(
+                    $this->dependencies->name,
+                    'validation',
+                    ['ps' => 1, 'cartid' => (int) $payment['cart_id']],
+                    true
+                );
+
+                exit(json_encode([
+                    'result' => true,
+                    'return_url' => $return_url,
+                    'resource_id' => $payment['resource_id'],
+                    'cart_id' => $payment['cart_id'],
+                    'message' => 'Success',
+                ]));
             } elseif ($tools->tool('getValue', 'method')) {
                 $method = $tools->tool('getValue', 'method');
                 $params = $tools->tool('getValue', 'params', []);

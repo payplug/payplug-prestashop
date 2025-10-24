@@ -14,5 +14,9 @@ class BaseMybankPaymentMethod extends BasePaymentMethod
         $this->class = \Mockery::mock(MybankPaymentMethod::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
+        $this->configuration->shouldReceive('getValue')
+            ->with('multi_account')
+            ->andReturn(json_encode([]))
+            ->byDefault();
     }
 }

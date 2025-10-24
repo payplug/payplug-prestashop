@@ -147,7 +147,7 @@ class Configuration
         'multi_account' => [
             'type' => 'string',
             'name' => 'MULTI_ACCOUNT',
-            'defaultValue' => '{"api_key_id":"","api_key":""}',
+            'defaultValue' => '{"api_key_id":"","api_key":"","account_key":""}',
             'setConf' => 1,
         ],
         'oauth_client_data' => [

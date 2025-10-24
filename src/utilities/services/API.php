@@ -1035,13 +1035,14 @@ class API
     }
 
     /**
-     * @param string $resource_id
+     * @param $resource_id
+     * @param $is_hosted_fields
      *
      * @return array
      */
-    public function retrievePayment($resource_id = '')
+    public function retrievePayment($resource_id = '', $is_hosted_fields = false)
     {
-        if (!$resource_id || !is_string($resource_id)) {
+        if (!$resource_id || (!is_string($resource_id) && !is_array($resource_id))) {
             return [
                 'result' => false,
                 'code' => null,
@@ -1064,7 +1065,7 @@ class API
                 $response = [
                     'result' => true,
                     'code' => 200,
-                    'resource' => Payment::retrieve($resource_id, $this->api),
+                    'resource' => Payment::retrieve($resource_id, $this->api, $is_hosted_fields),
                 ];
             }
         } catch (ConfigurationNotSetException $e) {
@@ -1110,6 +1111,13 @@ class API
         }
         if (isset($_ENV['SERVICE_BASE_URL'])) {
             APIRoutes::setServiceBaseUrl($_ENV['SERVICE_BASE_URL']);
+        }
+        // set Hosted Fields routes
+        if (isset($_ENV['HOSTED_FIELDS_RESOURCE'])) {
+            APIRoutes::setHostedFieldsResource($_ENV['HOSTED_FIELDS_RESOURCE']);
+        }
+        if (isset($_ENV['HOSTED_FIELDS_RESOURCE_RETRIEVE'])) {
+            APIRoutes::setHostedFieldsResourceRetrieve($_ENV['HOSTED_FIELDS_RESOURCE_RETRIEVE']);
         }
     }
 

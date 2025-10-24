@@ -217,5 +217,9 @@ class BasePaymentMethod extends TestCase
         $this->class = \Mockery::mock(PaymentMethod::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
+        $this->configuration->shouldReceive('getValue')
+            ->with('multi_account')
+            ->andReturn(json_encode([]))
+            ->byDefault();
     }
 }

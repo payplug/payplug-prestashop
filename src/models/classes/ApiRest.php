@@ -530,6 +530,14 @@ class ApiRest
                     ? $multi_account['api_key']
                     : '',
             ],
+            [
+                'name' => 'account_key',
+                'label' => $translation['inputs']['account_key']['label'],
+                'placeholder' => $translation['inputs']['account_key']['placeholder'],
+                'value' => isset($multi_account['account_key']) && $multi_account['account_key']
+                    ? $multi_account['account_key']
+                    : '',
+            ],
         ];
         $inputs = array_merge($inputs_identifiers, $inputs);
 
