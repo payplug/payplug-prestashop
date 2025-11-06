@@ -34,4 +34,6 @@ interface CurrencyInterface
     public function getCurrency($idCurrency);
 
     public function getIdByIsoCode($isoCode);
+
+    public function findAll($active, $groupBy, $currentShopOnly);
 }

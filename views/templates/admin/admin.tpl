@@ -22,5 +22,5 @@
 
 <div id="payplug_admin"></div>
 
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-1.7.12.js"></script>
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-1.7.12.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-2.0.0.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-2.0.0.js"></script>

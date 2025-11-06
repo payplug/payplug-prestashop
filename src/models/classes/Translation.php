@@ -263,6 +263,31 @@ class Translation
     /**
      * @return array
      */
+    public function getMultiAccountTranslations()
+    {
+        return [
+            'title' => $this->l('multi_account.title', 'translation'),
+            'description' => $this->l('multi_account.description', 'translation'),
+            'inputs' => [
+                'identifier' => [
+                    'label' => $this->l('multi_account.inputs.identifier.label', 'translation'),
+                    'placeholder' => $this->l('multi_account.inputs.identifier.placeholder', 'translation'),
+                ],
+                'api_key_id' => [
+                    'label' => $this->l('multi_account.inputs.api_key_id.label', 'translation'),
+                    'placeholder' => $this->l('multi_account.inputs.api_key_id.placeholder', 'translation'),
+                ],
+                'api_key' => [
+                    'label' => $this->l('multi_account.inputs.api_key.label', 'translation'),
+                    'placeholder' => $this->l('multi_account.inputs.api_key.placeholder', 'translation'),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getOrderTranslations()
     {
         return [

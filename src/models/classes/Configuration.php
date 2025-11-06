@@ -144,6 +144,12 @@ class Configuration
             'defaultValue' => null,
             'setConf' => 1,
         ],
+        'multi_account' => [
+            'type' => 'string',
+            'name' => 'MULTI_ACCOUNT',
+            'defaultValue' => '{"api_key_id":"","api_key":""}',
+            'setConf' => 1,
+        ],
         'oauth_client_data' => [
             'type' => 'string',
             'name' => 'OAUTH_CLIENT_DATA',
