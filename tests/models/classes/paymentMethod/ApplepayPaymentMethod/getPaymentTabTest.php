@@ -30,9 +30,16 @@ class getPaymentTabTest extends BaseApplepayPaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->tools_adapter->shouldReceive([
-            'tool' => 'shop domain ssl',
-        ]);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getShopDomainSsl', true, false)
+            ->andReturn('shop domain ssl');
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'hfToken')
+            ->andReturn('');
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'workflow')
+            ->andReturn('shopping-cart');
+
         $this->helpers['amount']->shouldReceive([
             'validateAmount' => [
                 'result' => true,

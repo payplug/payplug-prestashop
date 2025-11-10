@@ -955,6 +955,7 @@ class ConfigurationAction
                         break;
 
                     case 0 === strpos($config, 'payplug_identifier'):
+                    case 'payplug_account_key' == $config:
                     case 'payplug_api_key' == $config:
                     case 'payplug_api_key_id' == $config:
                         $multi_account[$key] = (string) $value;

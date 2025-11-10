@@ -1708,10 +1708,14 @@ var $document, $window, __moduleName__Module = {
                 if (document.getElementById(payment_option_id)) {
                     $document.on('click', '#' + payment_option_id, hosted.form.set);
                 }
+                // Bind tokenize handler only to hosted fields form (minimal change)
+                var $hfForm = $('.' + hosted.props.identifier);
+                if ($hfForm.length) {
+                    $hfForm.on('submit', hosted.form.tokenizeHandler);
+                }
             },
             set: function () {
                 const hosted = __moduleName__Module.hosted_fields;
-                // already HF initialized
                 if (hosted.props.hostedFieldsInstance) return;
                 if (!window.dalenys || !window.dalenys.hostedFields) {
                     if (hosted.props.attempts++ >= hosted.props.maxAttempts) {
@@ -1728,7 +1732,7 @@ var $document, $window, __moduleName__Module = {
                 });
                 try {
                     hosted.props.hostedFieldsInstance = window.dalenys.hostedFields({
-                        key: { id: 'fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f', value: 'Gf=}k6]*E@EYBxau' },
+                        key: { id: '1a8172b3-a060-4bce-b0ea-9abcdf288ff6', value: ')N-wwom4KmZ3aui$' },
                         fields: {
                             card: {
                                 id: 'card-container',
@@ -1855,10 +1859,89 @@ var $document, $window, __moduleName__Module = {
                 if (hosted.props.hostedFieldsInstance && hosted.props.hostedFieldsInstance.load) {
                     hosted.props.hostedFieldsInstance.load();
                 }
+            },
+            tokenizeHandler: function (event) {
+                var hosted = __moduleName__Module.hosted_fields;
+                var payment_option_id = hosted.props.paymentOptionId;
+                var selected = $('input[name="payment-option"]:checked').attr('id');
+                if (selected !== payment_option_id) { return true; }
+                if (hosted.props.hostedFieldsInstance && hosted.props.hostedFieldsInstance.createToken) {
+                    event.preventDefault();
+                    hosted.props.hostedFieldsInstance.createToken(function (result) {
+                        if (result && result.execCode === '0000') {
+                            var token = result.hfToken;
+                            $('#hf-token').val(token);
+                            $('#selected-brand').val(result.selectedBrand || '');
+                            hosted.form.createHF(token, event.target);
+                        }
+                    });
+                    return false;
+                }
+                return true;
+            },
+            validate: function(event){
+                return this.tokenizeHandler(event || {preventDefault:function(){}, target: $('.'+__moduleName__Module.hosted_fields.props.identifier).get(0)});
+            },
+            createHF: function(hfToken, formHh){
+                var hosted = __moduleName__Module.hosted_fields;
+                var integratedRoot = hosted.props.integratedIdentifier;
+                if(!hfToken){
+                    console.warn('[HostedFields] createHF aborted: missing token');
+                    if(formHf) formHf.submit();
+                    return;
+                }
+                if(hosted.props.query){
+                    try{ hosted.props.query.abort(); }catch(e){}
+                    hosted.props.query = null;
+                }
+                // reset payment/api errors
+                $('.'+integratedRoot+'_error.-payment').removeClass('-show');
+                $('.'+integratedRoot+'_error.-api').removeClass('-show');
+
+                if(__moduleName__Module.tools && __moduleName__Module.tools.loadSpinner){
+                    __moduleName__Module.tools.loadSpinner();
+                }
+                hosted.props.query = $.ajax({
+                    type: 'POST',
+                    url: window['__moduleName___ajax_url'],
+                    dataType: 'json',
+                    data: { _ajax:1, createHF:1, hfToken: hfToken },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        console.log('[HostedFields] createHF error', jqXHR, textStatus, errorThrown);
+                        if(__moduleName__Module.tools && __moduleName__Module.tools.removeSpinner){
+                            __moduleName__Module.tools.removeSpinner();
+                        }
+                        // show generic error and do not submit form
+                        $('.'+integratedRoot+'_error.-payment').text(integratedPaymentError).addClass('-show');
+                    },
+                    success: function(resp){
+                        if(__moduleName__Module.tools && __moduleName__Module.tools.removeSpinner){
+                            __moduleName__Module.tools.removeSpinner();
+                        }
+                        console.log(resp);
+                        // Successful payment confirmation -> redirect
+                        if(resp && resp.result && resp.return_url){
+                            console.log('redirect');
+                            window.location.href = resp.return_url;
+                            return;
+                        }
+                        // Force reload scenario
+                        if(resp && resp.force_reload && resp.return_url){
+                            console.log('force reload');
+                            window.location.href = resp.return_url;
+                            return;
+                        }
+                        // Failure -> show error, do not auto-submit
+                        var message = (resp && resp.message) ? resp.message : integratedPaymentError;
+                        $('.'+integratedRoot+'_error.-payment').text(message).addClass('-show');
+                        console.warn('[HostedFields] createHF server rejected token');
+                    }
+                });
             }
         }
     },
 };
+
 
 $(document).ready(function () {
     $document = $(document);
@@ -1867,3 +1950,4 @@ $(document).ready(function () {
 });
 
 window['__moduleName__Module'] = __moduleName__Module;
+

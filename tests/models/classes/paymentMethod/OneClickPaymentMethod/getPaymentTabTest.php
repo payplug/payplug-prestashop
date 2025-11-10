@@ -54,9 +54,16 @@ class getPaymentTabTest extends BaseOneClickPaymentMethod
             'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
-        $this->tools_adapter->shouldReceive([
-            'tool' => 'shop domain ssl',
-        ]);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getShopDomainSsl', true, false)
+            ->andReturn('shop domain ssl');
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'hfToken')
+            ->andReturn('');
+
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'pc', 'new_card')
+            ->andReturn('some_expected_value');
 
         $this->card_repository->shouldReceive([
             'getEntity' => [

@@ -128,6 +128,9 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('redirect');
+        $this->configuration->shouldReceive('getValue')
+            ->with('multi_account')
+            ->andReturn(json_encode([]));
 
         $this->expected_tab['authorized_amount'] = $this->expected_tab['amount'];
         unset($this->expected_tab['amount']);

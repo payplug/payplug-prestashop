@@ -16,5 +16,9 @@ class BaseOneyPaymentMethod extends BasePaymentMethod
             ->shouldAllowMockingProtectedMethods();
         $this->class->set('translation', $this->translation->getPaylaterTranslations());
         $this->class->set('logger', $this->logger);
+        $this->configuration->shouldReceive('getValue')
+            ->with('multi_account')
+            ->andReturn(json_encode([]))
+            ->byDefault();
     }
 }

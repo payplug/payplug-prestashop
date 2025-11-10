@@ -86,9 +86,9 @@ class PrestashopAdapter17
         $currency = $this->context->currency;
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
             && $this->dependencies->configClass->isValidFeature('feature_integrated')
-            && empty($multi_account['identifier_' . strtolower($currency->iso_code)])
             && array_key_exists('standard', $payment_options)
             && 'integrated' == (string) $this->configuration->getvalue('embedded_mode')
+            && 'EUR' === $currency->iso_code
         ) {
             $payment_options = $this->dependencies
                 ->getPlugin()
@@ -99,6 +99,7 @@ class PrestashopAdapter17
             && !empty($multi_account['identifier_' . strtolower($currency->iso_code)])
             && array_key_exists('standard', $payment_options)
             && 'integrated' == (string) $this->configuration->getvalue('embedded_mode')
+            && 'EUR' !== $currency->iso_code
         ) {
             $payment_options = $this->dependencies
                 ->getPlugin()

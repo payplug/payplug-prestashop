@@ -94,9 +94,12 @@ class getPaymentTabTest extends BasePaymentMethod
             'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
-        $this->tools_adapter->shouldReceive([
-            'tool' => 'shop domain ssl',
-        ]);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getShopDomainSsl', true, false)
+            ->andReturn('shop domain ssl');
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'hfToken')
+            ->andReturn('');
 
         $expected_tab = [
             'amount' => 4242,
@@ -173,9 +176,12 @@ class getPaymentTabTest extends BasePaymentMethod
             'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
-        $this->tools_adapter->shouldReceive([
-            'tool' => 'shop domain ssl',
-        ]);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getShopDomainSsl', true, false)
+            ->andReturn('shop domain ssl');
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'hfToken')
+            ->andReturn('');
 
         $expected_tab = [
             'amount' => 4242,
@@ -195,5 +201,67 @@ class getPaymentTabTest extends BasePaymentMethod
         ];
 
         $this->assertSame($expected_tab, $this->class->getPaymentTab());
+    }
+
+    public function testWhenHostedFieldsPaymentTabIsReturn()
+    {
+        $this->class->set('name', 'standard');
+        $this->validate_adapter->shouldReceive('validate')->andReturn(true);
+        $this->configuration->shouldReceive('getValue')->with('currencies')->andReturn('EUR');
+        $this->helpers['amount']->shouldReceive([
+            'validateAmount' => ['result' => true],
+            'convertAmount' => 4242,
+        ]);
+
+        $this->configuration->shouldReceive('getValue')
+            ->with('currencies')
+            ->andReturn('USD');
+        $config_class = \Mockery::mock('ConfigClass');
+
+        $config_class->shouldReceive([
+            'getIsoCodeByCountryId' => 'fr',
+            'formatPhoneNumber' => '0612345678',
+            'getIsoFromLanguageCode' => 'fr',
+        ]);
+        $this->dependencies->configClass = $config_class;
+        $this->tools_adapter->shouldReceive('tool')->with('getShopDomainSsl', true, false)->andReturn('shop domain ssl');
+        $this->tools_adapter->shouldReceive('tool')->with('getValue', 'hfToken')->andReturn('hf token value');
+        $this->tools_adapter->shouldReceive('tool')->with('getValue', 'save_card')->andReturn('0');
+        $this->configuration->shouldReceive('getValue')->with('multi_account')->andReturn(json_encode([
+            'identifier_eur' => 'IDENTIFIER',
+            'api_key_id' => 'APIKEYID',
+            'api_key' => 'APIKEY',
+        ]));
+        $result = $this->class->getPaymentTab();
+        $expected_tab = [
+            'method' => 'payment',
+            'params' => [
+                'IDENTIFIER' => 'IDENTIFIER',
+                'OPERATIONTYPE' => 'payment',
+                'AMOUNT' => 4242,
+                'VERSION' => '3.0',
+                'CARDFULLNAME' => 'Ipsum Lorem',
+                'CLIENTIDENT' => 'IpsumLorem',
+                'CLIENTEMAIL' => 'customer@payplug.com',
+                'CLIENTREFERRER' => 'shop domain ssl',
+                'CLIENTUSERAGENT' => 'Unknown',
+                'CLIENTIP' => 'Unknown',
+                'ORDERID' => 1,
+                'DESCRIPTION' => 'N.a.',
+                'CREATEALIAS' => 'no',
+                'APIKEYID' => 'APIKEYID',
+                'HFTOKEN' => 'hf token value',
+                'BILLINGADDRESS' => '1 rue de l\'avenue',
+                'BILLINGPOSTALCODE' => '75000',
+                'BILLINGCOUNTRY' => 'fr',
+                'MOBILEPHONE' => '0612345678',
+                'SHIPTOADDRESS' => '1 rue de l\'avenue',
+                'SHIPTOPOSTALCODE' => '75000',
+                'SHIPTOCOUNTRY' => 'fr',
+            ],
+        ];
+        $hash = $this->class->buildHashContent($expected_tab['params'], false);
+        $expected_tab['params']['HASH'] = $hash;
+        $this->assertSame($expected_tab, $result);
     }
 }
