@@ -547,7 +547,7 @@ class ConfigurationAction
         }
         $configuration->set('oauth_client_data', json_encode($oauth_client_data['data']));
 
-        // If jwt doesn't exists, we generate one.
+        // If jwt doesn't exist, we generate one.
         $jwt = $merchant->generateJWT($oauth_client_data['data']);
         if (empty($jwt) || !$jwt['result']) {
             $this->dependencies

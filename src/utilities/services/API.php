@@ -106,11 +106,10 @@ class API
     }
 
     /**
-     * @todo: cover this method
-     *
      * @param string $resource_id
      *
      * @return array
+     * @todo: cover this method
      */
     public function abortPayment($resource_id = '')
     {
@@ -728,29 +727,7 @@ class API
             $is_live = !(bool) $configuration->getValue('sandbox_mode');
         }
 
-        $mode = $is_live ? 'live' : 'test';
-        $configuration_key = $mode . '_api_key';
-        $token = $configuration->getValue($configuration_key);
-        $jwt = json_decode($configuration->getValue('jwt'), true);
-        if ($jwt && !empty($jwt)) {
-            $oauth_client_data = json_decode($configuration->getValue('oauth_client_data'), true);
-            $validate_jwt = Authentication::validateJWT($oauth_client_data[$mode], $jwt[$mode]);
-            if (empty($validate_jwt['token'])) {
-                $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be validated', 'error');
-
-                return null;
-            }
-
-            // todo: This calculation should be done in payplug-php
-            $validate_jwt['token']['expires_date'] -= 30;
-
-            $jwt[$mode] = $validate_jwt['token'];
-
-            if ($validate_jwt['need_update']) {
-                $configuration->set('jwt', json_encode($jwt));
-            }
-            $token = $jwt[$mode]['access_token'];
-        }
+        $token = $this->getApiBearer($is_live);
 
         $this->current_api_key = $token;
         $this->setUserAgent();
@@ -1111,6 +1088,56 @@ class API
         if (isset($_ENV['SERVICE_BASE_URL'])) {
             APIRoutes::setServiceBaseUrl($_ENV['SERVICE_BASE_URL']);
         }
+    }
+
+    /**
+     * @description Get api bearer from authentication way define in database
+     *
+     * @param bool $is_live
+     *
+     * @return string
+     */
+    protected function getApiBearer($is_live = true)
+    {
+        $this->setParameters();
+
+        $configuration = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass();
+
+        $mode = $is_live ? 'live' : 'test';
+        $configuration_key = $mode . '_api_key';
+        $token = $configuration->getValue($configuration_key);
+        $jwt = json_decode($configuration->getValue('jwt'), true);
+        $oauth_client_data = json_decode($configuration->getValue('oauth_client_data'), true);
+
+        if ($jwt && !empty($jwt) && !empty($oauth_client_data)) {
+            try {
+                $validate_jwt = Authentication::validateJWT($oauth_client_data[$mode], $jwt[$mode]);
+            } catch (\Exception $e) {
+                $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - Error thrown: ' . $e->getMessage(), 'error');
+
+                return '';
+            }
+
+            if (empty($validate_jwt['token'])) {
+                $this->dependencies->getPlugin()->getLogger()->addLog('Api::initialize - JWT can\'t be validated', 'error');
+
+                return '';
+            }
+
+            // todo: This calculation should be done in payplug-php
+            $validate_jwt['token']['expires_date'] -= 30;
+
+            $jwt[$mode] = $validate_jwt['token'];
+
+            if ($validate_jwt['need_update']) {
+                $configuration->set('jwt', json_encode($jwt));
+            }
+            $token = $jwt[$mode]['access_token'];
+        }
+
+        return $token;
     }
 
     /**
