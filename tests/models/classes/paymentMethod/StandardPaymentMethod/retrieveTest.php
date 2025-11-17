@@ -31,7 +31,7 @@ class retrieveTest extends BaseStandardPaymentMethod
     }
 
     /**
-     * @dataProvider invalidStringFormatDataProvider
+     * @dataProvider invalidRetrieveDataFormatDataProvider
      *
      * @param mixed $resource_id
      */

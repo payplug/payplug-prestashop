@@ -30,9 +30,12 @@ class getPaymentTabTest extends BaseAmexPaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->tools_adapter->shouldReceive([
-            'tool' => 'shop domain ssl',
-        ]);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getShopDomainSsl', true, false)
+            ->andReturn('shop domain ssl');
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'hfToken')
+            ->andReturn('');
         $this->helpers['amount']->shouldReceive([
             'validateAmount' => [
                 'result' => true,

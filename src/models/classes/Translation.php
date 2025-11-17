@@ -281,6 +281,10 @@ class Translation
                     'label' => $this->l('multi_account.inputs.api_key.label', 'translation'),
                     'placeholder' => $this->l('multi_account.inputs.api_key.placeholder', 'translation'),
                 ],
+                'account_key' => [
+                    'label' => $this->l('multi_account.inputs.account_key.label', 'translation'),
+                    'placeholder' => $this->l('multi_account.inputs.account_key.placeholder', 'translation'),
+                ],
             ],
         ];
     }

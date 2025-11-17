@@ -351,11 +351,9 @@ class PaymentAction
 
             return [];
         }
-
         $cart_id = $this->plugin
             ->getContext()
             ->get()->cart->id;
-
         // If a payment exists, we try to cancel it and remove from database.
         $resource = $this->plugin
             ->getPaymentRepository()
@@ -371,19 +369,33 @@ class PaymentAction
                 return [];
             }
         }
-
         // Create the payment from given payment_tab
         $payment_method = $this->plugin
             ->getPaymentMethodClass()
             ->getPaymentMethod($method);
-
         $resource = $payment_method->saveResource($payment_tab);
         if (!$resource['result']) {
             $this->logger->addLog('PaymentAction::createAction - Resource can\'t be created from given tab.', 'error');
 
             return [];
         }
-
+        //retrieve if hosted fields
+        if (is_string($resource['resource']) && isset(json_decode($resource['resource'], true)['TRANSACTIONID'])) {
+            $api_service = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api');
+            $hosted_fields_data = $this->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('standard')
+                ->BuildRetrieveHostedFieldsData(json_decode($resource['resource'], true)['TRANSACTIONID']);
+            $resource = $api_service->retrievePayment($hosted_fields_data, true);
+            $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+            // Hosted Fields response does not include is_live field in the getTransactions return
+            $resource['resource']->is_live = !(bool) $configuration->getValue('sandbox_mode');
+        }
         // Generate the hash and create payment in database
         $payment_hash = $payment_method->getPaymentMethodHash($payment_tab, $resource['resource']->is_live);
         $parameters = [
@@ -426,7 +438,6 @@ class PaymentAction
     public function dispatchAction($method = '', $force = false)
     {
         $this->setParameters();
-
         if (!is_string($method) || !$method) {
             $this->logger->addLog('PaymentAction::dispatchAction - Invalid argument, $method must be a string.', 'error');
 
@@ -483,14 +494,11 @@ class PaymentAction
                     break;
             }
         }
-
         // Generate payment tab from proper payment method
         $payment_method = $this->plugin
             ->getPaymentMethodClass()
             ->getPaymentMethod($method);
-
         $payment_tab = $payment_method->getPaymentTab();
-
         if (empty($payment_tab)) {
             $this->logger->addLog('PaymentAction::dispatchAction - Cannot generate payment tab.', 'error');
 
@@ -505,12 +513,10 @@ class PaymentAction
         $stored_resource = $this->plugin
             ->getPaymentRepository()
             ->getBy('id_cart', (int) $cart_id);
-
         $should_create_resource = $force_resource_creation
             || empty($stored_resource)
             || !$payment_method->isValidResource()
             || $stored_resource['method'] != $method;
-
         if ($should_create_resource) {
             return $this->createAction($method, $payment_tab);
         }
@@ -724,8 +730,8 @@ class PaymentAction
             return false;
         }
 
-        // Check the resource is cancellable
-        if (!$resource['resource']->failure && $cancellable) {
+        // Check the resource is cancellable and if is not Hosted fields
+        if (!$resource['resource']->failure && $cancellable && (0 === strpos($resource_id, 'pay'))) {
             $abort = $payment_method->abort($resource_id);
             if (!$abort['result']) {
                 $this->logger->addLog('PaymentAction::removeAction - Can\'t abord the retrieved resource.', 'error');

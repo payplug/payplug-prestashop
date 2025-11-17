@@ -95,4 +95,13 @@ trait FormatDataProvider
 
         yield [null];
     }
+
+    public function invalidRetrieveDataFormatDataProvider()
+    {
+        yield [42];
+
+        yield [false];
+
+        yield [null];
+    }
 }

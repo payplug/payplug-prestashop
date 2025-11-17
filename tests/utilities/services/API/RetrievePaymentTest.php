@@ -14,7 +14,7 @@ use PayPlug\tests\mock\PaymentMock;
 class RetrievePaymentTest extends BaseApi
 {
     /**
-     * @dataProvider invalidStringFormatDataProvider
+     * @dataProvider invalidRetrieveDataFormatDataProvider
      *
      * @param mixed $resource_id
      */
