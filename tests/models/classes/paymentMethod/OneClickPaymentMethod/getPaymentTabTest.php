@@ -9,8 +9,6 @@ use PayPlug\tests\mock\ContextMock;
  * @group class
  * @group payment_method_class
  * @group oneclick_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
 class getPaymentTabTest extends BaseOneClickPaymentMethod
 {

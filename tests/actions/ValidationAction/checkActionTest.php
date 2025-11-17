@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\ValidationAction;
  * @group unit
  * @group action
  * @group validation_action
- *
- * @runTestsInSeparateProcesses
  */
 class checkActionTest extends BaseValidationAction
 {

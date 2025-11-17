@@ -7,8 +7,6 @@ namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
  * @group class
  * @group payment_method_class
  * @group standard_payment_method_class
- *
- * @runTestsInSeparateProcesses
  */
 class getOptionTest extends BaseStandardPaymentMethod
 {

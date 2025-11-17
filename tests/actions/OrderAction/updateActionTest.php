@@ -9,8 +9,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group action
  * @group order_action
- *
- * @runTestsInSeparateProcesses
  */
 class updateActionTest extends BaseOrderAction
 {

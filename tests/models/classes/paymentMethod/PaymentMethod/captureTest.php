@@ -9,9 +9,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  * @group unit
  * @group class
  * @group payment_method_class
- * @group parent_payment_method_classe
- *
- * @runTestsInSeparateProcesses
+ * @group parent_payment_method_class
  */
 class captureTest extends BasePaymentMethod
 {

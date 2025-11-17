@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group validator
  * @group order_validator
- *
- * @runTestsInSeparateProcesses
  */
 class isSameAmountTest extends TestCase
 {

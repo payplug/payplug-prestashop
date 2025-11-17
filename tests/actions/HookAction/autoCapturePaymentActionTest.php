@@ -9,8 +9,6 @@ use PayPlug\tests\mock\PaymentMock;
  * @group unit
  * @group action
  * @group hook_action
- *
- * @runTestsInSeparateProcesses
  */
 class autoCapturePaymentActionTest extends BaseHookAction
 {
