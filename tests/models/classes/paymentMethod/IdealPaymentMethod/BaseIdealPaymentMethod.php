@@ -14,5 +14,9 @@ class BaseIdealPaymentMethod extends BasePaymentMethod
         $this->class = \Mockery::mock(IdealPaymentMethod::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
+        $this->configuration->shouldReceive('getValue')
+            ->with('multi_account')
+            ->andReturn(json_encode([]))
+            ->byDefault();
     }
 }

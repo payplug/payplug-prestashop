@@ -392,10 +392,14 @@ class PaymentMethod
 
             return [];
         }
-
-        $amount = $this->dependencies
-            ->getHelpers()['amount']
-            ->convertAmount($resource->amount, true);
+        if (0 === strpos($resource->id, 'pay_')) {
+            $amount = $this->dependencies
+                ->getHelpers()['amount']
+                ->convertAmount($resource->amount, true);
+        } else {
+            // no need to convert amount for  Hosted Fields resource
+            $amount = $resource->amount;
+        }
 
         $state_addons = $resource->is_live ? '' : '_test';
         $state = (bool) $resource->is_paid ? 'order_state_paid' : 'order_state_pending';
@@ -630,12 +634,12 @@ class PaymentMethod
         }
 
         $supported_currencies = explode(';', $this->configuration->getValue('currencies'));
-        if (!in_array($this->context->currency->iso_code, $supported_currencies, true)) {
+        $multi_account = json_decode($this->configuration->getValue('multi_account'), true);
+        if (!in_array($this->context->currency->iso_code, $supported_currencies, true) && empty($multi_account['identifier_' . strtolower($this->context->currency->iso_code)])) {
             $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Currency object is not supported.');
 
             return [];
         }
-
         // Check amount
         $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
         $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
@@ -794,7 +798,92 @@ class PaymentMethod
             $payment_tab['billing'] = $billing;
         }
 
+        // Hosted fields parameters handling
+        $hfToken = $this->tools->tool('getValue', 'hfToken');
+        if ($hfToken) {
+            // Removed debug print to prevent polluting JSON response
+            $multi_account = json_decode($this->configuration->getValue('multi_account'), true);
+            // Build hosted fields payment tab structure
+            $save_card_flag = $this->tools->tool('getValue', 'save_card');
+            $save_card = (bool) $save_card_flag;
+            $return_url = $payment_tab['hosted_payment']['return_url'];
+            $identifier = $multi_account['identifier_' . strtolower($this->context->currency->iso_code)];
+            $api_key_id = $multi_account['api_key_id'];
+            $billing_first = isset($payment_tab['billing']['first_name']) ? $payment_tab['billing']['first_name'] : '';
+            $billing_last = isset($payment_tab['billing']['last_name']) ? $payment_tab['billing']['last_name'] : '';
+            $client_email = (bool) $valid_customer ? $this->context->customer->email : '';
+            $order_id = (int) $this->context->cart->id;
+            $description = 'N.a.';
+
+            $amount = $payment_tab['amount'];
+            $params = [
+                'IDENTIFIER' => $identifier,
+                'OPERATIONTYPE' => 'payment',
+                'AMOUNT' => $amount,
+                'VERSION' => '3.0',
+                'CARDFULLNAME' => trim($billing_first . ' ' . $billing_last),
+                'CLIENTIDENT' => trim($billing_first . $billing_last),
+                'CLIENTEMAIL' => $client_email,
+                'CLIENTREFERRER' => substr($this->tools->tool('getShopDomainSsl', true, false), 0, 500),
+                'CLIENTUSERAGENT' => isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'Unknown',
+                'CLIENTIP' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'Unknown',
+                'ORDERID' => $order_id,
+                'DESCRIPTION' => $description,
+                'CREATEALIAS' => $save_card ? 'yes' : 'no',
+                'APIKEYID' => $api_key_id,
+                'HFTOKEN' => $hfToken,
+            ];
+            if ($save_card) {
+                $params['ALIASMODE'] = 'oneclick';
+            }
+            // Map billing/shipping addresses into hosted field params
+            if (isset($payment_tab['billing'])) {
+                $billing = $payment_tab['billing'];
+                $params['BILLINGADDRESS'] = isset($billing['address1']) ? $billing['address1'] : null;
+                $params['BILLINGPOSTALCODE'] = isset($billing['postcode']) ? $billing['postcode'] : null;
+                $params['BILLINGCOUNTRY'] = isset($billing['country']) ? $billing['country'] : null;
+                $params['MOBILEPHONE'] = isset($billing['mobile_phone_number']) ? $billing['mobile_phone_number'] : null;
+            }
+            if (isset($payment_tab['shipping'])) {
+                $shipping = $payment_tab['shipping'];
+                $params['SHIPTOADDRESS'] = isset($shipping['address1']) ? $shipping['address1'] : null;
+                $params['SHIPTOPOSTALCODE'] = isset($shipping['postcode']) ? $shipping['postcode'] : null;
+                $params['SHIPTOCOUNTRY'] = isset($shipping['country']) ? $shipping['country'] : null;
+            }
+
+            $params['HASH'] = $this->buildHashContent($params);
+            $hosted_fields_payment_tab['method'] = 'payment';
+            $hosted_fields_payment_tab['params'] = $params;
+
+            return $hosted_fields_payment_tab;
+        }
+
         return $payment_tab;
+    }
+
+    /**
+     * @description calculate hash for hosted field resource
+     *
+     * @param $params
+     * @param $getTransaction
+     *
+     * @return string
+     */
+    public function buildHashContent($params, $getTransaction = false)
+    {
+        $this->setParameters();
+        if (empty($params) || !is_array($params)) {
+            $this->logger->addLog('PaymentMethod::buildHashContent() - Invalid prams $params must be a non empty array.');
+        }
+        $multi_account = json_decode($this->configuration->getValue('multi_account'), true);
+        $key = $getTransaction ? $multi_account['account_key'] : $multi_account['api_key'];
+        ksort($params);
+        $string = '';
+        foreach ($params as $k => $v) {
+            $string .= $k . '=' . $v . $key;
+        }
+
+        return hash('sha256', $key . $string);
     }
 
     /**
@@ -976,6 +1065,16 @@ class PaymentMethod
             $card_date = $card_details['exp_month'] . '/' . $card_details['exp_year'];
         }
 
+        // Safe created_at conversion (numeric timestamp or parsable string)
+        $created_at_raw = $resource->created_at;
+        if (is_int($created_at_raw)) {
+            $created_at_ts = $created_at_raw;
+        } elseif (is_string($created_at_raw) && ctype_digit($created_at_raw)) {
+            $created_at_ts = (int) $created_at_raw;
+        } else {
+            $created_at_ts = strtotime($created_at_raw) ?: 0;
+        }
+
         $type = isset($resource->payment_method, $resource->payment_method['type'])
             ? $resource->payment_method['type']
             : '';
@@ -1002,7 +1101,7 @@ class PaymentMethod
             'status' => $pay_status,
             'status_code' => $status['code'],
             'status_class' => $status_class,
-            'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($resource->amount, true),
+            'amount' => 'EUR' != $resource->currency ? $resource->amount : $this->dependencies->getHelpers()['amount']->convertAmount($resource->amount, true),
             'card_brand' => $card_brand,
             'card_mask' => $card_mask,
             'card_date' => $card_date,
@@ -1010,7 +1109,7 @@ class PaymentMethod
             'mode' => $resource->is_live ? $translation['detail']['mode']['live'] : $translation['detail']['mode']['test'],
             'paid' => (bool) $resource->is_paid,
             'authorization' => false,
-            'date' => date('d/m/Y', $resource->created_at),
+            'date' => date('d/m/Y', $created_at_ts),
             'error' => $resource->failure ? '(' . $resource->failure->message . ')' : '',
             'tds' => null !== $resource->is_3ds ? $translation['detail'][$resource->is_3ds ? 'yes' : 'no'] : false,
             'type' => $type,
@@ -1043,7 +1142,6 @@ class PaymentMethod
 
             return [];
         }
-
         $retrieve = $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
@@ -1094,7 +1192,6 @@ class PaymentMethod
 
             return false;
         }
-
         // Check if resource is expired
         $is_expired = $this->dependencies
             ->getValidators()['payment']
@@ -1104,7 +1201,6 @@ class PaymentMethod
 
             return false;
         }
-
         // Get the resource from API
         $retrieve = $this->dependencies
             ->getPlugin()
@@ -1175,16 +1271,18 @@ class PaymentMethod
         $data['metadata']['Order'] = (int) $order->id;
         $data['metadata']['OrderRef'] = $order->reference;
 
-        $patchPayment = $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.utilities.service.api')
-            ->patchPayment($resource->id, $data);
-        if (!$patchPayment['result']) {
-            $this->logger->addLog('PaymentMethod::postProcessOrder() - Payment resource can not be patch for given datas');
+        if (0 === strpos($resource->id, 'pay_')) {
+            $patchPayment = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.api')
+                ->patchPayment($resource->id, $data);
+            if (!$patchPayment['result']) {
+                $this->logger->addLog('PaymentMethod::postProcessOrder() - Payment resource can not be patch for given datas');
 
-            return false;
+                return false;
+            }
         }
 
         return true;
@@ -1249,7 +1347,6 @@ class PaymentMethod
                 'result' => false,
             ];
         }
-
         $payment = $this->api_service->createPayment($payment_tab);
 
         // If the payment resource can\'t be created due to to bad permission, we update the feature activation
@@ -1416,7 +1513,7 @@ class PaymentMethod
     {
         $this->setParameters();
 
-        if (!is_string($resource_id) || !$resource_id) {
+        if ((!is_string($resource_id) || !$resource_id) && !is_array($resource_id)) {
             $this->logger->addLog('PaymentMethod::retrieve - Invalid argument, $resource_id must be a non empty string.', 'error');
 
             return [
@@ -1430,6 +1527,7 @@ class PaymentMethod
             ->getPlugin()
             ->getPaymentRepository()
             ->getBy('resource_id', $resource_id);
+
         if (!$stored_resource) {
             $this->logger->addLog('PaymentMethod::retrieve - Can\'t find stored payment from given resource id.', 'error');
 
@@ -1448,10 +1546,11 @@ class PaymentMethod
         $retrieve = $is_installment
             ? $this->api_service->retrieveInstallment($resource_id)
             : $this->api_service->retrievePayment($resource_id);
-
-        // If we don't find the payment, for retrocompatibility we switch the mode then try again
-        // This section could be removed for highter module version
-        if (!$retrieve['result']) {
+        if ($retrieve['result']) {
+            $retrieve['resource']->is_live = $is_live;
+        } else {
+            // If we don't find the payment, for retrocompatibility we switch the mode then try again
+            // This section could be removed for highter module version
             $this->api_service->initialize(!(bool) $is_live);
             $retrieve = $is_installment
                 ? $this->api_service->retrieveInstallment($resource_id)

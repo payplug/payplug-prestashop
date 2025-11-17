@@ -33,7 +33,7 @@ class retrieveTest extends BasePaymentMethod
     }
 
     /**
-     * @dataProvider invalidStringFormatDataProvider
+     * @dataProvider invalidRetrieveDataFormatDataProvider
      *
      * @param mixed $resource_id
      */
@@ -46,6 +46,19 @@ class retrieveTest extends BasePaymentMethod
                 'message' => 'Invalid argument, $resource_id must be a non empty string.',
             ],
             $this->class->retrieve($resource_id)
+        );
+    }
+
+    public function testWhenGivenResourceIdIsArray()
+    {
+        $this->payment_repository->shouldReceive(['getBy' => []]);
+        $this->assertSame(
+            [
+                'code' => 500,
+                'result' => false,
+                'message' => 'Can\'t find stored payment from given resource id',
+            ],
+            $this->class->retrieve(['value'])
         );
     }
 

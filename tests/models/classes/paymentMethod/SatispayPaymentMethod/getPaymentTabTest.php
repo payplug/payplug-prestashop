@@ -30,9 +30,12 @@ class getPaymentTabTest extends BaseSatispayPaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->tools_adapter->shouldReceive([
-            'tool' => 'shop domain ssl',
-        ]);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getShopDomainSsl', true, false)
+            ->andReturn('shop domain ssl');
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'hfToken')
+            ->andReturn('');
         $this->helpers['amount']->shouldReceive([
             'validateAmount' => [
                 'result' => true,
@@ -45,6 +48,9 @@ class getPaymentTabTest extends BaseSatispayPaymentMethod
             'formatPhoneNumber' => '0612345678',
             'getIsoFromLanguageCode' => 'fr',
         ]);
+        $this->configuration->shouldReceive('getValue')
+            ->with('multi_account')
+            ->andReturn(json_encode([]));
         $this->dependencies->configClass = $config_class;
 
         $expected_tab = [

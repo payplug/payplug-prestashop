@@ -29,9 +29,15 @@ var $document, $window, __moduleName__Module = {
     init: function () {
         this.card.init();
         this.order.init();
+        if (is_hosted_fields) {
+            this.hosted_fields.init();
+        } else {
+            this.integrated.init();
+        }
         this.oney.init();
         this.popup.init();
-        this.integrated.init();
+
+
     },
     order: {
         init: function () {
@@ -1643,7 +1649,299 @@ var $document, $window, __moduleName__Module = {
             }
         }
     },
+    hosted_fields: {
+        props: {
+            identifier: '__moduleName__HostedFields',
+            integratedIdentifier: '__moduleName__IntegratedPayment',
+            cartId: null,
+            paymentId: null,
+            paymentOptionId: null,
+            form: {},
+            checkoutForm: null,
+            api: null,
+            hostedFieldsInstance: null,
+            token: null,
+            notValid: false,
+            fieldsInvalid: {cardHolder: true, pan: true, cvv: true, exp: true},
+            fieldsEmpty: {cardHolder: true, pan: true, cvv: true, exp: true},
+            save_card: false,
+            scheme: null,
+            query: null,
+            submit: null,
+            attempts: 0,
+            maxAttempts: 30,
+        },
+        init: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                $hostedForm = $('.' + hosted.props.identifier);
+            if (!$hostedForm.length) return false;
+            // get payment option id
+            let paymentOptionId = null;
+            try {
+                const formPayment = $hostedForm.get(0);
+                const additional = formPayment.closest('.additional-information');
+                if (additional && additional.id) {
+                    paymentOptionId = additional.id.replace('-additional-information','');
+                }
+            } catch (e) {
+                console.warn('[HostedFields] could not get payment option id to init HF', e);
+            }
+            if (!paymentOptionId) {
+                console.warn('[HostedFields] unable to determine payment option id');
+                return false;
+            }
+            hosted.props.paymentOptionId = paymentOptionId;
+            hosted.form.init();
+        },
+        form: {
+            init: function () {
+                var hosted = __moduleName__Module.hosted_fields,
+                    payment_option_id = hosted.props.paymentOptionId;
+                if (typeof $document == 'undefined') return false;
+                if (!payment_option_id) {
+                    console.warn('[HostedFields] init aborted: missing payment_option_id');
+                    return false;
+                }
+                if ($('#' + payment_option_id).is(':checked')) {
+                    hosted.form.set();
+                }
+                if (document.getElementById(payment_option_id)) {
+                    $document.on('click', '#' + payment_option_id, hosted.form.set);
+                }
+                // Bind tokenize handler only to hosted fields form (minimal change)
+                var $hfForm = $('.' + hosted.props.identifier);
+                if ($hfForm.length) {
+                    $hfForm.on('submit', hosted.form.tokenizeHandler);
+                }
+            },
+            set: function () {
+                const hosted = __moduleName__Module.hosted_fields;
+                if (hosted.props.hostedFieldsInstance) return;
+                if (!window.dalenys || !window.dalenys.hostedFields) {
+                    if (hosted.props.attempts++ >= hosted.props.maxAttempts) {
+                        console.error('[HostedFields] library not available after attempts');
+                        return;
+                    }
+                    setTimeout(hosted.form.set, 300);
+                    return;
+                }
+                ['card-container','expiry-container','cvv-container'].forEach(function(id){
+                    if(!document.getElementById(id)){
+                        console.error('[HostedFields] Missing container #' + id);
+                    }
+                });
+                try {
+                    hosted.props.hostedFieldsInstance = window.dalenys.hostedFields({
+                        key: { id: '1a8172b3-a060-4bce-b0ea-9abcdf288ff6', value: ')N-wwom4KmZ3aui$' },
+                        fields: {
+                            card: {
+                                id: 'card-container',
+                                enableAutospacing: true,
+                                placeholder: (typeof placeholderPan !== 'undefined' ? placeholderPan : 'Card number'),
+                                onInput: function (event) {
+                                    const hosted = __moduleName__Module.hosted_fields;
+                                    const root = hosted.props.integratedIdentifier;
+                                    // scheme auto-detect
+                                    if (event.cardType) {
+                                        var type = event.cardType.toLowerCase();
+                                        if (['visa','mastercard','cb'].includes(type)) {
+                                            hosted.props.scheme = type;
+                                            $("."+root+"_scheme.-"+type+" input").prop('checked', true).trigger('change');
+                                        }
+                                    }
+                                    if (event.type === 'invalid') {
+                                        $("."+root+"_error.-pan span.invalidField").removeClass('-hide').text(event.message || '');
+                                        $("."+root+"_container.-pan").addClass('-invalid');
+                                        hosted.props.fieldsInvalid.pan = true;
+                                        hosted.props.fieldsEmpty.pan = (event.errorName === 'FIELD_EMPTY');
+                                    } else if (event.type === 'valid') {
+                                        $("."+root+"_error.-pan span.invalidField").addClass('-hide');
+                                        $("."+root+"_container.-pan").removeClass('-invalid');
+                                        hosted.props.fieldsInvalid.pan = false;
+                                        hosted.props.fieldsEmpty.pan = false;
+                                    }
+                                }
+                            },
+                            expiry: {
+                                id: 'expiry-container',
+                                placeholder: (typeof placeholderExp !== 'undefined' ? placeholderExp : 'MM/YY'),
+                                onInput: function (event) {
+                                    const hosted = __moduleName__Module.hosted_fields;
+                                    const root = hosted.props.integratedIdentifier;
+                                    if (event.type === 'invalid') {
+                                        $("."+root+"_error.-exp span.invalidField").removeClass('-hide').text(event.message || '');
+                                        $("."+root+"_container.-exp").addClass('-invalid');
+                                        hosted.props.fieldsInvalid.exp = true;
+                                        hosted.props.fieldsEmpty.exp = (event.errorName === 'FIELD_EMPTY');
+                                    } else if (event.type === 'valid') {
+                                        $("."+root+"_error.-exp span.invalidField").addClass('-hide');
+                                        $("."+root+"_container.-exp").removeClass('-invalid');
+                                        hosted.props.fieldsInvalid.exp = false;
+                                        hosted.props.fieldsEmpty.exp = false;
+                                    }
+                                }
+                            },
+                            cryptogram: {
+                                id: 'cvv-container',
+                                placeholder: (typeof placeholderCvv !== 'undefined' ? placeholderCvv : 'CVV'),
+                                onInput: function (event) {
+                                    const hosted = __moduleName__Module.hosted_fields;
+                                    const root = hosted.props.integratedIdentifier;
+                                    if (event.type === 'invalid') {
+                                        $("."+root+"_error.-cvv span.invalidField").removeClass('-hide').text(event.message || '');
+                                        $("."+root+"_container.-cvv").addClass('-invalid');
+                                        hosted.props.fieldsInvalid.cvv = true;
+                                        hosted.props.fieldsEmpty.cvv = (event.errorName === 'FIELD_EMPTY');
+                                    } else if (event.type === 'valid') {
+                                        $("."+root+"_error.-cvv span.invalidField").addClass('-hide');
+                                        $("."+root+"_container.-cvv").removeClass('-invalid');
+                                        hosted.props.fieldsInvalid.cvv = false;
+                                        hosted.props.fieldsEmpty.cvv = false;
+                                    }
+                                }
+                            },
+                        },
+                    });
+                    // card holder input validation since hosted field does not cover it
+                    (function setupCardHolderValidation(){
+                        const hosted = __moduleName__Module.hosted_fields;
+                        const root = hosted.props.integratedIdentifier;
+                        const $container = $('.'+root+'_container.-cardHolder');
+                        if(!$container.length) return;
+
+                        const $input = $('#cardholder');
+                        if(!$input.length) return;
+
+                        const pattern = /^[A-Za-zÀ-ÖØ-öø-ÿ' .-]{4,}$/;
+                        let touched = false;
+                        function updateState(value){
+                            const trimmed = (value||'').trim();
+                            const empty = trimmed.length === 0;
+                            const invalid = !empty && !pattern.test(trimmed);
+                            hosted.props.fieldsEmpty.cardHolder = empty;
+                            hosted.props.fieldsInvalid.cardHolder = invalid;
+                            const $error = $('.'+root+'_error.-cardHolder');
+                            if(!$error.length) return;
+                            if(!touched){
+                                // hide errors until user interaction
+                                $error.find('span.emptyField').addClass('-hide');
+                                $error.find('span.invalidField').addClass('-hide');
+                                $container.removeClass('-invalid');
+                                return;
+                            }
+                            $error.find('span.emptyField')[empty ? 'removeClass':'addClass']('-hide');
+                            $error.find('span.invalidField')[(!empty && invalid) ? 'removeClass':'addClass']('-hide');
+                            $container[(empty || invalid) ? 'addClass':'removeClass']('-invalid');
+                        }
+
+                        updateState($input.val());
+
+                        $input.on('input', function(){
+                            touched = true;
+                            updateState(this.value);
+                        });
+                        $input.on('blur', function(){
+                            touched = true;
+                            updateState(this.value);
+                        });
+                        $input.on('focus', function(){
+                            $container.addClass('-focus').removeClass('-invalid');
+                            const $error = $('.'+root+'_error.-cardHolder');
+                            $error.find('span.emptyField').addClass('-hide');
+                            $error.find('span.invalidField').addClass('-hide');
+                        });
+                    })();
+                    console.log('[HostedFields] initialized');
+                } catch (e) {
+                    console.error('[HostedFields] init error', e);
+                    return;
+                }
+                if (hosted.props.hostedFieldsInstance && hosted.props.hostedFieldsInstance.load) {
+                    hosted.props.hostedFieldsInstance.load();
+                }
+            },
+            tokenizeHandler: function (event) {
+                var hosted = __moduleName__Module.hosted_fields;
+                var payment_option_id = hosted.props.paymentOptionId;
+                var selected = $('input[name="payment-option"]:checked').attr('id');
+                if (selected !== payment_option_id) { return true; }
+                if (hosted.props.hostedFieldsInstance && hosted.props.hostedFieldsInstance.createToken) {
+                    event.preventDefault();
+                    hosted.props.hostedFieldsInstance.createToken(function (result) {
+                        if (result && result.execCode === '0000') {
+                            var token = result.hfToken;
+                            $('#hf-token').val(token);
+                            $('#selected-brand').val(result.selectedBrand || '');
+                            hosted.form.createHF(token, event.target);
+                        }
+                    });
+                    return false;
+                }
+                return true;
+            },
+            validate: function(event){
+                return this.tokenizeHandler(event || {preventDefault:function(){}, target: $('.'+__moduleName__Module.hosted_fields.props.identifier).get(0)});
+            },
+            createHF: function(hfToken, formHh){
+                var hosted = __moduleName__Module.hosted_fields;
+                var integratedRoot = hosted.props.integratedIdentifier;
+                if(!hfToken){
+                    console.warn('[HostedFields] createHF aborted: missing token');
+                    if(formHf) formHf.submit();
+                    return;
+                }
+                if(hosted.props.query){
+                    try{ hosted.props.query.abort(); }catch(e){}
+                    hosted.props.query = null;
+                }
+                // reset payment/api errors
+                $('.'+integratedRoot+'_error.-payment').removeClass('-show');
+                $('.'+integratedRoot+'_error.-api').removeClass('-show');
+
+                if(__moduleName__Module.tools && __moduleName__Module.tools.loadSpinner){
+                    __moduleName__Module.tools.loadSpinner();
+                }
+                hosted.props.query = $.ajax({
+                    type: 'POST',
+                    url: window['__moduleName___ajax_url'],
+                    dataType: 'json',
+                    data: { _ajax:1, createHF:1, hfToken: hfToken },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        console.log('[HostedFields] createHF error', jqXHR, textStatus, errorThrown);
+                        if(__moduleName__Module.tools && __moduleName__Module.tools.removeSpinner){
+                            __moduleName__Module.tools.removeSpinner();
+                        }
+                        // show generic error and do not submit form
+                        $('.'+integratedRoot+'_error.-payment').text(integratedPaymentError).addClass('-show');
+                    },
+                    success: function(resp){
+                        if(__moduleName__Module.tools && __moduleName__Module.tools.removeSpinner){
+                            __moduleName__Module.tools.removeSpinner();
+                        }
+                        console.log(resp);
+                        // Successful payment confirmation -> redirect
+                        if(resp && resp.result && resp.return_url){
+                            console.log('redirect');
+                            window.location.href = resp.return_url;
+                            return;
+                        }
+                        // Force reload scenario
+                        if(resp && resp.force_reload && resp.return_url){
+                            console.log('force reload');
+                            window.location.href = resp.return_url;
+                            return;
+                        }
+                        // Failure -> show error, do not auto-submit
+                        var message = (resp && resp.message) ? resp.message : integratedPaymentError;
+                        $('.'+integratedRoot+'_error.-payment').text(message).addClass('-show');
+                        console.warn('[HostedFields] createHF server rejected token');
+                    }
+                });
+            }
+        }
+    },
 };
+
 
 $(document).ready(function () {
     $document = $(document);
@@ -1652,3 +1950,4 @@ $(document).ready(function () {
 });
 
 window['__moduleName__Module'] = __moduleName__Module;
+

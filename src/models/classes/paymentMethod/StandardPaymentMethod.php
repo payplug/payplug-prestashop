@@ -346,7 +346,6 @@ class StandardPaymentMethod extends PaymentMethod
         if (empty($payment_tab)) {
             return $payment_tab;
         }
-
         $payment_methods = $this->configuration->getValue('payment_methods');
         $payment_methods = json_decode($payment_methods, true);
 
@@ -357,7 +356,7 @@ class StandardPaymentMethod extends PaymentMethod
         }
 
         // Update if current display is integrated
-        if ('integrated' == (string) $this->configuration->getValue('embedded_mode')) {
+        if ('integrated' == (string) $this->configuration->getValue('embedded_mode') && !$this->tools->tool('getValue', 'hfToken')) {
             $payment_tab['integration'] = 'INTEGRATED_PAYMENT';
             unset($payment_tab['hosted_payment']['cancel_url']);
         }
@@ -531,7 +530,7 @@ class StandardPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        if (!is_string($resource_id) || !$resource_id) {
+        if ((!is_string($resource_id) || !$resource_id) && !is_array($resource_id)) {
             $this->logger->addLog('PaymentMethod::retrieve - Invalid argument, $resource_id must be a non empty string.', 'error');
 
             return [
@@ -567,16 +566,122 @@ class StandardPaymentMethod extends PaymentMethod
         // We retrieve the payment from the stored payment configuration
         $is_live = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live'];
         $this->api_service->initialize((bool) $is_live);
-        $retrieve = $this->api_service->retrievePayment($resource_id);
-
-        // If we don't find the payment, for retrocompatibility we switch the mode then try again
-        // This section could be removed for highter module version
-        if (!$retrieve['result']) {
+        $is_hosted_fields = 0 !== strpos($resource_id, 'pay_');
+        if ($is_hosted_fields) {
+            $resource_id = $this->BuildRetrieveHostedFieldsData($resource_id);
+        }
+        $retrieve = $this->api_service->retrievePayment($resource_id, $is_hosted_fields);
+        if ($retrieve['result']) {
+            $retrieve['resource']->is_live = $is_live;
+        } else {
+            // If we don't find the payment, for retrocompatibility we switch the mode then try again
+            // This section could be removed for highter module version
             $this->api_service->initialize(!(bool) $is_live);
             $retrieve = $this->api_service->retrievePayment($resource_id);
         }
 
         return $retrieve;
+    }
+
+    /**
+     * @description build retrieve hostedFields data
+     *
+     * @param $resource_id
+     *
+     * @return array
+     */
+    public function BuildRetrieveHostedFieldsData($resource_id)
+    {
+        $this->setParameters();
+        $multi_account = json_decode($this->configuration->getValue('multi_account'), true);
+        if (isset($multi_account) && !empty($multi_account)) {
+            $identifier = $multi_account['identifier_' . strtolower($this->context->currency->iso_code)];
+        } else {
+            return [];
+        }
+
+        $hosted_fields_data['method'] = 'getTransactions';
+        $hosted_fields_data['params']['IDENTIFIER'] = $identifier;
+        $hosted_fields_data['params']['OPERATIONTYPE'] = 'getTransaction';
+        $hosted_fields_data['params']['TRANSACTIONID'] = $resource_id;
+        $hosted_fields_data['params']['VERSION'] = '3.0';
+        $hosted_fields_data['params']['HASH'] = $this->buildHashContent($hosted_fields_data['params'], true);
+
+        return $hosted_fields_data;
+    }
+
+    /**
+     * Build Payment options  for integrated payment or hosted fields.
+     *
+     * @param array $payment_options
+     * @param string $mode 'integrated'|'hosted_fields'
+     *
+     * @return array
+     */
+    public function buildEmbeddedPaymentOption($payment_options, $mode)
+    {
+        if (empty($payment_options) || !isset($payment_options['standard'])) {
+            return $payment_options;
+        }
+        $payment_data = [
+            'integrated' => [
+                'name' => 'integrated',
+                'action' => 'javascript:payplugModule.integrated.form.validate();',
+                'tpl' => 'integrated_payment.tpl',
+                'additionalTpl' => 'checkout/payment/integrated_payment.tpl',
+                'jsUrl' => 'integrated_payment_js_url',
+                'extra_classes' => 'payplug integrated',
+            ],
+            'hosted_fields' => [
+                'name' => 'hosted_fields',
+                'action' => 'javascript:payplugModule.hosted_fields.form.validate();',
+                'tpl' => 'hosted_fields.tpl',
+                'additionalTpl' => 'checkout/payment/hosted_fields.tpl',
+                'jsUrl' => 'hosted_fields_js_url',
+                'extra_classes' => 'payplug hosted_fields',
+            ],
+        ];
+        if (!isset($payment_data[$mode])) {
+            return $payment_options;
+        }
+
+        $embedded_option = $payment_data[$mode];
+        $js_url = $this->dependencies->getPlugin()->getRoutes()->loadEmbeddedJsUrl($mode);
+        $translation = $this->dependencies->getPlugin()->getTranslationClass()->getFrontIntegratedPaymentTranslations();
+        $privacyLink = $this->getPrivacyLink();
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $this->context->smarty->assign([
+            $embedded_option['jsUrl'] => $js_url,
+            'is_one_click_activated' => !empty($payment_methods['one_click']),
+            'is_deferred_activated' => !empty($payment_methods['deferred']),
+            'placeholderCardholder' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
+            'placeholderPan' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
+            'placeholderExp' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
+            'placeholderCvv' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopadapter17'),
+            'privacy' => isset($translation['privacy']) ? $translation['privacy'] : '',
+            'secure' => isset($translation['secure']) ? $translation['secure'] : '',
+            'privacyLink' => $privacyLink,
+        ]);
+        $option = [
+            'name' => $embedded_option['name'],
+            'inputs' => [
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => $embedded_option['name'],
+                ],
+            ],
+            'action' => $embedded_option['action'],
+            'logo' => $payment_options['standard']['logo'],
+            'moduleName' => 'payplug',
+            'callToActionText' => $this->dependencies->getPlugin()->getTranslationClass()->l('specific17.setIntegratedPaymentOption.name', 'prestashopadapter17'),
+            'tpl' => $embedded_option['tpl'],
+            'extra_classes' => $embedded_option['extra_classes'],
+            'additionalInformation' => $this->dependencies->configClass->fetchTemplate($embedded_option['additionalTpl']),
+        ];
+        $payment_options['standard'] = $option;
+
+        return $payment_options;
     }
 
     /**
@@ -659,5 +764,25 @@ class StandardPaymentMethod extends PaymentMethod
             . $this->dependencies->configClass->getImgLang() . '.svg';
 
         return $payment_options;
+    }
+
+    /**
+     * build privacy policy link.
+     */
+    protected function getPrivacyLink()
+    {
+        $this->setParameters();
+        $iso = isset($this->context->language->iso_code) ? $this->context->language->iso_code : '';
+
+        switch ($iso) {
+            case 'fr':
+                return 'https://www.payplug.com/fr/politique-de-confidentialite/';
+
+            case 'it':
+                return 'https://www.payplug.com/it/politica-di-confidenzialita/';
+
+            default:
+                return 'https://www.payplug.com/privacy-policy/';
+        }
     }
 }

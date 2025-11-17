@@ -15,5 +15,9 @@ class BaseStandardPaymentMethod extends BasePaymentMethod
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
         $this->class->set('translation', $this->translation->getPaymentMethodsTranslations());
+        $this->configuration->shouldReceive('getValue')
+            ->with('multi_account')
+            ->andReturn(json_encode([]))
+            ->byDefault();
     }
 }
