@@ -6,8 +6,6 @@ namespace PayPlug\tests\models\classes\Translation;
  * @group unit
  * @group class
  * @group translation_class
- *
- * @runTestsInSeparateProcesses
  */
 class getDefaultTranslationTest extends BaseTranslation
 {

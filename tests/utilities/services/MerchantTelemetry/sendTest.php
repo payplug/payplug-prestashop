@@ -10,8 +10,6 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group service
  * @group merchant_telemetry_service
- *
- * @runTestsInSeparateProcesses
  */
 class sendTest extends TestCase
 {
@@ -28,12 +26,18 @@ class sendTest extends TestCase
         $this->plugin_telemetry = \Mockery::mock('alias:Payplug\PluginTelemetry');
     }
 
+    protected function tearDown()
+    {
+        \Mockery::close();
+        parent::tearDown();
+    }
+
     /**
      * @dataProvider invalidStringFormatDataProvider
      *
-     * @param mixed $datas
+     * @param mixed $data
      */
-    public function testWhenGivenDatasHasInvalidStringFormat($datas)
+    public function testWhenGivenDatasHasInvalidStringFormat($data)
     {
         $this->assertSame(
             [
@@ -41,7 +45,7 @@ class sendTest extends TestCase
                 'code' => null,
                 'message' => 'Invalid argument given, $datas must be a non empty string',
             ],
-            $this->service->send($datas)
+            $this->service->send($data)
         );
     }
 
@@ -49,12 +53,12 @@ class sendTest extends TestCase
     {
         $this->plugin_telemetry
             ->shouldReceive('Send')
-            ->andThrow(new \Exception('An error occured during the process', 404));
+            ->andThrow(new \Exception('An error occured during the process', 500));
 
         $this->assertSame(
             [
                 'result' => false,
-                'code' => 404,
+                'code' => 500,
                 'message' => 'An error occured during the process',
             ],
             $this->service->send($this->data)
@@ -63,17 +67,16 @@ class sendTest extends TestCase
 
     public function testWhenTelemetryIsSend()
     {
-        $success_code = 201;
         $this->plugin_telemetry->shouldReceive([
             'Send' => [
-                'httpStatus' => $success_code,
+                'httpStatus' => 201,
             ],
         ]);
 
         $this->assertSame(
             [
                 'result' => true,
-                'code' => $success_code,
+                'code' => 201,
                 'message' => '',
             ],
             $this->service->send($this->data)

@@ -6,8 +6,6 @@ namespace PayPlug\tests\actions\RequestAction;
  * @group unit
  * @group action
  * @group request_action
- *
- * @runTestsInSeparateProcesses
  */
 class dispatchActionTest extends BaseRequestAction
 {
