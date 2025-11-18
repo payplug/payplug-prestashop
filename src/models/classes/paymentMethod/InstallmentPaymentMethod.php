@@ -769,25 +769,8 @@ class InstallmentPaymentMethod extends PaymentMethod
             ->getService('payplug.utilities.service.api')
             ->createInstallment($payment_tab);
 
-        // If the payment resource can\'t be created due to to bad permission, we update the feature activation
-        if (403 == (int) $payment['code']) {
-            $this->logger->addLog('InstallmentPaymentMethod::saveResource - Bad permission error is returned by API.', 'error');
-            $cart = $this->dependencies
-                ->getPlugin()
-                ->getContext()
-                ->get()->cart;
-            $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
-            $this->resetPaymentMethodFromPermission($permissions);
-        }
-
-        // If the payment resource can't be created due to bad credential, we log out the merchand
-        if (401 == (int) $payment['code']) {
-            $this->logger
-                ->addLog('InstallmentPaymentMethod::saveResource: The merchant will be logout due to bad credential error returned by API.');
-            $this->dependencies
-                ->getPlugin()
-                ->getConfigurationAction()
-                ->logoutAction();
+        if (200 != (int) $payment['code']) {
+            return $this->processPaymentError((int) $payment['code'], $payment_tab);
         }
 
         return $this->retrieveSchedules($payment);
