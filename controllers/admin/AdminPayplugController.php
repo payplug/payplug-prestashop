@@ -192,6 +192,13 @@ class AdminPayplugController extends ModuleAdminController
 
         $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
 
+        $phone_number_service = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.phonenumber')
+            ->formatPhoneNumber('0670000000', 'FR');
+
         parent::initContent();
     }
 

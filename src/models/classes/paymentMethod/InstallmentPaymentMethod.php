@@ -254,14 +254,16 @@ class InstallmentPaymentMethod extends PaymentMethod
      */
     public function getPaymentTab()
     {
-        $payment_tab = parent::getPaymentTab();
+        $this->setParameters();
 
+        $payment_tab = $this->getDefaultPaymentTab();
         if (empty($payment_tab)) {
             return $payment_tab;
         }
 
         // Update from current schedule configuration
         $schedule_nb = (int) $this->configuration->getValue('inst_mode');
+
         $schedule = [];
         for ($i = 0; $i < $schedule_nb; ++$i) {
             if (0 == $i) {

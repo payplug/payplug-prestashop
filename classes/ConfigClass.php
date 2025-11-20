@@ -23,8 +23,6 @@
 
 namespace PayPlug\classes;
 
-use PayPlug\lib\libphonenumber;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -408,23 +406,6 @@ class ConfigClass
         return $state['result'];
     }
 
-    /**
-     * @description Get iso code from language code.
-     *
-     * @param $language
-     *
-     * @return string
-     */
-    public function getIsoFromLanguageCode($language)
-    {
-        if (!$this->validate->validate('isLoadedObject', $language)) {
-            return '';
-        }
-        $parse = explode('-', $language->language_code);
-
-        return $this->tools->tool('strtolower', $parse[0]);
-    }
-
     public static function setNotification()
     {
         return new PayPlugNotifications();
@@ -484,50 +465,6 @@ class ConfigClass
         }
 
         return false;
-    }
-
-    /**
-     * @description Return international formatted phone number (norm E.164).
-     *
-     * @param $phone_number
-     * @param $country
-     *
-     * @return string
-     */
-    public function formatPhoneNumber($phone_number, $country)
-    {
-        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number)) {
-            return '';
-        }
-        if (!is_object($country)) {
-            $country = $this->country->get((int) $country);
-        }
-        if (!$this->validate->validate('isLoadedObject', $country)) {
-            return '';
-        }
-
-        try {
-            $iso_code = $this->getIsoCodeByCountryId($country->id);
-
-            if (!$iso_code) {
-                return '';
-            }
-
-            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
-            $parsed = $phone_util->parse($phone_number, $iso_code);
-
-            if (!$phone_util->isValidNumber($parsed)) {
-                $this->logger->addLog('ConfigClass::formatPhoneNumber() - Invalid phone number for the country given');
-
-                return '';
-            }
-
-            return $phone_util->format($parsed, libphonenumber\PhoneNumberFormat::E164);
-        } catch (libphonenumber\NumberParseException $e) {
-            $this->logger->addLog('ConfigClass::formatPhoneNumber() - Exception thrown: ' . $e->getMessage());
-
-            return '';
-        }
     }
 
     /**

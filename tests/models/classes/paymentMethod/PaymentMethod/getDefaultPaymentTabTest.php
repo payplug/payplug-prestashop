@@ -10,13 +10,8 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  * @group payment_method_class
  * @group parent_payment_method_class
  */
-class getPaymentTabTest extends BasePaymentMethod
+class getDefaultPaymentTabTest extends BasePaymentMethod
 {
-    public function testWhenPaymentMethodHasNoNameDefined()
-    {
-        $this->assertSame([], $this->class->getPaymentTab());
-    }
-
     public function testWhenCartInContextIsntAValidObject()
     {
         $this->class->set('name', 'standard');
@@ -25,7 +20,7 @@ class getPaymentTabTest extends BasePaymentMethod
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->assertSame([], $this->class->getPaymentTab());
+        $this->assertSame([], $this->class->getDefaultPaymentTab());
     }
 
     public function testWhenCurrencyInContextIsntAValidObject()
@@ -36,7 +31,7 @@ class getPaymentTabTest extends BasePaymentMethod
             ->andReturnUsing(function ($method, $object) {
                 return (bool) $object;
             });
-        $this->assertSame([], $this->class->getPaymentTab());
+        $this->assertSame([], $this->class->getDefaultPaymentTab());
     }
 
     public function testWhenCurrentCurrencyIsoCodeIsntSupported()
@@ -49,7 +44,7 @@ class getPaymentTabTest extends BasePaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('USD');
-        $this->assertSame([], $this->class->getPaymentTab());
+        $this->assertSame([], $this->class->getDefaultPaymentTab());
     }
 
     public function testWhenCartIsntValidAmount()
@@ -66,7 +61,7 @@ class getPaymentTabTest extends BasePaymentMethod
             ->andReturn([
                 'result' => false,
             ]);
-        $this->assertSame([], $this->class->getPaymentTab());
+        $this->assertSame([], $this->class->getDefaultPaymentTab());
     }
 
     public function testWhenPaymentTabIsReturn()
@@ -85,11 +80,12 @@ class getPaymentTabTest extends BasePaymentMethod
             ],
             'convertAmount' => 4242,
         ]);
+        $this->phone_number_service->shouldReceive([
+            'formatPhoneNumber' => '0612345678',
+        ]);
         $config_class = \Mockery::mock('ConfigClass');
         $config_class->shouldReceive([
             'getIsoCodeByCountryId' => 'fr',
-            'formatPhoneNumber' => '0612345678',
-            'getIsoFromLanguageCode' => 'fr',
         ]);
         $this->dependencies->configClass = $config_class;
         $this->tools_adapter->shouldReceive([
@@ -144,7 +140,7 @@ class getPaymentTabTest extends BasePaymentMethod
             ],
         ];
 
-        $this->assertSame($expected_tab, $this->class->getPaymentTab());
+        $this->assertSame($expected_tab, $this->class->getDefaultPaymentTab());
     }
 
     public function testWhenPaymentTabIsReturnWithoutAddresses()
@@ -164,13 +160,10 @@ class getPaymentTabTest extends BasePaymentMethod
             ],
             'convertAmount' => 4242,
         ]);
-        $config_class = \Mockery::mock('ConfigClass');
-        $config_class->shouldReceive([
-            'getIsoCodeByCountryId' => 'fr',
+
+        $this->phone_number_service->shouldReceive([
             'formatPhoneNumber' => '0612345678',
-            'getIsoFromLanguageCode' => 'fr',
         ]);
-        $this->dependencies->configClass = $config_class;
         $this->tools_adapter->shouldReceive([
             'tool' => 'shop domain ssl',
         ]);
@@ -192,6 +185,6 @@ class getPaymentTabTest extends BasePaymentMethod
             'allow_save_card' => false,
         ];
 
-        $this->assertSame($expected_tab, $this->class->getPaymentTab());
+        $this->assertSame($expected_tab, $this->class->getDefaultPaymentTab());
     }
 }

@@ -609,194 +609,7 @@ class PaymentMethod
      */
     public function getPaymentTab()
     {
-        $this->setParameters();
-
-        if (!is_string($this->name) || '' == $this->name) {
-            $this->logger->addLog('PaymentMethod::getPaymentTab() - Invalid object prop, $name must be a non empty string.');
-
-            return [];
-        }
-        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
-            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Cart object must be a valid object.');
-
-            return [];
-        }
-
-        $valid_customer = $this->validate_adapter->validate('isLoadedObject', $this->context->customer);
-
-        // Check currency
-        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->currency)) {
-            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Currency object must be a valid object.');
-
-            return [];
-        }
-
-        $supported_currencies = explode(';', $this->configuration->getValue('currencies'));
-        if (!in_array($this->context->currency->iso_code, $supported_currencies, true)) {
-            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Currency object is not supported.');
-
-            return [];
-        }
-
-        // Check amount
-        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
-        $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
-        $cart_amount = $this->context->cart->getOrderTotal(true);
-        $is_valid_amount = $this->dependencies
-            ->getHelpers()['amount']
-            ->validateAmount($price_limit, (float) $cart_amount);
-        if (!$is_valid_amount['result']) {
-            $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
-
-            return [];
-        }
-
-        $payment_tab = [
-            'amount' => $this->dependencies
-                ->getHelpers()['amount']
-                ->convertAmount($cart_amount),
-            'currency' => $this->context->currency->iso_code,
-            'notification_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ipn', [], true),
-            'force_3ds' => false,
-            'hosted_payment' => [
-                'return_url' => $this->context->link->getModuleLink(
-                    $this->dependencies->name,
-                    'validation',
-                    ['ps' => 1, 'cartid' => (int) $this->context->cart->id],
-                    true
-                ),
-                'cancel_url' => $this->context->link->getModuleLink(
-                    $this->dependencies->name,
-                    'validation',
-                    ['ps' => 2, 'cartid' => (int) $this->context->cart->id],
-                    true
-                ),
-            ],
-            'metadata' => [
-                'ID Client' => (bool) $valid_customer ? (int) $this->context->customer->id : 0,
-                'ID Cart' => (int) $this->context->cart->id,
-                'Website' => $this->tools->tool('getShopDomainSsl', true, false),
-            ],
-            'allow_save_card' => false,
-        ];
-
-        // Set addresses if user is logged and has delivery/billing addresses
-        if ((bool) $valid_customer
-            && (bool) $this->context->cart->id_address_delivery) {
-            $billing_address = $this->dependencies
-                ->getPlugin()
-                ->getAddress()
-                ->get((int) $this->context->cart->id_address_invoice);
-            $billing_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $billing_address->id_country);
-            $shipping_address = $this->dependencies
-                ->getPlugin()
-                ->getAddress()
-                ->get((int) $this->context->cart->id_address_delivery);
-            $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
-
-            if (!$shipping_iso || !$billing_iso) {
-                $default_language = $this->dependencies
-                    ->getPlugin()
-                    ->getLanguage()
-                    ->get(
-                        (int) $this->dependencies
-                            ->getPlugin()
-                            ->getConfiguration()
-                            ->get('PS_LANG_DEFAULT')
-                    );
-                $iso_code_list = $this->dependencies
-                    ->getPlugin()
-                    ->getCountryClass()
-                    ->getIsoCodeList();
-                if (in_array($this->tools->tool('strtoupper', $default_language->iso_code), $iso_code_list, true)) {
-                    $iso_code = $this->tools->tool('strtoupper', $default_language->iso_code);
-                } else {
-                    $iso_code = 'FR';
-                }
-                if (!$shipping_iso) {
-                    $metadata['cms_shipping_country'] = $this
-                        ->dependencies
-                        ->configClass
-                        ->getIsoCodeByCountryId((int) $shipping_address->id_country);
-                    $shipping_iso = $iso_code;
-                }
-                if (!$billing_iso) {
-                    $metadata['cms_billing_country'] = $this
-                        ->dependencies
-                        ->configClass
-                        ->getIsoCodeByCountryId((int) $billing_address->id_country);
-                    $billing_iso = $iso_code;
-                }
-            }
-
-            // Set billing informations
-            $billing = [
-                'title' => null,
-                'first_name' => !empty($billing_address->firstname) ? $billing_address->firstname : null,
-                'last_name' => !empty($billing_address->lastname) ? $billing_address->lastname : null,
-                'company_name' => !empty($billing_address->company) ? trim($billing_address->company) : null,
-                'email' => $this->context->customer->email,
-                'landline_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
-                    $billing_address->phone,
-                    $billing_address->id_country
-                ),
-                'mobile_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
-                    $billing_address->phone_mobile,
-                    $billing_address->id_country
-                ),
-                'address1' => !empty($billing_address->address1) ? $billing_address->address1 : null,
-                'address2' => !empty($billing_address->address2) ? $billing_address->address2 : null,
-                'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
-                'city' => !empty($billing_address->city) ? $billing_address->city : null,
-                'country' => $billing_iso,
-                'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
-            ];
-            $billing['company_name'] = empty($billing['company_name']) || !is_string($billing['company_name'])
-                ? $billing['first_name'] . ' ' . $billing['last_name']
-                : $billing['company_name'];
-            $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: null;
-            $billing['mobile_phone_number'] = $billing['mobile_phone_number'] ?: $billing['landline_phone_number'];
-
-            // Set shipping informations
-            $delivery_type = 'NEW';
-            if ($this->context->cart->id_address_delivery == $this->context->cart->id_address_invoice) {
-                $delivery_type = 'BILLING';
-            } elseif ($shipping_address->isUsed()) {
-                $delivery_type = 'VERIFIED';
-            }
-            $shipping = [
-                'title' => null,
-                'first_name' => !empty($shipping_address->firstname) ? $shipping_address->firstname : null,
-                'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
-                'company_name' => !empty($shipping_address->company) ? trim($shipping_address->company) : null,
-                'email' => $this->context->customer->email,
-                'landline_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
-                    $shipping_address->phone,
-                    $shipping_address->id_country
-                ),
-                'mobile_phone_number' => $this->dependencies->configClass->formatPhoneNumber(
-                    $shipping_address->phone_mobile,
-                    $shipping_address->id_country
-                ),
-                'address1' => !empty($shipping_address->address1) ? $shipping_address->address1 : null,
-                'address2' => !empty($shipping_address->address2) ? $shipping_address->address2 : null,
-                'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,
-                'city' => !empty($shipping_address->city) ? $shipping_address->city : null,
-                'country' => $shipping_iso,
-                'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
-                'delivery_type' => $delivery_type,
-            ];
-            $shipping['company_name'] = empty($shipping['company_name']) || !is_string($shipping['company_name'])
-                ? $shipping['first_name'] . ' ' . $shipping['last_name']
-                : $shipping['company_name'];
-            $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: null;
-            $shipping['mobile_phone_number'] = $shipping['mobile_phone_number'] ?: $shipping['landline_phone_number'];
-
-            $payment_tab['shipping'] = $shipping;
-            $payment_tab['billing'] = $billing;
-        }
-
-        return $payment_tab;
+        return $this->getDefaultPaymentTab();
     }
 
     /**
@@ -1521,6 +1334,197 @@ class PaymentMethod
         $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
 
         return $this->tools->tool('redirectAdmin', $link_order);
+    }
+
+    /**
+     * @description Return default payment attribute to generate payment resource
+     *
+     * @return array
+     */
+    protected function getDefaultPaymentTab()
+    {
+        $this->setParameters();
+
+        if (!is_string($this->name) || '' == $this->name) {
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Invalid object prop, $name must be a non empty string.');
+
+            return [];
+        }
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->cart)) {
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Cart object must be a valid object.');
+
+            return [];
+        }
+
+        $valid_customer = $this->validate_adapter->validate('isLoadedObject', $this->context->customer);
+
+        // Check currency
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->currency)) {
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Currency object must be a valid object.');
+
+            return [];
+        }
+
+        $supported_currencies = explode(';', $this->configuration->getValue('currencies'));
+        if (!in_array($this->context->currency->iso_code, $supported_currencies, true)) {
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Currency object is not supported.');
+
+            return [];
+        }
+
+        // Check amount
+        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
+        $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
+        $cart_amount = $this->context->cart->getOrderTotal(true);
+        $is_valid_amount = $this->dependencies
+            ->getHelpers()['amount']
+            ->validateAmount($price_limit, (float) $cart_amount);
+        if (!$is_valid_amount['result']) {
+            $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
+
+            return [];
+        }
+
+        $payment_tab = [
+            'amount' => $this->dependencies
+                ->getHelpers()['amount']
+                ->convertAmount($cart_amount),
+            'currency' => $this->context->currency->iso_code,
+            'notification_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ipn', [], true),
+            'force_3ds' => false,
+            'hosted_payment' => [
+                'return_url' => $this->context->link->getModuleLink(
+                    $this->dependencies->name,
+                    'validation',
+                    ['ps' => 1, 'cartid' => (int) $this->context->cart->id],
+                    true
+                ),
+                'cancel_url' => $this->context->link->getModuleLink(
+                    $this->dependencies->name,
+                    'validation',
+                    ['ps' => 2, 'cartid' => (int) $this->context->cart->id],
+                    true
+                ),
+            ],
+            'metadata' => [
+                'ID Client' => (bool) $valid_customer ? (int) $this->context->customer->id : 0,
+                'ID Cart' => (int) $this->context->cart->id,
+                'Website' => $this->tools->tool('getShopDomainSsl', true, false),
+            ],
+            'allow_save_card' => false,
+        ];
+
+        // Set addresses if user is logged and has delivery/billing addresses
+        if ((bool) $valid_customer
+            && (bool) $this->context->cart->id_address_delivery) {
+            $billing_address = $this->dependencies
+                ->getPlugin()
+                ->getAddress()
+                ->get((int) $this->context->cart->id_address_invoice);
+            $billing_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $billing_address->id_country);
+            $shipping_address = $this->dependencies
+                ->getPlugin()
+                ->getAddress()
+                ->get((int) $this->context->cart->id_address_delivery);
+            $shipping_iso = $this->dependencies->configClass->getIsoCodeByCountryId((int) $shipping_address->id_country);
+
+            if (!$shipping_iso || !$billing_iso) {
+                $default_language = $this->dependencies
+                    ->getPlugin()
+                    ->getLanguage()
+                    ->get(
+                        (int) $this->dependencies
+                            ->getPlugin()
+                            ->getConfiguration()
+                            ->get('PS_LANG_DEFAULT')
+                    );
+                $iso_code_list = $this->dependencies
+                    ->getPlugin()
+                    ->getCountryClass()
+                    ->getIsoCodeList();
+                if (in_array($this->tools->tool('strtoupper', $default_language->iso_code), $iso_code_list, true)) {
+                    $iso_code = $this->tools->tool('strtoupper', $default_language->iso_code);
+                } else {
+                    $iso_code = 'FR';
+                }
+                if (!$shipping_iso) {
+                    $metadata['cms_shipping_country'] = $this
+                        ->dependencies
+                        ->configClass
+                        ->getIsoCodeByCountryId((int) $shipping_address->id_country);
+                    $shipping_iso = $iso_code;
+                }
+                if (!$billing_iso) {
+                    $metadata['cms_billing_country'] = $this
+                        ->dependencies
+                        ->configClass
+                        ->getIsoCodeByCountryId((int) $billing_address->id_country);
+                    $billing_iso = $iso_code;
+                }
+            }
+
+            $phone_number_service = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.phonenumber');
+
+            // Set billing informations
+            $billing = [
+                'title' => null,
+                'first_name' => !empty($billing_address->firstname) ? $billing_address->firstname : null,
+                'last_name' => !empty($billing_address->lastname) ? $billing_address->lastname : null,
+                'company_name' => !empty($billing_address->company) ? trim($billing_address->company) : null,
+                'email' => $this->context->customer->email,
+                'landline_phone_number' => $phone_number_service->formatPhoneNumber($billing_address->phone, $billing_iso),
+                'mobile_phone_number' => $phone_number_service->formatPhoneNumber($billing_address->phone_mobile, $billing_iso),
+                'address1' => !empty($billing_address->address1) ? $billing_address->address1 : null,
+                'address2' => !empty($billing_address->address2) ? $billing_address->address2 : null,
+                'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
+                'city' => !empty($billing_address->city) ? $billing_address->city : null,
+                'country' => $billing_iso,
+                'language' => $this->context->language->iso_code,
+            ];
+            $billing['company_name'] = empty($billing['company_name']) || !is_string($billing['company_name'])
+                ? $billing['first_name'] . ' ' . $billing['last_name']
+                : $billing['company_name'];
+            $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: null;
+            $billing['mobile_phone_number'] = $billing['mobile_phone_number'] ?: $billing['landline_phone_number'];
+
+            // Set shipping informations
+            $delivery_type = 'NEW';
+            if ($this->context->cart->id_address_delivery == $this->context->cart->id_address_invoice) {
+                $delivery_type = 'BILLING';
+            } elseif ($shipping_address->isUsed()) {
+                $delivery_type = 'VERIFIED';
+            }
+            $shipping = [
+                'title' => null,
+                'first_name' => !empty($shipping_address->firstname) ? $shipping_address->firstname : null,
+                'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
+                'company_name' => !empty($shipping_address->company) ? trim($shipping_address->company) : null,
+                'email' => $this->context->customer->email,
+                'landline_phone_number' => $phone_number_service->formatPhoneNumber($shipping_address->phone, $shipping_iso),
+                'mobile_phone_number' => $phone_number_service->formatPhoneNumber($shipping_address->phone_mobile, $shipping_iso),
+                'address1' => !empty($shipping_address->address1) ? $shipping_address->address1 : null,
+                'address2' => !empty($shipping_address->address2) ? $shipping_address->address2 : null,
+                'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,
+                'city' => !empty($shipping_address->city) ? $shipping_address->city : null,
+                'country' => $shipping_iso,
+                'language' => $this->context->language->iso_code,
+                'delivery_type' => $delivery_type,
+            ];
+            $shipping['company_name'] = empty($shipping['company_name']) || !is_string($shipping['company_name'])
+                ? $shipping['first_name'] . ' ' . $shipping['last_name']
+                : $shipping['company_name'];
+            $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: null;
+            $shipping['mobile_phone_number'] = $shipping['mobile_phone_number'] ?: $shipping['landline_phone_number'];
+
+            $payment_tab['shipping'] = $shipping;
+            $payment_tab['billing'] = $billing;
+        }
+
+        return $payment_tab;
     }
 
     /**

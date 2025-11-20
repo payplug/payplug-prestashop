@@ -284,6 +284,8 @@ class Translation
                     'x4_without_fees' => $this->l('order.module.oney.x4_without_fees', 'translation'),
                 ],
                 'satispay' => $this->l('order.module.satispay', 'translation'),
+                'wero' => $this->l('order.module.wero', 'translation'),
+                'bizum' => $this->l('order.module.bizum', 'translation'),
             ],
             'detail' => [
                 'mode' => [

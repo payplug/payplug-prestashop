@@ -1,14 +1,14 @@
 <?php
 
-namespace PayPlug\tests\models\classes\paymentMethod\IdealPaymentMethod;
+namespace PayPlug\tests\models\classes\paymentMethod\BizumPaymentMethod;
 
 /**
  * @group unit
  * @group class
  * @group payment_method_class
- * @group ideal_payment_method_class
+ * @group bizum_payment_method_class
  */
-class getPaymentTabTest extends BaseIdealPaymentMethod
+class getPaymentTabTest extends BaseBizumPaymentMethod
 {
     public function testWhenParentMethodReturnEmptyArray()
     {
@@ -27,7 +27,7 @@ class getPaymentTabTest extends BaseIdealPaymentMethod
             'getDefaultPaymentTab' => $this->default_payment_tab,
         ]);
         $expected_tab = $this->default_payment_tab;
-        $expected_tab['payment_method'] = 'ideal';
+        $expected_tab['payment_method'] = 'bizum';
         unset($expected_tab['force_3ds'], $expected_tab['allow_save_card']);
 
         $this->assertSame(
