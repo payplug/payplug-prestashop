@@ -6,7 +6,6 @@ namespace PayPlug\tests\utilities\services\API;
  * @group unit
  * @group service
  * @group api_service
- * @group dev
  */
 class getApiBearerTest extends BaseApi
 {

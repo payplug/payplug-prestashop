@@ -381,7 +381,7 @@ class ApplepayPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        $payment_tab = parent::getPaymentTab();
+        $payment_tab = $this->getDefaultPaymentTab();
         if (empty($payment_tab)) {
             return $payment_tab;
         }
@@ -494,7 +494,6 @@ class ApplepayPaymentMethod extends PaymentMethod
                     'firstname' => 'applepay firstname',
                     'lastname' => 'applepay lastname',
                     'address1' => 'applepay address1',
-                    'address2' => 'applepay address2',
                     'postcode' => $address['postalCode'],
                     'city' => $address['locality'],
                     'id_country' => $this->dependencies
@@ -621,20 +620,22 @@ class ApplepayPaymentMethod extends PaymentMethod
             'first_name' => $address_data['givenName'],
             'last_name' => $address_data['familyName'],
             'address1' => $address_data['addressLines'][0],
-            'address2' => isset($address_data['addressLines'][1]) && !empty($address_data['addressLines'][1])
-                ? $address_data['addressLines'][1]
-                : '',
             'postcode' => $address_data['postalCode'],
             'city' => $address_data['locality'],
             'country' => $address_data['countryCode'],
-            'language' => $this->dependencies->configClass->getIsoFromLanguageCode($this->context->language),
+            'language' => $this->context->language->iso_code,
             'email' => '' != $shipping_email ? $shipping_email : $address_data['emailAddress'],
         ];
 
         if (isset($address_data['phoneNumber'])) {
-            $prepared_data['mobile_phone_number'] = $this->dependencies->configClass->formatPhoneNumber(
+            $phone_number_service = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.service.phonenumber');
+            $prepared_data['mobile_phone_number'] = $phone_number_service->formatPhoneNumber(
                 $address_data['phoneNumber'],
-                $this->country_adapter->getByIso($address_data['countryCode'])
+                $address_data['countryCode']
             );
         }
 

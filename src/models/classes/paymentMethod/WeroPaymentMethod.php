@@ -27,13 +27,14 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class MybankPaymentMethod extends PaymentMethod
+class WeroPaymentMethod extends PaymentMethod
 {
     public function __construct($dependencies)
     {
         parent::__construct($dependencies);
-        $this->name = 'mybank';
-        $this->order_name = 'mybank';
+        $this->name = 'wero';
+        $this->order_name = 'wero';
+        $this->cancellable = false;
     }
 
     /**
@@ -60,7 +61,7 @@ class MybankPaymentMethod extends PaymentMethod
             return $payment_tab;
         }
 
-        $payment_tab['payment_method'] = 'mybank';
+        $payment_tab['payment_method'] = 'wero';
         unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
 
         return $payment_tab;

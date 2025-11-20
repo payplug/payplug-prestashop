@@ -254,14 +254,16 @@ class InstallmentPaymentMethod extends PaymentMethod
      */
     public function getPaymentTab()
     {
-        $payment_tab = parent::getPaymentTab();
+        $this->setParameters();
 
+        $payment_tab = $this->getDefaultPaymentTab();
         if (empty($payment_tab)) {
             return $payment_tab;
         }
 
         // Update from current schedule configuration
         $schedule_nb = (int) $this->configuration->getValue('inst_mode');
+
         $schedule = [];
         for ($i = 0; $i < $schedule_nb; ++$i) {
             if (0 == $i) {
@@ -771,47 +773,6 @@ class InstallmentPaymentMethod extends PaymentMethod
 
         if (200 != (int) $payment['code']) {
             return $this->processPaymentError((int) $payment['code'], $payment_tab);
-        }
-
-        // If the payment resource can\'t be created due to to bad permission, we update the feature activation
-        if (403 == (int) $payment['code']) {
-            $this->logger->addLog('InstallmentPaymentMethod::saveResource - Bad permission error is returned by API.', 'error');
-            $cart = $this->dependencies
-                ->getPlugin()
-                ->getContext()
-                ->get()->cart;
-            $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
-            $this->resetPaymentMethodFromPermission($permissions);
-        }
-
-        // If the payment resource can't be created due to bad credential, we log out the merchand
-        if (401 == (int) $payment['code']) {
-            $this->logger
-                ->addLog('InstallmentPaymentMethod::saveResource: The merchant will be logout due to bad credential error returned by API.');
-            $this->dependencies
-                ->getPlugin()
-                ->getConfigurationAction()
-                ->logoutAction();
-
-            $this->dependencies
-                ->getPlugin()
-                ->getModule()
-                ->getInstanceByName($this->dependencies->name)
-                ->getService('payplug.utilities.service.mail')
-                ->sendMail();
-
-            $translation = $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->getFrontPaymentErrorTranslations();
-            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
-                $translation['401']['description1'],
-                $translation['401']['description2'],
-            ]);
-
-            return [
-                'result' => false,
-            ];
         }
 
         return $this->retrieveSchedules($payment);

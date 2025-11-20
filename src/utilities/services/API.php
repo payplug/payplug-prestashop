@@ -517,12 +517,6 @@ class API
                     ->getPlugin()
                     ->getConfigurationAction()
                     ->logoutAction();
-                $this->dependencies
-                    ->getPlugin()
-                    ->getModule()
-                    ->getInstanceByName($this->dependencies->name)
-                    ->getService('payplug.utilities.service.mail')
-                    ->sendMail();
             }
 
             return [];
