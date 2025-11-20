@@ -71,8 +71,16 @@ class saveResourceTest extends BaseInstallmentPaymentMethod
             'resetPaymentMethodFromPermission' => true,
         ]);
 
+        $expected_error = [
+            'result' => false,
+            'code' => 403,
+        ];
+        $this->class->shouldReceive([
+            'processPaymentError' => $expected_error,
+        ]);
+
         $this->assertSame(
-            $resource,
+            $expected_error,
             $this->class->saveResource($payment_tab)
         );
     }
@@ -104,8 +112,16 @@ class saveResourceTest extends BaseInstallmentPaymentMethod
             'getConfigurationAction' => $configurationAction,
         ]);
 
+        $expected_error = [
+            'result' => false,
+            'code' => 401,
+        ];
+        $this->class->shouldReceive([
+            'processPaymentError' => $expected_error,
+        ]);
+
         $this->assertSame(
-            $resource,
+            $expected_error,
             $this->class->saveResource($payment_tab)
         );
     }

@@ -1252,26 +1252,8 @@ class PaymentMethod
 
         $payment = $this->api_service->createPayment($payment_tab);
 
-        // If the payment resource can\'t be created due to to bad permission, we update the feature activation
-        if (403 == (int) $payment['code']) {
-            $cart = $this->dependencies
-                ->getPlugin()
-                ->getContext()
-                ->get()->cart;
-            $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
-            $this->resetPaymentMethodFromPermission($permissions);
-        }
-
-        // If the payment resource can\'t be created due to bad credential, we log out the merchand
-        if (401 == (int) $payment['code']) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('PaymentMethod::saveResource: The merchant will be logout due to bad credential error returned by API.');
-            $this->dependencies
-                ->getPlugin()
-                ->getConfigurationAction()
-                ->logoutAction();
+        if (200 != (int) $payment['code']) {
+            return $this->processPaymentError((int) $payment['code'], $payment_tab);
         }
 
         return $payment;
@@ -1710,5 +1692,63 @@ class PaymentMethod
                 ->getPlugin()
                 ->getValidate();
         }
+    }
+
+    /**
+     * @descript Process payment creation error from API given error code
+     *
+     * @param $error_code
+     * @param $payment_tab
+     *
+     * @return array
+     */
+    protected function processPaymentError($error_code = 0, $payment_tab = [])
+    {
+        // If the payment resource can't be created due to bad permission, we update the feature activation
+        if (403 == $error_code) {
+            $cart = $this->dependencies
+                ->getPlugin()
+                ->getContext()
+                ->get()->cart;
+            $permissions = $this->dependencies->configClass->getAvailableOptions($cart);
+            $this->resetPaymentMethodFromPermission($permissions);
+        }
+
+        // If the payment resource can't be created due to bad credential, we log out the merchand
+        if (401 == $error_code) {
+            // But first, we try to reload the token from client data if possible; in that case, we simply return the error.
+            $oauth_client_data = json_decode($this->configuration->getValue('oauth_client_data'), true);
+
+            $need_logout = true;
+            if (!empty($oauth_client_data)) {
+                // If jwt doesn't exist, we generate one.
+                $jwt = $this->dependencies
+                    ->getPlugin()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.models.classes.merchant')
+                    ->generateJWT($oauth_client_data);
+                if ($jwt['result']) {
+                    $this->configuration->set('jwt', json_encode($jwt));
+                    $need_logout = false;
+                }
+            }
+
+            if ($need_logout) {
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('PaymentMethod::saveResource: The merchant will be logout due to bad credential error returned by API.');
+                $this->dependencies
+                    ->getPlugin()
+                    ->getConfigurationAction()
+                    ->logoutAction();
+            }
+        }
+
+        return [
+            'result' => false,
+            'code' => $error_code,
+        ];
     }
 }

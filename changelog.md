@@ -5,6 +5,7 @@
   - [PRE-3040](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2723): Add log in logout action
   - [PRE-3064](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2721): Update JWT experacy date and update payplug-php library to 4.0.0
   - [PRE-2206](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2728): Refactor Oney unit tests
+  - [PRE-3076](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2729): Try jwt generation in case of 401 error code
 
 ## Version 4.20.1
 - Bugfix :
