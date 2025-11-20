@@ -5,6 +5,10 @@
   - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet
 
 ## Version 4.21.0
+- Feature :
+  - [PRE-3033](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/): Add new payment method: Wero & Bizum
+
+## Version 4.21.0
 - Refactor :
   - [PRE-3040](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2723): Add log in logout action
   - [PRE-3064](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2721): Update JWT experacy date and update payplug-php library to 4.0.0
