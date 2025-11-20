@@ -233,6 +233,8 @@ class ApiRest
             'satispay' => (bool) $payment_methods['satispay'],
             'ideal' => (bool) $payment_methods['ideal'],
             'mybank' => (bool) $payment_methods['mybank'],
+            'wero' => (bool) $payment_methods['wero'],
+            'bizum' => (bool) $payment_methods['bizum'],
         ];
     }
 
