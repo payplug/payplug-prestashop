@@ -124,9 +124,14 @@ build_static_assets:
     - mkdir ./views/build
     - mkdir ./views/build/css
     - mkdir ./views/build/js
+    - mkdir ./views/build/img
     - mv ./views/css/*.css ./views/build/css
     - cp ./views/templates/index.php ./views/build/css
     - mv ./views/js/* ./views/build/js
+    - echo "Moving file from npm package payplug-ui-plugins-bo"
+    - cp ./node_modules/payplug-ui-plugins-bo/js/* ./views/build/js/
+    - cp ./node_modules/payplug-ui-plugins-bo/css/* ./views/build/css/
+    - cp ./node_modules/payplug-ui-plugins-bo/img/* ./views/build/img/
     - ls -l ./views/build/css/*.css
     - ls -l ./views/build/css/*.php
     - ls -l ./views/build/js/*.js
@@ -250,3 +255,4 @@ variables:
   SEMANTIC_BRANCHES: "master_and_develop"
   SONAR_ENABLED: "true"
   RUN_FOR_RELEASE: "false"
+  CI_CD_ALTERNATIVE_BRANCH_NAME: "PRE-3033-add-new-payment-feature"
