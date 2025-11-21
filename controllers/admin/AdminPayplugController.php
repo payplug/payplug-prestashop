@@ -179,6 +179,7 @@ class AdminPayplugController extends ModuleAdminController
         $this->media->addJsDef([
             'payplug_admin_config' => [
                 'ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&_ajax=1',
+                'rest_url' => $this->dependencies->adminClass->getAdminAjaxUrl() . '&rest_route=',
                 'img_path' => $lib_path,
             ],
         ]);
