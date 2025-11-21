@@ -1,0 +1,11 @@
+Hello,
+
+Your Payplug module on {shop_name} has been disconnected following an authentication error (401).
+Please reconnect your Payplug account from your store’s back-office to restore the connection and keep accepting payments.
+
+Best regards,
+The Payplug Team
+
+[{shop_name}]
+
+Powered by [PrestaShop](https://www.prestashop-project.org/)

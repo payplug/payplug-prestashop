@@ -21,6 +21,7 @@ class BaseApi extends MockeryTestCase
     public $card;
     public $dependencies;
     public $installment_plan;
+    public $module;
     public $oney_simulation;
     public $payment;
     public $plugin;
@@ -33,9 +34,11 @@ class BaseApi extends MockeryTestCase
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->plugin = \Mockery::mock('Plugin');
+        $this->module = \Mockery::mock('Module');
         $this->dependencies->name = 'payplug';
         $this->dependencies->shouldReceive([
             'getPlugin' => $this->plugin,
+            'getModule' => $this->module,
         ]);
 
         $this->api = \Mockery::mock('alias:Payplug\Payplug');

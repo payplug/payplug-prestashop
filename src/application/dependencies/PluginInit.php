@@ -52,6 +52,7 @@ use PayPlug\src\application\adapter\CurrencyAdapter;
 use PayPlug\src\application\adapter\CustomerAdapter;
 use PayPlug\src\application\adapter\DispatcherAdapter;
 use PayPlug\src\application\adapter\LanguageAdapter;
+use PayPlug\src\application\adapter\MailAdapter;
 use PayPlug\src\application\adapter\MediaAdapter;
 use PayPlug\src\application\adapter\MessageAdapter;
 use PayPlug\src\application\adapter\ModuleAdapter;
@@ -128,6 +129,7 @@ class PluginInit extends BaseClass
     private $customer_adapter;
     private $dispatcher_adapter;
     private $language_adapter;
+    private $mail_adapter;
     private $media_adapter;
     private $message_adapter;
     private $module_adapter;
@@ -211,6 +213,7 @@ class PluginInit extends BaseClass
             ->setCustomer($this->customer_adapter)
             ->setDispatcher($this->dispatcher_adapter)
             ->setLanguage($this->language_adapter)
+            ->setMail($this->mail_adapter)
             ->setMedia($this->media_adapter)
             ->setMessage($this->message_adapter)
             ->setModule($this->module_adapter)
@@ -351,6 +354,7 @@ class PluginInit extends BaseClass
         $this->customer_adapter = new CustomerAdapter();
         $this->dispatcher_adapter = new DispatcherAdapter();
         $this->language_adapter = new LanguageAdapter();
+        $this->mail_adapter = new MailAdapter();
         $this->media_adapter = new MediaAdapter();
         $this->message_adapter = new MessageAdapter();
         $this->module_adapter = new ModuleAdapter();

@@ -1,0 +1,11 @@
+Ciao,
+
+Il tuo modulo Payplug sul negozio {shop_name} è stato disconnesso a causa di un errore di autenticazione (401).
+Accedi nuovamente al tuo account Payplug dal back-office del tuo negozio per ripristinare la connessione e continuare ad accettare pagamenti.
+
+Cordiali saluti,
+Il team Payplug
+
+[{shop_name}]
+
+Powered by [PrestaShop](https://www.prestashop-project.org/)

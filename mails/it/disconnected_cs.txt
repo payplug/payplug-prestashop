@@ -1,0 +1,11 @@
+Ciao,
+
+Il modulo Payplug del commerciante {shop_name} è stato disconnesso a causa di un errore di autenticazione (401).
+È stato inviato un avviso al commerciante per invitarlo a riconnettersi.
+
+Cordiali saluti,
+Sistema di avviso PrestaShop – Payplug
+
+[{shop_name}]
+
+Powered by [PrestaShop](https://www.prestashop-project.org/)
