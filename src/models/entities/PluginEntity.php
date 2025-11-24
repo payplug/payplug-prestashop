@@ -107,6 +107,9 @@ class PluginEntity
     private $logger;
 
     /** @var object */
+    private $mail;
+
+    /** @var object */
     private $merchant_telemetry;
 
     /** @var object */
@@ -485,6 +488,14 @@ class PluginEntity
     public function getLoggerRepository()
     {
         return $this->logger_repository;
+    }
+
+    /**
+     * @return object
+     */
+    public function getMail()
+    {
+        return $this->mail;
     }
 
     /**
@@ -1285,6 +1296,22 @@ class PluginEntity
         }
 
         $this->logger_repository = $logger_repository;
+
+        return $this;
+    }
+
+    /**
+     * @param object $mail
+     *
+     * @return self
+     */
+    public function setMail($mail)
+    {
+        if (!is_object($mail)) {
+            throw new BadParameterException('Invalid argument, $mail must be a MailAdapter');
+        }
+
+        $this->mail = $mail;
 
         return $this;
     }

@@ -1,0 +1,11 @@
+Bonjour,
+
+Votre module Payplug sur votre boutique {shop_name} a été déconnecté à la suite d’une erreur d’authentification (code 401).
+Veuillez vous reconnecter à votre compte Payplug depuis le back-office de votre boutique pour rétablir la connexion et continuer à accepter les paiements.
+
+Cordialement,
+L’équipe Payplug
+
+[{shop_name}]
+
+Powered by [PrestaShop](https://www.prestashop-project.org/)
