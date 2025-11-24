@@ -1,0 +1,11 @@
+Bonjour,
+
+Le module Payplug du marchand {shop_name} a été déconnecté à la suite d’une erreur d’authentification (401).
+Une alerte a été envoyée au marchand pour l’inviter à se reconnecter.
+
+Cordialement,
+Système d’alerting PrestaShop – Payplug
+
+[{shop_name}]
+
+Powered by [PrestaShop](https://www.prestashop-project.org/)

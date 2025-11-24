@@ -1,0 +1,11 @@
+Hello,
+
+The Payplug module of merchant {shop_name} has been disconnected following an authentication error (401).
+An alert has been sent to the merchant inviting them to reconnect.
+
+Best regards,
+PrestaShop Alerting System – Payplug
+
+[{shop_name}]
+
+Powered by [PrestaShop](https://www.prestashop-project.org/)
