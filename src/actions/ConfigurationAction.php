@@ -970,6 +970,8 @@ class ConfigurationAction
             'oney' => 'enable_oney',
             'satispay' => 'enable_satispay',
             'standard' => 'enable_standard',
+            'wero' => 'enable_wero',
+            'bizum' => 'enable_bizum',
         ];
         foreach ($payment_method_keys as $key => $config) {
             $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;

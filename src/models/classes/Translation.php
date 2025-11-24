@@ -614,6 +614,24 @@ class Translation
                 'link' => $this->l('paymentmethods.mybank.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.mybank.call_to_action', 'translation'),
             ],
+            'wero' => [
+                'title' => $this->l('paymentmethods.wero.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->l('paymentmethods.wero.descriptions.live', 'translation'),
+                    'sandbox' => $this->l('paymentmethods.wero.descriptions.sandbox', 'translation'),
+                ],
+                'link' => $this->l('paymentmethods.wero.link', 'translation'),
+                'call_to_action' => $this->l('paymentmethods.wero.call_to_action', 'translation'),
+            ],
+            'bizum' => [
+                'title' => $this->l('paymentmethods.bizum.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->l('paymentmethods.bizum.descriptions.live', 'translation'),
+                    'sandbox' => $this->l('paymentmethods.bizum.descriptions.sandbox', 'translation'),
+                ],
+                'link' => $this->l('paymentmethods.bizum.link', 'translation'),
+                'call_to_action' => $this->l('paymentmethods.bizum.call_to_action', 'translation'),
+            ],
         ];
     }
 

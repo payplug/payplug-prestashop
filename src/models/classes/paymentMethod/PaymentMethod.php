@@ -249,6 +249,8 @@ class PaymentMethod
             'oney',
             'email_link',
             'sms_link',
+            'wero',
+            'bizum',
         ];
     }
 

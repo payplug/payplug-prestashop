@@ -351,7 +351,7 @@ class Configuration
         'payment_methods' => [
             'type' => 'string',
             'name' => 'PAYMENT_METHODS',
-            'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"installment":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"standard":true}',
+            'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"installment":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"standard":true,"wero":false,"bizum":false}',
             'setConf' => 1,
         ],
         'sandbox_mode' => [

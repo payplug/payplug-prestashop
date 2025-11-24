@@ -14,6 +14,8 @@
         "feature_satispay",
         "feature_standard",
         "feature_merchant_telemetry",
-        "feature_queueing_system"
+        "feature_queueing_system",
+        "feature_wero",
+        "feature_bizum"
     ]
 }
