@@ -243,7 +243,7 @@ class OneyPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        $payment_tab = parent::getPaymentTab();
+        $payment_tab = $this->getDefaultPaymentTab();
 
         if (empty($payment_tab)) {
             return $payment_tab;
@@ -253,19 +253,16 @@ class OneyPaymentMethod extends PaymentMethod
         $payment_tab['authorized_amount'] = $payment_tab['amount'];
 
         // Check if oney was elligible then return if not
-        $is_valid_cart = $this->isValidOneyCartQty($this->context->cart)['result'];
-        $use_taxes = (bool) $this->dependencies
-            ->getPlugin()
-            ->getConfiguration()
-            ->get('PS_TAX');
+        $use_taxes = (bool) $this->configuration->getValue('PS_TAX');
         $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
+        $is_valid_cart = $this->isValidOneyCartQty($this->context->cart);
         $is_valid_addresses = $this->isValidOneyAddresses(
             (int) $this->context->cart->id_address_delivery,
             (int) $this->context->cart->id_address_invoice
         );
         $is_valid_amount = $this->isValidOneyAmount($cart_amount);
         $is_elligible = $this->validators['payment']->isOneyElligible(
-            $is_valid_cart,
+            $is_valid_cart['result'],
             $is_valid_addresses['result'],
             $is_valid_amount['result']
         );
@@ -2128,20 +2125,22 @@ class OneyPaymentMethod extends PaymentMethod
             $field_name = $keys[1];
 
             if (false != strpos($field_name, 'phone')) {
+                $phone_number_service = $this->dependencies
+                    ->getPlugin()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.utilities.service.phonenumber');
+
                 switch ($type) {
                     case 'billing':
-                        $id_country = $this->country->getByIso($payment_tab['billing']['country']);
-                        $billing_country = $this->country->get((int) $id_country);
-                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $billing_country);
+                        $field = $phone_number_service->formatPhoneNumber($field, $payment_tab['billing']['country']);
 
                         break;
 
                     case 'same':
                     case 'shipping':
                     default:
-                        $id_country = $this->country->getByIso($payment_tab['shipping']['country']);
-                        $shipping_country = $this->country->get((int) $id_country);
-                        $field = $this->dependencies->configClass->formatPhoneNumber($field, $shipping_country);
+                    $field = $phone_number_service->formatPhoneNumber($field, $payment_tab['shipping']['country']);
 
                         break;
                 }

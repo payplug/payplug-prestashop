@@ -21,5 +21,8 @@ services:
   payplug.utilities.service.api:
     class: PayPlug\src\utilities\services\API
 
+  payplug.utilities.service.phonenumber:
+    class: PayPlug\src\utilities\services\PhoneNumber
+
   payplug.utilities.validator.regex:
     class: PayPlug\src\utilities\validators\RegexValidator

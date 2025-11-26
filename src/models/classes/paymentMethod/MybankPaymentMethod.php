@@ -54,7 +54,7 @@ class MybankPaymentMethod extends PaymentMethod
     // todo: add coverage to this method
     public function getPaymentTab()
     {
-        $payment_tab = parent::getPaymentTab();
+        $payment_tab = $this->getDefaultPaymentTab();
 
         if (empty($payment_tab)) {
             return $payment_tab;

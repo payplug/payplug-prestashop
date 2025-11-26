@@ -33,13 +33,10 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
         $this->helpers['cookies']->shouldReceive([
             'setPaymentErrorsCookie' => true,
         ]);
-        $config_class = \Mockery::mock('ConfigClass');
-        $config_class->shouldReceive([
-            'getIsoCodeByCountryId' => 'fr',
+
+        $this->phone_number_service->shouldReceive([
             'formatPhoneNumber' => '0612345678',
-            'getIsoFromLanguageCode' => 'fr',
         ]);
-        $this->dependencies->configClass = $config_class;
         $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $arg) {
                 switch ($method) {
@@ -55,54 +52,6 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
                 }
             });
 
-        $this->expected_tab = [
-            'amount' => 4242,
-            'currency' => 'EUR',
-            'notification_url' => 'link',
-            'force_3ds' => false,
-            'hosted_payment' => [
-                'return_url' => 'link',
-                'cancel_url' => 'link',
-            ],
-            'metadata' => [
-                'ID Client' => 1,
-                'ID Cart' => 1,
-                'Website' => true,
-            ],
-            'allow_save_card' => false,
-            'shipping' => [
-                'title' => null,
-                'first_name' => 'Ipsum',
-                'last_name' => 'Lorem',
-                'company_name' => 'Payplug',
-                'email' => 'customer@payplug.com',
-                'landline_phone_number' => '0612345678',
-                'mobile_phone_number' => '0612345678',
-                'address1' => '1 rue de l\'avenue',
-                'address2' => null,
-                'postcode' => '75000',
-                'city' => 'Paris',
-                'country' => 'fr',
-                'language' => 'fr',
-                'delivery_type' => 'BILLING',
-            ],
-            'billing' => [
-                'title' => null,
-                'first_name' => 'Ipsum',
-                'last_name' => 'Lorem',
-                'company_name' => 'Payplug',
-                'email' => 'customer@payplug.com',
-                'landline_phone_number' => '0612345678',
-                'mobile_phone_number' => '0612345678',
-                'address1' => '1 rue de l\'avenue',
-                'address2' => null,
-                'postcode' => '75000',
-                'city' => 'Paris',
-                'country' => 'fr',
-                'language' => 'fr',
-            ],
-        ];
-
         $this->oney = \Mockery::mock('StandardOldRepository');
         $this->plugin->shouldReceive([
             'getStandard' => $this->oney,
@@ -111,7 +60,9 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
 
     public function testWhenParentMethodReturnEmptyArray()
     {
-        $this->class->set('name', '');
+        $this->class->shouldReceive([
+            'getDefaultPaymentTab' => [],
+        ]);
         $this->assertSame(
             [],
             $this->class->getPaymentTab()
@@ -120,6 +71,9 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
 
     public function testWhenDeferredPaymentIsAllowed()
     {
+        $this->class->shouldReceive([
+            'getDefaultPaymentTab' => $this->default_payment_tab,
+        ]);
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": true, "one_click": false}');
@@ -127,17 +81,21 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
             ->with('embedded_mode')
             ->andReturn('redirect');
 
-        $this->expected_tab['authorized_amount'] = $this->expected_tab['amount'];
-        unset($this->expected_tab['amount']);
+        $expected_tab = $this->default_payment_tab;
+        $expected_tab['authorized_amount'] = $expected_tab['amount'];
+        unset($expected_tab['amount']);
 
         $this->assertSame(
-            $this->expected_tab,
+            $expected_tab,
             $this->class->getPaymentTab()
         );
     }
 
     public function testWhenDisplayModeIsIntegrated()
     {
+        $this->class->shouldReceive([
+            'getDefaultPaymentTab' => $this->default_payment_tab,
+        ]);
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": false, "one_click": false}');
@@ -145,17 +103,21 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
             ->with('embedded_mode')
             ->andReturn('integrated');
 
-        $this->expected_tab['integration'] = 'INTEGRATED_PAYMENT';
-        unset($this->expected_tab['hosted_payment']['cancel_url']);
+        $expected_tab = $this->default_payment_tab;
+        $expected_tab['integration'] = 'INTEGRATED_PAYMENT';
+        unset($expected_tab['hosted_payment']['cancel_url']);
 
         $this->assertSame(
-            $this->expected_tab,
+            $expected_tab,
             $this->class->getPaymentTab()
         );
     }
 
     public function testWhenOneClickIsAllowed()
     {
+        $this->class->shouldReceive([
+            'getDefaultPaymentTab' => $this->default_payment_tab,
+        ]);
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
             ->andReturn('{"standard":true, "deferred": false, "one_click": true}');
@@ -165,10 +127,12 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
         $this->cart_adapter->shouldReceive([
             'isGuestCartByCartId' => false,
         ]);
-        $this->expected_tab['allow_save_card'] = true;
+
+        $expected_tab = $this->default_payment_tab;
+        $expected_tab['allow_save_card'] = true;
 
         $this->assertSame(
-            $this->expected_tab,
+            $expected_tab,
             $this->class->getPaymentTab()
         );
     }

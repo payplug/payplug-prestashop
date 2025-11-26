@@ -104,4 +104,15 @@ trait FormatDataProvider
 
         yield ['emailtest.com'];
     }
+
+    public function invalidPhoneFormatDataProvider()
+    {
+        yield [42];
+
+        yield ['invalid phone number'];
+
+        yield [false];
+
+        yield [null];
+    }
 }

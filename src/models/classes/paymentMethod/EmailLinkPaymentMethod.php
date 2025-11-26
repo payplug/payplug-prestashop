@@ -55,7 +55,7 @@ class EmailLinkPaymentMethod extends StandardPaymentMethod
      */
     public function getPaymentTab()
     {
-        $payment_tab = parent::getPaymentTab();
+        $payment_tab = $this->getDefaultPaymentTab();
         if (empty($payment_tab)) {
             return $payment_tab;
         }
