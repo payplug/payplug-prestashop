@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.22.0
+- Bugfix :
+  - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet
+
 ## Version 4.21.0
 - Refactor :
   - [PRE-3040](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2723): Add log in logout action
