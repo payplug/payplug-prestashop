@@ -22,6 +22,8 @@ class BasePaymentMethod extends TestCase
 {
     use FormatDataProvider;
 
+    public $default_payment_tab;
+
     protected $address;
     protected $api_service;
     protected $assign_adapter;
@@ -47,6 +49,7 @@ class BasePaymentMethod extends TestCase
     protected $payment_method;
     protected $payment_method_class;
     protected $payment_repository;
+    protected $phone_number_service;
     protected $plugin;
     protected $route;
     protected $tools_adapter;
@@ -61,12 +64,12 @@ class BasePaymentMethod extends TestCase
         $this->dependencies->shouldReceive('l')
             ->andReturnUsing(function ($string, $name) {
                 return $string;
-            })
-        ;
+            });
 
         $this->routes = \Mockery::mock(Routes::class)->makePartial();
 
         $this->api_service = \Mockery::mock('ApiService');
+        $this->phone_number_service = \Mockery::mock('PhoneNumberService');
         $this->constant = \Mockery::mock('Constant');
         $this->constant->shouldReceive([
             'get' => '',
@@ -150,6 +153,10 @@ class BasePaymentMethod extends TestCase
             ->shouldReceive('getService')
             ->with('payplug.utilities.service.api')
             ->andReturn($this->api_service);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.phonenumber')
+            ->andReturn($this->phone_number_service);
 
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
@@ -215,6 +222,54 @@ class BasePaymentMethod extends TestCase
             'getPlugin' => $this->plugin,
             'getValidators' => $this->validators,
         ]);
+
+        $this->default_payment_tab = [
+            'amount' => 4242,
+            'currency' => 'EUR',
+            'notification_url' => 'notification_url',
+            'force_3ds' => false,
+            'hosted_payment' => [
+                'return_url' => 'return_url',
+                'cancel_url' => 'cancel_url',
+            ],
+            'metadata' => [
+                'IDClient' => 1,
+                'IDCart' => 2,
+                'Website' => 'website_url',
+            ],
+            'allow_save_card' => false,
+            'shipping' => [
+                'title' => null,
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'company_name' => 'Payplug',
+                'email' => 'jdoe@payplug.com',
+                'landline_phone_number' => '+33123456789',
+                'mobile_phone_number' => '+33123456789',
+                'address1' => 'address name',
+                'address2' => null,
+                'postcode' => 'postcode',
+                'city' => 'City name',
+                'country' => 'FR',
+                'language' => 'fr',
+                'delivery_type' => 'BILLING',
+            ],
+            'billing' => [
+                'title' => null,
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'company_name' => 'Payplug',
+                'email' => 'jdoe@payplug.com',
+                'landline_phone_number' => '+33123456789',
+                'mobile_phone_number' => '+33123456789',
+                'address1' => 'address name',
+                'address2' => null,
+                'postcode' => 'postcode',
+                'city' => 'City name',
+                'country' => 'FR',
+                'language' => 'fr',
+            ],
+        ];
 
         $this->class = \Mockery::mock(PaymentMethod::class, [$this->dependencies])
             ->makePartial()

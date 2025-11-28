@@ -20,7 +20,9 @@ class getPaymentTabTest extends BaseInstallmentPaymentMethod
 
     public function testWhenParentMethodReturnEmptyArray()
     {
-        $this->class->set('name', '');
+        $this->class->shouldReceive([
+            'getDefaultPaymentTab' => [],
+        ]);
         $this->assertSame(
             [],
             $this->class->getPaymentTab()
@@ -29,86 +31,21 @@ class getPaymentTabTest extends BaseInstallmentPaymentMethod
 
     public function testWhenPaymentTabIsReturned()
     {
-        $this->class->set('name', 'installment');
-        $this->validate_adapter->shouldReceive([
-            'validate' => true,
+        $this->class->shouldReceive([
+            'getDefaultPaymentTab' => $this->default_payment_tab,
         ]);
         $this->configuration->shouldReceive('getValue')
             ->with('inst_mode')
             ->andReturn('2');
-        $this->configuration->shouldReceive('getValue')
-            ->with('currencies')
-            ->andReturn('EUR');
-        $this->tools_adapter->shouldReceive([
-            'tool' => 'shop domain ssl',
-        ]);
-        $this->helpers['amount']->shouldReceive([
-            'validateAmount' => [
-                'result' => true,
+        $expected_tab = $this->default_payment_tab;
+        $expected_tab['schedule'] = [
+            [
+                'date' => 'TODAY',
+                'amount' => 2121,
             ],
-            'convertAmount' => 4242,
-        ]);
-        $config_class = \Mockery::mock('ConfigClass');
-        $config_class->shouldReceive([
-            'getIsoCodeByCountryId' => 'fr',
-            'formatPhoneNumber' => '0612345678',
-            'getIsoFromLanguageCode' => 'fr',
-        ]);
-        $this->dependencies->configClass = $config_class;
-
-        $expected_tab = [
-            'amount' => 4242,
-            'currency' => 'EUR',
-            'notification_url' => 'link',
-            'hosted_payment' => [
-                'return_url' => 'link',
-                'cancel_url' => 'link',
-            ],
-            'metadata' => [
-                'ID Client' => 1,
-                'ID Cart' => 1,
-                'Website' => 'shop domain ssl',
-            ],
-            'shipping' => [
-                'title' => null,
-                'first_name' => 'Ipsum',
-                'last_name' => 'Lorem',
-                'company_name' => 'Payplug',
-                'email' => 'customer@payplug.com',
-                'landline_phone_number' => '0612345678',
-                'mobile_phone_number' => '0612345678',
-                'address1' => '1 rue de l\'avenue',
-                'address2' => null,
-                'postcode' => '75000',
-                'city' => 'Paris',
-                'country' => 'fr',
-                'language' => 'fr',
-                'delivery_type' => 'BILLING',
-            ],
-            'billing' => [
-                'title' => null,
-                'first_name' => 'Ipsum',
-                'last_name' => 'Lorem',
-                'company_name' => 'Payplug',
-                'email' => 'customer@payplug.com',
-                'landline_phone_number' => '0612345678',
-                'mobile_phone_number' => '0612345678',
-                'address1' => '1 rue de l\'avenue',
-                'address2' => null,
-                'postcode' => '75000',
-                'city' => 'Paris',
-                'country' => 'fr',
-                'language' => 'fr',
-            ],
-            'schedule' => [
-                [
-                    'date' => 'TODAY',
-                    'amount' => 2121,
-                ],
-                [
-                    'date' => date('Y-m-d', strtotime('+ 30 days')),
-                    'amount' => 2121,
-                ],
+            [
+                'date' => date('Y-m-d', strtotime('+ 30 days')),
+                'amount' => 2121,
             ],
         ];
 
