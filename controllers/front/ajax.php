@@ -266,6 +266,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ->getPlugin()
                     ->getPaymentAction()
                     ->dispatchAction('standard', true);
+
                 $payment['force_reload'] = false;
 
                 if (empty($payment)) {
@@ -384,6 +385,19 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     ->getPlugin()
                     ->getPaymentAction()
                     ->dispatchAction('standard', true);
+
+                // 3DS authentication required
+                if (isset($payment['is_3ds']) && $payment['is_3ds']) {
+                    exit(json_encode([
+                        'result' => true,
+                        'is_3ds' => true,
+                        'message' => isset($payment['message']) ? $payment['message'] : '3DS authentication required',
+                        'redirect_url' => isset($payment['redirect_url']) ? $payment['redirect_url'] : '',
+                        'redirect_params' => isset($payment['redirect_params']) ? $payment['redirect_params'] : null,
+                        'transaction_id' => isset($payment['transaction_id']) ? $payment['transaction_id'] : null,
+                        'exec_code' => isset($payment['exec_code']) ? $payment['exec_code'] : null,
+                    ]));
+                }
 
                 $payment['force_reload'] = false;
 

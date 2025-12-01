@@ -379,7 +379,51 @@ class PaymentAction
 
             return [];
         }
-        //retrieve if hosted fields
+        // Check if 3D Secure authentication is required (EXECCODE 0001)
+        if (is_string($resource['resource'])) {
+            $raw_3ds = json_decode($resource['resource'], true);
+            if (is_array($raw_3ds)
+                && isset($raw_3ds['EXECCODE'])
+                && '0001' === $raw_3ds['EXECCODE']
+                && !empty($raw_3ds['REDIRECTURL'])
+                && !empty($raw_3ds['REDIRECTPOSTPARAMS'])
+            ) {
+                $transaction_id = isset($raw_3ds['TRANSACTIONID']) ? $raw_3ds['TRANSACTIONID'] : null;
+                $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+                $is_live_flag = !(bool) $configuration->getValue('sandbox_mode');
+                $payment_hash = $payment_method->getPaymentMethodHash($payment_tab, (bool) $is_live_flag);
+                $existing = $this->plugin->getPaymentRepository()->getBy('id_cart', (int) $cart_id);
+                if (empty($existing)) {
+                    $this->plugin->getPaymentRepository()->createEntity([
+                        'resource_id' => $transaction_id,
+                        'is_live' => (bool) $is_live_flag,
+                        'method' => $method,
+                        'id_cart' => (int) $cart_id,
+                        'cart_hash' => $payment_hash,
+                        'date_upd' => date('Y-m-d H:i:s'),
+                    ]);
+                }
+                // Return sanitized data for client-side form building
+                $redirectUrl = htmlspecialchars((string) $raw_3ds['REDIRECTURL'], ENT_QUOTES, 'UTF-8');
+                // Parse params  from 3ds authentication response
+                $params = [];
+                parse_str((string) $raw_3ds['REDIRECTPOSTPARAMS'], $params);
+                $sanitized_params = [];
+                foreach ($params as $k => $v) {
+                    $sanitized_params[htmlspecialchars((string) $k, ENT_QUOTES, 'UTF-8')] = htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+                }
+
+                return [
+                    'is_3ds' => true,
+                    'redirect_url' => $redirectUrl,
+                    'redirect_params' => $sanitized_params,
+                    'transaction_id' => $transaction_id,
+                    'resource_id' => $transaction_id,
+                ];
+            }
+        }
+
+        //retrieve if a non 3ds hosted fields
         if (is_string($resource['resource']) && isset(json_decode($resource['resource'], true)['TRANSACTIONID'])) {
             $api_service = $this->dependencies
                 ->getPlugin()
@@ -391,7 +435,9 @@ class PaymentAction
                 ->getPaymentMethodClass()
                 ->getPaymentMethod('standard')
                 ->BuildRetrieveHostedFieldsData(json_decode($resource['resource'], true)['TRANSACTIONID']);
+
             $resource = $api_service->retrievePayment($hosted_fields_data, true);
+
             $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
             // Hosted Fields response does not include is_live field in the getTransactions return
             $resource['resource']->is_live = !(bool) $configuration->getValue('sandbox_mode');
