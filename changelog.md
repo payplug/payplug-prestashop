@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.22.0
+- Feature :
+  - [PRE-3015](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2735): Add refund for Hosted Fields payment
+
 ## Version 4.20.0
 - Feature :
   - [SMP-2967](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2715): Activate Apple Pay on product page
