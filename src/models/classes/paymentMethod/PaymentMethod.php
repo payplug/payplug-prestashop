@@ -816,6 +816,7 @@ class PaymentMethod
             $description = 'N.a.';
 
             $amount = $payment_tab['amount'];
+            $payment_tab['force_3ds'] = true;
             $params = [
                 'IDENTIFIER' => $identifier,
                 'OPERATIONTYPE' => 'payment',
@@ -833,6 +834,16 @@ class PaymentMethod
                 'APIKEYID' => $api_key_id,
                 'HFTOKEN' => $hfToken,
             ];
+            // Add 3DS parameters only if force_3ds flag is true
+            if (!empty($payment_tab['force_3ds'])) {
+                $params += [
+                    '3DSECUREDISPLAYMODE' => 'raw',
+                    '3DSECUREPREFERENCE' => 'nopref',
+                    'REDIRECTURLCANCEL' => $return_url,
+                    'REDIRECTURLSUCCESS' => $return_url,
+                    '3DSECUREVERSION' => '2',
+                ];
+            }
             if ($save_card) {
                 $params['ALIASMODE'] = 'oneclick';
             }
