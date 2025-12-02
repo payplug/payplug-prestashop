@@ -56,6 +56,7 @@ class BaseApi extends MockeryTestCase
             'allow_save_card' => false,
         ];
         $this->resource_id = 'pay_azerty12345';
+        $this->id_order = 135;
         $this->service = Mockery::mock(API::class)
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
