@@ -38,6 +38,7 @@ use Payplug\OneySimulation;
 use Payplug\Payment;
 use Payplug\Payplug;
 use Payplug\Refund;
+use PayPlug\src\models\classes\paymentMethod\HostedFieldsPaymentMethod;
 use Symfony\Component\Dotenv\Dotenv;
 
 if (!defined('_PS_VERSION_')) {
@@ -47,7 +48,6 @@ if (!defined('_PS_VERSION_')) {
 class API
 {
     public $dependencies;
-
     private $current_api_key = '';
     private $site_url = '';
     private $portal_url = '';
@@ -926,10 +926,11 @@ class API
      *
      * @param string $resource_id
      * @param array $attributes
+     * @param int $id_order
      *
      * @return array
      */
-    public function refundPayment($resource_id = '', $attributes = [])
+    public function refundPayment($resource_id = '', $attributes = [], $id_order = 0)
     {
         if (!$resource_id || !is_string($resource_id)) {
             return [
@@ -947,6 +948,14 @@ class API
             ];
         }
 
+        if (!$id_order || !is_int($id_order)) {
+            return [
+                'result' => false,
+                'code' => null,
+                'message' => 'Wrong $id_order given',
+            ];
+        }
+
         try {
             if (!$this->api) {
                 $this->api = $this->initialize();
@@ -959,10 +968,27 @@ class API
                     'message' => 'Cannot connect to the API',
                 ];
             } else {
+                if (0 === strpos($resource_id, 'pay_')) {
+                    $refund = Refund::create($resource_id, $attributes);
+                } else {
+                    $multi_account = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('multi_account'), true);
+                    $context = $this->dependencies->getPlugin()->getContext()->get();
+                    $currency = $context->currency;
+                    $hosted_fields = new HostedFieldsPaymentMethod(
+                        $this->dependencies,
+                        $multi_account['api_key'],
+                        $multi_account['api_key_id'],
+                        $multi_account['identifier_' . strtolower($currency->iso_code)],
+                        $multi_account['account_key'],
+                    );
+                    $amount = $attributes['amount'];
+                    $refund = Refund::create($hosted_fields->refundTransaction($resource_id, $amount, $id_order), null, null, true);
+                }
+
                 $response = [
                     'result' => true,
                     'code' => 200,
-                    'resource' => Refund::create($resource_id, $attributes),
+                    'resource' => $refund,
                 ];
             }
         } catch (\Exception $e) {
@@ -1109,6 +1135,7 @@ class API
         if (isset($_ENV['API_BASE_URL'])) {
             APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
         }
+
         if (isset($_ENV['SERVICE_BASE_URL'])) {
             APIRoutes::setServiceBaseUrl($_ENV['SERVICE_BASE_URL']);
         }
