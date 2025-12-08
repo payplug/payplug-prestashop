@@ -1732,7 +1732,7 @@ var $document, $window, __moduleName__Module = {
                 });
                 try {
                     hosted.props.hostedFieldsInstance = window.dalenys.hostedFields({
-                        key: { id: '1a8172b3-a060-4bce-b0ea-9abcdf288ff6', value: ')N-wwom4KmZ3aui$' },
+                        key: { id: hf_api_key_id, value: hf_api_key },
                         fields: {
                             card: {
                                 id: 'card-container',
@@ -1749,7 +1749,12 @@ var $document, $window, __moduleName__Module = {
                                             $("."+root+"_scheme.-"+type+" input").prop('checked', true).trigger('change');
                                         }
                                     }
-                                    if (event.type === 'invalid') {
+                                    if (type === 'american_express') {
+                                        $("."+root+"_error.-pan span.invalidField").removeClass('-hide').text(errorAmex || '');
+                                        $("."+root+"_container.-pan").addClass('-invalid');
+                                        hosted.props.fieldsInvalid.pan = true;
+                                        hosted.props.fieldsEmpty.pan = false;
+                                    } else if (event.type === 'invalid') {
                                         $("."+root+"_error.-pan span.invalidField").removeClass('-hide').text(event.message || '');
                                         $("."+root+"_container.-pan").addClass('-invalid');
                                         hosted.props.fieldsInvalid.pan = true;
