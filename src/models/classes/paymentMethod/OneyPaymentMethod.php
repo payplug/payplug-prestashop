@@ -756,9 +756,6 @@ class OneyPaymentMethod extends PaymentMethod
             $oney_payment_options = false;
         }
 
-        $translations = $this->dependencies->getPlugin()->getTranslationClass();
-        $types = $translations
-            ->getOrderStateActionRenderTranslations();
         $error = isset($is_elligible['error']) ? $is_elligible['error'] : (
             $oney_payment_options
             ? false
@@ -766,11 +763,6 @@ class OneyPaymentMethod extends PaymentMethod
         );
 
         $withFirstSchedule = 'it' == $this->context->language->iso_code;
-
-        $context = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get();
 
         $this->assign_adapter->assign([
             'payplug_oney_required_field' => false,
