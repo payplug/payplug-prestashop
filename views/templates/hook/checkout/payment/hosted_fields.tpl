@@ -64,6 +64,16 @@
         <span class="-hide emptyField">{l s='hook.checkout.payment.integrated.cardholder.empty' mod='payplug'}</span>
     </div>
 
+    {if isset($is_one_click_activated) && $is_one_click_activated && $customer.is_guest != '1'}
+        <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_container -saveCard">
+            <label>
+                <input type="checkbox" name="savecard">
+                <span></span>
+                {l s='hook.integratedPayment.savecard' mod='payplug'}
+            </label>
+        </div>
+    {/if}
+
     <div class="{$module_name|escape:'htmlall':'UTF-8'}IntegratedPayment_privacy_policy">
         <img class="-lock" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/integrated/lock.svg"/>
         <span>{$secure|escape:'htmlall':'UTF-8'}</span>

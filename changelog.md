@@ -12,6 +12,10 @@
 
 ## Version 4.20.0
 - Feature :
+  - [PRE-3056](https://github.com/payplug/payplug-prestashop/pull/9): Add save card for Hosted Fields
+
+## Version 4.20.0
+- Feature :
   - [SMP-2967](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2715): Activate Apple Pay on product page
 
 - Bugfix :
