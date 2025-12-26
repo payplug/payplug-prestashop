@@ -1918,7 +1918,42 @@ var $document, $window, __moduleName__Module = {
                         if(__moduleName__Module.tools && __moduleName__Module.tools.removeSpinner){
                             __moduleName__Module.tools.removeSpinner();
                         }
-                        console.log(resp);
+                        // 3DS flow: inject form
+                        if(resp && resp.is_3ds){
+                            try{
+                                // Remove any previous injected form
+                                document.querySelectorAll('#redirectForm').forEach(f=>f.remove());
+                                var url = (resp.redirect_url||'').toString();
+                                var params = resp.redirect_params||{};
+                                if(!url){ throw new Error('Missing redirect_url'); }
+                                var form = document.createElement('form');
+                                form.id = 'redirectForm';
+                                form.method = 'post';
+                                form.action = url;
+                                form.style.display = 'none';
+                                var count = 0;
+                                for(var k in params){
+                                    if(!Object.prototype.hasOwnProperty.call(params,k)) continue;
+                                    if(count++ > 50) break;
+                                    var name = (k||'').toString();
+                                    var value = (params[k]||'').toString();
+                                    if(!name) continue;
+                                    var input = document.createElement('input');
+                                    input.type = 'hidden';
+                                    input.name = name;
+                                    input.value = value;
+                                    form.appendChild(input);
+                                }
+                                document.body.appendChild(form);
+                                form.submit();
+                                return;
+                            }catch(e){
+                                console.warn('[HostedFields] 3DS redirect build failed', e);
+                                var message = (resp && resp.message) ? resp.message : integratedPaymentError;
+                                $('.'+integratedRoot+'_error.-payment').text(message).addClass('-show');
+                                return;
+                            }
+                        }
                         // Successful payment confirmation -> redirect
                         if(resp && resp.result && resp.return_url){
                             console.log('redirect');
@@ -1950,4 +1985,6 @@ $(document).ready(function () {
 });
 
 window['__moduleName__Module'] = __moduleName__Module;
+
+
 

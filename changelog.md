@@ -1,4 +1,10 @@
 # Payplug module changelog
+## Version 4.21.0
+- Feature :
+    - [PRE-3012](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2720): Show Hosted field on BO 
+    - [PRE-3053](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2725): display hosted field on checkout
+    - [PRE-3054](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2727): Process a simple Hosted feild payment
+    - [PRE-3055](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2734): Process a 3ds payment with hosted fields
 
 ## Version 4.20.0
 - Feature :
