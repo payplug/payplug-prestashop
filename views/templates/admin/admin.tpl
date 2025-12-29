@@ -1,5 +1,5 @@
 {*
-* 2023 Payplug
+* COPYRIGHT_YEAR Payplug
 *
 * NOTICE OF LICENSE
 *
@@ -15,12 +15,12 @@
  * versions in the future.
 *
 *  @author Payplug SAS
-*  @copyright 2023 Payplug SAS
+*  @copyright COPYRIGHT_YEAR Payplug SAS
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of Payplug SAS
 *}
 
 <div id="payplug_admin"></div>
 
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-1.7.12.js"></script>
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-1.7.12.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-{$plugin_version|escape:'htmlall':'UTF-8'}.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-{$plugin_version|escape:'htmlall':'UTF-8'}.js"></script>

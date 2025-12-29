@@ -24,5 +24,8 @@ services:
   payplug.utilities.service.mail:
     class: PayPlug\src\utilities\services\Mail
 
+  payplug.utilities.service.props:
+    class: PayPlug\src\utilities\services\Props
+
   payplug.utilities.validator.regex:
     class: PayPlug\src\utilities\validators\RegexValidator

@@ -396,15 +396,21 @@ class StandardPaymentMethod extends PaymentMethod
             $return['cart_id'] = (int) $this->context->cart->id;
         }
 
-        // todo: getter of $_SERVER['HTTP_USER_AGENT'] should be in a service
         $regex_validator = $this->dependencies
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.validator.regex');
 
+        $http_user_agent = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.props')
+            ->getServerProp('HTTP_USER_AGENT');
+
         $return['embedded'] = 'redirect' != (string) $this->configuration->getValue('embedded_mode')
-            && !$regex_validator->isMobileDevice($_SERVER['HTTP_USER_AGENT'])['result'];
+            && !$regex_validator->isMobileDevice($http_user_agent)['result'];
 
         unset($return['resource_stored']);
 

@@ -73,11 +73,18 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
             'retrieve' => $resource,
         ]);
 
-        $_SERVER['HTTP_USER_AGENT'] = 'lorem ipsum';
-
         $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('integrated');
+
+        $props_service = \Mockery::mock('PropsService');
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.props')
+            ->andReturn($props_service);
+        $props_service->shouldReceive([
+            'getServerProp' => 'HTTP_USER_AGENT',
+        ]);
 
         $regex_validator = \Mockery::mock('RegexValidator');
         $this->module
@@ -85,7 +92,9 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
             ->with('payplug.utilities.validator.regex')
             ->andReturn($regex_validator);
         $regex_validator->shouldReceive([
-            'isMobileDevice' => false,
+            'isMobileDevice' => [
+                'result' => false,
+            ],
         ]);
 
         $this->assertSame(
@@ -102,13 +111,23 @@ class getReturnUrlTest extends BaseStandardPaymentMethod
     public function testWhenReturnUrlIsReturned()
     {
         $this->class->set('name', 'standard');
+        $props_service = \Mockery::mock('PropsService');
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.service.props')
+            ->andReturn($props_service);
+        $props_service->shouldReceive([
+            'getServerProp' => 'HTTP_USER_AGENT',
+        ]);
         $regex_validator = \Mockery::mock('RegexValidator');
         $this->module
             ->shouldReceive('getService')
             ->with('payplug.utilities.validator.regex')
             ->andReturn($regex_validator);
         $regex_validator->shouldReceive([
-            'isMobileDevice' => false,
+            'isMobileDevice' => [
+                'result' => false,
+            ],
         ]);
 
         $this->payment_repository->shouldReceive([
