@@ -113,6 +113,8 @@ class ApiRest
             case 'oney_permissions':
             case 'satispay_permissions':
             case 'mybank_permissions':
+            case 'wero_permissions':
+            case 'bizum_permissions':
             case 'ideal_permissions':
                 $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $payment_method = str_replace('_permissions', '', $action);

@@ -236,6 +236,8 @@ class Translation
                     'ideal' => $this->l('modal.premium.feature.ideal', 'translation'),
                     'mybank' => $this->l('modal.premium.feature.mybank', 'translation'),
                     'satispay' => $this->l('modal.premium.feature.satispay', 'translation'),
+                    'bizum' => $this->l('modal.premium.feature.bizum', 'translation'),
+                    'wero' => $this->l('modal.premium.feature.wero', 'translation'),
                     'oney' => $this->l('modal.premium.feature.oney', 'translation'),
                     'one_click' => $this->l('modal.premium.feature.oneclick', 'translation'),
                     'installment' => $this->l('modal.premium.feature.installment', 'translation'),

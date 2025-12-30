@@ -81,6 +81,8 @@ class ConfigurationAction
             'oney' => 'can_use_oney',
             'satispay' => 'can_use_satispay',
             'use_live_mode' => 'use_live_mode',
+            'bizum' => 'can_use_bizum',
+            'wero' => 'can_use_wero',
         ];
 
         if (!$this->dependencies
