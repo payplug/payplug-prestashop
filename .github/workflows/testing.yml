@@ -36,6 +36,7 @@ jobs:
         with:
           name: vendor
           path: vendor
+          retention-days: 1
 
   linter:
     runs-on: ubuntu-latest
@@ -84,12 +85,14 @@ jobs:
         with:
           name: junit-tests
           path: report/junit-tests.xml
+          retention-days: 1
       - name: Upload couverture
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: report/coverage.xml
+          retention-days: 1
 
 #  todo: get SONAR_TOKEN && SONAR_ORGANIZATION to make it work
 #  sonarcloud:

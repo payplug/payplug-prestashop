@@ -64,23 +64,8 @@ class GetAccountTest extends BaseApi
         $configuration_action->shouldReceive([
             'logoutAction' => true,
         ]);
-
-        $module = \Mockery::mock('Module');
-        $mail_service = \Mockery::mock('MailService');
-        $mail_service->shouldReceive([
-            'sendMail' => true,
-        ]);
-        $module
-            ->shouldReceive('getService')
-            ->with('payplug.utilities.service.mail')
-            ->andReturn($mail_service);
-        $module_adapter = \Mockery::mock('ModuleAdapter');
-        $module_adapter->shouldReceive([
-            'getInstanceByName' => $module,
-        ]);
         $this->plugin->shouldReceive([
             'getConfigurationAction' => $configuration_action,
-            'getModule' => $module_adapter,
         ]);
 
         $this->assertSame(

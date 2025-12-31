@@ -42,6 +42,8 @@ class PaymentAction
         'oney',
         'satispay',
         'standard',
+        'wero',
+        'bizum',
     ];
     private $context;
     private $dependencies;
@@ -355,7 +357,6 @@ class PaymentAction
         $cart_id = $this->plugin
             ->getContext()
             ->get()->cart->id;
-
         // If a payment exists, we try to cancel it and remove from database.
         $resource = $this->plugin
             ->getPaymentRepository()
@@ -378,6 +379,7 @@ class PaymentAction
             ->getPaymentMethod($method);
 
         $resource = $payment_method->saveResource($payment_tab);
+
         if (!$resource['result']) {
             $this->logger->addLog('PaymentAction::createAction - Resource can\'t be created from given tab.', 'error');
 

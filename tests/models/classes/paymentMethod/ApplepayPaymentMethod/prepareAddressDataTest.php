@@ -47,13 +47,12 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'first_name' => 'John',
             'last_name' => 'Doe',
             'address1' => '123 Street',
-            'address2' => '',
             'postcode' => '12345',
             'city' => 'City',
             'country' => 'FR',
             'language' => 'fr',
             'email' => 'john@example.com',
-            'mobile_phone_number' => '1234567890',
+            'mobile_phone_number' => '0612345678',
         ];
 
         $this->tools_adapter->shouldReceive('tool')
@@ -61,12 +60,9 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
                 return strtolower($param);
             });
 
-        $config_class = \Mockery::mock('ConfigClass');
-        $config_class->shouldReceive([
-            'formatPhoneNumber' => '1234567890',
-            'getIsoFromLanguageCode' => 'fr',
+        $this->phone_number_service->shouldReceive([
+            'formatPhoneNumber' => '0612345678',
         ]);
-        $this->dependencies->configClass = $config_class;
 
         $this->country_adapter->shouldReceive([
             'getByIso' => 1,
@@ -85,27 +81,19 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
                 return strtolower($param);
             });
 
-        $config_class = \Mockery::mock('ConfigClass');
-        $config_class->shouldReceive([
-            'formatPhoneNumber' => '0657789067',
-            'getIsoFromLanguageCode' => 'fr',
-        ]);
-        $this->dependencies->configClass = $config_class;
-
-        $this->country_adapter->shouldReceive([
-            'getByIso' => 1,
+        $this->phone_number_service->shouldReceive([
+            'formatPhoneNumber' => '0612345678',
         ]);
         $expected_data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
             'address1' => '123 Street',
-            'address2' => '',
             'postcode' => '12345',
             'city' => 'City',
             'country' => 'FR',
             'language' => 'fr',
             'email' => 'john@example.com',
-            'mobile_phone_number' => '0657789067',
+            'mobile_phone_number' => '0612345678',
         ];
         $this->assertEquals($expected_data, $this->class->prepareAddressData($this->address_data));
     }

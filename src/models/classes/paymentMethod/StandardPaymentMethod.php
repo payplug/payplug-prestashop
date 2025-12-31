@@ -341,7 +341,9 @@ class StandardPaymentMethod extends PaymentMethod
      */
     public function getPaymentTab()
     {
-        $payment_tab = parent::getPaymentTab();
+        $this->setParameters();
+
+        $payment_tab = $this->getDefaultPaymentTab();
 
         if (empty($payment_tab)) {
             return $payment_tab;

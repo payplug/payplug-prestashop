@@ -21,8 +21,8 @@ services:
   payplug.utilities.service.api:
     class: PayPlug\src\utilities\services\API
 
-  payplug.utilities.service.mail:
-    class: PayPlug\src\utilities\services\Mail
+  payplug.utilities.service.phonenumber:
+    class: PayPlug\src\utilities\services\PhoneNumber
 
   payplug.utilities.service.props:
     class: PayPlug\src\utilities\services\Props

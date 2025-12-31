@@ -90,3 +90,4 @@ jobs:
         with:
           name: payplug_${{ needs.define-package-version.outputs.artifact_version }}
           path: payplug.zip
+          retention-days: 7
