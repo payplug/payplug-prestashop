@@ -1730,6 +1730,17 @@ var $document, $window, __moduleName__Module = {
                         console.error('[HostedFields] Missing container #' + id);
                     }
                 });
+
+                $saveCard = $('form.payplugHostedFields').find('.-saveCard');
+                $saveCard.find('input').on('change', function () {
+                    if ($(this).prop('checked')) {
+                        hosted.props.save_card = true;
+                        $saveCard.addClass('-checked');
+                    } else {
+                        hosted.props.save_card = false;
+                        $saveCard.removeClass('-checked');
+                    }
+                });
                 try {
                     hosted.props.hostedFieldsInstance = window.dalenys.hostedFields({
                         key: { id: hf_api_key_id, value: hf_api_key },
@@ -1910,7 +1921,7 @@ var $document, $window, __moduleName__Module = {
                     type: 'POST',
                     url: window['__moduleName___ajax_url'],
                     dataType: 'json',
-                    data: { _ajax:1, createHF:1, hfToken: hfToken },
+                    data: { _ajax:1, createHF:1, hfToken: hfToken, save_card: (hosted.props.save_card ? 1 : 0) },
                     error: function(jqXHR, textStatus, errorThrown){
                         console.log('[HostedFields] createHF error', jqXHR, textStatus, errorThrown);
                         if(__moduleName__Module.tools && __moduleName__Module.tools.removeSpinner){
