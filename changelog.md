@@ -6,6 +6,10 @@
     - [PRE-3054](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2727): Process a simple Hosted feild payment
     - [PRE-3055](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2734): Process a 3ds payment with hosted fields
 
+## Version 4.22.0
+- Feature :
+  - [PRE-3015](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2735): Add refund for Hosted Fields payment
+
 ## Version 4.20.0
 - Feature :
   - [SMP-2967](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2715): Activate Apple Pay on product page

@@ -58,7 +58,7 @@ class RefundPaymentTest extends BaseApi
                 'code' => 500,
                 'message' => 'Cannot connect to the API',
             ],
-            $this->service->refundPayment($this->resource_id, $this->resource_attribute)
+            $this->service->refundPayment($this->resource_id, $this->resource_attribute, $this->id_order)
         );
     }
 
@@ -77,7 +77,7 @@ class RefundPaymentTest extends BaseApi
                 'code' => 500,
                 'message' => 'An error occured during the process',
             ],
-            $this->service->refundPayment($this->resource_id, $this->resource_attribute)
+            $this->service->refundPayment($this->resource_id, $this->resource_attribute, $this->id_order)
         );
     }
 
@@ -96,7 +96,7 @@ class RefundPaymentTest extends BaseApi
                 'code' => 200,
                 'resource' => $resource,
             ],
-            $this->service->refundPayment($this->resource_id, $this->resource_attribute)
+            $this->service->refundPayment($this->resource_id, $this->resource_attribute, $this->id_order)
         );
     }
 }

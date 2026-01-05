@@ -1502,7 +1502,8 @@ class PaymentMethod
             [
                 'amount' => $truly_refundable_amount,
                 'metadata' => $metadata,
-            ]
+            ],
+            $resource->metadata['Order']
         );
 
         // then we reset the initial mode from configuration

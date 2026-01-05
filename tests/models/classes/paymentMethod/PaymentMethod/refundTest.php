@@ -138,7 +138,13 @@ class refundTest extends BasePaymentMethod
         $this->class->shouldReceive([
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(['is_paid' => true, 'is_live' => true]),
+                'resource' => PaymentMock::getStandard([
+                    'is_paid' => true,
+                    'is_live' => true,
+                    'metadata' => [
+                        'Order' => 135,
+                    ],
+                ]),
             ],
         ]);
         $this->configuration->shouldReceive('getValue')
@@ -162,7 +168,13 @@ class refundTest extends BasePaymentMethod
         $this->class->shouldReceive([
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(['is_paid' => true, 'is_live' => true]),
+                'resource' => PaymentMock::getStandard([
+                    'is_paid' => true,
+                    'is_live' => true,
+                    'metadata' => [
+                        'Order' => 135,
+                    ],
+                ]),
             ],
         ]);
         $this->configuration->shouldReceive('getValue')
