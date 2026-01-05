@@ -448,6 +448,7 @@ $_MODULE['<{payplug}prestashop>translation_ca06657b8f3f74842dd4c9241707f0fa'] = 
 $_MODULE['<{payplug}prestashop>translation_ca443f17e9e3cddaee616db9d2614f00'] = 'Please enter your shipping postcode.';
 $_MODULE['<{payplug}prestashop>translation_cc93f702d49b40211bc8d63fdf6814b0'] = 'Embedded';
 $_MODULE['<{payplug}prestashop>translation_cd65da5c0646e75c0cfb10967896a6f8'] = 'Payplug will interpret this status as an order Error';
+$_MODULE['<{payplug}prestashop>translation_ce1fafe00402c39a9adb084d139d51ec'] = 'We do not accept American Express cards. Please use a different card.';
 $_MODULE['<{payplug}prestashop>translation_ce2335f7076720c7f345df1d28ad688d'] = 'Satispay payments';
 $_MODULE['<{payplug}prestashop>translation_ce2d5bff62443fece24dcf4bf5d103b0'] = 'Offer guaranteed split payments for amounts between ';
 $_MODULE['<{payplug}prestashop>translation_cfcd8c08cda720f480ca0182002679a1'] = 'Account Key';

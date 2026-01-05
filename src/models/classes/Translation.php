@@ -94,6 +94,16 @@ class Translation
     /**
      * @return array
      */
+    public function getHostedFieldsTranslations()
+    {
+        return [
+            'errorAmex' => $this->l('payplug.getHostedFieldsTranslations.errorAmex', 'translation'),
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getLoggedTranslations()
     {
         return [

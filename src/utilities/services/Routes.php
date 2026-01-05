@@ -79,7 +79,7 @@ class Routes
             'embedded' => $this->getApiUrl() . '/js/1/form.latest.js',
             'integrated' => $this->getCDNUrl() . '/js/integrated-payment/v1@1/index.js',
             //todo: update with prod url
-            'hosted_fields' => 'https://staging-internal-payment.gcp.dlns.io/ui/hosted-fields-lib/hosted-fields/v2.1.0/hosted-fields.min.js',
+            'hosted_fields' => 'https://sandbox-internal-payment.gcp.dlns.io/ui/hosted-fields-lib/hosted-fields/v2.2.0/hosted-fields.min.js',
         ];
     }
 
