@@ -53,6 +53,9 @@ jobs:
 
       - name: Build the package
         run: |
+          echo "Copy upgrade files"
+          cp -r ./dev/dist/payplug/upgrade .
+          
           echo "Set license headers"
           ./dev/ci/set_licenses.sh -b payplug
 
