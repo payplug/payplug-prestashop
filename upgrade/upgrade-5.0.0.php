@@ -37,12 +37,6 @@ function upgrade_module_5_0_0($object)
     $payment_methods['wero'] = false;
     $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
 
-    // Add new payment methods amount
-    $payment_methods = json_decode(Configuration::get('PAYPLUG_AMOUNTS'), true);
-    $payment_methods['bizum'] = $payment_methods['default'];
-    $payment_methods['wero'] = $payment_methods['default'];
-    $flag = $flag && Configuration::updateValue('PAYPLUG_AMOUNTS', json_encode($payment_methods));
-
     $logger->addLog('End upgrade script 5.0.0, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;

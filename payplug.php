@@ -561,10 +561,28 @@ class Payplug extends PaymentModule
             $helpers = $this->payplug_dependencies->getHelpers();
             $helpers['files']::clean();
 
-            // Call getAccount method to update countries and amounts configurations from merchant account
-            $permissions = $this
+            // Call getAccount method to update amounts configurations from merchant account
+            // todo: Étendre cette logique aux autres configurations des méthodes de paiement
+            $permissions = $this->payplug_dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->payplug_dependencies->name)
                 ->getService('payplug.utilities.service.api')
-                ->getAccount();
+                ->getAccount(false);
+
+            if ('{}' != Configuration::get('PAYPLUG_AMOUNTS')
+                && !empty($permissions)) {
+                $payment_methods = json_decode(Configuration::get('PAYPLUG_AMOUNTS'), true);
+                foreach ($payment_methods as $key => &$payment_method) {
+                    if (isset($permissions[$key]['min_amounts'])) {
+                        $payment_method['min'] = $permissions[$key]['min_amounts'];
+                    }
+                    if (isset($payment_method['max_amounts'])) {
+                        $payment_method['max'] = $permissions[$key]['max_amounts'];
+                    }
+                }
+                Configuration::updateValue('PAYPLUG_AMOUNTS', json_encode($payment_methods));
+            }
         }
 
         return parent::runUpgradeModule();
