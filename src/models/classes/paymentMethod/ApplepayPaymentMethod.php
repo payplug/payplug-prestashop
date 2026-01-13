@@ -494,6 +494,7 @@ class ApplepayPaymentMethod extends PaymentMethod
                     'firstname' => 'applepay firstname',
                     'lastname' => 'applepay lastname',
                     'address1' => 'applepay address1',
+                    'address2' => 'applepay address2',
                     'postcode' => $address['postalCode'],
                     'city' => $address['locality'],
                     'id_country' => $this->dependencies
@@ -620,6 +621,9 @@ class ApplepayPaymentMethod extends PaymentMethod
             'first_name' => $address_data['givenName'],
             'last_name' => $address_data['familyName'],
             'address1' => $address_data['addressLines'][0],
+            'address2' => isset($address_data['addressLines'][1]) && !empty($address_data['addressLines'][1])
+                ? $address_data['addressLines'][1]
+                : '',
             'postcode' => $address_data['postalCode'],
             'city' => $address_data['locality'],
             'country' => $address_data['countryCode'],
