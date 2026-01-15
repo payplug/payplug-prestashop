@@ -58,12 +58,16 @@ class OrderStateAdapter implements OrderStateInterface
         return \OrderState::getOrderStates($id_lang);
     }
 
-    public function softDelete()
+    public function softDelete($id = 0)
     {
-        if (method_exists($this->orderState, 'softDelete')) {
-            return $this->orderState->softDelete();
+        if (!is_int($id) || !$id) {
+            return false;
+        }
+        $orderState = $this->get($id);
+        if (method_exists($orderState, 'softDelete')) {
+            return $orderState->softDelete();
         }
 
-        return $this->delete();
+        return $orderState->delete();
     }
 }

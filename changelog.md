@@ -1,5 +1,7 @@
 # Payplug module changelog
-
+## Version 4.22.1
+- Bugfix :
+  - [SMP-3240](https://github.com/payplug/payplug-prestashop/pull/16): Fix Order state soft delete issue
 ## Version 4.22.0
 - Feature :
   - [PRE-3033](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/): Add new payment method: Wero & Bizum
