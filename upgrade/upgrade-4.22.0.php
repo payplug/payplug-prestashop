@@ -24,12 +24,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_5_0_0($object)
+function upgrade_module_4_22_0($object)
 {
     $flag = true;
 
     $logger = $object->payplug_dependencies->getPlugin()->getLogger();
-    $logger->addLog('Start upgrade script 5.0.0');
+    $logger->addLog('Start upgrade script 4.22.0');
 
     // Add new payment methods
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
@@ -37,7 +37,7 @@ function upgrade_module_5_0_0($object)
     $payment_methods['wero'] = false;
     $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
 
-    $logger->addLog('End upgrade script 5.0.0, result: ' . ($flag ? 'ok' : 'ko'));
+    $logger->addLog('End upgrade script 4.22.0, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;
 }
