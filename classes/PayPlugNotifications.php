@@ -691,7 +691,7 @@ class PayPlugNotifications
 
         if (empty($this->stored_resource)) {
             $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-            $this->exitProcess($error_msg, 'oney' == $payment_method ? 242 : 500);
+            $this->exitProcess($error_msg, 'oney' == $this->payment->payment_method ? 242 : 500);
         }
 
         $retrieve = $this->dependencies
