@@ -106,6 +106,20 @@ It is possible to use npm as alternative, adapte the following example to your n
     
 NB: Use npm nor npx command will generate `.map` files who could be helpfull for the development of feature.
 
+Git Hooks
+---------
+
+This project uses **CaptainHook** to manage Git hooks (pre-commit, post-checkout).
+
+Hooks are automatically installed when running `composer install`. For detailed information about setup, configuration, and migration from Husky, see [docs/captainhook-migration.md](docs/captainhook-migration.md).
+
+**Quick start:**
+```bash
+composer install        # Hooks are installed automatically
+composer cs:fix         # Manual code formatting
+composer hooks:install  # Reinstall hooks if needed
+```
+
 Webpack
 ---------
 Webpack is automatically installed when running the "composer install" command.

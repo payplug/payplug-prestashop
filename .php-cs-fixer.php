@@ -1,7 +1,6 @@
 <?php
 
 $finder = (new PhpCsFixer\Finder())
-    ->exclude('test')
     ->exclude('vendor')
     ->exclude('translations')
     ->exclude('.tmp_staging')

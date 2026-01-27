@@ -6,11 +6,6 @@ php-cs-fixer-v2.phar
 .idea/
 .well-know/
 node_modules/
-composer.json
-composer.lock
-features.json
-package-lock.json
-package.json
 vendor/
 views/css/*.css
 views/css/*.map
