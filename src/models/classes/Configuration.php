@@ -459,8 +459,8 @@ class Configuration
             'name' => [
                 'en' => 'Payment failed',
                 'fr' => 'Paiement échoué',
-                'es' => 'Payment failed',
-                'it' => 'Payment failed',
+                'es' => 'Pago fallido',
+                'it' => 'Pagamento fallito',
             ],
             'type' => 'error',
         ],
@@ -477,8 +477,8 @@ class Configuration
             'name' => [
                 'en' => 'Payment cancelled',
                 'fr' => 'Paiement annulé',
-                'es' => 'Payment cancelled',
-                'it' => 'Payment cancelled',
+                'es' => 'Pago cancelado',
+                'it' => 'Pagamento annullato',
             ],
             'type' => 'cancelled',
         ],
@@ -495,7 +495,7 @@ class Configuration
             'name' => [
                 'en' => 'Payment authorized',
                 'fr' => 'Paiement autorisé',
-                'es' => 'Pago',
+                'es' => 'Pago autorizado',
                 'it' => 'Pagamento autorizzato',
             ],
             'type' => 'pending',
@@ -531,8 +531,8 @@ class Configuration
             'name' => [
                 'en' => 'Oney - Pending',
                 'fr' => 'Oney - En attente',
-                'es' => 'Oney - Pending',
-                'it' => 'Oney - Pending',
+                'es' => 'Oney - Pendiente',
+                'it' => 'Oney - In attesa',
             ],
             'type' => 'pending',
         ],
@@ -549,7 +549,7 @@ class Configuration
             'name' => [
                 'en' => 'Payment Link Sent by Email',
                 'fr' => 'Lien de Paiement Envoyé par Email',
-                'es' => 'Payment Link Sent by Email',
+                'es' => 'Enlace de pago enviado por correo electrónico',
                 'it' => 'Link di Pagamento Inviato via Email',
             ],
             'type' => 'pending',
@@ -567,7 +567,7 @@ class Configuration
             'name' => [
                 'en' => 'Payment Link Sent by SMS',
                 'fr' => 'Lien de Paiement Envoyé par SMS',
-                'es' => 'Payment Link Sent by SMS',
+                'es' => 'Enlace de pago enviado por SMS',
                 'it' => 'Link di Pagamento Inviato via SMS',
             ],
             'type' => 'pending',
