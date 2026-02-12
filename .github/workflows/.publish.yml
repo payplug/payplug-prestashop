@@ -1,0 +1,93 @@
+name: publish-workflow
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+
+jobs:
+  define-package-version:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_version: ${{ steps.get_version.outputs.artifact_version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: get_version
+        run: |
+          ARTIFACT_VERSION=$(jq -r '.version' dev/dist/payplug/composer.json)
+          echo "artifact_version=$ARTIFACT_VERSION" >> $GITHUB_OUTPUT
+
+  build-package:
+    runs-on: ubuntu-latest
+    needs: [define-package-version]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 7.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - name: Récupération des fichiers dist payplug
+        run: ./dev/ci/dist_files.sh -b payplug
+
+      - name: Générer les traductions
+        run: |
+          php dev/ci/generate-translations.php ${{ github.base_ref || github.ref_name }}
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Installer les dépendances && build les assets
+        run: |
+          npm ci
+          chmod +x ./dev/ci/generate-asset-files.sh && ./dev/ci/generate-asset-files.sh
+          npm install --save-dev webpack
+          npm run build
+
+      - name: Composer install --no-dev
+        run: composer install --no-dev
+
+      - name: Build the package
+        run: |
+          echo "Set license headers"
+          ./dev/ci/set_licenses.sh -b payplug
+
+          echo "Update copyright years"
+          ./dev/ci/update_year.sh
+
+          echo "Add index.php files to directories"
+          ./dev/ci/secure_directories.sh
+
+          echo "Create empty log files for installation"
+          echo "" > log/install-log.csv
+
+          echo "Creating the package zip file"
+          php dev/ci/list_module_files.php .
+
+          echo "Remove unnecessary files"
+          rm -rf node_modules dev tests
+
+          echo "Generating plugin dir then move file in created folder"
+          mkdir payplug
+          find . -maxdepth 1 ! -name payplug ! -name '.' -exec mv {} payplug/ \;
+
+          echo "Check the content"
+          ls -la
+
+          echo "and plugin dir"
+          ls -la payplug
+
+          echo "Zipping payplug directory"
+          cp payplug/composer.json composer.json
+          composer archive --file payplug --format zip
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: payplug_${{ needs.define-package-version.outputs.artifact_version }}
+          path: payplug.zip
+          retention-days: 7
