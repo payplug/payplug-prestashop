@@ -837,10 +837,13 @@ var $document, $window, __moduleName__Module = {
             }
 
             // Check if it's on the product page and add product-related data
-            if (workflow === 'product' && $('#product_page_product_id').length && $('#quantity_wanted').length) {
-                data.id_product = $('#product_page_product_id').val();
-                data.quantity = $('#quantity_wanted').val();
+            if (workflow === 'product' && $('#product_page_product_id').length) {
                 data.empty_cart = true;
+                var $product_form = $('#add-to-cart-or-refresh'),
+                    form_data = $product_form.serializeArray();
+                form_data.map(function (field) {
+                    data[field.name] = field.value;
+                });
             }
             let response_data;
             applepay.props.query = $.ajax({
