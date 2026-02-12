@@ -164,7 +164,7 @@ class PluginEntity
     private $paymentMethod;
 
     /** @var object */
-    private $product;
+    private $product_adapter;
 
     /** @var object */
     private $query_repository;
@@ -682,9 +682,9 @@ class PluginEntity
     /**
      * @return object
      */
-    public function getProduct()
+    public function getProductAdapter()
     {
-        return $this->product;
+        return $this->product_adapter;
     }
 
     /**
@@ -1664,17 +1664,17 @@ class PluginEntity
     }
 
     /**
-     * @param object $product
+     * @param object $product_adapter
      *
      * @return self
      */
-    public function setProduct($product)
+    public function setProductAdapter($product_adapter)
     {
-        if (!is_object($product)) {
-            throw new BadParameterException('Invalid argument, $product must be a ProductAdapter');
+        if (!is_object($product_adapter)) {
+            throw new BadParameterException('Invalid argument, $product_adapter must be a ProductAdapter');
         }
 
-        $this->product = $product;
+        $this->product_adapter = $product_adapter;
 
         return $this;
     }

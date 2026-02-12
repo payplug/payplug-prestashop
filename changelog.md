@@ -3,6 +3,7 @@
 ## Version 4.22.2
 - Bugfix :
   - [SMP-3248](https://github.com/payplug/payplug-prestashop/pull/27): Update order detail if order state is undefined
+  - [SMP-3246](https://github.com/payplug/payplug-prestashop/pull/23): Specify attributes and customization for applepay product
 
 ## Version 4.22.0
 - Feature :
