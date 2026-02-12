@@ -221,7 +221,7 @@ class PluginInit extends BaseClass
             ->setOrderHistory($this->order_history_adapter)
             ->setOrderSlip($this->order_slip_adapter)
             ->setOrderStateAdapter($this->order_state_adapter)
-            ->setProduct($this->product_adapter)
+            ->setProductAdapter($this->product_adapter)
             ->setQueryAdapter($this->query_adapter)
             ->setShop($this->shop_adapter)
             ->setTabAdapter($this->tab_adapter)
