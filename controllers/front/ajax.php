@@ -60,7 +60,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             $this->configurationAdapter = $this->plugin->getConfiguration();
 
             $this->contextAdapter = $this->plugin->getContext(); // get ContextAdapter Repository object
-            $this->productAdapter = $this->plugin->getProduct();
+            $this->productAdapter = $this->plugin->getProductAdapter();
             $context = $this->contextAdapter->get(); // get the method
             $tools = $this->tools_adapter;
 
