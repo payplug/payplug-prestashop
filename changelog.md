@@ -1,17 +1,21 @@
 # Payplug module changelog
 
+## Version 4.22.2
+- Bugfix :
+    - [SMP-3248](https://github.com/payplug/payplug-prestashop/pull/27): Update order detail if order state is undefined
+
 ## Version 4.22.1
 - Bugfix :
-  - [SMP-3145](https://github.com/payplug/payplug-prestashop/pull/20): Fix error 500 on Oney notifications
-  - [SMP-3239](https://github.com/payplug/payplug-prestashop/pull/30): Logout action on 401 error and send alert email
+    - [SMP-3145](https://github.com/payplug/payplug-prestashop/pull/20): Fix error 500 on Oney notifications
+    - [SMP-3239](https://github.com/payplug/payplug-prestashop/pull/30): Logout action on 401 error and send alert email
 
 ## Version 4.22.0
 - Feature :
-  - [PRE-3033](https://github.com/payplug/payplug-prestashop/pull/5): Add new payment method: Wero & Bizum
-  - [PRE-3154](https://github.com/payplug/payplug-prestashop/pull/18): Update wording for APM bundle description 
+    - [PRE-3033](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/): Add new payment method: Wero & Bizum
+    - [PRE-3154](https://github.com/payplug/payplug-prestashop/pull/18): Update wording for APM bundle description
 
 - Bugfix :
-  - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet
+    - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet
 
 ## Version 4.21.0
 - Refactor :
