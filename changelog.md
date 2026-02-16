@@ -11,11 +11,11 @@
 
 ## Version 4.22.0
 - Feature :
-    - [PRE-3033](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/): Add new payment method: Wero & Bizum
-    - [PRE-3154](https://github.com/payplug/payplug-prestashop/pull/18): Update wording for APM bundle description
+  - [PRE-3033](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/): Add new payment method: Wero & Bizum
+  - [PRE-3154](https://github.com/payplug/payplug-prestashop/pull/18): Update wording for APM bundle description
 
 - Bugfix :
-    - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet
+  - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet
 
 ## Version 4.21.0
 - Refactor :
