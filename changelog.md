@@ -7,8 +7,8 @@
 
 ## Version 4.22.1
 - Bugfix :
-  - [SMP-3145](https://github.com/payplug/payplug-prestashop/pull/20): Fix error 500 on Oney notifications
-  - [SMP-3239](https://github.com/payplug/payplug-prestashop/pull/30): Logout action on 401 error and send alert email
+    - [SMP-3145](https://github.com/payplug/payplug-prestashop/pull/20): Fix error 500 on Oney notifications
+    - [SMP-3239](https://github.com/payplug/payplug-prestashop/pull/30): Logout action on 401 error and send alert email
 
 ## Version 4.22.0
 - Feature :
