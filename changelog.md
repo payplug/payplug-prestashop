@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.22.2
+- Bugfix :
+  - [SMP-3248](https://github.com/payplug/payplug-prestashop/pull/27): Update order detail if order state is undefined
+
 ## Version 4.22.0
 - Feature :
   - [PRE-3033](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/): Add new payment method: Wero & Bizum
