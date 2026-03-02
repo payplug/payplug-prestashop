@@ -22,5 +22,5 @@
 
 <div id="payplug_admin"></div>
 
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-{$plugin_version|escape:'htmlall':'UTF-8'}.js"></script>
-<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-{$plugin_version|escape:'htmlall':'UTF-8'}.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/app-v{$plugin_version|escape:'htmlall':'UTF-8'}.js"></script>
+<script type="text/javascript" src="{$lib_url|escape:'htmlall':'UTF-8'}js/chunk-vendors-v{$plugin_version|escape:'htmlall':'UTF-8'}.js"></script>

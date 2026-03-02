@@ -189,7 +189,7 @@ class AdminPayplugController extends ModuleAdminController
             'lib_url' => $this->context->shop->getBaseURL(true) . 'modules/' . $this->dependencies->name . '/views/',
         ]);
 
-        $this->context->controller->addCSS($lib_path . '/css/app-' . $this->dependencies->version . '.css');
+        $this->context->controller->addCSS($lib_path . '/css/app-v' . $this->dependencies->version . '.css');
 
         $this->content = $this->context->smarty->fetch($this->module->getLocalPath() . '/views/templates/admin/admin.tpl');
 
