@@ -251,6 +251,7 @@ class PaymentMethod
             'sms_link',
             'wero',
             'bizum',
+            'scalapay',
         ];
     }
 
