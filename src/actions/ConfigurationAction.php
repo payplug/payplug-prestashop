@@ -83,6 +83,7 @@ class ConfigurationAction
             'use_live_mode' => 'use_live_mode',
             'bizum' => 'can_use_bizum',
             'wero' => 'can_use_wero',
+            'scalapay' => 'can_use_scalapay',
         ];
 
         if (!$this->dependencies
@@ -974,6 +975,7 @@ class ConfigurationAction
             'standard' => 'enable_standard',
             'wero' => 'enable_wero',
             'bizum' => 'enable_bizum',
+            'scalapay' => 'enable_scalapay',
         ];
         foreach ($payment_method_keys as $key => $config) {
             $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;

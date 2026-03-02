@@ -1209,7 +1209,7 @@ class API
         if (isset($_ENV['API_BASE_URL']) && !empty($_ENV['API_BASE_URL'])) {
             $this->setApiUrl($_ENV['API_BASE_URL']);
         } else {
-            $this->setApiUrl('https://api.payplug.com');
+            $this->setApiUrl('https://api-qa.payplug.com');
         }
 
         $this->site_url = !$this->site_url && isset($_ENV['PAYPLUG_SITE_URL']) && !empty($_ENV['PAYPLUG_SITE_URL'])

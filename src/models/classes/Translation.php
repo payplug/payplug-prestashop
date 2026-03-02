@@ -238,6 +238,7 @@ class Translation
                     'satispay' => $this->l('modal.premium.feature.satispay', 'translation'),
                     'bizum' => $this->l('modal.premium.feature.bizum', 'translation'),
                     'wero' => $this->l('modal.premium.feature.wero', 'translation'),
+                    'scalapay' => $this->l('modal.premium.feature.scalapay', 'translation'),
                     'oney' => $this->l('modal.premium.feature.oney', 'translation'),
                     'one_click' => $this->l('modal.premium.feature.oneclick', 'translation'),
                     'installment' => $this->l('modal.premium.feature.installment', 'translation'),
@@ -635,6 +636,15 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.bizum.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.bizum.call_to_action', 'translation'),
+            ],
+            'scalapay' => [
+                'title' => $this->l('paymentmethods.scalapay.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->l('paymentmethods.scalapay.descriptions.live', 'translation'),
+                    'sandbox' => $this->l('paymentmethods.scalapay.descriptions.sandbox', 'translation'),
+                ],
+                'link' => $this->l('paymentmethods.scalapay.link', 'translation'),
+                'call_to_action' => $this->l('paymentmethods.scalapay.call_to_action', 'translation'),
             ],
         ];
     }
