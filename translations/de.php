@@ -341,7 +341,7 @@ $_MODULE['<{payplug}prestashop>translation_80bca4436c5b5e2d9e56dda2c2245e7d'] = 
 $_MODULE['<{payplug}prestashop>translation_80d89af49cffae6024239e2f8e5c6479'] = 'Please fill in the required fields';
 $_MODULE['<{payplug}prestashop>translation_820e44ab0a2e491963bead5746bdea60'] = 'iDEAL';
 $_MODULE['<{payplug}prestashop>translation_8225dc6896940f129f16a82a13f35a75'] = 'PayLater';
-$_MODULE['<{payplug}prestashop>translation_83202da4a3cf025e24362fb83d72acf4'] = 'Wero is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it., Wero is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."';
+$_MODULE['<{payplug}prestashop>translation_83202da4a3cf025e24362fb83d72acf4'] = 'Wero is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it.';
 $_MODULE['<{payplug}prestashop>translation_83de36c28c4741b8e97139ee98a632a3'] = 'Your email address is too long and the + character is not valid';
 $_MODULE['<{payplug}prestashop>translation_842a5156a43c41e75473ef0e67d42e3a'] = 'The payment solution that increases your sales.';
 $_MODULE['<{payplug}prestashop>translation_8488221a790287726a027336cfe92eac'] = 'Congratulations, your account is connected!';
@@ -411,7 +411,7 @@ $_MODULE['<{payplug}prestashop>translation_b3555b96d39a91158e5c60c0b423668f'] = 
 $_MODULE['<{payplug}prestashop>translation_b35fde6c614e9689414d6c417e9d5bcc'] = 'capture authorized before %s"
 <{payplug}prestashop>translation_b5282215d1ef0800cbc2f989aad4a67c;paymentmethods.deferred.states.state;;Capture automatique au statut : %s';
 $_MODULE['<{payplug}prestashop>translation_b3bb2f3a0735826a87f457845b0a858e'] = 'General';
-$_MODULE['<{payplug}prestashop>translation_b46f1e901216d7ebf40dff7700ebf11f'] = 'Scalapay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it., "Scalapay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."';
+$_MODULE['<{payplug}prestashop>translation_b46f1e901216d7ebf40dff7700ebf11f'] = 'Scalapay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it.';
 $_MODULE['<{payplug}prestashop>translation_b5282215d1ef0800cbc2f989aad4a67c'] = 'Automatic capture at status: %s';
 $_MODULE['<{payplug}prestashop>translation_b55fe6b67ecd328248053410c9e26e76'] = 'Pay with Wero';
 $_MODULE['<{payplug}prestashop>translation_b5772224c0057b51de1b2ef2f26e9d0d'] = 'Show payment schedule on the checkout page';
