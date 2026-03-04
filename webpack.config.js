@@ -71,7 +71,7 @@ function _getAllFilesFromFolder(dir)
             if (stat && stat.isDirectory()) {
                 _getAllFilesFromFolder(filePath);
             } else {
-                entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, filePath);
+                entryFiles[wpFile + '-' + moduleVersion] = path.resolve(__dirname, filePath);
             }
         }
 
@@ -85,7 +85,7 @@ function _getAllFilesFromFolder(dir)
                 switch (dir) {
                     // compilation des fichiers .js
                     case jsViewsFolder:
-                        entryFiles[wpFile + '-v' + moduleVersion] = path.resolve(__dirname, filePath);
+                        entryFiles[wpFile + '-' + moduleVersion] = path.resolve(__dirname, filePath);
                         break;
                 }
             }

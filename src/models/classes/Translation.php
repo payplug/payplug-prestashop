@@ -289,6 +289,7 @@ class Translation
                 'satispay' => $this->l('order.module.satispay', 'translation'),
                 'wero' => $this->l('order.module.wero', 'translation'),
                 'bizum' => $this->l('order.module.bizum', 'translation'),
+                'scalapay' => $this->l('order.module.scalapay', 'translation'),
             ],
             'detail' => [
                 'mode' => [

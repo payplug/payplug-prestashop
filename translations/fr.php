@@ -348,6 +348,7 @@ $_MODULE['<{payplug}prestashop>translation_8598266b5aa25405f6ed58c08371f72a'] = 
 $_MODULE['<{payplug}prestashop>translation_85c9706cf5c49c33262d40df8b9414d8'] = 'Paramétrages avancés';
 $_MODULE['<{payplug}prestashop>translation_85e40373979d430939adefddadd1326e'] = 'Oney 3x sans frais';
 $_MODULE['<{payplug}prestashop>translation_865ded3b13c4fa2dc84373802db0295d'] = 'Impossible d\'enregistrer la configuration. Merci de sélectionner au moins une méthode de livraison compatible pour Apple Pay Panier ou désactivez la fonctionnalité.';
+$_MODULE['<{payplug}prestashop>translation_86d9c026d0f5352769a8672802ccf808'] = 'Scalapay';
 $_MODULE['<{payplug}prestashop>translation_8763320529c923badb04702366dddd66'] = 'Paiements Bizum';
 $_MODULE['<{payplug}prestashop>translation_87a6bec11161f861ab19ac6816b5cafd'] = 'OUI';
 $_MODULE['<{payplug}prestashop>translation_8948b2c39066e6ab61dceee29219b3e3'] = 'Vous pouvez désormais utiliser le mode LIVE et encaisser des paiements dès maintenant.';
