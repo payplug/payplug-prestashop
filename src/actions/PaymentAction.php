@@ -44,6 +44,7 @@ class PaymentAction
         'standard',
         'wero',
         'bizum',
+        'scalapay',
     ];
     private $context;
     private $dependencies;

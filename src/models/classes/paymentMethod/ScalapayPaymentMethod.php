@@ -29,6 +29,8 @@ if (!defined('_PS_VERSION_')) {
 
 class ScalapayPaymentMethod extends PaymentMethod
 {
+    private $cart_adapter;
+
     public function __construct($dependencies)
     {
         parent::__construct($dependencies);
@@ -55,6 +57,8 @@ class ScalapayPaymentMethod extends PaymentMethod
     // todo: add coverage to this method
     public function getPaymentTab()
     {
+        $this->setParameters();
+
         $payment_tab = $this->getDefaultPaymentTab();
 
         if (empty($payment_tab)) {
@@ -62,8 +66,71 @@ class ScalapayPaymentMethod extends PaymentMethod
         }
 
         $payment_tab['payment_method'] = 'scalapay';
+        $payment_tab['payment_context'] = $this->getScalapayPaymentContext();
+
         unset($payment_tab['force_3ds'], $payment_tab['allow_save_card']);
 
         return $payment_tab;
+    }
+
+    /**
+     * @description Get Scalapay payment Context
+     *
+     * @return array
+     */
+    public function getScalapayPaymentContext()
+    {
+        $this->setParameters();
+
+        $cart_context = [];
+        $cart = $this->cart_adapter->get((int) $this->context->cart->id);
+        if (!$this->validate_adapter->validate('isLoadedObject', $cart)) {
+            return ['cart' => $cart_context];
+        }
+
+        $products = $this->cart_adapter->getProducts($cart);
+
+        foreach ($products as $product) {
+            $unit_price = $this->dependencies
+                ->getHelpers()['amount']
+                ->convertAmount($product['price_wt']);
+            $productName = (string) $product['name'] . (isset($product['attributes'])
+                    ? ' - ' . $product['attributes']
+                    : '');
+
+            $item = [
+                'delivery_label' => $this->dependencies
+                    ->getPlugin()
+                    ->getConfiguration()
+                    ->get('PS_SHOP_NAME') . ' store',
+                'delivery_type' => 'storepickup',
+                'brand' => (isset($product['manufacturer_name']) && $product['manufacturer_name']) ?
+                    $this->tools->substr($product['manufacturer_name'], 0, 250) :
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getConfiguration()
+                        ->get('PS_SHOP_NAME'),
+                'merchant_item_id' => (string) $product['id_product'],
+                'name' => $this->tools->substr($productName, 0, 250),
+                'expected_delivery_date' => date('Y-m-d', strtotime('+1 week')),
+                'total_amount' => $unit_price * $product['cart_quantity'],
+                'price' => (int) $unit_price,
+                'quantity' => (int) $product['cart_quantity'],
+            ];
+
+            $cart_context[] = $item;
+        }
+
+        return ['cart' => $cart_context];
+    }
+
+    /**
+     * @description Set parameters for usage
+     */
+    protected function setParameters()
+    {
+        parent::setParameters();
+
+        $this->cart_adapter = $this->cart_adapter ?: $this->dependencies->getPlugin()->getCart();
     }
 }
