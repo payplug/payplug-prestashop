@@ -81,6 +81,34 @@ class Translation
     /**
      * @return array
      */
+    public function getFrontPaymentErrorTranslations()
+    {
+        return [
+            '401' => [
+                'description1' => $this->l('paymenterror.401.description1', 'translation'),
+                'description2' => $this->l('paymenterror.401.description2', 'translation'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getMailTranslations()
+    {
+        return [
+            'merchant' => [
+                'subject' => $this->l('mail.merchant.subject', 'translation'),
+            ],
+            'cs' => [
+                'subject' => $this->l('mail.cs.subject', 'translation'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getHeaderTranslations()
     {
         return [

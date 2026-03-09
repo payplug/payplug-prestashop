@@ -82,7 +82,8 @@ class generateJWTTest extends BaseMerchant
         $this->assertSame(
             [
                 'result' => false,
-                'message' => 'Error during JWT generation',
+                'code' => 400,
+                'message' => 'Some error message',
             ],
             $this->class->generateJWT($this->oauth_client_data)
         );

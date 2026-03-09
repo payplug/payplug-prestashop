@@ -1735,9 +1735,9 @@ class PaymentMethod
                     ->getService('payplug.models.classes.merchant')
                     ->generateJWT($oauth_client_data);
                 if ($jwt['result']) {
-                    $this->configuration->set('jwt', json_encode($jwt));
-                    $need_logout = false;
+                    $this->configuration->set('jwt', json_encode($jwt['data']));
                 }
+                $need_logout = !$jwt['result'] && (401 == $jwt['code']);
             }
 
             if ($need_logout) {
@@ -1749,6 +1749,22 @@ class PaymentMethod
                     ->getPlugin()
                     ->getConfigurationAction()
                     ->logoutAction();
+
+                $this->dependencies
+                    ->getPlugin()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.utilities.service.mail')
+                    ->sendMail();
+
+                $translation = $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->getFrontPaymentErrorTranslations();
+                $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
+                    $translation['401']['description1'],
+                    $translation['401']['description2'],
+                ]);
             }
         }
 
