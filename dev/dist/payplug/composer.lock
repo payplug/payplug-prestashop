@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "78a5c94872bc97265c4426112e6726ea",
+    "content-hash": "2211c5221a1f2c18ef3a9b9bb974f9e5",
     "packages": [
         {
             "name": "payplug/payplug-php",
@@ -403,152 +403,86 @@
     ],
     "packages-dev": [
         {
-            "name": "ccinn/composer-husky-plugin",
-            "version": "v0.2.0",
+            "name": "captainhook/captainhook",
+            "version": "5.2.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/whiteCcinn/composer-husky-plugin.git",
-                "reference": "815623c34991991e998572abca8208c07295838c"
+                "url": "https://github.com/captainhook-git/captainhook.git",
+                "reference": "85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/whiteCcinn/composer-husky-plugin/zipball/815623c34991991e998572abca8208c07295838c",
-                "reference": "815623c34991991e998572abca8208c07295838c",
+                "url": "https://api.github.com/repos/captainhook-git/captainhook/zipball/85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31",
+                "reference": "85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.1 || ^2.0",
-                "ext-json": "*"
+                "ext-json": "*",
+                "ext-spl": "*",
+                "ext-xml": "*",
+                "php": "^7.2",
+                "sebastianfeldmann/camino": "^0.9.2",
+                "sebastianfeldmann/cli": "^3.0",
+                "sebastianfeldmann/git": "^3.1",
+                "symfony/console": "^2.7 || ^3.0 || ^4.0 || ^5.0",
+                "symfony/process": "^2.7 || ^3.0 || ^4.0 || ^5.0"
+            },
+            "replace": {
+                "sebastianfeldmann/captainhook": "*"
             },
             "require-dev": {
-                "composer/composer": "^1.6.5 || ^1.7.0 || ^1.8.0 || ^2.0"
+                "composer/composer": "~1",
+                "mikey179/vfsstream": "~1"
             },
-            "type": "composer-plugin",
+            "bin": [
+                "bin/captainhook"
+            ],
+            "type": "library",
             "extra": {
-                "class": "Husky\\Plugins\\HuskyPlugin"
+                "captainhook": {
+                    "config": "captainhook.json"
+                },
+                "branch-alias": {
+                    "dev-master": "6.0.x-dev"
+                }
             },
             "autoload": {
                 "psr-4": {
-                    "Husky\\": "src/"
+                    "CaptainHook\\App\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "authors": [
                 {
-                    "name": "caiwenhui",
-                    "email": "471113744@qq.com",
-                    "homepage": "https://github.com/whiteCcinn",
-                    "role": "Developer"
+                    "name": "Sebastian Feldmann",
+                    "email": "sf@sebastian-feldmann.info"
                 }
             ],
-            "description": "Husky-php composer plugin",
+            "description": "PHP git hook manager",
+            "homepage": "https://github.com/captainhookphp/captainhook",
             "keywords": [
-                "composer-husky-plugin",
-                "composer-plugin",
-                "husky-php"
+                "commit-msg",
+                "git",
+                "hooks",
+                "post-merge",
+                "pre-commit",
+                "pre-push",
+                "prepare-commit-msg"
             ],
             "support": {
-                "issues": "https://github.com/whiteCcinn/composer-husky-plugin/issues",
-                "source": "https://github.com/whiteCcinn/composer-husky-plugin/tree/v0.2.0"
+                "issues": "https://github.com/captainhookphp/captainhook/issues",
+                "source": "https://github.com/captainhook-git/captainhook/tree/5.2.1"
             },
-            "time": "2021-08-06T15:36:19+00:00"
-        },
-        {
-            "name": "ccinn/husky-php",
-            "version": "v0.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/whiteCcinn/husky-php.git",
-                "reference": "be2000b7a0f1579de69054d226f55fb5d829c8ce"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/whiteCcinn/husky-php/zipball/be2000b7a0f1579de69054d226f55fb5d829c8ce",
-                "reference": "be2000b7a0f1579de69054d226f55fb5d829c8ce",
-                "shasum": ""
-            },
-            "require": {
-                "ccinn/php-cs-fixer-config": "^0.1.0",
-                "ext-json": "*",
-                "php": ">=7",
-                "symfony/console": "^3.4|^4|^5",
-                "symfony/filesystem": "^3.4|^4|^5"
-            },
-            "bin": [
-                "husky-php",
-                "sh/husky-default-pre-commit"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "App\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
+            "funding": [
                 {
-                    "name": "caiwenhui",
-                    "email": "471113744@qq.com"
+                    "url": "https://github.com/sponsors/sebastianfeldmann",
+                    "type": "github"
                 }
             ],
-            "description": "Similar to js-husky client git hook implementation",
-            "keywords": [
-                "husky",
-                "php"
-            ],
-            "support": {
-                "issues": "https://github.com/whiteCcinn/husky-php/issues",
-                "source": "https://github.com/whiteCcinn/husky-php/tree/v0.1.1"
-            },
-            "time": "2021-08-17T09:16:02+00:00"
-        },
-        {
-            "name": "ccinn/php-cs-fixer-config",
-            "version": "v0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/whiteCcinn/php-cs-fixer-config.git",
-                "reference": "0c9a9f61fea8bb589826e84b15bc376068382a8e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/whiteCcinn/php-cs-fixer-config/zipball/0c9a9f61fea8bb589826e84b15bc376068382a8e",
-                "reference": "0c9a9f61fea8bb589826e84b15bc376068382a8e",
-                "shasum": ""
-            },
-            "require": {
-                "friendsofphp/php-cs-fixer": "^2.14.0",
-                "php": "^5.6 || ^7.0"
-            },
-            "bin": [
-                ".php56_cs",
-                ".php70_cs",
-                ".php71_cs"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "PhpCsFixer\\Config\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "caiwenhui",
-                    "email": "471113744@qq.com",
-                    "homepage": "https://github.com/whiteCcinn",
-                    "role": "Developer"
-                }
-            ],
-            "description": "php-cs-fixer-config",
-            "keywords": [
-                "php-cs-fixer-config"
-            ],
-            "support": {
-                "issues": "https://github.com/whiteCcinn/php-cs-fixer-config/issues",
-                "source": "https://github.com/whiteCcinn/php-cs-fixer-config/tree/v0.1.0"
-            },
-            "time": "2019-05-09T12:12:56+00:00"
+            "time": "2020-05-01T15:25:44+00:00"
         },
         {
             "name": "composer/pcre",
@@ -2793,6 +2727,181 @@
             "time": "2016-10-03T07:35:21+00:00"
         },
         {
+            "name": "sebastianfeldmann/camino",
+            "version": "0.9.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianfeldmann/camino.git",
+                "reference": "bf2e4c8b2a029e9eade43666132b61331e3e8184"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianfeldmann/camino/zipball/bf2e4c8b2a029e9eade43666132b61331e3e8184",
+                "reference": "bf2e4c8b2a029e9eade43666132b61331e3e8184",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SebastianFeldmann\\Camino\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Feldmann",
+                    "email": "sf@sebastian-feldmann.info"
+                }
+            ],
+            "description": "Path management the OO way",
+            "homepage": "https://github.com/sebastianfeldmann/camino",
+            "keywords": [
+                "file system",
+                "path"
+            ],
+            "support": {
+                "issues": "https://github.com/sebastianfeldmann/camino/issues",
+                "source": "https://github.com/sebastianfeldmann/camino/tree/0.9.5"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sebastianfeldmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-01-03T13:15:10+00:00"
+        },
+        {
+            "name": "sebastianfeldmann/cli",
+            "version": "3.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianfeldmann/cli.git",
+                "reference": "6fa122afd528dae7d7ec988a604aa6c600f5d9b5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianfeldmann/cli/zipball/6fa122afd528dae7d7ec988a604aa6c600f5d9b5",
+                "reference": "6fa122afd528dae7d7ec988a604aa6c600f5d9b5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "symfony/process": "^4.3 | ^5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SebastianFeldmann\\Cli\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Feldmann",
+                    "email": "sf@sebastian-feldmann.info"
+                }
+            ],
+            "description": "PHP cli helper classes",
+            "homepage": "https://github.com/sebastianfeldmann/cli",
+            "keywords": [
+                "cli"
+            ],
+            "support": {
+                "issues": "https://github.com/sebastianfeldmann/cli/issues",
+                "source": "https://github.com/sebastianfeldmann/cli/tree/3.4.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sebastianfeldmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-11-26T10:19:01+00:00"
+        },
+        {
+            "name": "sebastianfeldmann/git",
+            "version": "3.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianfeldmann/git.git",
+                "reference": "eb2ca84a2b45a461f0bf5d4fd400df805649e83a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/eb2ca84a2b45a461f0bf5d4fd400df805649e83a",
+                "reference": "eb2ca84a2b45a461f0bf5d4fd400df805649e83a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-xml": "*",
+                "php": ">=7.2",
+                "sebastianfeldmann/cli": "^3.0"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "^1.6"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SebastianFeldmann\\Git\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Feldmann",
+                    "email": "sf@sebastian-feldmann.info"
+                }
+            ],
+            "description": "PHP git wrapper",
+            "homepage": "https://github.com/sebastianfeldmann/git",
+            "keywords": [
+                "git"
+            ],
+            "support": {
+                "issues": "https://github.com/sebastianfeldmann/git/issues",
+                "source": "https://github.com/sebastianfeldmann/git/tree/3.9.3"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sebastianfeldmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-10-13T09:10:48+00:00"
+        },
+        {
             "name": "squizlabs/php_codesniffer",
             "version": "3.13.4",
             "source": {
@@ -3800,16 +3909,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v5.4.47",
+            "version": "v5.4.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "5d1662fb32ebc94f17ddb8d635454a776066733d"
+                "reference": "467bfc56f18f5ef6d5ccb09324d7e988c1c0a98f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/5d1662fb32ebc94f17ddb8d635454a776066733d",
-                "reference": "5d1662fb32ebc94f17ddb8d635454a776066733d",
+                "url": "https://api.github.com/repos/symfony/process/zipball/467bfc56f18f5ef6d5ccb09324d7e988c1c0a98f",
+                "reference": "467bfc56f18f5ef6d5ccb09324d7e988c1c0a98f",
                 "shasum": ""
             },
             "require": {
@@ -3842,7 +3951,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v5.4.47"
+                "source": "https://github.com/symfony/process/tree/v5.4.51"
             },
             "funding": [
                 {
@@ -3854,11 +3963,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-06T11:36:42+00:00"
+            "time": "2026-01-26T15:53:37+00:00"
         },
         {
             "name": "symfony/stopwatch",
