@@ -1,9 +1,5 @@
 # Payplug module changelog
 
-## Next Version
-- Feature :
-  - [PRE-3165](https://github.com/payplug/payplug-prestashop/pull/21): Add Spanish translations
-
 ## Version 4.22.0
 - Feature :
   - [PRE-3033](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/): Add new payment method: Wero & Bizum
