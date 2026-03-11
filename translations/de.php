@@ -399,7 +399,8 @@ $_MODULE['<{payplug}prestashop>translation_b0888d14ec9952c4a08a5f6f166f4b86'] = 
 $_MODULE['<{payplug}prestashop>translation_b0982d7be8e2668bcde5e550b917edcf'] = 'Offer your customers the option to pay for their orders in';
 $_MODULE['<{payplug}prestashop>translation_b1117a2d93d2bbb027bf42d3de596d48'] = 'Bancontact';
 $_MODULE['<{payplug}prestashop>translation_b3555b96d39a91158e5c60c0b423668f'] = 'Find out more.';
-$_MODULE['<{payplug}prestashop>translation_b35fde6c614e9689414d6c417e9d5bcc'] = 'capture authorized before %s';
+$_MODULE['<{payplug}prestashop>translation_b35fde6c614e9689414d6c417e9d5bcc'] = 'capture authorized before %s"
+<{payplug}prestashop>translation_b5282215d1ef0800cbc2f989aad4a67c;paymentmethods.deferred.states.state;;Capture automatique au statut : %s';
 $_MODULE['<{payplug}prestashop>translation_b3bb2f3a0735826a87f457845b0a858e'] = 'General';
 $_MODULE['<{payplug}prestashop>translation_b5282215d1ef0800cbc2f989aad4a67c'] = 'Automatic capture at status: %s';
 $_MODULE['<{payplug}prestashop>translation_b55fe6b67ecd328248053410c9e26e76'] = 'Pay with Wero';

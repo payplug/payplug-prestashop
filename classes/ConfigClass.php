@@ -100,7 +100,7 @@ class ConfigClass
             'name' => [
                 'en' => 'Payment in progress',
                 'fr' => 'Paiement en cours',
-                'es' => 'Pago en progreso',
+                'es' => 'Pago en curso',
                 'it' => 'Pagamento in corso',
             ],
         ],
@@ -122,8 +122,8 @@ class ConfigClass
             'name' => [
                 'en' => 'Payment failed',
                 'fr' => 'Paiement échoué',
-                'es' => 'Pago fallido',
-                'it' => 'Pagamento fallito',
+                'es' => 'Payment failed',
+                'it' => 'Payment failed',
             ],
         ],
         'cancelled' => [
@@ -144,8 +144,8 @@ class ConfigClass
             'name' => [
                 'en' => 'Payment cancelled',
                 'fr' => 'Paiement annulé',
-                'es' => 'Pago cancelado',
-                'it' => 'Pagamento annullato',
+                'es' => 'Payment cancelled',
+                'it' => 'Payment cancelled',
             ],
         ],
         'auth' => [
@@ -166,8 +166,8 @@ class ConfigClass
             'name' => [
                 'en' => 'Payment authorized',
                 'fr' => 'Paiement autorisé',
-                'es' => 'Pago autorizado',
-                'it' => 'Pagamento autorizzato',
+                'es' => 'Pago',
+                'it' => 'Pagamento',
             ],
         ],
         'exp' => [
@@ -212,8 +212,8 @@ class ConfigClass
             'name' => [
                 'en' => 'Oney - Pending',
                 'fr' => 'Oney - En attente',
-                'es' => 'Oney - Pendiente',
-                'it' => 'Oney - In attesa',
+                'es' => 'Oney - Pending',
+                'it' => 'Oney - Pending',
             ],
         ],
     ];
