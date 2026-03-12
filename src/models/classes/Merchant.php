@@ -75,10 +75,7 @@ class Merchant
                 ->generateJWT($data['client_id'], $data['client_secret']);
 
             if (!$generated_jwt['result']) {
-                return [
-                    'result' => false,
-                    'message' => 'Error during JWT generation',
-                ];
+                return $generated_jwt;
             }
 
             $jwt[$key] = $generated_jwt['data'];
