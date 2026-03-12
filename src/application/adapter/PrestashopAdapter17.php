@@ -50,9 +50,9 @@ class PrestashopAdapter17
     public function displayHeader()
     {
         $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-        $this->context->controller->addCSS($views_path . '/css/front-v' . $this->dependencies->version . '.css');
-        $this->context->controller->addJS($views_path . '/js/utilities-v' . $this->dependencies->version . '.js');
-        $this->context->controller->addJS($views_path . '/js/front-v' . $this->dependencies->version . '.js');
+        $this->context->controller->addCSS($views_path . '/css/front-' . $this->dependencies->version . '.css');
+        $this->context->controller->addJS($views_path . '/js/utilities-' . $this->dependencies->version . '.js');
+        $this->context->controller->addJS($views_path . '/js/front-' . $this->dependencies->version . '.js');
         $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
         if ($this->dependencies->configClass->isValidFeature('feature_applepay')
             && (bool) $payment_methods['applepay']) {
