@@ -1,8 +1,10 @@
 # Payplug module changelog
 
-## Next Version
+## Version 4.23.0
 - Feature :
   - [PRE-3165](https://github.com/payplug/payplug-prestashop/pull/21): Add Spanish translations
+  - [PRE-3202](https://github.com/payplug/payplug-prestashop/pull/28): Add Scalapay BO configuration
+  - [PRE-3203](https://github.com/payplug/payplug-prestashop/pull/29): Make a payment with Scalapay
 
 ## Version 4.22.0
 - Feature :

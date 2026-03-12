@@ -115,6 +115,7 @@ class ApiRest
             case 'mybank_permissions':
             case 'wero_permissions':
             case 'bizum_permissions':
+            case 'scalapay_permissions':
             case 'ideal_permissions':
                 $datas = json_decode($tools->tool('file_get_contents', 'php://input'), false);
                 $payment_method = str_replace('_permissions', '', $action);
@@ -237,6 +238,7 @@ class ApiRest
             'mybank' => (bool) $payment_methods['mybank'],
             'wero' => (bool) $payment_methods['wero'],
             'bizum' => (bool) $payment_methods['bizum'],
+            'scalapay' => (bool) $payment_methods['scalapay'],
         ];
     }
 
