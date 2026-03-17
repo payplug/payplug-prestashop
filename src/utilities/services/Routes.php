@@ -44,7 +44,7 @@ class Routes
             $dotenv->load($dotenvFile);
             $api_url = $_ENV['API_BASE_URL'];
         } else {
-            $api_url = 'https://api-qa.payplug.com';
+            $api_url = 'https://api.payplug.com';
         }
 
         return $api_url;
