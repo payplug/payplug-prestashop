@@ -240,9 +240,9 @@ class HookClass
             if ($order->module == $this->dependencies->name) {
                 $module_url = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/';
                 $this->dependencies->mediaClass->setMedia([
-                    $module_url . 'views/css/admin_order-v' . $this->dependencies->version . '.css',
-                    $module_url . 'views/js/admin_order-v' . $this->dependencies->version . '.js',
-                    $module_url . 'views/js/utilities-v' . $this->dependencies->version . '.js',
+                    $module_url . 'views/css/admin_order-' . $this->dependencies->version . '.css',
+                    $module_url . 'views/js/admin_order-' . $this->dependencies->version . '.js',
+                    $module_url . 'views/js/utilities-' . $this->dependencies->version . '.js',
                 ]);
             }
         }
@@ -314,7 +314,7 @@ class HookClass
                 return;
             }
             $views_path = $this->constant->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/';
-            $this->context->controller->addJS($views_path . 'js/embedded-v' . $this->dependencies->version . '.js');
+            $this->context->controller->addJS($views_path . 'js/embedded-' . $this->dependencies->version . '.js');
 
             $payment_options = [
                 'id_card' => $id_card,

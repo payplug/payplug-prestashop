@@ -1,6 +1,6 @@
 {
   "name": "payplug",
-  "version": "4.22.1",
+  "version": "4.23.0",
   "description": "======================================== Prestashop paiement module using Payplug ========================================",
   "private": true,
   "directories": {
@@ -33,7 +33,7 @@
     "webpack-fix-style-only-entries": "^0.6.1"
   },
   "dependencies": {
-    "payplug-ui-plugins-bo": "^2.1.0",
+    "payplug-ui-plugins-bo": "^2.2.1",
     "replace-in-file-webpack-plugin": "^1.0.6",
     "webpack-remove-empty-scripts": "^1.0.0"
   },
