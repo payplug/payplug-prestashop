@@ -1,14 +1,24 @@
 # Payplug module changelog
 
-## Version 4.22.1
+## Version 4.23.0
+- Feature :
+  - [PRE-3165](https://github.com/payplug/payplug-prestashop/pull/21): Add Spanish translations
+  - [PRE-3202](https://github.com/payplug/payplug-prestashop/pull/28): Add Scalapay BO configuration
+  - [PRE-3203](https://github.com/payplug/payplug-prestashop/pull/29): Make a payment with Scalapay
+  - [PRE-3248](https://github.com/payplug/payplug-prestashop/pull/38): Lower logos size in checkout page
+
 - Bugfix :
   - [SMP-3145](https://github.com/payplug/payplug-prestashop/pull/20): Fix error 500 on Oney notifications
   - [SMP-3239](https://github.com/payplug/payplug-prestashop/pull/30): Logout action on 401 error and send alert email
+  - [SMP-3248](https://github.com/payplug/payplug-prestashop/pull/27): Update order detail if order state is undefined
+  - [SMP-3246](https://github.com/payplug/payplug-prestashop/pull/23): Specify attributes and customization for applepay product
+  - [PRE-3073](https://github.com/payplug/payplug-prestashop/pull/30): Send email on auto logout (401 error)
+
 
 ## Version 4.22.0
 - Feature :
   - [PRE-3033](https://github.com/payplug/payplug-prestashop/pull/5): Add new payment method: Wero & Bizum
-  - [PRE-3154](https://github.com/payplug/payplug-prestashop/pull/18): Update wording for APM bundle description 
+  - [PRE-3154](https://github.com/payplug/payplug-prestashop/pull/18): Update wording for APM bundle description
 
 - Bugfix :
   - [SMP-3239](https://gitlab.com/dalenys/public/ecommerce/prestashop_v4_17_8/-/merge_requests/2733): Integration complementary address from apple wallet

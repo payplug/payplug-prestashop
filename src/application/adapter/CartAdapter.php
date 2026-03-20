@@ -187,11 +187,22 @@ class CartAdapter implements CartInterface
      * @param mixed $id_product
      * @param mixed $id_lang
      * @param mixed $id_currency
+     * @param mixed|null $id_product_attribute
+     * @param mixed $id_customization
+     * @param mixed $operator
+     * @param mixed $id_address_delivery
      *
      * @return mixed
      */
-    public function updateQty($id_cart = 0, $quantity = 0, $id_product = 0, $id_lang = 0, $id_currency = 0)
-    {
+    public function updateQty(
+        $id_cart = 0,
+        $quantity = 0,
+        $id_product = 0,
+        $id_product_attribute = null,
+        $id_customization = false,
+        $operator = 'up',
+        $id_address_delivery = 0
+    ) {
         if (!is_int($id_cart)) {
             return [];
         }
@@ -203,7 +214,7 @@ class CartAdapter implements CartInterface
         }
         $cart = new \Cart($id_cart);
 
-        return $cart->updateQty($quantity, $id_product);
+        return $cart->updateQty($quantity, $id_product, $id_product_attribute, $id_customization, $operator, $id_address_delivery);
     }
 
     /**

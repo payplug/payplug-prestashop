@@ -22,7 +22,7 @@
 
 {if isset($undefined_history_states) && $undefined_history_states}
     {foreach $undefined_history_states as $state}
-        <div class="alert alert-danger">
+        <div class="alert alert-info">
             {assign "orderStateUpdateLink" $state.updateLink}
             {assign "payplug_order_state_link" "<a href='{$payplug_order_state_url|escape:'htmlall':'UTF-8'}' target='_blank'>"}
             {assign "linkToUpdate" "<a href ='$orderStateUpdateLink' target='_blank'>"}

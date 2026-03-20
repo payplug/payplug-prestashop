@@ -101,7 +101,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $this->setParameters();
         $product_adapter = $this->dependencies
             ->getPlugin()
-            ->getProduct();
+            ->getProductAdapter();
         $product = $product_adapter->get((int) $product_id);
         $carriers_list = $product->getCarriers();
         $available_carriers = $this->dependencies
@@ -476,9 +476,20 @@ class ApplepayPaymentMethod extends PaymentMethod
             $this->context->cookie->write();
 
             $id_product = (int) $this->tools->tool('getValue', 'id_product');
-            $quantity = (int) $this->tools->tool('getValue', 'quantity');
-            // add product to cart
-            $cart_adapter->updateQty((int) $current_cart->id, $quantity, $id_product);
+            $group = $this->tools->tool('getValue', 'group');
+            $id_product_attribute = $group ?
+                (int) $this->dependencies
+                    ->getPlugin()
+                    ->getProductAdapter()
+                    ->getIdProductAttributeByIdAttributes($id_product, $group) :
+                0;
+            $cart_adapter->updateQty(
+                (int) $current_cart->id,
+                (int) $this->tools->tool('getValue', 'qty'),
+                (int) $id_product,
+                (int) $id_product_attribute,
+                (int) $this->tools->tool('getValue', 'id_customization')
+            );
             $current_address_delivery = (int) $current_cart->id_address_delivery;
             $cart_adapter->update($current_cart);
             $cart_adapter->updateAddressId((int) $current_cart->id, $current_address_delivery, (int) $this->context->cart->id_address_delivery);
