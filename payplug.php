@@ -92,6 +92,11 @@ class Payplug extends PaymentModule
         }
     }
 
+    public function isMcpCompliant()
+    {
+        return true;
+    }
+
     /**
      * @param bool $force_all
      *
