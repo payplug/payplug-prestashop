@@ -1,34 +1,41 @@
 # payplug/config/services.yml
 services:
-  _defaults:
-    public: true
-
   payplug.dependencies_class:
     class: PayPlug\classes\DependenciesClass
+    public: true
 
   payplug.action.hook:
     class: PayPlug\src\actions\HookAction
+    public: true
 
   payplug.action.request:
     class: PayPlug\src\actions\RequestAction
+    public: true
 
   payplug.models.classes.hook:
     class: PayPlug\src\models\classes\Hook
+    public: true
 
   payplug.models.classes.merchant:
     class: PayPlug\src\models\classes\Merchant
+    public: true
 
   payplug.utilities.service.api:
     class: PayPlug\src\utilities\services\API
+    public: true
 
   payplug.utilities.service.mail:
     class: PayPlug\src\utilities\services\Mail
+    public: true
 
   payplug.utilities.service.phonenumber:
     class: PayPlug\src\utilities\services\PhoneNumber
+    public: true
 
   payplug.utilities.service.props:
     class: PayPlug\src\utilities\services\Props
+    public: true
 
   payplug.utilities.validator.regex:
     class: PayPlug\src\utilities\validators\RegexValidator
+    public: true
