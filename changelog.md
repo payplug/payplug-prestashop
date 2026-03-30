@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.23.1
+- Bugfix :
+  - [SMP-3240](https://github.com/payplug/payplug-prestashop/pull/44): Fix Order state soft delete issue
+
 ## Version 4.23.0
 - Feature :
   - [PRE-3165](https://github.com/payplug/payplug-prestashop/pull/21): Add Spanish translations

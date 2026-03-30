@@ -266,8 +266,7 @@ class OrderStateRepository extends BaseClass
             }
 
             if (false === $first_os && false === $second_os) {
-                $os = $this->order_state_adapter->get($payplug_os_id['id_order_state']);
-                $deleted = $deleted && $os->softDelete();
+                $deleted = $deleted && (bool) $this->order_state_adapter->softDelete((int) $payplug_os_id['id_order_state']);
             }
         }
 
