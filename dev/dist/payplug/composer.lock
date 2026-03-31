@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f542fb8c1b71c7e61fd4ab0ae4680c1c",
+    "content-hash": "fd6e860d432c3a5a3897e6c38c29ff1d",
     "packages": [
         {
             "name": "payplug/payplug-php",
@@ -59,29 +59,30 @@
         },
         {
             "name": "payplug/payplug-plugin-core",
-            "version": "dev-PRE-3169-set-coverage-stable",
+            "version": "dev-dist/php72/feature/PRE-3169-coverage-with-php8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-plugin-core.git",
-                "reference": "e185d4f7e0d29e6cb46a5f48e4370a8b34630309"
+                "reference": "0bb2413bcce7f68ea0525a96fe1734452a5a93ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-plugin-core/zipball/e185d4f7e0d29e6cb46a5f48e4370a8b34630309",
-                "reference": "e185d4f7e0d29e6cb46a5f48e4370a8b34630309",
+                "url": "https://api.github.com/repos/payplug/payplug-plugin-core/zipball/0bb2413bcce7f68ea0525a96fe1734452a5a93ec",
+                "reference": "0bb2413bcce7f68ea0525a96fe1734452a5a93ec",
                 "shasum": ""
             },
             "require": {
                 "payplug/payplug-php": "^4.0",
-                "php": ">=7.2"
+                "php": "^7.2"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.0",
-                "phpunit/phpunit": "^8.0"
+                "mockery/mockery": "^1.3",
+                "phpunit/phpunit": "^8.5"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
+                    "PayplugPluginCore\\Tests\\": "tests/",
                     "PayplugPluginCore\\": "src/"
                 }
             },
@@ -89,29 +90,6 @@
                 "psr-4": {
                     "PayplugPluginCore\\Tests\\": "tests/"
                 }
-            },
-            "scripts": {
-                "cs:lint": [
-                    "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff --using-cache=yes"
-                ],
-                "cs:fix": [
-                    "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=yes"
-                ],
-                "cs:cache:reset": [
-                    "rm -f .php_cs.cache && : > .php_cs.cache"
-                ],
-                "hooks:install": [
-                    "php vendor/bin/captainhook install -f"
-                ],
-                "test:unit": [
-                    "./vendor/bin/phpunit tests --group unit --coverage-text -d memory_limit=-1"
-                ],
-                "test:inte": [
-                    "./vendor/bin/phpunit tests --group integration --coverage-text -d memory_limit=-1"
-                ],
-                "test:all": [
-                    "./vendor/bin/phpunit tests --coverage-text -d memory_limit=-1"
-                ]
             },
             "license": [
                 "MIT"
@@ -124,10 +102,10 @@
             ],
             "description": "Module core pour l'intégration Payplug.",
             "support": {
-                "source": "https://github.com/payplug/payplug-plugin-core/tree/PRE-3169-set-coverage",
+                "source": "https://github.com/payplug/payplug-plugin-core/tree/dist/php72/feature/PRE-3169-coverage-with-php8",
                 "issues": "https://github.com/payplug/payplug-plugin-core/issues"
             },
-            "time": "2026-03-26T13:27:43+00:00"
+            "time": "2026-03-30T09:40:03+00:00"
         },
         {
             "name": "psr/container",
