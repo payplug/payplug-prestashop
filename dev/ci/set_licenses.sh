@@ -15,7 +15,7 @@ echo "Looking for tag in ${branch}.php..."
 tag=`grep '$this->version =' ${branch}.php | sed -n "s/.*= '//p" | sed -n "s/';//p"`
 
 jsPath="./views/js/"
-export jsFile="front"
+export jsFiles="front chunk-vendors app"
 
 licenseText="/**
   * 2013 - COPYRIGHT_YEAR PayPlug SAS
@@ -40,11 +40,16 @@ licenseText="/**
   */
   ";
 
-for file in $jsFile
+for file in $jsFiles
   do
-    echo "Adding license tag to ${file}-v${tag}.js"
-    echo "path => ${jsPath}${file}-v${tag}.js"
-    { echo "${licenseText}"; cat ${jsPath}${file}-v${tag}.js; } > ${jsPath}${file}.tmp.js
-    rm ${jsPath}${file}.js
-    mv ${jsPath}${file}.tmp.js ${jsPath}${file}-v${tag}.js
+    jsFilePath="${jsPath}${file}-${tag}.js"
+    if [ -f "$jsFilePath" ]; then
+      echo "Adding license tag to ${file}-${tag}.js"
+      echo "path => $jsFilePath"
+      { echo "${licenseText}"; cat "$jsFilePath"; } > "${jsPath}${file}.tmp.js"
+      rm "$jsFilePath"
+      mv "${jsPath}${file}.tmp.js" "$jsFilePath"
+    else
+      echo "[WARN] Fichier $jsFilePath non trouvé, licence non ajoutée."
+    fi
   done
