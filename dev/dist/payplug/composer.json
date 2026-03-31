@@ -8,7 +8,7 @@
         "payplug/payplug-php": "^4.0",
         "symfony/dotenv": "3.4.*",
         "symfony/dependency-injection": "4.4.0",
-        "payplug/payplug-plugin-core": "dev-PRE-3169-set-coverage-stable"
+        "payplug/payplug-plugin-core": "dev-dist/php72/feature/PRE-3169-coverage-with-php8"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*",
