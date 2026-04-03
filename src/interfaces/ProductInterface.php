@@ -43,4 +43,6 @@ interface ProductInterface
         $usereduc,
         $quantity
     );
+
+    public function hasAttributes($id_product);
 }

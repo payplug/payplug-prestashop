@@ -17,7 +17,7 @@ jobs:
           php-version: '7.2'
       - name: Vérifier la syntaxe de tous les fichiers PHP
         run: |
-          find . -type f -name "*.php" ! -name "index.php" -print0 | xargs -0 -n1 php -l
+          find . -type f -name "*.php" ! -name "index.php" ! -name "Mcp.php" -print0 | xargs -0 -n1 php -l
 
   composer-install:
     runs-on: ubuntu-latest

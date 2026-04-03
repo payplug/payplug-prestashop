@@ -6,6 +6,11 @@ $finder = (new PhpCsFixer\Finder())
     ->exclude('.tmp_staging')
     ->in(__DIR__);
 
+// Exclude Mcp.php only for PHP < 8.0 (it uses PHP 8 attributes)
+if (PHP_VERSION_ID < 80000) {
+    $finder->notPath('src/utilities/services/Mcp.php');
+}
+
 return (new PhpCsFixer\Config())
     ->setUsingCache(true)
     ->setRules([

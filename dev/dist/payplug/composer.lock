@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2211c5221a1f2c18ef3a9b9bb974f9e5",
+    "content-hash": "1a48fb205314c19421bfa11180453765",
     "packages": [
         {
             "name": "payplug/payplug-php",
@@ -56,6 +56,56 @@
                 "source": "https://github.com/payplug/payplug-php/tree/4.0.0"
             },
             "time": "2015-05-06T00:00:00+00:00"
+        },
+        {
+            "name": "payplug/payplug-plugin-core",
+            "version": "dev-dist/php72/feature/PRE-3169-coverage-with-php8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/payplug/payplug-plugin-core.git",
+                "reference": "19bca167e95db4689c27c5c1cca9d4460b2ff3d4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/payplug/payplug-plugin-core/zipball/19bca167e95db4689c27c5c1cca9d4460b2ff3d4",
+                "reference": "19bca167e95db4689c27c5c1cca9d4460b2ff3d4",
+                "shasum": ""
+            },
+            "require": {
+                "payplug/payplug-php": "^4.0",
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PayplugPluginCore\\Tests\\": "tests/",
+                    "PayplugPluginCore\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "PayplugPluginCore\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Payplug",
+                    "email": "support@payplug.com"
+                }
+            ],
+            "description": "Module core pour l'intégration Payplug.",
+            "support": {
+                "source": "https://github.com/payplug/payplug-plugin-core/tree/dist/php72/feature/PRE-3169-coverage-with-php8",
+                "issues": "https://github.com/payplug/payplug-plugin-core/issues"
+            },
+            "time": "2026-04-03T09:47:17+00:00"
         },
         {
             "name": "psr/container",
@@ -1425,16 +1475,16 @@
         },
         {
             "name": "phpdocumentor/type-resolver",
-            "version": "1.10.0",
+            "version": "1.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "679e3ce485b99e84c775d28e2e96fade9a7fb50a"
+                "reference": "92a98ada2b93d9b201a613cb5a33584dde25f195"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/679e3ce485b99e84c775d28e2e96fade9a7fb50a",
-                "reference": "679e3ce485b99e84c775d28e2e96fade9a7fb50a",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/92a98ada2b93d9b201a613cb5a33584dde25f195",
+                "reference": "92a98ada2b93d9b201a613cb5a33584dde25f195",
                 "shasum": ""
             },
             "require": {
@@ -1477,9 +1527,9 @@
             "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
             "support": {
                 "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
-                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.10.0"
+                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.12.0"
             },
-            "time": "2024-11-09T15:12:26+00:00"
+            "time": "2025-11-21T15:09:14+00:00"
         },
         {
             "name": "phpspec/prophecy",
@@ -2983,7 +3033,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-09-05T05:47:09+00:00"
+            "time": "2025-11-04T16:30:35+00:00"
         },
         {
             "name": "symfony/console",
@@ -4108,16 +4158,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.12.0",
+            "version": "1.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "541057574806f942c94662b817a50f63f7345360"
+                "reference": "9be6926d8b485f55b9229203f962b51ed377ba68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/541057574806f942c94662b817a50f63f7345360",
-                "reference": "541057574806f942c94662b817a50f63f7345360",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/9be6926d8b485f55b9229203f962b51ed377ba68",
+                "reference": "9be6926d8b485f55b9229203f962b51ed377ba68",
                 "shasum": ""
             },
             "require": {
@@ -4160,19 +4210,21 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/1.12.0"
+                "source": "https://github.com/webmozarts/assert/tree/1.12.1"
             },
-            "time": "2025-10-20T12:43:39+00:00"
+            "time": "2025-10-29T15:56:20+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "payplug/payplug-plugin-core": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "1.1.0"
 }

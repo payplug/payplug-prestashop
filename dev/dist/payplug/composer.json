@@ -2,10 +2,11 @@
     "name": "payplug/payplug-prestashop",
     "moduleName": "payplug",
     "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "4.23.1",
+    "version": "4.23.0",
     "require": {
         "php": ">=7.2.0",
         "payplug/payplug-php": "^4.0",
+        "payplug/payplug-plugin-core": "dev-dist/php72/feature/PRE-3169-coverage-with-php8",
         "symfony/dotenv": "3.4.*",
         "symfony/dependency-injection": "4.4.0"
     },
@@ -62,5 +63,11 @@
         "cs:fix": "php vendor/bin/php-cs-fixer fix -vvv --using-cache=yes",
         "cs:cache:reset": "rm -f .php_cs.cache && : > .php_cs.cache",
         "hooks:install": "php vendor/bin/captainhook install -f"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/payplug/payplug-plugin-core"
+        }
+    ]
 }

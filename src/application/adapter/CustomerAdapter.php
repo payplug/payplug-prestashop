@@ -74,4 +74,22 @@ class CustomerAdapter implements CustomerInterface
     {
         return $customer->add();
     }
+
+    /**
+     * @description Check if a customer exists by email and optionally return the customer ID
+     *
+     * @param string $email Customer email address
+     * @param mixed $return_id
+     *
+     * @return bool|int Returns customer ID if $returnId is true and customer exists,
+     *                  otherwise returns boolean indicating if customer exists
+     */
+    public function customerExists($email = '', $return_id = false)
+    {
+        if (!is_string($email) || empty($email)) {
+            return 0;
+        }
+
+        return \Customer::customerExists($email, $return_id);
+    }
 }
