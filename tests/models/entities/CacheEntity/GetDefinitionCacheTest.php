@@ -11,7 +11,7 @@ final class GetDefinitionCacheTest extends BaseCacheEntity
 {
     protected $definition;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->definition = [

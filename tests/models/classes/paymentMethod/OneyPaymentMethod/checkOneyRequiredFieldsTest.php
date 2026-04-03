@@ -12,7 +12,7 @@ use PayPlug\tests\mock\PaymentTabMock;
  */
 final class checkOneyRequiredFieldsTest extends BaseOneyPaymentMethod
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

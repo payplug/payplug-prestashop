@@ -11,7 +11,7 @@ final class GetBrandCardTest extends BaseCardEntity
 {
     protected $card;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setBrand('brand');

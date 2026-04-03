@@ -12,7 +12,7 @@ class renderPaymentCtaTest extends BaseCartAction
     public $payment_method;
     public $payment_method_class;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

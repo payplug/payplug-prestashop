@@ -13,7 +13,7 @@ class checkAndSaveAddressTest extends BaseAddress
 {
     public $user_address;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

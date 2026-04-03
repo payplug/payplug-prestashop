@@ -16,7 +16,7 @@ class isCreatedTest extends TestCase
     protected $validator;
     protected $order;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->validator = new orderValidator();
         $this->order = OrderMock::get(); // given order id_cart = 42

@@ -11,7 +11,7 @@ use PayPlug\tests\mock\ContextMock;
  */
 class getPaylaterSectionTest extends BaseApiRest
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $context = \Mockery::mock('Context');

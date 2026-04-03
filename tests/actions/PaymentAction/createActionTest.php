@@ -15,7 +15,7 @@ class createActionTest extends BasePaymentAction
     public $payment_tab;
     public $stored_resource;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

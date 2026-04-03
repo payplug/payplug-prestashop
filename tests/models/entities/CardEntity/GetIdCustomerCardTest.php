@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\CardEntity;
  */
 final class GetIdCustomerCardTest extends BaseCardEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setIdCustomer(42);

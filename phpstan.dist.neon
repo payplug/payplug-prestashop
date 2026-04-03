@@ -3,6 +3,8 @@ parameters:
     paths:
         - src
         - classes
+    excludePaths:
+        - src/utilities/services/Mcp.php
 
     # Chargement du bootstrap pour les constantes et les classes globales
     bootstrapFiles:

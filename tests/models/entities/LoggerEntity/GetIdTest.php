@@ -11,7 +11,7 @@ final class GetIdTest extends BaseLoggerEntity
 {
     public $id;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->id = 42;

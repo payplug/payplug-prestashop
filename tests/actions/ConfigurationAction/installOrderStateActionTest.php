@@ -11,7 +11,7 @@ class installOrderStateActionTest extends BaseConfigurationAction
 {
     public $order_state;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->order_state = \Mockery::mock('OrderState');

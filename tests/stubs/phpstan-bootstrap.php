@@ -27,6 +27,10 @@ namespace {
     }
     class Customer extends ObjectModel
     {
+        public static function customerExists($email, $returnId = false, $ignoreGuest = true)
+        {
+            return false;
+        }
     }
     class Order extends ObjectModel
     {

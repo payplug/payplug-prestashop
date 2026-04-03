@@ -14,7 +14,7 @@ class generateJWTTest extends BaseMerchant
     public $generated_jwt;
     public $jwt;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->oauth_client_data = [

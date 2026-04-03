@@ -14,7 +14,7 @@ class getPaymentMethodsSectionTest extends BaseApiRest
 {
     public $payment_method_option;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $context = \Mockery::mock('Context');

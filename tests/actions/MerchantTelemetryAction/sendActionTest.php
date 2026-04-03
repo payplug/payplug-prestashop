@@ -9,7 +9,7 @@ namespace PayPlug\tests\actions\MerchantTelemetryAction;
  */
 class sendActionTest extends BaseMerchantTelemetryAction
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

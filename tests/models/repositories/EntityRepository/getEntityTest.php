@@ -53,7 +53,11 @@ class getEntityTest extends BaseEntityRepository
             ->andReturn(null);
 
         // other methods are not called because getEntityObject returns null
-        $this->repository->shouldNotReceive(['select', 'fields', 'from', 'where', 'build']);
+        $this->repository->shouldNotReceive('select');
+        $this->repository->shouldNotReceive('fields');
+        $this->repository->shouldNotReceive('from');
+        $this->repository->shouldNotReceive('where');
+        $this->repository->shouldNotReceive('build');
 
         $this->assertEquals([], $this->repository->getEntity($this->entity_id));
     }

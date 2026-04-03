@@ -12,7 +12,7 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class retrieveSchedulesTest extends BaseInstallmentPaymentMethod
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->configuration

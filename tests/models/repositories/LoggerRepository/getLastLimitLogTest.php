@@ -11,7 +11,7 @@ class getLastLimitLogTest extends BaseLoggerRepository
 {
     public $limit;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->limit = 42;

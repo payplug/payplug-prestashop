@@ -15,7 +15,7 @@ class setLockTest extends BaseValidationAction
     protected $queue_repository;
     protected $resource_id;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

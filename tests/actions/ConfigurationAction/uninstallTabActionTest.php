@@ -11,7 +11,7 @@ class uninstallTabActionTest extends BaseConfigurationAction
 {
     protected $tab_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

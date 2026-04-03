@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\StateEntity;
  */
 final class GetDateUpdStateTest extends BaseStateEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setDateUpd('2021-12-31 23:59:42');

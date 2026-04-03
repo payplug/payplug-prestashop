@@ -14,7 +14,7 @@ class updateInstallmentSchedulesTest extends BaseInstallmentPaymentMethod
 {
     public $retrieve;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->retrieve = [

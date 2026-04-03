@@ -12,7 +12,7 @@ class dispatchActionTest extends BaseRequestAction
     public $method;
     public $parameters;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->method = 'triggerMethod';
@@ -65,7 +65,7 @@ class dispatchActionTest extends BaseRequestAction
                 $result
             );
         } catch (\Mockery\Exception\BadMethodCallException $e) {
-            $this->assertContains('does not exist on this mock object', $e->getMessage());
+            $this->assertStringContainsString('does not exist on this mock object', $e->getMessage());
         }
     }
 

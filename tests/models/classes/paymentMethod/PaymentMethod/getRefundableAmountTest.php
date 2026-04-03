@@ -15,7 +15,7 @@ class getRefundableAmountTest extends BasePaymentMethod
 {
     public $resource_id;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->resource_id = 'inst_azerty1234';

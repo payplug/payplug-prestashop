@@ -12,7 +12,7 @@ use PayPlug\tests\mock\ContextMock;
  */
 class getPaymentTabTest extends BaseOneClickPaymentMethod
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->configuration->shouldReceive('getValue')

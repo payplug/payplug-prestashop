@@ -32,7 +32,7 @@ abstract class BasePaymentAction extends TestCase
     protected $plugin;
     protected $toolsAdapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->configuration->shouldReceive([

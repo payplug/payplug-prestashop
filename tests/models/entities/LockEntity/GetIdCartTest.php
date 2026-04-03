@@ -11,7 +11,7 @@ final class GetIdCartTest extends BaseLockEntity
 {
     public $id;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->id = 42;

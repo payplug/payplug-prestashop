@@ -11,7 +11,7 @@ final class GetProcessTest extends BaseLoggerEntity
 {
     protected $logger;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setProcess('process');

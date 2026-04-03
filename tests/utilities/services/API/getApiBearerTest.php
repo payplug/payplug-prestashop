@@ -15,7 +15,7 @@ class getApiBearerTest extends BaseApi
     public $jwt;
     public $oauth_client_data;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->is_live = true;

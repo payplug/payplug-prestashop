@@ -12,7 +12,7 @@ use PayPlug\tests\mock\PaymentMock;
  */
 class updateActionTest extends BaseOrderAction
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

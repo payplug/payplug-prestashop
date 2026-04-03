@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\CardEntity;
  */
 final class GetExpYearCardTest extends BaseCardEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setExpYear('2021');

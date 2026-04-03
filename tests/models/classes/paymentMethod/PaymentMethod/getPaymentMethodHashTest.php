@@ -14,7 +14,7 @@ class getPaymentMethodHashTest extends BasePaymentMethod
 {
     public $payment_tab;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->payment_tab = [

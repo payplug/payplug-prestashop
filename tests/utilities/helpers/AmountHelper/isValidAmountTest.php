@@ -17,7 +17,7 @@ class validateAmountTest extends TestCase
 
     protected $helper;
 
-    public function setUp()
+    public function setUp(): void
     {
         $dependencies = \Mockery::mock('Dependencies');
         $this->helper = \Mockery::mock(AmountHelper::class, [$dependencies])->makePartial();

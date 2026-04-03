@@ -15,7 +15,7 @@ class uninstallActionTest extends BaseConfigurationAction
     public $constant;
     public $entity_repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

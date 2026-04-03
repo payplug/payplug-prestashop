@@ -12,7 +12,7 @@ class renderRefundDataTest extends BasePaymentAction
     public $amount_refunded_payplug;
     public $amount_available;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

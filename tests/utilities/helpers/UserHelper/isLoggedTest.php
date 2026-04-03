@@ -14,7 +14,7 @@ class isLoggedTest extends TestCase
 {
     protected $userHelper;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->userHelper = new UserHelper();
     }

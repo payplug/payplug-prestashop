@@ -19,7 +19,7 @@ abstract class BaseValidationAction extends TestCase
     protected $plugin;
     protected $logger;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
 

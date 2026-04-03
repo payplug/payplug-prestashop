@@ -7,7 +7,7 @@ use PayPlug\tests\models\repositories\BaseRepository;
 
 class BaseLockRepository extends BaseRepository
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->repository = \Mockery::mock(LockRepository::class, [$this->dependencies])

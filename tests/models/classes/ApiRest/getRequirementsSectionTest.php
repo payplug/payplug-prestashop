@@ -13,7 +13,7 @@ class getRequirementsSectionTest extends BaseApiRest
 {
     protected $moduleValidator;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->moduleValidator = new ModuleValidator();

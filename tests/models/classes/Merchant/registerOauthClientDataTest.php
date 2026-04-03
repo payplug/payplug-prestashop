@@ -11,7 +11,7 @@ class registerOauthClientDataTest extends BaseMerchant
 {
     protected $oauth_client_data;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->oauth_client_data = [

@@ -11,7 +11,7 @@ final class GetDateAddTest extends BaseLoggerEntity
 {
     public $date;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->date = '2021-12-31 23:59:42';

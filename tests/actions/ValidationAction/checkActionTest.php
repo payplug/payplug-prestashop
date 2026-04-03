@@ -14,7 +14,7 @@ class checkActionTest extends BaseValidationAction
     protected $order_adapter;
     protected $queue_repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->links = [

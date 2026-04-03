@@ -12,7 +12,7 @@ use PayPlug\src\models\entities\CardEntity;
  */
 final class SetIsSandboxTest extends BaseCardEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setIsSandbox(true);

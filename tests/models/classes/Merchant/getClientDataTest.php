@@ -12,7 +12,7 @@ class getClientDataTest extends BaseMerchant
     public $session;
     public $company_id;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->session = 'session_token';

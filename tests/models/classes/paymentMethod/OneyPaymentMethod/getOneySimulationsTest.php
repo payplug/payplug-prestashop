@@ -18,7 +18,7 @@ class getOneySimulationsTest extends BaseOneyPaymentMethod
     public $cache;
     public $simulations;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->amount = 42;

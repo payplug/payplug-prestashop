@@ -10,7 +10,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\InstallmentPaymentMethod;
  */
 class getPaymentTabTest extends BaseInstallmentPaymentMethod
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->configuration->shouldReceive('getValue')

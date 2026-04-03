@@ -16,7 +16,7 @@ class renderApplePayCheckoutTest extends BaseCartAction
     public $media;
     public $link;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $browser = \Mockery::mock('Browser');

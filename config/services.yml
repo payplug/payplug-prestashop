@@ -47,3 +47,14 @@ services:
   payplug.application.adapter.price:
     class: PayPlug\src\application\adapter\PriceAdapter
     public: true
+
+  payplug.action.payment_action:
+    class: PayplugPluginCore\Actions\PaymentAction
+    public: true
+
+  payplug.utilities.service.core:
+    class: PayPlug\src\utilities\services\Core
+    public: true
+    arguments:
+      - '@payplug.action.payment_action'
+

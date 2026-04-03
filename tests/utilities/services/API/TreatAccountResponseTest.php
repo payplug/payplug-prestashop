@@ -11,7 +11,7 @@ class TreatAccountResponseTest extends BaseApi
 {
     public $json_answer;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

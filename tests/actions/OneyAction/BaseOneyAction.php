@@ -25,7 +25,7 @@ abstract class BaseOneyAction extends TestCase
     public $toolsAdapter;
     public $translation;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
 

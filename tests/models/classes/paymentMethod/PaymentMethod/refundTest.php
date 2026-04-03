@@ -18,7 +18,7 @@ class refundTest extends BasePaymentMethod
     public $amount;
     public $metadata;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->resource_id = 'pay_azerty1234';

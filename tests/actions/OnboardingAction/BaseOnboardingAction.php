@@ -12,7 +12,7 @@ abstract class BaseOnboardingAction extends TestCase
     public $configurationClass;
     public $dependencies;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->configurationClass = \Mockery::mock(Configuration::class)->makePartial();
         $this->configurationClass->shouldReceive([

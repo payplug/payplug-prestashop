@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\classes\Merchant;
  */
 class isOnboardedTest extends BaseMerchant
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->configuration_class->shouldReceive('getValue')

@@ -30,7 +30,7 @@ abstract class BaseOrderAction extends TestCase
     protected $plugin;
     protected $validate_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->cart_adapter = \Mockery::mock('CartAdapter');
         $this->configuration_class = \Mockery::mock('ConfigurationClass');
