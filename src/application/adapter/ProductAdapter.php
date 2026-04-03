@@ -84,4 +84,10 @@ class ProductAdapter implements ProductInterface
             $quantity
         );
     }
+
+    public function hasAttributes($id_product)
+    {
+        $product = new \Product($id_product);
+        return $product->hasAttributes();
+    }
 }

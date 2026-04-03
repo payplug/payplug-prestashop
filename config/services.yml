@@ -32,3 +32,5 @@ services:
 
   payplug.utilities.validator.regex:
     class: PayPlug\src\utilities\validators\RegexValidator
+  payplug.utilities.service.core:
+    class: PayPlug\src\utilities\services\Core
