@@ -49,4 +49,7 @@ services:
 
   payplug.application.adapter.price:
     class: PayPlug\src\application\adapter\PriceAdapter
+  
+  payplug.utilities.service.core:
+    class: PayPlug\src\utilities\services\Core
     public: true
