@@ -70,7 +70,7 @@ class LinkHelper
 
             // Append state nonce for request-binding / CSRF protection
             if ($state) {
-                $url .= (strpos($url, '?') !== false ? '&' : '?') . 'state=' . urlencode($state);
+                $url .= (strpos($url, '?') !== false ? '&' : '?') . 'authState=' . urlencode($state);
             }
 
             return $url;

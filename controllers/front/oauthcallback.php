@@ -38,7 +38,7 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
         // Request-binding check: reject any callback that does not carry the
         // state nonce generated when the flow was started from the back-office.
         // This prevents unauthenticated actors from triggering OAuth mutations.
-        $state = Tools::getValue('state');
+        $state = Tools::getValue('authState');
         $storedState = LinkHelper::getStoredOAuthState();
 
         if (!$state || !$storedState || !hash_equals($storedState, $state)) {
@@ -67,10 +67,6 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
         // Authorization code flow: PayPlug redirects with code + state
         $code = Tools::getValue('code');
         if ($code) {
-            if (!preg_match('/^[a-zA-Z0-9_.\-]+$/i', $code)) {
-                header('HTTP/1.1 400 Bad Request');
-                exit('Bad Request');
-            }
             $configAction->OauthLoginAction($code);
             // Flow complete: invalidate the state nonce so it cannot be replayed.
             LinkHelper::clearOAuthState();
