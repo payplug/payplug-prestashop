@@ -1,0 +1,74 @@
+<?php
+/**
+ * 2013 - 2026 Payplug SAS.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * @author    Payplug SAS
+ * @copyright 2013 - 2026 Payplug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  International Registered Trademark & Property of Payplug SAS
+ */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+use PayPlug\src\utilities\helpers\LinkHelper;
+
+/**
+ * Front-office controller for OAuth2 callback from PayPlug.
+ */
+class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
+{
+    public function initContent()
+    {
+        parent::initContent();
+
+        // Security headers
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Pragma: no-cache');
+        header('Referrer-Policy: no-referrer');
+
+        $dependencies = new PayPlug\classes\DependenciesClass();
+        $configAction = $dependencies->getPlugin()->getConfigurationAction();
+
+        // Registration flow: PayPlug redirects with client_id + company_id
+        $clientId = Tools::getValue('client_id');
+        $companyId = Tools::getValue('company_id');
+        if ($clientId && $companyId) {
+            if (!preg_match('/^[a-f0-9\-]{36}$/i', $clientId) || !preg_match('/^[a-f0-9\-]{36}$/i', $companyId)) {
+                header('HTTP/1.1 400 Bad Request');
+                exit('Bad Request');
+            }
+            $configAction->registerOauthRequestAction($clientId, $companyId);
+            // registerOauthRequestAction calls initiateOAuth which sends a Location header
+            // to PayPlug's authorization page. Exit so that header takes effect.
+            exit;
+        }
+
+        // Authorization code flow: PayPlug redirects with code + state
+        $code = Tools::getValue('code');
+        if ($code) {
+            if (!preg_match('/^[a-zA-Z0-9_.\-]+$/i', $code)) {
+                header('HTTP/1.1 400 Bad Request');
+                exit('Bad Request');
+            }
+            $configAction->OauthLoginAction($code);
+        }
+
+        // Redirect back to admin config page
+        $returnUrl = LinkHelper::getAdminReturnUrl();
+        if ($returnUrl) {
+            Tools::redirect($returnUrl);
+        }
+
+        // Fallback: redirect to shop homepage
+        Tools::redirect($this->context->link->getPageLink('index'));
+    }
+}
