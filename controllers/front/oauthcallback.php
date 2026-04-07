@@ -48,6 +48,7 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
 
         if (!$state || !$storedState || !hash_equals($storedState, $state)) {
             header('HTTP/1.1 403 Forbidden');
+
             exit('Forbidden');
         }
 
@@ -70,12 +71,14 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
         if ($clientId && $companyId) {
             if (!preg_match('/^[a-f0-9\-]{36}$/i', $clientId) || !preg_match('/^[a-f0-9\-]{36}$/i', $companyId)) {
                 header('HTTP/1.1 400 Bad Request');
+
                 exit('Bad Request');
             }
             $configAction->registerOauthRequestAction($clientId, $companyId);
             // registerOauthRequestAction calls initiateOAuth which sends a Location header
             // to PayPlug's authorization page. Exit so that header takes effect.
             // State is intentionally kept alive for the upcoming auth-code callback.
+
             exit;
         }
 

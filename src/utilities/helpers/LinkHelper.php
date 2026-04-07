@@ -166,7 +166,7 @@ class LinkHelper
     /**
      * Retrieve the stored admin return URL (single-use).
      *
-     * @return string|false
+     * @return false|string
      */
     public static function getAdminReturnUrl()
     {
