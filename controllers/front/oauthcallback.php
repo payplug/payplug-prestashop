@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2026 Payplug SAS.
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -10,8 +10,13 @@
  * If you are unable to obtain it through the world-wide-web, please send an email
  * to contact@payplug.com so we can send you a copy immediately.
  *
+ *  DISCLAIMER
+ *
+ *  Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ *  versions in the future.
+ *
  * @author    Payplug SAS
- * @copyright 2013 - 2026 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -46,6 +51,16 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
             exit('Forbidden');
         }
 
+        // Handle OAuth error responses (e.g. user cancelled authorization)
+        $oauthError = Tools::getValue('error');
+        if ($oauthError) {
+            LinkHelper::clearOAuthState();
+            $returnUrl = LinkHelper::getAdminReturnUrl();
+            Tools::redirect($returnUrl ?: $this->context->link->getPageLink('index'));
+
+            return;
+        }
+
         $dependencies = new PayPlug\classes\DependenciesClass();
         $configAction = $dependencies->getPlugin()->getConfigurationAction();
 
@@ -67,9 +82,15 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
         // Authorization code flow: PayPlug redirects with code + state
         $code = Tools::getValue('code');
         if ($code) {
-            $configAction->OauthLoginAction($code);
+            $result = $configAction->oauthLoginAction($code);
             // Flow complete: invalidate the state nonce so it cannot be replayed.
             LinkHelper::clearOAuthState();
+            if (empty($result['result'])) {
+                PrestaShopLogger::addLog(
+                    'PayPlug OAuth callback: login failed — ' . ($result['message'] ?? 'unknown error'),
+                    3
+                );
+            }
         }
 
         // Redirect back to admin config page

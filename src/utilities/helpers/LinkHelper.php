@@ -1,6 +1,6 @@
 <?php
 /**
- * 2013 - 2026 Payplug SAS.
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
  *
  * NOTICE OF LICENSE
  *
@@ -10,8 +10,13 @@
  * If you are unable to obtain it through the world-wide-web, please send an email
  * to contact@payplug.com so we can send you a copy immediately.
  *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PayPlug module to newer
+ * versions in the future.
+ *
  * @author    Payplug SAS
- * @copyright 2013 - 2026 Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of Payplug SAS
  */
@@ -87,8 +92,11 @@ class LinkHelper
      */
     public static function generateAndStoreOAuthState()
     {
-        $state = bin2hex(random_bytes(32));
-        \Configuration::updateValue('PAYPLUG_OAUTH_STATE', $state);
+        static $state = null;
+        if ($state === null) {
+            $state = bin2hex(random_bytes(32));
+            \Configuration::updateValue('PAYPLUG_OAUTH_STATE', $state);
+        }
 
         return $state;
     }
@@ -168,15 +176,15 @@ class LinkHelper
             return false;
         }
 
-        // Single-use: clear after retrieval
-        \Configuration::deleteByName('PAYPLUG_ADMIN_RETURN_URL');
-
-        // Validate the URL domain matches this shop
+        // Validate the URL domain matches this shop before consuming it
         $shopDomain = \Tools::getShopDomainSsl(false);
         $urlHost = parse_url($url, PHP_URL_HOST);
         if ($urlHost !== $shopDomain) {
             return false;
         }
+
+        // Single-use: clear only after passing validation
+        \Configuration::deleteByName('PAYPLUG_ADMIN_RETURN_URL');
 
         return $url;
     }
