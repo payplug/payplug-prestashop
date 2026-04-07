@@ -35,6 +35,17 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
         header('Pragma: no-cache');
         header('Referrer-Policy: no-referrer');
 
+        // Request-binding check: reject any callback that does not carry the
+        // state nonce generated when the flow was started from the back-office.
+        // This prevents unauthenticated actors from triggering OAuth mutations.
+        $state = Tools::getValue('state');
+        $storedState = LinkHelper::getStoredOAuthState();
+
+        if (!$state || !$storedState || !hash_equals($storedState, $state)) {
+            header('HTTP/1.1 403 Forbidden');
+            exit('Forbidden');
+        }
+
         $dependencies = new PayPlug\classes\DependenciesClass();
         $configAction = $dependencies->getPlugin()->getConfigurationAction();
 
@@ -49,6 +60,7 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
             $configAction->registerOauthRequestAction($clientId, $companyId);
             // registerOauthRequestAction calls initiateOAuth which sends a Location header
             // to PayPlug's authorization page. Exit so that header takes effect.
+            // State is intentionally kept alive for the upcoming auth-code callback.
             exit;
         }
 
@@ -60,6 +72,8 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
                 exit('Bad Request');
             }
             $configAction->OauthLoginAction($code);
+            // Flow complete: invalidate the state nonce so it cannot be replayed.
+            LinkHelper::clearOAuthState();
         }
 
         // Redirect back to admin config page

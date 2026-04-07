@@ -29,6 +29,12 @@ class LinkHelper
      * PS >= 9.0.0: uses a front-office module controller.
      * PS < 9.0.0: uses the legacy admin link.
      *
+     * In admin context a fresh state nonce is generated and stored server-side
+     * so the front-office callback can verify the request was legitimately
+     * initiated from the back-office (CSRF/request-binding protection).
+     * In front-office context the already-stored nonce is reused so that the
+     * redirect_uri forwarded to PayPlug for the PKCE step also carries it.
+     *
      * @param \Context $context
      *
      * @return string
@@ -38,6 +44,16 @@ class LinkHelper
         if (version_compare(_PS_VERSION_, '9.0.0', '>=')) {
             // Store admin return URL only for PS9 and only in admin context
             self::storeAdminReturnUrl($context);
+
+            // Generate a new state nonce when the flow is started from BO;
+            // reuse the stored nonce when called from front-office
+            // (e.g. inside registerOauthRequestAction / oauthLoginAction).
+            if (defined('_PS_ADMIN_DIR_')) {
+                $state = self::generateAndStoreOAuthState();
+            } else {
+                $state = self::getStoredOAuthState();
+            }
+
             $url = $context->link->getModuleLink('payplug', 'oauthcallback', [], true);
 
             // Strip any token params for a clean callback URL
@@ -52,10 +68,48 @@ class LinkHelper
                     . ($cleanQuery ? '?' . $cleanQuery : '');
             }
 
+            // Append state nonce for request-binding / CSRF protection
+            if ($state) {
+                $url .= (strpos($url, '?') !== false ? '&' : '?') . 'state=' . urlencode($state);
+            }
+
             return $url;
         }
 
         return $context->link->getAdminLink('AdminPayplug');
+    }
+
+    /**
+     * Generate a cryptographically random OAuth state nonce, store it
+     * server-side, and return it.  Only called in admin context.
+     *
+     * @return string
+     */
+    public static function generateAndStoreOAuthState()
+    {
+        $state = bin2hex(random_bytes(32));
+        \Configuration::updateValue('PAYPLUG_OAUTH_STATE', $state);
+
+        return $state;
+    }
+
+    /**
+     * Return the currently stored OAuth state nonce, or an empty string
+     * if none exists.
+     *
+     * @return string
+     */
+    public static function getStoredOAuthState()
+    {
+        return (string) \Configuration::get('PAYPLUG_OAUTH_STATE');
+    }
+
+    /**
+     * Delete the stored OAuth state nonce (call after the flow completes).
+     */
+    public static function clearOAuthState()
+    {
+        \Configuration::deleteByName('PAYPLUG_OAUTH_STATE');
     }
 
     /**
