@@ -1,0 +1,18 @@
+{
+    "pre-commit": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "composer cs:fix"
+            }
+        ]
+    },
+    "post-checkout": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "composer cs:cache:reset"
+            }
+        ]
+    }
+}
