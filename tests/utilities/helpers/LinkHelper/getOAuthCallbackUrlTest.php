@@ -12,6 +12,11 @@ use PHPUnit\Framework\TestCase;
  */
 class getOAuthCallbackUrlTest extends TestCase
 {
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
+
     /**
      * @description On PS < 9.0.0 (bootstrap defines 1.7.0.0), getOAuthCallbackUrl
      *              must return the legacy admin link without any side effects.
@@ -64,10 +69,5 @@ class getOAuthCallbackUrlTest extends TestCase
         $result = LinkHelper::getOAuthCallbackUrl($context);
 
         $this->assertContains('token=stable_hash', $result);
-    }
-
-    public function tearDown()
-    {
-        \Mockery::close();
     }
 }

@@ -75,7 +75,7 @@ class LinkHelper
 
             // Append state nonce for request-binding / CSRF protection
             if ($state) {
-                $url .= (strpos($url, '?') !== false ? '&' : '?') . 'authState=' . urlencode($state);
+                $url .= (false !== strpos($url, '?') ? '&' : '?') . 'authState=' . urlencode($state);
             }
 
             return $url;
@@ -93,7 +93,8 @@ class LinkHelper
     public static function generateAndStoreOAuthState()
     {
         static $state = null;
-        if ($state === null) {
+
+        if (null === $state) {
             $state = bin2hex(random_bytes(32));
             \Configuration::updateValue('PAYPLUG_OAUTH_STATE', $state);
         }
