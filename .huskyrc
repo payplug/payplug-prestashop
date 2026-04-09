@@ -1,6 +1,0 @@
-{
-  "hooks": {
-    "pre-commit": "php vendor/bin/php-cs-fixer fix -vvv --using-cache yes",
-    "post-checkout": "echo '' > .php_cs.cache && rm -f .php_cs.cache"
-  }
-}

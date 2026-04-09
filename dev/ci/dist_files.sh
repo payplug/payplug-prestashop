@@ -21,7 +21,7 @@ fi
 
 echo "Dist files will be in: "$path
 echo "------------------"
-export distFile="composer.json composer.lock features.json package.json package-lock.json logo.gif logo.png"
+export distFile="logo.gif logo.png"
 for file in $distFile
   do
     echo -n "Copy $file "

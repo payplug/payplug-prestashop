@@ -1,0 +1,21 @@
+{
+    "features": [
+        "feature_amex",
+        "feature_applepay",
+        "feature_applepay_product",
+        "feature_bancontact",
+        "feature_deferred",
+        "feature_ideal",
+        "feature_installment",
+        "feature_integrated",
+        "feature_mybank",
+        "feature_one_click",
+        "feature_oney",
+        "feature_satispay",
+        "feature_standard",
+        "feature_merchant_telemetry",
+        "feature_queueing_system",
+        "feature_wero",
+        "feature_bizum"
+    ]
+}
