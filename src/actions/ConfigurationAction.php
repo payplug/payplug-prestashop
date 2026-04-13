@@ -24,6 +24,7 @@
 namespace PayPlug\src\actions;
 
 use PayPlug\classes\MyLogPHP;
+use PayPlug\src\utilities\helpers\LinkHelper;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -514,7 +515,7 @@ class ConfigurationAction
         // Get the JWT one shot
         $jwt = $api->generateJWTOneShot(
             $authorization_code,
-            $context->link->getAdminLink('AdminPayplug'),
+            LinkHelper::getOAuthCallbackUrl($context),
             $configuration->getValue('oauth_client_id'),
             $configuration->getValue('oauth_code_verifier')
         );
@@ -663,7 +664,7 @@ class ConfigurationAction
 
         return $api->initiateOAuth(
             $client_id,
-            $this->dependencies->getPlugin()->getContext()->get()->link->getAdminLink('AdminPayplug'),
+            LinkHelper::getOAuthCallbackUrl($this->dependencies->getPlugin()->getContext()->get()),
             $code_verifier
         );
     }
