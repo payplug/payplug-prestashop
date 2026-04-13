@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\models\classes;
 
+use PayPlug\src\utilities\helpers\LinkHelper;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -75,7 +77,7 @@ class ApiRest
                     ->getPlugin()
                     ->getContext()
                     ->get();
-                $register_url = $api->getRegisterUrl($context->link->getAdminLink('AdminPayplug'));
+                $register_url = $api->getRegisterUrl(LinkHelper::getOAuthCallbackUrl($context));
                 $json = [
                     'success' => $register_url['result'],
                 ];
@@ -430,7 +432,7 @@ class ApiRest
             'oauth' => $translation['inactive']['modal']['oauth'],
             'oauth_url' => $this->module
                 ->getService('payplug.utilities.service.api')
-                ->getRegisterUrl($context->link->getAdminLink('AdminPayplug'))['redirection'],
+                ->getRegisterUrl(LinkHelper::getOAuthCallbackUrl($context))['redirection'],
         ];
 
         return [
@@ -504,7 +506,7 @@ class ApiRest
         $translation['form']['forgot_password_url'] = $external_urls['forgot_password'];
         $translation['sso']['button_url'] = $this->module
             ->getService('payplug.utilities.service.api')
-            ->getRegisterUrl($context->link->getAdminLink('AdminPayplug'))['redirection'];
+            ->getRegisterUrl(LinkHelper::getOAuthCallbackUrl($context))['redirection'];
 
         return [
             'name' => 'oauthLogin',
