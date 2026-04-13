@@ -661,9 +661,7 @@ class PayPlugNotifications
             'paid' => $this->configuration->getValue('order_state_paid' . $state_addons),
             'pending' => $this->configuration->getValue('order_state_pending' . $state_addons),
             'refund' => $this->configuration->getValue('order_state_refund' . $state_addons),
-            'partial_refund' => $this->payment->is_live
-                ? $this->configuration->getValue('PS_CHECKOUT_STATE_PARTIALLY_REFUNDED')
-                : $this->configuration->getValue('order_state_partial_refund' . $state_addons),
+            'partial_refund' => $this->configuration->getValue('order_state_partial_refund' . $state_addons),
         ];
     }
 

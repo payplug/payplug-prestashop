@@ -15,7 +15,7 @@ use PayPlug\tests\mock\AddressMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseApiRest extends TestCase
+abstract class BaseApiRest extends TestCase
 {
     use FormatDataProvider;
 

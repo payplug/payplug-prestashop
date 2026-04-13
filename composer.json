@@ -2,7 +2,7 @@
     "name": "payplug/payplug-prestashop",
     "moduleName": "payplug",
     "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "4.23.0",
+    "version": "4.23.2",
     "require": {
         "php": ">=7.2.0",
         "payplug/payplug-php": "^4.0",
@@ -20,10 +20,6 @@
         "exclude": [
             ".*",
             "!vendor/*",
-            "!upgrade/*",
-            "!features.json",
-            "composer.json",
-            "!payplug/composer.json",
             "!payplug/module_files.csv",
             "!views/css/*.css",
             "!views/js/*.js",

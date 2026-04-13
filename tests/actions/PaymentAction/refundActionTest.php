@@ -218,7 +218,7 @@ class refundActionTest extends BasePaymentAction
             ->andReturn('42');
         $this->configuration
             ->shouldReceive('getValue')
-            ->with('PS_CHECKOUT_STATE_PARTIALLY_REFUNDED')
+            ->with('order_state_partial_refund')
             ->andReturn('43');
         $order_adapter = \Mockery::mock('OrderAdapter');
         $order_adapter->shouldReceive([

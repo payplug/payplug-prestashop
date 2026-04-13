@@ -6,7 +6,7 @@ use PayPlug\src\models\classes\Merchant;
 use PayPlug\tests\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
-class BaseMerchant extends TestCase
+abstract class BaseMerchant extends TestCase
 {
     use FormatDataProvider;
 

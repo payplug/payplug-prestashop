@@ -6,7 +6,7 @@ use PayPlug\src\models\entities\CacheEntity;
 use PayPlug\tests\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
-class BaseCacheEntity extends TestCase
+abstract class BaseCacheEntity extends TestCase
 {
     use FormatDataProvider;
     protected $cache;
