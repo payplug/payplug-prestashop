@@ -8,7 +8,7 @@ use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseCartAction extends TestCase
+abstract class BaseCartAction extends TestCase
 {
     protected $action;
     protected $cartAdapter;

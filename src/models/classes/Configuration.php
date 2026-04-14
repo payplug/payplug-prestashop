@@ -411,8 +411,8 @@ class Configuration
             'type' => 'refund',
         ],
         'partial_refund' => [
-            'cfg' => null,
-            'template' => 'refund',
+            'cfg' => 'PS_CHECKOUT_STATE_PARTIALLY_REFUNDED',
+            'template' => null,
             'logable' => false,
             'send_email' => true,
             'paid' => false,

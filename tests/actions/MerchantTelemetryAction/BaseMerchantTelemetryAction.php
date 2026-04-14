@@ -8,7 +8,7 @@ use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseMerchantTelemetryAction extends TestCase
+abstract class BaseMerchantTelemetryAction extends TestCase
 {
     use FormatDataProvider;
 

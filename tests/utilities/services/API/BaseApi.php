@@ -12,7 +12,7 @@ use PayPlug\tests\mock\MockHelper;
  * @internal
  * @coversNothing
  */
-class BaseApi extends MockeryTestCase
+abstract class BaseApi extends MockeryTestCase
 {
     use FormatDataProvider;
 

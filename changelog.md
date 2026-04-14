@@ -1,5 +1,10 @@
 # Payplug module changelog
 
+## Version 4.23.2
+- Bugfix :
+  - [PRE-3177](https://github.com/payplug/payplug-prestashop/pull/48): add ps9 oauth2 compatibility via front-office callback
+  - [PRE-3257](https://github.com/payplug/payplug-prestashop/pull/50): Fix Order state partial refund if ps_checkout not installed
+
 ## Version 4.23.1
 - Bugfix :
   - [SMP-3240](https://github.com/payplug/payplug-prestashop/pull/44): Fix Order state soft delete issue

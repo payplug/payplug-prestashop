@@ -10,7 +10,7 @@ use PayPlug\tests\FormatDataProvider;
  * @internal
  * @coversNothing
  */
-class BaseRegexValidator extends MockeryTestCase
+abstract class BaseRegexValidator extends MockeryTestCase
 {
     use FormatDataProvider;
 
