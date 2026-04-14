@@ -7,7 +7,7 @@ use PayPlug\src\models\classes\Configuration;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseOnboardingAction extends TestCase
+abstract class BaseOnboardingAction extends TestCase
 {
     public $configurationClass;
     public $dependencies;

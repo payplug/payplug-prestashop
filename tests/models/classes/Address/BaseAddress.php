@@ -7,7 +7,7 @@ use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseAddress extends TestCase
+abstract class BaseAddress extends TestCase
 {
     use FormatDataProvider;
     protected $dependencies;

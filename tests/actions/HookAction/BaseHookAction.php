@@ -7,7 +7,7 @@ use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseHookAction extends TestCase
+abstract class BaseHookAction extends TestCase
 {
     use FormatDataProvider;
 

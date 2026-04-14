@@ -6,7 +6,7 @@ use PayPlug\src\models\entities\StateEntity;
 use PayPlug\tests\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
-class BaseStateEntity extends TestCase
+abstract class BaseStateEntity extends TestCase
 {
     use FormatDataProvider;
     protected $entity;

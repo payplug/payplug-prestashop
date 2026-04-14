@@ -10,7 +10,7 @@ use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BasePaymentAction extends TestCase
+abstract class BasePaymentAction extends TestCase
 {
     use FormatDataProvider;
 
