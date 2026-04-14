@@ -6,7 +6,7 @@ use PayPlug\src\models\classes\Hook;
 use PayPlug\tests\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
-class BaseHook extends TestCase
+abstract class BaseHook extends TestCase
 {
     use FormatDataProvider;
 

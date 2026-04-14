@@ -1202,8 +1202,8 @@ class ConfigurationAction
 
         foreach ($order_states_list as $key => $state) {
             if ($install_order_state) {
-                $install_order_state = $order_state->create($key, $state, true);
-                $install_order_state = $install_order_state && $order_state->create($key, $state, false);
+                $install_order_state = $order_state->create($key, $state, true); // sandbox
+                $install_order_state = $install_order_state && $order_state->create($key, $state, false); // prod
             } else {
                 break;
             }

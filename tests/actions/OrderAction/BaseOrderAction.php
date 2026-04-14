@@ -8,7 +8,7 @@ use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseOrderAction extends TestCase
+abstract class BaseOrderAction extends TestCase
 {
     use FormatDataProvider;
 

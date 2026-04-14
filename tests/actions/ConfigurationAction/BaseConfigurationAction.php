@@ -9,7 +9,7 @@ use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseConfigurationAction extends TestCase
+abstract class BaseConfigurationAction extends TestCase
 {
     use FormatDataProvider;
 

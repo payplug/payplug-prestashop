@@ -8,7 +8,7 @@ use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseCardAction extends TestCase
+abstract class BaseCardAction extends TestCase
 {
     use FormatDataProvider;
 

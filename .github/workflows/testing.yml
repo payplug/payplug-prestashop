@@ -27,8 +27,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
-      - name: Récupération des fichiers dist payplug
-        run: ./dev/ci/dist_files.sh -b payplug
       - name: Installer les dépendances Composer
         run: composer install --prefer-dist --no-interaction --no-progress
       - name: Upload vendor
@@ -75,8 +73,6 @@ jobs:
           path: vendor
       - name: Dump php version
         run: php -v
-      - name: Récupération des fichiers dist payplug
-        run: ./dev/ci/dist_files.sh -b payplug
       - name: PHPUnit
         run: chmod +x ./vendor/bin/phpunit && ./vendor/bin/phpunit tests --bootstrap tests/bootstrap.php --coverage-text --colors=never -d memory_limit=-1
       - name: Upload JUnit report

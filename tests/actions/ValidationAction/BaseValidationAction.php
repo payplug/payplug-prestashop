@@ -9,7 +9,7 @@ use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseValidationAction extends TestCase
+abstract class BaseValidationAction extends TestCase
 {
     use FormatDataProvider;
     protected $action;

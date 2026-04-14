@@ -663,9 +663,7 @@ class PaymentAction
         if (!$remaining_refundable_amount) {
             $new_state = (int) $this->plugin->getConfigurationClass()->getValue('order_state_refund' . $state_addons);
         } else {
-            $new_state = $refund['resource']->is_live
-                ? (int) $this->plugin->getConfigurationClass()->getValue('PS_CHECKOUT_STATE_PARTIALLY_REFUNDED')
-                : (int) $this->plugin->getConfigurationClass()->getValue('order_state_partial_refund' . $state_addons);
+            $new_state = (int) $this->plugin->getConfigurationClass()->getValue('order_state_partial_refund' . $state_addons);
         }
 
         $reload = $order->current_state != $new_state && $this->plugin

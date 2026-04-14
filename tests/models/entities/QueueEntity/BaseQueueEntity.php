@@ -6,7 +6,7 @@ use PayPlug\src\models\entities\QueueEntity;
 use PayPlug\tests\FormatDataProvider;
 use PHPUnit\Framework\TestCase;
 
-class BaseQueueEntity extends TestCase
+abstract class BaseQueueEntity extends TestCase
 {
     use FormatDataProvider;
 
