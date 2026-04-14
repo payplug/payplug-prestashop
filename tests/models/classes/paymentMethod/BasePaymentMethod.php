@@ -50,6 +50,7 @@ class BasePaymentMethod extends TestCase
     protected $payment_method_class;
     protected $payment_repository;
     protected $phone_number_service;
+    protected $language_helper;
     protected $plugin;
     protected $route;
     protected $tools_adapter;
@@ -70,6 +71,7 @@ class BasePaymentMethod extends TestCase
 
         $this->api_service = \Mockery::mock('ApiService');
         $this->phone_number_service = \Mockery::mock('PhoneNumberService');
+        $this->language_helper = \Mockery::mock('LanguageHelper');
         $this->constant = \Mockery::mock('Constant');
         $this->constant->shouldReceive([
             'get' => '',
@@ -157,6 +159,10 @@ class BasePaymentMethod extends TestCase
             ->shouldReceive('getService')
             ->with('payplug.utilities.service.phonenumber')
             ->andReturn($this->phone_number_service);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.helper.language')
+            ->andReturn($this->language_helper);
 
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');

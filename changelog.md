@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Next release
+- Bugfix :
+  - [SMP-3200](https://github.com/payplug/payplug-prestashop/pull/52): Get language iso from code lang
+
 ## Version 4.23.1
 - Bugfix :
   - [SMP-3240](https://github.com/payplug/payplug-prestashop/pull/44): Fix Order state soft delete issue

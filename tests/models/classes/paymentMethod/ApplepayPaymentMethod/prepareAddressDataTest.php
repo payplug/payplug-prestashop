@@ -7,6 +7,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
  * @group class
  * @group payment_method_class
  * @group applepay_payment_method_class
+ * @group debug
  */
 class prepareAddressDataTest extends BaseApplepayPaymentMethod
 {

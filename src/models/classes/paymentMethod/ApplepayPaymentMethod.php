@@ -401,6 +401,11 @@ class ApplepayPaymentMethod extends PaymentMethod
                 ])),
             ],
         ];
+        $language_helper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.language');
 
         if (!isset($payment_tab['shipping']) || empty($payment_tab['shipping'])) {
             $payment_tab['shipping'] = [
@@ -417,7 +422,7 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'email' => 'noreply@' . $this->context->shop->domain_ssl,
                 'mobile_phone_number' => null,
                 'landline_phone_number' => null,
-                'language' => $this->context->language->iso_code,
+                'language' => $language_helper->getIsoFromCodeLang($this->context->language->language_code),
             ];
         } else {
             unset($payment_tab['shipping']['delivery_type']);
@@ -628,6 +633,12 @@ class ApplepayPaymentMethod extends PaymentMethod
             return [];
         }
 
+        $language_helper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.language');
+
         $prepared_data = [
             'first_name' => $address_data['givenName'],
             'last_name' => $address_data['familyName'],
@@ -638,7 +649,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             'postcode' => $address_data['postalCode'],
             'city' => $address_data['locality'],
             'country' => $address_data['countryCode'],
-            'language' => $this->context->language->iso_code,
+            'language' => $language_helper->getIsoFromCodeLang($this->context->language->language_code),
             'email' => '' != $shipping_email ? $shipping_email : $address_data['emailAddress'],
         ];
 
