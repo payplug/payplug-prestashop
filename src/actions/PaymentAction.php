@@ -666,9 +666,8 @@ class PaymentAction
             $new_state = (int) $this->plugin->getConfigurationClass()->getValue('order_state_partial_refund' . $state_addons);
         }
 
-        $reload = $order->current_state != $new_state && $this->plugin
-            ->getOrderClass()
-            ->updateOrderState($order, $new_state);
+        $reload = $order->current_state != $new_state;
+        $this->plugin->getOrderClass()->updateOrderState($order, $new_state);
 
         return [
             'result' => true,
