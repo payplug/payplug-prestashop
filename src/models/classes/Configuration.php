@@ -414,7 +414,7 @@ class Configuration
             'cfg' => 'PS_CHECKOUT_STATE_PARTIALLY_REFUNDED',
             'template' => null,
             'logable' => false,
-            'send_email' => true,
+            'send_email' => false,
             'paid' => false,
             'hidden' => false,
             'delivery' => false,
