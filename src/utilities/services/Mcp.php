@@ -160,11 +160,11 @@ class Mcp
                         'description' => 'Array of product objects to add to the cart. Must contain at least one product. Each product requires reference (id_product) and qty. For products with variants (sizes, colors), you MUST also provide the group (id_product_attribute) obtained from "Get product combinations" tool.',
                         'items' => [
                             'type' => 'object',
-                            'description' => 'Individual product object representing one item to add to the cart.',
+                            'description' => 'Individual product object representing one item to add to the cart. normally this information you will find it in the MCP Prestashop by getting the order id, within the display field associations > order_rows',
                             'properties' => [
-                                'reference' => ['type' => 'integer', 'description' => 'PrestaShop product ID (id_product). Required. Obtain this value using PrestaShop MCP "Search product" tool. This is the unique identifier of the base product, NOT the SKU/reference string.'],
+                                'reference' => ['type' => 'integer', 'description' => 'PrestaShop product ID (id_product). Required. Obtain this value using PrestaShop MCP "Search product" tool. This is the unique identifier of the base product, NOT the SKU/reference string NOT the Order ID, normally this information you will find it in the MCP Prestashop by getting the order id, within the display field associations > order_rows > product_id.'],
                                 'qty' => ['type' => 'integer', 'description' => 'Quantity of this product to add to cart. Required. Must be a positive integer >= 1. Example: 1 for one item, 3 for three items.'],
-                                'group' => ['type' => 'integer', 'description' => 'Product combination/variant ID (id_product_attribute). REQUIRED for products with variants (different sizes, colors, etc.). Obtain this value using PrestaShop MCP "Get product combinations" tool with the id_product. Example: For a T-shirt size S in black, get the specific id_product_attribute that matches "Taille: S, Couleur: Noir". If product has no combinations, omit this field.'],
+                                'group' => ['type' => 'integer', 'description' => 'Product combination/variant ID (id_product_attribute) for products with variants (different sizes, colors, etc.). Obtain this value using PrestaShop MCP "Get product combinations" tool with the id_product. Example: For a T-shirt size S in black, get the specific id_product_attribute that matches "Taille: S, Couleur: Noir". If product has no combinations, omit this field.'],
                             ],
                             'required' => ['reference', 'qty']
                         ],
