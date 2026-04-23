@@ -4,6 +4,7 @@
 - Bugfix :
   - [PRE-3177](https://github.com/payplug/payplug-prestashop/pull/48): add ps9 oauth2 compatibility via front-office callback
   - [PRE-3257](https://github.com/payplug/payplug-prestashop/pull/50): Fix Order state partial refund if ps_checkout not installed
+  - [PRE-3334](https://github.com/payplug/payplug-prestashop/pull/57): remove deprecated displayPrice method usage
   - [PRE-3279](https://github.com/payplug/payplug-prestashop/pull/56): Change Scalapay wording with 3x/4x precision
 
 ## Version 4.23.1

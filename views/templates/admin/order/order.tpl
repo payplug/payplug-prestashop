@@ -41,13 +41,12 @@
             {/if}
             {include file='./details.tpl' payment=$payment}
         {/if}
-
         {if $refund}
             <hr />
             {include file='./refund.tpl'}
         {elseif $refunded}
             <hr />
-            {include file='./refunded.tpl' refunded=$refunded}
+            {include file='./refunded.tpl'}
         {elseif $update}
             <hr />
             {include file='./update.tpl'}

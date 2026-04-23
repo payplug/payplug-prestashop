@@ -22,9 +22,7 @@
 
 <ul>
     <li>{l s='Amount already refunded with Payplug : ' mod='payplug'}<span id="amount_refunded_payplug">
-    {*<li>{l s='Amount already refunded with Payplug : ' d='Modules.Payplug.Admin'}<span id="amount_refunded_payplug">*}
-            {displayPrice price=$amount_refunded_payplug}</span></li>
+            {$amount_refunded_payplug_display|escape:'htmlall':'UTF-8'}</span></li>
     <li>{l s='Amount still refundable with Payplug : ' mod='payplug'}<span id="amount_available">
-    {*<li>{l s='Amount still refundable with Payplug : ' d='Modules.Payplug.Admin'}<span id="amount_available">*}
-            {displayPrice price=$amount_available}</span></li>
+            {$amount_available_display|escape:'htmlall':'UTF-8'}</span></li>
 </ul>
