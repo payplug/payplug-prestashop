@@ -42,6 +42,11 @@ services:
 
   payplug.utilities.service.core:
     class: PayPlug\src\utilities\services\Core
+    
+  payplug.utilities.helper.language:
+    class: Payplug\src\utilities\helpers\LanguageHelper
+    public: true
+
   payplug.application.adapter.price:
     class: PayPlug\src\application\adapter\PriceAdapter
     public: true
