@@ -39,15 +39,15 @@
         <tbody>
         {foreach $installment.payment_list as $k=>$payment}
             <tr class="pp_fixed_height">
-                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="date">{$payment['date']|escape:'htmlall':'UTF-8'}</td>
-                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="amount">{displayPrice price=$payment['amount']}</td>
+                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="date">{$payment.date|escape:'htmlall':'UTF-8'}</td>
+                <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="amount">{$payment.amount_display|escape:'htmlall':'UTF-8'}</td>
                 <td data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}="state"
-                    data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}-state="{$payment['status_code']|escape:'htmlall':'UTF-8'}"
-                    class="{$payment['status_class']|escape:'htmlall':'UTF-8'}">
-                    {$payment['status']|escape:'htmlall':'UTF-8'}
+                    data-e2e-payment-details-inst-{$k|escape:'htmlall':'UTF-8'}-state="{$payment.status_code|escape:'htmlall':'UTF-8'}"
+                    class="{$payment.status_class|escape:'htmlall':'UTF-8'}">
+                    {$payment.status|escape:'htmlall':'UTF-8'}
                 </td>
                 <td class="actions">
-                    {if isset($payment['id'])}
+                    {if isset($payment.id)}
                         <button class="btn btn-default open_payment_information" data-payment="{$k|escape:'htmlall':'UTF-8'}">
                             <i class="icon-search"></i>
                             {l s='Details' mod='payplug'}
@@ -55,7 +55,7 @@
                     {/if}
                 </td>
             </tr>
-            {if isset($payment['id'])}
+            {if isset($payment.id)}
                 <tr class="payment_information payment_information-{$k|escape:'htmlall':'UTF-8'}">
                     <td colspan="5">
                         {include file='./details.tpl' payment=$payment}

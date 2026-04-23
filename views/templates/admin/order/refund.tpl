@@ -32,11 +32,11 @@
         <ul>
             <li>
                 {l s='Amount already refunded with Payplug : ' mod='payplug'}
-                <span id="amount_refunded_payplug">{displayPrice price=$refund.refunded}</span>
+                <span id="amount_refunded_payplug">{$refund.refunded_display|escape:'htmlall':'UTF-8'}</span>
             </li>
             <li>
                 {l s='Amount still refundable with Payplug : ' mod='payplug'}
-                <span id="amount_available">{displayPrice price=$refund.available}</span>
+                <span id="amount_available"> {$refund.available_display|escape:'htmlall':'UTF-8'}</span>
             </li>
         </ul>
     </div>
