@@ -544,10 +544,11 @@ class OrderAction
 
                 return $order_details;
             }
-
             $order_details['refund'] = [
                 'refunded' => $resource_detail['refund']['refunded'],
                 'available' => $resource_detail['refund']['available'],
+                'refunded_display' => $resource_detail['refund']['refunded_display'],
+                'available_display' => $resource_detail['refund']['available_display'],
                 'refunded_presta' => $refunded_presta,
                 'suggested' => $amount_suggested,
                 'mode' => \strtolower($resource_detail['mode']),
@@ -558,6 +559,7 @@ class OrderAction
             ];
         } elseif ($resource_detail['refund']['is_refunded']) {
             $order_details['refunded'] = $resource_detail['refund']['refunded'];
+            $order_details['refunded_display'] = $resource_detail['refund']['refunded_display'];
         }
 
         return $order_details;

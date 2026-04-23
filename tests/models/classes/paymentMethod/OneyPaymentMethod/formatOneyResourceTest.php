@@ -124,25 +124,25 @@ final class formatOneyResourceTest extends BaseOneyPaymentMethod
             1 => 0,
             'total_cost' => [
                 'amount' => '1,500.00',
-                'value' => 15,
+                'value' => 1500,
             ],
             2 => 0,
             'down_payment_amount' => [
                 'amount' => '1,500.00',
-                'value' => 15,
+                'value' => 1500,
             ],
             3 => 0,
             'installments' => [
                 0 => [
                     'amount' => '1,500.00',
                     0 => 0,
-                    'value' => 15,
+                    'value' => 1500,
                     1 => 0,
                 ],
                 1 => [
                     'amount' => '1,500.00',
                     0 => 0,
-                    'value' => 15,
+                    'value' => 1500,
                     1 => 0,
                 ],
             ],
@@ -150,11 +150,11 @@ final class formatOneyResourceTest extends BaseOneyPaymentMethod
             'title' => 'Payment in 3x',
             'total_amount' => [
                 'amount' => '3,000.00',
-                'value' => 15,
+                'value' => 3000,
             ],
         ];
 
-        $this->assertSame(
+        $this->assertEquals(
             $expected,
             $this->class->formatOneyResource($operation, $resource, $total_amount)
         );

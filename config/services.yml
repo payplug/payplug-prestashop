@@ -42,4 +42,6 @@ services:
 
   payplug.utilities.service.core:
     class: PayPlug\src\utilities\services\Core
+  payplug.application.adapter.price:
+    class: PayPlug\src\application\adapter\PriceAdapter
     public: true

@@ -866,9 +866,18 @@ class PaymentAction
             return '';
         }
 
+        $price_adapter = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.application.adapter.price');
+        $amount_refunded_payplug = $this->dependencies->getHelpers()['amount']->convertAmount($amount_refunded_payplug, true);
+        $amount_available = $this->dependencies->getHelpers()['amount']->convertAmount($amount_available, true);
         $this->context->smarty->assign([
-            'amount_refunded_payplug' => $this->dependencies->getHelpers()['amount']->convertAmount($amount_refunded_payplug, true),
-            'amount_available' => $this->dependencies->getHelpers()['amount']->convertAmount($amount_available, true),
+            'amount_refunded_payplug' => $amount_refunded_payplug,
+            'amount_refunded_payplug_display' => $price_adapter->formatPrice($amount_refunded_payplug, $this->context->currency->iso_code),
+            'amount_available' => $amount_available,
+            'amount_available_display' => $price_adapter->formatPrice($amount_available, $this->context->currency->iso_code),
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('/views/templates/admin/order/refund_data.tpl');
