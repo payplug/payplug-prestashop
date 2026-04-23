@@ -1484,6 +1484,12 @@ class PaymentMethod
                 ->getInstanceByName($this->dependencies->name)
                 ->getService('payplug.utilities.service.phonenumber');
 
+            $language_helper = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.helper.language');
+
             // Set billing informations
             $billing = [
                 'title' => null,
@@ -1498,7 +1504,7 @@ class PaymentMethod
                 'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
                 'city' => !empty($billing_address->city) ? $billing_address->city : null,
                 'country' => $billing_iso,
-                'language' => $this->context->language->iso_code,
+                'language' => $language_helper->getIsoFromCodeLang($this->context->language->language_code),
             ];
             $billing['company_name'] = empty($billing['company_name']) || !is_string($billing['company_name'])
                 ? $billing['first_name'] . ' ' . $billing['last_name']
@@ -1526,7 +1532,7 @@ class PaymentMethod
                 'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,
                 'city' => !empty($shipping_address->city) ? $shipping_address->city : null,
                 'country' => $shipping_iso,
-                'language' => $this->context->language->iso_code,
+                'language' => $language_helper->getIsoFromCodeLang($this->context->language->language_code),
                 'delivery_type' => $delivery_type,
             ];
             $shipping['company_name'] = empty($shipping['company_name']) || !is_string($shipping['company_name'])
