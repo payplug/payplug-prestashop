@@ -26,6 +26,9 @@ class BaseApplepayPaymentMethod extends BasePaymentMethod
         $this->country_adapter->shouldReceive([
             'get' => CountryMock::get(),
         ]);
+        $this->language_helper->shouldReceive([
+            'getIsoFromCodeLang' => 'fr',
+        ]);
 
         $this->class = \Mockery::mock(ApplepayPaymentMethod::class, [$this->dependencies])
             ->makePartial()
