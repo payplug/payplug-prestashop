@@ -169,11 +169,13 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
 
                 try {
+                    // todo: Use LanguageAdapter to get iso code from language object
+                    $country = $this->dependencies->configClass->getIsoFromLanguageCode($context->language);
                     $payment_options = $this->dependencies
                         ->getPlugin()
                         ->getPaymentMethodClass()
                         ->getPaymentMethod('oney')
-                        ->getOneyPriceAndPaymentOptions($cart, $amount);
+                        ->getOneyPriceAndPaymentOptions($cart, $amount, $country);
                 } catch (Exception $e) {
                     exit(json_encode([
                         'exception' => $e->getMessage(),
