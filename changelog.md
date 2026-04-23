@@ -6,6 +6,7 @@
   - [PRE-3257](https://github.com/payplug/payplug-prestashop/pull/50): Fix Order state partial refund if ps_checkout not installed
   - [PRE-3334](https://github.com/payplug/payplug-prestashop/pull/57): remove deprecated displayPrice method usage
   - [PRE-3279](https://github.com/payplug/payplug-prestashop/pull/56): Change Scalapay wording with 3x/4x precision
+  - [PRE-3090](https://github.com/payplug/payplug-prestashop/pull/58): Fix Oney cta on product and cart page
 
 ## Version 4.23.1
 - Bugfix :
