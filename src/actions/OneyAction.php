@@ -79,10 +79,10 @@ class OneyAction
 
         // then check if the current language is the same as the one configured in the back office
         if ((string) $this->plugin
-                ->getTools()
-                ->tool('strtoupper', $this->plugin
-                ->getContext()
-                ->get()->language->iso_code) !=
+            ->getTools()
+            ->tool('strtoupper', $this->plugin
+            ->getContext()
+            ->get()->language->iso_code) !=
             $this->plugin->getConfigurationClass()->getValue('company_iso')) {
             return false;
         }
