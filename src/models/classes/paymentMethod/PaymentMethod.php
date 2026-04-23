@@ -797,13 +797,23 @@ class PaymentMethod
             : '';
 
         $amount_available = $resource->amount - $resource->amount_refunded;
+
+        $price_adapter = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.application.adapter.price');
+        $refunded = $this->dependencies
+            ->getHelpers()['amount']
+            ->convertAmount($resource->amount_refunded, true);
+        $available = 10 <= $amount_available
+            ? $this->dependencies->getHelpers()['amount']->convertAmount($amount_available, true)
+            : 0;
         $refund = [
-            'refunded' => $this->dependencies
-                ->getHelpers()['amount']
-                ->convertAmount($resource->amount_refunded, true),
-            'available' => 10 <= $amount_available
-                ? $this->dependencies->getHelpers()['amount']->convertAmount($amount_available, true)
-                : 0,
+            'refunded' => $refunded,
+            'refunded_display' => $price_adapter->formatPrice($refunded, $this->context->currency->iso_code),
+            'available' => $available,
+            'available_display' => $price_adapter->formatPrice($available, $this->context->currency->iso_code),
             'is_refunded' => (bool) $resource->is_refunded,
         ];
         $can_be_refund = $resource->is_paid
@@ -813,12 +823,16 @@ class PaymentMethod
             $refund['available'] = 0;
         }
 
+        $amount = $this->dependencies->getHelpers()['amount']->convertAmount($resource->amount, true);
+        $amount_display = $price_adapter->formatPrice($amount, $this->context->currency->iso_code);
+
         return [
             'id' => $resource->id,
             'status' => $pay_status,
             'status_code' => $status['code'],
             'status_class' => $status_class,
-            'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($resource->amount, true),
+            'amount' => $amount,
+            'amount_display' => $amount_display,
             'card_brand' => $card_brand,
             'card_mask' => $card_mask,
             'card_date' => $card_date,

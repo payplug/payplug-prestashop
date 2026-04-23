@@ -79,6 +79,7 @@ class getResourceDetailTest extends BasePaymentMethod
             'status_code' => 'paid',
             'status_class' => 'pp_success',
             'amount' => 313.2,
+            'amount_display' => 313.2,
             'card_brand' => null,
             'card_mask' => null,
             'card_date' => null,
@@ -93,7 +94,9 @@ class getResourceDetailTest extends BasePaymentMethod
             'type_code' => '',
             'refund' => [
                 'refunded' => 0,
+                'refunded_display' => 0,
                 'available' => 0,
+                'available_display' => 313.2,
                 'is_refunded' => false,
             ],
             'currency' => 'EUR',

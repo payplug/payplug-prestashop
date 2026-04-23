@@ -58,23 +58,31 @@ class OneyAction
     public function renderCTA($params = [])
     {
         $this->setParameters();
-        if (!isset($params['type'])
-            && 'cart' == $this->current_controller) {
+
+        if (!isset($params['type']) && 'cart' == $this->current_controller) {
             $params['type'] = 'oney_cart';
         }
 
-        if (('product' != $this->current_controller
-            && 'cart' != $this->current_controller)
-            || !$this->dependencies
-                ->getPlugin()
-                ->getPaymentMethodClass()
-                ->getPaymentMethod('oney')
-                ->isOneyAllowed()
-            || (string) $this->plugin
-                ->getTools()
-                ->tool('strtoupper', $this->plugin
-                ->getContext()
-                ->get()->language->iso_code) !=
+        // Check if current controller is product or cart, if not return false
+        if (!in_array($this->current_controller, ['product', 'cart'])) {
+            return false;
+        }
+
+        // then check if oney is allowed
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod('oney')
+            ->isOneyAllowed()) {
+            return false;
+        }
+
+        // then check if the current language is the same as the one configured in the back office
+        if ((string) $this->plugin
+            ->getTools()
+            ->tool('strtoupper', $this->plugin
+            ->getContext()
+            ->get()->language->iso_code) !=
             $this->plugin->getConfigurationClass()->getValue('company_iso')) {
             return false;
         }
@@ -186,12 +194,18 @@ class OneyAction
 
         $withFirstSchedule = 'it' == $this->context->language->iso_code;
 
+        $price_adapter = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.application.adapter.price');
+
         $vars = [
             'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
             'oney_payment_option' => $oney_payment,
             'payplug_oney_amount' => [
                 'amount' => $amount,
-                'value' => $this->tools->tool('displayPrice', $amount),
+                'value' => $price_adapter->formatPrice($amount, $this->context->currency->iso_code),
             ],
             'withFirstSchedule' => $withFirstSchedule,
             'iso_code' => $this->tools->tool(

@@ -410,6 +410,11 @@ class InstallmentPaymentMethod extends PaymentMethod
             ->getOrderTranslations();
         $status = $this->getPaymentStatus($resource);
 
+        $price_adapter = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.application.adapter.price');
         $refund = [
             'refunded' => 0,
             'available' => 0,
@@ -431,12 +436,14 @@ class InstallmentPaymentMethod extends PaymentMethod
                 $refund['is_refunded'] = (bool) $schedule_resource->is_refunded;
                 $payment_list[] = $schedule_detail;
             } else {
+                $amount = $this->dependencies->getHelpers()['amount']->convertAmount($schedule['amount'], true);
                 $payment_list[] = [
                     'id' => null,
                     'status' => $translation['detail']['status'][$status['code']],
                     'status_class' => $resource->is_active ? 'pp_success' : 'pp_error',
                     'status_code' => 'incoming',
-                    'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($schedule['amount'], true),
+                    'amount' => $amount,
+                    'amount_display' => $price_adapter->formatPrice($amount, $this->context->currency->iso_code),
                     'card_brand' => null,
                     'card_mask' => null,
                     'tds' => null,
@@ -447,6 +454,11 @@ class InstallmentPaymentMethod extends PaymentMethod
                 ];
             }
         }
+
+        $refund = $refund + [
+            'refunded_display' => $price_adapter->formatPrice($refund['refunded'], $this->context->currency->iso_code),
+            'available_display' => $price_adapter->formatPrice($refund['available'], $this->context->currency->iso_code),
+        ];
 
         return [
             'id' => $resource_id,

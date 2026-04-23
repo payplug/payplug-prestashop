@@ -56,11 +56,6 @@ class MockHelper extends Mockery
                     case 'strtolower':
                         return strtolower($value);
 
-                    case 'displayPrice':
-                        $value = number_format($value, 2) . ' €';
-
-                        return str_replace('.', ',', $value);
-
                     case 'ps_round':
                         return round($value, $params2);
 
