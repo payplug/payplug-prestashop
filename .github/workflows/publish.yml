@@ -5,6 +5,11 @@ on:
       - master
       - develop
   pull_request:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
 
 jobs:
   define-package-version:
@@ -79,8 +84,7 @@ jobs:
           ls -la payplug
 
           echo "Zipping payplug directory"
-          cp payplug/composer.json composer.json
-          composer archive --file payplug --format zip
+          zip -r payplug.zip payplug/
 
       - name: Upload package
         uses: actions/upload-artifact@v4
@@ -88,3 +92,9 @@ jobs:
           name: payplug_${{ needs.define-package-version.outputs.artifact_version }}
           path: payplug.zip
           retention-days: 7
+
+      - name: Attach artifact to GitHub Release
+        if: github.event_name == 'release'
+        run: gh release upload ${{ github.event.release.tag_name }} payplug.zip --clobber --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
