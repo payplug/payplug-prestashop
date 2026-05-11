@@ -1,0 +1,31 @@
+# Dev tooling & config
+.act-artifacts/
+.gemini/
+.git/
+.github/
+.gitignore
+.husky/
+.idea/
+.well-known/
+.php-cs-fixer.dist.php
+.php-cs-fixer.php
+.php_cs.cache
+captainhook.json
+eslint.config.js
+webpack.config.js
+package.json
+package-lock.json
+phpstan.dist.neon
+phpstan.neon
+
+
+# Dependencies (raw sources, not needed in zip)
+node_modules/
+
+# Tests
+tests/
+
+# Dev assets (compiled ones go to views/)
+dev/
+
+
