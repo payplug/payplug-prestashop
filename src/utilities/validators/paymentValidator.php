@@ -82,7 +82,7 @@ class paymentValidator
                 'result' => true,
                 'message' => 'payment can be refund.',
             ];
-        } elseif (!is_string($pay_id) || empty($pay_id)) {
+        } elseif (!is_string($pay_id) || '' === $pay_id) {
             return [
                 'result' => false,
                 'message' => 'invalid argument, $pay_id must be a string.',
