@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of Payplug SAS
  */
 
-namespace Payplug\src\utilities\helpers;
+namespace PayPlug\src\utilities\helpers;
 
 if (!defined('_PS_VERSION_')) {
     exit;

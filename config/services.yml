@@ -41,7 +41,7 @@ services:
     public: true
 
   payplug.utilities.helper.language:
-    class: Payplug\src\utilities\helpers\LanguageHelper
+    class: PayPlug\src\utilities\helpers\LanguageHelper
     public: true
 
   payplug.application.adapter.price:
