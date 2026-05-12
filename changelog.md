@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 4.23.3
+- Bugfix :
+  - [PATCH-4.23.3](https://github.com/payplug/payplug-prestashop/pull/63): Fix Namespace Typo for PS9
+
 ## Version 4.23.2
 - Bugfix :
   - [PRE-3177](https://github.com/payplug/payplug-prestashop/pull/48): add ps9 oauth2 compatibility via front-office callback
