@@ -67,6 +67,46 @@ class ValidationAction
             ];
         }
 
+        // Verify the cart belongs to the authenticated customer to prevent IDOR
+        $cart = $this->dependencies
+            ->getPlugin()
+            ->getCart()
+            ->get((int) $cart_id);
+
+        if (!$this->dependencies
+            ->getPlugin()
+            ->getValidate()
+            ->validate('isLoadedObject', $cart)) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::checkAction - Given cart obj isn\'t a valid object.');
+
+            return [
+                'result' => false,
+                'action' => 'redirect',
+                'redirected_url' => $this->getOrderLinks()['error'],
+            ];
+        }
+
+        $context = $this->dependencies
+            ->getPlugin()
+            ->getContext()
+            ->get();
+
+        if ($context->customer->id != $cart->id_customer) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::checkAction - Given cart customer id did not match with context customer id.');
+
+            return [
+                'result' => false,
+                'action' => 'redirect',
+                'redirected_url' => $this->getOrderLinks()['error'],
+            ];
+        }
+
         // Check if an order exists this related cart
         $id_order = $this->dependencies
             ->getPlugin()
