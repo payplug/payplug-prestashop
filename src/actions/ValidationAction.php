@@ -94,7 +94,7 @@ class ValidationAction
             ->getContext()
             ->get();
 
-        if ($context->customer->id != $cart->id_customer) {
+        if ($context->customer->id !== $cart->id_customer) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
@@ -419,7 +419,7 @@ class ValidationAction
             ->getContext()
             ->get();
 
-        if ($context->customer->id != $cart->id_customer) {
+        if ($context->customer->id !== $cart->id_customer) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
