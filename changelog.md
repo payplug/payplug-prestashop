@@ -1,4 +1,7 @@
 # Payplug module changelog
+## Version 4.25.0
+- Improvement:
+  - [PRE-3359](https://github.com/payplug/payplug-prestashop/pull/63): Improve github workflow 
 
 ## Version 4.23.3
 - Bugfix :
