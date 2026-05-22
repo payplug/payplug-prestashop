@@ -3,30 +3,30 @@ name: Prestashop — Release
 on:
   push:
     branches:
-      - master
+      - test-release
       - develop
     tags:
       - '[0-9]+.[0-9]+.[0-9]+**'
 
 jobs:
   # -----------------------------------------------------------------------
-  # 1. BUILD QA ZIP — triggered on push to master
+  # 1. BUILD QA ZIP — triggered on push to test-release (replaces master)
   # -----------------------------------------------------------------------
   build-qa-zip:
     name: Build QA zip
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/test-release'
     uses: payplug/template-ci/.github/workflows/presta-zip-generation.yml@main
     with:
       php-version: '7.2'
       node-version: '20'
       env: qa
-      ref: refs/heads/master
+      ref: refs/heads/test-release
     secrets:
       api-payplug: ${{ secrets.PAYPLUG_API_QA }}
       api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
 
   # -----------------------------------------------------------------------
-  # 2. REUSE QA ARTIFACT — download from last release run and re-upload on develop push
+  # 2. REUSE QA ARTIFACT — download from last release run and re-upload on release/4.25.0 push
   # -----------------------------------------------------------------------
   reuse-qa-artifact-develop:
     name: Reuse QA artifact from merged branch (develop)
@@ -68,19 +68,32 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ github.ref_name }}"
+          CHANGELOG=$(awk "/^## Version ${VERSION}$/{found=1; next} found && /^## Version /{exit} found{print}" changelog.md)
+          if [ -z "$CHANGELOG" ]; then
+            echo "⚠️  No changelog entry found for version ${VERSION} in changelog.md" >&2
+            CHANGELOG="No changelog entry found for version ${VERSION}."
+          fi
+          {
+            echo "content<<EOF"
+            echo "$CHANGELOG"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
       - name: Create release with changelog
         run: |
-          CHANGELOG=$(php -r "echo json_decode(file_get_contents('release.json'))->changelog ?? '';")
           gh release create ${{ github.ref_name }} \
             --title "${{ github.ref_name }}" \
-            --notes "$CHANGELOG" \
+            --notes "${{ steps.changelog.outputs.content }}" \
             --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # -----------------------------------------------------------------------
-  # 3. BUILD PROD ZIP + ATTACH TO RELEASE — triggered on tag push
-  #    builds the zip and attaches it directly to the release created above
+  # 4. BUILD PROD ZIP + ATTACH TO RELEASE — triggered on tag push
   # -----------------------------------------------------------------------
   build-prod-zip:
     name: Build prod zip
@@ -96,4 +109,3 @@ jobs:
       api-payplug: ${{ secrets.PAYPLUG_API_PROD }}
       api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}
       github-token: ${{ secrets.GITHUB_TOKEN }}
-
