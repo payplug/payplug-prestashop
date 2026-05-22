@@ -92,8 +92,32 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # -----------------------------------------------------------------------
-  # 4. BUILD PROD ZIP + ATTACH TO RELEASE — triggered on tag push
+  # 5. ATTACH ZIP TO GITHUB RELEASE
   # -----------------------------------------------------------------------
+  attach-release:
+    name: Attach zip to GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-prod-zip
+    if: github.event_name == 'release'
+    permissions:
+      contents: write
+    steps:
+      - name: Download prod artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: payplug_*-prod
+          merge-multiple: true
+          path: staging/
+
+      - name: Create zip
+        run: |
+          cd staging
+          zip -r ../payplug.zip payplug/
+
+      - name: Attach to GitHub Release
+        run: gh release upload ${{ github.ref_name }} payplug.zip --clobber --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   build-prod-zip:
     name: Build prod zip
     needs: create-github-release
