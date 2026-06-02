@@ -22,9 +22,6 @@
                     "regex": "/^(feature|fix|hotfix|refactor)\\/(PRE|SMP)-\\d+|(release|patch)\\/\\d+\\.\\d+\\.\\d+/"
                 }
 
-            },
-            {
-                "action": "composer cs:fix"
             }
         ]
     },
