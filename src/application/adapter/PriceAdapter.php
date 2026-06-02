@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use payplug\src\interfaces\PriceInterface;
+use PayPlug\src\interfaces\PriceInterface;
 
 class PriceAdapter implements PriceInterface
 {
