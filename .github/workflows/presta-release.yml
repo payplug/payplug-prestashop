@@ -73,7 +73,6 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          VERSION="${{ github.ref_name }}"
           CHANGELOG=$(awk "/^## Version ${VERSION}$/{found=1; next} found && /^## Version /{exit} found{print}" changelog.md)
           if [ -z "$CHANGELOG" ]; then
             echo "⚠️  No changelog entry found for version ${VERSION} in changelog.md" >&2
@@ -86,10 +85,6 @@ jobs:
           } >> $GITHUB_OUTPUT
 
       - name: Update release notes with changelog
-        run: |
-          gh release edit ${{ github.ref_name }} \
-            --notes "${{ steps.changelog.outputs.content }}" \
-            --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ github.ref_name }}
