@@ -8,7 +8,7 @@ $finder = (new PhpCsFixer\Finder())
     ->in(__DIR__);
 
 return (new PhpCsFixer\Config())
-    ->setUsingCache(true)
+    ->setUsingCache(false)
     ->setRules([
         '@PSR12' => true,
         '@PhpCsFixer' => true,
