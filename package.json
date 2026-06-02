@@ -21,11 +21,11 @@
   "license": "ISC",
   "devDependencies": {
     "css-loader": "^6.5.1",
-    "css-minimizer-webpack-plugin": "^4.0.0",
+    "css-minimizer-webpack-plugin": "8.0.0",
     "less": "^4.1.2",
     "less-loader": "^11.0.0",
     "mini-css-extract-plugin": "^2.4.5",
-    "prestashop_accounts_vue_components": "^4.0.0",
+    "prestashop_accounts_vue_components": "5.0.0-test-1",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.106.2",
