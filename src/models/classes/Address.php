@@ -63,8 +63,15 @@ class Address
         $this->setParameters();
         $existing_address_id = 0;
 
-        // Hash the user address
-        $user_address_hash = hash('sha256', json_encode($user_address));
+        $user_address_hash = hash('sha256', json_encode([
+            'firstname' => $user_address['firstname'],
+            'lastname' => $user_address['lastname'],
+            'address1' => $user_address['address1'],
+            'address2' => isset($user_address['address2']) ? $user_address['address2'] : '',
+            'postcode' => $user_address['postcode'],
+            'city' => $user_address['city'],
+            'id_country' => (int) $user_address['id_country'],
+        ]));
 
         if (!empty($customer_addresses)) {
             foreach ($customer_addresses as $address) {
@@ -75,6 +82,7 @@ class Address
                             'firstname' => $address['firstname'],
                             'lastname' => $address['lastname'],
                             'address1' => $address['address1'],
+                            'address2' => isset($address['address2']) ? $address['address2'] : '',
                             'postcode' => $address['postcode'],
                             'city' => $address['city'],
                             'id_country' => (int) $address['id_country'],
@@ -98,10 +106,12 @@ class Address
             $address->lastname = $user_address['lastname'];
             $address->id_country = $user_address['id_country'];
             $address->address1 = $user_address['address1'];
+            $address->address2 = isset($user_address['address2']) ? $user_address['address2'] : '';
             $address->postcode = $user_address['postcode'];
             $address->city = $user_address['city'];
             $address->phone_mobile = isset($user_address['phone_mobile']) ? $user_address['phone_mobile'] : '';
-            $address->alias = 'Apple Pay Address';
+            // Hash-based alias gives each distinct Apple Pay address a unique alias,
+            $address->alias = 'Apple Pay - ' . substr($user_address_hash, 0, 8);
             $address->id_customer = $customer_id;
             $this->address_adapter->saveAddress($address);
             $existing_address_id = $address->id;
