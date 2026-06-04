@@ -1,5 +1,8 @@
 # Payplug module changelog
 ## Version 4.24.0
+- Feature :
+  - [PRE-3161](https://github.com/payplug/payplug-prestashop/pull/80): Update iDEAL logo
+
 - Bugfix :
   - [SMP-3332](https://github.com/payplug/payplug-prestashop/pull/78): add missing field address2 in the cart information
 
