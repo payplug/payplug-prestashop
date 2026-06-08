@@ -38,7 +38,7 @@ jobs:
         with:
           workflow: github-actions.yml
           name_is_regexp: true
-          name: .*-qa
+          name: .*-[Qq][Aa]
           path: artifact/
 
       - name: Flatten artifact directory
