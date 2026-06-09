@@ -1,0 +1,26 @@
+name: PR Type of Change
+
+on:
+  pull_request:
+    branches:
+      - '**'
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  check-type-of-change:
+    name: Validate type of change is selected
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check that at least one "Type of Change" box is checked
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Extract the "Type of Change" section (between its heading and the next --- or ##)
+          section=$(echo "$PR_BODY" | awk '/^## Type of Change/,/^(---|## )/' | head -n -1)
+
+          if echo "$section" | grep -qE '^\- \[[xX]\]'; then
+            echo "Type of Change: at least one box is checked."
+          else
+            echo "::error::You must check at least one box in the 'Type of Change' section of the PR description."
+            exit 1
+          fi
