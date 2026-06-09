@@ -5,6 +5,7 @@
 
 - Bugfix :
   - [SMP-3332](https://github.com/payplug/payplug-prestashop/pull/78): add missing field address2 in the cart information
+  - [SMP-3253](https://github.com/payplug/payplug-prestashop/pull/79): add unique alias for each appelpay address
 
 ## Version 4.23.3
 - Bugfix :
