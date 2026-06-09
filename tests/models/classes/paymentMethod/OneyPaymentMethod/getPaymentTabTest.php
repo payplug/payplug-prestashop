@@ -16,7 +16,7 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
     public $oney_schedule;
     public $oney_context;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->oney_schedule = '2';

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class getOAuthCallbackUrlTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         \Mockery::close();
     }
@@ -42,6 +42,8 @@ class getOAuthCallbackUrlTest extends TestCase
      */
     public function testDoesNotCallGetModuleLinkForPrePS9()
     {
+        $this->expectNotToPerformAssertions();
+
         $context = new \stdClass();
         $context->link = \Mockery::mock();
         $context->link->shouldReceive('getAdminLink')
@@ -68,6 +70,6 @@ class getOAuthCallbackUrlTest extends TestCase
 
         $result = LinkHelper::getOAuthCallbackUrl($context);
 
-        $this->assertContains('token=stable_hash', $result);
+        $this->assertStringContainsString('token=stable_hash', $result);
     }
 }

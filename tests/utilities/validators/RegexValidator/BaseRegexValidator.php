@@ -16,7 +16,7 @@ abstract class BaseRegexValidator extends MockeryTestCase
 
     public $validator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->validator = \Mockery::mock(RegexValidator::class)
             ->shouldAllowMockingProtectedMethods()

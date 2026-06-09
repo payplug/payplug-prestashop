@@ -18,7 +18,7 @@ class refundActionTest extends BasePaymentAction
     public $id_customer;
     public $id_order;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

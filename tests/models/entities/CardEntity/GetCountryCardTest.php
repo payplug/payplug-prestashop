@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\CardEntity;
  */
 final class GetCountryCardTest extends BaseCardEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setCountry('ISO');

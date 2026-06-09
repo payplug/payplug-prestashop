@@ -17,7 +17,7 @@ class installActionTest extends BaseConfigurationAction
     public $order_state_action;
     public $entity_repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

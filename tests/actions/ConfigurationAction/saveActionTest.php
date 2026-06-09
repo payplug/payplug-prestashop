@@ -9,7 +9,7 @@ namespace PayPlug\tests\actions\ConfigurationAction;
  */
 class saveActionTest extends BaseConfigurationAction
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -15,7 +15,7 @@ class getClientDataTest extends BaseApi
     public $session;
     public $oauth_client_data;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->session = 'session_token';

@@ -14,7 +14,7 @@ class isApplepayAllowedDomainTest extends TestCase
 {
     protected $validator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->validator = new paymentValidator();
     }

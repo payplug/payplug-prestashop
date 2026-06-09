@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\QueueEntity;
  */
 final class GetDateUpdTest extends BaseQueueEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setDateUpd($this->date);

@@ -44,7 +44,7 @@ abstract class BaseApiRest extends TestCase
     protected $module_adapter;
     protected $merchant_class;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->api_service = \Mockery::mock('ApiService');
         $this->logger = \Mockery::mock('Logger');
@@ -159,7 +159,7 @@ abstract class BaseApiRest extends TestCase
         $this->class = \Mockery::mock(ApiRest::class, [$this->dependencies])->makePartial();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         \Mockery::close();
         parent::tearDown();

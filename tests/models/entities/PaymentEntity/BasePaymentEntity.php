@@ -20,7 +20,7 @@ abstract class BasePaymentEntity extends TestCase
     protected $resource_id;
     protected $schedules;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity = \Mockery::mock(PaymentEntity::class)->makePartial();

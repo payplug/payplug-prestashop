@@ -17,7 +17,7 @@ abstract class BaseOrder extends TestCase
     protected $payment_validator;
     protected $plugin;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->logger = \Mockery::mock('Logger');

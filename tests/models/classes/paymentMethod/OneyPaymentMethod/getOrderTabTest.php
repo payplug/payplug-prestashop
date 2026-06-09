@@ -16,7 +16,7 @@ class getOrderTabTest extends BaseOneyPaymentMethod
     public $order_tab;
     public $id_order_state_pending;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

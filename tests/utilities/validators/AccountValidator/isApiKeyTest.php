@@ -14,7 +14,7 @@ class isApiKeyTest extends TestCase
 {
     protected $accountValidator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->accountValidator = new AccountValidator();
     }

@@ -19,7 +19,7 @@ final class formatOneyResourceTest extends BaseOneyPaymentMethod
     protected $resource;
     protected $context;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

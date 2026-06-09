@@ -13,7 +13,7 @@ class DeleteCardTest extends BaseApi
 {
     public $card_id;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->card_id = 'card_123456azerty';

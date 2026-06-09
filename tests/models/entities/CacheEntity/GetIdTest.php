@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\CacheEntity;
  */
 final class GetIdTest extends BaseCacheEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->cache->setId(123);

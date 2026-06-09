@@ -14,7 +14,7 @@ class canBeShownTest extends TestCase
 {
     protected $moduleValidator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->moduleValidator = new moduleValidator();
     }

@@ -11,7 +11,7 @@ final class GetLimitNumberTest extends BaseLoggerEntity
 {
     public $limit_number;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->limit_number = 4000;

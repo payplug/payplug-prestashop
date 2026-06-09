@@ -30,7 +30,7 @@ abstract class BaseApi extends MockeryTestCase
     public $resource_id;
     public $service;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->plugin = \Mockery::mock('Plugin');

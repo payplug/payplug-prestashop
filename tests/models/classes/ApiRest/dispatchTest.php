@@ -14,7 +14,7 @@ class dispatchTest extends BaseApiRest
     public $module;
     public $module_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

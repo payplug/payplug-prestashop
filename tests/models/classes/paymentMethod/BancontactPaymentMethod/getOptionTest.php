@@ -12,7 +12,7 @@ class getOptionTest extends BaseBancontactPaymentMethod
 {
     public $config;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->config = [

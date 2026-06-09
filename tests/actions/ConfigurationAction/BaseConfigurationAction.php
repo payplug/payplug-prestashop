@@ -26,7 +26,7 @@ abstract class BaseConfigurationAction extends TestCase
     public $validator;
     public $validate_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->configuration = \Mockery::mock(Configuration::class)->makePartial();
         $this->configuration->shouldReceive([

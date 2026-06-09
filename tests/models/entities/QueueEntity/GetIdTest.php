@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\QueueEntity;
  */
 final class GetIdTest extends BaseQueueEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setId($this->id);

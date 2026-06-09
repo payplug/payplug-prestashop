@@ -16,7 +16,7 @@ class getResourceDetailTest extends BasePaymentMethod
     public $resource_id;
     public $retrieve;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->resource_id = 'pay_12345azerty';

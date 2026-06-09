@@ -11,7 +11,7 @@ class deleteFromDateTest extends BaseLoggerRepository
 {
     public $date;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->date = date('Y-m-d H:i:s');

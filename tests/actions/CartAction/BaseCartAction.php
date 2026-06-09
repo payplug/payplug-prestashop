@@ -23,7 +23,7 @@ abstract class BaseCartAction extends TestCase
     protected $plugin;
     protected $tools_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->configuration->shouldReceive([

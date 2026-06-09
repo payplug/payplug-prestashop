@@ -14,7 +14,7 @@ class InitializeTest extends BaseApi
     public $logger;
     public $token;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->token = 'bearer_token';

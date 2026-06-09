@@ -11,7 +11,7 @@ class BaseEntityRepository extends BaseRepository
     protected $entity_key;
     protected $entity_value;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->repository = \Mockery::mock(EntityRepository::class)

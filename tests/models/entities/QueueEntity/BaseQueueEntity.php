@@ -20,7 +20,7 @@ abstract class BaseQueueEntity extends TestCase
     protected $resource_id;
     protected $type;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity = \Mockery::mock(QueueEntity::class)->makePartial();

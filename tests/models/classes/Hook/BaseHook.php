@@ -16,7 +16,7 @@ abstract class BaseHook extends TestCase
     protected $plugin;
     protected $configClass;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = \Mockery::mock('DependenciesClass');
         $this->dependencies->name = 'payplug';

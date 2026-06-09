@@ -15,7 +15,7 @@ class removeActionTest extends BasePaymentAction
     public $cancellable;
     public $stored_resource;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->resource_id = 'pay_azerty';

@@ -14,7 +14,7 @@ class formatOneyAmountTest extends TestCase
 {
     protected $amountHelper;
 
-    public function setUp()
+    public function setUp(): void
     {
         $dependencies = \Mockery::mock('Dependencies');
         $this->amountHelper = new AmountHelper($dependencies);

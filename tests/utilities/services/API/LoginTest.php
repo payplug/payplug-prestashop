@@ -12,7 +12,7 @@ class LoginTest extends BaseApi
     public $email;
     public $password;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->email = 'unit_test@email.com';

@@ -13,7 +13,7 @@ class createOrderTest extends BaseValidationAction
     protected $payment_repository;
     protected $stored_payment;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->order_action = \Mockery::mock('OrderAction');

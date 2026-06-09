@@ -11,7 +11,7 @@ final class GetDefinitionStateTest extends BaseStateEntity
 {
     protected $definition;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->definition = [

@@ -12,7 +12,7 @@ class createPaymentLinkActionTest extends BaseHookAction
     private $order_state_id;
     private $id_cart;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

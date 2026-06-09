@@ -17,7 +17,7 @@ class updateOrderStateTest extends BasePaymentMethod
     public $order_adapter;
     public $order_class;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->order_id = 42;

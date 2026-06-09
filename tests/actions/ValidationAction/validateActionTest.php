@@ -19,7 +19,7 @@ class validateActionTest extends BaseValidationAction
     protected $order_id;
     protected $validate_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

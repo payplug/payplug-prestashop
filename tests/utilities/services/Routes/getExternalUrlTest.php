@@ -15,7 +15,7 @@ class getExternalUrlTest extends TestCase
     public $service;
     public $dependencies;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->service = \Mockery::mock(Routes::class)
             ->shouldAllowMockingProtectedMethods()

@@ -14,7 +14,7 @@ final class getOneyPriceLimitTest extends BaseOneyPaymentMethod
 {
     public $error_limits;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->configuration->shouldReceive('getValue')

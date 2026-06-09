@@ -13,7 +13,7 @@ class installTabActionTest extends BaseConfigurationAction
     protected $languages_adatper;
     protected $tools_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

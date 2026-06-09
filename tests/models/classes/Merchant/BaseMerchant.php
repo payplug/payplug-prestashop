@@ -19,7 +19,7 @@ abstract class BaseMerchant extends TestCase
     protected $module_adapter;
     protected $api_service;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = \Mockery::mock('DependenciesClass');
         $this->dependencies->name = 'payplug';

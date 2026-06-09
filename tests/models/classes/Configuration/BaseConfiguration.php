@@ -15,7 +15,7 @@ abstract class BaseConfiguration extends TestCase
     protected $dependencies;
     protected $class;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->configuration = \Mockery::mock('Configuration');
         $this->plugin = \Mockery::mock('Plugin');

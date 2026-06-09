@@ -11,7 +11,7 @@ final class GetContentTest extends BaseLoggerEntity
 {
     public $content;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->content = 'content';

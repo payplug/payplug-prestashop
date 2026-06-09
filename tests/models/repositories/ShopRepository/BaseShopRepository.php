@@ -7,7 +7,7 @@ use PayPlug\tests\models\repositories\BaseRepository;
 
 class BaseShopRepository extends BaseRepository
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->repository = \Mockery::mock(ShopRepository::class, [$this->dependencies])

@@ -51,6 +51,7 @@ jobs:
       php-version: '7.2'
       test-version-range: '7.2-8.1'
       src-folder: './src/'
+      ignore-patterns: 'src/utilities/services/Mcp.php'
 
   build-qa-zip:
     if: always() && !failure() && !cancelled()

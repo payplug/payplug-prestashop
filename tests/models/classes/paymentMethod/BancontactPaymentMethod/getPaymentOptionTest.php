@@ -10,7 +10,7 @@ namespace PayPlug\tests\models\classes\paymentMethod\BancontactPaymentMethod;
  */
 class getPaymentOptionTest extends BaseBancontactPaymentMethod
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

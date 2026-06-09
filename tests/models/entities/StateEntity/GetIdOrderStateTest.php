@@ -11,7 +11,7 @@ final class getIdOrderStateTest extends BaseStateEntity
 {
     protected $state;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setIdOrderState(42);

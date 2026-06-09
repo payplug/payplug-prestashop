@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\PaymentEntity;
  */
 final class GetIdTest extends BasePaymentEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setId($this->id);

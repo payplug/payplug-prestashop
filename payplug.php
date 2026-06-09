@@ -93,6 +93,17 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * Indicates that the module is compliant with the MCP.
+     * MCP requires PHP 8.0+ for attributes support.
+     *
+     * @return bool
+     */
+    public function isMcpCompliant()
+    {
+        return true;
+    }
+
+    /**
      * @param bool $force_all
      *
      * @return bool
