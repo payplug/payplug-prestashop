@@ -1,57 +1,54 @@
 {
-    "name": "payplug/payplug-prestashop",
-    "moduleName": "payplug",
-    "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
-    "version": "4.23.3",
-    "require": {
-        "php": ">=7.2.0",
-        "payplug/payplug-php": "^4.0",
-        "symfony/dotenv": "3.4.*",
-        "symfony/dependency-injection": "4.4.0",
-        "payplug/payplug-plugin-core": "1.*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^8.5.52",
-        "phpdocumentor/type-resolver": "1.6.1",
-        "friendsofphp/php-cs-fixer": "^2.18",
-        "squizlabs/php_codesniffer": "^3.5",
-        "phpcompatibility/php-compatibility": "^9.3",
-        "mockery/mockery": "^1.3 <1.4",
-        "phpunit/php-token-stream": "^3.0",
-        "captainhook/captainhook": "~5.2.0",
-        "phpstan/phpstan": "<1.11",
-        "prestashop/phpstan-prestashop": "^2.0",
-        "prestashop/php-dev-tools": "^5.0"
-    },
-
-    "autoload": {
-        "psr-4": {
-            "PayPlug\\": "./"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "PayPlug\\tests\\": "tests/"
-        }
-    },
-    "config": {
-        "prepend-autoloader": false
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "./dev/ci/composer.sh"
-        ],
-        "post-update-cmd": [
-            "./dev/ci/composer.sh"
-        ],
-        "install-dev": "composer install && composer hooks:install",
-        "stan": "php vendor/bin/phpstan analyse --no-progress",
-        "cs-lint": "php vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no",
-        "test": "php vendor/bin/phpunit -c tests/phpunit.xml",
-        "cs:fix": "php vendor/bin/php-cs-fixer fix -vvv --using-cache=yes",
-        "cs:cache:reset": "rm -f .php_cs.cache && : > .php_cs.cache",
-        "hooks:install": "php vendor/bin/captainhook install -f"
+  "name": "payplug/payplug-prestashop",
+  "moduleName": "payplug",
+  "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
+  "version": "4.24.0",
+  "require": {
+    "php": ">=7.2.0",
+    "payplug/payplug-php": "^4.0",
+    "symfony/dotenv": "3.4.*",
+    "symfony/dependency-injection": "4.4.0",
+    "payplug/payplug-plugin-core": "1.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.5.52",
+    "phpdocumentor/type-resolver": "1.6.1",
+    "friendsofphp/php-cs-fixer": "^2.18",
+    "squizlabs/php_codesniffer": "^3.5",
+    "phpcompatibility/php-compatibility": "^9.3",
+    "mockery/mockery": "^1.3 <1.4",
+    "phpunit/php-token-stream": "^3.0",
+    "captainhook/captainhook": "~5.2.0",
+    "phpstan/phpstan": "<1.11",
+    "prestashop/phpstan-prestashop": "^2.0",
+    "prestashop/php-dev-tools": "^5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "PayPlug\\": "./"
     }
-
-
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PayPlug\\tests\\": "tests/"
+    }
+  },
+  "config": {
+    "prepend-autoloader": false
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "./dev/ci/composer.sh"
+    ],
+    "post-update-cmd": [
+      "./dev/ci/composer.sh"
+    ],
+    "install-dev": "composer install && composer hooks:install",
+    "stan": "php vendor/bin/phpstan analyse --no-progress",
+    "cs-lint": "php vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no",
+    "test": "php vendor/bin/phpunit -c tests/phpunit.xml",
+    "cs:fix": "php vendor/bin/php-cs-fixer fix -vvv --using-cache=yes",
+    "cs:cache:reset": "rm -f .php_cs.cache && : > .php_cs.cache",
+    "hooks:install": "php vendor/bin/captainhook install -f"
+  }
 }
