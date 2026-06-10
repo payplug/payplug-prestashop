@@ -222,7 +222,7 @@ class HookClass
 
         $this->assign->assign($order_detail);
 
-        $this->html .= $this->dependencies->configClass->fetchTemplate('/views/templates/admin/order/order.tpl');
+        $this->html .= $this->dependencies->configClass->fetchTemplate('views/templates/admin/order/order.tpl');
 
         return $this->html;
     }
