@@ -880,7 +880,7 @@ class PaymentAction
             'amount_available_display' => $price_adapter->formatPrice($amount_available, $this->context->currency->iso_code),
         ]);
 
-        return $this->dependencies->configClass->fetchTemplate('/views/templates/admin/order/refund_data.tpl');
+        return $this->dependencies->configClass->fetchTemplate('views/templates/admin/order/refund_data.tpl');
     }
 
     /**
