@@ -17,5 +17,6 @@ cp ./node_modules/payplug-ui-plugins-bo/js/chunk-vendors.js.map ./views/js/chunk
 cp ./node_modules/payplug-ui-plugins-bo/js/chunk-vendors.js ./views/js/chunk-vendors-${version}.js
 cp ./node_modules/payplug-ui-plugins-bo/css/app.css ./views/css/app-${version}.css
 cp ./node_modules/payplug-ui-plugins-bo/img/*.svg ./views/img/
+cp ./node_modules/payplug-ui-plugins-bo/img/*.png ./views/img/
 #
 echo "Done."
