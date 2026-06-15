@@ -24,7 +24,7 @@ abstract class BaseMerchantTelemetryAction extends TestCase
     public $repositories;
     public $shop_repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->name = 'payplug';

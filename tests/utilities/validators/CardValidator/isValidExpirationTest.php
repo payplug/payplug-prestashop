@@ -16,7 +16,7 @@ class isValidExpirationTest extends TestCase
     use FormatDataProvider;
     protected $validator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->validator = new cardValidator();
     }

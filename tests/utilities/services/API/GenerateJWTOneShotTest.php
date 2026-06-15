@@ -17,7 +17,7 @@ class GenerateJWTOneShotTest extends BaseApi
     public $id_token;
     public $email;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->client_id = 'some_client_id';

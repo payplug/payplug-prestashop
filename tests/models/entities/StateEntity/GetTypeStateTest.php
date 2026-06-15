@@ -11,7 +11,7 @@ final class GetTypeStateTest extends BaseStateEntity
 {
     protected $state;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setType('type');

@@ -15,7 +15,7 @@ class isAllowedTest extends TestCase
     protected $moduleValidator;
     protected $features = [];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->moduleValidator = new moduleValidator();
     }

@@ -15,7 +15,7 @@ class isExpiredTest extends TestCase
 {
     public $validator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->validator = new paymentValidator();
     }

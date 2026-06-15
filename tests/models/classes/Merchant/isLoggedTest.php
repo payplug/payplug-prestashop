@@ -11,7 +11,7 @@ class isLoggedTest extends BaseMerchant
 {
     public $account_validator;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->configuration_class->shouldReceive('getValue')

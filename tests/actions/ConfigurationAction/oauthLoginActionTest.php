@@ -15,7 +15,7 @@ class oauthLoginActionTest extends BaseConfigurationAction
     public $merchant;
     public $jwt;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

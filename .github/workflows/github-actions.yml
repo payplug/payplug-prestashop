@@ -1,0 +1,77 @@
+name: Payplug Prestashop CI
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - 'release/**'
+  pull_request:
+    branches:
+      - '**'
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # -----------------------------------------------------------------------
+  # 0. APPLY RELEASE — update version files from release.json (release/* → master only)
+  # -----------------------------------------------------------------------
+  apply-release:
+    if: startsWith(github.head_ref, 'release/') && github.base_ref == 'master' && github.event.action == 'opened'
+    uses: payplug/template-ci/.github/workflows/presta-apply-release.yml@main
+    with:
+      ref: ${{ github.head_ref }}
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # -----------------------------------------------------------------------
+  # 1. QUALITY — static analysis & code style
+  # -----------------------------------------------------------------------
+  quality:
+    needs: [apply-release]
+    if: always() && !failure() && !cancelled()
+    uses: payplug/template-ci/.github/workflows/php-quality.yml@main
+    with:
+      php-version: '7.2'
+
+  # -----------------------------------------------------------------------
+  # 2. JS QUALITY — ESLint syntax & code style
+  # -----------------------------------------------------------------------
+  js-quality:
+    if: always() && !failure() && !cancelled()
+    needs: [apply-release]
+    uses: payplug/template-ci/.github/workflows/js-quality.yml@main
+    with:
+      node-version: '20'
+      js-folder: './dev/js/'
+
+  check-php-compatibility:
+    if: always() && !failure() && !cancelled()
+    needs: [quality, js-quality]
+    uses: payplug/template-ci/.github/workflows/check-php-compatibility.yml@main
+    with:
+      php-version: '7.2'
+      test-version-range: '7.2-8.1'
+      src-folder: './src/'
+      ignore-patterns: 'src/utilities/services/Mcp.php'
+
+  build-qa-zip:
+    if: always() && !failure() && !cancelled()
+    needs: [ quality, check-php-compatibility ]
+    uses: payplug/template-ci/.github/workflows/presta-zip-generation.yml@main
+    with:
+      php-version: '7.2'
+      node-version: '20'
+      ref: ${{ github.head_ref }}
+    secrets:
+      api-payplug: ${{ secrets.PAYPLUG_API_QA }}
+      api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
+
+  sonarcloud:
+    if: always() && !failure() && !cancelled() && github.base_ref == 'develop'
+    needs: build-qa-zip
+    uses: payplug/template-ci/.github/workflows/sonarcloud.yml@main
+    with:
+      project-name: 'github-payplug-payplug-prestashop'
+      src-folder: 'src/'
+    secrets:
+      sonar-orga: ${{ secrets.SONAR_ORGA }}
+      sonar-token: ${{ secrets.SONAR_TOKEN }}

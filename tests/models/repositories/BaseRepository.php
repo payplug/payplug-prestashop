@@ -15,7 +15,7 @@ abstract class BaseRepository extends TestCase
     protected $entity;
     protected $entity_id;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->dependencies = \Mockery::mock('Dependencies');
@@ -25,5 +25,11 @@ abstract class BaseRepository extends TestCase
         $this->engine = 'sql_engine';
         $this->entity_id = 42;
         $this->entity = \Mockery::mock('EntityObject');
+    }
+
+    public function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
     }
 }

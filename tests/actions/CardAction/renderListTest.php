@@ -9,7 +9,7 @@ namespace PayPlug\tests\actions\CardAction;
  */
 class renderListTest extends BaseCardAction
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->configuration_class->shouldReceive('getValue')

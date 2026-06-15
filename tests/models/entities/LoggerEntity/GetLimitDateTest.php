@@ -11,7 +11,7 @@ final class GetLimitDateTest extends BaseLoggerEntity
 {
     public $limit_date;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->limit_date = 'P1M';

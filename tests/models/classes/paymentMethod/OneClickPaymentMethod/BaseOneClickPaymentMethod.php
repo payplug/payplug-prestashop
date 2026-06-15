@@ -7,7 +7,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 class BaseOneClickPaymentMethod extends BasePaymentMethod
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

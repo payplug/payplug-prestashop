@@ -1497,8 +1497,12 @@ class PaymentMethod
                 'last_name' => !empty($billing_address->lastname) ? $billing_address->lastname : null,
                 'company_name' => !empty($billing_address->company) ? trim($billing_address->company) : null,
                 'email' => $this->context->customer->email,
-                'landline_phone_number' => $phone_number_service->formatPhoneNumber($billing_address->phone, $billing_iso),
-                'mobile_phone_number' => $phone_number_service->formatPhoneNumber($billing_address->phone_mobile, $billing_iso),
+                'landline_phone_number' => !empty($billing_address->phone)
+                    ? $phone_number_service->formatPhoneNumber($billing_address->phone, $billing_iso)
+                    : null,
+                'mobile_phone_number' => !empty($billing_address->phone_mobile)
+                    ? $phone_number_service->formatPhoneNumber($billing_address->phone_mobile, $billing_iso)
+                    : null,
                 'address1' => !empty($billing_address->address1) ? $billing_address->address1 : null,
                 'address2' => !empty($billing_address->address2) ? $billing_address->address2 : null,
                 'postcode' => !empty($billing_address->postcode) ? $billing_address->postcode : null,
@@ -1525,8 +1529,12 @@ class PaymentMethod
                 'last_name' => !empty($shipping_address->lastname) ? $shipping_address->lastname : null,
                 'company_name' => !empty($shipping_address->company) ? trim($shipping_address->company) : null,
                 'email' => $this->context->customer->email,
-                'landline_phone_number' => $phone_number_service->formatPhoneNumber($shipping_address->phone, $shipping_iso),
-                'mobile_phone_number' => $phone_number_service->formatPhoneNumber($shipping_address->phone_mobile, $shipping_iso),
+                'landline_phone_number' => !empty($shipping_address->phone)
+                    ? $phone_number_service->formatPhoneNumber($shipping_address->phone, $shipping_iso)
+                    : null,
+                'mobile_phone_number' => !empty($shipping_address->phone_mobile)
+                    ? $phone_number_service->formatPhoneNumber($shipping_address->phone_mobile, $shipping_iso)
+                    : null,
                 'address1' => !empty($shipping_address->address1) ? $shipping_address->address1 : null,
                 'address2' => !empty($shipping_address->address2) ? $shipping_address->address2 : null,
                 'postcode' => !empty($shipping_address->postcode) ? $shipping_address->postcode : null,

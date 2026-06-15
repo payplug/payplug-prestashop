@@ -18,7 +18,7 @@ class postProcessOrderTest extends BasePaymentMethod
     public $retrieve;
     public $id_order;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->order_adapter = \Mockery::mock('OrderAdapter');

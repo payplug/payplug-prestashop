@@ -12,7 +12,7 @@ use PayPlug\tests\mock\ContextMock;
  */
 class getSettingsSectionTest extends BaseApiRest
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $context = \Mockery::mock('Context');

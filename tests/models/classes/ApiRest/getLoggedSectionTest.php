@@ -14,7 +14,7 @@ class getLoggedSectionTest extends BaseApiRest
 {
     public $given_configuration;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $context = \Mockery::mock('Context');

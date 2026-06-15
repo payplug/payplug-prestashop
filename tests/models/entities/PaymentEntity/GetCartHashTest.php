@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\entities\PaymentEntity;
  */
 final class GetCartHashTest extends BasePaymentEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setCartHash($this->cart_hash);

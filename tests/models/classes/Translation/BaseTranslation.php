@@ -14,7 +14,7 @@ abstract class BaseTranslation extends TestCase
     protected $dependencies;
     protected $class;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin->shouldReceive([

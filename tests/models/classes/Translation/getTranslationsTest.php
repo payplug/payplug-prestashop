@@ -9,7 +9,7 @@ namespace PayPlug\tests\models\classes\Translation;
  */
 class getTranslationsTest extends BaseTranslation
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->class->shouldReceive('l')

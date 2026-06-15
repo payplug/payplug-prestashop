@@ -12,7 +12,7 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
 {
     public $payment_options;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->payment_options = [];

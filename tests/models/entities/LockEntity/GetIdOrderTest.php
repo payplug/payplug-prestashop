@@ -11,7 +11,7 @@ final class GetIdOrderTest extends BaseLockEntity
 {
     public $id_order;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->id_order = 'order_id';

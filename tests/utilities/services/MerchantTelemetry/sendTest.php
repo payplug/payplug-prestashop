@@ -19,14 +19,14 @@ class sendTest extends TestCase
     protected $service;
     protected $plugin_telemetry;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->data = 'some_json_data';
         $this->service = new MerchantTelemetry();
         $this->plugin_telemetry = \Mockery::mock('alias:Payplug\PluginTelemetry');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         \Mockery::close();
         parent::tearDown();

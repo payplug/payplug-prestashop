@@ -12,7 +12,7 @@ class getPaymentTabTest extends BaseStandardPaymentMethod
 {
     public $expected_tab;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

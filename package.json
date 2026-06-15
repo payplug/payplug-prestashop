@@ -1,6 +1,6 @@
 {
   "name": "payplug",
-  "version": "4.23.3",
+  "version": "4.24.0",
   "description": "======================================== Prestashop paiement module using Payplug ========================================",
   "private": true,
   "directories": {
@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js",
-    "watch": "webpack --config webpack.config.js -w"
+    "watch": "webpack --config webpack.config.js -w",
+    "lint": "eslint dev/js/"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,9 @@
   "author": "payplug",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
     "css-loader": "^6.5.1",
     "css-minimizer-webpack-plugin": "^4.0.0",
     "less": "^4.1.2",

@@ -1,4 +1,13 @@
 # Payplug module changelog
+## Version 4.24.0
+- Feature :
+  - [PRE-3161](https://github.com/payplug/payplug-prestashop/pull/80): Update iDEAL logo
+
+- Bugfix :
+  - [SMP-3332](https://github.com/payplug/payplug-prestashop/pull/78): add missing field address2 in the cart information
+  - [SMP-3253](https://github.com/payplug/payplug-prestashop/pull/79): add unique alias for each appelpay address
+  - [PRE-3376](https://github.com/payplug/payplug-prestashop/pull/84): Fix broken admin order page on Prestashop 9
+  - [PRE-3405](): fix missing payplug logo in the BO header
 
 ## Version 4.23.3
 - Bugfix :

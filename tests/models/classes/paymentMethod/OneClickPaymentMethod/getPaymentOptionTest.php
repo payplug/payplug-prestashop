@@ -12,7 +12,7 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
 {
     public $card;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

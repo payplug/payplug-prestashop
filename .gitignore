@@ -22,3 +22,5 @@ dev/css/*.css
 dev/css/*.map
 html/
 phpunit.log
+.php-cs-fixer.php
+phpstan.neon

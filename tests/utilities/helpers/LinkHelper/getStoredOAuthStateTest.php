@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class getStoredOAuthStateTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         \Mockery::close();
     }

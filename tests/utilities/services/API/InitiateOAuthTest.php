@@ -13,7 +13,7 @@ class InitiateOAuthTest extends BaseApi
     public $redirect_uri;
     public $code_verifier;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->client_id = 'some_client_id';

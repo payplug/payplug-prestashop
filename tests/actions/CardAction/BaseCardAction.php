@@ -23,7 +23,7 @@ abstract class BaseCardAction extends TestCase
     public $module;
     public $module_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->api_service = \Mockery::mock('ApiService');
         $this->card_repository = \Mockery::mock('CardRepository');

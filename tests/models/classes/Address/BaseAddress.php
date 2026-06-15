@@ -15,7 +15,7 @@ abstract class BaseAddress extends TestCase
     protected $customer_adapter;
     protected $class;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
 

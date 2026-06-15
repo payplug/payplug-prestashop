@@ -69,6 +69,12 @@ class LoggerRepository extends BaseClass
      */
     public function addLog($message, $level = 'info')
     {
+        $debug = '';
+        $debugBacktrace = debug_backtrace();
+        if (!empty($debugBacktrace)) {
+            $debug = reset($debugBacktrace);
+        }
+
         $validate = $this->validators['logger']->isContent($message);
         if (!$validate['result']) {
             throw new BadParameterException($validate['message']);
@@ -78,12 +84,6 @@ class LoggerRepository extends BaseClass
         $content = json_decode($this->loggerEntity->getContent(), true);
         if (!$content) {
             $content = [];
-        }
-
-        $debug = '';
-        $debugBacktrace = debug_backtrace();
-        if (!empty($debugBacktrace)) {
-            $debug = reset($debugBacktrace);
         }
 
         $this->loggerEntity->setDateAdd($this->udate('Y-m-d H:i:s')); // without .u T

@@ -18,7 +18,7 @@ class autoCapturePaymentActionTest extends BaseHookAction
     private $payment_validator;
     private $stored_resource;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

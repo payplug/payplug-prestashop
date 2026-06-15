@@ -1,9 +1,27 @@
 {
+    "commit-msg": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Regex",
+                "options": {
+                    "regex": "/^(PRE|SMP)-\\d+:\\s.+$/"
+                }
+            }
+        ]
+    },
     "pre-commit": {
         "enabled": true,
         "actions": [
             {
                 "action": "composer cs:fix"
+            },
+            {
+                "action": "\\CaptainHook\\App\\Hook\\Branch\\Action\\EnsureNaming",
+                "options": {
+                    "regex": "/^(feature|fix|hotfix|refactor)\\/(PRE|SMP)-\\d+|(release|patch)\\/\\d+\\.\\d+\\.\\d+/"
+                }
+
             }
         ]
     },
@@ -12,6 +30,23 @@
         "actions": [
             {
                 "action": "composer cs:cache:reset"
+            },
+            {
+                "action": "cp phpstan.dist.neon phpstan.neon"
+            },
+            {
+                "action": "cp .php-cs-fixer.dist.php .php-cs-fixer.php"
+            }
+        ]
+    },
+    "post-merge": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "cp phpstan.dist.neon phpstan.neon"
+            },
+            {
+                "action": "cp .php-cs-fixer.dist.php .php-cs-fixer.php"
             }
         ]
     }

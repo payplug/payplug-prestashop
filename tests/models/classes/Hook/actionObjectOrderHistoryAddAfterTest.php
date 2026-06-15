@@ -23,7 +23,7 @@ class actionObjectOrderHistoryAddAfterTest extends BaseHook
     private $hook_action;
     private $payment_repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

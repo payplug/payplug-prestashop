@@ -17,7 +17,7 @@ abstract class BaseRequestAction extends TestCase
     public $payment_method_class;
     public $payment_method;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->name = 'payplug';

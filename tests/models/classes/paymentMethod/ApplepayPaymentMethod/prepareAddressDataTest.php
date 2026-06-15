@@ -14,7 +14,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
     public $address_data;
     protected $tools_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->address_data = [

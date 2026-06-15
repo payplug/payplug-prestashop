@@ -9,7 +9,7 @@ class BaseOrderStateRepository extends BaseRepository
 {
     protected $repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->repository = \Mockery::mock(OrderStateRepository::class, [$this->dependencies])

@@ -12,7 +12,7 @@ class GetAccountTest extends BaseApi
     public $api_key;
     public $treat_account;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->api_key = 'live_api_key';

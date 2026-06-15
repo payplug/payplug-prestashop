@@ -11,7 +11,7 @@ class deleteFromIdTest extends BaseLoggerRepository
 {
     public $last_id;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->last_id = 42;

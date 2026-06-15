@@ -15,7 +15,7 @@ class updateOrderStateFromPendingToPaidTest extends BaseOneyPaymentMethod
     private $order_adapter;
     private $order_class;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

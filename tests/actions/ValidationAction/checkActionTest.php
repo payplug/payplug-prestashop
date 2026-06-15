@@ -14,7 +14,7 @@ class checkActionTest extends BaseValidationAction
     protected $order_adapter;
     protected $queue_repository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->links = [
@@ -29,9 +29,21 @@ class checkActionTest extends BaseValidationAction
 
         $this->order_adapter = \Mockery::mock('OrderAdapter');
         $this->queue_repository = \Mockery::mock('QueueRepository');
+
+        $cart_adapter = \Mockery::mock('CartAdapter');
+        $cart_adapter->shouldReceive([
+            'get' => \PayPlug\tests\mock\CartMock::get(),
+        ]);
+
+        $validate_adapter = \Mockery::mock('ValidateAdapter');
+        $validate_adapter->shouldReceive('validate')
+            ->andReturn(true);
+
         $this->plugin->shouldReceive([
+            'getCart' => $cart_adapter,
             'getOrder' => $this->order_adapter,
             'getQueueRepository' => $this->queue_repository,
+            'getValidate' => $validate_adapter,
         ]);
 
         $this->configClass = \Mockery::mock('ConfigClass');

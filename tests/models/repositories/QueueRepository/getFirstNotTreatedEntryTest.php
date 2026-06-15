@@ -11,7 +11,7 @@ class getFirstNotTreatedEntryTest extends BaseQueueRepository
 {
     public $id_cart;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->id_cart = 42;

@@ -13,7 +13,7 @@ use PayPlug\tests\mock\CurrencyMock;
  */
 class getRequestTest extends BaseApplepayPaymentMethod
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->cart_adapter->shouldReceive([

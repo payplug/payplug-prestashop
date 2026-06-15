@@ -1,0 +1,11 @@
+parameters:
+    level: 1
+    paths:
+        - src
+        - classes
+    excludePaths:
+        - src/utilities/services/Mcp.php
+
+    # Chargement du bootstrap pour les constantes et les classes globales
+    bootstrapFiles:
+        - tests/stubs/phpstan-bootstrap.php

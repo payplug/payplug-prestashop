@@ -12,7 +12,7 @@ use PayPlug\src\models\entities\CardEntity;
  */
 final class SetIdCardCardTest extends BaseCardEntity
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->entity->setIdCard('card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');

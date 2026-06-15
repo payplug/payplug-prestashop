@@ -18,7 +18,7 @@ class patchPaymentResourceTest extends BaseApplepayPaymentMethod
     public $workflow;
     public $payment_database_mock;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

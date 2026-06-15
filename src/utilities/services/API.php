@@ -1074,26 +1074,16 @@ class API
     }
 
     /**
-     * @description Check current environment to defined the api route
+     * @description Narrow public accessor for MCP internal use only.
+     * Delegates to the protected getApiBearer() without widening its visibility globally.
+     *
+     * @param bool $is_live
+     *
+     * @return string
      */
-    protected function checkEnvironment()
+    public function getMcpApiBearer($is_live = true)
     {
-        if (isset($_SERVER['SERVER_NAME']) && preg_match(
-            '/(localhost|shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io|ngrok-free.app|prestashop-qa.test)/i',
-            $_SERVER['SERVER_NAME']
-        )) {
-            $dotenv = new Dotenv();
-            $dotenvFile = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/payplugroutes/.env';
-            if (file_exists($dotenvFile)) {
-                $dotenv->load($dotenvFile);
-            }
-        }
-        if (isset($_ENV['API_BASE_URL'])) {
-            APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
-        }
-        if (isset($_ENV['SERVICE_BASE_URL'])) {
-            APIRoutes::setServiceBaseUrl($_ENV['SERVICE_BASE_URL']);
-        }
+        return $this->getApiBearer($is_live);
     }
 
     /**
@@ -1144,6 +1134,29 @@ class API
         }
 
         return $token;
+    }
+
+    /**
+     * @description Check current environment to defined the api route
+     */
+    protected function checkEnvironment()
+    {
+        if (isset($_SERVER['SERVER_NAME']) && preg_match(
+            '/(localhost|shopshelf|notpayplug.com|payplug.com|payplug.fr|ngrok.io|ngrok-free.app|prestashop-qa.test)/i',
+            $_SERVER['SERVER_NAME']
+        )) {
+            $dotenv = new Dotenv();
+            $dotenvFile = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/payplugroutes/.env';
+            if (file_exists($dotenvFile)) {
+                $dotenv->load($dotenvFile);
+            }
+        }
+        if (isset($_ENV['API_BASE_URL'])) {
+            APIRoutes::setApiBaseUrl($_ENV['API_BASE_URL']);
+        }
+        if (isset($_ENV['SERVICE_BASE_URL'])) {
+            APIRoutes::setServiceBaseUrl($_ENV['SERVICE_BASE_URL']);
+        }
     }
 
     /**

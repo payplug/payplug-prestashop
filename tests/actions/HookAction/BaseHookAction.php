@@ -22,7 +22,7 @@ abstract class BaseHookAction extends TestCase
     public $module;
     public $module_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->name = 'payplug';

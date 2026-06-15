@@ -14,7 +14,7 @@ class hasErrorTest extends TestCase
 {
     public $paymentValidator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->paymentValidator = new paymentValidator();
     }

@@ -13,7 +13,7 @@ class saveActionTest extends BaseCardAction
 {
     public $payment;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

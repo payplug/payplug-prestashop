@@ -13,7 +13,7 @@ class clearLockTest extends BaseValidationAction
     protected $lock_repository;
     protected $queue_action;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

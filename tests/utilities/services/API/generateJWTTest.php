@@ -14,7 +14,7 @@ class generateJWTTest extends BaseApi
     public $oauth_client_data;
     public $jwt;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->oauth_client_data = [

@@ -14,7 +14,7 @@ class registerOauthRequestActionTest extends BaseConfigurationAction
     public $context;
     public $context_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

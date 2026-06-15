@@ -411,7 +411,7 @@ class OneyPaymentMethod extends PaymentMethod
             return [];
         }
 
-        if (isset($resource->payment_method, $payment->payment_method['is_pending'])
+        if (isset($resource->payment_method, $resource->payment_method['is_pending'])
             && (bool) $resource->payment_method['is_pending']) {
             return [
                 'id_status' => 10,

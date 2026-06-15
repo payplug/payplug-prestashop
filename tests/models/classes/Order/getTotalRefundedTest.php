@@ -16,7 +16,7 @@ class getTotalRefundedTest extends BaseOrder
     public $order_slip_adapter;
     public $validate_adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->id_order = 42;

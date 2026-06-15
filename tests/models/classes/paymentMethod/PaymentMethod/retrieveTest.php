@@ -15,7 +15,7 @@ class retrieveTest extends BasePaymentMethod
 {
     public $stored_payment;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->stored_payment = [

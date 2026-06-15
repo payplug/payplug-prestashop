@@ -11,7 +11,7 @@ use PayPlug\src\models\classes\ApiRest;
  */
 class getHeaderSectionTest extends BaseApiRest
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
