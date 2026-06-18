@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d55804ab7421ec62c507d77f4ce028eb",
+    "content-hash": "5196b9ef4b87c652219c0cfc34355abd",
     "packages": [
         {
             "name": "payplug/payplug-php",
@@ -1647,16 +1647,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.67",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "16ddbe776f10da6a95ebd25de7c1dbed397dc493"
-            },
+            "version": "1.12.33",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/16ddbe776f10da6a95ebd25de7c1dbed397dc493",
-                "reference": "16ddbe776f10da6a95ebd25de7c1dbed397dc493",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/37982d6fc7cbb746dda7773530cda557cdf119e1",
+                "reference": "37982d6fc7cbb746dda7773530cda557cdf119e1",
                 "shasum": ""
             },
             "require": {
@@ -1701,65 +1696,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-04-16T07:22:02+00:00"
-        },
-        {
-            "name": "phpstan/phpstan",
-            "version": "1.10.67",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "16ddbe776f10da6a95ebd25de7c1dbed397dc493"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/16ddbe776f10da6a95ebd25de7c1dbed397dc493",
-                "reference": "16ddbe776f10da6a95ebd25de7c1dbed397dc493",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2|^8.0"
-            },
-            "conflict": {
-                "phpstan/phpstan-shim": "*"
-            },
-            "bin": [
-                "phpstan",
-                "phpstan.phar"
-            ],
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHPStan - PHP Static Analysis Tool",
-            "keywords": [
-                "dev",
-                "static analysis"
-            ],
-            "support": {
-                "docs": "https://phpstan.org/user-guide/getting-started",
-                "forum": "https://github.com/phpstan/phpstan/discussions",
-                "issues": "https://github.com/phpstan/phpstan/issues",
-                "security": "https://github.com/phpstan/phpstan/security/policy",
-                "source": "https://github.com/phpstan/phpstan-src"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/ondrejmirtes",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/phpstan",
-                    "type": "github"
-                }
-            ],
-            "time": "2024-04-16T07:22:02+00:00"
+            "time": "2026-02-28T20:30:03+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2162,118 +2099,6 @@
                 }
             ],
             "time": "2026-01-27T05:20:18+00:00"
-        },
-        {
-            "name": "prestashop/php-dev-tools",
-            "version": "v5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PrestaShop/php-dev-tools.git",
-                "reference": "4b284d9b07a274505c81144536924eb4014e6fbf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PrestaShop/php-dev-tools/zipball/4b284d9b07a274505c81144536924eb4014e6fbf",
-                "reference": "4b284d9b07a274505c81144536924eb4014e6fbf",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2.5",
-                "symfony/console": "~3.2 || ~4.0 || ~5.0 || ~6.0 || ~7.0",
-                "symfony/filesystem": "~3.2 || ~4.0 || ~5.0 || ~6.0 || ~7.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.2"
-            },
-            "suggest": {
-                "phpstan/phpstan": "^0.12",
-                "prestashop/autoindex": "^2.0",
-                "prestashop/header-stamp": "^2.0",
-                "squizlabs/php_codesniffer": "^3.4"
-            },
-            "bin": [
-                "bin/prestashop-coding-standards"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "PrestaShop\\CodingStandards\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PrestaShop"
-                }
-            ],
-            "description": "PrestaShop coding standards",
-            "support": {
-                "issues": "https://github.com/PrestaShop/php-dev-tools/issues",
-                "source": "https://github.com/PrestaShop/php-dev-tools/tree/v5"
-            },
-            "time": "2024-05-23T12:27:45+00:00"
-        },
-        {
-            "name": "prestashop/phpstan-prestashop",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PrestaShop/phpstan-prestashop.git",
-                "reference": "8e915210f8071f517fcbcbcc2fde6078ce7fbc36"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PrestaShop/phpstan-prestashop/zipball/8e915210f8071f517fcbcbcc2fde6078ce7fbc36",
-                "reference": "8e915210f8071f517fcbcbcc2fde6078ce7fbc36",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.2.0"
-            },
-            "require-dev": {
-                "nikic/php-parser": "^4.10",
-                "phpstan/phpstan-phpunit": "^1.0.0",
-                "phpstan/phpstan-strict-rules": "^1.1.0",
-                "phpunit/phpunit": "^8.5",
-                "symfony/console": "^5.2"
-            },
-            "type": "phpstan-extension",
-            "extra": {
-                "phpstan": {
-                    "includes": [
-                        "extension.neon",
-                        "rules.neon"
-                    ]
-                },
-                "branch-alias": {
-                    "dev-master": "0.12-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PHPStanForPrestaShop\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PrestaShop SA",
-                    "email": "contact@prestashop.com"
-                }
-            ],
-            "description": "PrestaShop extension for PHPStan",
-            "support": {
-                "issues": "https://github.com/PrestaShop/phpstan-prestashop/issues",
-                "source": "https://github.com/PrestaShop/phpstan-prestashop/tree/2.0.0"
-            },
-            "time": "2021-11-23T09:22:24+00:00"
         },
         {
             "name": "prestashop/php-dev-tools",
@@ -4676,5 +4501,5 @@
         "php": ">=7.2.0"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

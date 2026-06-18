@@ -6,11 +6,16 @@
 Ticket: [PRE-XXXX](https://payplug.atlassian.net/browse/PRE-XXXX)
 
 ## Type of Change
-- [ ] 🐛 Bug fix
-- [ ] ✨ New feature
-- [ ] ♻️ Refactor
-- [ ] 🔧 Configuration / CI
-- [ ] 📦 Release (`release/*` branch targeting `master`)
+<!-- At least one required — replace [ ] with [x] -->
+[ ] 🐛 Bug fix
+[ ] ✨ New feature
+[ ] 💥 Breaking change
+[ ] ♻️ Refactor
+[ ] 🔧 Configuration / CI
+[ ] 🚀 Release (`release/*` branch targeting `master`)
+[ ] 📦 Dependency update
+[ ] 🔒 Security fix
+[ ] 📝 Documentation update
 
 ---
 

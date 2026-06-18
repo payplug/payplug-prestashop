@@ -438,19 +438,23 @@ class ConfigurationAction
             ];
         }
 
-        if (!$this->dependencies
+        $apiService = $this->dependencies
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.utilities.service.api')
-            ->login($email, $password)) {
+            ->getService('payplug.utilities.service.api');
+
+        if (!$apiService->login($email, $password)) {
             $logger->addLog('ConfigurationAction::loginAction: invalid email and/or password.');
+
+            $loginErrorMessage = 'multiple_users' === $apiService->getLastLoginError()
+                ? $translation['login_error_multiple_users']
+                : $translation['login_error'];
 
             return [
                 'success' => false,
                 'data' => [
-                    // todo: add translation
-                    'message' => $translation['login_error'],
+                    'message' => $loginErrorMessage,
                 ],
             ];
         }

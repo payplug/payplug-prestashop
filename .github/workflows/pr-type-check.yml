@@ -15,10 +15,21 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Extract the "Type of Change" section (between its heading and the next --- or ##)
-          section=$(echo "$PR_BODY" | awk '/^## Type of Change/,/^(---|## )/' | head -n -1)
+          # Strip carriage returns (GitHub can send \r\n) then extract the section
+          section=$(printf '%s' "$PR_BODY" | tr -d '\r' | awk '
+            /^## Type of Change/ { found=1; next }
+            found && /^---/      { exit }
+            found && /^## /      { exit }
+            found                { print }
+          ')
 
-          if echo "$section" | grep -qE '^\- \[[xX]\]'; then
+          echo "--- Extracted section ---"
+          printf '%s\n' "$section"
+          echo "-------------------------"
+
+          # Match both formats: "[x] ..." (new) and "- [x] ..." (old)
+          # The ^[-*]? prefix avoids matching the HTML comment <!-- ... [x] ... -->
+          if printf '%s' "$section" | grep -qE '^[-*]?\s*\[[xX]\]'; then
             echo "Type of Change: at least one box is checked."
           else
             echo "::error::You must check at least one box in the 'Type of Change' section of the PR description."
