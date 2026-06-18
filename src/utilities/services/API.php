@@ -53,6 +53,7 @@ class API
     private $portal_url = '';
     private $api_url = '';
     private $api;
+    private $lastLoginError = '';
 
     public function __construct()
     {
@@ -816,10 +817,19 @@ class API
         }
 
         try {
+            $this->lastLoginError = '';
             $this->setParameters();
             $this->setUserAgent();
             $response = Authentication::getKeysByLogin($email, $password);
             $json_answer = $response['httpResponse'];
+
+            if (isset($json_answer['object']) && 'error' === $json_answer['object']
+                && isset($json_answer['message']) && 'Multiple users found.' === $json_answer['message']
+            ) {
+                $this->lastLoginError = 'multiple_users';
+
+                return false;
+            }
 
             if ($this->setApiKeysbyJsonResponse($json_answer)) {
                 return true;
@@ -848,6 +858,14 @@ class API
 
             return false;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastLoginError()
+    {
+        return $this->lastLoginError;
     }
 
     /**
@@ -1107,7 +1125,7 @@ class API
         $jwt = json_decode($configuration->getValue('jwt'), true);
         $oauth_client_data = json_decode($configuration->getValue('oauth_client_data'), true);
 
-        if ($jwt && !empty($jwt) && !empty($oauth_client_data)) {
+        if ($jwt && !empty($oauth_client_data)) {
             try {
                 $validate_jwt = Authentication::validateJWT($oauth_client_data[$mode], $jwt[$mode]);
             } catch (\Exception $e) {

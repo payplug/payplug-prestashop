@@ -164,6 +164,7 @@ class loginActionTest extends BaseConfigurationAction
 
         $this->api_service->shouldReceive([
             'login' => false,
+            'getLastLoginError' => '',
         ]);
 
         $this->assertSame(
