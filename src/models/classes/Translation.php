@@ -196,6 +196,7 @@ class Translation
             'connect' => $this->l('login.connect', 'translation'),
             'forgot_password' => $this->l('login.forgot_password', 'translation'),
             'login_error' => $this->l('login.error', 'translation'),
+            'login_error_multiple_users' => $this->l('login.error.multiple_users', 'translation'),
             'portal' => [
                 'text' => $this->l('login.portal.text', 'translation'),
                 'button' => $this->l('login.portal.button', 'translation'),

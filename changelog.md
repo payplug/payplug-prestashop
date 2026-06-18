@@ -1,4 +1,8 @@
 # Payplug module changelog
+## Next version
+- Feature :
+  - [PRE-3389](https://github.com/payplug/payplug-prestashop/pull/86): PRE-3389: Display clear message when attempting to log in legacy with a multi-company account
+
 ## Version 4.24.0
 - Feature :
   - [PRE-3161](https://github.com/payplug/payplug-prestashop/pull/80): Update iDEAL logo
