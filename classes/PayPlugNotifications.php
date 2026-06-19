@@ -28,6 +28,7 @@ use Payplug\Notification;
 use Payplug\Resource\InstallmentPlan;
 use Payplug\Resource\Payment;
 use Payplug\Resource\Refund;
+use PayPlug\src\models\classes\paymentMethod\OneyPaymentMethod;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -668,6 +669,7 @@ class PayPlugNotifications
     private function setPayment()
     {
         $this->logger->addLog('Notification: setPayment');
+        // to avoid competition with the queue system, we check if the payment is already set
         if ($this->payment) {
             return true;
         }
@@ -689,7 +691,9 @@ class PayPlugNotifications
 
         if (empty($this->stored_resource)) {
             $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-            $this->exitProcess($error_msg, 'oney' == $this->payment->payment_method ? 242 : 500);
+            $is_oney = isset($this->resource->payment_method, $this->resource->payment_method['type'])
+                && in_array($this->resource->payment_method['type'], OneyPaymentMethod::PAYMENT_METHODS);
+            $this->exitProcess($error_msg, $is_oney ? 242 : 500);
         }
 
         $retrieve = $this->dependencies
@@ -717,14 +721,8 @@ class PayPlugNotifications
     {
         $this->logger->addLog('Notification: setResourceProps');
         // Define if payment is oney resource
-        $oney_payment_methods = [
-            'oney_x3_with_fees',
-            'oney_x4_with_fees',
-            'oney_x3_without_fees',
-            'oney_x4_without_fees',
-        ];
         if (isset($this->payment->payment_method, $this->payment->payment_method['type'])) {
-            $this->is_oney = in_array($this->payment->payment_method['type'], $oney_payment_methods);
+            $this->is_oney = in_array($this->payment->payment_method['type'], OneyPaymentMethod::PAYMENT_METHODS);
         }
 
         // Define if payment is deferred resource
