@@ -29,6 +29,13 @@ if (!defined('_PS_VERSION_')) {
 
 class OneyPaymentMethod extends PaymentMethod
 {
+    const PAYMENT_METHODS = [
+        'oney_x3_with_fees',
+        'oney_x4_with_fees',
+        'oney_x3_without_fees',
+        'oney_x4_without_fees',
+    ];
+
     protected $country;
     private $oney_allowed_iso_codes = ['FR', 'IT', 'ES', 'NL'];
     private $oney_translations;

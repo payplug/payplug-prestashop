@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\models\classes;
 
+use PayPlug\src\models\classes\paymentMethod\OneyPaymentMethod;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -58,15 +60,9 @@ class Order
         }
 
         // Define if payment is oney resource
-        $oney_payment_methods = [
-            'oney_x3_with_fees',
-            'oney_x4_with_fees',
-            'oney_x3_without_fees',
-            'oney_x4_without_fees',
-        ];
         $is_oney = false;
         if (isset($resource->payment_method, $resource->payment_method['type'])) {
-            $is_oney = in_array($resource->payment_method['type'], $oney_payment_methods);
+            $is_oney = in_array($resource->payment_method['type'], OneyPaymentMethod::PAYMENT_METHODS);
         }
 
         // Check if order is refused by oney

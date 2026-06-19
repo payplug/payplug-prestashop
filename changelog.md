@@ -6,6 +6,7 @@
 - Bugfix :
   - [SMP-3405](https://github.com/payplug/payplug-prestashop/pull/87): Failed to create Scalapay payment when the phone field of the address is empty
   - [SMP-3423](https://github.com/payplug/payplug-prestashop/pull/89): Oney hook optimization on product listing pages (PrestaShop 9)
+  - [SMP-3393](https://github.com/payplug/payplug-prestashop/pull/88): Fix error 500 sent to the merchant but invisible in the admin
 
 ## Version 4.24.0
 - Feature :
