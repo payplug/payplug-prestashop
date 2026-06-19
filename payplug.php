@@ -425,10 +425,14 @@ class Payplug extends PaymentModule
     public function hookDisplayProductPriceBlock($params)
     {
         if ($this->payplug_dependencies) {
-            $configuration = $this->payplug_dependencies
-                ->getPlugin()
-                ->getConfigurationClass();
-            if ((bool) $configuration->getValue('oney_product_cta')) {
+            static $oneyEnabled = null;
+            if (null === $oneyEnabled) {
+                $oneyEnabled = (bool) $this->payplug_dependencies
+                    ->getPlugin()
+                    ->getConfigurationClass()
+                    ->getValue('oney_product_cta');
+            }
+            if ($oneyEnabled) {
                 return $this->payplug_dependencies
                     ->getPlugin()
                     ->getOneyAction()
