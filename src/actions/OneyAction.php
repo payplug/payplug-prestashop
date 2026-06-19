@@ -57,15 +57,18 @@ class OneyAction
      */
     public function renderCTA($params = [])
     {
+        // Early exit before setParameters() to avoid unnecessary initialization
+        if (!in_array(
+            $this->dependencies->getPlugin()->getDispatcher()->getInstance()->getController(),
+            ['product', 'cart']
+        )) {
+            return false;
+        }
+
         $this->setParameters();
 
         if (!isset($params['type']) && 'cart' == $this->current_controller) {
             $params['type'] = 'oney_cart';
-        }
-
-        // Check if current controller is product or cart, if not return false
-        if (!in_array($this->current_controller, ['product', 'cart'])) {
-            return false;
         }
 
         // then check if oney is allowed
