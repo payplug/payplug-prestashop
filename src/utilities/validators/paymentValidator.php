@@ -24,6 +24,7 @@
 namespace PayPlug\src\utilities\validators;
 
 use PayPlug\lib\libphonenumber;
+use PayPlug\src\models\classes\paymentMethod\OneyPaymentMethod;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -487,13 +488,7 @@ class paymentValidator
             ];
         }
 
-        $oney_payment_method = [
-            'oney_x3_with_fees',
-            'oney_x4_with_fees',
-            'oney_x3_without_fees',
-            'oney_x4_without_fees',
-        ];
-        if (isset($payment->payment_method, $payment->payment_method['type']) && in_array($payment->payment_method['type'], $oney_payment_method)) {
+        if (isset($payment->payment_method, $payment->payment_method['type']) && in_array($payment->payment_method['type'], OneyPaymentMethod::PAYMENT_METHODS)) {
             return [
                 'result' => false,
                 'message' => 'Given $payment is created with oney, it cannot be deferred',
