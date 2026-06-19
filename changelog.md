@@ -3,6 +3,9 @@
 - Feature :
   - [PRE-3389](https://github.com/payplug/payplug-prestashop/pull/86): PRE-3389: Display clear message when attempting to log in legacy with a multi-company account
 
+- Bugfix :
+  - [SMP-3405](https://github.com/payplug/payplug-prestashop/pull/87): Failed to create Scalapay payment when the phone field of the address is empty
+
 ## Version 4.24.0
 - Feature :
   - [PRE-3161](https://github.com/payplug/payplug-prestashop/pull/80): Update iDEAL logo
