@@ -132,6 +132,69 @@ class updateActionTest extends BaseOrderAction
         );
     }
 
+    public function testWhenUnpaidOneyPaymentWithFailureUpdatesOrderToCancelled()
+    {
+        $resource_id = 'pay_azerty123456';
+
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getOney([
+                    'is_paid' => false,
+                    'metadata' => ['Order' => 42],
+                    'failure' => [
+                        'code' => 'timeout',
+                        'message' => 'The customer has not tried to pay and left the payment page.',
+                    ],
+                ]),
+            ],
+        ]);
+        $this->order_adapter->shouldReceive([
+            'get' => OrderMock::get(),
+        ]);
+        $this->order_class->shouldReceive([
+            'getOrderStateFromResource' => [
+                'result' => false,
+                'status' => 'cancelled',
+            ],
+            'updateOrderState' => true,
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
+                'method' => 'oney',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->payplug_order_state_repository->shouldReceive([
+            'getBy' => [
+                'type' => 'oney',
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'id_order' => 42,
+                'message' => 'Order state will be: 1',
+            ],
+            $this->action->updateAction($resource_id)
+        );
+    }
+
     public function testWhenRelatedOrderIsntValid()
     {
         $resource_id = 'pay_azerty123456';
