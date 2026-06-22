@@ -284,11 +284,6 @@ class PayPlugNotifications
                 ->initialize((bool) $is_live);
             $this->resource = Notification::treat($body);
 
-            if (isset($this->resource->failure->code)) {
-                $this->logger->addLog('Given payment has a failure and should not be treated: ' . $this->resource->id);
-                $this->exitProcess('Given payment has a failure and should not be treated: ' . $this->resource->id, 200);
-            }
-
             $this->logger->addLog('Resource ID: ' . $this->resource->id);
         } catch (UnknownAPIResourceException $exception) {
             $this->exitProcess($exception->getMessage(), 500);
