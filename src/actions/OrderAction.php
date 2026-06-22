@@ -286,7 +286,7 @@ class OrderAction
         }
 
         $resource = $retrieve['resource'];
-        if (!(bool) $resource->is_paid) {
+        if (!(bool) $resource->is_paid && empty($resource->failure)) {
             return [
                 'result' => true,
                 'message' => 'The payment is not paid yet.',

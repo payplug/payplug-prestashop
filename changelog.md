@@ -4,9 +4,10 @@
   - [PRE-3389](https://github.com/payplug/payplug-prestashop/pull/86): PRE-3389: Display clear message when attempting to log in legacy with a multi-company account
 
 - Bugfix :
-  - [SMP-3405](https://github.com/payplug/payplug-prestashop/pull/87): Failed to create Scalapay payment when the phone field of the address is empty
-  - [SMP-3423](https://github.com/payplug/payplug-prestashop/pull/89): Oney hook optimization on product listing pages (PrestaShop 9)
-  - [SMP-3393](https://github.com/payplug/payplug-prestashop/pull/88): Fix error 500 sent to the merchant but invisible in the admin
+  - [PRE-3405](https://github.com/payplug/payplug-prestashop/pull/87): Failed to create Scalapay payment when the phone field of the address is empty
+  - [PRE-3423](https://github.com/payplug/payplug-prestashop/pull/89): Oney hook optimization on product listing pages (PrestaShop 9)
+  - [PRE-3393](https://github.com/payplug/payplug-prestashop/pull/88): Fix error 500 sent to the merchant but invisible in the admin
+  - [PRE-3397](https://github.com/payplug/payplug-prestashop/pull/90): Fix order created on payment abandonment by Oney
 
 ## Version 4.24.0
 - Feature :
