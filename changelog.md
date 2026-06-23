@@ -9,6 +9,7 @@
   - [PRE-3423](https://github.com/payplug/payplug-prestashop/pull/89): Oney hook optimization on product listing pages (PrestaShop 9)
   - [PRE-3397](https://github.com/payplug/payplug-prestashop/pull/90): Fix order created on payment abandonment by Oney
   - [PRE-3381](https://github.com/payplug/payplug-prestashop/pull/91): Fix wrong template when a payment in installments is interrupted
+  - [PRE-3394](https://github.com/payplug/payplug-prestashop/pull/92): Fix Oney orders that remain pending after a successful payment
 
 ## Version 4.24.0
 - Feature :

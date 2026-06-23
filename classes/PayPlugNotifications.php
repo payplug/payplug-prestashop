@@ -613,6 +613,9 @@ class PayPlugNotifications
         // check if queueing system is enabled
         if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
             $this->logger->addLog('Notification: Attempting to set queue for Cart ID: ' . $this->cart->id);
+
+            // Record time before creating the entry so we can identify it later in the wait loop
+            $hydrate_time = date('Y-m-d H:i:s');
             $create_queue = $this->dependencies
                 ->getPlugin()
                 ->getQueueAction()
@@ -623,7 +626,42 @@ class PayPlugNotifications
             }
 
             if ($create_queue['exists']) {
-                $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
+                // Another notification is being processed. Our entry is queued.
+                // Instead of abandoning, wait until it is our turn so we can verify the order state.
+                $this->logger->addLog('Notification: Queue exists for Cart ID: ' . $this->cart->id . ', waiting for prior entry to complete.');
+                $max_wait = 20;
+                $waited = 0;
+                $is_our_turn = false;
+
+                while ($waited < $max_wait) {
+                    sleep(1);
+                    ++$waited;
+
+                    $first_entry = $this->dependencies
+                        ->getPlugin()
+                        ->getQueueRepository()
+                        ->getFirstNotTreatedEntry((int) $this->cart->id);
+
+                    if (empty($first_entry)) {
+                        // The prior notification processed all pending entries (happy path).
+                        // Order state should already be correct.
+                        $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
+                    }
+
+                    // Our entry was created at $hydrate_time or just after.
+                    // If the first untreated entry is that recent, it is ours and it is our turn.
+                    if (isset($first_entry['date_add']) && $first_entry['date_add'] >= $hydrate_time) {
+                        $is_our_turn = true;
+
+                        break;
+                    }
+                }
+
+                if (!$is_our_turn) {
+                    $this->exitProcess('Queue already exists for Cart ID: ' . $this->cart->id);
+                }
+
+                $this->logger->addLog('Notification: Prior notification completed. Proceeding for Cart ID: ' . $this->cart->id);
             }
 
             $this->lock_key = $this->cart->id;
