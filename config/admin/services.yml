@@ -1,10 +1,12 @@
 services:
   ps_accounts.installer:
     class: 'PrestaShop\PsAccountsInstaller\Installer\Installer'
+    public: true
     arguments:
       - '5.2.5'
 
   ps_accounts.facade:
     class: 'PrestaShop\PsAccountsInstaller\Installer\Facade\PsAccounts'
+    public: true
     arguments:
       - '@ps_accounts.installer'
