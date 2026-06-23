@@ -122,7 +122,7 @@ class MediaClass
             'portal_url' => $api_service->getPortalUrl(),
             'inst_id' => $inst_id,
         ]);
-        $html = $this->dependencies->configClass->fetchTemplate('/views/templates/admin/popin.tpl');
+        $html = $this->dependencies->configClass->fetchTemplate('views/templates/admin/popin/abort.tpl');
 
         exit(json_encode(['content' => $html]));
     }
