@@ -70,6 +70,14 @@ class PayplugValidationModuleFrontController extends ModuleFrontController
                 ->getValidationAction()
                 ->checkAction((int) $this->cart_id, (bool) $last_try);
 
+            if (!$check['result'] && 'redirect' === ($check['action'] ?? '')) {
+                $error_message = $this->dependencies
+                    ->getPlugin()
+                    ->getTranslationClass()
+                    ->l('The transaction was not completed and your card was not charged.', 'validation');
+                $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([$error_message]);
+            }
+
             exit(json_encode($check));
         }
 
