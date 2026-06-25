@@ -445,7 +445,7 @@ class ValidationAction
             case 2 == $ps:
                 return [
                     'result' => false,
-                    'url' => $this->getOrderLinks()['cancel'],
+                    'url' => $this->getOrderLinks()['error'],
                     'message' => 'Order has been cancelled on PayPlug page',
                 ];
 

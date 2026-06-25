@@ -153,7 +153,7 @@ class validateActionTest extends BaseValidationAction
         $this->assertSame(
             [
                 'result' => false,
-                'url' => $this->links['cancel'],
+                'url' => $this->links['error'],
                 'message' => 'Order has been cancelled on PayPlug page',
             ],
             $this->action->validateAction($ps, $this->cart_id)
