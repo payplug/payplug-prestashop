@@ -40,6 +40,10 @@ services:
     class: PayPlug\src\utilities\validators\RegexValidator
     public: true
 
+  payplug.utilities.helper.amount:
+    class: PayPlug\src\utilities\helpers\AmountHelper
+    public: true
+
   payplug.utilities.helper.language:
     class: PayPlug\src\utilities\helpers\LanguageHelper
     public: true
@@ -49,12 +53,10 @@ services:
     public: true
 
   payplug.action.payment_action:
-    class: PayplugPluginCore\Actions\PaymentAction
+    class: PayPlugPluginMcp\Actions\PaymentAction
     public: true
 
   payplug.utilities.service.core:
     class: PayPlug\src\utilities\services\Core
     public: true
-    arguments:
-      - '@payplug.action.payment_action'
 

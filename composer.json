@@ -7,7 +7,7 @@
     "php": ">=7.4.0",
     "payplug/payplug-php": "^4.0",
     "symfony/dotenv": "3.4.*",
-    "symfony/dependency-injection": "4.4.0",
+    "symfony/dependency-injection": "^4.4",
     "payplug/payplug-plugin-mcp": "2.*"
   },
   "require-dev": {
@@ -18,7 +18,7 @@
     "phpcompatibility/php-compatibility": "^9.3",
     "mockery/mockery": "^1.3 <1.4",
     "phpunit/php-token-stream": "^3.0",
-    "captainhook/captainhook": "~5.2.0",
+    "captainhook/captainhook": "~5.18.0",
     "phpstan/phpstan": "^1.11",
     "prestashop/phpstan-prestashop": "^2.0",
     "prestashop/php-dev-tools": "^5.0"
