@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\utilities\helpers;
 
+use PayPlug\classes\DependenciesClass;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -33,7 +35,7 @@ class AmountHelper
 
     public function __construct($dependencies = null)
     {
-        $this->dependencies = $dependencies;
+        $this->dependencies = $dependencies ?? new DependenciesClass();
     }
 
     /**

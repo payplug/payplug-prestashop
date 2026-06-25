@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6792c4745d15966319e76c3e0118ab3a",
+    "content-hash": "3322d74380c8bcfe589621fee4400187",
     "packages": [
         {
             "name": "payplug/payplug-php",
@@ -63,21 +63,21 @@
         },
         {
             "name": "payplug/payplug-plugin-mcp",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-plugin-mcp.git",
-                "reference": "ff41edfe8d34c027f4f7912a9b95a5632886249c"
+                "reference": "eaea71e45af471c35745073cd809201d43ee6775"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-plugin-mcp/zipball/ff41edfe8d34c027f4f7912a9b95a5632886249c",
-                "reference": "ff41edfe8d34c027f4f7912a9b95a5632886249c",
+                "url": "https://api.github.com/repos/payplug/payplug-plugin-mcp/zipball/eaea71e45af471c35745073cd809201d43ee6775",
+                "reference": "eaea71e45af471c35745073cd809201d43ee6775",
                 "shasum": ""
             },
             "require": {
                 "payplug/payplug-php": "^4.0",
-                "php": "^7.4"
+                "php": ">=7.4"
             },
             "require-dev": {
                 "captainhook/captainhook": "^5.0",
@@ -107,9 +107,9 @@
             "description": "Module pour l'intégration MCP Payplug.",
             "support": {
                 "issues": "https://github.com/payplug/payplug-plugin-mcp/issues",
-                "source": "https://github.com/payplug/payplug-plugin-mcp/tree/2.0.0"
+                "source": "https://github.com/payplug/payplug-plugin-mcp/tree/2.1.0"
             },
-            "time": "2026-06-29T13:01:47+00:00"
+            "time": "2026-07-06T09:48:04+00:00"
         },
         {
             "name": "psr/container",
@@ -161,37 +161,38 @@
         },
         {
             "name": "symfony/dependency-injection",
-            "version": "v4.4.0",
+            "version": "v4.4.49",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
-                "reference": "d4439814135ed1343c93bde998b7792af8852e41"
+                "reference": "9065fe97dbd38a897e95ea254eb5ddfe1310f734"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/d4439814135ed1343c93bde998b7792af8852e41",
-                "reference": "d4439814135ed1343c93bde998b7792af8852e41",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/9065fe97dbd38a897e95ea254eb5ddfe1310f734",
+                "reference": "9065fe97dbd38a897e95ea254eb5ddfe1310f734",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1.3",
+                "php": ">=7.1.3",
                 "psr/container": "^1.0",
+                "symfony/polyfill-php80": "^1.16",
                 "symfony/service-contracts": "^1.1.6|^2"
             },
             "conflict": {
                 "symfony/config": "<4.3|>=5.0",
                 "symfony/finder": "<3.4",
                 "symfony/proxy-manager-bridge": "<3.4",
-                "symfony/yaml": "<3.4"
+                "symfony/yaml": "<4.4.26"
             },
             "provide": {
                 "psr/container-implementation": "1.0",
-                "symfony/service-implementation": "1.0"
+                "symfony/service-implementation": "1.0|2.0"
             },
             "require-dev": {
                 "symfony/config": "^4.3",
                 "symfony/expression-language": "^3.4|^4.0|^5.0",
-                "symfony/yaml": "^3.4|^4.0|^5.0"
+                "symfony/yaml": "^4.4.26|^5.0"
             },
             "suggest": {
                 "symfony/config": "",
@@ -201,11 +202,6 @@
                 "symfony/yaml": ""
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.4-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Symfony\\Component\\DependencyInjection\\": ""
@@ -228,12 +224,26 @@
                     "homepage": "https://symfony.com/contributors"
                 }
             ],
-            "description": "Symfony DependencyInjection Component",
+            "description": "Allows you to standardize and centralize the way objects are constructed in your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dependency-injection/tree/4.4"
+                "source": "https://github.com/symfony/dependency-injection/tree/v4.4.49"
             },
-            "time": "2019-11-20T13:27:43+00:00"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-11-16T16:18:09+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -372,6 +382,90 @@
             "time": "2020-10-24T10:57:07+00:00"
         },
         {
+            "name": "symfony/polyfill-php80",
+            "version": "v1.37.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php80.git",
+                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
+                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php80\\": ""
+                },
+                "classmap": [
+                    "Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ion Bazan",
+                    "email": "ion.bazan@gmail.com"
+                },
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 8.0+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.37.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-04-10T16:19:22+00:00"
+        },
+        {
             "name": "symfony/service-contracts",
             "version": "v2.5.4",
             "source": {
@@ -458,34 +552,35 @@
     "packages-dev": [
         {
             "name": "captainhook/captainhook",
-            "version": "5.2.1",
+            "version": "5.18.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhook-git/captainhook.git",
-                "reference": "85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31"
+                "reference": "b7bc503a40ccfe80ea9638e4921b4697669d725f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhook-git/captainhook/zipball/85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31",
-                "reference": "85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31",
+                "url": "https://api.github.com/repos/captainhook-git/captainhook/zipball/b7bc503a40ccfe80ea9638e4921b4697669d725f",
+                "reference": "b7bc503a40ccfe80ea9638e4921b4697669d725f",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-spl": "*",
                 "ext-xml": "*",
-                "php": "^7.2",
+                "php": ">=7.4",
                 "sebastianfeldmann/camino": "^0.9.2",
-                "sebastianfeldmann/cli": "^3.0",
-                "sebastianfeldmann/git": "^3.1",
-                "symfony/console": "^2.7 || ^3.0 || ^4.0 || ^5.0",
-                "symfony/process": "^2.7 || ^3.0 || ^4.0 || ^5.0"
+                "sebastianfeldmann/cli": "^3.3",
+                "sebastianfeldmann/git": "^3.9",
+                "symfony/console": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0",
+                "symfony/filesystem": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0",
+                "symfony/process": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0"
             },
             "replace": {
                 "sebastianfeldmann/captainhook": "*"
             },
             "require-dev": {
-                "composer/composer": "~1",
+                "composer/composer": "~1 || ^2.0",
                 "mikey179/vfsstream": "~1"
             },
             "bin": [
@@ -497,7 +592,7 @@
                     "config": "captainhook.json"
                 },
                 "branch-alias": {
-                    "dev-master": "6.0.x-dev"
+                    "dev-main": "6.0.x-dev"
                 }
             },
             "autoload": {
@@ -528,7 +623,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhook-git/captainhook/tree/5.2.1"
+                "source": "https://github.com/captainhook-git/captainhook/tree/5.18.3"
             },
             "funding": [
                 {
@@ -536,7 +631,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-05-01T15:25:44+00:00"
+            "time": "2023-11-05T13:56:19+00:00"
         },
         {
             "name": "composer/pcre",
@@ -4238,90 +4333,6 @@
             "time": "2024-09-09T11:45:10+00:00"
         },
         {
-            "name": "symfony/polyfill-php80",
-            "version": "v1.37.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
-                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2"
-            },
-            "type": "library",
-            "extra": {
-                "thanks": {
-                    "url": "https://github.com/symfony/polyfill",
-                    "name": "symfony/polyfill"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ],
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php80\\": ""
-                },
-                "classmap": [
-                    "Resources/stubs"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ion Bazan",
-                    "email": "ion.bazan@gmail.com"
-                },
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill backporting some PHP 8.0+ features to lower PHP versions",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.37.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2026-04-10T16:19:22+00:00"
-        },
-        {
             "name": "symfony/process",
             "version": "v5.4.51",
             "source": {
@@ -4502,12 +4513,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
