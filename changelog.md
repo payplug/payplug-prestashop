@@ -11,6 +11,7 @@
   - [PRE-3381](https://github.com/payplug/payplug-prestashop/pull/91): Fix wrong template when a payment in installments is interrupted
   - [PRE-3380](https://github.com/payplug/payplug-prestashop/pull/93): Fix Symfony conflicts between Payplug and Prestashop Shipping
   - [PRE-3065](https://github.com/payplug/payplug-prestashop/pull/94): Fix incorrect Oney return when a payment file is rejected
+  - [PRE-3070](https://github.com/payplug/payplug-prestashop/pull/95): Fix error message for 3DS payment
 
 ## Version 4.24.0
 - Feature :
@@ -20,7 +21,7 @@
   - [SMP-3332](https://github.com/payplug/payplug-prestashop/pull/78): add missing field address2 in the cart information
   - [SMP-3253](https://github.com/payplug/payplug-prestashop/pull/79): add unique alias for each appelpay address
   - [PRE-3376](https://github.com/payplug/payplug-prestashop/pull/84): Fix broken admin order page on Prestashop 9
-  - [PRE-3405](): fix missing payplug logo in the BO header
+  - [PRE-3405](https://github.com/payplug/payplug-prestashop/pull/85): fix missing payplug logo in the BO header
 
 ## Version 4.23.3
 - Bugfix :
