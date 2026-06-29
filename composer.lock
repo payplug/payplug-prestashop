@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5196b9ef4b87c652219c0cfc34355abd",
+    "content-hash": "6792c4745d15966319e76c3e0118ab3a",
     "packages": [
         {
             "name": "payplug/payplug-php",
-            "version": "4.0.0",
+            "version": "4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "ad19dee72100668e14c8c4974a6791ca2d1c8482"
+                "reference": "fddb60a9d0afe3b06d7fac7bec2df33cd0164009"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/ad19dee72100668e14c8c4974a6791ca2d1c8482",
-                "reference": "ad19dee72100668e14c8c4974a6791ca2d1c8482",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/fddb60a9d0afe3b06d7fac7bec2df33cd0164009",
+                "reference": "fddb60a9d0afe3b06d7fac7bec2df33cd0164009",
                 "shasum": ""
             },
             "require": {
@@ -47,43 +47,51 @@
                 {
                     "name": "PayPlug",
                     "email": "support@payplug.com"
+                },
+                {
+                    "name": "Daniel FLOREZ MURILLO",
+                    "email": "dmurillo@payplug.com"
                 }
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
             "support": {
                 "issues": "https://github.com/payplug/payplug-php/issues",
-                "source": "https://github.com/payplug/payplug-php/tree/4.0.0"
+                "source": "https://github.com/payplug/payplug-php/tree/4.1.0"
             },
             "time": "2015-05-06T00:00:00+00:00"
         },
         {
-            "name": "payplug/payplug-plugin-core",
-            "version": "1.0.0",
+            "name": "payplug/payplug-plugin-mcp",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/payplug/payplug-plugin-core.git",
-                "reference": "d7232e2acac33f10a958daf07947e83db8dcfe57"
+                "url": "https://github.com/payplug/payplug-plugin-mcp.git",
+                "reference": "ff41edfe8d34c027f4f7912a9b95a5632886249c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-plugin-core/zipball/d7232e2acac33f10a958daf07947e83db8dcfe57",
-                "reference": "d7232e2acac33f10a958daf07947e83db8dcfe57",
+                "url": "https://api.github.com/repos/payplug/payplug-plugin-mcp/zipball/ff41edfe8d34c027f4f7912a9b95a5632886249c",
+                "reference": "ff41edfe8d34c027f4f7912a9b95a5632886249c",
                 "shasum": ""
             },
             "require": {
                 "payplug/payplug-php": "^4.0",
-                "php": "^7.2"
+                "php": "^7.4"
             },
             "require-dev": {
+                "captainhook/captainhook": "^5.0",
+                "friendsofphp/php-cs-fixer": "^3.0",
                 "mockery/mockery": "^1.3",
-                "phpunit/phpunit": "^8.5"
+                "phpstan/phpstan": "^2.2.0",
+                "phpstan/phpstan-mockery": "*",
+                "phpstan/phpstan-phpunit": "*",
+                "phpunit/phpunit": "^9.5"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "PayplugPluginCore\\": "src/",
-                    "PayplugPluginCore\\Tests\\": "tests/"
+                    "PayPlugPluginMcp\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -96,29 +104,29 @@
                     "email": "support@payplug.com"
                 }
             ],
-            "description": "Module core pour l'intégration Payplug.",
+            "description": "Module pour l'intégration MCP Payplug.",
             "support": {
-                "issues": "https://github.com/payplug/payplug-plugin-core/issues",
-                "source": "https://github.com/payplug/payplug-plugin-core/tree/1.0.0"
+                "issues": "https://github.com/payplug/payplug-plugin-mcp/issues",
+                "source": "https://github.com/payplug/payplug-plugin-mcp/tree/2.0.0"
             },
-            "time": "2026-06-04T15:28:13+00:00"
+            "time": "2026-06-29T13:01:47+00:00"
         },
         {
             "name": "psr/container",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/container.git",
-                "reference": "8622567409010282b7aeebe4bb841fe98b58dcaf"
+                "reference": "513e0666f7216c7459170d56df27dfcefe1689ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/container/zipball/8622567409010282b7aeebe4bb841fe98b58dcaf",
-                "reference": "8622567409010282b7aeebe4bb841fe98b58dcaf",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/513e0666f7216c7459170d56df27dfcefe1689ea",
+                "reference": "513e0666f7216c7459170d56df27dfcefe1689ea",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.0"
+                "php": ">=7.4.0"
             },
             "type": "library",
             "autoload": {
@@ -147,9 +155,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-fig/container/issues",
-                "source": "https://github.com/php-fig/container/tree/1.1.1"
+                "source": "https://github.com/php-fig/container/tree/1.1.2"
             },
-            "time": "2021-03-05T17:36:06+00:00"
+            "time": "2021-11-05T16:50:12+00:00"
         },
         {
             "name": "symfony/dependency-injection",
@@ -1128,20 +1136,20 @@
         },
         {
             "name": "hamcrest/hamcrest-php",
-            "version": "v2.0.1",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hamcrest/hamcrest-php.git",
-                "reference": "8c3d0a3f6af734494ad8f6fbbee0ba92422859f3"
+                "reference": "f8b1c0173b22fa6ec77a81fe63e5b01eba7e6487"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/8c3d0a3f6af734494ad8f6fbbee0ba92422859f3",
-                "reference": "8c3d0a3f6af734494ad8f6fbbee0ba92422859f3",
+                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/f8b1c0173b22fa6ec77a81fe63e5b01eba7e6487",
+                "reference": "f8b1c0173b22fa6ec77a81fe63e5b01eba7e6487",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3|^7.0|^8.0"
+                "php": "^7.4|^8.0"
             },
             "replace": {
                 "cordoval/hamcrest-php": "*",
@@ -1149,8 +1157,8 @@
                 "kodova/hamcrest-php": "*"
             },
             "require-dev": {
-                "phpunit/php-file-iterator": "^1.4 || ^2.0",
-                "phpunit/phpunit": "^4.8.36 || ^5.7 || ^6.5 || ^7.0"
+                "phpunit/php-file-iterator": "^1.4 || ^2.0 || ^3.0",
+                "phpunit/phpunit": "^4.8.36 || ^5.7 || ^6.5 || ^7.0 || ^8.0 || ^9.0"
             },
             "type": "library",
             "extra": {
@@ -1173,9 +1181,9 @@
             ],
             "support": {
                 "issues": "https://github.com/hamcrest/hamcrest-php/issues",
-                "source": "https://github.com/hamcrest/hamcrest-php/tree/v2.0.1"
+                "source": "https://github.com/hamcrest/hamcrest-php/tree/v2.1.1"
             },
-            "time": "2020-07-09T08:09:16+00:00"
+            "time": "2025-04-30T06:54:44+00:00"
         },
         {
             "name": "mockery/mockery",
@@ -3933,16 +3941,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.38.1",
+            "version": "v1.38.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "14c5439eec4ccff081ac14eca2dc57feb2a66d92"
+                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/14c5439eec4ccff081ac14eca2dc57feb2a66d92",
-                "reference": "14c5439eec4ccff081ac14eca2dc57feb2a66d92",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
+                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
                 "shasum": ""
             },
             "require": {
@@ -3994,7 +4002,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.2"
             },
             "funding": [
                 {
@@ -4014,7 +4022,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-26T12:51:13+00:00"
+            "time": "2026-05-27T06:59:30+00:00"
         },
         {
             "name": "symfony/polyfill-php70",
@@ -4494,12 +4502,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.2.0"
+        "php": ">=7.4.0"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.2.0"
 }

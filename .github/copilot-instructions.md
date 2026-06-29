@@ -6,7 +6,7 @@ These instructions apply to code reviews on pull requests in this repository.
 
 This is PayPlug's official PrestaShop module. PayPlug is a Payment Service Provider (PSP). The module integrates PayPlug's payment processing into PrestaShop via multiple payment methods: standard card, Oney financing, Bancontact, Scalapay, Apple Pay, American Express, iDEAL, MyBank, Satispay, Wero, Bizum, installment plans, one-click (saved card), email link, and SMS link.
 
-**Stack**: PHP 7.2+, PrestaShop 1.7+, Symfony DI Container (YAML), `payplug/payplug-php ^4.0`, no Payum.
+**Stack**: PHP 7.4+, PrestaShop 1.7+, Symfony DI Container (YAML), `payplug/payplug-php ^4.0`, no Payum.
 
 **Key architectural layers**:
 - `payplug/payplug.php` — module entry point, bootstraps the Symfony DI container
@@ -56,7 +56,7 @@ This is PayPlug's official PrestaShop module. PayPlug is a Payment Service Provi
 - Race conditions and concurrency issues
 - Error handling and propagation
 - Off-by-one errors, type safety
-- `declare(strict_types=1)` is encouraged but not universally enforced (PHP 7.2 baseline — flag its absence in new files, not existing ones)
+- `declare(strict_types=1)` is encouraged but not universally enforced (PHP 7.4 baseline — flag its absence in new files, not existing ones)
 - **Amount units**: the PayPlug API expects amounts as integers in euro-cents. `AmountHelper::convertAmount($amount)` converts from a float (euros) to an integer (cents); `convertAmount($amount, true)` converts from cents back to float. Silently mixing units is a payment amount bug. Any code that passes an unconverted float to the API, or converts twice, must be flagged.
 - **EUR-only enforcement**: currency validation must happen before the API call, not after. Missing it for a new payment method is a bug.
 - **Refund amounts**: a refund must not exceed `resource->amount - resource->amount_refunded`. Missing this guard is a bug.

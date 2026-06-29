@@ -627,7 +627,7 @@ class ConfigClass
      */
     public function getReportRequirements()
     {
-        $php_min_version = 50600;
+        $php_min_version = 70100;
         $curl_min_version = '7.21';
         $openssl_min_version = 0x1000100F;
         $report = [

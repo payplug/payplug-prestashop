@@ -553,7 +553,7 @@ class Payplug extends PaymentModule
      */
     public function isValidPHPVersion()
     {
-        $php_min_version = 50600;
+        $php_min_version = 70100;
 
         if (!defined('PHP_VERSION_ID')) {
             $php_version = explode('.', PHP_VERSION);
