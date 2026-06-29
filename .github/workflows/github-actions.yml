@@ -30,7 +30,7 @@ jobs:
     if: always() && !failure() && !cancelled()
     uses: payplug/template-ci/.github/workflows/php-quality.yml@main
     with:
-      php-version: '7.2'
+      php-version: '7.4'
 
   # -----------------------------------------------------------------------
   # 2. JS QUALITY — ESLint syntax & code style
@@ -48,8 +48,8 @@ jobs:
     needs: [quality, js-quality]
     uses: payplug/template-ci/.github/workflows/check-php-compatibility.yml@main
     with:
-      php-version: '7.2'
-      test-version-range: '7.2-8.1'
+      php-version: '7.4'
+      test-version-range: '7.1-8.4'
       src-folder: './src/'
       ignore-patterns: 'src/utilities/services/Mcp.php'
 
@@ -58,7 +58,7 @@ jobs:
     needs: [ quality, check-php-compatibility ]
     uses: payplug/template-ci/.github/workflows/presta-zip-generation.yml@main
     with:
-      php-version: '7.2'
+      php-version: '7.4'
       node-version: '20'
       ref: ${{ github.head_ref }}
     secrets:

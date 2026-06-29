@@ -2,8 +2,8 @@
 
 namespace PayPlug\src\utilities\services;
 
-use PayplugPluginCore\Actions\PaymentAction;
-use PayplugPluginCore\Models\Entities\PaymentInputDTO;
+use PayPlugPluginMcp\Actions\PaymentAction;
+use PayPlugPluginMcp\Models\Entities\PaymentInputDTO;
 
 class Core
 {
