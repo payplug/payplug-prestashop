@@ -2,6 +2,7 @@
 ## Next version
 - Feature :
   - [PRE-3389](https://github.com/payplug/payplug-prestashop/pull/86): PRE-3389: Display clear message when attempting to log in legacy with a multi-company account
+  - [PRE-3358](https://github.com/payplug/payplug-prestashop/pull/99): PRE-3358: Update pay by card translations
 
 - Bugfix :
   - [PRE-3405](https://github.com/payplug/payplug-prestashop/pull/87): Failed to create Scalapay payment when the phone field of the address is empty
