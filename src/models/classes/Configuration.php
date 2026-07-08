@@ -775,11 +775,11 @@ class Configuration
      * @description set a configuration
      *
      * @param string $key
-     * @param string $value
+     * @param string|null $value
      *
      * @return bool
      */
-    public function set($key = '', $value = '')
+    public function set($key = '', $value = null)
     {
         if (!is_string($key) || !$key) {
             return false;

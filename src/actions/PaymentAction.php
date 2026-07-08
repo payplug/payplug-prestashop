@@ -685,7 +685,7 @@ class PaymentAction
      * @param string $resource_id
      * @param bool $cancellable
      *
-     * @return false
+     * @return bool
      */
     public function removeAction($resource_id = '', $cancellable = true)
     {

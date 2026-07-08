@@ -1,10 +1,14 @@
 # Payplug module changelog
-## Next version
+
+## Version 5.0.0
 - Feature :
   - [PRE-3389](https://github.com/payplug/payplug-prestashop/pull/86): PRE-3389: Display clear message when attempting to log in legacy with a multi-company account
   - [PRE-3358](https://github.com/payplug/payplug-prestashop/pull/99): PRE-3358: Update pay by card translations
+  - [PRE-3360](https://github.com/payplug/payplug-prestashop/pull/96) : PRE-3360: Add Refund MCP tool
+
 
 - Bugfix :
+  - [PRE-3425](https://github.com/payplug/payplug-prestashop/pull/100): Fix prestashop validator errors
   - [PRE-3405](https://github.com/payplug/payplug-prestashop/pull/87): Failed to create Scalapay payment when the phone field of the address is empty
   - [PRE-3393](https://github.com/payplug/payplug-prestashop/pull/88): Fix error 500 sent to the merchant but invisible in the admin
   - [PRE-3423](https://github.com/payplug/payplug-prestashop/pull/89): Oney hook optimization on product listing pages (PrestaShop 9)

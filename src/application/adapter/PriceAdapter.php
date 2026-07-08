@@ -36,10 +36,11 @@ class PriceAdapter implements PriceInterface
         $context = \Context::getContext();
 
         try {
-            if (isset($context->currentLocale) && is_object($context->currentLocale)) {
+            if (isset($context->currentLocale)) {
                 $price_formated = $context->currentLocale->formatPrice($price, $iso_code);
             } else {
-                $price_formated = \Tools::displayPrice($price, $iso_code);
+                $currency_id = $iso_code ? \Currency::getIdByIsoCode($iso_code) : null;
+                $price_formated = \Tools::displayPrice($price, $currency_id ?: null);
             }
         } catch (\Exception $e) {
             $price_formated = '';

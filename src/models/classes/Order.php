@@ -41,13 +41,13 @@ class Order
     /**
      * @description Get the appropriate order state for a given resource
      *
-     * @param object $resource
+     * @param object|null $resource
      *
      * @return array
      */
     public function getOrderStateFromResource($resource = null)
     {
-        if (!is_object($resource) || !$resource) {
+        if (!is_object($resource)) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
@@ -118,14 +118,14 @@ class Order
     /**
      * @description Update the current state of an order
      *
-     * @param object $order
+     * @param object|null $order
      * @param int $new_order_state
      *
      * @return bool
      */
     public function updateOrderState($order = null, $new_order_state = 0)
     {
-        if (!is_object($order) || !$order) {
+        if (!is_object($order)) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()

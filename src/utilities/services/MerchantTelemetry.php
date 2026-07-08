@@ -49,7 +49,7 @@ class MerchantTelemetry
         }
 
         try {
-            $send = PluginTelemetry::Send($datas);
+            $send = PluginTelemetry::send($datas);
             $response = [
                 'result' => 201 == (int) $send['httpStatus'] ? true : false,
                 'code' => $send['httpStatus'],

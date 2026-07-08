@@ -629,7 +629,7 @@ class ApplepayPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        if (empty($address_data) || !$address_data) {
+        if (empty($address_data)) {
             return [];
         }
 
@@ -990,7 +990,8 @@ class ApplepayPaymentMethod extends PaymentMethod
                 ->checkAndSaveAddress($user_shipping_address, $this->context->customer->id, $customer_addresses);
 
             // Check and save the billing address if it's different from the shipping address
-            if ($user_shipping_address != $user_billing_address) {
+            $shipping_address_for_comparison = array_diff_key($user_shipping_address, ['phone_mobile' => null]);
+            if ($shipping_address_for_comparison != $user_billing_address) {
                 $existing_billing_address = $this->dependencies
                     ->getPlugin()
                     ->getAddressClass()

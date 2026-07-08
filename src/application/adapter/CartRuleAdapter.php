@@ -45,10 +45,10 @@ class CartRuleAdapter implements CartRuleInterface
      *
      * @return \CartRule
      */
-    public function get($id_cart_rule = false)
+    public function get($id_cart_rule = 0)
     {
         if (!is_int($id_cart_rule)) {
-            $id_cart_rule = false;
+            $id_cart_rule = 0;
         }
 
         return new \CartRule($id_cart_rule);

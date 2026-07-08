@@ -26,18 +26,16 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_18_0($object)
 {
-    $flag = true;
-
     $logger = $object->payplug_dependencies->getPlugin()->getLogger();
-    $logger->addLog('Start upgrade script 4.19.0');
+    $logger->addLog('Start upgrade script 4.18.0');
 
-    $flag = $flag && Configuration::updateValue('PAYPLUG_OAUTH_CLIENT_DATA', '{}');
+    $flag = Configuration::updateValue('PAYPLUG_OAUTH_CLIENT_DATA', '{}');
     $flag = $flag && Configuration::updateValue('PAYPLUG_JWT', '{}');
     $flag = $flag && Configuration::updateValue('PAYPLUG_OAUTH_CLIENT_ID', '');
     $flag = $flag && Configuration::updateValue('PAYPLUG_OAUTH_CODE_VERIFIER', '');
     $flag = $flag && Configuration::updateValue('PAYPLUG_OAUTH_COMPANY_ID', '');
 
-    $logger->addLog('End upgrade script 4.19.0, result: ' . ($flag ? 'ok' : 'ko'));
+    $logger->addLog('End upgrade script 4.18.0, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;
 }

@@ -8,6 +8,9 @@ namespace {
 
     class ObjectModel
     {
+        /** @var int|null */
+        public $id;
+
         public function __construct($id = null, $id_lang = null, $id_shop = null)
         {
         }
@@ -46,6 +49,9 @@ namespace {
     }
     class Language extends ObjectModel
     {
+        /** @var string */
+        public $iso_code;
+
         public static function getIDs($active = true)
         {
             return [];
@@ -98,9 +104,24 @@ namespace {
 
         public static function updateValue($k, $v)
         {
+            return true;
         }
 
         public static function deleteByName($k)
+        {
+        }
+    }
+
+    class Cookie
+    {
+        /** @var int|null */
+        public $id_cart;
+        /** @var int|null */
+        public $id_customer;
+        /** @var int|null */
+        public $previous_cart_id;
+
+        public function write()
         {
         }
     }
@@ -109,6 +130,10 @@ namespace {
     {
         public $customer;
         public $cart;
+        /** @var \Cookie */
+        public $cookie;
+        public $currency;
+        public $currentLocale;
         public $link;
         public $language;
         public $shop;
