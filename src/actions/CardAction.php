@@ -233,7 +233,7 @@ class CardAction
      */
     public function renderOrderDetail($payment = null)
     {
-        if (!is_object($payment) || !$payment) {
+        if (!is_object($payment)) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
@@ -260,7 +260,7 @@ class CardAction
      */
     public function saveAction($payment = null)
     {
-        if (!is_object($payment) || !$payment) {
+        if (!is_object($payment)) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()

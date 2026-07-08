@@ -10,3 +10,4 @@ parameters:
     # Chargement du bootstrap pour les constantes et les classes globales
     bootstrapFiles:
         - tests/stubs/phpstan-bootstrap.php
+

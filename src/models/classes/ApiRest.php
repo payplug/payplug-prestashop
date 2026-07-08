@@ -32,7 +32,6 @@ if (!defined('_PS_VERSION_')) {
 class ApiRest
 {
     private $dependencies;
-    private $helpers;
     private $validators;
     private $module;
 
@@ -40,7 +39,6 @@ class ApiRest
     {
         $this->dependencies = $dependencies;
         $this->validators = $this->dependencies->getValidators();
-        $this->helpers = $this->dependencies->getHelpers();
     }
 
     /**

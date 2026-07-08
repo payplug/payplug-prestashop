@@ -117,6 +117,8 @@ class Payplug extends PaymentModule
                     ->getConfigurationAction()
                     ->disableAction();
         }
+
+        return parent::disable($force_all);
     }
 
     /**

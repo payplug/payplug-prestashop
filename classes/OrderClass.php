@@ -83,7 +83,7 @@ class OrderClass
                 ->getStateRepository()
                 ->getBy('id_order_state', (int) $state['id_order_state']);
             $state['type'] = isset($order_state['type']) && $order_state['type'] ? $order_state['type'] : 'undefined';
-            if (!$state['type'] || 'undefined' != $state['type']) {
+            if ('undefined' !== $state['type']) {
                 continue;
             }
             $update_link_params = [

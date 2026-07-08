@@ -227,10 +227,7 @@ class ConfigClass
     private $country;
     private $dependencies;
     private $img_lang;
-    private $media;
     private $module_adapter;
-    private $oney;
-    private $ssl_enable;
     private $tools;
     private $validate;
     private $validators = [];
@@ -244,9 +241,7 @@ class ConfigClass
         $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->context = $this->dependencies->getPlugin()->getContext()->get();
         $this->country = $this->dependencies->getPlugin()->getCountry();
-        $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module_adapter = $this->dependencies->getPlugin()->getModule();
-        $this->oney = $this->dependencies->getPlugin()->getOney();
         $this->tools = $this->dependencies->getPlugin()->getTools();
         $this->validate = $this->dependencies->getPlugin()->getValidate();
         $this->validators = $this->dependencies->getValidators();

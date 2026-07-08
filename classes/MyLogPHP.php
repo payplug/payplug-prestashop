@@ -62,7 +62,7 @@ class MyLogPHP
      *
      * @param string $value
      * @param string $tag
-     * @param null $line_n
+     * @param int|null $line_n
      */
     public function info($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
@@ -74,7 +74,7 @@ class MyLogPHP
      *
      * @param string $value
      * @param string $tag
-     * @param null $line_n
+     * @param int|null $line_n
      */
     public function warning($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
@@ -86,7 +86,7 @@ class MyLogPHP
      *
      * @param string $value
      * @param string $tag
-     * @param null $line_n
+     * @param int|null $line_n
      */
     public function error($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
@@ -98,7 +98,7 @@ class MyLogPHP
      *
      * @param string $value
      * @param string $tag
-     * @param null $line_n
+     * @param int|null $line_n
      */
     public function debug($value = '', $tag = self::DEFAULT_TAG, $line_n = null)
     {
@@ -111,7 +111,7 @@ class MyLogPHP
      * @param string $errorlevel
      * @param string $value
      * @param string $tag
-     * @param null $line_n
+     * @param int|null $line_n
      */
     private function log($errorlevel = 'INFO', $value = '', $tag = '', $line_n = null)
     {

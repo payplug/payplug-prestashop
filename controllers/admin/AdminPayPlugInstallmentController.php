@@ -274,7 +274,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
 
     private function filterPayments()
     {
-        if (!$this->_filter) {
+        if (!$this->_filter || !is_string($this->_filter)) {
             return false;
         }
 

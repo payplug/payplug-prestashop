@@ -26,8 +26,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_22_0($object)
 {
-    $flag = true;
-
     $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.22.0');
 
@@ -35,7 +33,7 @@ function upgrade_module_4_22_0($object)
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
     $payment_methods['bizum'] = false;
     $payment_methods['wero'] = false;
-    $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
+    $flag = Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
 
     $logger->addLog('End upgrade script 4.22.0, result: ' . ($flag ? 'ok' : 'ko'));
 

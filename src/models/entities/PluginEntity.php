@@ -47,9 +47,6 @@ class PluginEntity
     private $assign;
 
     /** @var object */
-    private $api_service;
-
-    /** @var object */
     private $cache;
 
     /** @var object */

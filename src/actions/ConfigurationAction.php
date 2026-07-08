@@ -372,7 +372,7 @@ class ConfigurationAction
     /**
      * @description Process the login of the merchant
      *
-     * @param object $datas
+     * @param \stdClass|null $datas
      *
      * @return array
      */
@@ -734,7 +734,7 @@ class ConfigurationAction
     /**
      * @description Process the save the configuration
      *
-     * @param object $datas
+     * @param \stdClass|null $datas
      *
      * @return array
      */
@@ -1016,7 +1016,7 @@ class ConfigurationAction
     /**
      * @description Check merchant is onboarded
      *
-     * @param object $datas
+     * @param \stdClass $datas
      *
      * @return array
      */
