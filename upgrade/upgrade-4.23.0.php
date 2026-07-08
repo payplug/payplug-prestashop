@@ -26,15 +26,13 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_23_0($object)
 {
-    $flag = true;
-
     $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 4.23.0');
 
     // Add new payment methods
     $payment_methods = json_decode(Configuration::get('PAYPLUG_PAYMENT_METHODS'), true);
     $payment_methods['scalapay'] = false;
-    $flag = $flag && Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
+    $flag = Configuration::updateValue('PAYPLUG_PAYMENT_METHODS', json_encode($payment_methods));
 
     $logger->addLog('End upgrade script 4.23.0, result: ' . ($flag ? 'ok' : 'ko'));
 

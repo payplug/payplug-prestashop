@@ -30,6 +30,8 @@ use Payplug\Core\APIRoutes;
 use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\ForbiddenException;
+use Payplug\Exception\NotAllowedException;
 use Payplug\Exception\NotFoundException;
 use Payplug\Exception\PayplugServerException;
 use Payplug\Exception\UndefinedAttributeException;
@@ -1182,7 +1184,7 @@ class API
      *
      * @param $json_answer
      *
-     * @return Payplug\Payplug|null
+     * @return Payplug|null
      */
     protected function setApiKeysbyJsonResponse($json_answer)
     {

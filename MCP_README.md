@@ -42,27 +42,27 @@ To allow the MCP client to successfully read and write data, the following core 
 ## ⚙️ Back Office (BO) Plugin Configuration
 
 Once the modules are installed, navigate to the **SERVEUR MCP PRESTASHOP** configuration page in your PrestaShop Back Office to complete the setup:
-![](views/readme/ps_mcp_server_configuration.png)
+![](views/img/readme/ps_mcp_server_configuration.png)
 ---
 
 ### 1. Enable Debugging & Cache
 
 * To ensure optimal performance and allow easy troubleshooting, make sure to **turn on both Logs and Cache** inside the module settings block.
-  ![img.png](views/readme/ps_mcp_server_logs.png)
+  ![img.png](views/img/readme/ps_mcp_server_logs.png)
 ---
 
 ### 2. Connect an AI Member & Generate Token
 
 * Add a new members in section members & permissions as much as you want by entering the **exact email address** associated with the related ** `ps_accounts` profiles**.
 * Generate a secure **Access Token**. This secret token will be required by your AI Client (such as **Claude Code**, **Claude Desktop**, or **Chatgpt**) to communicate with your shop.
-![](views/readme/ps_mcp_server_members.png)
+![](views/img/readme/ps_mcp_server_members.png)
 
 ---
 
 ### 3. Discover Available Tools
 
 * Once successfully authenticated, you will be able to see the registered **Payplug Tools** listed directly within the *Modules & Features* dashboard section, ready to pass schemas over to your LLM context.
-  ![](views/readme/ps_mcp_server_payplug.png)
+  ![](views/img/readme/ps_mcp_server_payplug.png)
 ---
 
 ## 🔁 Setup Checklist

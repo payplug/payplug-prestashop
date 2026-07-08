@@ -165,7 +165,7 @@ class EntityRepository extends QueryRepository
      * @description Delete entities from database for given key and value.
      *
      * @param string $key
-     * @param null $value
+     * @param mixed $value
      *
      * @return bool
      */
@@ -268,7 +268,7 @@ class EntityRepository extends QueryRepository
      * @description Get an collection from database for given key and value.
      *
      * @param string $key
-     * @param null $value
+     * @param mixed $value
      *
      * @return array
      */
@@ -311,7 +311,7 @@ class EntityRepository extends QueryRepository
      * @description Get an entity from database for given key and value.
      *
      * @param string $key
-     * @param null $value
+     * @param mixed $value
      *
      * @return array
      */
@@ -415,7 +415,7 @@ class EntityRepository extends QueryRepository
      * @description Update an entity in the database for a given key
      *
      * @param string $key
-     * @param null $value
+     * @param mixed $value
      * @param array $fields
      *
      * @return bool

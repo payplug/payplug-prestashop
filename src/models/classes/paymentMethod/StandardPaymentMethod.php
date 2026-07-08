@@ -492,7 +492,7 @@ class StandardPaymentMethod extends PaymentMethod
      * @description Get the current payment status
      * @todo: add coverage to this method
      *
-     * @param null $resource
+     * @param object|null $resource
      *
      * @return array
      */
@@ -500,7 +500,7 @@ class StandardPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        if (!is_object($resource) || !$resource) {
+        if (!is_object($resource)) {
             $this->logger->addLog('StandardPaymentMethod::getPaymentStatus() - Invalid argument given, $resource must be a non null object.');
 
             return [];

@@ -169,7 +169,7 @@ class LoggerRepository extends BaseClass
      * @description Format date to help for more precisions.
      *
      * @param string $format
-     * @param null $utimestamp
+     * @param float|null $utimestamp
      *
      * @return string
      */
@@ -182,6 +182,6 @@ class LoggerRepository extends BaseClass
         $timestamp = floor($utimestamp);
         $milliseconds = round(($utimestamp - $timestamp) * 1000000);
 
-        return date(preg_replace('`(?<!\\\\)u`', $milliseconds, $format), $timestamp);
+        return date(preg_replace('`(?<!\\\\)u`', (string) $milliseconds, $format), (int) $timestamp);
     }
 }

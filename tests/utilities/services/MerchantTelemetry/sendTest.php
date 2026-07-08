@@ -52,7 +52,7 @@ class sendTest extends TestCase
     public function testWhenNotFoundExceptionIsThrown()
     {
         $this->plugin_telemetry
-            ->shouldReceive('Send')
+            ->shouldReceive('send')
             ->andThrow(new \Exception('An error occured during the process', 500));
 
         $this->assertSame(
@@ -68,7 +68,7 @@ class sendTest extends TestCase
     public function testWhenTelemetryIsSend()
     {
         $this->plugin_telemetry->shouldReceive([
-            'Send' => [
+            'send' => [
                 'httpStatus' => 201,
             ],
         ]);

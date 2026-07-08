@@ -39,7 +39,7 @@ class CardEntity
     /** @var int */
     private $id_company;
 
-    /** @var int */
+    /** @var bool */
     private $is_sandbox;
 
     /** @var string card token looking like a 32 characters hash : card_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */

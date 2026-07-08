@@ -18,19 +18,13 @@
  *  @author    Payplug SAS
  *  @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
  *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * International Registered Trademark & Property of Payplug SAS
+ *  International Registered Trademark & Property of Payplug SAS
  */
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified:  Mon, 26 Jul 1997 05:00:00 GMT');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+header('Location: ../');
 
-function upgrade_module_3_2_1()
-{
-    $flag = true;
-
-    if (Configuration::hasKey('PAYPLUG_ONEY_TOS')) {
-        $flag = Configuration::deleteByName('PAYPLUG_ONEY_TOS');
-    }
-
-    return $flag;
-}
+exit;

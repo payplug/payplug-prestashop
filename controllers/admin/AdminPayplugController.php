@@ -33,7 +33,6 @@ class AdminPayplugController extends ModuleAdminController
     public $module;
     private $dependencies;
     private $api_rest;
-    private $configuration;
     private $constant;
     private $media;
     private $tools;
@@ -46,7 +45,6 @@ class AdminPayplugController extends ModuleAdminController
 
         $this->dependencies = new DependenciesClass();
         $this->api_rest = $this->dependencies->getPlugin()->getApiRestClass();
-        $this->configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $this->constant = $this->dependencies->getPlugin()->getConstant();
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);

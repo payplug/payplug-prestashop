@@ -49,7 +49,7 @@ class InstallmentPaymentMethod extends PaymentMethod
         }
 
         $installment = $retrieve['resource'];
-        if (!is_object($installment) || !$installment) {
+        if (!is_object($installment)) {
             return false;
         }
 
@@ -125,7 +125,7 @@ class InstallmentPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         $resource = $retrieve['resource'];
-        if (!is_object($resource) || !$resource) {
+        if (!is_object($resource)) {
             $this->logger->addLog('InstallmentPaymentMethod::getOrderTab() - Invalid argument given, $resource must be a non null object.');
 
             return [];
@@ -173,7 +173,7 @@ class InstallmentPaymentMethod extends PaymentMethod
     {
         $this->setParameters();
 
-        if (!is_object($resource) || !$resource) {
+        if (!is_object($resource)) {
             // todo: add error log
             return [];
         }
@@ -804,7 +804,7 @@ class InstallmentPaymentMethod extends PaymentMethod
         }
 
         $installment = $retrieve['resource'];
-        if (!is_object($installment) || !$installment) {
+        if (!is_object($installment)) {
             return false;
         }
 

@@ -23,6 +23,8 @@
 
 namespace PayPlug\classes;
 
+use PayPlug\src\repositories\InstallRepository;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -32,7 +34,7 @@ class PayPlugDependencies
     /** @var HookClass */
     public $hookClass;
 
-    /** @var OneyRepository */
+    /** @var object|null */
     public $oney;
 
     /** @var object */
@@ -46,9 +48,6 @@ class PayPlugDependencies
 
     /** @var MyLogPHP */
     private $mylogphp;
-
-    /** @var PluginEntity */
-    private $plugin;
 
     public function __construct()
     {

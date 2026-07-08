@@ -2273,7 +2273,7 @@ class PhoneNumberUtil
      * into digits if it thinks this is a vanity number of the type "1800 MICROSOFT".
      *
      * @param $numberToParse
-     * @param null $defaultRegion
+     * @param string|null $defaultRegion
      * @param false $keepRawInput
      *
      * @return PhoneNumber|null

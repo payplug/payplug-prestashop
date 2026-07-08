@@ -179,14 +179,10 @@ class CartAdapter implements CartInterface
     /**
      * @description  update product quantity
      * related to a given cart
-     * to cart
      *
-     * @param $cart
      * @param mixed $id_cart
      * @param mixed $quantity
      * @param mixed $id_product
-     * @param mixed $id_lang
-     * @param mixed $id_currency
      * @param mixed|null $id_product_attribute
      * @param mixed $id_customization
      * @param mixed $operator
