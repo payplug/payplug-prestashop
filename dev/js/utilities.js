@@ -49,7 +49,7 @@ var payplug_utilities = {
     },
     init: function(){
     },
-    loadScript: function (url, callback) {
+    loadScript: function (url, callback, onError) {
         // Check if already loaded
         if (payplug_utilities.props.loadedScript.includes(url)) {
             return callback();
@@ -71,6 +71,14 @@ var payplug_utilities = {
                 callback();
             };
         }
+
+        // Network failure, 404, ad/tracker blocker... never leave the page in a
+        // stuck "loading" state: fail gracefully instead.
+        script.onerror = function () {
+            if (typeof onError === 'function') {
+                onError();
+            }
+        };
 
         script.src = url;
         document.getElementsByTagName("head")[0].appendChild(script);

@@ -138,56 +138,9 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         ->isValidOneyAmount($amount);
                 }
 
+                $is_elligible['amount'] = $amount;
+
                 exit(json_encode($is_elligible));
-            } elseif ($tools->tool('getIsset', 'getOneyPriceAndPaymentOptions')) {
-                $use_taxes = (bool) $this->configurationAdapter->get('PS_TAX');
-
-                if ($id_product = (int) $tools->tool('getValue', 'id_product')) {
-                    $group = $tools->tool('getValue', 'group');
-                    $id_product_attribute = $group ?
-                        (int) $this->productAdapter->getIdProductAttributeByIdAttributes($id_product, $group) :
-                        0;
-                    // Some integration will not use qty data but quantity_wanted
-                    $quantity = (int) $tools->tool('getValue', 'qty');
-                    $quantity = $quantity ? $quantity : (int) $tools->tool('getValue', 'quantity_wanted', 1);
-                    $quantity = $quantity ? $quantity : 1;
-                    $product_price = Product::getPriceStatic(
-                        (int) $id_product,
-                        $use_taxes,
-                        $id_product_attribute,
-                        6,
-                        null,
-                        false,
-                        true,
-                        $quantity
-                    );
-                    $amount = $product_price * $quantity;
-                    $cart = false;
-                } else {
-                    $amount = $context->cart->getOrderTotal($use_taxes);
-                    $cart = $context->cart;
-                }
-
-                try {
-                    // todo: Use LanguageAdapter to get iso code from language object
-                    $country = $this->dependencies->configClass->getIsoFromLanguageCode($context->language);
-                    $payment_options = $this->dependencies
-                        ->getPlugin()
-                        ->getPaymentMethodClass()
-                        ->getPaymentMethod('oney')
-                        ->getOneyPriceAndPaymentOptions($cart, $amount, $country);
-                } catch (Exception $e) {
-                    exit(json_encode([
-                        'exception' => $e->getMessage(),
-                        'result' => false,
-                        'error' => $this->dependencies
-                            ->getPlugin()
-                            ->getTranslationClass()
-                            ->l('Oney is momentarily unavailable.', 'ajax'),
-                    ]));
-                }
-
-                exit(json_encode($payment_options));
             } elseif ($tools->tool('getIsset', 'getPaymentErrors')) {
                 // check if errors
                 $errors = $this->dependencies->getHelpers()['cookies']->getPaymentErrorsCookie();

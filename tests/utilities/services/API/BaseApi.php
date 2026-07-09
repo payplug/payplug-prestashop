@@ -22,7 +22,6 @@ abstract class BaseApi extends MockeryTestCase
     public $dependencies;
     public $installment_plan;
     public $module;
-    public $oney_simulation;
     public $payment;
     public $plugin;
     public $refund;
@@ -45,7 +44,6 @@ abstract class BaseApi extends MockeryTestCase
         $this->authentication = \Mockery::mock('alias:Payplug\Authentication');
         $this->card = \Mockery::mock('alias:Payplug\Card');
         $this->installment_plan = \Mockery::mock('alias:Payplug\InstallmentPlan');
-        $this->oney_simulation = \Mockery::mock('alias:Payplug\OneySimulation');
         $this->payment = \Mockery::mock('alias:Payplug\Payment');
         $this->refund = \Mockery::mock('alias:Payplug\Refund');
 

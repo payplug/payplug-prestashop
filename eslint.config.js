@@ -34,8 +34,11 @@ export default [
                 // Payplug JS SDK
                 Payplug: "readonly",
                 ApplePaySession: "readonly",
+                // Official Oney widget (loaded at runtime from Oney's own loader script)
+                oneyMerchantApp: "readonly",
                 // Functions/variables defined across JS files (writable = assigned without var)
                 callCapture: "writable",
+                payplug_utilities: "writable",
                 sanitizePopupHtml: "writable",
                 getHtmlTags: "writable",
                 allTags: "writable",

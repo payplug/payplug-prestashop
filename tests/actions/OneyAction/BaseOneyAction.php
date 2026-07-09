@@ -43,9 +43,12 @@ abstract class BaseOneyAction extends TestCase
         $this->context_adapter->cart->shouldReceive([
             'getOrderTotal' => 42.42,
         ]);
-        $this->context_adapter->shouldReceive([
-            'get' => ContextMock::get(),
-        ]);
+        // byDefault() lets individual tests override this with their own double
+        // (e.g. one that supports ->getContext()->smarty) without affecting the
+        // other tests that rely on the plain ContextMock.
+        $this->context_adapter->shouldReceive('get')
+            ->andReturn(ContextMock::get())
+            ->byDefault();
         $this->dispatcher = \Mockery::mock('Dispatcher');
         $this->instance = \Mockery::mock('Instance');
         $this->controller = \Mockery::mock('Controller');
@@ -58,6 +61,9 @@ abstract class BaseOneyAction extends TestCase
         $this->payment_method = \Mockery::mock('PaymentMethod');
         $this->payment_method_class->shouldReceive([
             'getPaymentMethod' => $this->payment_method,
+        ]);
+        $this->payment_method->shouldReceive([
+            'getOperations' => ['x3_with_fees', 'x3_without_fees', 'x4_with_fees', 'x4_without_fees'],
         ]);
 
         $logger = \Mockery::mock('Logger');
