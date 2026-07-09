@@ -1,11 +1,13 @@
 # Payplug module changelog
+## Version 5.1.0
+- Feature :
+  - [PRE-3456](https://github.com/payplug/payplug-prestashop/pull/103): Replace the Oney simulator cache by the official Oney widget on the product page, cart and checkout
 
 ## Version 5.0.0
 - Feature :
   - [PRE-3389](https://github.com/payplug/payplug-prestashop/pull/86): PRE-3389: Display clear message when attempting to log in legacy with a multi-company account
   - [PRE-3358](https://github.com/payplug/payplug-prestashop/pull/99): PRE-3358: Update pay by card translations
   - [PRE-3360](https://github.com/payplug/payplug-prestashop/pull/96) : PRE-3360: Add Refund MCP tool
-
 
 - Bugfix :
   - [PRE-3425](https://github.com/payplug/payplug-prestashop/pull/100): Fix prestashop validator errors

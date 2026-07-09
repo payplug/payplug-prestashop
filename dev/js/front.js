@@ -25,6 +25,27 @@ var allow_debug = true, debug = function (str) {
     }
 };
 let ipCDNCountdown = 0;
+
+// Oney's loader script (loader.min.js) runs its own async initialization: by the
+// time our <script> tag's onload fires, window.oneyMerchantApp isn't guaranteed to
+// exist yet. Poll for it (bounded) instead of assuming it's ready as soon as the
+// script has loaded, and fail gracefully (onUnavailable) if it never shows up.
+function loadOneyWidget(callback, onUnavailable) {
+    var attempts = 0,
+        maxAttempts = 50, // 50 * 100ms = 5s
+        interval = setInterval(function () {
+            if (window.oneyMerchantApp) {
+                clearInterval(interval);
+                callback();
+            } else if (++attempts >= maxAttempts) {
+                clearInterval(interval);
+                if (typeof onUnavailable === 'function') {
+                    onUnavailable();
+                }
+            }
+        }, 100);
+}
+
 var $document, $window, __moduleName__Module = {
     init: function () {
         this.card.init();
@@ -1079,18 +1100,6 @@ var $document, $window, __moduleName__Module = {
     oney: {
         props: {
             query: null,
-            sizes: [
-                {format: 'mobile', limit: 735},
-                {format: 'desktop', limit: 9999},
-            ]
-        },
-        clear: function () {
-            for (i = 0; i < __moduleName__Module.oney.props.queries.length; i++) {
-                if (typeof __moduleName__Module.oney.props.queries[i] != 'undefined') {
-                    __moduleName__Module.oney.props.queries[i].abort();
-                }
-            }
-            __moduleName__Module.oney.props.queries = [];
         },
         init: function () {
             if (typeof window['__moduleName___oney'] == 'undefined' || !window['__moduleName___oney']) {
@@ -1100,23 +1109,21 @@ var $document, $window, __moduleName__Module = {
 
             this.cta.init();
             this.required.init();
+            this.checkout.init();
 
             oney.load();
 
-            var popin = oney.cta.popin;
-            prestashop.on('updatedCart', popin.check).on('updatedProduct', popin.check);
+            prestashop.on('updatedCart', oney.load).on('updatedProduct', oney.load);
         },
-        load: function (with_schedule) {
+        // Fetch eligibility (allowed country/amount) and the amount to pass to the
+        // official Oney widget: the widget itself computes the schedule, this module
+        // no longer calls Oney's simulation API.
+        load: function () {
             var oney = __moduleName__Module.oney,
                 data = {
                     _ajax: 1,
+                    isOneyElligible: 1,
                 };
-
-            if (with_schedule) {
-                data['getOneyPriceAndPaymentOptions'] = 1;
-            } else {
-                data['isOneyElligible'] = 1;
-            }
 
             // check if context is product page
             if ($('#product_page_product_id').length) {
@@ -1132,8 +1139,6 @@ var $document, $window, __moduleName__Module = {
                 oney.props.query.abort();
             }
 
-            oney.cta.popin.reset();
-
             oney.props.query = $.ajax({
                 url: window['__moduleName___ajax_url'] + '?rand=' + new Date().getTime(),
                 headers: {"cache-control": "no-cache"},
@@ -1143,205 +1148,163 @@ var $document, $window, __moduleName__Module = {
                 dataType: 'json',
                 data: data,
                 success: function (data) {
+                    oney.cta.props.amount = data.amount || 0;
                     if (data.result) {
-                        if (typeof data.popin != 'undefined' && data.popin && oney.cta.props.loaded) {
-                            oney.cta.popin.hydrate(data.popin);
-                            if (typeof data.error != 'undefined' && data.error) {
-                                oney.cta.disable();
-                            } else {
-                                oney.cta.enable();
-                            }
-                        } else if (!with_schedule) {
-                            oney.cta.enable();
-                        }
-                    } else if (oney.cta.props.loaded) {
-                        if (typeof data.popin != 'undefined') {
-                            oney.cta.popin.hydrate(data.popin);
-                        } else if (typeof data.error != 'undefined') {
-                            var popin_error = '<span class="' + oney.cta.popin.props.identifier + '"><p class="' + oney.cta.popin.props.identifier + '_error">' + data.error + '</p></span>'
-                            oney.cta.popin.hydrate(popin_error);
-                        }
+                        oney.cta.enable();
+                    } else {
                         oney.cta.disable();
                     }
+                },
+                error: function () {
+                    oney.cta.disable();
                 }
-
             });
-        },
-        loader: {
-            props: {
-                identifier: '__moduleName__OneyLoader',
-            },
-            set: function (target) {
-                if (typeof target == 'undefined' || !target) {
-                    return;
-                }
-                var loader = '<span class="' + this.props.identifier + '">' +
-                    '<span class="' + this.props.identifier + '_spinner"><span></span></span>' +
-                    '<span class="' + this.props.identifier + '_message">' + window['__moduleName___oney_loading_msg'] + ' <i>.</i><i>.</i><i>.</i></span>' +
-                    '</span>';
-                $(target).html(loader);
-            },
         },
         cta: {
             props: {
                 identifier: '__moduleName__OneyCta',
-                loaded: false
+                amount: 0
             },
             init: function () {
                 var cta = this;
-                cta.props.loaded = true;
-                $document.on('click', '.' + cta.props.identifier + '_button', cta.popin.toggle);
-                cta.popin.init();
+                $document.on('click', '.' + cta.props.identifier + '_button', cta.open);
             },
             enable: function () {
-                var popin = __moduleName__Module.oney.cta.popin.props.identifier,
-                    cta = __moduleName__Module.oney.cta.props.identifier;
-                $('.' + cta + '_button').removeClass('-disabled');
-                $('.' + popin).removeClass('-error');
+                $('.' + __moduleName__Module.oney.cta.props.identifier + '_button').removeClass('-disabled');
             },
             disable: function () {
-                var popin = __moduleName__Module.oney.cta.popin.props.identifier,
-                    cta = __moduleName__Module.oney.cta.props.identifier;
-                $('.' + cta + '_button').addClass('-disabled');
-                $('.' + popin).addClass('-error');
+                $('.' + __moduleName__Module.oney.cta.props.identifier + '_button').addClass('-disabled');
             },
-            popin: {
-                props: {
-                    identifier: '__moduleName__OneyPopin',
-                    open: false,
-                    loaded: false,
-                },
-                init: function () {
-                    var oney = __moduleName__Module.oney,
-                        cta = oney.cta,
-                        popin = cta.popin;
+            // Loads the official Oney loader (once) then opens the Oney-hosted
+            // simulation pop-in — Payplug no longer renders its own pop-in markup.
+            open: function (event) {
+                event.preventDefault();
+                event.stopPropagation();
 
-                    $document.on('click', '.' + popin.props.identifier + '_close', popin.hide)
-                        .on('click', '.' + popin.props.identifier + '_navigation button', popin.select)
-                        .on('click', function (event) {
-                            var $clicked = $(event.target);
-                            if ((!$clicked.is('.' + popin.props.identifier) && !$clicked.parents('.' + popin.props.identifier).length) && $('.' + cta.props.identifier).is('.-open')) {
-                                popin.close();
+                var cta = __moduleName__Module.oney.cta;
+                if ($(event.currentTarget).is('.-disabled')) {
+                    return;
+                }
+
+                // merchant_guid can be missing (e.g. no Oney metadata for the shop's
+                // home country, and no allowed country has one either): the widget
+                // can't initialize without it, so disable the CTA instead of calling
+                // it with a broken value.
+                if (!window['__moduleName___oney_merchant_guid']) {
+                    cta.disable();
+
+                    return;
+                }
+
+                var options = {
+                    country: window['__moduleName___oney_country'],
+                    language: window['__moduleName___oney_language'],
+                    merchant_guid: window['__moduleName___oney_merchant_guid'],
+                    payment_amount: cta.props.amount,
+                    errorCallback: function () {
+                        cta.disable();
+                    }
+                };
+
+                // Only filter by business_transaction_codes when we actually have some:
+                // filtering on an empty list is invalid and Oney's API rejects it. With
+                // no filter, Oney falls back to its own default offer for the merchant.
+                var business_transaction_codes = window['__moduleName___oney_business_transaction_codes'];
+                if (business_transaction_codes && business_transaction_codes.length) {
+                    options.filter_by = 'business_transaction_codes';
+                    options.business_transaction_codes = business_transaction_codes;
+                }
+
+                payplug_utilities.loadScript(window['__moduleName___oney_loader_url'], function () {
+                    loadOneyWidget(function () {
+                        oneyMerchantApp.loadSimulationPopin({options: options});
+                    }, function () {
+                        // oneyMerchantApp never showed up after the loader ran: keep the
+                        // page usable, just don't offer a schedule that can't be trusted.
+                        cta.disable();
+                    });
+                }, function () {
+                    // Oney unavailable (loader blocked/unreachable): keep the page usable,
+                    // just don't offer a schedule that can't be trusted.
+                    cta.disable();
+                });
+            },
+        },
+        // Checkout: inline section injected by Oney into our placeholder(s), one per
+        // Oney payment option (x3/x4, with/without fees), each filtered by its own
+        // single business_transaction_code — a legal requirement.
+        checkout: {
+            props: {
+                identifier: '__moduleName__OneyCheckout'
+            },
+            init: function () {
+                var checkout = this;
+                $('.' + checkout.props.identifier).each(function () {
+                    checkout.load($(this));
+                });
+
+                // The Oney widget can detach its own popin from the DOM (as part of its
+                // close handler) before the click event finishes bubbling. When that
+                // happens, PrestaShop's checkout-step click handler (bound on the
+                // .checkout-step containers) can no longer resolve $(target).closest('.checkout-step'),
+                // which wipes -current/js-current-step from every step instead of
+                // restoring it to the payment step, collapsing the whole checkout.
+                // This listener is bound without the capture flag, so it runs on the
+                // bubble phase after every other click handler (Oney's own included) has
+                // already run. If nothing ended up marked current, restore the payment
+                // step instead of blocking propagation, which would also prevent Oney's
+                // own handler (e.g. its close button) from running at all.
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('#showOneyWidgetAsModal, .oney-modal')) {
+                        return;
+                    }
+                    if (!$('.checkout-step.-current').length) {
+                        $('#checkout-payment-step').addClass('-current js-current-step');
+                    }
+                });
+            },
+            load: function ($placeholder) {
+                var id = $placeholder.attr('id'),
+                    business_transaction_code = $placeholder.data('business-transaction-code'),
+                    payment_amount = parseFloat($placeholder.data('payment-amount')),
+                    // The buyer's delivery country (and its matching merchant_guid) can
+                    // differ from the shop's company_iso for multi-country merchants: use
+                    // the same country server-side resolved the business_transaction_code
+                    // for, not the shop-wide globals used by the PDP/cart pop-in.
+                    country = $placeholder.data('country'),
+                    merchant_guid = $placeholder.data('merchant-guid');
+
+                if (!id || !business_transaction_code || !payment_amount || !country || !merchant_guid) {
+                    return;
+                }
+
+                payplug_utilities.loadScript(window['__moduleName___oney_loader_url'], function () {
+                    loadOneyWidget(function () {
+                        oneyMerchantApp.loadCheckoutSection({
+                            options: {
+                                country: country,
+                                language: window['__moduleName___oney_language'],
+                                merchant_guid: merchant_guid,
+                                payment_amount: payment_amount,
+                                filter_by: 'business_transaction_code',
+                                business_transaction_code: business_transaction_code,
+                                checkout_placeholder: '#' + id,
+                                errorCallback: function () {
+                                    $placeholder.hide();
+                                }
                             }
                         });
-                    popin.reset();
-                },
-                reset: function () {
-                    var oney = __moduleName__Module.oney,
-                        cta = oney.cta,
-                        popin = cta.popin;
-                    if (!$('.' + popin.props.identifier).length) {
-                        $('.' + cta.props.identifier).append('<span class="' + popin.props.identifier + '" />');
-                    }
-                    oney.loader.set('.' + popin.props.identifier);
-                    $('.' + popin.props.identifier).addClass('-loading');
-                },
-                hydrate: function (content) {
-                    if (typeof content == 'undefined' || !content) {
-                        return false;
-                    }
-
-                    var oney = __moduleName__Module.oney,
-                        popin = oney.cta.popin,
-                        identifier = popin.props.identifier,
-                        open = popin.props.open;
-
-                    $('.' + identifier).replaceWith(content).removeClass('-loading');
-                    oney.props.loaded = true;
-
-                    var $button = $('.' + identifier + '_navigation button').eq(0);
-                    popin.choose($button.data('type'));
-
-                    if (open) {
-                        setTimeout(popin.open, 0);
-                    }
-                },
-                select: function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    var $button = $(this),
-                        $li = $button.parents('li');
-
-                    if ($li.is('.selected')) {
-                        return false;
-                    }
-                    __moduleName__Module.oney.cta.popin.choose($button.data('type'));
-                },
-                choose: function (option) {
-                    var identifier = __moduleName__Module.oney.cta.popin.props.identifier;
-                    // nav
-                    $('.' + identifier + '_navigation li').removeClass('selected');
-                    $('.' + identifier + '_navigation button[data-type=' + option + ']').parent('li').addClass('selected');
-
-                    // option
-                    $('.' + identifier + '_option').removeClass('-show');
-                    $('.' + identifier + '_option[data-type=' + option + ']').addClass('-show');
-                },
-                toggle: function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    var popin = __moduleName__Module.oney.cta.popin;
-
-                    var is_open = $('-open').length > 0;
-                    if (is_open) {
-                        popin.close();
-                    } else {
-                        popin.open();
-                    }
-                },
-                check: function () {
-                    var oney = __moduleName__Module.oney,
-                        popin = oney.cta.popin,
-                        open = popin.props.open;
-
-                    oney.props.loaded = false;
-
-                    if (open) {
-                        popin.open();
-                    }
-                },
-                open: function () {
-                    var oney = __moduleName__Module.oney,
-                        cta = oney.cta,
-                        popin = cta.popin;
-
-                    if (!oney.props.loaded) {
-                        oney.load(true);
-                    }
-
-                    $('.' + cta.props.identifier).addClass('-open');
-                    $('.' + popin.props.identifier).addClass('-open');
-
-                    setTimeout(function () {
-                        $('.' + popin.props.identifier).addClass('-show');
-                        popin.props.open = true;
-                    }, 0);
-                },
-                close: function () {
-                    var oney = __moduleName__Module.oney,
-                        cta = oney.cta,
-                        popin = cta.popin;
-
-                    $('.' + popin.props.identifier).removeClass('-show');
-                    $('.' + popin.props.identifier).removeClass('-open');
-
-                    setTimeout(function () {
-                        $('.' + cta.props.identifier).removeClass('-open');
-                        popin.props.open = false;
-                    }, 0);
-                },
-                show: function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    __moduleName__Module.oney.cta.popin.open();
-                },
-                hide: function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    __moduleName__Module.oney.cta.popin.close();
-                },
-            }
+                    }, function () {
+                        // oneyMerchantApp never showed up after the loader ran: hide the
+                        // placeholder, the rest of the checkout stays usable.
+                        $placeholder.hide();
+                    });
+                }, function () {
+                    // Oney unavailable (loader blocked/unreachable): hide the placeholder,
+                    // the rest of the checkout (other payment methods) stays usable.
+                    $placeholder.hide();
+                });
+            },
         },
         required: {
             props: {

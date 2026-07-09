@@ -380,7 +380,6 @@ class Translation
             'billing_address' => $this->l('Please enter your billing address.', 'translation'),
             'shipping_postcode' => $this->l('Please enter your shipping postcode.', 'translation'),
             'billing_postcode' => $this->l('Please enter your billing postcode.', 'translation'),
-            'schedules_unavailable' => $this->l('oney.getOneyPriceAndPaymentOptions.unavailable', 'translation'),
             'shipping_city' => $this->l('Please enter your shipping city.', 'translation'),
             'billing_city' => $this->l('Please enter your billing city.', 'translation'),
             'city_name_error' => $this->l('Your city name is too long (max 32 characters).', 'translation'),

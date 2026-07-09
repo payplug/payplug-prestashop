@@ -26,6 +26,12 @@ final class getOneyPriceLimitTest extends BaseOneyPaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('oney_custom_max_amounts')
             ->andReturn('EUR:420000');
+        $this->configuration->shouldReceive('getValue')
+            ->with('oney_min_amounts')
+            ->andReturn('{"EUR":10000}');
+        $this->configuration->shouldReceive('getValue')
+            ->with('oney_max_amounts')
+            ->andReturn('{"EUR":300000}');
         $this->currency_adapter->shouldReceive([
             'get' => CurrencyMock::get(),
         ]);

@@ -29,8 +29,5 @@
             <span class="{$module_name|escape:'htmlall':'UTF-8'}OneyCta_logo {$module_name|escape:'htmlall':'UTF-8'}OneyLogo -x3x4{if isset($use_fees) && !$use_fees} -withoutFees{/if} {if isset($iso_code) && $iso_code == 'IT' } -isItalian{/if}"></span>
             <span class="{$module_name|escape:'htmlall':'UTF-8'}OneyCta_tooltip {$module_name|escape:'htmlall':'UTF-8'}OneyLogo -tooltip"></span>
         </button>
-        {if isset($popin) && $popin}
-            {include file="./popin.tpl"}
-        {/if}
     </div>
 </div>

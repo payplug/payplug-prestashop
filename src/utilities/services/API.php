@@ -36,10 +36,10 @@ use Payplug\Exception\NotFoundException;
 use Payplug\Exception\PayplugServerException;
 use Payplug\Exception\UndefinedAttributeException;
 use Payplug\InstallmentPlan;
-use Payplug\OneySimulation;
 use Payplug\Payment;
 use Payplug\Payplug;
 use Payplug\Refund;
+use PayPlug\src\models\classes\Oney\OneyAccountData;
 use Symfony\Component\Dotenv\Dotenv;
 
 if (!defined('_PS_VERSION_')) {
@@ -603,52 +603,6 @@ class API
                 'code' => 200,
                 'data' => $oauth_client_data['httpResponse'],
             ];
-        } catch (\Exception $e) {
-            $response = [
-                'result' => false,
-                'code' => (int) $e->getCode(),
-                'message' => $e->getMessage(),
-            ];
-        }
-
-        return $response;
-    }
-
-    /**
-     * @description get the oney simulations from the api
-     *
-     * @param array $data
-     *
-     * @return array
-     */
-    public function getOneySimulations($data = [])
-    {
-        if (!$data || !is_array($data)) {
-            return [
-                'result' => false,
-                'code' => null,
-                'message' => 'Wrong $data given',
-            ];
-        }
-
-        try {
-            if (!$this->api) {
-                $this->api = $this->initialize();
-            }
-
-            if (!$this->api) {
-                $response = [
-                    'result' => false,
-                    'code' => 500,
-                    'message' => 'Cannot connect to the API',
-                ];
-            } else {
-                $response = [
-                    'result' => true,
-                    'code' => 200,
-                    'resource' => OneySimulation::getSimulations($data, $this->api),
-                ];
-            }
         } catch (\Exception $e) {
             $response = [
                 'result' => false,
@@ -1335,18 +1289,48 @@ class API
                     $configuration['currencies'][] = $value;
                 }
             }
+        }
 
-            // Check oney allowed countries
-            if (isset($json_answer['configuration']['oney'], $json_answer['configuration']['oney']['allowed_countries'])) {
-                $allowed_countries = $json_answer['configuration']['oney']['allowed_countries'];
-                if (!empty($allowed_countries)) {
-                    $allowed = '';
-                    foreach ($json_answer['configuration']['oney']['allowed_countries'] as $country) {
-                        $allowed .= $country . ',';
-                    }
-                    $configuration['oney_allowed_countries'] = $tools->substr($allowed, 0, -1);
-                }
-            }
+        // Consume the `oney` object exposed by GET /account (per-country merchant_guid
+        // and business transaction codes under `countries_metadata`, allowed countries,
+        // min/max amounts, legal notices): this is the sole data source for the official
+        // Oney widget, replacing the legacy simulation cache. It is documented as a
+        // root-level key, but read defensively from `configuration.oney` too in case the
+        // API still nests it there.
+        $oney_data = [];
+        if (isset($json_answer['oney']) && is_array($json_answer['oney'])) {
+            $oney_data = $json_answer['oney'];
+        } elseif (isset($json_answer['configuration']['oney']) && is_array($json_answer['configuration']['oney'])) {
+            $oney_data = $json_answer['configuration']['oney'];
+        }
+
+        if (!empty($oney_data)) {
+            $oney_account_data = OneyAccountData::fromAccountResponse($oney_data);
+            $configuration['oney_show_legal_notices'] = (int) $oney_account_data->showLegalNotices();
+            $configuration['oney_countries_metadata'] = json_encode(
+                isset($oney_data['countries_metadata']) && is_array($oney_data['countries_metadata'])
+                    ? $oney_data['countries_metadata']
+                    : []
+            );
+
+            // $oney_data being present means this is an authoritative response: a
+            // missing/empty field here means "none", not "unknown" — it must overwrite
+            // any previously stored value (notably allowed_countries, otherwise a
+            // country the merchant is no longer allowed to use Oney in would stay
+            // enabled).
+            $configuration['oney_min_amounts'] = json_encode(
+                isset($oney_data['min_amounts']) && is_array($oney_data['min_amounts'])
+                    ? $oney_data['min_amounts']
+                    : []
+            );
+            $configuration['oney_max_amounts'] = json_encode(
+                isset($oney_data['max_amounts']) && is_array($oney_data['max_amounts'])
+                    ? $oney_data['max_amounts']
+                    : []
+            );
+            $configuration['oney_allowed_countries'] = isset($oney_data['allowed_countries']) && is_array($oney_data['allowed_countries'])
+                ? implode(',', $oney_data['allowed_countries'])
+                : '';
         }
 
         $permissions = [

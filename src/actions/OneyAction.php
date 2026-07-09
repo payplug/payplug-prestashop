@@ -169,57 +169,88 @@ class OneyAction
     }
 
     /**
-     * @description Display the Oney Schedule.
+     * @description Display the checkout placeholder for the official Oney widget
+     * (oneyMerchantApp.loadCheckoutSection), filtered by the single
+     * business_transaction_code matching this Oney payment option. Unlike the PDP/cart
+     * pop-in, this is a legal requirement: the widget renders the schedule inline.
      *
-     * @param $oney_payment
-     * @param $amount
+     * @param string $type Oney operation type (e.g. 'x3_with_fees')
+     * @param float|int $amount
+     * @param string $isoCode country used to resolve the per-country merchant_guid/business codes
      *
-     * @return bool
+     * @return bool|string
      */
-    public function renderSchedule($oney_payment, $amount)
+    public function renderCheckoutSection($type, $amount, $isoCode)
     {
         $this->setParameters();
-        if (!is_array($oney_payment) || !$oney_payment) {
+
+        if (!is_string($type) || !$type) {
             $this->plugin
                 ->getLogger()
-                ->addLog('OneyAction::renderRequiredFields() - Invalid argument given, $oney_payment must be a non empty array.');
+                ->addLog('OneyAction::renderCheckoutSection() - Invalid argument given, $type must be a non empty string.');
 
             return false;
         }
 
-        if (!is_float($amount) || !$amount) {
+        if (!is_numeric($amount) || !$amount) {
             $this->plugin
                 ->getLogger()
-                ->addLog('OneyAction::renderRequiredFields() - Invalid argument given, $amount must be a non null float.');
+                ->addLog('OneyAction::renderCheckoutSection() - Invalid argument given, $amount must be a non null numeric value.');
 
             return false;
         }
 
-        $withFirstSchedule = 'it' == $this->context->language->iso_code;
+        if (!is_string($isoCode) || !$isoCode) {
+            $this->plugin
+                ->getLogger()
+                ->addLog('OneyAction::renderCheckoutSection() - Invalid argument given, $isoCode must be a non empty string.');
 
-        $price_adapter = $this->dependencies
+            return false;
+        }
+
+        $oney_payment_method = $this->dependencies
             ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.application.adapter.price');
+            ->getPaymentMethodClass()
+            ->getPaymentMethod('oney');
 
-        $vars = [
-            'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
-            'oney_payment_option' => $oney_payment,
-            'payplug_oney_amount' => [
-                'amount' => $amount,
-                'value' => $price_adapter->formatPrice($amount, $this->context->currency->iso_code),
-            ],
-            'withFirstSchedule' => $withFirstSchedule,
-            'iso_code' => $this->tools->tool(
-                'strtoupper',
-                $this->context->language->iso_code
-            ),
-            'merchant_company_iso' => $this->configuration->getValue('company_iso'),
-        ];
-        $this->context->getContext()->smarty->assign($vars);
+        // Reuse OneyPaymentMethod::getOperations() as the single source of truth for
+        // the 4 known Oney types, instead of duplicating that list here.
+        $known_types = $oney_payment_method->getOperations();
+        if (!in_array($type, $known_types, true)) {
+            $this->plugin
+                ->getLogger()
+                ->addLog('OneyAction::renderCheckoutSection() - Invalid argument given, $type must be one of: ' . implode(', ', $known_types) . '.');
 
-        return $this->dependencies->configClass->fetchTemplate('oney/schedule.tpl');
+            return false;
+        }
+
+        // A merchant's Oney contract (merchant_guid/business codes) is set up per
+        // country, matching the buyer's delivery country used for this payment option.
+        // The widget must be initialized with that same country/merchant_guid pair:
+        // the shop-wide company_iso used for the PDP/cart pop-in can differ from it
+        // for multi-country merchants and would make the widget reject the request.
+        $oney_account_data = $oney_payment_method->getOneyAccountData();
+
+        $business_codes = $oney_account_data->getBusinessCodes($isoCode);
+        $merchant_guid = $oney_account_data->getMerchantGuid($isoCode);
+
+        $with_fees = false !== strpos($type, 'with_fees') && false === strpos($type, 'without_fees');
+        $operation = 0 === strpos($type, 'x4') ? 'x4' : 'x3';
+        $business_transaction_code = $business_codes->get($operation, $with_fees);
+
+        if (!$business_transaction_code || !$merchant_guid) {
+            return false;
+        }
+
+        $this->context->getContext()->smarty->assign([
+            'oney_checkout_placeholder' => $this->dependencies->name . 'OneyCheckout_' . $type,
+            'oney_checkout_business_transaction_code' => $business_transaction_code,
+            'oney_checkout_amount' => $amount,
+            'oney_checkout_country' => strtoupper($isoCode),
+            'oney_checkout_merchant_guid' => $merchant_guid,
+        ]);
+
+        return $this->dependencies->configClass->fetchTemplate('oney/checkout.tpl');
     }
 
     /**
