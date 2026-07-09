@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\models\classes\paymentMethod;
 
+use PayPlug\src\models\classes\Oney\OneyAccountData;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -724,375 +726,6 @@ class OneyPaymentMethod extends PaymentMethod
     }
 
     /**
-     * @description Display Oney payment options
-     *
-     * todo: the bellow $amount and $country are not well tested in this method
-     *
-     * @param object $cart
-     * @param int $amount
-     * @param string $country
-     *
-     * @return array
-     */
-    public function getOneyPriceAndPaymentOptions($cart = null, $amount = 0, $country = '')
-    {
-        $this->setParameters();
-
-        if ($this->validate_adapter->validate('isLoadedObject', $cart)
-            && $cart->id_address_invoice
-            && $cart->id_address_delivery) {
-            $is_valid_cart = $this->isValidOneyCartQty($cart)['result'];
-            $is_valid_addresses = $this->isValidOneyAddresses(
-                (int) $cart->id_address_delivery,
-                (int) $cart->id_address_invoice
-            );
-            $is_valid_amount = $this->isValidOneyAmount($amount ? $amount : $cart->getOrderTotal(true))['result'];
-
-            $is_elligible = $this->validators['payment']
-                ->isOneyElligible($is_valid_cart, $is_valid_amount, $is_valid_addresses['result']);
-        } else {
-            $is_elligible = $this->isValidOneyAmount($amount);
-        }
-
-        if ($is_elligible['result']) {
-            $oney_payment_options = $this->getOneyPaymentOptionsList($amount, $country);
-        } else {
-            $oney_payment_options = false;
-        }
-
-        $error = isset($is_elligible['error']) ? $is_elligible['error'] : (
-            $oney_payment_options
-            ? false
-            : $this->oney_translations['schedules_unavailable']
-        );
-
-        $withFirstSchedule = 'it' == $this->context->language->iso_code;
-
-        $price_adapter = $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.application.adapter.price');
-
-        $this->assign_adapter->assign([
-            'payplug_oney_required_field' => false,
-            'payplug_oney_amount' => [
-                'amount' => $amount,
-                'value' => $price_adapter->formatPrice($amount, $this->context->currency->iso_code),
-            ],
-            'payplug_oney_allowed' => $is_elligible['result'] && $oney_payment_options,
-            'payplug_oney_error' => $error,
-            'withFirstSchedule' => $withFirstSchedule,
-        ]);
-        if ($oney_payment_options) {
-            $this->assign_adapter->assign([
-                'oney_payment_options' => $oney_payment_options,
-            ]);
-        }
-
-        $popin_tpl = $this->displayOneyPopin();
-
-        return [
-            'result' => $is_elligible['result'] && $oney_payment_options,
-            'error' => $error,
-            'popin' => $popin_tpl,
-        ];
-    }
-
-    /**
-     * @description Display Oney popin template
-     *
-     * @return mixed
-     */
-    public function displayOneyPopin()
-    {
-        $this->setParameters();
-
-        $this->assignLegalNotice();
-        $this->context->getContext()->smarty->assign([
-            'use_fees' => (bool) $this->configuration->getValue('oney_fees'),
-            'iso_code' => $this->tools->tool(
-                'strtoupper',
-                $this->context->language->iso_code
-            ),
-        ]);
-
-        return $this->dependencies->configClass->fetchTemplate('oney/popin.tpl');
-    }
-
-    /**
-     * @description Assign Oney Legal Notice
-     */
-    public function assignLegalNotice()
-    {
-        $this->setParameters();
-
-        $limits = $this->getOneyPriceLimit();
-        $learnMoreLink = 'IT' == $this->configuration->getValue('company_iso')
-            && 'it' == $this->tools->tool('strtolower', $this->context->language->iso_code);
-
-        $price_adapter = $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.application.adapter.price');
-
-        $this->context->getContext()->smarty->assign([
-            'learnMoreLink' => (bool) $learnMoreLink,
-            'oneyWithFees' => (bool) $this->configuration->getValue('oney_fees'),
-            'oneyMinAmounts' => $price_adapter->formatPrice(
-                $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
-                $this->context->currency->iso_code
-            ),
-            'oneyMaxAmounts' => $price_adapter->formatPrice(
-                $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result'],
-                $this->context->currency->iso_code
-            ),
-            'oneyUrl' => 'https://www.oney.' . $this->context->language->iso_code,
-        ]);
-    }
-
-    /**
-     * @description Get Oney payment options
-     *
-     * @param int $amount
-     * @param string $country
-     *
-     * @return array
-     */
-    public function getOneyPaymentOptionsList($amount = 0, $country = '')
-    {
-        $this->setParameters();
-
-        // get Oney resource
-        $payment_list = [];
-        if (!is_numeric($amount) || !$amount) {
-            return $payment_list;
-        }
-
-        $amount = $this->dependencies
-            ->getHelpers()['amount']
-            ->convertAmount($amount);
-
-        if (!is_string($country)) {
-            $iso_code_list = $this->configuration->getValue('oney_allowed_countries');
-            if (!$iso_code_list) {
-                return $payment_list;
-            }
-
-            $iso_list = explode(',', $iso_code_list);
-            $country = reset($iso_list);
-        }
-        $country = $this->tools->tool('strtoupper', $country);
-
-        $available_oney_payments = $this->getOperations();
-        $oney_simulations = $this->getOneySimulations($amount, $country, $available_oney_payments);
-        if (!$oney_simulations['result']) {
-            return $payment_list;
-        }
-
-        $use_fees = (bool) $this->configuration->getValue('oney_fees');
-
-        foreach (array_keys($oney_simulations['simulations']) as $key) {
-            $with_fees = false !== (bool) strpos($key, 'with_fees');
-            if (($use_fees && !$with_fees) || (!$use_fees && $with_fees)) {
-                unset($oney_simulations['simulations'][$key]);
-            }
-        }
-
-        foreach ($oney_simulations['simulations'] as $method => $oney_simulation) {
-            if (isset($oney_simulation['installments']) && $oney_simulation['installments']) {
-                $payment_list[$method] = $this->formatOneyResource($method, $oney_simulation, $amount);
-                if (!$use_fees) {
-                    $payment_list[$method]['effective_annual_percentage_rate'] = 0;
-                }
-            }
-        }
-
-        return $payment_list;
-    }
-
-    /**
-     * @description Format Oney simulation from resource
-     *
-     * @param string $operation
-     * @param array $resource
-     * @param int $total_amount
-     *
-     * @return array
-     */
-    public function formatOneyResource($operation = '', $resource = [], $total_amount = 0)
-    {
-        if (!in_array($operation, $this->getOperations()) || !is_string($operation)) {
-            return [];
-        }
-
-        if (!is_array($resource) || empty($resource)) {
-            return [];
-        }
-
-        if (!is_int($total_amount)) {
-            return [];
-        }
-
-        $context = $this->dependencies
-            ->getPlugin()
-            ->getContext()
-            ->get();
-
-        $type = explode('_', $operation);
-
-        $resource['nominal_annual_percentage_rate'] = number_format($resource['nominal_annual_percentage_rate'], 2);
-        $resource['effective_annual_percentage_rate'] = number_format($resource['effective_annual_percentage_rate'], 2);
-
-        $resource['split'] = (int) str_replace('x', '', $type[0]);
-        $resource['title'] = sprintf($this->oney_translations['percentage'], $resource['split']);
-
-        // format price
-        $price_adapter = $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.application.adapter.price');
-
-        $total_cost = $this->dependencies
-            ->getHelpers()['amount']
-            ->convertAmount($resource['total_cost'], true);
-
-        $resource['total_cost'] = [
-            'amount' => number_format($total_cost, 2),
-            'value' => $price_adapter->formatPrice($total_cost, $context->currency->iso_code),
-        ];
-        $down_payment_amount = $this->dependencies
-            ->getHelpers()['amount']
-            ->convertAmount($resource['down_payment_amount'], true);
-        $resource['down_payment_amount'] = [
-            'amount' => number_format($down_payment_amount, 2),
-            'value' => $price_adapter->formatPrice($down_payment_amount, $context->currency->iso_code),
-        ];
-        foreach ($resource['installments'] as &$installment) {
-            $amount = $this->dependencies
-                ->getHelpers()['amount']
-                ->convertAmount($installment['amount'], true);
-            $installment['amount'] = number_format($amount, 2);
-            $installment['value'] = $price_adapter->formatPrice($amount, $context->currency->iso_code);
-        }
-
-        $total_amount = $this->dependencies
-            ->getHelpers()['amount']
-            ->convertAmount($total_amount, true);
-
-        $total_amount += $total_cost;
-        $resource['total_amount'] = [
-            'amount' => number_format($total_amount, 2),
-            'value' => $price_adapter->formatPrice($total_amount, $context->currency->iso_code),
-        ];
-
-        return $resource;
-    }
-
-    /**
-     * @description Get Oney Payment Simulations
-     *
-     * @param int $amount
-     * @param string $country
-     * @param array $operation
-     *
-     * @return array|mixed
-     */
-    public function getOneySimulations($amount = 0, $country = '', $operation = [])
-    {
-        if (!$amount || !is_int($amount)) {
-            return [
-                'result' => false,
-                'error' => '$amount is not a valid int',
-            ];
-        }
-
-        if (!$country || !is_string($country)) {
-            return [
-                'result' => false,
-                'error' => '$country is not a valid string',
-            ];
-        }
-
-        if (!$operation || !is_array($operation)) {
-            return [
-                'result' => false,
-                'error' => '$operation is not a valid array',
-            ];
-        }
-
-        $cacheRepository = $this->dependencies->getPlugin()->getCache();
-
-        $cache_key = $cacheRepository->setCacheKey($amount, $country, $operation);
-
-        if (!$cache_key['result']) {
-            return [
-                'result' => false,
-                'error' => $cache_key['message'],
-            ];
-        }
-
-        // Checks if the current simulation is already saved in the database
-        // If not, we do a simulation for Oney, and we will store it to the DB
-        $cache = $cacheRepository->getCacheByKey($cache_key['result']);
-
-        if ($cache['result']) {
-            return json_decode($cache['result']['cache_value'], true);
-        }
-
-        $data = [
-            'amount' => $amount,
-            'country' => $this->formatOverseaCountryIso($country),
-            'operations' => $operation,
-        ];
-        $simulations = $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.utilities.service.api')
-            ->getOneySimulations($data);
-
-        if (!$simulations['result']) {
-            $this->logger->addLog($simulations['message'], 'error');
-
-            return [
-                'result' => false,
-                'error' => $simulations['message'],
-            ];
-        }
-
-        $simulations = $simulations['resource'];
-        if (isset($simulations['object']) && 'error' == $simulations['object']) {
-            return [
-                'result' => false,
-                'error' => $simulations['message'],
-            ];
-        }
-        if ($simulations) {
-            ksort($simulations);
-            $to_cache = [
-                'result' => true,
-                'simulations' => $simulations,
-            ];
-
-            // $cache_id = cache_key in db
-            // $to_cache = cache_value in db
-            if (!$cacheRepository->setCache($cache_key['result'], $to_cache)) {
-                $error_message = 'Error during setting Oney Simulation in DB cache [OneyRepository]';
-                $error_level = 'error';
-                $this->logger->addLog($error_message, $error_level);
-            }
-        }
-
-        return [
-            'result' => true,
-            'simulations' => $simulations,
-        ];
-    }
-
-    /**
      * @description Temp get valid iso code for french overseas,
      * todo: remove when it's fix in API
      *
@@ -1147,34 +780,47 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $iso_code = $this->tools->tool('strtoupper', $currency->iso_code);
-        $amounts = json_decode($this->configuration->getValue('amounts'), true);
 
         if ((bool) $custom) {
-            $oney_min_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_min_amounts')));
-            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $this->configuration->getValue('oney_custom_max_amounts')));
+            $oney_min_amounts = $this->parseCsvAmounts($this->configuration->getValue('oney_custom_min_amounts'));
+            $oney_max_amounts = $this->parseCsvAmounts($this->configuration->getValue('oney_custom_max_amounts'));
         } else {
-            $oney_min_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['min']));
-            $oney_max_amounts = explode(',', $this->tools->tool('strtoupper', $amounts['oney_x3_with_fees']['max']));
+            // Sourced from the `oney` object of GET /account (min_amounts/max_amounts,
+            // in cents per currency), mapped in API::treatAccountResponse().
+            $oney_min_amounts = (array) json_decode($this->configuration->getValue('oney_min_amounts'), true);
+            $oney_max_amounts = (array) json_decode($this->configuration->getValue('oney_max_amounts'), true);
+            $oney_min_amounts = array_change_key_case($oney_min_amounts, CASE_UPPER);
+            $oney_max_amounts = array_change_key_case($oney_max_amounts, CASE_UPPER);
         }
 
-        foreach ($oney_min_amounts as $min_amount) {
-            $min = explode(':', $min_amount);
-            if ($min[0] == $iso_code) {
-                $limits['min'] = (int) $min[1];
-
-                break;
-            }
-        }
-        foreach ($oney_max_amounts as $max_amount) {
-            $max = explode(':', $max_amount);
-            if ($max[0] == $iso_code) {
-                $limits['max'] = (int) $max[1];
-
-                break;
-            }
-        }
+        $limits['min'] = isset($oney_min_amounts[$iso_code]) ? (int) $oney_min_amounts[$iso_code] : false;
+        $limits['max'] = isset($oney_max_amounts[$iso_code]) ? (int) $oney_max_amounts[$iso_code] : false;
 
         return $limits;
+    }
+
+    /**
+     * @description Rebuild the Oney widget data (merchant_guid, business transaction
+     * codes, allowed countries, min/max amounts, legal notices) mapped from GET
+     * /account by API::treatAccountResponse().
+     *
+     * @return OneyAccountData
+     */
+    public function getOneyAccountData()
+    {
+        $this->setParameters();
+
+        $allowed_countries = $this->configuration->getValue('oney_allowed_countries');
+        $payment_methods = (array) json_decode($this->configuration->getValue('payment_methods'), true);
+
+        return OneyAccountData::fromAccountResponse([
+            'enabled' => !empty($payment_methods['oney']),
+            'allowed_countries' => $allowed_countries ? explode(',', $allowed_countries) : [],
+            'min_amounts' => (array) json_decode($this->configuration->getValue('oney_min_amounts'), true),
+            'max_amounts' => (array) json_decode($this->configuration->getValue('oney_max_amounts'), true),
+            'show_legal_notices' => (bool) $this->configuration->getValue('oney_show_legal_notices'),
+            'countries_metadata' => (array) json_decode($this->configuration->getValue('oney_countries_metadata'), true),
+        ]);
     }
 
     /**
@@ -2072,6 +1718,26 @@ class OneyPaymentMethod extends PaymentMethod
         $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
 
         return $this->tools->tool('redirectAdmin', $link_order);
+    }
+
+    /**
+     * @description Parse a "ISO:amount,ISO:amount" CSV string into an ISO-keyed amounts array
+     *
+     * @param string $csv
+     *
+     * @return array
+     */
+    private function parseCsvAmounts($csv)
+    {
+        $amounts = [];
+        foreach (explode(',', $this->tools->tool('strtoupper', (string) $csv)) as $entry) {
+            $parts = explode(':', $entry);
+            if (2 === count($parts) && '' !== $parts[0]) {
+                $amounts[$parts[0]] = (int) $parts[1];
+            }
+        }
+
+        return $amounts;
     }
 
     /**

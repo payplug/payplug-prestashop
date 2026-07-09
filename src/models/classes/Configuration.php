@@ -186,6 +186,12 @@ class Configuration
             'defaultValue' => 1,
             'setConf' => 1,
         ],
+        'oney_countries_metadata' => [
+            'type' => 'string',
+            'name' => 'ONEY_COUNTRIES_METADATA',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'oney_custom_max_amounts' => [
             'type' => 'string',
             'name' => 'ONEY_CUSTOM_MAX_AMOUNTS',
@@ -204,6 +210,18 @@ class Configuration
             'defaultValue' => 1,
             'setConf' => 1,
         ],
+        'oney_max_amounts' => [
+            'type' => 'string',
+            'name' => 'ONEY_MAX_AMOUNTS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
+        'oney_min_amounts' => [
+            'type' => 'string',
+            'name' => 'ONEY_MIN_AMOUNTS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'oney_optimized' => [
             'type' => 'integer',
             'name' => 'ONEY_OPTIMIZED',
@@ -213,6 +231,12 @@ class Configuration
         'oney_product_cta' => [
             'type' => 'integer',
             'name' => 'ONEY_PRODUCT_CTA',
+            'defaultValue' => 1,
+            'setConf' => 1,
+        ],
+        'oney_show_legal_notices' => [
+            'type' => 'integer',
+            'name' => 'ONEY_SHOW_LEGAL_NOTICES',
             'defaultValue' => 1,
             'setConf' => 1,
         ],

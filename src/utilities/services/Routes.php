@@ -32,41 +32,61 @@ use Symfony\Component\Dotenv\Dotenv;
 class Routes
 {
     /**
-     * @description Get the Api url
-     *
-     * @return string
+     * @var bool whether payplugroutes/.env has already been parsed into this
+     *           request. getSourceUrl() alone calls into getApiUrl()/getCDNUrl()/getOneyLoaderUrl(),
+     *           so without this the same file would be parsed up to three times per call.
      */
-    public function getApiUrl()
-    {
-        $dotenv = new Dotenv();
-        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
-        if (\file_exists($dotenvFile)) {
-            $dotenv->load($dotenvFile);
-            $api_url = $_ENV['API_BASE_URL'];
-        } else {
-            $api_url = 'https://api.payplug.com';
-        }
-
-        return $api_url;
-    }
+    private static $dotenvLoaded = false;
 
     /**
      * @description Get the Api url
      *
      * @return string
      */
-    public function getCDNUrl()
+    public function getApiUrl()
     {
-        $dotenv = new Dotenv();
         $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
         if (\file_exists($dotenvFile)) {
-            $dotenv->load($dotenvFile);
-            $cdn_url = $_ENV['CDN_BASE_URL'];
-        } else {
-            $cdn_url = 'https://cdn.payplug.com';
+            $this->loadDotenv($dotenvFile);
         }
 
-        return $cdn_url;
+        return isset($_ENV['API_BASE_URL'])
+            ? $_ENV['API_BASE_URL']
+            : 'https://api.payplug.com';
+    }
+
+    /**
+     * @description Get the CDN url
+     *
+     * @return string
+     */
+    public function getCDNUrl()
+    {
+        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            $this->loadDotenv($dotenvFile);
+        }
+
+        return isset($_ENV['CDN_BASE_URL'])
+            ? $_ENV['CDN_BASE_URL']
+            : 'https://cdn.payplug.com';
+    }
+
+    /**
+     * @description Get the Oney widget loader url
+     *
+     * @return string
+     */
+    public function getOneyLoaderUrl()
+    {
+        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            $this->loadDotenv($dotenvFile);
+        }
+
+        return isset($_ENV['ONEY_LOADER_URL'])
+            ? $_ENV['ONEY_LOADER_URL']
+            : 'https://assets.oney.io/build/loader.min.js';
     }
 
     /**
@@ -78,6 +98,7 @@ class Routes
             'applepay' => 'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js',
             'embedded' => $this->getApiUrl() . '/js/1/form.latest.js',
             'integrated' => $this->getCDNUrl() . '/js/integrated-payment/v1@1/index.js',
+            'oney' => $this->getOneyLoaderUrl(),
         ];
     }
 
@@ -134,5 +155,20 @@ class Routes
             'satispay' => $default . '/articles/8089121532700',
             'signup' => 'https://portal.payplug.com/auth/signup',
         ];
+    }
+
+    /**
+     * @description Parse payplugroutes/.env into $_ENV, at most once per request.
+     *
+     * @param string $dotenvFile
+     */
+    private function loadDotenv($dotenvFile)
+    {
+        if (self::$dotenvLoaded) {
+            return;
+        }
+
+        (new Dotenv())->load($dotenvFile);
+        self::$dotenvLoaded = true;
     }
 }

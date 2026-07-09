@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3322d74380c8bcfe589621fee4400187",
+    "content-hash": "6b58e0ad7fc5e1159b62d41813eae236",
     "packages": [
         {
             "name": "payplug/payplug-php",
@@ -4520,5 +4520,5 @@
         "php": ">=7.4.0"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

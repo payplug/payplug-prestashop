@@ -384,12 +384,47 @@ class HookClass
         $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
 
         if ((bool) $payment_methods['oney']) {
+            $oney_account_data = $this->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('oney')
+                ->getOneyAccountData();
+            // A merchant's Oney contract (merchant_guid/business codes) is set up per
+            // country: the shop's home country is used as the default for the PDP/cart
+            // pop-in, which is not tied to a specific buyer/delivery address. If that
+            // country has no Oney metadata (multi-country shop whose contract doesn't
+            // cover its own home country), fall back to the first allowed country that
+            // does have one, so the widget still gets a usable merchant_guid.
+            $oney_country = $this->tools->tool('strtoupper', $this->configuration->getValue('company_iso'));
+            if (!$oney_account_data->getMerchantGuid($oney_country)) {
+                foreach ($oney_account_data->getAllowedCountries() as $allowed_country) {
+                    if ($oney_account_data->getMerchantGuid($allowed_country)) {
+                        $oney_country = $this->tools->tool('strtoupper', $allowed_country);
+
+                        break;
+                    }
+                }
+            }
+
             $this->media->addJsDef([
                 $this->dependencies->name . '_oney' => true,
                 $this->dependencies->name . '_oney_loading_msg' => $this->dependencies
                     ->getPlugin()
                     ->getTranslationClass()
                     ->l('hook.header.loading', 'hookclass'),
+                // Official Oney widget (loader.min.js) data, mapped from GET /account.
+                // The checkout section uses its own per-option business_transaction_code
+                // (see OneyAction::renderCheckoutSection()); only the PDP/cart pop-in
+                // (loadSimulationPopin), which offers every option at once, needs the list.
+                $this->dependencies->name . '_oney_loader_url' => $this->dependencies
+                    ->getPlugin()
+                    ->getRoutes()
+                    ->getSourceUrl()['oney'],
+                $this->dependencies->name . '_oney_merchant_guid' => $oney_account_data->getMerchantGuid($oney_country),
+                $this->dependencies->name . '_oney_business_transaction_codes' => $oney_account_data->getBusinessCodes($oney_country)->toList(),
+                $this->dependencies->name . '_oney_show_legal_notices' => $oney_account_data->showLegalNotices(),
+                $this->dependencies->name . '_oney_country' => $oney_country,
+                $this->dependencies->name . '_oney_language' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
             ]);
         }
 
