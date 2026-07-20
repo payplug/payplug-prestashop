@@ -17,6 +17,7 @@
   - [PRE-3380](https://github.com/payplug/payplug-prestashop/pull/93): Fix Symfony conflicts between Payplug and Prestashop Shipping
   - [PRE-3065](https://github.com/payplug/payplug-prestashop/pull/94): Fix incorrect Oney return when a payment file is rejected
   - [PRE-3070](https://github.com/payplug/payplug-prestashop/pull/95): Fix error message for 3DS payment
+  - [PRE-3569](https://github.com/payplug/payplug-prestashop/pull/105): Remove platform check to allow php 7.1 compatibility
 
 ## Version 4.24.0
 - Feature :
