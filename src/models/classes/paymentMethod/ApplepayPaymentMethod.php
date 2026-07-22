@@ -537,7 +537,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             if ($carrier) {
                 $id_carrier = (int) $carrier['identifier'];
             } else {
-                $id_carrier = $delivery_options[0]['identifier'];
+                $id_carrier = !empty($delivery_options) ? (int) $delivery_options[0]['identifier'] : 0;
             }
         } else {
             $id_carrier = (int) $current_cart->id_carrier;
