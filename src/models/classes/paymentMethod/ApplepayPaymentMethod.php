@@ -1086,7 +1086,12 @@ class ApplepayPaymentMethod extends PaymentMethod
 
         // then get the new amount for the request
         $request = $this->getRequest();
-        $cart_data['amount'] = $this->dependencies->getHelpers()['amount']->convertAmount($request['total']['amount']);
+        $cart_data['amount'] = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount')
+            ->convertAmount($request['total']['amount']);
 
         return [
             'result' => true,

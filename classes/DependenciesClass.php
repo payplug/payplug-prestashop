@@ -171,7 +171,7 @@ class DependenciesClass
     private function setHelpers()
     {
         $this->helpers = [
-            'amount' => new AmountHelper($this),
+            'amount' => new AmountHelper($this), // @deprecated in 5.1.0, use service getter instead, to remove in 5.2.0
             'configuration' => new ConfigurationHelper(),
             'cookies' => new CookiesHelper($this),
             'files' => new FilesHelper(),

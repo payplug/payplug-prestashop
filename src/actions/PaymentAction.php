@@ -871,8 +871,13 @@ class PaymentAction
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.application.adapter.price');
-        $amount_refunded_payplug = $this->dependencies->getHelpers()['amount']->convertAmount($amount_refunded_payplug, true);
-        $amount_available = $this->dependencies->getHelpers()['amount']->convertAmount($amount_available, true);
+        $amountHelper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount');
+        $amount_refunded_payplug = $amountHelper->convertAmount($amount_refunded_payplug, true);
+        $amount_available = $amountHelper->convertAmount($amount_available, true);
         $this->context->smarty->assign([
             'amount_refunded_payplug' => $amount_refunded_payplug,
             'amount_refunded_payplug_display' => $price_adapter->formatPrice($amount_refunded_payplug, $this->context->currency->iso_code),

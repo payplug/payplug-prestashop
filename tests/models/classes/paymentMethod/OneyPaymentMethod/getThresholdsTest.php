@@ -31,6 +31,8 @@ class getThresholdsTest extends BaseOneyPaymentMethod
             'oney_custom_min_amounts' => 'EUR:10000',
             'oney_custom_max_amounts' => 'EUR:300000',
         ];
+        $min_amount = 100;
+        $max_amount = 3000;
         $expected = [
             'name' => 'thresholds',
             'image_url' => 'oney/payplug-thresholds.jpg',
@@ -39,16 +41,16 @@ class getThresholdsTest extends BaseOneyPaymentMethod
                 'description' => 'thresholds.description',
                 'min_amount' => [
                     'name' => 'oney_min_amounts',
-                    'value' => 100,
-                    'placeholder' => 100,
-                    'default' => 100,
+                    'value' => (float) $min_amount,
+                    'placeholder' => (float) $min_amount,
+                    'default' => (float) $min_amount,
                 ],
                 'inter' => 'thresholds.inter',
                 'max_amount' => [
                     'name' => 'oney_max_amounts',
-                    'value' => 3000,
-                    'placeholder' => 3000,
-                    'default' => 3000,
+                    'value' => (float) $max_amount,
+                    'placeholder' => (float) $max_amount,
+                    'default' => (float) $max_amount,
                 ],
                 'error' => [
                     'text' => 'thresholds.error.text',

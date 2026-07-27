@@ -58,6 +58,7 @@ abstract class BasePaymentMethod extends TestCase
     protected $validate_adapter;
     protected $validators;
     protected $price_adapter;
+    protected $amountHelper;
 
     public function setUp(): void
     {
@@ -150,6 +151,7 @@ abstract class BasePaymentMethod extends TestCase
         $this->module = \Mockery::mock('PrestashopModule');
         $this->module_adapter = \Mockery::mock('ModuleAdapter');
         $this->price_adapter = \Mockery::mock('PriceAdapter');
+        $this->amountHelper = \Mockery::mock(AmountHelper::class)->makePartial();
         $this->module_adapter->shouldReceive([
             'getInstanceByName' => $this->module,
         ]);
@@ -169,10 +171,20 @@ abstract class BasePaymentMethod extends TestCase
             ->shouldReceive('getService')
             ->with('payplug.utilities.helper.language')
             ->andReturn($this->language_helper);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.helper.amount')
+            ->andReturn($this->amountHelper);
 
         $this->price_adapter->shouldReceive('formatPrice')
             ->andReturnUsing(function ($amount) {
                 return $amount;
+            });
+        $this->amountHelper->shouldReceive('convertAmount')
+            ->andReturnUsing(function ($amount, $from_cent) {
+                return $from_cent
+                    ? $amount / 100
+                    : round($amount * 100, 0);
             });
 
         $this->payment_repository = \Mockery::mock('PaymentRepository');

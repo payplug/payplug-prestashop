@@ -42,25 +42,53 @@ class AmountHelper
      * @description Format amount float to int or int to float.
      *
      * @param $amount
-     * @param bool $to_cents
+     * @param bool $from_cents
      *
      * @return float|int
      */
-    public function convertAmount($amount = 0, $to_cents = false)
+    public function convertAmount($amount = 0, $from_cents = false)
     {
         if (!$amount) {
             return 0;
         }
 
-        if ($to_cents) {
-            return (float) ($amount / 100);
+        if ($from_cents) {
+            return \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::fromCents((int) $amount);
         }
-        $amount = (float) ($amount * 1000); // we use this trick to avoid rounding while converting to int
-        $amount = (float) ($amount / 10); // otherwise, sometimes 17.90 become 17.89 \o/
 
-        $amount = $this->dependencies->getPlugin()->getTools()->tool('ps_round', $amount, 2);
+        $round_mode = (int) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('PS_PRICE_ROUND_MODE');
+        $constantAdapter = $this->dependencies->getPlugin()->getConstant();
+        $roundUp = $constantAdapter->get('PS_ROUND_UP');
+        $roundDown = $constantAdapter->get('PS_ROUND_DOWN');
+        $roundHalfUp = $constantAdapter->get('PS_ROUND_HALF_UP');
+        $roundHalfDown = $constantAdapter->get('PS_ROUND_HALF_DOWN');
+        $roundHalfEven = $constantAdapter->get('PS_ROUND_HALF_EVEN');
+        $roundHalfOdd = $constantAdapter->get('PS_ROUND_HALF_ODD');
+        $modes = [
+            $roundHalfUp => PHP_ROUND_HALF_UP,
+            $roundHalfDown => PHP_ROUND_HALF_DOWN,
+            $roundHalfEven => PHP_ROUND_HALF_EVEN,
+            $roundHalfOdd => PHP_ROUND_HALF_ODD,
+        ];
+        $mode = isset($modes[$round_mode]) ? $modes[$round_mode] : PHP_ROUND_HALF_UP;
 
-        return intval(strval($amount));
+        switch ($round_mode) {
+            case $roundUp:
+            case $roundDown:
+                $amount = $amount * 100;
+                $amount_to_cent = $this->dependencies->getPlugin()->getTools()->tool('ps_round', $amount);
+
+                break;
+
+            case $roundHalfUp:
+            case $roundHalfDown:
+            case $roundHalfEven:
+            case $roundHalfOdd:
+            default:
+                $amount_to_cent = \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::toCents((float) $amount, $mode);
+        }
+
+        return (int) $amount_to_cent;
     }
 
     /**
@@ -80,7 +108,7 @@ class AmountHelper
         }
 
         return [
-            'result' => $amount / 100,
+            'result' => (float) $this->convertAmount($amount, true),
             'message' => '$amount is formatted',
         ];
     }

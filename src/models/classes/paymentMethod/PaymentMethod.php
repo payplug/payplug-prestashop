@@ -397,7 +397,10 @@ class PaymentMethod
         }
 
         $amount = $this->dependencies
-            ->getHelpers()['amount']
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount')
             ->convertAmount($resource->amount, true);
 
         $state_addons = $resource->is_live ? '' : '_test';
@@ -803,11 +806,14 @@ class PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.application.adapter.price');
-        $refunded = $this->dependencies
-            ->getHelpers()['amount']
-            ->convertAmount($resource->amount_refunded, true);
+        $amountHelper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount');
+        $refunded = $amountHelper->convertAmount($resource->amount_refunded, true);
         $available = 10 <= $amount_available
-            ? $this->dependencies->getHelpers()['amount']->convertAmount($amount_available, true)
+            ? $amountHelper->convertAmount($amount_available, true)
             : 0;
         $refund = [
             'refunded' => $refunded,
@@ -823,7 +829,7 @@ class PaymentMethod
             $refund['available'] = 0;
         }
 
-        $amount = $this->dependencies->getHelpers()['amount']->convertAmount($resource->amount, true);
+        $amount = $amountHelper->convertAmount($resource->amount, true);
         $amount_display = $price_adapter->formatPrice($amount, $this->context->currency->iso_code);
 
         return [
@@ -1402,7 +1408,10 @@ class PaymentMethod
 
         $payment_tab = [
             'amount' => $this->dependencies
-                ->getHelpers()['amount']
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.helper.amount')
                 ->convertAmount($cart_amount),
             'currency' => $this->context->currency->iso_code,
             'notification_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ipn', [], true),

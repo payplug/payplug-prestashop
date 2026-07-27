@@ -20,7 +20,6 @@ abstract class BaseApiRest extends TestCase
     use FormatDataProvider;
 
     protected $address_adapter;
-    protected $amount_helper;
     protected $api_service;
     protected $assign_adapter;
     protected $carrier_adapter;
@@ -42,6 +41,7 @@ abstract class BaseApiRest extends TestCase
     protected $validate_adapter;
     protected $module;
     protected $module_adapter;
+    protected $amountHelper;
     protected $merchant_class;
 
     public function setUp(): void
@@ -112,6 +112,7 @@ abstract class BaseApiRest extends TestCase
         $this->merchant_class = \Mockery::mock('MerchantClass');
         $this->module = \Mockery::mock('Module');
         $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->amountHelper = \Mockery::mock(AmountHelper::class)->makePartial();
         $this->module_adapter->shouldReceive([
             'getInstanceByName' => $this->module,
         ]);
@@ -123,6 +124,10 @@ abstract class BaseApiRest extends TestCase
             ->shouldReceive('getService')
             ->with('payplug.models.classes.merchant')
             ->andReturn($this->merchant_class);
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.helper.amount')
+            ->andReturn($this->amountHelper);
 
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin->shouldReceive([
@@ -145,13 +150,11 @@ abstract class BaseApiRest extends TestCase
             'getValidate' => $this->validate_adapter,
         ]);
 
-        $this->amount_helper = \Mockery::mock(AmountHelper::class)->makePartial();
         $this->configuration_helper = \Mockery::mock(ConfigurationHelper::class)->makePartial();
         $this->dependencies->shouldReceive([
             'getPlugin' => $this->plugin,
             'getValidators' => ['module' => \Mockery::mock(moduleValidator::class)->makePartial()],
             'getHelpers' => [
-                'amount' => $this->amount_helper,
                 'configuration' => $this->configuration_helper,
             ],
         ]);

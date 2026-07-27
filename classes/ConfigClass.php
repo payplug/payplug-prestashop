@@ -528,7 +528,7 @@ class ConfigClass
     /**
      * @description Get the right country iso-code or null if it does'nt fit the ISO 3166-1 alpha-2 norm.
      *
-     * todo: Deprected method: Use src/models/classe/Country::getIsoCodeByCountryId instead
+     * todo: deprecated method: Use src/models/classe/Country::getIsoCodeByCountryId instead
      *
      * @param $country_id
      *
