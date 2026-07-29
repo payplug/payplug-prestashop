@@ -934,17 +934,16 @@ class OneyPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         $limits = $this->getOneyPriceLimit();
+        $amountHelper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount');
         $is_valid_amount = $this->validators['payment']->isAmount(
-            $this->dependencies
-                ->getHelpers()['amount']
-                ->convertAmount($amount),
+            $amountHelper->convertAmount($amount),
             [
-                'min' => $this->dependencies
-                    ->getHelpers()['amount']
-                    ->convertAmount($this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result']),
-                'max' => $this->dependencies
-                    ->getHelpers()['amount']
-                    ->convertAmount($this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result']),
+                'min' => $amountHelper->convertAmount($amountHelper->formatOneyAmount($limits['min'])['result']),
+                'max' => $amountHelper->convertAmount($amountHelper->formatOneyAmount($limits['max'])['result']),
             ]
         );
 
@@ -953,8 +952,8 @@ class OneyPaymentMethod extends PaymentMethod
                 'result' => false,
                 'message' => sprintf(
                     $this->oney_translations['amount_error'],
-                    $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
-                    $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result']
+                    $amountHelper->formatOneyAmount($limits['min'])['result'],
+                    $amountHelper->formatOneyAmount($limits['max'])['result']
                 ),
             ];
         }
@@ -1028,10 +1027,13 @@ class OneyPaymentMethod extends PaymentMethod
         $products = $this->cart_adapter->getProducts($cart);
         $delivery_context = $this->getOneyDeliveryContext();
 
+        $amountHelper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount');
         foreach ($products as $product) {
-            $unit_price = $this->dependencies
-                ->getHelpers()['amount']
-                ->convertAmount($product['price_wt']);
+            $unit_price = $amountHelper->convertAmount($product['price_wt']);
             $productName = (string) $product['name'] . (isset($product['attributes'])
                     ? ' - ' . $product['attributes']
                     : '');
@@ -1547,7 +1549,12 @@ class OneyPaymentMethod extends PaymentMethod
 
             $amount = explode(':', $config);
             $amount = (int) $amount[1];
-            $amount = $this->dependencies->getHelpers()['amount']->formatOneyAmount($amount)['result'];
+            $amount = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.helper.amount')
+                ->formatOneyAmount($amount)['result'];
             $thresholds[$amount_key] = $amount;
         }
 
@@ -1605,6 +1612,12 @@ class OneyPaymentMethod extends PaymentMethod
             return $this->oney_translations['payment_option_error'];
         }
 
+        $amountHelper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount');
+
         switch ($error) {
             case 'address':
                 $err_label = $this->oney_translations['address_invalid'];
@@ -1615,8 +1628,8 @@ class OneyPaymentMethod extends PaymentMethod
                 $limits = $this->getOneyPriceLimit(true);
                 $err_label = sprintf(
                     $this->oney_translations['invalid_amount'],
-                    $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['min'])['result'],
-                    $this->dependencies->getHelpers()['amount']->formatOneyAmount($limits['max'])['result']
+                    $amountHelper->formatOneyAmount($limits['min'])['result'],
+                    $amountHelper->formatOneyAmount($limits['max'])['result']
                 );
 
                 break;

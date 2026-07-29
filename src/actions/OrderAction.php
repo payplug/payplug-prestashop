@@ -399,7 +399,13 @@ class OrderAction
         // Get associated transaction
         $order_payments = $order->getOrderPayments();
         if (!$order_payments) {
-            if (!$order->addOrderPayment($resource->amount / 100, null, $resource->id)) {
+            $amount = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.helper.amount')
+                ->convertAmount($resource->amount, true);
+            if (!$order->addOrderPayment($amount, null, $resource->id)) {
                 $this->logger->addLog('OrderAction::updateAction - Can set order payment for given order', 'error');
 
                 return [

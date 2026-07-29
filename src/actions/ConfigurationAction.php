@@ -877,7 +877,12 @@ class ConfigurationAction
                                 ->getPaymentMethod('oney')
                                 ->getOneyPriceLimit(false);
                             $amount = $datas->{$config};
-                            $amount_to_cent = $this->dependencies->amountCurrencyClass->convertAmount($amount);
+                            $amount_to_cent = $this->dependencies
+                                ->getPlugin()
+                                ->getModule()
+                                ->getInstanceByName($this->dependencies->name)
+                                ->getService('payplug.utilities.helper.amount')
+                                ->convertAmount($amount);
                             $is_valid_amount = $this->dependencies
                                 ->getValidators()['payment']
                                 ->isAmount((int) $amount_to_cent, $limit_oney);

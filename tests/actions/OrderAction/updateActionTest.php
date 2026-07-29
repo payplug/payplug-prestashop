@@ -522,6 +522,15 @@ class updateActionTest extends BaseOrderAction
             ],
         ]);
 
+        $amountHelper = \Mockery::mock('AmountHelper');
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.helper.amount')
+            ->andReturn($amountHelper);
+        $amountHelper->shouldReceive([
+            'convertAmount' => 200,
+        ]);
+
         $this->assertSame(
             [
                 'result' => false,

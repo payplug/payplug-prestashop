@@ -3,7 +3,7 @@
 
 ## Related Issue
 <!-- Link to the Jira ticket or GitHub issue -->
-Ticket: [PRE-XXXX](https://payplug.atlassian.net/browse/PRE-XXXX)
+Ticket: [PRE-XXXX](https://payplug-prod.atlassian.net/browse/PRE-XXXX)
 
 ## Type of Change
 <!-- At least one required — replace [ ] with [x] -->

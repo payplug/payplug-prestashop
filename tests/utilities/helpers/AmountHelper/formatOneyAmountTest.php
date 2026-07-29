@@ -65,17 +65,18 @@ class formatOneyAmountTest extends TestCase
      *
      * @dataProvider validFormatOneyAmountDataProvider
      *
-     * @param $amount
+     * @param $amount_given
      * @param $message
      */
-    public function testFormatOneyAmountWithValidDataProvider($amount, $message)
+    public function testFormatOneyAmountWithValidDataProvider($amount_given, $message)
     {
+        $amount = 200;
         $this->assertSame(
             [
-                'result' => 200,
+                'result' => (float) $amount,
                 'message' => $message,
             ],
-            $this->amountHelper->formatOneyAmount($amount)
+            $this->amountHelper->formatOneyAmount($amount_given)
         );
     }
 }

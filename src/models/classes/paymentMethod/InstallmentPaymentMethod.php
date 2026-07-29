@@ -147,7 +147,10 @@ class InstallmentPaymentMethod extends PaymentMethod
         }
 
         $amount = $this->dependencies
-            ->getHelpers()['amount']
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount')
             ->convertAmount($amount, true);
 
         $translation = $this->dependencies
@@ -422,6 +425,13 @@ class InstallmentPaymentMethod extends PaymentMethod
         ];
         $payment_list = [];
         $amount = 0;
+
+        $amountHelper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount');
+
         foreach ($retrieve['schedule'] as $schedule) {
             $amount += $schedule['amount'];
             if ($schedule['resource']) {
@@ -436,7 +446,7 @@ class InstallmentPaymentMethod extends PaymentMethod
                 $refund['is_refunded'] = (bool) $schedule_resource->is_refunded;
                 $payment_list[] = $schedule_detail;
             } else {
-                $amount = $this->dependencies->getHelpers()['amount']->convertAmount($schedule['amount'], true);
+                $amount = $amountHelper->convertAmount($schedule['amount'], true);
                 $payment_list[] = [
                     'id' => null,
                     'status' => $translation['detail']['status'][$status['code']],
@@ -476,7 +486,7 @@ class InstallmentPaymentMethod extends PaymentMethod
                 : $translation['detail']['mode']['test'],
             'refund' => $refund,
             'currency' => $resource->currency,
-            'amount' => $this->dependencies->getHelpers()['amount']->convertAmount($amount, true),
+            'amount' => $amountHelper->convertAmount($amount, true),
         ];
     }
 

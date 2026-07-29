@@ -89,11 +89,13 @@ class ScalapayPaymentMethod extends PaymentMethod
         }
 
         $products = $this->cart_adapter->getProducts($cart);
-
+        $amountHelper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount');
         foreach ($products as $product) {
-            $unit_price = $this->dependencies
-                ->getHelpers()['amount']
-                ->convertAmount($product['price_wt']);
+            $unit_price = $amountHelper->convertAmount($product['price_wt']);
             $productName = (string) $product['name'] . (isset($product['attributes'])
                     ? ' - ' . $product['attributes']
                     : '');
