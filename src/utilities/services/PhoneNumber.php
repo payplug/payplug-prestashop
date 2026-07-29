@@ -23,8 +23,8 @@
 
 namespace PayPlug\src\utilities\services;
 
+use libphonenumber;
 use PayPlug\classes\DependenciesClass;
-use PayPlug\lib\libphonenumber;
 
 if (!defined('_PS_VERSION_')) {
     exit;
