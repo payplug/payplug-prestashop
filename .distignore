@@ -17,6 +17,8 @@ package.json
 package-lock.json
 phpstan.dist.neon
 phpstan.neon
+views/js/*.map
+views/css/*.map
 
 # Dependencies (raw sources, not needed in zip)
 node_modules/
