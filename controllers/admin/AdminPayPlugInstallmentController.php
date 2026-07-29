@@ -260,7 +260,10 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                     'order_total' => $amount,
                     'step' => $schedule['step'],
                     'amount' => $this->dependencies
-                        ->getHelpers()['amount']
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.utilities.helper.amount')
                         ->convertAmount($schedule['amount'], true),
                     'status' => $this->getPaymentStatusById($schedule['status']),
                     'scheduled_date' => $schedule['scheduled_date'],

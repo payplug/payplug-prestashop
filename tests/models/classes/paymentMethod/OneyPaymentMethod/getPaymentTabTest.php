@@ -7,7 +7,6 @@ namespace PayPlug\tests\models\classes\paymentMethod\OneyPaymentMethod;
  * @group class
  * @group payment_method_class
  * @group oney_payment_method_class
- * @group debug
  */
 class getPaymentTabTest extends BaseOneyPaymentMethod
 {

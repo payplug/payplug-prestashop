@@ -91,7 +91,12 @@ class AdminPayplugController extends ModuleAdminController
             if ($this->tools->tool('getValue', 'refund')) {
                 $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
                 $amount_formated = is_numeric($amount)
-                    ? $this->dependencies->amountCurrencyClass->convertAmount($amount)
+                    ? $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.utilities.helper.amount')
+                        ->convertAmount($amount)
                     : 0;
                 $resource_id = $this->tools->tool('getValue', 'resource_id');
                 $id_customer = $this->tools->tool('getValue', 'id_customer');
@@ -161,7 +166,6 @@ class AdminPayplugController extends ModuleAdminController
 
                 exit(json_encode(['reload' => true]));
             }
-
             if ($this->tools->tool('getValue', 'update')) {
                 $pay_id = $this->tools->tool('getValue', 'pay_id');
                 $id_order = $this->tools->tool('getValue', 'id_order');

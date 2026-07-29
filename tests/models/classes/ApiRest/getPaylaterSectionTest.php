@@ -66,7 +66,7 @@ class getPaylaterSectionTest extends BaseApiRest
             if (false !== strpos($key, '_amounts')) {
                 $amount = explode(':', $configuration);
                 $all_amounts[$key] = (int) $amount[1];
-                $this->amount_helper
+                $this->amountHelper
                     ->shouldReceive('formatOneyAmount')
                     ->once()
                     ->with($amount[1])

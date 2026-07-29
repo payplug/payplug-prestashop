@@ -75,6 +75,8 @@ class AmountCurrencyClass
     /**
      * Check if amount is correct.
      *
+     * @deprecated in 5.1.0 to remove in 5.2.0
+     *
      * @param int $amount
      * @param object $order
      *
@@ -100,6 +102,8 @@ class AmountCurrencyClass
 
     /**
      * Check amount to refund.
+     *
+     * @deprecated in 5.1.0 to remove in 5.2.0
      *
      * @param int $amount
      *
@@ -136,6 +140,8 @@ class AmountCurrencyClass
 
     /**
      * Format amount float to int or int to float.
+     *
+     * @deprecated in 5.1.0 to remove in 5.2.0
      *
      * @param $amount
      * @param bool $to_cents
