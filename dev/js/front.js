@@ -26,24 +26,42 @@ var allow_debug = true, debug = function (str) {
 };
 let ipCDNCountdown = 0;
 
-// Oney's loader script (loader.min.js) runs its own async initialization: by the
-// time our <script> tag's onload fires, window.oneyMerchantApp isn't guaranteed to
-// exist yet. Poll for it (bounded) instead of assuming it's ready as soon as the
-// script has loaded, and fail gracefully (onUnavailable) if it never shows up.
-function loadOneyWidget(callback, onUnavailable) {
-    var attempts = 0,
-        maxAttempts = 50, // 50 * 100ms = 5s
-        interval = setInterval(function () {
-            if (window.oneyMerchantApp) {
-                clearInterval(interval);
-                callback();
-            } else if (++attempts >= maxAttempts) {
-                clearInterval(interval);
+// loader.min.js doesn't fetch widget.min.js (the script that actually sets
+// window.oneyMerchantApp) on its own - it only *defines* window.loadOneyWidget(t),
+// which must be called to trigger that fetch and get notified once it's done.
+// This file is webpack-bundled, so a local helper of the same name doesn't merge
+// with that global: it just shadows it, and window.loadOneyWidget never gets
+// called - oneyMerchantApp never appears, and callers silently time out. Call the
+// official window.loadOneyWidget directly instead, with a bounded timeout kept as
+// a safety net (widget.min.js failing/hanging) and to fail gracefully
+// (onUnavailable) if the official loader isn't present at all.
+function waitForOneyWidget(callback, onUnavailable) {
+    if (typeof window.loadOneyWidget !== 'function') {
+        if (typeof onUnavailable === 'function') {
+            onUnavailable();
+        }
+
+        return;
+    }
+
+    var settled = false,
+        timeout = setTimeout(function () {
+            if (!settled) {
+                settled = true;
                 if (typeof onUnavailable === 'function') {
                     onUnavailable();
                 }
             }
-        }, 100);
+        }, 5000);
+
+    window.loadOneyWidget(function () {
+        if (settled) {
+            return;
+        }
+        settled = true;
+        clearTimeout(timeout);
+        callback();
+    });
 }
 
 var $document, $window, __moduleName__Module = {
@@ -1216,7 +1234,7 @@ var $document, $window, __moduleName__Module = {
                 }
 
                 payplug_utilities.loadScript(window['__moduleName___oney_loader_url'], function () {
-                    loadOneyWidget(function () {
+                    waitForOneyWidget(function () {
                         oneyMerchantApp.loadSimulationPopin({options: options});
                     }, function () {
                         // oneyMerchantApp never showed up after the loader ran: keep the
@@ -1279,7 +1297,7 @@ var $document, $window, __moduleName__Module = {
                 }
 
                 payplug_utilities.loadScript(window['__moduleName___oney_loader_url'], function () {
-                    loadOneyWidget(function () {
+                    waitForOneyWidget(function () {
                         oneyMerchantApp.loadCheckoutSection({
                             options: {
                                 country: country,
