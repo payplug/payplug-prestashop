@@ -181,7 +181,7 @@ abstract class BasePaymentMethod extends TestCase
                 return $amount;
             });
         $this->amountHelper->shouldReceive('convertAmount')
-            ->andReturnUsing(function ($amount, $from_cent) {
+            ->andReturnUsing(function ($amount, $from_cent = false) {
                 return $from_cent
                     ? $amount / 100
                     : round($amount * 100, 0);
