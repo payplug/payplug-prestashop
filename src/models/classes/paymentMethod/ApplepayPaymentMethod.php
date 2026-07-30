@@ -654,12 +654,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         ];
 
         if (isset($address_data['phoneNumber'])) {
-            $phone_number_service = $this->dependencies
-                ->getPlugin()
-                ->getModule()
-                ->getInstanceByName($this->dependencies->name)
-                ->getService('payplug.utilities.service.phonenumber');
-            $prepared_data['mobile_phone_number'] = $phone_number_service->formatPhoneNumber(
+            $prepared_data['mobile_phone_number'] = $this->formatPhoneNumberSafely(
                 $address_data['phoneNumber'],
                 $address_data['countryCode']
             );
