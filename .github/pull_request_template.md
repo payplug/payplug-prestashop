@@ -7,15 +7,15 @@ Ticket: [PRE-XXXX](https://payplug-prod.atlassian.net/browse/PRE-XXXX)
 
 ## Type of Change
 <!-- At least one required — replace [ ] with [x] -->
-- [ ] 🐛 Bug fix
-- [ ] ✨ New feature
-- [ ] 💥 Breaking change
-- [ ] ♻️ Refactor
-- [ ] 🔧 Configuration / CI
-- [ ] 🚀 Release (`release/*` branch targeting `master`)
-- [ ] 📦 Dependency update
-- [ ] 🔒 Security fix
-- [ ] 📝 Documentation update
+[ ] 🐛 Bug fix
+[ ] ✨ New feature
+[ ] 💥 Breaking change
+[ ] ♻️ Refactor
+[ ] 🔧 Configuration / CI
+[ ] 🚀 Release (`release/*` branch targeting `master`)
+[ ] 📦 Dependency update
+[ ] 🔒 Security fix
+[ ] 📝 Documentation update
 
 ---
 

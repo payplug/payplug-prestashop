@@ -1487,12 +1487,6 @@ class PaymentMethod
                 }
             }
 
-            $phone_number_service = $this->dependencies
-                ->getPlugin()
-                ->getModule()
-                ->getInstanceByName($this->dependencies->name)
-                ->getService('payplug.utilities.service.phonenumber');
-
             $language_helper = $this->dependencies
                 ->getPlugin()
                 ->getModule()
@@ -1507,10 +1501,10 @@ class PaymentMethod
                 'company_name' => !empty($billing_address->company) ? trim($billing_address->company) : null,
                 'email' => $this->context->customer->email,
                 'landline_phone_number' => !empty($billing_address->phone)
-                    ? $phone_number_service->formatPhoneNumber($billing_address->phone, $billing_iso)
+                    ? $this->formatPhoneNumberSafely($billing_address->phone, $billing_iso)
                     : null,
                 'mobile_phone_number' => !empty($billing_address->phone_mobile)
-                    ? $phone_number_service->formatPhoneNumber($billing_address->phone_mobile, $billing_iso)
+                    ? $this->formatPhoneNumberSafely($billing_address->phone_mobile, $billing_iso)
                     : null,
                 'address1' => !empty($billing_address->address1) ? $billing_address->address1 : null,
                 'address2' => !empty($billing_address->address2) ? $billing_address->address2 : null,
@@ -1539,10 +1533,10 @@ class PaymentMethod
                 'company_name' => !empty($shipping_address->company) ? trim($shipping_address->company) : null,
                 'email' => $this->context->customer->email,
                 'landline_phone_number' => !empty($shipping_address->phone)
-                    ? $phone_number_service->formatPhoneNumber($shipping_address->phone, $shipping_iso)
+                    ? $this->formatPhoneNumberSafely($shipping_address->phone, $shipping_iso)
                     : null,
                 'mobile_phone_number' => !empty($shipping_address->phone_mobile)
-                    ? $phone_number_service->formatPhoneNumber($shipping_address->phone_mobile, $shipping_iso)
+                    ? $this->formatPhoneNumberSafely($shipping_address->phone_mobile, $shipping_iso)
                     : null,
                 'address1' => !empty($shipping_address->address1) ? $shipping_address->address1 : null,
                 'address2' => !empty($shipping_address->address2) ? $shipping_address->address2 : null,
@@ -1563,6 +1557,35 @@ class PaymentMethod
         }
 
         return $payment_tab;
+    }
+
+    /**
+     * Formats a phone number to E.164 for the Payplug API, returning an
+     * empty string if it cannot be parsed or is not valid for the given
+     * country — the safe-fallback contract previously provided by the
+     * deprecated PhoneNumber::formatPhoneNumber() service.
+     *
+     * @param string $phone_number
+     * @param string $iso_code
+     *
+     * @return string
+     */
+    protected function formatPhoneNumberSafely($phone_number, $iso_code)
+    {
+        if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number) || empty($iso_code)) {
+            return '';
+        }
+
+        try {
+            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164((string) $phone_number, (string) $iso_code);
+        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog(static::class . '::formatPhoneNumberSafely() - Exception thrown: ' . $e->getMessage(), 'error');
+
+            return '';
+        }
     }
 
     /**
