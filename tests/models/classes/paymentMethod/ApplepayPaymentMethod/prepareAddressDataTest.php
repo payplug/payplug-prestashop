@@ -24,7 +24,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'locality' => 'City',
             'countryCode' => 'FR',
             'emailAddress' => 'john@example.com',
-            'phoneNumber' => '1234567890',
+            'phoneNumber' => '0612345678',
         ];
     }
 
@@ -53,17 +53,13 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'country' => 'FR',
             'language' => 'fr',
             'email' => 'john@example.com',
-            'mobile_phone_number' => '0612345678',
+            'mobile_phone_number' => '+33612345678',
         ];
 
         $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $param) {
                 return strtolower($param);
             });
-
-        $this->phone_number_service->shouldReceive([
-            'formatPhoneNumber' => '0612345678',
-        ]);
 
         $this->country_adapter->shouldReceive([
             'getByIso' => 1,
@@ -82,9 +78,6 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
                 return strtolower($param);
             });
 
-        $this->phone_number_service->shouldReceive([
-            'formatPhoneNumber' => '0612345678',
-        ]);
         $expected_data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
@@ -95,7 +88,7 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
             'country' => 'FR',
             'language' => 'fr',
             'email' => 'john@example.com',
-            'mobile_phone_number' => '0612345678',
+            'mobile_phone_number' => '+33612345678',
         ];
         $this->assertEquals($expected_data, $this->class->prepareAddressData($this->address_data));
     }

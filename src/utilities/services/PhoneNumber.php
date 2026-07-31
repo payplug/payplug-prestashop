@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\utilities\services;
 
-use libphonenumber;
 use PayPlug\classes\DependenciesClass;
 
 if (!defined('_PS_VERSION_')) {
@@ -40,6 +39,8 @@ class PhoneNumber
     }
 
     /**
+     * @deprecated in 5.1.0, use \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164() instead, to remove in 5.2.0
+     *
      * @description Return international formatted phone number (norm E.164).
      *
      * @param string $phone_number
@@ -65,37 +66,19 @@ class PhoneNumber
 
             return '';
         }
-        $formated_phone = '';
 
         // Assumed that iso_code should always be in uppercase
         $iso_code = strtoupper($iso_code);
 
         try {
-            $phone_util = $this->getLibInstance();
-            $parsed = $phone_util->parse($phone_number, $iso_code);
-
-            if (!$phone_util->isValidNumber($parsed)) {
-                $this->dependencies
-                    ->getPlugin()
-                    ->getLogger()
-                    ->addLog('PhoneNumber::formatPhoneNumber - Invalid phone number for the country given', 'error');
-
-                return '';
-            }
-
-            $formated_phone = $phone_util->format($parsed, 0); // E164
-        } catch (\Exception $e) {
+            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164($phone_number, $iso_code);
+        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
                 ->addLog('PhoneNumber::formatPhoneNumber - Exception thrown: ' . $e->getMessage(), 'error');
+
+            return '';
         }
-
-        return $formated_phone;
-    }
-
-    protected function getLibInstance()
-    {
-        return libphonenumber\PhoneNumberUtil::getInstance();
     }
 }

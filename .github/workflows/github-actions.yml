@@ -1,32 +1,17 @@
 name: Payplug Prestashop CI
 on:
-  push:
+  pull_request:
     branches:
       - develop
       - master
       - 'release/**'
-  pull_request:
-    branches:
-      - '**'
     types: [opened, synchronize, reopened]
 
 jobs:
   # -----------------------------------------------------------------------
-  # 0. APPLY RELEASE — update version files from release.json (release/* → master only)
-  # -----------------------------------------------------------------------
-  apply-release:
-    if: startsWith(github.head_ref, 'release/') && github.base_ref == 'master' && github.event.action == 'opened'
-    uses: payplug/template-ci/.github/workflows/presta-apply-release.yml@main
-    with:
-      ref: ${{ github.head_ref }}
-    secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  # -----------------------------------------------------------------------
   # 1. QUALITY — static analysis & code style
   # -----------------------------------------------------------------------
   quality:
-    needs: [apply-release]
     if: always() && !failure() && !cancelled()
     uses: payplug/template-ci/.github/workflows/php-quality.yml@main
     with:
@@ -37,7 +22,6 @@ jobs:
   # -----------------------------------------------------------------------
   js-quality:
     if: always() && !failure() && !cancelled()
-    needs: [apply-release]
     uses: payplug/template-ci/.github/workflows/js-quality.yml@main
     with:
       node-version: '20'

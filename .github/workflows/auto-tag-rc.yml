@@ -1,10 +1,27 @@
-name: Auto-tag RC0
+name: Prestashop — Auto RC
 
 'on':
   create:
 
 jobs:
+  # -----------------------------------------------------------------------
+  # 1. APPLY RELEASE — update version files from the branch name, before
+  #    any PR exists (avoids a mid-PR commit that would re-trigger the
+  #    whole CI suite via a "synchronize" event — see github-actions.yml)
+  # -----------------------------------------------------------------------
+  apply-release:
+    if: startsWith(github.ref, 'refs/heads/release/')
+    uses: payplug/template-ci/.github/workflows/presta-apply-release.yml@main
+    with:
+      ref: ${{ github.ref_name }}
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # -----------------------------------------------------------------------
+  # 2. CREATE RC0 TAG
+  # -----------------------------------------------------------------------
   create-rc0-tag:
+    needs: apply-release
     if: startsWith(github.ref, 'refs/heads/release/')
     uses: payplug/template-ci/.github/workflows/auto_tag_rc.yml@main
     secrets: inherit

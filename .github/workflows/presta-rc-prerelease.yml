@@ -1,0 +1,46 @@
+name: Prestashop — RC Pre-Release
+
+on:
+  push:
+    tags:
+      - '*.*.*-rc*'
+
+jobs:
+  # -----------------------------------------------------------------------
+  # 1. CREATE PRE-RELEASE
+  # -----------------------------------------------------------------------
+  create-prerelease:
+    name: Create GitHub pre-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Pre-Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            --prerelease
+
+  # -----------------------------------------------------------------------
+  # 2. BUILD QA ZIP + ATTACH — chained in this same run since the pre-release
+  #    above is bot-created and won't itself trigger release: [published]
+  # -----------------------------------------------------------------------
+  build-qa-zip:
+    name: Build QA zip
+    needs: create-prerelease
+    uses: payplug/template-ci/.github/workflows/presta-zip-generation.yml@main
+    with:
+      php-version: '7.4'
+      node-version: '20'
+      env: qa
+      ref: ${{ github.ref_name }}
+    secrets:
+      api-payplug: ${{ secrets.PAYPLUG_API_QA }}
+      api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
+      github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -125,4 +125,78 @@ class getPaymentTabTest extends BaseOneyPaymentMethod
             $this->class->getPaymentTab()
         );
     }
+
+    /**
+     * Documents that the landline-to-mobile fallback branch, previously
+     * always a structural no-op because of the isMobilePhoneNumber()
+     * guard-clause bug, is now reachable: when the billing
+     * mobile_phone_number field is not a valid mobile number but the
+     * landline_phone_number field is, the code copies the landline value
+     * into mobile_phone_number.
+     *
+     * Note: $this->dependencies->getHelpers()['phone'] is invoked in
+     * production code via static syntax (::isMobilePhoneNumber()), which
+     * Mockery partial mocks cannot intercept. This means the call goes
+     * through to the real PhoneHelper::isMobilePhoneNumber() implementation,
+     * so genuine, correctly classified phone number fixtures are required
+     * below (not mocked).
+     */
+    public function testFallsBackToLandlineNumberWhenBillingMobileNumberIsNotAValidMobile()
+    {
+        $payment_tab = $this->default_payment_tab;
+        // '+33123456789' is a valid FR landline number, but not a valid mobile number.
+        $payment_tab['billing']['mobile_phone_number'] = '+33123456789';
+        // '+33612345678' is a genuine FR mobile number.
+        $payment_tab['billing']['landline_phone_number'] = '+33612345678';
+
+        $this->class->shouldReceive([
+            'getDefaultPaymentTab' => $payment_tab,
+            'hasOneyRequiredFields' => false,
+        ]);
+        $this->validators['payment']->shouldReceive([
+            'isOneyElligible' => [
+                'result' => true,
+            ],
+        ]);
+
+        $result = $this->class->getPaymentTab();
+
+        $this->assertSame('+33612345678', $result['billing']['mobile_phone_number']);
+    }
+
+    /**
+     * Documents hydratePaymentTabFromPaymentData() — a private method with no
+     * previous direct test coverage, since every other path mocks
+     * hasOneyRequiredFields() to false and short-circuits before it's reached.
+     * It is exercised here through its only caller, getPaymentTab(): the first
+     * hasOneyRequiredFields() check reports missing fields, the cookie/form
+     * payment data is hydrated into the payment tab, and the recheck reports
+     * the fields are now satisfied.
+     *
+     * '0612345678' is a genuine local-format FR mobile number; the real
+     * formatPhoneNumberSafely() call reachable from hydratePaymentTabFromPaymentData()
+     * converts it to E.164 ('+33612345678'), verified empirically beforehand.
+     */
+    public function testHydratesPaymentTabFromPaymentDataOnRequiredFieldsRecheck()
+    {
+        $this->class->shouldReceive([
+            'getDefaultPaymentTab' => $this->default_payment_tab,
+        ]);
+        $this->class->shouldReceive('hasOneyRequiredFields')
+            ->andReturn(true, false);
+        $this->validators['payment']->shouldReceive([
+            'isOneyElligible' => [
+                'result' => true,
+            ],
+        ]);
+        $this->helpers['cookies']->shouldReceive([
+            'getPaymentDataCookie' => [
+                'billing-mobile_phone_number' => '0612345678',
+            ],
+        ]);
+
+        $result = $this->class->getPaymentTab();
+
+        $this->assertSame('+33612345678', $result['billing']['mobile_phone_number']);
+    }
 }

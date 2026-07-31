@@ -29,9 +29,17 @@ if (!defined('_PS_VERSION_')) {
 
 class PhoneHelper
 {
+    /**
+     * @deprecated in 5.1.0, use \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::isMobile() instead, to remove in 5.2.0
+     *
+     * @param string $iso_code
+     * @param string $phone_number
+     *
+     * @return bool
+     */
     public static function isMobilePhoneNumber($iso_code = '', $phone_number = false)
     {
-        if (!is_string($iso_code) || $iso_code) {
+        if (!is_string($iso_code) || !$iso_code) {
             return false;
         }
 
@@ -40,18 +48,8 @@ class PhoneHelper
         }
 
         try {
-            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
-            $parsed = $phone_util->parse($phone_number, $iso_code);
-
-            if ($phone_util->getRegionCodeForCountryCode($parsed->getCountryCode()) != $iso_code) {
-                return false;
-            }
-
-            $is_mobile = $phone_util->getNumberType($parsed);
-
-            return (bool) in_array($is_mobile, [1, 2], true);
-        } catch (libphonenumber\NumberParseException $e) {
-            // @todo : Add Log
+            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::isMobile($phone_number, $iso_code);
+        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
             return false;
         }
     }
