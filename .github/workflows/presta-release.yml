@@ -6,7 +6,7 @@ on:
       - master
       - develop
   release:
-    types: [published]
+    types: [published, created]
 
 jobs:
   # -----------------------------------------------------------------------
@@ -122,3 +122,21 @@ jobs:
       api-payplug: ${{ secrets.PAYPLUG_API_PROD }}
       api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}
       github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # -----------------------------------------------------------------------
+  # 5. PUBLISH RC PRE-RELEASE — flips the draft to visible/notified only
+  #    once the zip above is confirmed attached
+  # -----------------------------------------------------------------------
+  publish-rc-release:
+    name: Publish RC pre-release
+    needs: build-prod-zip
+    if: github.event_name == 'release' && github.event.action == 'created' && github.event.release.prerelease
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Un-draft the pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release edit "${{ github.event.release.tag_name }}" --draft=false --repo "$GH_REPO"
