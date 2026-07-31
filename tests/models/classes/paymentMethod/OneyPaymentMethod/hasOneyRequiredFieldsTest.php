@@ -88,18 +88,24 @@ class hasOneyRequiredFieldsTest extends BaseOneyPaymentMethod
 
     /**
      * Test that hasOneyRequiredFields returns false when all required fields in shipping and billing are valid.
+     *
+     * Note: the mobile-number check is invoked via $this->isMobilePhoneNumberSafely(),
+     * a protected method on this class that Mockery partial mocks cannot intercept unless
+     * explicitly stubbed. It is left unstubbed here on purpose, so the call goes through to
+     * the real implementation, which is why a genuine FR mobile number fixture is required
+     * below (not just any well-formed phone number).
      */
     public function testReturnsFalseForAllValidFields()
     {
         $shipping = [
             'email' => 'test@example.com',
-            'mobile_phone_number' => '+33123456789',
+            'mobile_phone_number' => '+33612345678',
             'country' => 'FR',
             'city' => 'Paris',
         ];
         $billing = [
             'email' => 'test@example.com',
-            'mobile_phone_number' => '+33123456789',
+            'mobile_phone_number' => '+33612345678',
             'country' => 'FR',
             'city' => 'Paris',
         ];
@@ -110,10 +116,6 @@ class hasOneyRequiredFieldsTest extends BaseOneyPaymentMethod
         $this->class->shouldReceive('isValidOneyEmail')->andReturn(['result' => true]);
         $this->validators['payment']->shouldReceive([
             'isPhoneNumber' => [
-                'result' => true,
-                'message' => '',
-            ],
-            'isValidMobilePhoneNumber' => [
                 'result' => true,
                 'message' => '',
             ],
