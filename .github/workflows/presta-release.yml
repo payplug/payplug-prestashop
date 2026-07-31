@@ -6,7 +6,7 @@ on:
       - master
       - develop
   release:
-    types: [published]
+    types: [published, created]
 
 jobs:
   # -----------------------------------------------------------------------
@@ -70,6 +70,7 @@ jobs:
 
       - name: Extract changelog for this version
         id: changelog
+        if: '!github.event.release.prerelease'
         env:
           VERSION: ${{ github.ref_name }}
         run: |
@@ -85,6 +86,7 @@ jobs:
           } >> $GITHUB_OUTPUT
 
       - name: Update release notes with changelog
+        if: '!github.event.release.prerelease'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ github.ref_name }}
@@ -96,12 +98,20 @@ jobs:
             --repo "$GH_REPO"
 
   # -----------------------------------------------------------------------
-  # 4. BUILD PROD ZIP + ATTACH TO RELEASE — triggered on release published
+  # 4. BUILD PROD ZIP + ATTACH TO RELEASE
+  #    RC pre-releases are created as drafts (see auto-tag-rc.yml), so this
+  #    runs on their "created" event; final releases are published directly
+  #    (non-draft), so this runs on "published" for them instead — either
+  #    way it fires exactly once per release.
   # -----------------------------------------------------------------------
   build-prod-zip:
     name: Build prod zip
     needs: create-github-release
-    if: github.event_name == 'release'
+    if: |
+      github.event_name == 'release' && (
+        (github.event.action == 'created' && github.event.release.prerelease) ||
+        (github.event.action == 'published' && !github.event.release.prerelease)
+      )
     uses: payplug/template-ci/.github/workflows/presta-zip-generation.yml@main
     with:
       php-version: '7.4'
@@ -112,3 +122,21 @@ jobs:
       api-payplug: ${{ secrets.PAYPLUG_API_PROD }}
       api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}
       github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # -----------------------------------------------------------------------
+  # 5. PUBLISH RC PRE-RELEASE — flips the draft to visible/notified only
+  #    once the zip above is confirmed attached
+  # -----------------------------------------------------------------------
+  publish-rc-release:
+    name: Publish RC pre-release
+    needs: build-prod-zip
+    if: github.event_name == 'release' && github.event.action == 'created' && github.event.release.prerelease
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Un-draft the pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release edit "${{ github.event.release.tag_name }}" --draft=false --repo "$GH_REPO"

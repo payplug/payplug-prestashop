@@ -23,8 +23,6 @@
 
 namespace PayPlug\classes;
 
-use libphonenumber;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -482,6 +480,8 @@ class ConfigClass
     }
 
     /**
+     * @deprecated in 5.1.0, use \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164() instead, to remove in 5.2.0
+     *
      * @description Return international formatted phone number (norm E.164).
      *
      * @param $phone_number
@@ -501,24 +501,15 @@ class ConfigClass
             return '';
         }
 
+        $iso_code = $this->getIsoCodeByCountryId($country->id);
+
+        if (!$iso_code) {
+            return '';
+        }
+
         try {
-            $iso_code = $this->getIsoCodeByCountryId($country->id);
-
-            if (!$iso_code) {
-                return '';
-            }
-
-            $phone_util = libphonenumber\PhoneNumberUtil::getInstance();
-            $parsed = $phone_util->parse($phone_number, $iso_code);
-
-            if (!$phone_util->isValidNumber($parsed)) {
-                $this->logger->addLog('ConfigClass::formatPhoneNumber() - Invalid phone number for the country given');
-
-                return '';
-            }
-
-            return $phone_util->format($parsed, libphonenumber\PhoneNumberFormat::E164);
-        } catch (libphonenumber\NumberParseException $e) {
+            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164($phone_number, $iso_code);
+        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
             $this->logger->addLog('ConfigClass::formatPhoneNumber() - Exception thrown: ' . $e->getMessage());
 
             return '';
