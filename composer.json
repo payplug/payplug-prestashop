@@ -36,7 +36,7 @@
   },
   "config": {
     "prepend-autoloader": false,
-    "platform-check" : false
+    "platform-check": false
   },
   "scripts": {
     "post-install-cmd": [
