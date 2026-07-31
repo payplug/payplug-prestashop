@@ -23,7 +23,7 @@
 
 namespace PayPlug\classes;
 
-use PayPlug\lib\libphonenumber;
+use libphonenumber;
 
 if (!defined('_PS_VERSION_')) {
     exit;

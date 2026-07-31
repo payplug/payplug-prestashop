@@ -18,7 +18,6 @@ package-lock.json
 phpstan.dist.neon
 phpstan.neon
 
-
 # Dependencies (raw sources, not needed in zip)
 node_modules/
 
@@ -28,4 +27,16 @@ tests/
 # Dev assets (compiled ones go to views/)
 dev/
 
+# giggsey/libphonenumber-for-php: geocoding/carrier lookups unused by PhoneHelper
+# (only parse/format/isValidNumber/getNumberType are called)
+vendor/giggsey/libphonenumber-for-php/src/carrier/
+vendor/giggsey/libphonenumber-for-php/src/geocoding/
+vendor/giggsey/libphonenumber-for-php/src/Leniency/
+vendor/giggsey/libphonenumber-for-php/src/prefixmapper/
+vendor/giggsey/libphonenumber-for-php/src/timezone/
+vendor/giggsey/locale/
 
+# Remove vendor tests directories (not needed in zip)
+vendor/payplug/payplug-php/tests/
+vendor/payplug/payplug-plugin-mcp/tests/
+vendor/payplug/unified-plugin-core/tests/
