@@ -89,4 +89,33 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
         // that it's not immediately rejected by the regex guard)
         $this->assertNotEquals('', $result_valid);
     }
+
+    /**
+     * @description Verify that formatPhoneNumberSafely() correctly formats a valid
+     * number for a non-FR country, proving the UPC PhoneHelper delegation isn't
+     * accidentally FR-specific. '030 1234567' is a genuine German (DE) landline
+     * number (Berlin), verified valid against the real libphonenumber data.
+     */
+    public function testFormatPhoneNumberSafelyFormatsNonFrenchNumbersToE164()
+    {
+        $result = $this->class->formatPhoneNumberSafely('030 1234567', 'DE');
+
+        $this->assertSame('+49301234567', $result);
+    }
+
+    /**
+     * @description Documents the cross-border behavior tightening this PR
+     * introduces on the live checkout path (PRE-3591): formatPhoneNumberSafely()
+     * now rejects a phone number that is valid, but not for the given country,
+     * instead of formatting it through as-is. '+32470123456' is a genuine
+     * Belgian mobile number, submitted here with country 'FR' to reproduce the
+     * scenario flagged in the PR description (a Belgian/Swiss mobile number on
+     * a French address).
+     */
+    public function testFormatPhoneNumberSafelyRejectsPhoneNumberValidForADifferentCountry()
+    {
+        $result = $this->class->formatPhoneNumberSafely('+32470123456', 'FR');
+
+        $this->assertSame('', $result);
+    }
 }
