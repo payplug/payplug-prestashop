@@ -23,7 +23,7 @@
 
 namespace PayPlug\src\utilities\validators;
 
-use PayPlug\lib\libphonenumber;
+use libphonenumber;
 use PayPlug\src\models\classes\paymentMethod\OneyPaymentMethod;
 
 if (!defined('_PS_VERSION_')) {
