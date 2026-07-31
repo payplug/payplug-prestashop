@@ -3,6 +3,14 @@
 - Feature :
   - [PRE-3456](https://github.com/payplug/payplug-prestashop/pull/103): Replace the Oney simulator cache by the official Oney widget on the product page, cart and checkout
 
+- Bugfix :
+  - [PRE-3456](https://github.com/payplug/payplug-prestashop/pull/109): Wait for Oney widget to respond before trying to show it
+  - [PRE-3531](https://github.com/payplug/payplug-prestashop/pull/107): Use UPC amount converter
+
+- Refactoring :
+  - [PRE-3584](https://github.com/payplug/payplug-prestashop/pull/108): Optimize plugin size
+  - [PRE-3591](https://github.com/payplug/payplug-prestashop/pull/110): Delegate phone number formatting and validation to UPC's PhoneHelper
+
 ## Version 5.0.0
 - Feature :
   - [PRE-3389](https://github.com/payplug/payplug-prestashop/pull/86): PRE-3389: Display clear message when attempting to log in legacy with a multi-company account

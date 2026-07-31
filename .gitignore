@@ -24,3 +24,4 @@ html/
 phpunit.log
 .php-cs-fixer.php
 phpstan.neon
+docs/
