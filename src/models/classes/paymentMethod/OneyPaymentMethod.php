@@ -651,7 +651,7 @@ class OneyPaymentMethod extends PaymentMethod
                     $is_valid_phone = $this->validators['payment']
                         ->isPhoneNumber($data)['result'];
                     $valid = $is_valid_phone
-                        && $this->isValidMobilePhoneNumberSafely($data, $country->iso_code);
+                        && $this->isMobilePhoneNumberSafely($country->iso_code, $data);
                     if (!$valid) {
                         $errors[] = $this->oney_translations['mobile'];
                     }
@@ -1107,9 +1107,9 @@ class OneyPaymentMethod extends PaymentMethod
         // Validate phone number
         $is_valid_phone = $this->validators['payment']
             ->isPhoneNumber($shipping['mobile_phone_number'])['result'];
-        $valid_shipping_mobile = $is_valid_phone && $this->isValidMobilePhoneNumberSafely(
-            $shipping['mobile_phone_number'],
-            $shipping['country']
+        $valid_shipping_mobile = $is_valid_phone && $this->isMobilePhoneNumberSafely(
+            $shipping['country'],
+            $shipping['mobile_phone_number']
         );
 
         if (!$valid_shipping_mobile) {
@@ -1127,9 +1127,9 @@ class OneyPaymentMethod extends PaymentMethod
         // Validate phone number
         $is_valid_phone = $this->validators['payment']
             ->isPhoneNumber($billing['mobile_phone_number'])['result'];
-        $valid_billing_mobile = $is_valid_phone && $this->isValidMobilePhoneNumberSafely(
-            $shipping['mobile_phone_number'],
-            $shipping['country']
+        $valid_billing_mobile = $is_valid_phone && $this->isMobilePhoneNumberSafely(
+            $billing['country'],
+            $billing['mobile_phone_number']
         );
 
         if (!$valid_billing_mobile) {
@@ -1272,7 +1272,10 @@ class OneyPaymentMethod extends PaymentMethod
      * Determines whether a phone number is a mobile line for the given
      * country, returning false if it cannot be parsed or is not valid —
      * the safe-fallback contract previously provided by the deprecated
-     * PhoneHelper::isMobilePhoneNumber() helper.
+     * PhoneHelper::isMobilePhoneNumber() helper and paymentValidator::
+     * isValidMobilePhoneNumber() validator (using only its boolean
+     * result, since every call site only ever used ['result'], never
+     * ['message']) — both now delegate to the same underlying check.
      *
      * @param string $iso_code
      * @param string $phone_number
@@ -1282,32 +1285,6 @@ class OneyPaymentMethod extends PaymentMethod
     protected function isMobilePhoneNumberSafely($iso_code, $phone_number)
     {
         if (!is_string($iso_code) || !$iso_code || empty($phone_number)) {
-            return false;
-        }
-
-        try {
-            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::isMobile((string) $phone_number, (string) $iso_code);
-        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Determines whether a phone number is a valid mobile line for the
-     * given country, returning false if it cannot be parsed or is not
-     * valid — the safe-fallback contract previously provided by the
-     * deprecated paymentValidator::isValidMobilePhoneNumber() validator
-     * (using only its boolean result, since every call site only ever
-     * used ['result'], never ['message']).
-     *
-     * @param string $phone_number
-     * @param string $iso_code
-     *
-     * @return bool
-     */
-    protected function isValidMobilePhoneNumberSafely($phone_number, $iso_code)
-    {
-        if (!is_string($phone_number) || empty($phone_number) || !is_string($iso_code) || !$iso_code) {
             return false;
         }
 

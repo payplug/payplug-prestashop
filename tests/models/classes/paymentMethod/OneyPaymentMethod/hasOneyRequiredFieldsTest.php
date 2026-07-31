@@ -89,7 +89,7 @@ class hasOneyRequiredFieldsTest extends BaseOneyPaymentMethod
     /**
      * Test that hasOneyRequiredFields returns false when all required fields in shipping and billing are valid.
      *
-     * Note: the mobile-number check is invoked via $this->isValidMobilePhoneNumberSafely(),
+     * Note: the mobile-number check is invoked via $this->isMobilePhoneNumberSafely(),
      * a protected method on this class that Mockery partial mocks cannot intercept unless
      * explicitly stubbed. It is left unstubbed here on purpose, so the call goes through to
      * the real implementation, which is why a genuine FR mobile number fixture is required

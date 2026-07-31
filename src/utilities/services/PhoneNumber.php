@@ -23,7 +23,6 @@
 
 namespace PayPlug\src\utilities\services;
 
-use libphonenumber;
 use PayPlug\classes\DependenciesClass;
 
 if (!defined('_PS_VERSION_')) {
@@ -81,10 +80,5 @@ class PhoneNumber
 
             return '';
         }
-    }
-
-    protected function getLibInstance()
-    {
-        return libphonenumber\PhoneNumberUtil::getInstance();
     }
 }
