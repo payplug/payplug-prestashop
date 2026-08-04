@@ -66,6 +66,7 @@ class createOrderTest extends BaseValidationAction
         $this->assertSame(
             [
                 'result' => true,
+                'id_order' => 0,
             ],
             $this->action->createOrder($this->cart_id)
         );
@@ -87,6 +88,29 @@ class createOrderTest extends BaseValidationAction
         $this->assertSame(
             [
                 'result' => false,
+            ],
+            $this->action->createOrder($this->cart_id)
+        );
+    }
+
+    public function testWhenOrderCreationIsDeferredBecausePaymentNotResolved()
+    {
+        $this->order_action->shouldReceive([
+            'createAction' => [
+                'result' => true,
+                'message' => 'The payment is not paid yet.',
+            ],
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => $this->stored_payment,
+        ]);
+        $this->action->shouldReceive([
+            'setLock' => true,
+        ]);
+        $this->assertSame(
+            [
+                'result' => true,
+                'id_order' => 0,
             ],
             $this->action->createOrder($this->cart_id)
         );

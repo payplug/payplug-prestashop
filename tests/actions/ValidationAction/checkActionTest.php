@@ -218,4 +218,75 @@ class checkActionTest extends BaseValidationAction
             $this->action->checkAction($this->cart_id, true)
         );
     }
+
+    public function testWhenOrderCreationIsDeferred()
+    {
+        $this->configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
+        // Returns false both for the top-of-method check and for checkAction()'s
+        // re-check after a deferred createOrder() result: the order genuinely never
+        // got created, so the error page redirect is the correct outcome.
+        $this->order_adapter
+            ->shouldReceive('getIdByCartId')
+            ->once()
+            ->andReturn(false);
+        $this->order_adapter->shouldReceive([
+            'getIdByCartId' => false,
+        ]);
+        $this->queue_repository->shouldReceive([
+            'updateBy' => true,
+        ]);
+        $this->action->shouldReceive([
+            'createOrder' => [
+                'result' => true,
+                'id_order' => 0,
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'action' => 'redirect',
+                'redirected_url' => $this->links['error'],
+            ],
+            $this->action->checkAction($this->cart_id, true)
+        );
+    }
+
+    public function testWhenOrderCreationIsDeferredButOrderAlreadyExists()
+    {
+        $this->configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
+        // False for the top-of-method check (so we proceed to createOrder()), then a
+        // real order id for checkAction()'s re-check: an order was created concurrently
+        // (e.g. by an IPN notification) while this deferred createOrder() call was
+        // in flight, so it must not be reported as a failure to the customer.
+        $this->order_adapter
+            ->shouldReceive('getIdByCartId')
+            ->once()
+            ->andReturn(false);
+        $this->order_adapter->shouldReceive([
+            'getIdByCartId' => 42,
+        ]);
+        $this->queue_repository->shouldReceive([
+            'updateBy' => true,
+        ]);
+        $this->action->shouldReceive([
+            'createOrder' => [
+                'result' => true,
+                'id_order' => 0,
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'action' => 'redirect',
+                'redirected_url' => $this->links['confirm'],
+            ],
+            $this->action->checkAction($this->cart_id, true)
+        );
+    }
 }

@@ -168,6 +168,30 @@ class ValidationAction
         // Clear lock before rendering it
         $this->clearLock((int) $cart_id);
 
+        if (empty($order_create['id_order'])) {
+            // An order may already exist (e.g. a concurrent IPN notification created
+            // it, or createAction() found one already there) even though createOrder()
+            // didn't return its id — don't tell a customer who was actually charged
+            // that their card was not charged.
+            $existing_id_order = $this->dependencies
+                ->getPlugin()
+                ->getOrder()
+                ->getIdByCartId((int) $cart_id);
+            if ($existing_id_order) {
+                return [
+                    'result' => true,
+                    'action' => 'redirect',
+                    'redirected_url' => $this->getOrderLinks((int) $existing_id_order)['confirm'],
+                ];
+            }
+
+            return [
+                'result' => false,
+                'action' => 'redirect',
+                'redirected_url' => $this->getOrderLinks()['error'],
+            ];
+        }
+
         return [
             'result' => true,
             'action' => 'redirect',
@@ -252,13 +276,14 @@ class ValidationAction
 
             return [
                 'result' => true,
+                'id_order' => 0,
             ];
         }
 
         $order_create = $this->dependencies
             ->getPlugin()
             ->getOrderAction()
-            ->createAction($stored_payment['resource_id']);
+            ->createAction($stored_payment['resource_id'], true);
         if (!$order_create['result']) {
             $this->dependencies
                 ->getPlugin()
@@ -267,6 +292,18 @@ class ValidationAction
 
             return [
                 'result' => false,
+            ];
+        }
+
+        if (empty($order_create['id_order'])) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::createOrder - Payment is not resolved yet, order creation deferred.');
+
+            return [
+                'result' => true,
+                'id_order' => 0,
             ];
         }
 

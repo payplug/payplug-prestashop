@@ -125,6 +125,295 @@ class createActionTest extends BaseOrderAction
         );
     }
 
+    public function testWhenPaymentIsNotPaidNotDeferredNotOney()
+    {
+        $resource_id = 'pay_azerty123456';
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+            'isDeferred' => [
+                'result' => false,
+            ],
+        ]);
+
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => 'The payment is not paid yet.',
+            ],
+            $this->action->createAction($resource_id, true)
+        );
+    }
+
+    public function testWhenRequireConfirmedPaymentDefaultsToFalseAndDoesNotBlockCreation()
+    {
+        $resource_id = 'pay_azerty123456';
+        $this->payment_method->shouldReceive([
+            'getOrderTab' => [
+                'order_state' => 2,
+                'amount' => 4242,
+                'module_name' => 'Payplug',
+            ],
+            'postProcessOrder' => true,
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard(),
+            ],
+        ]);
+
+        $card_action = \Mockery::mock('CardAction');
+        $card_action->shouldReceive([
+            'saveAction' => true,
+        ]);
+
+        $order = \Mockery::mock('Order');
+        $order->id = 42;
+        $order->shouldReceive([
+            'getOrderPayments' => [],
+            'addOrderPayment' => true,
+        ]);
+
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->customer_adapter->shouldReceive([
+            'get' => CustomerMock::get(),
+        ]);
+        $this->module->shouldReceive([
+            'validateOrder' => true,
+        ]);
+        $this->module->currentOrder = 42;
+        $this->order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
+        $this->order_repository
+            ->shouldReceive('getByIdCart')
+            ->once()
+            ->andReturn([]);
+        $this->order_repository->shouldReceive([
+            'getByIdCart' => [
+                [
+                    'id_order' => 1,
+                    'id_lang' => 1,
+                    'id_customer' => 3,
+                    'id_cart' => 42,
+                    'id_currency' => 1,
+                    'id_address_delivery' => 14,
+                    'id_address_invoice' => 14,
+                    'current_state' => 2,
+                ],
+            ],
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+            'canSaveCard' => [
+                'result' => false,
+            ],
+        ]);
+        $this->plugin->shouldReceive([
+            'getCardAction' => $card_action,
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'id_order' => 42,
+                'message' => '',
+            ],
+            $this->action->createAction($resource_id)
+        );
+    }
+
+    public function testWhenPaymentIsNotPaidButIsDeferred()
+    {
+        $resource_id = 'pay_azerty123456';
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+            'isDeferred' => [
+                'result' => true,
+            ],
+        ]);
+
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getDeferred(['is_paid' => false]),
+            ],
+        ]);
+
+        $this->validate_adapter->shouldReceive('validate')
+            ->andReturnUsing(function ($method, $mock) {
+                return $mock != CartMock::get();
+            });
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => '$cart should be a valid Cart Object',
+            ],
+            $this->action->createAction($resource_id, true)
+        );
+    }
+
+    public function testWhenPaymentIsNotPaidButIsOney()
+    {
+        $resource_id = 'pay_azerty123456';
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+
+        $this->payment_validator->shouldReceive([
+            'isInstallment' => [
+                'result' => false,
+            ],
+        ]);
+
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getOney(['is_paid' => false]),
+            ],
+        ]);
+
+        $this->validate_adapter->shouldReceive('validate')
+            ->andReturnUsing(function ($method, $mock) {
+                return $mock != CartMock::get();
+            });
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => '$cart should be a valid Cart Object',
+            ],
+            $this->action->createAction($resource_id, true)
+        );
+    }
+
+    public function testWhenRequireConfirmedPaymentIsTrueAndResourceHasNoIsPaidAttribute()
+    {
+        $resource_id = 'pay_azerty123456';
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
+                'method' => 'installment',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+
+        // PaymentMock::getInstallment() merges into PaymentMock::getDefault(), which
+        // always carries an `is_paid` key, so it does not faithfully reproduce a real
+        // InstallmentPlan API response (which never has `is_paid` at all). Strip the
+        // attribute from the resource's internal storage so isset($resource->is_paid)
+        // is genuinely false, exercising Fix 1's isset() guard.
+        $resource = PaymentMock::getInstallment();
+        $attributes_property = (new \ReflectionClass($resource))->getProperty('_attributes');
+        $attributes_property->setAccessible(true);
+        $attributes = $attributes_property->getValue($resource);
+        unset($attributes['is_paid']);
+        $attributes_property->setValue($resource, $attributes);
+
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => $resource,
+            ],
+        ]);
+
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+
+        $this->validate_adapter->shouldReceive('validate')
+            ->andReturnUsing(function ($method, $mock) {
+                return $mock != CartMock::get();
+            });
+
+        // Proceeding past the guard (instead of throwing UndefinedAttributeException
+        // on `$resource->is_paid`) to the next failure point is the assertion here.
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => '$cart should be a valid Cart Object',
+            ],
+            $this->action->createAction($resource_id, true)
+        );
+    }
+
     public function testWhenRelatedCartIsntValid()
     {
         $resource_id = 'pay_azerty123456';
@@ -154,7 +443,7 @@ class createActionTest extends BaseOrderAction
         $this->payment_method->shouldReceive([
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(),
+                'resource' => PaymentMock::getStandard(['is_paid' => true]),
             ],
         ]);
 
@@ -209,7 +498,7 @@ class createActionTest extends BaseOrderAction
         $this->payment_method->shouldReceive([
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(),
+                'resource' => PaymentMock::getStandard(['is_paid' => true]),
             ],
         ]);
 
@@ -269,7 +558,7 @@ class createActionTest extends BaseOrderAction
             'getOrderTab' => [],
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(),
+                'resource' => PaymentMock::getStandard(['is_paid' => true]),
             ],
         ]);
 
@@ -305,7 +594,7 @@ class createActionTest extends BaseOrderAction
             ],
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(),
+                'resource' => PaymentMock::getStandard(['is_paid' => true]),
             ],
         ]);
         $this->module->shouldReceive('validateOrder')
@@ -374,7 +663,7 @@ class createActionTest extends BaseOrderAction
         $this->payment_method->shouldReceive([
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(),
+                'resource' => PaymentMock::getStandard(['is_paid' => true]),
             ],
         ]);
         $this->module->shouldReceive([
@@ -455,7 +744,7 @@ class createActionTest extends BaseOrderAction
             'postProcessOrder' => true,
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(),
+                'resource' => PaymentMock::getStandard(['is_paid' => true]),
             ],
         ]);
         $this->module->shouldReceive([
@@ -516,7 +805,7 @@ class createActionTest extends BaseOrderAction
             'postProcessOrder' => true,
             'retrieve' => [
                 'result' => true,
-                'resource' => PaymentMock::getStandard(),
+                'resource' => PaymentMock::getStandard(['is_paid' => true]),
             ],
         ]);
 

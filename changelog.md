@@ -1,4 +1,8 @@
 # Payplug module changelog
+## Unreleased
+- Bugfix :
+  - [PRE-3557](https://payplug-prod.atlassian.net/browse/PRE-3557): Don't create an order (and send the confirmation email) until a card payment is confirmed paid, deferred or Oney; let late payment failures cancel the order instead of being silently dropped
+
 ## Version 5.1.0
 - Feature :
   - [PRE-3456](https://github.com/payplug/payplug-prestashop/pull/103): Replace the Oney simulator cache by the official Oney widget on the product page, cart and checkout
