@@ -23,6 +23,8 @@
 
 namespace PayPlug\src\actions;
 
+use PayPlug\src\models\classes\paymentMethod\OneyPaymentMethod;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -45,10 +47,11 @@ class OrderAction
      * @description Add an order from a resource id
      *
      * @param string $resource_id
+     * @param bool $require_confirmed_payment
      *
      * @return array
      */
-    public function createAction($resource_id = '')
+    public function createAction($resource_id = '', $require_confirmed_payment = false)
     {
         $this->setParameters();
 
@@ -99,6 +102,21 @@ class OrderAction
                 'result' => false,
                 'message' => 'Resource failure: ' . $resource->failure->message,
             ];
+        }
+
+        if ($require_confirmed_payment && isset($resource->is_paid) && !(bool) $resource->is_paid) {
+            $is_oney = isset($resource->payment_method, $resource->payment_method['type'])
+                && in_array($resource->payment_method['type'], OneyPaymentMethod::PAYMENT_METHODS);
+            $is_deferred = !$is_oney && $this->dependencies->getValidators()['payment']->isDeferred($resource)['result'];
+
+            if (!$is_deferred && !$is_oney) {
+                $this->logger->addLog('OrderAction::createAction - Payment is not paid, not deferred and not Oney, order creation deferred', 'info');
+
+                return [
+                    'result' => true,
+                    'message' => 'The payment is not paid yet.',
+                ];
+            }
         }
 
         // Get the related Cart
