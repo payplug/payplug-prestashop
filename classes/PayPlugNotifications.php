@@ -686,9 +686,7 @@ class PayPlugNotifications
 
         if (empty($this->stored_resource)) {
             $error_msg = 'The cart cannot be found with payment ID: ' . $this->resource->id;
-            $is_oney = isset($this->resource->payment_method, $this->resource->payment_method['type'])
-                && in_array($this->resource->payment_method['type'], OneyPaymentMethod::PAYMENT_METHODS);
-            $this->exitProcess($error_msg, $is_oney ? 242 : 500);
+            $this->exitProcess($error_msg, $this->getMissingResourceStatusCode());
         }
 
         $retrieve = $this->dependencies
@@ -710,6 +708,28 @@ class PayPlugNotifications
         } else {
             $this->payment = $retrieve['resource'];
         }
+    }
+
+    /**
+     * @description Resolve the HTTP status to answer when the notified payment has no
+     * matching stored resource. A failed payment with no local association is expected
+     * once a newer attempt on the same cart has replaced it (PaymentAction::createAction
+     * removes the previous attempt's row), so it must be acknowledged instead of retried
+     * as a server error.
+     */
+    private function getMissingResourceStatusCode()
+    {
+        $is_oney = isset($this->resource->payment_method, $this->resource->payment_method['type'])
+            && in_array($this->resource->payment_method['type'], OneyPaymentMethod::PAYMENT_METHODS);
+        if ($is_oney) {
+            return 242;
+        }
+
+        if (isset($this->resource->failure) && null !== $this->resource->failure) {
+            return 200;
+        }
+
+        return 500;
     }
 
     private function setResourceProps()

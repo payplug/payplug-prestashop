@@ -2,6 +2,7 @@
 ## Unreleased
 - Bugfix :
   - [PRE-3557](https://payplug-prod.atlassian.net/browse/PRE-3557): Don't create an order (and send the confirmation email) until a card payment is confirmed paid, deferred or Oney; let late payment failures cancel the order instead of being silently dropped
+  - [PRE-3580](https://payplug-prod.atlassian.net/browse/PRE-3580): Stop answering 500 (retried in a loop by PayPlug) to a replayed IPN for a failed payment whose cart association was already replaced by a newer attempt
 
 ## Version 5.1.0
 - Feature :
