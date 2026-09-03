@@ -828,6 +828,7 @@ class ConfigurationAction
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
+            'identifier' => 'payplug_identifier',
         ];
 
         foreach ($configuration_keys as $key => $config) {
@@ -947,6 +948,20 @@ class ConfigurationAction
                             ];
                         }
 
+                        break;
+
+                    case 'payplug_identifier':
+                        $hosted_fields = json_decode($configuration->getValue('hosted_fields') ?: '{}', true);
+                        $hosted_fields[$key] = (string) $value;
+                        if (!$configuration->set('hosted_fields', (string) json_encode($hosted_fields))) {
+                            return [
+                                'success' => false,
+                                'data' => [
+                                    // todo: add translation
+                                    'message' => 'An error has occurred while register ' . $config,
+                                ],
+                            ];
+                        }
                         break;
 
                     default:
