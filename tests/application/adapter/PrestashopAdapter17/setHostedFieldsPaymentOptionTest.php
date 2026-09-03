@@ -88,6 +88,10 @@ class setHostedFieldsPaymentOptionTest extends BasePrestashopAdapter17
         );
         $this->assertSame('ident_42', $assigned_vars['hosted_fields_identifier']);
         $this->assertSame(
+            json_encode(['cb', 'visa', 'mastercard']),
+            $assigned_vars['hosted_fields_accepted_brands']
+        );
+        $this->assertSame(
             'https://shop.example/module/payplug/uhf',
             $assigned_vars['hosted_fields_uhf_url']
         );

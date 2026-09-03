@@ -248,6 +248,20 @@ namespace {
     class PrestaShopException extends Exception
     {
     }
+    class PrestaShopLogger
+    {
+        public static function addLog(
+            $message,
+            $severity = 1,
+            $error_code = null,
+            $object_type = null,
+            $object_id = null,
+            $allow_duplicate = false,
+            $id_employee = null
+        ) {
+            return true;
+        }
+    }
     class CartRule extends ObjectModel
     {
     }

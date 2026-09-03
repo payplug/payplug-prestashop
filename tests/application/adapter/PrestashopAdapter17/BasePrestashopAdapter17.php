@@ -30,6 +30,14 @@ abstract class BasePrestashopAdapter17 extends TestCase
 
         $this->config_class = \Mockery::mock('ConfigClass');
         $this->config_class->shouldReceive('fetchTemplate')->andReturn('')->byDefault();
+        $this->config_class->shouldReceive('getValue')
+            ->with('oauth_company_id')
+            ->andReturn('comp_123')
+            ->byDefault();
+        $this->config_class->shouldReceive('getValue')
+            ->with('payment_methods')
+            ->andReturn(json_encode(['one_click' => false, 'deferred' => false]))
+            ->byDefault();
         $this->configuration = \Mockery::mock(Configuration::class);
         $this->constant = \Mockery::mock('Constant');
         $this->routes = \Mockery::mock('Routes');
@@ -38,6 +46,12 @@ abstract class BasePrestashopAdapter17 extends TestCase
             ->andReturnUsing(function ($string) {
                 return $string;
             });
+        $this->translation->shouldReceive('getFrontIntegratedPaymentTranslations')
+            ->andReturn([
+                'privacy' => 'privacy',
+                'secure' => 'secure',
+            ])
+            ->byDefault();
 
         $this->context = ContextMock::get();
         $this->context->currency->iso_code = 'EUR';
@@ -49,6 +63,7 @@ abstract class BasePrestashopAdapter17 extends TestCase
         $this->plugin->shouldReceive([
             'getRoutes' => $this->routes,
             'getTranslationClass' => $this->translation,
+            'getConfigurationClass' => $this->config_class,
         ]);
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');

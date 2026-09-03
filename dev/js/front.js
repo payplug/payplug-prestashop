@@ -71,6 +71,7 @@ var $document, $window, __moduleName__Module = {
         this.oney.init();
         this.popup.init();
         this.integrated.init();
+        this.hosted_fields.init();
     },
     order: {
         init: function () {
@@ -606,7 +607,6 @@ var $document, $window, __moduleName__Module = {
                         integrated.form.showError();
                     }
                 });
-
                 $document.on('submit', 'form', integrated.form.validate);
             },
             showError: function () {
@@ -1626,6 +1626,348 @@ var $document, $window, __moduleName__Module = {
                 }, attemps.interval);
             }
         }
+    },
+    hosted_fields: {
+        props: {
+            identifier: '__moduleName__HostedFields',
+            root: '__moduleName__HostedFields',
+            paymentOptionId: null,
+            instance: null,
+            fieldsInvalid: {cardHolder: true, pan: true, exp: true, cvv: true},
+            fieldsEmpty: {cardHolder: true, pan: true, exp: true, cvv: true},
+            attempts: 0,
+            maxAttempts: 30,
+            // Mirrors integrated.props.submited (same file, integrated sub-module):
+            // guards against a second createToken()/AJAX round-trip firing while the
+            // first one is still in flight (form.validate() is invoked from an
+            // action="javascript:..." handler, not a submit event, so nothing else
+            // stops a double click).
+            submited: false,
+            // id of the watchdog timer started right before createToken() is called
+            // (see form.validate()/form.onSubmitTimeout below). Unlike integrated's
+            // equivalent guard, which is always followed by our OWN $.ajax() call
+            // (whose error/success pair is browser-guaranteed to fire), createToken()
+            // is third-party SDK code with no such guarantee - if it never invokes
+            // onTokenCreated (SDK bug, a synchronous throw before it calls back, a
+            // dropped connection mid-tokenization), submited would stay true forever
+            // and the form would silently ignore every further click. The timeout is
+            // the fallback for that case; onTokenCreated clears it on every normal
+            // (on-time) completion so it never fires spuriously. Reassigned - not
+            // reused - on every submit attempt, so a retry after a timeout gets its
+            // own fresh timer, never the previous attempt's stale id.
+            submitTimeoutId: null,
+            // Monotonically-incrementing id of the current submit attempt. Bumped in
+            // form.validate() every time a new createToken() round-trip starts, and
+            // captured by closure into that attempt's watchdog timeout and
+            // onTokenCreated callback (see form.validate() below). A callback from an
+            // OLDER attempt (e.g. createToken() finally resolves for attempt N well
+            // after its watchdog already fired, submited was reset, and the shopper
+            // retried as attempt N+1) compares its captured id against this counter
+            // and no-ops if it no longer matches, instead of clobbering the newer
+            // attempt's state or firing a second, concurrent $.ajax POST.
+            submitAttemptId: 0,
+        },
+        init: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (!$('.' + hosted.props.identifier).length) {
+                return;
+            }
+
+            // Mirrors integrated's init() intent (find the radio input for this
+            // payment option) without inheriting its fragility: integrated's
+            // hardcoded childNodes[3] index assumes a fixed sibling layout, but
+            // setHostedFieldsPaymentOption() (PrestashopAdapter17) builds one more
+            // inputs[] entry (id_cart) than setIntegratedPaymentOption(), which can
+            // shift this option's actual DOM sibling positions. Look up the radio
+            // input directly instead of by position, and degrade safely (no throw)
+            // if the hidden method input or its radio sibling isn't in the DOM yet.
+            var $methodInput = $('input[name=method][value=hosted_fields]').first(),
+                $paymentOption = $methodInput.length ? $methodInput.parent().find('input[type=radio]').first() : $();
+            hosted.props.paymentOptionId = $paymentOption.length ? $paymentOption.attr('id').replace('pay-with-', '') : null;
+
+            // Mirrors integrated.form.init() (same file, integrated sub-module):
+            // instance.load() (called from setup(), below) mounts cross-origin
+            // iframes, which can fail to render if mounted while this option's
+            // container is still display:none (i.e. not yet selected). Only call
+            // setup() once the option is actually checked - already at load, or
+            // via a later click - instead of unconditionally on every page load.
+            if (typeof $document != 'undefined' && hosted.props.paymentOptionId) {
+                if ($('#' + hosted.props.paymentOptionId).attr('checked') == 'checked') {
+                    hosted.setup();
+                } else {
+                    $document.on('click', '#' + hosted.props.paymentOptionId, hosted.setup);
+                }
+            }
+
+            hosted.bindCardholder();
+        },
+        setup: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (hosted.props.instance) {
+                return;
+            }
+            if (typeof window.dalenys === 'undefined' || typeof window.dalenys.hostedFields === 'undefined') {
+                if (hosted.props.attempts++ >= hosted.props.maxAttempts) {
+                    console.error('[HostedFields] SDK not available after ' + hosted.props.maxAttempts + ' attempts');
+                    // Retries exhausted: fieldsInvalid never clears, so form.validate()
+                    // would fail forever with no visible feedback. Surface the same
+                    // generic error shown on every other failure path in this sub-module.
+                    $('.' + hosted.props.root + '_error.-payment')
+                        .text(window['payplug_hosted_fields_error_generic'])
+                        .addClass('-show');
+                    return;
+                }
+                setTimeout(hosted.setup, 300);
+                return;
+            }
+            const uhf_obj = {
+                companyId: window['hosted_company_id'], // PAYPLUG_OAUTH_COMPANY_ID
+                // Per-currency UHF identifier, merchant-configured (PrestashopAdapter17's
+                // getHostedFieldsIdentifier(), PRE-3622 admin config).
+                identifier: window['payplug_hosted_fields_identifier'],
+                fields: {
+                    brand: {
+                        id: "hosted-brand-container",
+                    },
+                    card: {
+                        id: 'hosted-card-container',
+                        placeholder: placeholderPan,
+                        onInput: function (event) {
+                            hosted.handleFieldEvent('pan', event);
+                        },
+                    },
+                    expiry: {
+                        id: 'hosted-expiry-container',
+                        placeholder: placeholderExp,
+                        onInput: function (event) {
+                            hosted.handleFieldEvent('exp', event);
+                        },
+                    },
+                    cryptogram: {
+                        id: 'hosted-cvv-container',
+                        placeholder: placeholderCvv,
+                        onInput: function (event) {
+                            hosted.handleFieldEvent('cvv', event);
+                        },
+                    },
+                },
+            };
+            hosted.props.instance = window.dalenys.hostedFields(uhf_obj);
+            if (hosted.props.instance && hosted.props.instance.load) {
+                hosted.props.instance.load();
+            }
+        },
+        handleFieldEvent: function (field, event) {
+            var hosted = __moduleName__Module.hosted_fields;
+            var root = hosted.props.root;
+            var $error = $('.' + root + '_error.-' + field);
+            if (event.type === 'invalid') {
+                var isEmpty = event.errorName === 'FIELD_EMPTY';
+                $error.find('span.invalidField')[isEmpty ? 'addClass' : 'removeClass']('-hide');
+                $error.find('span.emptyField')[isEmpty ? 'removeClass' : 'addClass']('-hide');
+                $('.' + root + '_container.-' + field).addClass('-invalid');
+                hosted.props.fieldsInvalid[field] = true;
+                hosted.props.fieldsEmpty[field] = isEmpty;
+            } else if (event.type === 'valid') {
+                $error.find('span.invalidField').addClass('-hide');
+                $error.find('span.emptyField').addClass('-hide');
+                $('.' + root + '_container.-' + field).removeClass('-invalid');
+                hosted.props.fieldsInvalid[field] = false;
+                hosted.props.fieldsEmpty[field] = false;
+            }
+        },
+        bindCardholder: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            var root = hosted.props.root;
+            var $input = $('#hf-cardholder');
+            if (!$input.length) {
+                return;
+            }
+            var pattern = /^[A-Za-zÀ-ÖØ-öø-ÿ' .-]{2,}$/;
+            var update = function () {
+                var value = ($input.val() || '').trim();
+                var empty = value.length === 0;
+                var invalid = !empty && !pattern.test(value);
+                hosted.props.fieldsEmpty.cardHolder = empty;
+                hosted.props.fieldsInvalid.cardHolder = invalid;
+                var $error = $('.' + root + '_error.-cardHolder');
+                $error.find('span.emptyField')[empty ? 'removeClass' : 'addClass']('-hide');
+                $error.find('span.invalidField')[(!empty && invalid) ? 'removeClass' : 'addClass']('-hide');
+            };
+            // hosted_fields.init() runs twice in normal operation (once at document
+            // ready, once from hosted_fields.tpl's own bootstrap after the SDK loads).
+            // setup() guards against that via props.instance; bindCardholder() has no
+            // such guard, so without unbinding first each re-run would stack a
+            // duplicate listener. `update` is a fresh closure every call, so off()
+            // can't target it by reference - use a namespace instead, which off()
+            // can remove regardless of which call created the handler.
+            $input.off('input.hostedFieldsCardholder blur.hostedFieldsCardholder')
+                .on('input.hostedFieldsCardholder blur.hostedFieldsCardholder', update);
+            update();
+        },
+        form: {
+            validate: function () {
+                var hosted = __moduleName__Module.hosted_fields;
+                // Mirrors integrated.form.getPaymentId's submited guard (same file,
+                // integrated sub-module): bail out early on a second call instead of
+                // firing a second createToken()/AJAX round-trip. Reset alongside
+                // props.submited = true below happens in every terminal failure path
+                // (onTokenCreated's two failure branches, form.submit's ajax error/
+                // non-success callbacks, and the onSubmitTimeout watchdog below for
+                // the case where onTokenCreated never fires at all); the success path
+                // redirects away instead.
+                if (hosted.props.submited) {
+                    return false;
+                }
+                var invalid = Object.keys(hosted.props.fieldsInvalid).some(function (key) {
+                    return hosted.props.fieldsInvalid[key] || hosted.props.fieldsEmpty[key];
+                });
+                if (invalid || !hosted.props.instance || !hosted.props.instance.createToken) {
+                    return false;
+                }
+                hosted.props.submited = true;
+                // New attempt: bump the generation counter and capture it locally so
+                // this attempt's watchdog and createToken callback can each recognize
+                // (when they eventually run) whether they're still current - see
+                // props.submitAttemptId above and onSubmitTimeout/onTokenCreated below.
+                hosted.props.submitAttemptId += 1;
+                var attemptId = hosted.props.submitAttemptId;
+                // Bounded watchdog: createToken() is third-party SDK code, so unlike
+                // form.submit()'s own $.ajax() call there's no browser guarantee that
+                // onTokenCreated ever fires. 20s is generous for a real card
+                // tokenization round-trip (network + SDK-side validation) while still
+                // recovering a stuck form well within a shopper's patience. Cleared at
+                // the top of onTokenCreated on every on-time completion, so a
+                // legitimate (even if slow) callback is never contradicted by a stray
+                // timeout firing afterwards.
+                hosted.props.submitTimeoutId = setTimeout(function () {
+                    hosted.form.onSubmitTimeout(attemptId);
+                }, 20000);
+                hosted.props.instance.createToken(function (result) {
+                    hosted.form.onTokenCreated(attemptId, result);
+                });
+                return false;
+            },
+            onSubmitTimeout: function (attemptId) {
+                var hosted = __moduleName__Module.hosted_fields;
+                // Stale-attempt guard: if a newer submit attempt has started since this
+                // watchdog was scheduled, this timer is no longer relevant - it was
+                // superseded when submitAttemptId was bumped, and its own createToken()
+                // callback may still be in flight. No-op rather than touching submited,
+                // which belongs to the newer attempt now.
+                if (attemptId !== hosted.props.submitAttemptId) {
+                    return;
+                }
+                if (!hosted.props.submited) {
+                    return;
+                }
+                hosted.props.submited = false;
+                $('.' + hosted.props.root + '_error.-payment')
+                    .text(window['payplug_hosted_fields_error_generic'])
+                    .addClass('-show');
+            },
+            onTokenCreated: function (attemptId, result) {
+                var hosted = __moduleName__Module.hosted_fields;
+                // Stale-attempt guard: if this attempt's watchdog already fired (and
+                // reset submited, letting the shopper retry as a newer attempt) before
+                // this createToken() callback finally arrived, bail out before doing
+                // anything - including before the clearTimeout() below, so a stale
+                // callback can never clear a newer attempt's own live watchdog timer.
+                // Acting further here (or even just clearing that timer) would clobber
+                // the newer attempt's state or risk firing a second, concurrent
+                // $.ajax POST alongside it.
+                if (attemptId !== hosted.props.submitAttemptId) {
+                    return;
+                }
+                // Past the staleness guard above, this IS the current attempt: clear
+                // its watchdog unconditionally, before any branching below, so it never
+                // fires after (and contradicts) a callback that did arrive - regardless
+                // of whether that callback turns out to be a tokenize failure, an
+                // unsupported brand, or a success.
+                clearTimeout(hosted.props.submitTimeoutId);
+                var root = hosted.props.root;
+                var $paymentError = $('.' + root + '_error.-payment');
+
+                if (!result || result.execCode !== '0000') {
+                    hosted.props.submited = false;
+                    $paymentError.text(window['payplug_hosted_fields_error_generic']).addClass('-show');
+                    return;
+                }
+
+                var brand = (result.selectedBrand || '').toLowerCase();
+                if ((window['payplug_hosted_fields_accepted_brands'] || []).indexOf(brand) === -1) {
+                    hosted.props.submited = false;
+                    $paymentError.text(window['payplug_hosted_fields_error_unsupported_brand']).addClass('-show');
+                    return;
+                }
+
+                $paymentError.removeClass('-show').text('');
+                $('#hf-token').val(result.hfToken);
+                $('#hf-selected-brand').val(brand);
+                hosted.form.submit(result.hfToken, brand);
+            },
+            submit: function (hfToken, selectedBrand) {
+                var hosted = __moduleName__Module.hosted_fields;
+                // Note: tools.loadSpinner()/removeSpinner() are intentionally not used
+                // here - they target .__moduleName__IntegratedPayment, the *other*
+                // (integrated) sub-module's own root container, which is a different
+                // <form> entirely (see integrated_payment.tpl vs hosted_fields.tpl) and
+                // is display:none unless integrated's own form.set() has applied
+                // -loaded to it. Calling them here is a silent no-op. The .ipOverlay
+                // CSS is also LESS-nested strictly under .__moduleName__IntegratedPayment,
+                // so it can't be reused here without adding new CSS, which this feature
+                // deliberately avoids. The submited guard in form.validate() is the
+                // functional fix for the lack of feedback (it stops duplicate
+                // requests); busy-state UI for this form is left as a follow-up.
+                $.ajax({
+                    type: 'POST',
+                    url: window['payplug_hosted_fields_uhf_url'],
+                    dataType: 'json',
+                    data: {
+                        hfToken: hfToken,
+                        selectedBrand: selectedBrand,
+                        save_card: $('#hf-save-card').is(':checked') ? 1 : 0,
+                        // Every payment option's own form already carries a hidden
+                        // id_cart input (PaymentMethod::getPaymentOption(),
+                        // PaymentMethod.php:1661-1665) - read it directly rather than
+                        // relying on window['ajax_cart_id'], which is only defined on
+                        // the post-redirect validation page (validation.php), not here.
+                        // Left unscoped (page-wide selector): PaymentMethod's `inputs`
+                        // (id_cart included) and hosted_fields.tpl's additionalInformation
+                        // are both rendered inside the same outer per-option <form>, with
+                        // hosted_fields.tpl nesting its own <form class="...HostedFields">
+                        // inside that - and nested <form> start tags are dropped by the
+                        // HTML parser, so it's unverified whether .identifier still lands
+                        // on a real element scoping id_cart underneath it without
+                        // rendering the live checkout page. Not risking that without
+                        // being able to verify against the actual DOM.
+                        id_cart: $('input[name="id_cart"]').val(),
+                        cardholderName: $('#hf-cardholder').val(),
+                    },
+                    error: function () {
+                        hosted.props.submited = false;
+                        $('.' + hosted.props.root + '_error.-payment')
+                            .text(window['payplug_hosted_fields_error_generic'])
+                            .addClass('-show');
+                    },
+                    success: function (resp) {
+                        if (resp && resp.result) {
+                            if (resp.return_url) {
+                                window.location.href = resp.return_url;
+                                return;
+                            }
+                            hosted.props.submited = false;
+                            return;
+                        }
+                        hosted.props.submited = false;
+                        var message = (resp && resp.message) ? resp.message : window['payplug_hosted_fields_error_generic'];
+                        $('.' + hosted.props.root + '_error.-payment')
+                            .text(message)
+                            .addClass('-show');
+                    },
+                });
+            },
+        },
     },
 };
 
