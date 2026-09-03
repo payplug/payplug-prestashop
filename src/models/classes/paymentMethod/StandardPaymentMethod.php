@@ -57,6 +57,14 @@ class StandardPaymentMethod extends PaymentMethod
         $advanced_settings = [];
 
         $embedded_mode = [];
+        if ($this->dependencies->configClass->isValidFeature('feature_hosted_fields')) {
+            $embedded_mode[] = [
+                'name' => 'payplug_embedded',
+                'label' => $this->translation['embedded']['options']['hosted_fields'],
+                'value' => 'hosted_fields',
+                'checked' => 'hosted_fields' == $current_configuration['embedded_mode'],
+            ];
+        }
         if ($this->dependencies->configClass->isValidFeature('feature_integrated')) {
             $embedded_mode[] = [
                 'name' => 'payplug_embedded',
@@ -144,17 +152,17 @@ class StandardPaymentMethod extends PaymentMethod
                             [
                                 'value' => 2,
                                 'label' => $this->translation['installment']['select']['2_schedules'],
-                                'checked' => 2 == (int) $current_configuration['inst_mode'],
+                                'checked' => 2 == (int)$current_configuration['inst_mode'],
                             ],
                             [
                                 'value' => 3,
                                 'label' => $this->translation['installment']['select']['3_schedules'],
-                                'checked' => 3 == (int) $current_configuration['inst_mode'],
+                                'checked' => 3 == (int)$current_configuration['inst_mode'],
                             ],
                             [
                                 'value' => 4,
                                 'label' => $this->translation['installment']['select']['4_schedules'],
-                                'checked' => 4 == (int) $current_configuration['inst_mode'],
+                                'checked' => 4 == (int)$current_configuration['inst_mode'],
                             ],
                         ],
                     ],
@@ -162,7 +170,7 @@ class StandardPaymentMethod extends PaymentMethod
                         'type' => 'input',
                         'name' => 'payplug_inst_min_amount',
                         'disabled' => !$current_configuration['installment'],
-                        'value' => (int) $current_configuration['inst_min_amount'],
+                        'value' => (int)$current_configuration['inst_min_amount'],
                         'min' => 4,
                         'step' => 1,
                         'max' => 20000,
@@ -213,7 +221,41 @@ class StandardPaymentMethod extends PaymentMethod
                     'disabled' => !$current_configuration['deferred'],
                     'name' => 'payplug_deferred_state',
                     'type' => 'select',
-                    'options' => $this->getDeferredState((int) $current_configuration['deferred_state']),
+                    'options' => $this->getDeferredState((int)$current_configuration['deferred_state']),
+                ],
+            ];
+        }
+
+        if ($this->dependencies->configClass->isValidFeature('feature_hosted_fields')) {
+            $hosted_fields = json_decode(isset($current_configuration['hosted_fields']) ? $current_configuration['hosted_fields'] : '{}', true);
+
+            $advanced_settings[] = [
+                'name' => 'hosted_fields',
+                'title' => $this->translation['hosted_fields']['title'],
+                'class' => '-hosted_fields',
+                'descriptions' => [
+                    'live' => [
+                        'description' => $this->translation['hosted_fields']['descriptions']['live'],
+                    ],
+                    'sandbox' => [
+                        'description' => $this->translation['hosted_fields']['descriptions']['sandbox'],
+                    ],
+                ],
+                'options' => [
+                    [
+                        'type' => 'input',
+                        'label' => $this->translation['hosted_fields']['identifier']['label'],
+                        'placeholder' => $this->translation['hosted_fields']['identifier']['placeholder'],
+                        'name' => 'payplug_identifier',
+                        'value' => isset($hosted_fields['identifier']) ? $hosted_fields['identifier'] : '',
+                    ],
+                    [
+                        'type' => 'input',
+                        'label' => $this->translation['hosted_fields']['submerchant_id']['label'],
+                        'placeholder' => $this->translation['hosted_fields']['submerchant_id']['placeholder'],
+                        'name' => 'payplug_submerchant_id',
+                        'value' => isset($hosted_fields['submerchant_id']) ? $hosted_fields['submerchant_id'] : '',
+                    ],
                 ],
             ];
         }
@@ -306,11 +348,11 @@ class StandardPaymentMethod extends PaymentMethod
 
     /**
      * @description Get order tab for given resource to create the order
-     * @todo: add coverage to this method
-     *
      * @param array $retrieve
      *
      * @return array
+     * @todo: add coverage to this method
+     *
      */
     public function getOrderTab($retrieve = [])
     {
@@ -335,9 +377,9 @@ class StandardPaymentMethod extends PaymentMethod
 
     /**
      * @description Get the payment tab required to generate a resource payment.
+     * @return array
      * @todo: add coverage to this method
      *
-     * @return array
      */
     public function getPaymentTab()
     {
@@ -359,7 +401,7 @@ class StandardPaymentMethod extends PaymentMethod
         }
 
         // Update if current display is integrated
-        if ('integrated' == (string) $this->configuration->getValue('embedded_mode')) {
+        if ('integrated' == (string)$this->configuration->getValue('embedded_mode')) {
             $payment_tab['integration'] = 'INTEGRATED_PAYMENT';
             unset($payment_tab['hosted_payment']['cancel_url']);
         }
@@ -369,7 +411,7 @@ class StandardPaymentMethod extends PaymentMethod
             $cart_adapter = $this->dependencies
                 ->getPlugin()
                 ->getCart();
-            $payment_tab['allow_save_card'] = !(bool) $cart_adapter->isGuestCartByCartId((int) $this->context->cart->id);
+            $payment_tab['allow_save_card'] = !(bool)$cart_adapter->isGuestCartByCartId((int)$this->context->cart->id);
         }
 
         return $payment_tab;
@@ -393,9 +435,9 @@ class StandardPaymentMethod extends PaymentMethod
         }
 
         // Update if current display is integrated
-        if ('integrated' == (string) $this->configuration->getValue('embedded_mode')) {
+        if ('integrated' == (string)$this->configuration->getValue('embedded_mode')) {
             $return['resource_id'] = $return['resource_stored']['resource_id'];
-            $return['cart_id'] = (int) $this->context->cart->id;
+            $return['cart_id'] = (int)$this->context->cart->id;
         }
 
         $regex_validator = $this->dependencies
@@ -411,7 +453,7 @@ class StandardPaymentMethod extends PaymentMethod
             ->getService('payplug.utilities.service.props')
             ->getServerProp('HTTP_USER_AGENT');
 
-        $return['embedded'] = 'redirect' != (string) $this->configuration->getValue('embedded_mode')
+        $return['embedded'] = 'redirect' != (string)$this->configuration->getValue('embedded_mode')
             && !$regex_validator->isMobileDevice($http_user_agent)['result'];
 
         unset($return['resource_stored']);
@@ -458,13 +500,13 @@ class StandardPaymentMethod extends PaymentMethod
             ->getOrderTranslations();
 
         $can_be_captured = !$this->dependencies->getValidators()['payment']->isFailed($resource)['result']
-            && !(bool) $resource->is_paid
+            && !(bool)$resource->is_paid
             && !$this->dependencies->getValidators()['payment']->isExpired($resource)['result'];
 
         $resource_details['can_be_captured'] = $can_be_captured;
         $resource_details['authorization'] = true;
 
-        if ((bool) $resource->is_paid) {
+        if ((bool)$resource->is_paid) {
             $resource_details['date'] = date('d/m/Y', $resource->paid_at);
             $resource_details['status_message'] = '(' . $translation['detail']['capture']['deferred'] . ')';
         } else {
@@ -480,7 +522,7 @@ class StandardPaymentMethod extends PaymentMethod
                     $translation['detail']['capture']['warning'],
                     $expiration
                 );
-            } elseif (isset($resource->authorization->authorized_at) && (bool) $resource->authorization->authorized_at) {
+            } elseif (isset($resource->authorization->authorized_at) && (bool)$resource->authorization->authorized_at) {
                 $resource_details['date'] = date('d/m/Y', $resource->authorization->authorized_at);
             }
         }
@@ -490,11 +532,11 @@ class StandardPaymentMethod extends PaymentMethod
 
     /**
      * @description Get the current payment status
-     * @todo: add coverage to this method
-     *
      * @param object|null $resource
      *
      * @return array
+     * @todo: add coverage to this method
+     *
      */
     public function getPaymentStatus($resource = null)
     {
@@ -511,14 +553,14 @@ class StandardPaymentMethod extends PaymentMethod
             return $status;
         }
 
-        if ((bool) $resource->authorization && ($resource->authorization->expires_at - time()) > 0) {
+        if ((bool)$resource->authorization && ($resource->authorization->expires_at - time()) > 0) {
             return [
                 'id_status' => 8,
                 'code' => 'authorized',
             ];
         }
 
-        if ((bool) $resource->authorization && ($resource->authorization->expires_at - time()) <= 0) {
+        if ((bool)$resource->authorization && ($resource->authorization->expires_at - time()) <= 0) {
             return [
                 'id_status' => 9,
                 'code' => 'authorization_expired',
@@ -573,14 +615,14 @@ class StandardPaymentMethod extends PaymentMethod
         }
 
         // We retrieve the payment from the stored payment configuration
-        $is_live = isset($stored_resource['is_live']) && (bool) $stored_resource['is_live'];
-        $this->api_service->initialize((bool) $is_live);
+        $is_live = isset($stored_resource['is_live']) && (bool)$stored_resource['is_live'];
+        $this->api_service->initialize((bool)$is_live);
         $retrieve = $this->api_service->retrievePayment($resource_id);
 
         // If we don't find the payment, for retrocompatibility we switch the mode then try again
         // This section could be removed for highter module version
         if (!$retrieve['result']) {
-            $this->api_service->initialize(!(bool) $is_live);
+            $this->api_service->initialize(!(bool)$is_live);
             $retrieve = $this->api_service->retrievePayment($resource_id);
         }
 
@@ -608,7 +650,7 @@ class StandardPaymentMethod extends PaymentMethod
             0 => [
                 'value' => 0,
                 'label' => $this->translation['deferred']['states']['default'],
-                'checked' => (int) $deferred_state ? false : true,
+                'checked' => (int)$deferred_state ? false : true,
             ],
         ];
         if ($order_states) {
@@ -629,7 +671,7 @@ class StandardPaymentMethod extends PaymentMethod
         }
         ksort($order_states_values);
 
-        return (array) $order_states_values;
+        return (array)$order_states_values;
     }
 
     /**

@@ -33,4 +33,13 @@ class getNameTest extends BaseConfiguration
             $this->class->getName($key)
         );
     }
+
+    public function testWhenHostedFieldsNameConfigurationIsReturned()
+    {
+        $key = 'hosted_fields';
+        $this->assertSame(
+            'PAYPLUG_HOSTED_FIELDS',
+            $this->class->getName($key)
+        );
+    }
 }

@@ -396,6 +396,12 @@ class Configuration
             'defaultValue' => '',
             'setConf' => 0,
         ],
+        'hosted_fields' => [
+            'type' => 'string',
+            'name' => 'HOSTED_FIELDS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
     ];
     public $order_states = [
         'paid' => [
