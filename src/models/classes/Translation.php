@@ -514,12 +514,16 @@ class Translation
                         'text' => $this->l('paymentmethods.embedded.descriptions.redirect.text', 'translation'),
                         'link' => $this->l('paymentmethods.embedded.descriptions.redirect.link', 'translation'),
                     ],
+                    'hosted_fields' => [
+                        'text' => $this->l('paymentmethods.embedded.descriptions.hosted_fields.text', 'translation'),
+                    ],
                 ],
                 'link' => $this->l('paymentmethods.embedded.link', 'translation'),
                 'options' => [
                     'integrated' => $this->l('paymentmethods.embedded.options.integrated', 'translation'),
                     'popup' => $this->l('paymentmethods.embedded.options.popup', 'translation'),
                     'redirect' => $this->l('paymentmethods.embedded.options.redirect', 'translation'),
+                    'hosted_fields' => $this->l('paymentmethods.embedded.options.hosted_fields', 'translation'),
                 ],
             ],
             'integrated' => [
@@ -674,6 +678,21 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.scalapay.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.scalapay.call_to_action', 'translation'),
+            ],
+            'hosted_fields' => [
+                'title' => $this->l('paymentmethods.hosted_fields.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->l('paymentmethods.hosted_fields.descriptions.live', 'translation'),
+                    'sandbox' => $this->l('paymentmethods.hosted_fields.descriptions.sandbox', 'translation'),
+                ],
+                'identifier' => [
+                    'label' => $this->l('paymentmethods.hosted_fields.identifier.label', 'translation'),
+                    'placeholder' => $this->l('paymentmethods.hosted_fields.identifier.placeholder', 'translation'),
+                ],
+                'submerchant_id' => [
+                    'label' => $this->l('paymentmethods.hosted_fields.submerchant_id.label', 'translation'),
+                    'placeholder' => $this->l('paymentmethods.hosted_fields.submerchant_id.placeholder', 'translation'),
+                ]
             ],
         ];
     }

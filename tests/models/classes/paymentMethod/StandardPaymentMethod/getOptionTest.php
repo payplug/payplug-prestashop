@@ -425,4 +425,103 @@ class getOptionTest extends BaseStandardPaymentMethod
 
         $this->assertSame($expected, $this->class->getOption($current_configuration)['advanced_settings']);
     }
+
+    public function testWhenHostedFieldsEmbeddedOptionExpected()
+    {
+        $current_configuration = [
+            'embedded_mode' => 'hosted_fields',
+            'one_click' => true,
+            'hosted_fields' => '{}',
+        ];
+
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('isValidFeature')
+            ->andReturnUsing(function ($feature) {
+                return 'feature_hosted_fields' == $feature;
+            });
+        $this->dependencies->configClass = $configClass;
+
+        $this->assertSame(
+            [
+                'name' => 'payplug_embedded',
+                'label' => 'paymentmethods.embedded.options.hosted_fields',
+                'value' => 'hosted_fields',
+                'checked' => true,
+            ],
+            $this->class->getOption($current_configuration)['options'][0]['options'][0]
+        );
+    }
+
+    public function testWhenHostedFieldsAdvancedSettingsExpected()
+    {
+        $current_configuration = [
+            'embedded_mode' => 'redirect',
+            'one_click' => true,
+            'hosted_fields' => '{"identifier":"ident_42","submerchant_id":"sub_42"}',
+        ];
+
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('isValidFeature')
+            ->andReturnUsing(function ($feature) {
+                return 'feature_hosted_fields' == $feature;
+            });
+        $this->dependencies->configClass = $configClass;
+
+        $expected = [
+            'title' => 'paymentmethods.standard.advanced',
+            'options' => [
+                [
+                    'name' => 'hosted_fields',
+                    'title' => 'paymentmethods.hosted_fields.title',
+                    'class' => '-hosted_fields',
+                    'descriptions' => [
+                        'live' => [
+                            'description' => 'paymentmethods.hosted_fields.descriptions.live',
+                        ],
+                        'sandbox' => [
+                            'description' => 'paymentmethods.hosted_fields.descriptions.sandbox',
+                        ],
+                    ],
+                    'options' => [
+                        [
+                            'type' => 'input',
+                            'label' => 'paymentmethods.hosted_fields.identifier.label',
+                            'placeholder' => 'paymentmethods.hosted_fields.identifier.placeholder',
+                            'name' => 'payplug_identifier',
+                            'value' => 'ident_42',
+                        ],
+                        [
+                            'type' => 'input',
+                            'label' => 'paymentmethods.hosted_fields.submerchant_id.label',
+                            'placeholder' => 'paymentmethods.hosted_fields.submerchant_id.placeholder',
+                            'name' => 'payplug_submerchant_id',
+                            'value' => 'sub_42',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, $this->class->getOption($current_configuration)['advanced_settings']);
+    }
+
+    public function testWhenHostedFieldsAdvancedSettingsExpectedWithoutStoredValues()
+    {
+        $current_configuration = [
+            'embedded_mode' => 'redirect',
+            'one_click' => true,
+        ];
+
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('isValidFeature')
+            ->andReturnUsing(function ($feature) {
+                return 'feature_hosted_fields' == $feature;
+            });
+        $this->dependencies->configClass = $configClass;
+
+        $advanced_settings = $this->class->getOption($current_configuration)['advanced_settings'];
+
+        $this->assertSame('', $advanced_settings['options'][0]['options'][0]['value']);
+        $this->assertSame('', $advanced_settings['options'][0]['options'][1]['value']);
+    }
 }

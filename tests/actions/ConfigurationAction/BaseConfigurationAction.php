@@ -100,4 +100,10 @@ abstract class BaseConfigurationAction extends TestCase
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
     }
+
+    public function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
+    }
 }
