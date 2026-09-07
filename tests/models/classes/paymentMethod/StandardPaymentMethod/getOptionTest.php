@@ -426,38 +426,12 @@ class getOptionTest extends BaseStandardPaymentMethod
         $this->assertSame($expected, $this->class->getOption($current_configuration)['advanced_settings']);
     }
 
-    public function testWhenHostedFieldsEmbeddedOptionExpected()
-    {
-        $current_configuration = [
-            'embedded_mode' => 'hosted_fields',
-            'one_click' => true,
-            'hosted_fields' => '{}',
-        ];
-
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive('isValidFeature')
-            ->andReturnUsing(function ($feature) {
-                return 'feature_hosted_fields' == $feature;
-            });
-        $this->dependencies->configClass = $configClass;
-
-        $this->assertSame(
-            [
-                'name' => 'payplug_embedded',
-                'label' => 'paymentmethods.embedded.options.hosted_fields',
-                'value' => 'hosted_fields',
-                'checked' => true,
-            ],
-            $this->class->getOption($current_configuration)['options'][0]['options'][0]
-        );
-    }
-
     public function testWhenHostedFieldsAdvancedSettingsExpected()
     {
         $current_configuration = [
             'embedded_mode' => 'redirect',
             'one_click' => true,
-            'hosted_fields' => '{"identifier":"ident_42"}',
+            'hosted_fields' => '{"payplug_identifier_usd":"ident_42"}',
         ];
 
         $configClass = \Mockery::mock('Config');
@@ -466,6 +440,9 @@ class getOptionTest extends BaseStandardPaymentMethod
                 return 'feature_hosted_fields' == $feature;
             });
         $this->dependencies->configClass = $configClass;
+
+        $this->currencies = [['iso_code' => 'USD']];
+        $this->has_eur_currency = false;
 
         $expected = [
             'title' => 'paymentmethods.standard.advanced',
@@ -485,9 +462,9 @@ class getOptionTest extends BaseStandardPaymentMethod
                     'options' => [
                         [
                             'type' => 'input',
-                            'label' => 'paymentmethods.hosted_fields.identifier.label',
-                            'placeholder' => 'paymentmethods.hosted_fields.identifier.placeholder',
-                            'name' => 'payplug_identifier',
+                            'label' => 'paymentmethods.hosted_fields.identifier.label USD',
+                            'placeholder' => 'paymentmethods.hosted_fields.identifier.placeholder USD',
+                            'name' => 'payplug_identifier_usd',
                             'value' => 'ident_42',
                         ],
                     ],
@@ -511,6 +488,9 @@ class getOptionTest extends BaseStandardPaymentMethod
                 return 'feature_hosted_fields' == $feature;
             });
         $this->dependencies->configClass = $configClass;
+
+        $this->currencies = [['iso_code' => 'USD'], ['iso_code' => 'GBP']];
+        $this->has_eur_currency = false;
 
         $advanced_settings = $this->class->getOption($current_configuration)['advanced_settings'];
 

@@ -725,6 +725,10 @@ class ConfigurationAction
             }
         }
 
+        if (empty($datas['payment_paylater'])) {
+            unset($datas['payment_paylater']);
+        }
+
         return [
             'success' => true,
             'data' => $datas,
@@ -828,9 +832,16 @@ class ConfigurationAction
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
-            'identifier' => 'payplug_identifier',
         ];
 
+        $currencies = $this->dependencies
+            ->getPlugin()
+            ->getCurrency()
+            ->findAll();
+        foreach ($currencies as $currency) {
+            $name = 'identifier_' . strtolower($currency['iso_code']);
+            $configuration_keys[$name] = 'payplug_' . $name;
+        }
         foreach ($configuration_keys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};
@@ -950,9 +961,10 @@ class ConfigurationAction
 
                         break;
 
-                    case 'payplug_identifier':
+                    case 0 === strpos($config, 'payplug_identifier'):
                         $hosted_fields = json_decode($configuration->getValue('hosted_fields') ?: '{}', true);
-                        $hosted_fields[$key] = (string) $value;
+                        $name = str_replace('payplug_identifier_', '', $config);
+                        $hosted_fields[$name] = (string) $value;
                         if (!$configuration->set('hosted_fields', (string) json_encode($hosted_fields))) {
                             return [
                                 'success' => false,
@@ -962,6 +974,7 @@ class ConfigurationAction
                                 ],
                             ];
                         }
+
                         break;
 
                     default:

@@ -239,6 +239,7 @@ class ApiRest
             'wero' => (bool) $payment_methods['wero'],
             'bizum' => (bool) $payment_methods['bizum'],
             'scalapay' => (bool) $payment_methods['scalapay'],
+            'hosted_fields' => $configuration->getValue('hosted_fields'),
         ];
     }
 
@@ -532,6 +533,11 @@ class ApiRest
             return [];
         }
 
+        // IF merchant only hasn't EUR currency, we disable all other payment feature
+        if (!$this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()) {
+            return [];
+        }
+
         return $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
@@ -571,6 +577,7 @@ class ApiRest
             'inst_mode' => $configuration->getDefault('inst_mode'),
             'inst_min_amount' => $configuration->getDefault('inst_min_amount'),
             'deferred_state' => $configuration->getDefault('deferred_state'),
+            'hosted_fields' => $configuration->getDefault('hosted_fields'),
         ];
         foreach ($default_configuration as $k => $v) {
             if (!isset($current_configuration[$k])) {

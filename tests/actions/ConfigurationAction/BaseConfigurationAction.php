@@ -17,6 +17,7 @@ abstract class BaseConfigurationAction extends TestCase
     public $api_service;
     public $configuration;
     public $configuration_class;
+    public $currency_adapter;
     public $dependencies;
     public $logger;
     public $module;
@@ -42,6 +43,11 @@ abstract class BaseConfigurationAction extends TestCase
         $this->oney = \Mockery::mock('Oney');
         $this->plugin = \Mockery::mock('Plugin');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
+        $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $this->currency_adapter->shouldReceive([
+            'findAll' => [],
+            'hasEurCurrency' => true,
+        ]);
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->shouldReceive('l')
@@ -78,6 +84,7 @@ abstract class BaseConfigurationAction extends TestCase
             'getLogger' => $this->logger,
             'getConfiguration' => $this->configuration,
             'getConfigurationClass' => $this->configuration_class,
+            'getCurrency' => $this->currency_adapter,
             'getOney' => $this->oney,
             'getTranslationClass' => $this->translation,
             'getModule' => $this->module_adapter,
