@@ -236,6 +236,13 @@ class PaymentMethod
      */
     public function getAvailablePaymentMethod()
     {
+        // IF merchant only hasn't EUR currency, we disable all other payment feature
+        if (!$this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()) {
+            return [
+                'standard',
+            ];
+        }
+
         return [
             'one_click',
             'standard',

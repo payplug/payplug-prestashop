@@ -96,6 +96,10 @@ abstract class BaseApiRest extends TestCase
             });
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
         $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $this->currency_adapter->shouldReceive([
+            'findAll' => [['iso_code' => 'EUR']],
+            'hasEurCurrency' => true,
+        ]);
         $this->assign_adapter = \Mockery::mock('AssignAdapter');
         $this->address_adapter = \Mockery::mock('AddressAdapter');
         $this->address_adapter->shouldReceive([

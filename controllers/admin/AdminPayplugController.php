@@ -205,6 +205,7 @@ class AdminPayplugController extends ModuleAdminController
     {
         if ($rest_route = $this->tools->tool('getValue', 'rest_route')) {
             $json = $this->api_rest->dispatch($rest_route);
+
             exit(json_encode($json));
         }
     }

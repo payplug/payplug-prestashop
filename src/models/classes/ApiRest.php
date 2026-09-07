@@ -532,6 +532,11 @@ class ApiRest
             return [];
         }
 
+        // IF merchant only hasn't EUR currency, we disable all other payment feature
+        if (!$this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()) {
+            return [];
+        }
+
         return $this->dependencies
             ->getPlugin()
             ->getPaymentMethodClass()
