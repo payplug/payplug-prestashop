@@ -38,4 +38,18 @@ class getTest extends BaseConfiguration
             $this->class->get($key)
         );
     }
+
+    public function testWhenHostedFieldsConfigurationIsReturned()
+    {
+        $key = 'hosted_fields';
+        $this->assertSame(
+            [
+                'type' => 'string',
+                'name' => 'HOSTED_FIELDS',
+                'defaultValue' => '{}',
+                'setConf' => 1,
+            ],
+            $this->class->get($key)
+        );
+    }
 }
