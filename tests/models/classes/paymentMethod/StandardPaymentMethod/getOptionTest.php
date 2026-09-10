@@ -425,4 +425,116 @@ class getOptionTest extends BaseStandardPaymentMethod
 
         $this->assertSame($expected, $this->class->getOption($current_configuration)['advanced_settings']);
     }
+
+    public function testWhenHostedFieldsAdvancedSettingsExpected()
+    {
+        $current_configuration = [
+            'embedded_mode' => 'redirect',
+            'one_click' => true,
+            'hosted_fields' => '{"usd":"ident_42"}',
+        ];
+
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('isValidFeature')
+            ->andReturnUsing(function ($feature) {
+                return 'feature_hosted_fields' == $feature;
+            });
+        $this->dependencies->configClass = $configClass;
+
+        $this->currencies = [['iso_code' => 'USD']];
+        $this->has_eur_currency = false;
+
+        $expected = [
+            'title' => 'paymentmethods.standard.advanced',
+            'options' => [
+                [
+                    'name' => 'hosted_fields',
+                    'title' => 'paymentmethods.hosted_fields.title',
+                    'class' => '-hosted_fields',
+                    'descriptions' => [
+                        'live' => [
+                            'description' => 'paymentmethods.hosted_fields.descriptions.live',
+                        ],
+                        'sandbox' => [
+                            'description' => 'paymentmethods.hosted_fields.descriptions.sandbox',
+                        ],
+                    ],
+                    'options' => [
+                        [
+                            'type' => 'input',
+                            'label' => 'paymentmethods.hosted_fields.identifier.label USD',
+                            'placeholder' => 'paymentmethods.hosted_fields.identifier.placeholder USD',
+                            'name' => 'payplug_identifier_usd',
+                            'value' => 'ident_42',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $option = $this->class->getOption($current_configuration);
+
+        $this->assertSame($expected, $option['advanced_settings']);
+
+        // Shop has no EUR currency: the classic embedded-mode selector and its
+        // integrated-mode warning must be hidden, leaving only the one_click switch.
+        $this->assertSame(
+            [
+                [
+                    'type' => 'payment_option',
+                    'sub_type' => 'switch',
+                    'name' => 'one_click',
+                    'title' => 'paymentmethods.one_click.title',
+                    'descriptions' => [
+                        'live' => [
+                            'description' => 'paymentmethods.one_click.descriptions.live',
+                            'link_know_more' => [
+                                'text' => 'paymentmethods.one_click.link',
+                                'url' => 'https://support.payplug.com/hc/fr/articles/360022213892',
+                                'target' => '_blank',
+                            ],
+                        ],
+                        'sandbox' => [
+                            'description' => 'paymentmethods.one_click.descriptions.live',
+                            'link_know_more' => [
+                                'text' => 'paymentmethods.one_click.link',
+                                'url' => 'https://support.payplug.com/hc/fr/articles/360022213892',
+                                'target' => '_blank',
+                            ],
+                        ],
+                    ],
+                    'checked' => true,
+                ],
+            ],
+            $option['options']
+        );
+    }
+
+    public function testWhenHostedFieldsAdvancedSettingsExpectedWithoutStoredValues()
+    {
+        $current_configuration = [
+            'embedded_mode' => 'redirect',
+            'one_click' => true,
+        ];
+
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('isValidFeature')
+            ->andReturnUsing(function ($feature) {
+                return 'feature_hosted_fields' == $feature;
+            });
+        $this->dependencies->configClass = $configClass;
+
+        $this->currencies = [['iso_code' => 'USD'], ['iso_code' => 'GBP']];
+        $this->has_eur_currency = false;
+
+        $option = $this->class->getOption($current_configuration);
+
+        $this->assertSame('', $option['advanced_settings']['options'][0]['options'][0]['value']);
+        $this->assertSame('', $option['advanced_settings']['options'][0]['options'][1]['value']);
+
+        // Shop has no EUR currency: the embedded-mode selector and its warning must be
+        // hidden — only the one_click switch remains.
+        $this->assertCount(1, $option['options']);
+        $this->assertSame('one_click', $option['options'][0]['name']);
+    }
 }
