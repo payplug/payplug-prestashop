@@ -200,22 +200,24 @@ class StandardPaymentMethod extends PaymentMethod
         // If available currencies on the current shop contain EUR currency, then unified hosted fields can't be configured.
         $currency_adapter = $this->dependencies->getPlugin()->getCurrency();
         $currencies = $currency_adapter->findAll();
-        $can_use_unified_hf = !$currency_adapter->hasEurCurrency();
+        $can_use_unified_hf = $currency_adapter->hasOtherCurrency();
         if ($can_use_unified_hf && $this->dependencies->configClass->isValidFeature('feature_hosted_fields')) {
             $hosted_fields = json_decode(isset($current_configuration['hosted_fields']) ? $current_configuration['hosted_fields'] : '{}', true);
+
             $inputs_identifiers = [];
             foreach ($currencies as $currency) {
                 if ('EUR' == $currency['iso_code']) {
                     continue;
                 }
-                $name = 'payplug_identifier_' . strtolower($currency['iso_code']);
+                $iso_code = strtolower($currency['iso_code']);
+                $name = 'payplug_identifier_' . $iso_code;
                 $inputs_identifiers[] = [
                     'type' => 'input',
                     'label' => $this->translation['hosted_fields']['identifier']['label'] . ' ' . $currency['iso_code'],
                     'placeholder' => $this->translation['hosted_fields']['identifier']['placeholder'] . ' ' . $currency['iso_code'],
                     'name' => $name,
-                    'value' => isset($hosted_fields[$name]) && $hosted_fields[$name]
-                        ? $hosted_fields[$name]
+                    'value' => isset($hosted_fields[$iso_code]) && $hosted_fields[$iso_code]
+                        ? $hosted_fields[$iso_code]
                         : '',
                 ];
             }
@@ -234,6 +236,7 @@ class StandardPaymentMethod extends PaymentMethod
                 'options' => $inputs_identifiers,
             ];
         }
+
         $option['options'] = [];
         if ($embedded_options = $this->getEmbeddedOptions($current_configuration)) {
             $option['options'][] = $embedded_options;
@@ -625,7 +628,8 @@ class StandardPaymentMethod extends PaymentMethod
     private function getEmbeddedOptions($current_configuration = [])
     {
         // IF merchant only hasn't EUR currency, we disable display seleciton
-        if (!$this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()) {
+        if ($this->dependencies->configClass->isValidFeature('feature_hosted_fields')
+            && !$this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()) {
             return [];
         }
 

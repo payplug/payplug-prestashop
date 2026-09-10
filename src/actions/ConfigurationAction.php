@@ -832,7 +832,6 @@ class ConfigurationAction
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
-            'identifier' => 'payplug_identifier',
         ];
 
         $currencies = $this->dependencies
@@ -846,6 +845,23 @@ class ConfigurationAction
         foreach ($configuration_keys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};
+
+                if (0 === strpos($config, 'payplug_identifier_')) {
+                    $hosted_fields = json_decode($configuration->getValue('hosted_fields') ?: '{}', true);
+                    $name = str_replace('payplug_identifier_', '', $config);
+                    $hosted_fields[$name] = (string) $value;
+                    if (!$configuration->set('hosted_fields', (string) json_encode($hosted_fields))) {
+                        return [
+                            'success' => false,
+                            'data' => [
+                                // todo: add translation
+                                'message' => 'An error has occurred while register ' . $config,
+                            ],
+                        ];
+                    }
+
+                    continue;
+                }
 
                 switch ($config) {
                     case 'payplug_oney':
@@ -951,22 +967,6 @@ class ConfigurationAction
 
                     case 'applepay_carriers':
                         if ((bool) $datas->enable_applepay && !$configuration->set($key, json_encode($value))) {
-                            return [
-                                'success' => false,
-                                'data' => [
-                                    // todo: add translation
-                                    'message' => 'An error has occurred while register ' . $config,
-                                ],
-                            ];
-                        }
-
-                        break;
-
-                    case 'payplug_identifier':
-                    case 0 === strpos($config, 'payplug_identifier'):
-                        $hosted_fields = json_decode($configuration->getValue('hosted_fields') ?: '{}', true);
-                        $hosted_fields[$key] = (string) $value;
-                        if (!$configuration->set('hosted_fields', (string) json_encode($hosted_fields))) {
                             return [
                                 'success' => false,
                                 'data' => [

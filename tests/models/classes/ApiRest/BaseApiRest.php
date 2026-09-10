@@ -32,6 +32,9 @@ abstract class BaseApiRest extends TestCase
     protected $constant;
     protected $country;
     protected $currency_adapter;
+    protected $currencies;
+    protected $has_eur_currency;
+    protected $has_valid_feature;
     protected $dependencies;
     protected $logger;
     protected $payment_method;
@@ -95,11 +98,33 @@ abstract class BaseApiRest extends TestCase
                 return $str;
             });
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
+        $this->currencies = [['iso_code' => 'EUR']];
+        $this->has_eur_currency = true;
         $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
-        $this->currency_adapter->shouldReceive([
-            'findAll' => [['iso_code' => 'EUR']],
-            'hasEurCurrency' => true,
-        ]);
+        $this->currency_adapter->shouldReceive('findAll')
+            ->andReturnUsing(function () {
+                return $this->currencies;
+            });
+        $this->currency_adapter->shouldReceive('hasEurCurrency')
+            ->andReturnUsing(function () {
+                return $this->has_eur_currency;
+            });
+        $this->currency_adapter->shouldReceive('hasOtherCurrency')
+            ->andReturnUsing(function () {
+                foreach ($this->currencies as $currency) {
+                    if ('EUR' != $currency['iso_code']) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+        $this->has_valid_feature = true;
+        $this->dependencies->configClass = \Mockery::mock('Config');
+        $this->dependencies->configClass->shouldReceive('isValidFeature')
+            ->andReturnUsing(function () {
+                return $this->has_valid_feature;
+            });
         $this->assign_adapter = \Mockery::mock('AssignAdapter');
         $this->address_adapter = \Mockery::mock('AddressAdapter');
         $this->address_adapter->shouldReceive([

@@ -203,6 +203,16 @@ abstract class BasePaymentMethod extends TestCase
             ->andReturnUsing(function () {
                 return $this->has_eur_currency;
             });
+        $this->currency_adapter->shouldReceive('hasOtherCurrency')
+            ->andReturnUsing(function () {
+                foreach ($this->currencies as $currency) {
+                    if ('EUR' != $currency['iso_code']) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
         $this->carrier_adapter = \Mockery::mock('CarrierAdapter');
         $this->cart_adapter = \Mockery::mock('CartAdapter');
         $this->cart_rule_adapter = \Mockery::mock('CartRuleAdapter');

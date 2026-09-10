@@ -31,8 +31,9 @@ use PayPlug\src\interfaces\CurrencyInterface;
 
 class CurrencyAdapter implements CurrencyInterface
 {
-    private $currencies;
+    private $currencies_cache = [];
     private $has_eur_currency;
+    private $has_other_currency;
 
     public function get($idCurrency = false)
     {
@@ -44,9 +45,9 @@ class CurrencyAdapter implements CurrencyInterface
     }
 
     /**
-     * @description Result is cached per instance (this adapter is only ever called with its
-     * default arguments in this codebase), to avoid re-querying the database every time
-     * several consumers need the currency list within a single request.
+     * @description Result is cached per instance and per distinct set of arguments, to avoid
+     * re-querying the database every time several consumers need the currency list within a
+     * single request.
      *
      * @param mixed $active
      * @param mixed $groupBy
@@ -54,11 +55,12 @@ class CurrencyAdapter implements CurrencyInterface
      */
     public function findAll($active = true, $groupBy = false, $currentShopOnly = true)
     {
-        if (null === $this->currencies) {
-            $this->currencies = \Currency::findAll($active, $groupBy, $currentShopOnly);
+        $cache_key = serialize([$active, $groupBy, $currentShopOnly]);
+        if (!isset($this->currencies_cache[$cache_key])) {
+            $this->currencies_cache[$cache_key] = \Currency::findAll($active, $groupBy, $currentShopOnly);
         }
 
-        return $this->currencies;
+        return $this->currencies_cache[$cache_key];
     }
 
     /**
@@ -80,6 +82,27 @@ class CurrencyAdapter implements CurrencyInterface
         }
 
         return $this->has_eur_currency;
+    }
+
+    /**
+     * @description Whether the shop has a currency other than EUR among its active currencies
+     *
+     * @return bool
+     */
+    public function hasOtherCurrency()
+    {
+        if (null === $this->has_other_currency) {
+            $this->has_other_currency = false;
+            foreach ($this->findAll() as $currency) {
+                if ('EUR' != $currency['iso_code']) {
+                    $this->has_other_currency = true;
+
+                    break;
+                }
+            }
+        }
+
+        return $this->has_other_currency;
     }
 
     public function getCurrency($idCurrency)

@@ -184,17 +184,19 @@ class saveActionTest extends BaseConfigurationAction
 
     public function testWhenIdentifierIsSaved()
     {
+        $this->currencies = [['iso_code' => 'USD']];
+
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
         $datas->payplug_standard = 1;
-        $datas->payplug_identifier = 'ident_42';
+        $datas->payplug_identifier_usd = 'ident_42';
 
         $this->configuration_class->shouldReceive('getValue')
             ->with('hosted_fields')
             ->andReturn('{}');
 
         $this->configuration_class->shouldReceive('set')
-            ->with('hosted_fields', json_encode(['identifier' => 'ident_42']))
+            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
             ->once()
             ->andReturn(true);
 
@@ -208,17 +210,19 @@ class saveActionTest extends BaseConfigurationAction
 
     public function testWhenIdentifierIsSavedWithoutExistingHostedFields()
     {
+        $this->currencies = [['iso_code' => 'USD']];
+
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
         $datas->payplug_standard = 1;
-        $datas->payplug_identifier = 'ident_42';
+        $datas->payplug_identifier_usd = 'ident_42';
 
         $this->configuration_class->shouldReceive('getValue')
             ->with('hosted_fields')
             ->andReturn(false);
 
         $this->configuration_class->shouldReceive('set')
-            ->with('hosted_fields', json_encode(['identifier' => 'ident_42']))
+            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
             ->once()
             ->andReturn(true);
 
@@ -232,10 +236,12 @@ class saveActionTest extends BaseConfigurationAction
 
     public function testWhenHostedFieldsCannotBeUpdated()
     {
+        $this->currencies = [['iso_code' => 'USD']];
+
         $datas = new \stdClass();
         $datas->action = 'payplug_save_data';
         $datas->payplug_standard = 1;
-        $datas->payplug_identifier = 'ident_42';
+        $datas->payplug_identifier_usd = 'ident_42';
 
         $this->configuration_class->shouldReceive('getValue')
             ->with('hosted_fields')
@@ -249,7 +255,7 @@ class saveActionTest extends BaseConfigurationAction
             [
                 'success' => false,
                 'data' => [
-                    'message' => 'An error has occurred while register payplug_identifier',
+                    'message' => 'An error has occurred while register payplug_identifier_usd',
                 ],
             ],
             $this->action->saveAction($datas)
