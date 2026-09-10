@@ -56,28 +56,6 @@ class StandardPaymentMethod extends PaymentMethod
 
         $advanced_settings = [];
 
-        $embedded_mode = [];
-        if ($this->dependencies->configClass->isValidFeature('feature_integrated')) {
-            $embedded_mode[] = [
-                'name' => 'payplug_embedded',
-                'label' => $this->translation['embedded']['options']['integrated'],
-                'value' => 'integrated',
-                'checked' => 'integrated' == $current_configuration['embedded_mode'],
-            ];
-        }
-        $embedded_mode[] = [
-            'name' => 'payplug_embedded',
-            'label' => $this->translation['embedded']['options']['popup'],
-            'value' => 'popup',
-            'checked' => 'popup' == $current_configuration['embedded_mode'],
-        ];
-        $embedded_mode[] = [
-            'name' => 'payplug_embedded',
-            'label' => $this->translation['embedded']['options']['redirect'],
-            'value' => 'redirect',
-            'checked' => 'redirect' == $current_configuration['embedded_mode'],
-        ];
-
         if ($this->dependencies->configClass->isValidFeature('feature_installment')) {
             $advanced_settings[] = [
                 'name' => 'fractional',
@@ -218,82 +196,53 @@ class StandardPaymentMethod extends PaymentMethod
             ];
         }
 
-        $popup_description = $this->translation['embedded']['descriptions']['popup']['text'];
-        $popup_description_link = '<a href="' . $this->external_url['portal'] . '" target="_blank">'
-            . $this->translation['embedded']['descriptions']['popup']['link']
-            . '</a>';
-        $popup_description = str_replace('$popup_description_link', $popup_description_link, $popup_description);
+        // Unified hosted fields
+        // If available currencies on the current shop contain EUR currency, then unified hosted fields can't be configured.
+        $currency_adapter = $this->dependencies->getPlugin()->getCurrency();
+        $currencies = $currency_adapter->findAll();
+        $can_use_unified_hf = $currency_adapter->hasOtherCurrency();
+        if ($can_use_unified_hf && $this->dependencies->configClass->isValidFeature('feature_hosted_fields')) {
+            $hosted_fields = json_decode(isset($current_configuration['hosted_fields']) ? $current_configuration['hosted_fields'] : '{}', true);
 
-        $redirect_description = $this->translation['embedded']['descriptions']['redirect']['text'];
-        $redirect_description_link = '<a href="' . $this->external_url['portal'] . '" target="_blank">'
-            . $this->translation['embedded']['descriptions']['redirect']['link']
-            . '</a>';
-        $redirect_description = str_replace('$redirect_description_link', $redirect_description_link, $redirect_description);
-
-        $option['options'] = [
-            [
-                'type' => 'payment_option',
-                'sub_type' => 'IOptions',
-                'name' => 'embeded',
-                'title' => $this->translation['embedded']['title'],
+            $inputs_identifiers = [];
+            foreach ($currencies as $currency) {
+                if ('EUR' == $currency['iso_code']) {
+                    continue;
+                }
+                $iso_code = strtolower($currency['iso_code']);
+                $name = 'payplug_identifier_' . $iso_code;
+                $inputs_identifiers[] = [
+                    'type' => 'input',
+                    'label' => $this->translation['hosted_fields']['identifier']['label'] . ' ' . $currency['iso_code'],
+                    'placeholder' => $this->translation['hosted_fields']['identifier']['placeholder'] . ' ' . $currency['iso_code'],
+                    'name' => $name,
+                    'value' => isset($hosted_fields[$iso_code]) && $hosted_fields[$iso_code]
+                        ? $hosted_fields[$iso_code]
+                        : '',
+                ];
+            }
+            $advanced_settings[] = [
+                'name' => 'hosted_fields',
+                'title' => $this->translation['hosted_fields']['title'],
+                'class' => '-hosted_fields',
                 'descriptions' => [
                     'live' => [
-                        'description_popup' => $popup_description,
-                        'description_redirect' => $redirect_description,
-                        'description_integrated' => $this->translation['embedded']['descriptions']['integrated']['text'],
-                        'link_know_more' => [
-                            'text' => $this->translation['embedded']['link'],
-                            'url' => $this->external_url['embedded'],
-                            'target' => '_blank',
-                        ],
+                        'description' => $this->translation['hosted_fields']['descriptions']['live'],
                     ],
                     'sandbox' => [
-                        'description_popup' => $popup_description,
-                        'description_redirect' => $redirect_description,
-                        'description_integrated' => $this->translation['embedded']['descriptions']['integrated']['text'],
-                        'link_know_more' => [
-                            'text' => $this->translation['embedded']['link'],
-                            'url' => $this->external_url['embedded'],
-                            'target' => '_blank',
-                        ],
+                        'description' => $this->translation['hosted_fields']['descriptions']['sandbox'],
                     ],
                 ],
-                'options' => $embedded_mode,
-            ],
-            [
-                'type' => 'warning_message',
-                'sub_type' => 'warning',
-                'name' => 'warning_message',
-                'payment_method' => 'integrated',
-                'description_title' => $this->translation['integrated']['alert']['title'],
-                'description' => $this->translation['integrated']['alert']['text'],
-            ],
-            [
-                'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'one_click',
-                'title' => $this->translation['one_click']['title'],
-                'descriptions' => [
-                    'live' => [
-                        'description' => $this->translation['one_click']['descriptions']['live'],
-                        'link_know_more' => [
-                            'text' => $this->translation['one_click']['link'],
-                            'url' => $this->external_url['one_click'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'sandbox' => [
-                        'description' => $this->translation['one_click']['descriptions']['live'],
-                        'link_know_more' => [
-                            'text' => $this->translation['one_click']['link'],
-                            'url' => $this->external_url['one_click'],
-                            'target' => '_blank',
-                        ],
-                    ],
-                ],
-                'checked' => $current_configuration['one_click'],
-            ],
-        ];
+                'options' => $inputs_identifiers,
+            ];
+        }
+
+        $option['options'] = [];
+        if ($embedded_options = $this->getEmbeddedOptions($current_configuration)) {
+            $option['options'][] = $embedded_options;
+            $option['options'][] = $this->getWarningOptions();
+        }
+        $option['options'][] = $this->getAliasingOptions($current_configuration);
         $option['advanced_settings'] = $advanced_settings ? [
             'title' => $this->translation['standard']['advanced'],
             'options' => $advanced_settings,
@@ -306,11 +255,11 @@ class StandardPaymentMethod extends PaymentMethod
 
     /**
      * @description Get order tab for given resource to create the order
-     * @todo: add coverage to this method
      *
      * @param array $retrieve
      *
      * @return array
+     * @todo: add coverage to this method
      */
     public function getOrderTab($retrieve = [])
     {
@@ -335,9 +284,9 @@ class StandardPaymentMethod extends PaymentMethod
 
     /**
      * @description Get the payment tab required to generate a resource payment.
-     * @todo: add coverage to this method
      *
      * @return array
+     * @todo: add coverage to this method
      */
     public function getPaymentTab()
     {
@@ -490,11 +439,11 @@ class StandardPaymentMethod extends PaymentMethod
 
     /**
      * @description Get the current payment status
-     * @todo: add coverage to this method
      *
      * @param object|null $resource
      *
      * @return array
+     * @todo: add coverage to this method
      */
     public function getPaymentStatus($resource = null)
     {
@@ -667,5 +616,137 @@ class StandardPaymentMethod extends PaymentMethod
             . $this->dependencies->configClass->getImgLang() . '.svg';
 
         return $payment_options;
+    }
+
+    /**
+     * @description Get embedded options
+     *
+     * @param $current_configuration
+     *
+     * @return array
+     */
+    private function getEmbeddedOptions($current_configuration = [])
+    {
+        // IF merchant only hasn't EUR currency, we disable display seleciton
+        if ($this->dependencies->configClass->isValidFeature('feature_hosted_fields')
+            && !$this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()) {
+            return [];
+        }
+
+        $embedded_mode = [];
+        if ($this->dependencies->configClass->isValidFeature('feature_integrated')) {
+            $embedded_mode[] = [
+                'name' => 'payplug_embedded',
+                'label' => $this->translation['embedded']['options']['integrated'],
+                'value' => 'integrated',
+                'checked' => 'integrated' == $current_configuration['embedded_mode'],
+            ];
+        }
+        $embedded_mode[] = [
+            'name' => 'payplug_embedded',
+            'label' => $this->translation['embedded']['options']['popup'],
+            'value' => 'popup',
+            'checked' => 'popup' == $current_configuration['embedded_mode'],
+        ];
+        $embedded_mode[] = [
+            'name' => 'payplug_embedded',
+            'label' => $this->translation['embedded']['options']['redirect'],
+            'value' => 'redirect',
+            'checked' => 'redirect' == $current_configuration['embedded_mode'],
+        ];
+        $popup_description = $this->translation['embedded']['descriptions']['popup']['text'];
+        $popup_description_link = '<a href="' . $this->external_url['portal'] . '" target="_blank">'
+            . $this->translation['embedded']['descriptions']['popup']['link']
+            . '</a>';
+        $popup_description = str_replace('$popup_description_link', $popup_description_link, $popup_description);
+
+        $redirect_description = $this->translation['embedded']['descriptions']['redirect']['text'];
+        $redirect_description_link = '<a href="' . $this->external_url['portal'] . '" target="_blank">'
+            . $this->translation['embedded']['descriptions']['redirect']['link']
+            . '</a>';
+        $redirect_description = str_replace('$redirect_description_link', $redirect_description_link, $redirect_description);
+
+        return [
+            'type' => 'payment_option',
+            'sub_type' => 'IOptions',
+            'name' => 'embeded',
+            'title' => $this->translation['embedded']['title'],
+            'descriptions' => [
+                'live' => [
+                    'description_popup' => $popup_description,
+                    'description_redirect' => $redirect_description,
+                    'description_integrated' => $this->translation['embedded']['descriptions']['integrated']['text'],
+                    'link_know_more' => [
+                        'text' => $this->translation['embedded']['link'],
+                        'url' => $this->external_url['embedded'],
+                        'target' => '_blank',
+                    ],
+                ],
+                'sandbox' => [
+                    'description_popup' => $popup_description,
+                    'description_redirect' => $redirect_description,
+                    'description_integrated' => $this->translation['embedded']['descriptions']['integrated']['text'],
+                    'link_know_more' => [
+                        'text' => $this->translation['embedded']['link'],
+                        'url' => $this->external_url['embedded'],
+                        'target' => '_blank',
+                    ],
+                ],
+            ],
+            'options' => $embedded_mode,
+        ];
+    }
+
+    /**
+     * @description Get warning options for integrated display
+     *
+     * @return array
+     */
+    private function getWarningOptions()
+    {
+        return [
+            'type' => 'warning_message',
+            'sub_type' => 'warning',
+            'name' => 'warning_message',
+            'payment_method' => 'integrated',
+            'description_title' => $this->translation['integrated']['alert']['title'],
+            'description' => $this->translation['integrated']['alert']['text'],
+        ];
+    }
+
+    /**
+     * @description Get aliasing options for one click payment
+     *
+     * @param $current_configuration
+     *
+     * @return array
+     */
+    private function getAliasingOptions($current_configuration)
+    {
+        return [
+            'type' => 'payment_option',
+            'sub_type' => 'switch',
+            'name' => 'one_click',
+            'title' => $this->translation['one_click']['title'],
+            'descriptions' => [
+                'live' => [
+                    'description' => $this->translation['one_click']['descriptions']['live'],
+                    'link_know_more' => [
+                        'text' => $this->translation['one_click']['link'],
+                        'url' => $this->external_url['one_click'],
+                        'target' => '_blank',
+                    ],
+                ],
+                'sandbox' => [
+                    'description' => $this->translation['one_click']['descriptions']['live'],
+                    'link_know_more' => [
+                        'text' => $this->translation['one_click']['link'],
+                        'url' => $this->external_url['one_click'],
+                        'target' => '_blank',
+                    ],
+                ],
+            ],
+            'checked' => $current_configuration['one_click'],
+        ];
     }
 }

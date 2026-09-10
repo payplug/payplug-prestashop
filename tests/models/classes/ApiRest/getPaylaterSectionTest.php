@@ -134,4 +134,65 @@ class getPaylaterSectionTest extends BaseApiRest
             $response['options']['options'][1]['checked']
         );
     }
+
+    public function testWhenFeatureHostedFieldsIsActiveAndShopHasNoEurCurrency()
+    {
+        $this->has_valid_feature = true;
+        $this->currencies = [['iso_code' => 'USD']];
+        $this->has_eur_currency = false;
+
+        $this->assertSame(
+            [],
+            $this->class->getPaylaterSection([
+                'oney' => true,
+            ])
+        );
+    }
+
+    public function testWhenFeatureHostedFieldsIsInactiveAndShopHasNoEurCurrency()
+    {
+        $this->has_valid_feature = false;
+        $this->currencies = [['iso_code' => 'USD']];
+        $this->has_eur_currency = false;
+
+        $current_configuration = [
+            'oney' => true,
+            'oney_min_amounts' => 'EUR:10000',
+            'oney_max_amounts' => 'EUR:300000',
+            'oney_custom_min_amounts' => 'EUR:10000',
+            'oney_custom_max_amounts' => 'EUR:300000',
+            'oney_product_animation' => true,
+            'oney_cart_animation' => true,
+            'oney_schedule' => true,
+            'oney_fees' => true,
+        ];
+
+        foreach ($current_configuration as $key => $configuration) {
+            if (false !== strpos($key, '_amounts')) {
+                $amount = explode(':', $configuration);
+                $this->amountHelper
+                    ->shouldReceive('formatOneyAmount')
+                    ->with($amount[1])
+                    ->andReturn(['result' => [
+                        1 => $amount[1],
+                    ]]);
+            }
+        }
+
+        $this->dependencies->shouldReceive('getConfigurationKey')
+            ->andReturnUsing(function ($key) {
+                switch ($key) {
+                    case 'oneyAllowedCountries':
+                        return 'GP,MQ,FR,GF,RE,YT';
+
+                    default:
+                        return false;
+                }
+            });
+
+        $this->assertSame(
+            true,
+            $this->class->getPaylaterSection($current_configuration)['options']['checked']
+        );
+    }
 }

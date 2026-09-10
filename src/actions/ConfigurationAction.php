@@ -725,6 +725,10 @@ class ConfigurationAction
             }
         }
 
+        if (empty($datas['payment_paylater'])) {
+            unset($datas['payment_paylater']);
+        }
+
         return [
             'success' => true,
             'data' => $datas,
@@ -830,9 +834,34 @@ class ConfigurationAction
             'applepay_display' => 'enable_applepay',
         ];
 
+        $currencies = $this->dependencies
+            ->getPlugin()
+            ->getCurrency()
+            ->findAll();
+        foreach ($currencies as $currency) {
+            $name = 'identifier_' . strtolower($currency['iso_code']);
+            $configuration_keys[$name] = 'payplug_' . $name;
+        }
         foreach ($configuration_keys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};
+
+                if (0 === strpos($config, 'payplug_identifier_')) {
+                    $hosted_fields = json_decode($configuration->getValue('hosted_fields') ?: '{}', true);
+                    $name = str_replace('payplug_identifier_', '', $config);
+                    $hosted_fields[$name] = (string) $value;
+                    if (!$configuration->set('hosted_fields', (string) json_encode($hosted_fields))) {
+                        return [
+                            'success' => false,
+                            'data' => [
+                                // todo: add translation
+                                'message' => 'An error has occurred while register ' . $config,
+                            ],
+                        ];
+                    }
+
+                    continue;
+                }
 
                 switch ($config) {
                     case 'payplug_oney':
