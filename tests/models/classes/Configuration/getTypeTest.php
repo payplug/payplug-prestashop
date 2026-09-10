@@ -33,4 +33,13 @@ class getTypeTest extends BaseConfiguration
             $this->class->getType($key)
         );
     }
+
+    public function testWhenHostedFieldsConfigurationTypeIsReturned()
+    {
+        $key = 'hosted_fields';
+        $this->assertSame(
+            'string',
+            $this->class->getType($key)
+        );
+    }
 }
