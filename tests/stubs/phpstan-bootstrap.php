@@ -205,6 +205,11 @@ namespace {
         {
             return 1;
         }
+
+        public static function findAll($active = true, $groupBy = false, $currentShopOnly = true)
+        {
+            return [];
+        }
     }
     class Translate
     {
