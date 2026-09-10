@@ -17,6 +17,7 @@
         "feature_queueing_system",
         "feature_wero",
         "feature_bizum",
-        "feature_scalapay"
+        "feature_scalapay",
+        "feature_hosted_fields"
     ]
 }
