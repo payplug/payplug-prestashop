@@ -811,6 +811,42 @@ class ConfigurationAction
             }
         }
 
+        // Scalapay amounts reach us in euros from the back office. The merchant may only
+        // narrow the range their Payplug account authorizes (from GET /account), never
+        // widen it, and a minimum above the maximum would hide the method for every cart.
+        if (isset($datas->enable_scalapay, $datas->scalapay_min_amounts, $datas->scalapay_max_amounts)
+            && (bool) $datas->enable_scalapay) {
+            $scalapay = $this->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('scalapay');
+            $account_limits = $scalapay->getScalapayPriceLimit(false);
+            $amount_helper = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.helper.amount');
+            $scalapay_min = (int) $amount_helper->convertAmount($datas->scalapay_min_amounts);
+            $scalapay_max = (int) $amount_helper->convertAmount($datas->scalapay_max_amounts);
+            $payment_validator = $this->dependencies->getValidators()['payment'];
+
+            if ($scalapay_min > $scalapay_max
+                || !$payment_validator->isAmount($scalapay_min, $account_limits)['result']
+                || !$payment_validator->isAmount($scalapay_max, $account_limits)['result']) {
+                $logger->addLog('ConfigurationAction::saveAction: Scalapay amounts are outside the range authorized by the account.');
+
+                return [
+                    'success' => false,
+                    'data' => [
+                        'title' => null,
+                        'msg' => $translation['scalapay']['thresholds']['text'],
+                        'close' => $translation['scalapay']['thresholds']['submit'],
+                        'class' => '-error',
+                    ],
+                ];
+            }
+        }
+
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $configuration_keys = [
             'deferred_state' => 'payplug_deferred_state',
@@ -825,6 +861,8 @@ class ConfigurationAction
             'sandbox_mode' => 'payplug_sandbox',
             'oney_custom_min_amounts' => 'oney_min_amounts',
             'oney_custom_max_amounts' => 'oney_max_amounts',
+            'scalapay_custom_min_amounts' => 'scalapay_min_amounts',
+            'scalapay_custom_max_amounts' => 'scalapay_max_amounts',
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
@@ -893,6 +931,35 @@ class ConfigurationAction
                                 ->setCustomOneyLimit((int) $amount_to_cent);
 
                             if ($is_valid_amount && !$configuration->set($key, (string) $formated_amount)) {
+                                return [
+                                    'success' => false,
+                                    'data' => [
+                                        // todo: add translation
+                                        'message' => 'An error has occurred while register ' . $config,
+                                    ],
+                                ];
+                            }
+                        }
+
+                        break;
+
+                    case 'scalapay_min_amounts':
+                    case 'scalapay_max_amounts':
+                        // Already validated against the account's authorized range above.
+                        if (isset($datas->enable_scalapay) && (bool) $datas->enable_scalapay) {
+                            $amount_to_cent = $this->dependencies
+                                ->getPlugin()
+                                ->getModule()
+                                ->getInstanceByName($this->dependencies->name)
+                                ->getService('payplug.utilities.helper.amount')
+                                ->convertAmount($value);
+                            $formated_amount = $this->dependencies
+                                ->getPlugin()
+                                ->getPaymentMethodClass()
+                                ->getPaymentMethod('scalapay')
+                                ->setCustomScalapayLimit((int) $amount_to_cent);
+
+                            if (!$configuration->set($key, (string) $formated_amount)) {
                                 return [
                                     'success' => false,
                                     'data' => [

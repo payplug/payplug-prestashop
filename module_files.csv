@@ -14376,6 +14376,8 @@ upgrade/upgrade-4.4.0.php
 upgrade/upgrade-4.7.1.php
 upgrade/upgrade-4.8.0.php
 upgrade/upgrade-4.9.0.php
+upgrade/upgrade-5.1.0.php
+upgrade/upgrade-5.2.0.php
 vendor/autoload.php
 vendor/composer/ClassLoader.php
 vendor/composer/InstalledVersions.php
