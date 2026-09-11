@@ -378,6 +378,21 @@ class Configuration
             'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"installment":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"standard":true,"wero":false,"bizum":false,"scalapay":false}',
             'setConf' => 1,
         ],
+        'scalapay_custom_max_amounts' => [
+            'type' => 'string',
+            'name' => 'SCALAPAY_CUSTOM_MAX_AMOUNTS',
+            // Empty means the merchant never customised the limit: the account's own
+            // authorized range from GET /account applies as-is. It must NOT default to a
+            // concrete amount, or that amount would read as an explicit override.
+            'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'scalapay_custom_min_amounts' => [
+            'type' => 'string',
+            'name' => 'SCALAPAY_CUSTOM_MIN_AMOUNTS',
+            'defaultValue' => '',
+            'setConf' => 1,
+        ],
         'sandbox_mode' => [
             'type' => 'integer',
             'name' => 'SANDBOX_MODE',
