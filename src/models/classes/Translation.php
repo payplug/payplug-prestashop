@@ -285,6 +285,12 @@ class Translation
                     'submit' => $this->l('modal.applepay.carrier.submit', 'translation'),
                 ],
             ],
+            'scalapay' => [
+                'thresholds' => [
+                    'text' => $this->l('modal.scalapay.thresholds.text', 'translation'),
+                    'submit' => $this->l('modal.scalapay.thresholds.submit', 'translation'),
+                ],
+            ],
             'error' => [
                 'text' => $this->l('modal.error.text', 'translation'),
                 'submit' => $this->l('modal.error.submit', 'translation'),
@@ -674,6 +680,16 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.scalapay.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.scalapay.call_to_action', 'translation'),
+                'thresholds' => [
+                    'title' => $this->l('paymentmethods.scalapay.thresholds.title', 'translation'),
+                    'description' => $this->l('paymentmethods.scalapay.thresholds.description', 'translation'),
+                    'inter' => $this->l('paymentmethods.scalapay.thresholds.inter', 'translation'),
+                    'error' => [
+                        'default' => $this->l('paymentmethods.scalapay.thresholds.error.text', 'translation'),
+                        'max' => $this->l('paymentmethods.scalapay.thresholds.error.max.text', 'translation'),
+                        'min' => $this->l('paymentmethods.scalapay.thresholds.error.min.text', 'translation'),
+                    ],
+                ],
             ],
         ];
     }

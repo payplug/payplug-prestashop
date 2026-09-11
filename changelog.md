@@ -1,8 +1,10 @@
 # Payplug module changelog
-## Unreleased
+## Version 5.2.0
+- Feature :
+  - [PRE-3601](https://payplug-prod.atlassian.net/browse/PRE-3601): Let the merchant narrow the Scalapay amount range from the back office, and hide Scalapay at checkout for carts outside it
+
 - Bugfix :
-  - [PRE-3557](https://payplug-prod.atlassian.net/browse/PRE-3557): Don't create an order (and send the confirmation email) until a card payment is confirmed paid, deferred or Oney; let late payment failures cancel the order instead of being silently dropped
-  - [PRE-3580](https://payplug-prod.atlassian.net/browse/PRE-3580): Stop answering 500 (retried in a loop by PayPlug) to a replayed IPN for a failed payment whose cart association was already replaced by a newer attempt
+  - [PRE-3601](https://payplug-prod.atlassian.net/browse/PRE-3601): Stop `FilesHelper::clean()` from deleting `upgrade/upgrade-5.1.0.php`, which was missing from the module file list
 
 ## Version 5.1.0
 - Feature :
@@ -11,6 +13,8 @@
 - Bugfix :
   - [PRE-3456](https://github.com/payplug/payplug-prestashop/pull/109): Wait for Oney widget to respond before trying to show it
   - [PRE-3531](https://github.com/payplug/payplug-prestashop/pull/107): Use UPC amount converter
+  - [PRE-3557](https://payplug-prod.atlassian.net/browse/PRE-3557): Don't create an order (and send the confirmation email) until a card payment is confirmed paid, deferred or Oney; let late payment failures cancel the order instead of being silently dropped
+  - [PRE-3580](https://payplug-prod.atlassian.net/browse/PRE-3580): Stop answering 500 (retried in a loop by PayPlug) to a replayed IPN for a failed payment whose cart association was already replaced by a newer attempt
 
 - Refactoring :
   - [PRE-3584](https://github.com/payplug/payplug-prestashop/pull/108): Optimize plugin size
