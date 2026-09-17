@@ -241,6 +241,10 @@ class StandardPaymentMethod extends PaymentMethod
         if ($embedded_options = $this->getEmbeddedOptions($current_configuration)) {
             $option['options'][] = $embedded_options;
             $option['options'][] = $this->getWarningOptions();
+            if ($this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()
+                && $this->dependencies->getPlugin()->getCurrency()->hasOtherCurrency()) {
+                $option['options'][] = $this->getCurrencyScopeWarningOptions();
+            }
         }
         $option['options'][] = $this->getAliasingOptions($current_configuration);
         $option['advanced_settings'] = $advanced_settings ? [
@@ -711,6 +715,27 @@ class StandardPaymentMethod extends PaymentMethod
             'payment_method' => 'integrated',
             'description_title' => $this->translation['integrated']['alert']['title'],
             'description' => $this->translation['integrated']['alert']['text'],
+        ];
+    }
+
+    /**
+     * @description Get warning options clarifying that "Integrated" checkout mode
+     *              only applies to EUR orders on a shop with more than one active
+     *              currency (see PrestashopAdapter17::displayPaymentOption(), which
+     *              gates the embedded-mode rendering on the cart's own currency,
+     *              not the shop-wide currency list this settings screen uses).
+     *
+     * @return array
+     */
+    private function getCurrencyScopeWarningOptions()
+    {
+        return [
+            'type' => 'warning_message',
+            'sub_type' => 'warning',
+            'name' => 'integrated_currency_scope_warning',
+            'payment_method' => 'integrated',
+            'description_title' => $this->translation['integrated']['currencyScopeAlert']['title'],
+            'description' => $this->translation['integrated']['currencyScopeAlert']['text'],
         ];
     }
 

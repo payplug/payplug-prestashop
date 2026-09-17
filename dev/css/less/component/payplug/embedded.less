@@ -1,3 +1,4 @@
+.__moduleName__HostedFields,
 .__moduleName__IntegratedPayment {
   display: none;
   width: 100%;
@@ -179,6 +180,19 @@
       color: #colorMap[deferred_color];
       display: block;
       text-align: center;
+    }
+
+    input {
+      border: none;
+      width: 100%;
+      color: #2b343d;
+      font-family: Poppins, sans-serif;
+      font-size: 14px;
+      text-align: left;
+      outline: none;
+      &::placeholder {
+        color: #2b343d;
+      }
     }
   }
 
@@ -376,5 +390,29 @@
     a {
       display: block;
     }
+  }
+}
+
+.__moduleName__HostedFields {
+  display: flex;
+
+
+  &_container {
+    &.-cardHolder,
+    &.-pan,
+    &.-exp,
+    &.-cvv {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      iframe {
+        height: 50% !important;
+      }
+    }
+  }
+
+  &_schemes {
+    width: 90px;
+    height: 22px;
   }
 }
