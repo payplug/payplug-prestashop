@@ -236,6 +236,118 @@ class getOptionTest extends BaseStandardPaymentMethod
         $this->assertSame($expected, $this->class->getOption($current_configuration)['options']);
     }
 
+    public function testWhenIntegratedPaymentExpectedAndShopHasMultipleCurrencies()
+    {
+        $current_configuration = [
+            'embedded_mode' => 'redirect',
+            'one_click' => true,
+        ];
+
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('isValidFeature')
+            ->andReturnUsing(function ($feature) {
+                return 'feature_integrated' == $feature;
+            });
+        $this->dependencies->configClass = $configClass;
+
+        $this->currencies = [['iso_code' => 'EUR'], ['iso_code' => 'USD']];
+        $this->has_eur_currency = true;
+
+        $expected = [
+            [
+                'type' => 'payment_option',
+                'sub_type' => 'IOptions',
+                'name' => 'embeded',
+                'title' => 'paymentmethods.embedded.title',
+                'descriptions' => [
+                    'live' => [
+                        'description_popup' => 'paymentmethods.embedded.descriptions.popup.text',
+                        'description_redirect' => 'paymentmethods.embedded.descriptions.redirect.text',
+                        'description_integrated' => 'paymentmethods.embedded.descriptions.integrated.text',
+                        'link_know_more' => [
+                            'text' => 'paymentmethods.embedded.link',
+                            'url' => 'https://support.payplug.com/hc/fr/articles/4409698334098',
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'sandbox' => [
+                        'description_popup' => 'paymentmethods.embedded.descriptions.popup.text',
+                        'description_redirect' => 'paymentmethods.embedded.descriptions.redirect.text',
+                        'description_integrated' => 'paymentmethods.embedded.descriptions.integrated.text',
+                        'link_know_more' => [
+                            'text' => 'paymentmethods.embedded.link',
+                            'url' => 'https://support.payplug.com/hc/fr/articles/4409698334098',
+                            'target' => '_blank',
+                        ],
+                    ],
+                ],
+                'options' => [
+                    [
+                        'name' => 'payplug_embedded',
+                        'label' => 'paymentmethods.embedded.options.integrated',
+                        'value' => 'integrated',
+                        'checked' => false,
+                    ],
+                    [
+                        'name' => 'payplug_embedded',
+                        'label' => 'paymentmethods.embedded.options.popup',
+                        'value' => 'popup',
+                        'checked' => false,
+                    ],
+                    [
+                        'name' => 'payplug_embedded',
+                        'label' => 'paymentmethods.embedded.options.redirect',
+                        'value' => 'redirect',
+                        'checked' => true,
+                    ],
+                ],
+            ],
+            [
+                'type' => 'warning_message',
+                'sub_type' => 'warning',
+                'name' => 'warning_message',
+                'payment_method' => 'integrated',
+                'description_title' => 'paymentmethods.integrated.alert.text.title',
+                'description' => 'paymentmethods.integrated.alert.text',
+            ],
+            [
+                'type' => 'warning_message',
+                'sub_type' => 'warning',
+                'name' => 'integrated_currency_scope_warning',
+                'payment_method' => 'integrated',
+                'description_title' => 'paymentmethods.integrated.currencyScope.alert.title',
+                'description' => 'paymentmethods.integrated.currencyScope.alert.text',
+            ],
+            [
+                'type' => 'payment_option',
+                'sub_type' => 'switch',
+                'name' => 'one_click',
+                'title' => 'paymentmethods.one_click.title',
+                'descriptions' => [
+                    'live' => [
+                        'description' => 'paymentmethods.one_click.descriptions.live',
+                        'link_know_more' => [
+                            'text' => 'paymentmethods.one_click.link',
+                            'url' => 'https://support.payplug.com/hc/fr/articles/360022213892',
+                            'target' => '_blank',
+                        ],
+                    ],
+                    'sandbox' => [
+                        'description' => 'paymentmethods.one_click.descriptions.live',
+                        'link_know_more' => [
+                            'text' => 'paymentmethods.one_click.link',
+                            'url' => 'https://support.payplug.com/hc/fr/articles/360022213892',
+                            'target' => '_blank',
+                        ],
+                    ],
+                ],
+                'checked' => true,
+            ],
+        ];
+
+        $this->assertSame($expected, $this->class->getOption($current_configuration)['options']);
+    }
+
     public function testWhenInstallmentPaymentExpected()
     {
         $current_configuration = [
@@ -472,42 +584,7 @@ class getOptionTest extends BaseStandardPaymentMethod
             ],
         ];
 
-        $option = $this->class->getOption($current_configuration);
-
-        $this->assertSame($expected, $option['advanced_settings']);
-
-        // Shop has no EUR currency: the classic embedded-mode selector and its
-        // integrated-mode warning must be hidden, leaving only the one_click switch.
-        $this->assertSame(
-            [
-                [
-                    'type' => 'payment_option',
-                    'sub_type' => 'switch',
-                    'name' => 'one_click',
-                    'title' => 'paymentmethods.one_click.title',
-                    'descriptions' => [
-                        'live' => [
-                            'description' => 'paymentmethods.one_click.descriptions.live',
-                            'link_know_more' => [
-                                'text' => 'paymentmethods.one_click.link',
-                                'url' => 'https://support.payplug.com/hc/fr/articles/360022213892',
-                                'target' => '_blank',
-                            ],
-                        ],
-                        'sandbox' => [
-                            'description' => 'paymentmethods.one_click.descriptions.live',
-                            'link_know_more' => [
-                                'text' => 'paymentmethods.one_click.link',
-                                'url' => 'https://support.payplug.com/hc/fr/articles/360022213892',
-                                'target' => '_blank',
-                            ],
-                        ],
-                    ],
-                    'checked' => true,
-                ],
-            ],
-            $option['options']
-        );
+        $this->assertSame($expected, $this->class->getOption($current_configuration)['advanced_settings']);
     }
 
     public function testWhenHostedFieldsAdvancedSettingsExpectedWithoutStoredValues()
@@ -527,14 +604,9 @@ class getOptionTest extends BaseStandardPaymentMethod
         $this->currencies = [['iso_code' => 'USD'], ['iso_code' => 'GBP']];
         $this->has_eur_currency = false;
 
-        $option = $this->class->getOption($current_configuration);
+        $advanced_settings = $this->class->getOption($current_configuration)['advanced_settings'];
 
-        $this->assertSame('', $option['advanced_settings']['options'][0]['options'][0]['value']);
-        $this->assertSame('', $option['advanced_settings']['options'][0]['options'][1]['value']);
-
-        // Shop has no EUR currency: the embedded-mode selector and its warning must be
-        // hidden — only the one_click switch remains.
-        $this->assertCount(1, $option['options']);
-        $this->assertSame('one_click', $option['options'][0]['name']);
+        $this->assertSame('', $advanced_settings['options'][0]['options'][0]['value']);
+        $this->assertSame('', $advanced_settings['options'][0]['options'][1]['value']);
     }
 }

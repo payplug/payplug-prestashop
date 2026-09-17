@@ -531,6 +531,10 @@ class Translation
                     'title' => $this->l('paymentmethods.integrated.alert.text.title', 'translation'),
                     'text' => $this->l('paymentmethods.integrated.alert.text', 'translation'),
                 ],
+                'currencyScopeAlert' => [
+                    'title' => $this->l('paymentmethods.integrated.currencyScope.alert.title', 'translation'),
+                    'text' => $this->l('paymentmethods.integrated.currencyScope.alert.text', 'translation'),
+                ],
             ],
             'one_click' => [
                 'title' => $this->l('paymentmethods.one_click.title', 'translation'),
