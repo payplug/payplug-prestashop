@@ -90,6 +90,44 @@ class Routes
     }
 
     /**
+     * @description Get the UHF (hosted fields) widget SDK url
+     *
+     * @return string
+     */
+    public function getHostedFieldsUrl()
+    {
+        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            $this->loadDotenv($dotenvFile);
+        }
+
+        if (isset($_ENV['HOSTED_FIELDS_URL'])) {
+            return $_ENV['HOSTED_FIELDS_URL'];
+        }
+
+        // No hardcoded production fallback: the real production CDN URL for this SDK
+        // is not yet confirmed (see PRE-3623 technical doc §3.6). A guessed-but-wrong
+        // URL would fail silently (fields just don't render); an empty string fails
+        // loudly instead - "loudly" here means the log line below, since the empty
+        // string itself is otherwise indistinguishable from any other falsy value
+        // once it reaches the checkout template. Every real deployment is expected
+        // to set HOSTED_FIELDS_URL via payplugroutes/.env, exactly like ONEY_LOADER_URL
+        // above.
+        //
+        // Not throttled/deduped: this is only reached via getSourceUrl(), itself only
+        // called while actually building the hosted_fields payment option for a real
+        // checkout (PrestashopAdapter17::displayPaymentOption() / :setHostedFieldsPaymentOption()),
+        // already gated behind feature_hosted_fields + a non-EUR cart + a configured
+        // per-currency identifier - not something invoked on every page load.
+        \PrestaShopLogger::addLog(
+            'PayPlug: HOSTED_FIELDS_URL is not configured — hosted fields checkout will not load for non-EUR carts.',
+            3
+        );
+
+        return '';
+    }
+
+    /**
      * @return array
      */
     public function getSourceUrl()
@@ -99,6 +137,7 @@ class Routes
             'embedded' => $this->getApiUrl() . '/js/1/form.latest.js',
             'integrated' => $this->getCDNUrl() . '/js/integrated-payment/v1@1/index.js',
             'oney' => $this->getOneyLoaderUrl(),
+            'hosted_fields' => $this->getHostedFieldsUrl(),
         ];
     }
 
