@@ -33,6 +33,15 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class PrestashopAdapter17
 {
+    /**
+     * @description Card brands accepted for UHF hosted-fields tokenization. Shared
+     *              single source of truth for both the client-side rejection (via
+     *              window['payplug_hosted_fields_accepted_brands'], see
+     *              setHostedFieldsPaymentOption()) and the server-side re-validation
+     *              in controllers/front/uhf.php.
+     */
+    const HOSTED_FIELDS_ACCEPTED_BRANDS = ['cb', 'visa', 'mastercard'];
+
     public $payplug;
     private $configuration;
     private $constant;
@@ -83,12 +92,22 @@ class PrestashopAdapter17
      */
     public function displayPaymentOption($payment_options)
     {
+        // 'integrated' is EUR-only; a non-EUR cart routes to 'hosted_fields' below
+        // instead (PRE-3623) - the currency check here is deliberate, not redundant.
         if ($this->dependencies->configClass->isValidFeature('feature_standard')
             && $this->dependencies->configClass->isValidFeature('feature_integrated')
             && array_key_exists('standard', $payment_options)
             && 'integrated' == (string) $this->configuration->getvalue('embedded_mode')
+            && 'EUR' === $this->context->currency->iso_code
         ) {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
+        } elseif ($this->dependencies->configClass->isValidFeature('feature_standard')
+            && $this->dependencies->configClass->isValidFeature('feature_hosted_fields')
+            && array_key_exists('standard', $payment_options)
+            && 'EUR' !== $this->context->currency->iso_code
+            && $this->isHostedFieldsIdentifierConfigured()
+        ) {
+            $payment_options = $this->setHostedFieldsPaymentOption($payment_options);
         }
 
         $paymentOptions = [];
@@ -145,6 +164,7 @@ class PrestashopAdapter17
     /**
      * @description  creation payment option
      * for integreated payment
+     * @description  since PRE-3623, only reached for EUR carts (see displayPaymentOption())
      *
      * @param $payment_options
      *
@@ -185,54 +205,141 @@ class PrestashopAdapter17
 
         $translation = $this->dependencies->getPlugin()->getTranslationClass()->getFrontIntegratedPaymentTranslations();
 
-        switch ($this->context->language->iso_code) {
-            case 'fr':
-                $privacyLink = 'https://www.payplug.com/fr/politique-de-confidentialite/';
-
-                break;
-
-            case 'it':
-                $privacyLink = 'https://www.payplug.com/it/politica-di-confidenzialita/';
-
-                break;
-
-            default:
-                $privacyLink = 'https://www.payplug.com/privacy-policy/';
-
-                break;
-        }
+        $privacyLink = $this->getPrivacyLink();
 
         $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
 
-        $this->context->smarty->assign([
-            'integrated_payment_js_url' => $integrated_payment_js_url,
-            'is_one_click_activated' => (bool) $payment_methods['one_click'],
-            'is_deferred_activated' => (bool) $payment_methods['deferred'],
-            'placeholderCardholder' => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
-            'placeholderPan' => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
-            'placeholderExp' => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
-            'placeholderCvv' => $this->dependencies
-                ->getPlugin()
-                ->getTranslationClass()
-                ->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopadapter17'),
-            'privacy' => $translation['privacy'],
-            'secure' => $translation['secure'],
-            'privacyLink' => $privacyLink,
-        ]);
+        $this->context->smarty->assign(array_merge(
+            [
+                'integrated_payment_js_url' => $integrated_payment_js_url,
+                'is_one_click_activated' => (bool) $payment_methods['one_click'],
+                'is_deferred_activated' => (bool) $payment_methods['deferred'],
+                'privacy' => $translation['privacy'],
+                'secure' => $translation['secure'],
+                'privacyLink' => $privacyLink,
+            ],
+            $this->getEmbeddedPlaceholderTranslations()
+        ));
 
         $integrated['additionalInformation'] =
             $this->dependencies->configClass->fetchTemplate('checkout/payment/integrated_payment.tpl');
 
         $payment_options['standard'] = $integrated;
+
+        return $payment_options;
+    }
+
+    /**
+     * @description Whether the shop has a UHF identifier configured for the given
+     *              currency (PRE-3622, Configuration::hosted_fields, JSON map of
+     *              lowercase ISO code => identifier). Defaults to the request
+     *              context's currency when $isoCode is not passed, so existing
+     *              call sites (e.g. displayPaymentOption()) are unaffected.
+     *
+     * @param string|null $isoCode
+     *
+     * @return bool
+     */
+    public function isHostedFieldsIdentifierConfigured($isoCode = null)
+    {
+        return '' !== $this->getHostedFieldsIdentifier($isoCode);
+    }
+
+    /**
+     * @description UHF identifier configured for the given currency, used to
+     *              initialize the client-side hosted-fields widget. Defaults to
+     *              the request context's currency when $isoCode is not passed.
+     *              Empty string when nothing is configured for this currency,
+     *              or when the configured value isn't a plain string (e.g. a
+     *              malformed config entry written outside the module's own
+     *              save flow) - never bypassed by casting a non-scalar to string.
+     *
+     * @param string|null $isoCode
+     *
+     * @return string
+     */
+    public function getHostedFieldsIdentifier($isoCode = null)
+    {
+        $iso_code = strtolower(null === $isoCode ? $this->context->currency->iso_code : $isoCode);
+        $hosted_fields = json_decode($this->configuration->getValue('hosted_fields') ?: '{}', true);
+
+        return isset($hosted_fields[$iso_code]) && is_string($hosted_fields[$iso_code])
+            ? $hosted_fields[$iso_code]
+            : '';
+    }
+
+    /**
+     * @description  creation payment option
+     * for hosted fields (UHF) payment, mirroring setIntegratedPaymentOption()
+     *
+     * @param $payment_options
+     *
+     * @return mixed
+     */
+    public function setHostedFieldsPaymentOption($payment_options)
+    {
+        if (empty($payment_options)) {
+            return [];
+        }
+
+        $hosted_fields = [];
+        // Mirrors setIntegratedPaymentOption()'s own inner 'name' => 'integrated':
+        // this inner field intentionally differs from the outer array key
+        // ('standard', set at the end of this method) - same divergence that
+        // already exists in the code being mirrored, not a new inconsistency.
+        $hosted_fields['name'] = 'hosted_fields';
+        $hosted_fields['inputs']['method'] = [
+            'name' => 'method',
+            'type' => 'hidden',
+            'value' => 'hosted_fields',
+        ];
+        $hosted_fields['inputs']['id_cart'] = $payment_options['standard']['inputs']['id_cart'];
+        $hosted_fields['action'] = 'javascript:payplugModule.hosted_fields.form.validate();';
+        $hosted_fields['logo'] = $payment_options['standard']['logo'];
+        $hosted_fields['moduleName'] = 'payplug';
+        $hosted_fields['callToActionText'] = $this->dependencies
+            ->getPlugin()
+            ->getTranslationClass()
+            ->l('specific17.setHostedFieldsPaymentOption.name', 'prestashopadapter17');
+        $hosted_fields['tpl'] = 'hosted_fields.tpl';
+        $hosted_fields['extra_classes'] = 'payplug hosted_fields';
+        $company_id = $this->dependencies
+            ->getPlugin()
+            ->getConfigurationClass()
+            ->getValue('oauth_company_id');
+
+        $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $translation = $this->dependencies->getPlugin()->getTranslationClass()->getFrontIntegratedPaymentTranslations();
+        $privacyLink = $this->getPrivacyLink();
+
+        $this->context->smarty->assign(array_merge(
+            [
+                'is_one_click_activated' => (bool) $payment_methods['one_click'],
+                'privacy' => $translation['privacy'],
+                'secure' => $translation['secure'],
+                'privacyLink' => $privacyLink,
+
+                'hosted_fields_js_url' => $this->dependencies
+                    ->getPlugin()
+                    ->getRoutes()
+                    ->getSourceUrl()['hosted_fields'],
+                'hosted_company_id' => $company_id,
+                'hosted_fields_identifier' => $this->getHostedFieldsIdentifier(),
+                'hosted_fields_accepted_brands' => json_encode(self::HOSTED_FIELDS_ACCEPTED_BRANDS),
+                'hosted_fields_uhf_url' => $this->context->link->getModuleLink(
+                    $this->dependencies->name,
+                    'uhf',
+                    [],
+                    true
+                ),
+            ],
+            $this->getEmbeddedPlaceholderTranslations()
+        ));
+
+        $hosted_fields['additionalInformation'] =
+            $this->dependencies->configClass->fetchTemplate('checkout/payment/hosted_fields.tpl');
+
+        $payment_options['standard'] = $hosted_fields;
 
         return $payment_options;
     }
@@ -424,5 +531,58 @@ class PrestashopAdapter17
         $this->context->smarty->assign([
             'payplug_switch' => $switch,
         ]);
+    }
+
+    /**
+     * @description Privacy-policy link for the current front-office language,
+     *              shared by both the integrated and hosted-fields embedded
+     *              checkout renderings.
+     *
+     * @return string
+     */
+    private function getPrivacyLink()
+    {
+        switch ($this->context->language->iso_code) {
+            case 'fr':
+                return 'https://www.payplug.com/fr/politique-de-confidentialite/';
+
+            case 'it':
+                return 'https://www.payplug.com/it/politica-di-confidenzialita/';
+
+            default:
+                return 'https://www.payplug.com/privacy-policy/';
+        }
+    }
+
+    /**
+     * @description The four hosted-card-field placeholder translations, shared
+     *              by both the integrated and hosted-fields embedded checkout
+     *              renderings (both use the exact same 'specific17.setIntegratedPaymentOption.placeholder*'
+     *              keys - the hosted-fields rendering deliberately reuses these
+     *              rather than defining its own, since the placeholder text is
+     *              identical).
+     *
+     * @return array
+     */
+    private function getEmbeddedPlaceholderTranslations()
+    {
+        return [
+            'placeholderCardholder' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('specific17.setIntegratedPaymentOption.placeholderCardholder', 'prestashopadapter17'),
+            'placeholderPan' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('specific17.setIntegratedPaymentOption.placeholderPan', 'prestashopadapter17'),
+            'placeholderExp' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('specific17.setIntegratedPaymentOption.placeholderExp', 'prestashopadapter17'),
+            'placeholderCvv' => $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->l('specific17.setIntegratedPaymentOption.placeholderCvv', 'prestashopadapter17'),
+        ];
     }
 }
