@@ -1685,7 +1685,6 @@ var $document, $window, __moduleName__Module = {
                 $form = $methodInput.length ? $methodInput.parent() : $();
             hosted.props.paymentOptionId = $form.length ? $form.attr('id').replace('payment-payment-option-', 'payment-option-').replace('-form', '') : null;
 
-
             // Mirrors integrated.form.init() (same file, integrated sub-module):
             // instance.load() (called from setup(), below) mounts cross-origin
             // iframes, which can fail to render if mounted while this option's
@@ -1701,6 +1700,7 @@ var $document, $window, __moduleName__Module = {
             }
 
             hosted.bindCardholder();
+            hosted.attachFormValidateListener();
         },
         setup: function () {
             var hosted = __moduleName__Module.hosted_fields;
@@ -1721,7 +1721,7 @@ var $document, $window, __moduleName__Module = {
                 setTimeout(hosted.setup, 300);
                 return;
             }
-            const uhf_obj = {
+            hosted.props.instance = window.dalenys.hostedFields({
                 companyId: window['hosted_company_id'], // PAYPLUG_OAUTH_COMPANY_ID
                 // Per-currency UHF identifier, merchant-configured (PrestashopAdapter17's
                 // getHostedFieldsIdentifier(), PRE-3622 admin config).
@@ -1753,8 +1753,7 @@ var $document, $window, __moduleName__Module = {
                         },
                     },
                 },
-            };
-            hosted.props.instance = window.dalenys.hostedFields(uhf_obj);
+            });
             if (hosted.props.instance && hosted.props.instance.load) {
                 hosted.props.instance.load();
             }
@@ -1807,9 +1806,30 @@ var $document, $window, __moduleName__Module = {
                 .on('input.hostedFieldsCardholder blur.hostedFieldsCardholder', update);
             update();
         },
+        attachFormValidateListener: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (typeof $document == 'undefined') {
+                return;
+            }
+            // Mirrors integrated.form.init() listener (line 610): attach validate()
+            // to the global form submit event so it fires every time the form is
+            // submitted, not just the first time. This allows retrying after
+            // switching payment methods or recovering from errors.
+            $document.on('submit', 'form', hosted.form.validate);
+        },
         form: {
-            validate: function () {
-                var hosted = __moduleName__Module.hosted_fields;
+            validate: function (event) {
+                var hosted = __moduleName__Module.hosted_fields,
+                    payment_option_id = hosted.props.paymentOptionId,
+                    isHostedFields = payment_option_id == $('input[name="payment-option"]:checked').attr('id');
+
+                // Mirrors integrated.form.validate(): only proceed if hosted_fields
+                // is the currently selected payment option. This ensures the global
+                // submit listener doesn't interfere with other payment methods.
+                if (typeof event != 'undefined' && !isHostedFields) {
+                    return;
+                }
+
                 // Mirrors integrated.form.getPaymentId's submited guard (same file,
                 // integrated sub-module): bail out early on a second call instead of
                 // firing a second createToken()/AJAX round-trip. Reset alongside
@@ -1821,6 +1841,13 @@ var $document, $window, __moduleName__Module = {
                 if (hosted.props.submited) {
                     return false;
                 }
+
+                // Prevent form from submitting while we process the payment
+                if (typeof event != 'undefined' && isHostedFields) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
                 var invalid = Object.keys(hosted.props.fieldsInvalid).some(function (key) {
                     return hosted.props.fieldsInvalid[key] || hosted.props.fieldsEmpty[key];
                 });

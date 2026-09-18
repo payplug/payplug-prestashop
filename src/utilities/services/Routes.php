@@ -128,6 +128,54 @@ class Routes
     }
 
     /**
+     * @description Get the Unified API base url
+     *
+     * @return string
+     */
+    public function getUnifiedApiUrl()
+    {
+        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            $this->loadDotenv($dotenvFile);
+        }
+
+        if (isset($_ENV['UNIFIED_API_BASE_URL'])) {
+            return $_ENV['UNIFIED_API_BASE_URL'];
+        }
+
+        \PrestaShopLogger::addLog(
+            'PayPlug: UNIFIED_API_BASE_URL is not configured — Unified Hosted Fields payments will fail.',
+            3
+        );
+
+        return '';
+    }
+
+    /**
+     * @description Get the UPC identity provider base url
+     *
+     * @return string
+     */
+    public function getIdentityProviderUrl()
+    {
+        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            $this->loadDotenv($dotenvFile);
+        }
+
+        if (isset($_ENV['UPC_IDENTITY_PROVIDER_URL'])) {
+            return $_ENV['UPC_IDENTITY_PROVIDER_URL'];
+        }
+
+        \PrestaShopLogger::addLog(
+            'PayPlug: UPC_IDENTITY_PROVIDER_URL is not configured — Unified Hosted Fields payments will fail.',
+            3
+        );
+
+        return '';
+    }
+
+    /**
      * @return array
      */
     public function getSourceUrl()

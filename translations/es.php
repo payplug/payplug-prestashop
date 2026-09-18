@@ -483,6 +483,7 @@ $_MODULE['<{payplug}prestashop>translation_fb0bc235ce26e6f1c34b96f4afd349d8'] = 
 $_MODULE['<{payplug}prestashop>translation_fcaec54014b191c119559483f6e3d426'] = 'Cancelar';
 $_MODULE['<{payplug}prestashop>uhf_a229f78198b690f17107c9fc65bfa74d'] = 'Este tipo de tarjeta no está soportado.';
 $_MODULE['<{payplug}prestashop>uhf_cef5ffe1ea30cca7818c988c27467aed'] = 'La transacción no se completó y no se cargó a su tarjeta.';
+$_MODULE['<{payplug}prestashop>uhf_03271becb2128e430f04d027883a6bd9'] = 'Espere, su solicitud anterior todavía se está procesando.';
 $_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'Su simulación del calendario de pagos no está disponible temporalmente. Encontrará esta información en la etapa de pago.';
 $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Datos de pago vacíos.';
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'Se ha producido un error. Inténtelo de nuevo en unos segundos.';

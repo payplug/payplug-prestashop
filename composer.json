@@ -4,6 +4,8 @@
   "description": "Payplug: The online payment solution combining simplicity and first-rate support to boost your sales",
   "version": "5.2.0",
   "require": {
+    "ext-curl": "*",
+    "ext-json": "*",
     "php": ">=7.4.0",
     "payplug/payplug-php": "^4.0",
     "symfony/dotenv": "3.4.*",
@@ -48,7 +50,7 @@
     "install-dev": "composer install && composer hooks:install",
     "stan": "php vendor/bin/phpstan analyse --no-progress",
     "cs-lint": "php vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no",
-    "test": "php vendor/bin/phpunit -c tests/phpunit.xml",
+    "test": "php -d memory_limit=-1 vendor/bin/phpunit -c tests/phpunit.xml",
     "cs:fix": "php vendor/bin/php-cs-fixer fix -vvv --using-cache=yes",
     "cs:cache:reset": "rm -f .php_cs.cache && : > .php_cs.cache",
     "hooks:install": "php vendor/bin/captainhook install -f"

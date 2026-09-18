@@ -38,7 +38,7 @@ class PrestashopAdapter17
      *              single source of truth for both the client-side rejection (via
      *              window['payplug_hosted_fields_accepted_brands'], see
      *              setHostedFieldsPaymentOption()) and the server-side re-validation
-     *              in controllers/front/uhf.php.
+     *              in controllers/front/unified.php?action=create.
      */
     const HOSTED_FIELDS_ACCEPTED_BRANDS = ['cb', 'visa', 'mastercard'];
 
@@ -328,8 +328,8 @@ class PrestashopAdapter17
                 'hosted_fields_accepted_brands' => json_encode(self::HOSTED_FIELDS_ACCEPTED_BRANDS),
                 'hosted_fields_uhf_url' => $this->context->link->getModuleLink(
                     $this->dependencies->name,
-                    'uhf',
-                    [],
+                    'unified',
+                    ['action' => 'create'],
                     true
                 ),
             ],

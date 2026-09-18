@@ -482,6 +482,7 @@ $_MODULE['<{payplug}prestashop>translation_fb0bc235ce26e6f1c34b96f4afd349d8'] = 
 $_MODULE['<{payplug}prestashop>translation_fcaec54014b191c119559483f6e3d426'] = 'Annulla';
 $_MODULE['<{payplug}prestashop>uhf_a229f78198b690f17107c9fc65bfa74d'] = 'Questo tipo di carta non è supportato.';
 $_MODULE['<{payplug}prestashop>uhf_cef5ffe1ea30cca7818c988c27467aed'] = 'La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta.';
+$_MODULE['<{payplug}prestashop>uhf_03271becb2128e430f04d027883a6bd9'] = 'Attendere, la richiesta precedente è ancora in fase di elaborazione.';
 $_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'La simulazione del tuo piano di finanziamento non è per il momento disponibile. Queste informazioni ti saranno fornite al momento del pagamento.';
 $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Nessun campo è stato completato.';
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'Si è verificato un errore. Riprova tra un attimo.';

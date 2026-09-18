@@ -484,6 +484,7 @@ $_MODULE['<{payplug}prestashop>translation_fb0bc235ce26e6f1c34b96f4afd349d8'] = 
 $_MODULE['<{payplug}prestashop>translation_fcaec54014b191c119559483f6e3d426'] = 'Cancel';
 $_MODULE['<{payplug}prestashop>uhf_a229f78198b690f17107c9fc65bfa74d'] = 'This card brand is not supported.';
 $_MODULE['<{payplug}prestashop>uhf_cef5ffe1ea30cca7818c988c27467aed'] = 'The transaction was not completed and your card was not charged.';
+$_MODULE['<{payplug}prestashop>uhf_03271becb2128e430f04d027883a6bd9'] = 'Please wait, your previous request is still being processed.';
 $_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.';
 $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Empty payment data.';
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'An error occurred. Please retry in few seconds.';

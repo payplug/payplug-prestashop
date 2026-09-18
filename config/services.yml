@@ -12,6 +12,10 @@ services:
     class: PayPlug\src\actions\RequestAction
     public: true
 
+  payplug.action.operation:
+    class: PayPlug\src\actions\OperationAction
+    public: true
+
   payplug.models.classes.hook:
     class: PayPlug\src\models\classes\Hook
     public: true
@@ -44,6 +48,10 @@ services:
 
   payplug.utilities.service.props:
     class: PayPlug\src\utilities\services\Props
+    public: true
+
+  payplug.utilities.service.unified_api_payment_service_factory:
+    class: PayPlug\src\utilities\services\UnifiedApiPaymentServiceFactory
     public: true
 
   payplug.utilities.validator.regex:
