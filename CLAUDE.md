@@ -54,12 +54,35 @@ The admin configuration UI itself (Vue.js) lives in a separate repo (`payplug-ui
 2. `PluginInit` (extends `BaseClass`) constructs every adapter, action, model class, and repository, then wires them all onto a single `PluginEntity` via fluent setters (`setCardAction()`, `setAddress()`, `setOrderRepository()`, ...). This `PluginEntity` is the object graph everything else reads from (`$dependencies->getPlugin()`).
 3. `DependenciesClass` also builds a set of legacy top-level classes (`AdminClass`, `CartClass`, `ConfigClass`, `HookClass`, `MediaClass`, `OrderClass`, `PaymentClass`, `PayplugLock`, `AmountCurrencyClass`) that wrap/delegate into the same plugin graph — these are what `payplug.php` and `classes/` code call directly (e.g. `$this->payplug_dependencies->hookClass->...`).
 
-When adding a new collaborator, wire it into `PluginInit` (constructor + a setter call) and, if it needs to be resolved as a Symfony service (e.g. for the MCP plugin actions), also register it in `config/services.yml` — a service used but not registered fails at runtime with `ServiceNotFoundException`.
+**`PluginInit`/`PluginEntity` is legacy — do not add new collaborators to it.** The steps above describe what already exists and why `$dependencies->getPlugin()->getXxx()` still works for old collaborators; they are not instructions for new code. Every new collaborator (repository, adapter, model class, action) is registered directly in `config/services.yml` instead — no `PluginInit` constructor line, no `PluginEntity` property/getter/setter. Resolve it either via the module (`$this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name)->getService('service.id')`) or, for any class that already exposes `$dependencies`, via the `ServiceGetter` trait (`src/utilities/traits/ServiceGetter.php`): `$this->getService('service.id')`. A service used but not registered fails at runtime with `ServiceNotFoundException`.
+
+For a class whose constructor already expects an injected `$dependencies` (e.g. anything extending `EntityRepository`/`QueryRepository` — their base constructor is `__construct($dependencies = null)`, stored as-is with **no fallback** to building its own), register it with an explicit argument reference to the existing `payplug.dependencies_class` service, e.g.:
+
+```yaml
+  payplug.models.repositories.operation:
+    class: PayPlug\src\models\repositories\OperationRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+```
+
+Omitting `arguments` here is a silent runtime bug, not a simplification — the container then calls the constructor with zero arguments, `$dependencies` is `null`, and the first `$this->dependencies->getPlugin()->...` call inside the class fatals. Classes that instead build their own `new DependenciesClass()` internally (the established convention for `src/actions/*Action`, `src/utilities/services/*`, and `src/models/classes/*` — see `HookAction`, `API`, `Merchant`) take no constructor argument and need no `arguments` key at all.
+
+Usage from calling code stays the same either way:
+
+```php
+$operation_repository = $this->dependencies
+    ->getPlugin()
+    ->getModule()
+    ->getInstanceByName($this->dependencies->name)
+    ->getService('payplug.models.repositories.operation');
+// or, inside a class using ServiceGetter:
+$operation_repository = $this->getService('payplug.models.repositories.operation');
+```
 
 ### Layers under `src/`
 
 - `src/actions/` — business logic entry points (`PaymentAction`, `ValidationAction`, `OrderAction`, `CartAction`, `OneyAction`, `CardAction`, `QueueAction`, `HookAction`, ...). Controllers and hooks call into these rather than touching models/adapters directly.
-- `src/application/adapter/` — thin wrappers around PrestaShop core classes (`Order`, `Cart`, `Context`, `Tools`, ...), each with a matching interface in `src/interfaces/`. This indirection exists for testability and PS-version isolation; do not bypass it to call PrestaShop core statics directly from business logic.
+- `src/application/adapter/` — thin wrappers around **CMS-native classes** (PrestaShop's `Product`, `Order`, `Cart`, `Context`, `Tools`, ...), each with a matching interface in `src/interfaces/`. The criterion for a file/method belonging here is narrow: it must directly call a CMS core class/static. E.g. `ProductAdapter::getIdProductAttributeByIdAttributes()` calls `\Product::getIdProductAttributeByIdAttributes(...)` directly — if this module were ported to a CMS where the equivalent class is `Item`, only that one line inside the adapter changes (`\Product::...` → `\Item::...`); every business-logic call site (`$this->productAdapter->getIdProductAttributeByIdAttributes(...)`) stays identical. This indirection exists for testability and CMS-version/CMS-portability isolation; do not bypass it to call CMS core statics directly from business logic. Conversely, a class that only orchestrates *other* module classes/repositories (no direct CMS static/class call of its own) is not an adapter, even if it implements a third-party vendor interface (e.g. a `payplug/unified-plugin-core` contract) — that's domain logic and belongs in `src/models/classes/` instead (see `UpcLogger`/`UpcLock`/`UpcConfigurationRepository`/etc., PRE-3624).
 - `src/models/classes/` — domain model classes (`Order`, `Configuration`, `ApiRest`, `Merchant`, ...) and, under `paymentMethod/`, one class per payment method extending `PaymentMethod`.
 - `src/models/repositories/` and `src/repositories/` — two parallel repository layers (the `models/repositories` ones are the newer, DI-wired versions constructed in `PluginInit::setRepositories()`; `src/repositories/*` plus `classes/*` are older repositories still constructed directly in `PluginInit::setOldRepositories()`/`DependenciesClass`). Check which one a given entity already uses before adding new persistence code for it.
 - `src/utilities/services/` — cross-cutting services: `API.php` (the only allowed entry point to the PayPlug PHP SDK — never instantiate SDK classes directly elsewhere), `Core.php`, `Mail.php`, `PhoneNumber.php`, `Routes.php`, `MerchantTelemetry.php`, `Mcp.php` (MCP integration, PHP 8+ only, excluded from phpstan/cs-fixer on PHP < 8).

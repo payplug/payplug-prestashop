@@ -219,4 +219,54 @@ class Merchant
 
         return (bool) $token;
     }
+
+    /**
+     * @description Resolve one field ('client_id' or 'client_secret') of the OAuth2
+     * client-credentials pair already obtained at onboarding, for the current live/sandbox mode
+     *
+     * @param string $field
+     *
+     * @return string
+     */
+    public function getOauthClientField($field = '')
+    {
+        if (!is_string($field) || !$field) {
+            return '';
+        }
+
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $is_live = !(bool) $configuration->getValue('sandbox_mode');
+        $mode = $is_live ? 'live' : 'test';
+        $oauth_client_data = json_decode((string) $configuration->getValue('oauth_client_data'), true);
+
+        if (!isset($oauth_client_data[$mode][$field]) || !is_string($oauth_client_data[$mode][$field])) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('Merchant::getOauthClientField - missing/malformed oauth_client_data.' . $mode . '.' . $field, 'error');
+
+            return '';
+        }
+
+        return $oauth_client_data[$mode][$field];
+    }
+
+    /**
+     * @description Resolve the PRE-3622 Unified Hosted Fields identifier configured for the
+     * current context currency
+     *
+     * @return string
+     */
+    public function getHostedFieldsIdentifier()
+    {
+        $iso_code = strtolower($this->dependencies->getPlugin()->getContext()->currency->iso_code);
+        $hosted_fields = json_decode(
+            (string) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('hosted_fields'),
+            true
+        );
+
+        return (isset($hosted_fields[$iso_code]) && is_string($hosted_fields[$iso_code]))
+            ? $hosted_fields[$iso_code]
+            : '';
+    }
 }

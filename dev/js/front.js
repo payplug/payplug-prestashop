@@ -1682,8 +1682,9 @@ var $document, $window, __moduleName__Module = {
             // input directly instead of by position, and degrade safely (no throw)
             // if the hidden method input or its radio sibling isn't in the DOM yet.
             var $methodInput = $('input[name=method][value=hosted_fields]').first(),
-                $paymentOption = $methodInput.length ? $methodInput.parent().find('input[type=radio]').first() : $();
-            hosted.props.paymentOptionId = $paymentOption.length ? $paymentOption.attr('id').replace('pay-with-', '') : null;
+                $form = $methodInput.length ? $methodInput.parent() : $();
+            hosted.props.paymentOptionId = $form.length ? $form.attr('id').replace('payment-payment-option-', 'payment-option-').replace('-form', '') : null;
+
 
             // Mirrors integrated.form.init() (same file, integrated sub-module):
             // instance.load() (called from setup(), below) mounts cross-origin
@@ -1728,6 +1729,7 @@ var $document, $window, __moduleName__Module = {
                 fields: {
                     brand: {
                         id: "hosted-brand-container",
+                        useInlineSelection: true, // to use the new version of the brand selector component
                     },
                     card: {
                         id: 'hosted-card-container',

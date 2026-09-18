@@ -234,6 +234,21 @@ class ConfigurationAction
         // Install SQL
         $txt_log->info('Install SQL');
 
+        // Force-autoload repositories registered only in config/services.yml (not wired into
+        // PluginInit) so EntityRepository::initialize()'s get_declared_classes() reflection walk
+        // below can find them and create their tables on a fresh install. Add one line here per
+        // such repository as new ones are introduced.
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.models.repositories.operation');
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.models.repositories.upc_lock');
+
         if (!$this->dependencies->getPlugin()->getEntityRepository()->initialize()) {
             $txt_log->info('Install failed: Install SQL tables.');
 

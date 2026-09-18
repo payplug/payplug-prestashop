@@ -20,6 +20,16 @@ services:
     class: PayPlug\src\models\classes\Merchant
     public: true
 
+  payplug.models.repositories.operation:
+    class: PayPlug\src\models\repositories\OperationRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+
+  payplug.models.repositories.upc_lock:
+    class: PayPlug\src\models\repositories\UpcLockRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+
   payplug.utilities.service.api:
     class: PayPlug\src\utilities\services\API
     public: true

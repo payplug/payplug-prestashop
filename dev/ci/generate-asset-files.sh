@@ -7,8 +7,8 @@ echo "get version from package.json..."
 version=$(grep '"version"' ./package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
 
 # Run the build
-echo "Installing dependencies..."
-npm install --no-save
+#echo "Installing dependencies..."
+#npm install --no-save
 
 echo "Copying assets..."
 cp ./node_modules/payplug-ui-plugins-bo/js/app.js ./views/js/app-${version}.js
