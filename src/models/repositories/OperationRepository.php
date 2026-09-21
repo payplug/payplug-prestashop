@@ -27,7 +27,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class OperationRepository extends EntityRepository
+use PayplugUnifiedCore\Contracts\IPaymentRepository;
+use PayplugUnifiedCore\DataValues\OperationData;
+use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
+
+class OperationRepository extends EntityRepository implements IPaymentRepository
 {
     public function __construct($dependencies = null)
     {
@@ -71,5 +75,78 @@ class OperationRepository extends EntityRepository
             ->engine($engine);
 
         return $this->build();
+    }
+
+    public function getByOrderId(string $orderId): OperationData
+    {
+        $row = $this->getBy('order_id', $orderId);
+
+        if (!$row) {
+            throw new PaymentNotFoundException(sprintf('No UPC operation for order "%s".', $orderId));
+        }
+
+        return $this->toOperationData($row);
+    }
+
+    public function getByOperationId(string $operationId): OperationData
+    {
+        $row = $this->getBy('operation_id', $operationId);
+
+        if (!$row) {
+            throw new PaymentNotFoundException(sprintf('No UPC operation "%s".', $operationId));
+        }
+
+        return $this->toOperationData($row);
+    }
+
+    public function save(OperationData $operationData): void
+    {
+        $existing = $this->getBy('operation_id', $operationData->operationId);
+
+        $fields = [
+            'operation_id' => $operationData->operationId,
+            'order_id' => $operationData->orderId,
+            'exec_code' => $operationData->execCode,
+            'outcome' => $operationData->outcome,
+            'amount' => (int) $operationData->amount,
+        ];
+
+        if ($existing) {
+            $this->updateEntity((int) $existing['id_payplug_upc_operation'], $fields);
+
+            return;
+        }
+
+        $fields['treated'] = false;
+        $this->createEntity($fields);
+    }
+
+    public function markTreated(string $operationId): void
+    {
+        $existing = $this->getBy('operation_id', $operationId);
+
+        if (!$existing) {
+            return;
+        }
+
+        $this->updateEntity((int) $existing['id_payplug_upc_operation'], ['treated' => true]);
+    }
+
+    public function isTreated(string $operationId): bool
+    {
+        $row = $this->getBy('operation_id', $operationId);
+
+        return (bool) ($row && $row['treated']);
+    }
+
+    private function toOperationData(array $row): OperationData
+    {
+        return new OperationData(
+            $row['operation_id'],
+            $row['exec_code'],
+            $row['outcome'],
+            (int) $row['amount'],
+            $row['order_id']
+        );
     }
 }
