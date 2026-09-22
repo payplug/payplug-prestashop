@@ -14,7 +14,7 @@ class setTest extends BaseUpcTokenCache
         $this->cache_repository->shouldReceive('createEntity')->once()->withArgs(function ($fields) {
             $decoded = json_decode($fields['cache_value'], true);
 
-            return 'upc_token:foo' === $fields['cache_key'] && 'a-jwt' === $decoded['value'];
+            return 'upc_token:foo' === $fields['cache_key'] && 'a-jwt' === base64_decode($decoded['value']);
         });
 
         $this->cache->set('foo', 'a-jwt', 60);
@@ -31,7 +31,7 @@ class setTest extends BaseUpcTokenCache
         $this->cache_repository->shouldReceive('updateEntity')->once()->withArgs(function ($id, $fields) {
             $decoded = json_decode($fields['cache_value'], true);
 
-            return 7 === $id && 'new-jwt' === $decoded['value'];
+            return 7 === $id && 'new-jwt' === base64_decode($decoded['value']);
         });
 
         $this->cache->set('foo', 'new-jwt', 60);

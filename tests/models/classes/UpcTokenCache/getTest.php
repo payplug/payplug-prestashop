@@ -20,7 +20,7 @@ class getTest extends BaseUpcTokenCache
         $this->cache_repository->shouldReceive('getBy')->with('cache_key', 'upc_token:foo')->andReturn([
             'id_payplug_cache' => 1,
             'cache_key' => 'upc_token:foo',
-            'cache_value' => json_encode(['value' => 'a-jwt', 'expires_at' => time() + 60]),
+            'cache_value' => json_encode(['value' => base64_encode('a-jwt'), 'expires_at' => time() + 60]),
         ]);
 
         $this->assertSame('a-jwt', $this->cache->get('foo'));
@@ -31,7 +31,7 @@ class getTest extends BaseUpcTokenCache
         $this->cache_repository->shouldReceive('getBy')->with('cache_key', 'upc_token:foo')->andReturn([
             'id_payplug_cache' => 1,
             'cache_key' => 'upc_token:foo',
-            'cache_value' => json_encode(['value' => 'a-jwt', 'expires_at' => time() - 60]),
+            'cache_value' => json_encode(['value' => base64_encode('a-jwt'), 'expires_at' => time() - 60]),
         ]);
         $this->cache_repository->shouldReceive('deleteBy')->once()->with('cache_key', 'upc_token:foo');
 

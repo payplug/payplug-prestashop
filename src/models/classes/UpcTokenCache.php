@@ -61,7 +61,13 @@ class UpcTokenCache implements ITokenCache
             return null;
         }
 
-        return (string) $decoded['value'];
+        // base64: EntityRepository::createEntity()/updateEntity() escape string fields via
+        // Db::escape($value, $htmlOK = false), which runs strip_tags() on the raw value. A
+        // cached value may itself be HTML (e.g. a 3DS challenge form), so it's stored/read back
+        // as base64 to survive that unrelated to what the caller puts in it.
+        $value = base64_decode((string) $decoded['value'], true);
+
+        return false !== $value ? $value : null;
     }
 
     public function set(string $key, string $value, int $ttlSeconds): void
@@ -69,7 +75,7 @@ class UpcTokenCache implements ITokenCache
         $repository = $this->dependencies->getPlugin()->getCacheRepository();
         $physical_key = self::KEY_PREFIX . $key;
         $row = $repository->getBy('cache_key', $physical_key);
-        $cache_value = json_encode(['value' => $value, 'expires_at' => time() + $ttlSeconds]);
+        $cache_value = json_encode(['value' => base64_encode($value), 'expires_at' => time() + $ttlSeconds]);
 
         if ($row) {
             $repository->updateEntity((int) $row['id_payplug_cache'], ['cache_value' => $cache_value]);

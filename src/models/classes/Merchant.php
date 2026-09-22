@@ -250,23 +250,4 @@ class Merchant
 
         return $oauth_client_data[$mode][$field];
     }
-
-    /**
-     * @description Resolve the PRE-3622 Unified Hosted Fields identifier configured for the
-     * current context currency
-     *
-     * @return string
-     */
-    public function getHostedFieldsIdentifier()
-    {
-        $iso_code = strtolower($this->dependencies->getPlugin()->getContext()->currency->iso_code);
-        $hosted_fields = json_decode(
-            (string) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('hosted_fields'),
-            true
-        );
-
-        return (isset($hosted_fields[$iso_code]) && is_string($hosted_fields[$iso_code]))
-            ? $hosted_fields[$iso_code]
-            : '';
-    }
 }
