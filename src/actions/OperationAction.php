@@ -237,7 +237,8 @@ class OperationAction
             $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
 
             if ($output->redirectHtml) {
-                $token_cache->set('uhf_challenge_html:' . $cart->id, (string) $output->redirectHtml, 600);
+                $output_html = base64_encode($output->redirectHtml);
+                $token_cache->set('uhf_challenge_html:' . $cart->id, (string) $output_html, 600);
                 $redirect_url = $context->link->getModuleLink(
                     $this->dependencies->name,
                     'unified',
@@ -296,7 +297,10 @@ class OperationAction
             return ['result' => false];
         }
 
-        return ['result' => true, 'html' => $html];
+        return [
+            'result' => true,
+            'html' => base64_decode($html)
+        ];
     }
 
     public function returnAction($params = [])
