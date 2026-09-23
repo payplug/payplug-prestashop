@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1bbdf9479a1fbe16f5849f3513571cc6",
+    "content-hash": "6c3a4390f09d774d83c98b7e3361c4c2",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -241,16 +241,16 @@
         },
         {
             "name": "payplug/unified-plugin-core",
-            "version": "0.0.7",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/unified-plugin-core.git",
-                "reference": "e6a6733c5629a3d58c40ed16287cba6111d98868"
+                "reference": "10ead914e201c06243ddfd61b5ac23f9799a39a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/unified-plugin-core/zipball/e6a6733c5629a3d58c40ed16287cba6111d98868",
-                "reference": "e6a6733c5629a3d58c40ed16287cba6111d98868",
+                "url": "https://api.github.com/repos/payplug/unified-plugin-core/zipball/10ead914e201c06243ddfd61b5ac23f9799a39a1",
+                "reference": "10ead914e201c06243ddfd61b5ac23f9799a39a1",
                 "shasum": ""
             },
             "require": {
@@ -287,9 +287,9 @@
             "description": "Core foundations shared library for Payplug e-commerce plugins.",
             "support": {
                 "issues": "https://github.com/payplug/unified-plugin-core/issues",
-                "source": "https://github.com/payplug/unified-plugin-core/tree/0.0.7"
+                "source": "https://github.com/payplug/unified-plugin-core/tree/1.1.2"
             },
-            "time": "2026-07-21T14:40:20+00:00"
+            "time": "2026-09-15T14:24:30+00:00"
         },
         {
             "name": "psr/container",

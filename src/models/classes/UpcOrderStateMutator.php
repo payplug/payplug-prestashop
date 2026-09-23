@@ -67,6 +67,20 @@ class UpcOrderStateMutator implements IOrderStateMutator
             return;
         }
 
+        // Terminal-state guard: an order already marked paid must not be pushed backward to
+        // error/refund by a late/out-of-order notification (e.g. a stale retried webhook, or a
+        // FAILED arriving after a PAID one). A same-state re-application, or any forward-moving
+        // bucket, is left untouched here - Order::updateOrderState() already no-ops gracefully
+        // (with its own log) when $new_order_state matches the order's current state.
+        $paid_order_state = isset($order_states['paid']) ? (int) $order_states['paid'] : 0;
+        $is_regressive_bucket = in_array($bucket, ['error', 'refund'], true);
+
+        if ($paid_order_state && $is_regressive_bucket && $paid_order_state === (int) $order->getCurrentState()) {
+            $this->logger->error('UpcOrderStateMutator::apply - Skipped regressive state transition to bucket "' . $bucket . '" for already-paid order id: ' . $orderId);
+
+            return;
+        }
+
         $this->dependencies->getPlugin()->getOrderClass()->updateOrderState($order, $new_order_state);
     }
 

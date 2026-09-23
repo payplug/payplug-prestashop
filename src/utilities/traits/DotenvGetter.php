@@ -43,7 +43,8 @@ trait DotenvGetter
     /**
      * @param string $key
      *
-     * @return string|null
+     * @return string always the env value when set (via $_ENV, then $_SERVER, then getenv()),
+     *                otherwise '' - never null, so callers can chain a default with `?:`
      */
     protected function getEnv($key)
     {
@@ -51,15 +52,30 @@ trait DotenvGetter
             $this->loadDotenv();
         }
 
-        return isset($_ENV[$key]) ? $_ENV[$key] : null;
+        if (isset($_ENV[$key])) {
+            return (string) $_ENV[$key];
+        }
+
+        if (isset($_SERVER[$key])) {
+            return (string) $_SERVER[$key];
+        }
+
+        $value = getenv($key);
+
+        return false !== $value ? (string) $value : '';
     }
 
     private function loadDotenv()
     {
-        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
         if (self::$dotenvLoaded) {
             return;
         }
-        self::$dotenvLoaded = (new Dotenv())->load($dotenvFile);
+
+        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
+        if (\file_exists($dotenvFile)) {
+            (new Dotenv())->load($dotenvFile);
+        }
+
+        self::$dotenvLoaded = true;
     }
 }

@@ -57,7 +57,7 @@ class UnifiedApiPaymentServiceFactory
         $http_client = new CurlHttpClient();
         $oauth2_client = new OAuth2Client(
             $http_client,
-            $this->dependencies->getPlugin()->getRoutes()->getIdentityProviderUrl(),
+            $this->dependencies->getPlugin()->getRoutes()->getApiUrl(),
             '',
             self::SCOPE,
             self::AUDIENCE

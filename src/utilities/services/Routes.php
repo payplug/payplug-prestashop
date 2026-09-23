@@ -40,7 +40,8 @@ class Routes
      */
     public function getApiUrl()
     {
-        return $this->getEnv('API_BASE_URL') ?? 'https://api.payplug.com';
+        // getEnv() returns '' (never null) when unset, so the default needs `?:`, not `??`.
+        return $this->getEnv('API_BASE_URL') ?: 'https://api.payplug.com';
     }
 
     /**
@@ -50,7 +51,7 @@ class Routes
      */
     public function getCDNUrl()
     {
-        return $this->getEnv('CDN_BASE_URL') ?? 'https://cdn.payplug.com';
+        return $this->getEnv('CDN_BASE_URL') ?: 'https://cdn.payplug.com';
     }
 
     /**
@@ -60,7 +61,7 @@ class Routes
      */
     public function getOneyLoaderUrl()
     {
-        return $this->getEnv('ONEY_LOADER_URL') ?? 'https://assets.oney.io/build/loader.min.js';
+        return $this->getEnv('ONEY_LOADER_URL') ?: 'https://assets.oney.io/build/loader.min.js';
     }
 
     /**
@@ -70,7 +71,7 @@ class Routes
      */
     public function getHostedFieldsUrl()
     {
-        return $this->getEnv('HOSTED_FIELDS_URL') ?? '';
+        return $this->getEnv('HOSTED_FIELDS_URL') ?: 'https://cdn.payplug.com/js/hosted-fields/v1@1/index.js';
     }
 
     /**
@@ -80,17 +81,7 @@ class Routes
      */
     public function getUnifiedApiUrl()
     {
-        return $this->getEnv('UNIFIED_API_BASE_URL') ?? $this->getApiUrl();
-    }
-
-    /**
-     * @description Get the UPC identity provider base url
-     *
-     * @return string
-     */
-    public function getIdentityProviderUrl()
-    {
-        return $this->getEnv('UPC_IDENTITY_PROVIDER_URL') ?? $this->getApiUrl();
+        return $this->getEnv('UNIFIED_API_BASE_URL') ?: 'https://api.payplug.com';
     }
 
     /**

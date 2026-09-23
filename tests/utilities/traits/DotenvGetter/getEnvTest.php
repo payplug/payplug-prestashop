@@ -38,10 +38,10 @@ class getEnvTest extends TestCase
         $this->assertSame('a-value', $this->user_of_trait->callGetEnv('PAYPLUG_TEST_DOTENV_GETTER_KEY'));
     }
 
-    public function testReturnsNullWhenNotSet()
+    public function testReturnsEmptyStringWhenNotSet()
     {
         unset($_ENV['PAYPLUG_TEST_DOTENV_GETTER_KEY']);
 
-        $this->assertNull($this->user_of_trait->callGetEnv('PAYPLUG_TEST_DOTENV_GETTER_KEY'));
+        $this->assertSame('', $this->user_of_trait->callGetEnv('PAYPLUG_TEST_DOTENV_GETTER_KEY'));
     }
 }

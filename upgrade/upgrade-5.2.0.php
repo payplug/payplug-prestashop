@@ -39,12 +39,13 @@ function upgrade_module_5_2_0($object)
             `treated` TINYINT(1) NOT NULL DEFAULT 0,
             `date_add` DATETIME NULL,
             `date_upd` DATETIME NULL,
-            CONSTRAINT payplug_upc_operation_unique UNIQUE (operation_id)) ENGINE=' . _MYSQL_ENGINE_;
+            CONSTRAINT payplug_upc_operation_unique UNIQUE (operation_id),
+            KEY payplug_upc_operation_order_id (order_id)) ENGINE=' . _MYSQL_ENGINE_;
 
     try {
-        $flag = Db::getInstance()->Execute($sql);
+        $flag_operation = Db::getInstance()->Execute($sql);
     } catch (PrestaShopDatabaseException $e) {
-        $flag = false;
+        $flag_operation = false;
     }
 
     $sql_lock = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_upc_lock` (
@@ -56,10 +57,12 @@ function upgrade_module_5_2_0($object)
             CONSTRAINT payplug_upc_lock_unique UNIQUE (lock_key)) ENGINE=' . _MYSQL_ENGINE_;
 
     try {
-        $flag = $flag && Db::getInstance()->Execute($sql_lock);
+        $flag_lock = Db::getInstance()->Execute($sql_lock);
     } catch (PrestaShopDatabaseException $e) {
-        $flag = false;
+        $flag_lock = false;
     }
+
+    $flag = $flag_operation && $flag_lock;
 
     $logger->addLog('End upgrade script 5.2.0, result: ' . ($flag ? 'ok' : 'ko'));
 

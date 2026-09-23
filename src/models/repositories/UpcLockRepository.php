@@ -68,4 +68,49 @@ class UpcLockRepository extends EntityRepository
 
         return $this->build();
     }
+
+    /**
+     * @description Atomically steal an expired lock row: UPDATE ... WHERE lock_key = :key AND
+     *              expires_at < :now in a single statement, re-checking the expiry condition at
+     *              SQL level instead of a prior SELECT. Returns true only when this specific
+     *              UPDATE affected exactly one row, i.e. only for the caller that actually won
+     *              the steal race - two concurrent callers targeting the same expired (or
+     *              already-gone) row can no longer both succeed, unlike a read-then-blind-UPDATE-
+     *              by-id approach.
+     *
+     * @param string $lock_key
+     * @param int $new_expires_at
+     *
+     * @return bool
+     */
+    public function stealExpired($lock_key = '', $new_expires_at = 0)
+    {
+        if (!is_string($lock_key) || !$lock_key) {
+            return false;
+        }
+        if (!is_int($new_expires_at) || !$new_expires_at) {
+            return false;
+        }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+
+        $definition = $entity->getDefinition();
+
+        $this
+            ->update()
+            ->table($this->getTableName($definition['table']))
+            ->set('expires_at = ' . (int) $new_expires_at)
+            ->where('lock_key = "' . $this->escape($lock_key) . '"')
+            ->where('expires_at < ' . time());
+
+        $this->build();
+
+        return 1 === $this->dependencies->getPlugin()->getQueryAdapter()->getAffectedRows();
+    }
 }

@@ -68,7 +68,8 @@ class CurlHttpClient implements IOAuthHttpClient, IUnifiedApiHttpClient
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headerLines);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 
         // Secure by default: this client talks to PayPlug's own API/identity-provider endpoints
         // (OAuth2 credentials, payment operations) - verification is only disabled by an explicit

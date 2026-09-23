@@ -155,6 +155,16 @@ namespace {
         {
             return [];
         }
+
+        public function execute($s, $use_cache = true)
+        {
+            return true;
+        }
+
+        public function Affected_Rows()
+        {
+            return 0;
+        }
     }
 
     class Module extends ObjectModel

@@ -11,7 +11,7 @@
     "symfony/dotenv": "3.4.*",
     "symfony/dependency-injection": "^4.4",
     "payplug/payplug-plugin-mcp": "2.*",
-    "payplug/unified-plugin-core": "^0.0.7"
+    "payplug/unified-plugin-core": "^1.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^8.5.52",

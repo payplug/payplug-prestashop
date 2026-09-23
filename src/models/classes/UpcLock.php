@@ -38,6 +38,16 @@ class UpcLock implements ILock
 
     private $dependencies;
 
+    /**
+     * The expires_at value this instance itself set the last time it acquired/stole a given key -
+     * release() only deletes the row while it still carries this exact value, so releasing after
+     * the row has since been stolen by someone else (this instance's TTL ran out) can't delete
+     * that new owner's lock out from under them.
+     *
+     * @var array<string, int>
+     */
+    private $ownedExpirations = [];
+
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
@@ -51,28 +61,41 @@ class UpcLock implements ILock
         // Insert-first: a UNIQUE violation on lock_key makes createEntity() return 0
         // (EntityRepository::build() catches the exception), never throws.
         if ($repository->createEntity(['lock_key' => $key, 'expires_at' => $expires_at])) {
+            $this->ownedExpirations[$key] = $expires_at;
+
             return true;
         }
 
-        $row = $repository->getBy('lock_key', $key);
-        if (!$row) {
-            // Lost a race to a concurrent acquire/steal between our failed INSERT and
-            // this re-read; refuse rather than retry.
+        // Expired-lock steal, atomic at the SQL level: UPDATE ... WHERE lock_key = :key AND
+        // expires_at < :now, re-checking the expiry in the same statement instead of a prior
+        // SELECT. Only the caller whose UPDATE actually affects a row (checked via
+        // Db::Affected_Rows(), see UpcLockRepository::stealExpired()) wins the race - two
+        // concurrent stealers targeting the same expired row can no longer both succeed. A
+        // non-expired lock, or a lock_key that no longer exists at all (e.g. lost a race to a
+        // concurrent acquire/steal between our failed INSERT and this steal attempt), both
+        // simply affect zero rows and fall through to `return false` below.
+        if (!$repository->stealExpired($key, $expires_at)) {
             return false;
         }
 
-        if ((int) $row['expires_at'] >= time()) {
-            return false;
-        }
+        $this->ownedExpirations[$key] = $expires_at;
 
-        // Expired: steal it via UPDATE. Narrow residual race: two concurrent stealers
-        // can both succeed here, same accepted trade-off as this codebase's existing
-        // PayplugLock precedent.
-        return (bool) $repository->updateEntity((int) $row['id_payplug_upc_lock'], ['expires_at' => $expires_at]);
+        return true;
     }
 
     public function release(string $key): void
     {
-        $this->getService(self::REPOSITORY_SERVICE)->deleteBy('lock_key', $key);
+        if (!isset($this->ownedExpirations[$key])) {
+            return;
+        }
+
+        $repository = $this->getService(self::REPOSITORY_SERVICE);
+        $row = $repository->getBy('lock_key', $key);
+
+        if ($row && (int) $row['expires_at'] === $this->ownedExpirations[$key]) {
+            $repository->deleteBy('lock_key', $key);
+        }
+
+        unset($this->ownedExpirations[$key]);
     }
 }

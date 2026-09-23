@@ -78,16 +78,34 @@ class UpcTokenCache implements ITokenCache
         $cache_value = json_encode(['value' => base64_encode($value), 'expires_at' => time() + $ttlSeconds]);
 
         if ($row) {
-            $repository->updateEntity((int) $row['id_payplug_cache'], ['cache_value' => $cache_value]);
+            $updated = $repository->updateEntity((int) $row['id_payplug_cache'], ['cache_value' => $cache_value]);
+
+            if (!$updated) {
+                // The ITokenCache contract returns void - a write failure can't be propagated to
+                // the caller, so this is the only place it's observable at all. A caller storing
+                // e.g. uhf_pending_operation right after a real Unified API payment was created
+                // depends on this write succeeding; logging here is what lets a silent DB
+                // error/truncation/duplicate key be diagnosed after the fact instead of vanishing.
+                $this->logger()->error('UpcTokenCache::set - Failed to update cache row for key: ' . $key);
+            }
 
             return;
         }
 
-        $repository->createEntity(['cache_key' => $physical_key, 'cache_value' => $cache_value]);
+        $created_id = $repository->createEntity(['cache_key' => $physical_key, 'cache_value' => $cache_value]);
+
+        if (!$created_id) {
+            $this->logger()->error('UpcTokenCache::set - Failed to create cache row for key: ' . $key);
+        }
     }
 
     public function delete(string $key): void
     {
         $this->dependencies->getPlugin()->getCacheRepository()->deleteBy('cache_key', self::KEY_PREFIX . $key);
+    }
+
+    private function logger(): UpcLogger
+    {
+        return new UpcLogger($this->dependencies);
     }
 }

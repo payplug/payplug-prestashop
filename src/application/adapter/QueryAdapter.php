@@ -72,6 +72,19 @@ class QueryAdapter implements QueryInterface
         return $this->db->Insert_ID();
     }
 
+    /**
+     * @description Number of rows affected by the last INSERT/UPDATE/DELETE run through query().
+     *              Used where a caller needs to know whether a conditional UPDATE actually
+     *              matched a row (e.g. an atomic compare-and-swap), not just that it executed
+     *              without error.
+     *
+     * @return int
+     */
+    public function getAffectedRows()
+    {
+        return (int) $this->db->Affected_Rows();
+    }
+
     // @todo : A optimiser dans QueryRepository
     public function getValue($id)
     {

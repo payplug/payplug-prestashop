@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PayPlug\classes\DependenciesClass;
-use PayPlug\src\actions\UnifiedOrderCreator;
+use PayPlug\src\actions\UnifiedOrderAction;
 use PayPlug\src\utilities\traits\ServiceGetter;
 
 class PayplugUnifiedModuleFrontController extends ModuleFrontController
@@ -52,6 +52,9 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
             'cardholder' => $this->toolsAdapter->tool('getValue', 'cardholder'),
             'cardholderName' => $this->toolsAdapter->tool('getValue', 'cardholderName'),
             'id_cart' => $this->toolsAdapter->tool('getValue', 'id_cart'),
+            // 'challenge'/'return' resolve their cart from this opaque, unguessable token instead
+            // of a client-supplied id_cart - see OperationAction::createAction()/resolveIdCartFromToken().
+            'token' => $this->toolsAdapter->tool('getValue', 'token'),
         ];
 
         switch ($action) {
@@ -71,6 +74,13 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
                 break;
 
             default:
+                // Explicit non-2xx rather than PHP's implicit 200: this also covers a stray
+                // request to the old unified.php?action=notify route (removed in favor of the
+                // dedicated notify.php - see CLAUDE.md) landing here during a deploy where
+                // PayPlug's Receiver URL hasn't been repointed yet - failing loudly (PayPlug
+                // retries a non-2xx) is far preferable to a silent 200 that looks like success
+                // and drops the notification.
+                http_response_code(400);
                 header('Content-Type: application/json');
 
                 exit(json_encode(['result' => false, 'message' => 'Unknown or missing action']));
@@ -89,7 +99,7 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
         $result = $this->getService('payplug.action.operation')->dispatchAction('challenge', $params);
 
         if (!$result['result']) {
-            $this->renderClientRedirect(UnifiedOrderCreator::errorUrl($this->dependencies));
+            $this->renderClientRedirect((new UnifiedOrderAction($this->dependencies))->errorUrl());
 
             return;
         }
@@ -106,7 +116,7 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
     {
         $result = $this->getService('payplug.action.operation')->dispatchAction('return', $params);
 
-        $redirect_url = isset($result['redirect_url']) ? $result['redirect_url'] : UnifiedOrderCreator::errorUrl($this->dependencies);
+        $redirect_url = isset($result['redirect_url']) ? $result['redirect_url'] : (new UnifiedOrderAction($this->dependencies))->errorUrl();
 
         if ($this->wantsJsonResponse()) {
             header('Content-Type: application/json');

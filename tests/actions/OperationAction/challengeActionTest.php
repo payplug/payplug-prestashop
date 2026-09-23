@@ -17,11 +17,25 @@ class challengeActionTest extends TestCase
         \Mockery::close();
     }
 
-    public function testReturnsFalseWhenIdCartIsInvalid()
+    public function testReturnsFalseWhenTokenIsMissing()
     {
-        $action = (new \ReflectionClass(OperationAction::class))->newInstanceWithoutConstructor();
+        [$action, $mocks] = $this->mockActionWithFactory();
 
-        $result = $action->challengeAction(['id_cart' => 0]);
+        $mocks['logger']->shouldReceive('error')->once();
+
+        $result = $action->challengeAction([]);
+
+        $this->assertSame(['result' => false], $result);
+    }
+
+    public function testReturnsFalseWhenTokenIsUnknownOrExpired()
+    {
+        [$action, $mocks] = $this->mockActionWithFactory();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:bad-token')->andReturn(null);
+        $mocks['logger']->shouldReceive('error')->once();
+
+        $result = $action->challengeAction(['token' => 'bad-token']);
 
         $this->assertSame(['result' => false], $result);
     }
@@ -30,10 +44,11 @@ class challengeActionTest extends TestCase
     {
         [$action, $mocks] = $this->mockActionWithFactory();
 
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_challenge_html:42')->andReturn('<html>3DS form</html>');
         $mocks['logger']->shouldReceive('error')->never();
 
-        $result = $action->challengeAction(['id_cart' => 42]);
+        $result = $action->challengeAction(['token' => 'good-token']);
 
         $this->assertSame(['result' => true, 'html' => '<html>3DS form</html>'], $result);
     }
@@ -42,10 +57,11 @@ class challengeActionTest extends TestCase
     {
         [$action, $mocks] = $this->mockActionWithFactory();
 
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_challenge_html:42')->andReturn(null);
         $mocks['logger']->shouldReceive('error')->once();
 
-        $result = $action->challengeAction(['id_cart' => 42]);
+        $result = $action->challengeAction(['token' => 'good-token']);
 
         $this->assertSame(['result' => false], $result);
     }

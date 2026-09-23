@@ -21,14 +21,14 @@ class getUnifiedApiUrlTest extends TestCase
     {
         $this->service = new Routes();
         $this->setDotenvLoaded(true);
-        unset($_ENV['UNIFIED_API_BASE_URL'], $_ENV['UPC_IDENTITY_PROVIDER_URL']);
+        unset($_ENV['UNIFIED_API_BASE_URL']);
         \PrestaShopLogger::$logs = [];
     }
 
     public function tearDown(): void
     {
         $this->setDotenvLoaded(false);
-        unset($_ENV['UNIFIED_API_BASE_URL'], $_ENV['UPC_IDENTITY_PROVIDER_URL']);
+        unset($_ENV['UNIFIED_API_BASE_URL']);
         \PrestaShopLogger::$logs = [];
     }
 
@@ -40,26 +40,13 @@ class getUnifiedApiUrlTest extends TestCase
         $this->assertSame([], \PrestaShopLogger::$logs);
     }
 
-    public function testReturnsEmptyStringAndLogsWhenUnifiedApiUrlIsMissing()
+    public function testReturnsDefaultUnifiedApiUrlWhenMissing()
     {
-        $this->assertSame('', $this->service->getUnifiedApiUrl());
-        $this->assertCount(1, \PrestaShopLogger::$logs);
-        $this->assertSame('PayPlug: UNIFIED_API_BASE_URL is not configured — Unified Hosted Fields payments will fail.', \PrestaShopLogger::$logs[0]['message']);
-    }
-
-    public function testReturnsIdentityProviderUrlFromEnvWhenConfigured()
-    {
-        $_ENV['UPC_IDENTITY_PROVIDER_URL'] = 'https://identity.example';
-
-        $this->assertSame('https://identity.example', $this->service->getIdentityProviderUrl());
+        // No dedicated identity-provider concept/fallback: auth goes through getApiUrl()
+        // directly (see Routes::getApiUrl()). The Unified API's own base URL now shares
+        // getApiUrl()'s production default too.
+        $this->assertSame('https://api.payplug.com', $this->service->getUnifiedApiUrl());
         $this->assertSame([], \PrestaShopLogger::$logs);
-    }
-
-    public function testReturnsEmptyStringAndLogsWhenIdentityProviderUrlIsMissing()
-    {
-        $this->assertSame('', $this->service->getIdentityProviderUrl());
-        $this->assertCount(1, \PrestaShopLogger::$logs);
-        $this->assertSame('PayPlug: UPC_IDENTITY_PROVIDER_URL is not configured — Unified Hosted Fields payments will fail.', \PrestaShopLogger::$logs[0]['message']);
     }
 
     private function setDotenvLoaded($value)

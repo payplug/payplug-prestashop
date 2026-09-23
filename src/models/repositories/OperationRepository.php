@@ -71,7 +71,7 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
             ->fields('`treated` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
-            ->condition('CONSTRAINT payplug_upc_operation_unique UNIQUE (operation_id)')
+            ->condition('CONSTRAINT payplug_upc_operation_unique UNIQUE (operation_id), KEY payplug_upc_operation_order_id (order_id)')
             ->engine($engine);
 
         return $this->build();
