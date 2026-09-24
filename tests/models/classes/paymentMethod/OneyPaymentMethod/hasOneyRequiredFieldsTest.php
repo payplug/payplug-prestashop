@@ -59,6 +59,33 @@ class hasOneyRequiredFieldsTest extends BaseOneyPaymentMethod
     }
 
     /**
+     * A phone rejected by the shared formatter is represented as null. Oney
+     * must continue to require a valid mobile number in its shipping address.
+     */
+    public function testReturnsTrueWhenShippingMobilePhoneNumberIsNull()
+    {
+        $shipping = [
+            'email' => 'test@example.com',
+            'mobile_phone_number' => null,
+            'country' => 'FR',
+            'city' => 'Paris',
+        ];
+        $billing = [
+            'email' => 'test@example.com',
+            'mobile_phone_number' => '+33612345678',
+            'country' => 'FR',
+            'city' => 'Paris',
+        ];
+
+        $this->class->shouldReceive('isValidOneyEmail')->andReturn(['result' => true]);
+
+        $this->assertTrue($this->class->hasOneyRequiredFields([
+            'shipping' => $shipping,
+            'billing' => $billing,
+        ]));
+    }
+
+    /**
      * Test that hasOneyRequiredFields returns true for city name longer than 32 characters.
      */
     public function testReturnsTrueForCityNameTooLong()
