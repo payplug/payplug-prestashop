@@ -12,12 +12,26 @@ services:
     class: PayPlug\src\actions\RequestAction
     public: true
 
+  payplug.action.operation:
+    class: PayPlug\src\actions\OperationAction
+    public: true
+
   payplug.models.classes.hook:
     class: PayPlug\src\models\classes\Hook
     public: true
 
   payplug.models.classes.merchant:
     class: PayPlug\src\models\classes\Merchant
+    public: true
+
+  payplug.models.repositories.operation:
+    class: PayPlug\src\models\repositories\OperationRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+
+  payplug.models.repositories.upc_lock:
+    class: PayPlug\src\models\repositories\UpcLockRepository
+    arguments: ['@payplug.dependencies_class']
     public: true
 
   payplug.utilities.service.api:
@@ -34,6 +48,10 @@ services:
 
   payplug.utilities.service.props:
     class: PayPlug\src\utilities\services\Props
+    public: true
+
+  payplug.utilities.service.unified_api_payment_service_factory:
+    class: PayPlug\src\utilities\services\UnifiedApiPaymentServiceFactory
     public: true
 
   payplug.utilities.validator.regex:

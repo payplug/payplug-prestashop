@@ -484,6 +484,7 @@ $_MODULE['<{payplug}prestashop>translation_fb0bc235ce26e6f1c34b96f4afd349d8'] = 
 $_MODULE['<{payplug}prestashop>translation_fcaec54014b191c119559483f6e3d426'] = 'Annuler';
 $_MODULE['<{payplug}prestashop>uhf_a229f78198b690f17107c9fc65bfa74d'] = 'Ce type de carte n\'est pas accepté.';
 $_MODULE['<{payplug}prestashop>uhf_cef5ffe1ea30cca7818c988c27467aed'] = 'La transaction n\'a pas pu aboutir, et votre carte n\'a pas été débitée.';
+$_MODULE['<{payplug}prestashop>uhf_03271becb2128e430f04d027883a6bd9'] = 'Veuillez patienter, votre requête précédente est toujours en cours de traitement.';
 $_MODULE['<{payplug}prestashop>translationsrepository_05db6d24e779f385e197ae37aaac54de'] = 'La simulation de votre échéancier est temporairement indisponible. Vous retrouverez cette information à l\'étape du paiement.';
 $_MODULE['<{payplug}prestashop>translationsrepository_2d4a1a72019bef6fe2be71d83d382ce2'] = 'Aucun champ n\'a été rempli.';
 $_MODULE['<{payplug}prestashop>translationsrepository_443388128bed099c5199f1220572f96d'] = 'Une erreur s\'est produite. Veuillez réessayer dans quelques secondes.';

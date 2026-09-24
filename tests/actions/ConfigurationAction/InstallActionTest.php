@@ -33,6 +33,14 @@ class installActionTest extends BaseConfigurationAction
 
         $this->entity_repository = \Mockery::mock('EntityRepository');
 
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.operation')
+            ->andReturn(\Mockery::mock('OperationRepository'));
+
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.upc_lock')
+            ->andReturn(\Mockery::mock('UpcLockRepository'));
+
         $shop = \Mockery::mock('Shop');
         $shop->shouldReceive([
             'isFeatureActive' => true,
