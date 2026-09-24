@@ -81,13 +81,13 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
 
         // Directly test formatPhoneNumberSafely with a loose phone number
         $result = $this->class->formatPhoneNumberSafely('01 23 45 67 89 (bureau)', 'FR');
-        $this->assertSame('', $result);
+        $this->assertNull($result);
 
         // Also verify a properly formatted loose number (no trailing text) is accepted
         $result_valid = $this->class->formatPhoneNumberSafely('01 23 45 67 89', 'FR');
         // This should attempt formatting (not testing the full format here, just
         // that it's not immediately rejected by the regex guard)
-        $this->assertNotEquals('', $result_valid);
+        $this->assertNotNull($result_valid);
     }
 
     /**
@@ -107,15 +107,42 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
      * @description Documents the cross-border behavior tightening this PR
      * introduces on the live checkout path (PRE-3591): formatPhoneNumberSafely()
      * now rejects a phone number that is valid, but not for the given country,
-     * instead of formatting it through as-is. '+32470123456' is a genuine
-     * Belgian mobile number, submitted here with country 'FR' to reproduce the
-     * scenario flagged in the PR description (a Belgian/Swiss mobile number on
-     * a French address).
+     * instead of formatting it through as-is. '+262 692 12 34 56' is a
+     * Reunionese mobile number (national form 06 92 12 34 56), submitted here
+     * with country 'FR' to reproduce the overseas-territory mismatch.
      */
     public function testFormatPhoneNumberSafelyRejectsPhoneNumberValidForADifferentCountry()
     {
-        $result = $this->class->formatPhoneNumberSafely('+32470123456', 'FR');
+        $result = $this->class->formatPhoneNumberSafely('+262 692 12 34 56', 'FR');
 
-        $this->assertSame('', $result);
+        $this->assertNull($result);
+    }
+
+    public function testInvalidPhoneNumbersAreNullInTheStandardPaymentTab()
+    {
+        $address = $this->address_adapter->get(42);
+        $address->phone = '+262 692 12 34 56';
+        $address->phone_mobile = '+262 692 12 34 56';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        $this->assertNull($payment_tab['billing']['landline_phone_number']);
+        $this->assertNull($payment_tab['billing']['mobile_phone_number']);
+        $this->assertNull($payment_tab['shipping']['landline_phone_number']);
+        $this->assertNull($payment_tab['shipping']['mobile_phone_number']);
+    }
+
+    public function testMissingPhoneNumbersRemainNullInTheStandardPaymentTab()
+    {
+        $address = $this->address_adapter->get(42);
+        $address->phone = '';
+        $address->phone_mobile = '';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        $this->assertNull($payment_tab['billing']['landline_phone_number']);
+        $this->assertNull($payment_tab['billing']['mobile_phone_number']);
+        $this->assertNull($payment_tab['shipping']['landline_phone_number']);
+        $this->assertNull($payment_tab['shipping']['mobile_phone_number']);
     }
 }

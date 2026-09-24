@@ -1560,31 +1560,29 @@ class PaymentMethod
     }
 
     /**
-     * Formats a phone number to E.164 for the Payplug API, returning an
-     * empty string if it cannot be parsed or is not valid for the given
-     * country — the safe-fallback contract previously provided by the
-     * deprecated PhoneNumber::formatPhoneNumber() service.
+     * Formats a phone number to E.164 for the Payplug API, returning null if
+     * it cannot be parsed or is not valid for the given country.
      *
      * @param string $phone_number
      * @param string $iso_code
      *
-     * @return string
+     * @return string|null
      */
     protected function formatPhoneNumberSafely($phone_number, $iso_code)
     {
         if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number) || empty($iso_code)) {
-            return '';
+            return null;
         }
 
         try {
-            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164((string) $phone_number, (string) $iso_code);
+            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164((string) $phone_number, (string) $iso_code) ?: null;
         } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
                 ->addLog(static::class . '::formatPhoneNumberSafely() - Exception thrown: ' . $e->getMessage(), 'error');
 
-            return '';
+            return null;
         }
     }
 
