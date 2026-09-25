@@ -1,4 +1,9 @@
 # Payplug module changelog
+
+## Version 5.2.1
+- Bugfix :
+  - [PRE-3598](https://payplug-prod.atlassian.net/browse/PRE-3598): Only start the integrated card payment from its own checkout form
+
 ## Version 5.2.0
 - Feature :
   - [PRE-3601](https://payplug-prod.atlassian.net/browse/PRE-3601): Let the merchant narrow the Scalapay amount range from the back office, and hide Scalapay at checkout for carts outside it
