@@ -27,16 +27,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Symfony\Component\Dotenv\Dotenv;
+use PayPlug\src\utilities\traits\DotenvGetter;
 
 class Routes
 {
-    /**
-     * @var bool whether payplugroutes/.env has already been parsed into this
-     *           request. getSourceUrl() alone calls into getApiUrl()/getCDNUrl()/getOneyLoaderUrl(),
-     *           so without this the same file would be parsed up to three times per call.
-     */
-    private static $dotenvLoaded = false;
+    use DotenvGetter;
 
     /**
      * @description Get the Api url
@@ -45,14 +40,8 @@ class Routes
      */
     public function getApiUrl()
     {
-        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
-        if (\file_exists($dotenvFile)) {
-            $this->loadDotenv($dotenvFile);
-        }
-
-        return isset($_ENV['API_BASE_URL'])
-            ? $_ENV['API_BASE_URL']
-            : 'https://api.payplug.com';
+        // getEnv() returns '' (never null) when unset, so the default needs `?:`, not `??`.
+        return $this->getEnv('API_BASE_URL') ?: 'https://api.payplug.com';
     }
 
     /**
@@ -62,14 +51,7 @@ class Routes
      */
     public function getCDNUrl()
     {
-        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
-        if (\file_exists($dotenvFile)) {
-            $this->loadDotenv($dotenvFile);
-        }
-
-        return isset($_ENV['CDN_BASE_URL'])
-            ? $_ENV['CDN_BASE_URL']
-            : 'https://cdn.payplug.com';
+        return $this->getEnv('CDN_BASE_URL') ?: 'https://cdn.payplug.com';
     }
 
     /**
@@ -79,14 +61,7 @@ class Routes
      */
     public function getOneyLoaderUrl()
     {
-        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
-        if (\file_exists($dotenvFile)) {
-            $this->loadDotenv($dotenvFile);
-        }
-
-        return isset($_ENV['ONEY_LOADER_URL'])
-            ? $_ENV['ONEY_LOADER_URL']
-            : 'https://assets.oney.io/build/loader.min.js';
+        return $this->getEnv('ONEY_LOADER_URL') ?: 'https://assets.oney.io/build/loader.min.js';
     }
 
     /**
@@ -96,35 +71,17 @@ class Routes
      */
     public function getHostedFieldsUrl()
     {
-        $dotenvFile = \dirname(__FILE__, 5) . '/payplugroutes/.env';
-        if (\file_exists($dotenvFile)) {
-            $this->loadDotenv($dotenvFile);
-        }
+        return $this->getEnv('HOSTED_FIELDS_URL') ?: 'https://cdn.payplug.com/js/hosted-fields/v1@1/index.js';
+    }
 
-        if (isset($_ENV['HOSTED_FIELDS_URL'])) {
-            return $_ENV['HOSTED_FIELDS_URL'];
-        }
-
-        // No hardcoded production fallback: the real production CDN URL for this SDK
-        // is not yet confirmed (see PRE-3623 technical doc §3.6). A guessed-but-wrong
-        // URL would fail silently (fields just don't render); an empty string fails
-        // loudly instead - "loudly" here means the log line below, since the empty
-        // string itself is otherwise indistinguishable from any other falsy value
-        // once it reaches the checkout template. Every real deployment is expected
-        // to set HOSTED_FIELDS_URL via payplugroutes/.env, exactly like ONEY_LOADER_URL
-        // above.
-        //
-        // Not throttled/deduped: this is only reached via getSourceUrl(), itself only
-        // called while actually building the hosted_fields payment option for a real
-        // checkout (PrestashopAdapter17::displayPaymentOption() / :setHostedFieldsPaymentOption()),
-        // already gated behind feature_hosted_fields + a non-EUR cart + a configured
-        // per-currency identifier - not something invoked on every page load.
-        \PrestaShopLogger::addLog(
-            'PayPlug: HOSTED_FIELDS_URL is not configured — hosted fields checkout will not load for non-EUR carts.',
-            3
-        );
-
-        return '';
+    /**
+     * @description Get the Unified API base url
+     *
+     * @return string
+     */
+    public function getUnifiedApiUrl()
+    {
+        return $this->getEnv('UNIFIED_API_BASE_URL') ?: 'https://api.payplug.com';
     }
 
     /**
@@ -194,20 +151,5 @@ class Routes
             'satispay' => $default . '/articles/8089121532700',
             'signup' => 'https://portal.payplug.com/auth/signup',
         ];
-    }
-
-    /**
-     * @description Parse payplugroutes/.env into $_ENV, at most once per request.
-     *
-     * @param string $dotenvFile
-     */
-    private function loadDotenv($dotenvFile)
-    {
-        if (self::$dotenvLoaded) {
-            return;
-        }
-
-        (new Dotenv())->load($dotenvFile);
-        self::$dotenvLoaded = true;
     }
 }

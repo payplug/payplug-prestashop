@@ -33,43 +33,26 @@ class UpcLogger implements ILogger
 {
     private $dependencies;
 
-    /**
-     * @description Store the dependencies
-     *
-     * @param mixed $dependencies
-     */
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
     }
 
-    /**
-     * @description Log a debug message (stored at info level)
-     */
     public function debug(string $message, array $context = []): void
     {
         $this->log($message, $context, 'info');
     }
 
-    /**
-     * @description Log an info message
-     */
     public function info(string $message, array $context = []): void
     {
         $this->log($message, $context, 'info');
     }
 
-    /**
-     * @description Log an error message
-     */
     public function error(string $message, array $context = []): void
     {
         $this->log($message, $context, 'error');
     }
 
-    /**
-     * @description Add a log entry with its JSON-encoded context, skipping empty messages
-     */
     private function log(string $message, array $context, string $level): void
     {
         // A logging call must never interrupt its caller: no-op on an empty message
