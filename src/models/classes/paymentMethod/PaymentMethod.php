@@ -1576,20 +1576,27 @@ class PaymentMethod
     }
 
     /**
-     * Formats a phone number to E.164 for the Payplug API, returning an
-     * empty string if it cannot be parsed or is not valid for the given
-     * country — the safe-fallback contract previously provided by the
-     * deprecated PhoneNumber::formatPhoneNumber() service.
+     * Formats a phone number to E.164 for the Payplug API, returning null
+     * if it cannot be parsed or is not valid for the given country — the
+     * safe-fallback contract previously provided by the deprecated
+     * PhoneNumber::formatPhoneNumber() service.
+     *
+     * Returning null rather than an empty string matters downstream: an
+     * empty string reads as "a phone number was supplied and it's blank",
+     * while null reads as "no phone number available" — the contract every
+     * other caller here (ApplepayPaymentMethod, OneyPaymentMethod, and the
+     * billing/shipping arrays built by getDefaultPaymentTab()) already uses
+     * for an absent phone number.
      *
      * @param string $phone_number
      * @param string $iso_code
      *
-     * @return string
+     * @return string|null
      */
     protected function formatPhoneNumberSafely($phone_number, $iso_code)
     {
         if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number) || empty($iso_code)) {
-            return '';
+            return null;
         }
 
         try {
@@ -1598,10 +1605,38 @@ class PaymentMethod
             $this->dependencies
                 ->getPlugin()
                 ->getLogger()
-                ->addLog(static::class . '::formatPhoneNumberSafely() - Exception thrown: ' . $e->getMessage(), 'error');
+                ->addLog(
+                    static::class . '::formatPhoneNumberSafely() - Phone number "'
+                        . $this->maskPhoneNumberForLogging($phone_number)
+                        . '" could not be formatted for country "' . $iso_code . '": ' . $e->getMessage(),
+                    'error'
+                );
 
-            return '';
+            return null;
         }
+    }
+
+    /**
+     * Masks a phone number for logging, keeping only enough of it (the first
+     * 3 and last 2 characters) to correlate a log line with a support case
+     * without writing the customer's full phone number to Kibana/support
+     * exports.
+     *
+     * @param string $phone_number
+     *
+     * @return string
+     */
+    protected function maskPhoneNumberForLogging($phone_number)
+    {
+        $length = \strlen($phone_number);
+        if ($length <= 5) {
+            return str_repeat('*', $length);
+        }
+
+        $visible_prefix = substr($phone_number, 0, 3);
+        $visible_suffix = substr($phone_number, -2);
+
+        return $visible_prefix . str_repeat('*', $length - 5) . $visible_suffix;
     }
 
     /**
