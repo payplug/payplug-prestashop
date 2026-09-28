@@ -219,4 +219,35 @@ class Merchant
 
         return (bool) $token;
     }
+
+    /**
+     * @description Resolve one field ('client_id' or 'client_secret') of the OAuth2
+     * client-credentials pair already obtained at onboarding, for the current live/sandbox mode
+     *
+     * @param string $field
+     *
+     * @return string
+     */
+    public function getOauthClientField($field = '')
+    {
+        if (!is_string($field) || !$field) {
+            return '';
+        }
+
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $is_live = !(bool) $configuration->getValue('sandbox_mode');
+        $mode = $is_live ? 'live' : 'test';
+        $oauth_client_data = json_decode((string) $configuration->getValue('oauth_client_data'), true);
+
+        if (!isset($oauth_client_data[$mode][$field]) || !is_string($oauth_client_data[$mode][$field])) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('Merchant::getOauthClientField - missing/malformed oauth_client_data.' . $mode . '.' . $field, 'error');
+
+            return '';
+        }
+
+        return $oauth_client_data[$mode][$field];
+    }
 }
