@@ -33,11 +33,6 @@ use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
 
 class OperationRepository extends EntityRepository implements IPaymentRepository
 {
-    /**
-     * @description Set up the repository for the OperationEntity
-     *
-     * @param mixed|null $dependencies
-     */
     public function __construct($dependencies = null)
     {
         parent::__construct($dependencies);
@@ -82,9 +77,6 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
         return $this->build();
     }
 
-    /**
-     * @description Get the operation data for an order id
-     */
     public function getByOrderId(string $orderId): OperationData
     {
         $row = $this->getBy('order_id', $orderId);
@@ -96,9 +88,6 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
         return $this->toOperationData($row);
     }
 
-    /**
-     * @description Get the operation data for an operation id
-     */
     public function getByOperationId(string $operationId): OperationData
     {
         $row = $this->getBy('operation_id', $operationId);
@@ -110,9 +99,6 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
         return $this->toOperationData($row);
     }
 
-    /**
-     * @description Create or update an operation by its operation id
-     */
     public function save(OperationData $operationData): void
     {
         $existing = $this->getBy('operation_id', $operationData->operationId);
@@ -135,9 +121,6 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
         $this->createEntity($fields);
     }
 
-    /**
-     * @description Mark an operation as treated
-     */
     public function markTreated(string $operationId): void
     {
         $existing = $this->getBy('operation_id', $operationId);
@@ -149,9 +132,6 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
         $this->updateEntity((int) $existing['id_payplug_upc_operation'], ['treated' => true]);
     }
 
-    /**
-     * @description Check whether an operation has been treated
-     */
     public function isTreated(string $operationId): bool
     {
         $row = $this->getBy('operation_id', $operationId);
@@ -159,9 +139,6 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
         return (bool) ($row && $row['treated']);
     }
 
-    /**
-     * @description Convert a database row to an OperationData
-     */
     private function toOperationData(array $row): OperationData
     {
         return new OperationData(

@@ -38,8 +38,8 @@ class setHostedFieldsPaymentOptionTest extends BasePrestashopAdapter17
 
         $this->context->currency->iso_code = 'USD';
         $this->context->link->shouldReceive('getModuleLink')
-            ->with('payplug', 'uhf', [], true)
-            ->andReturn('https://shop.example/module/payplug/uhf');
+            ->with('payplug', 'unified', ['action' => 'create'], true)
+            ->andReturn('https://shop.example/module/payplug/unified?action=create');
 
         $this->configuration->shouldReceive('getValue')
             ->with('hosted_fields')
@@ -92,7 +92,7 @@ class setHostedFieldsPaymentOptionTest extends BasePrestashopAdapter17
             $assigned_vars['hosted_fields_accepted_brands']
         );
         $this->assertSame(
-            'https://shop.example/module/payplug/uhf',
+            'https://shop.example/module/payplug/unified?action=create',
             $assigned_vars['hosted_fields_uhf_url']
         );
     }
