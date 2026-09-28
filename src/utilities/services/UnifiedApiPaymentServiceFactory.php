@@ -46,17 +46,11 @@ class UnifiedApiPaymentServiceFactory
 
     public $dependencies;
 
-    /**
-     * @description Initialize the factory dependencies
-     */
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
     }
 
-    /**
-     * @description Create the Unified API payment service
-     */
     public function create(): UnifiedApiPaymentService
     {
         $configuration_repository = $this->createConfigurationRepository();
@@ -79,49 +73,31 @@ class UnifiedApiPaymentServiceFactory
         );
     }
 
-    /**
-     * @description Create the UPC logger
-     */
     public function createLogger(): UpcLogger
     {
         return new UpcLogger($this->dependencies);
     }
 
-    /**
-     * @description Create the UPC lock
-     */
     public function createLock(): UpcLock
     {
         return new UpcLock($this->dependencies);
     }
 
-    /**
-     * @description Create the UPC token cache
-     */
     public function createTokenCache(): UpcTokenCache
     {
         return new UpcTokenCache($this->dependencies);
     }
 
-    /**
-     * @description Create the UPC payment repository
-     */
     public function createPaymentRepository(): IPaymentRepository
     {
         return new OperationRepository($this->dependencies);
     }
 
-    /**
-     * @description Create the UPC order state mutator
-     */
     public function createOrderStateMutator(): UpcOrderStateMutator
     {
         return new UpcOrderStateMutator($this->dependencies);
     }
 
-    /**
-     * @description Create the UPC configuration repository
-     */
     public function createConfigurationRepository(): UpcConfigurationRepository
     {
         return new UpcConfigurationRepository($this->dependencies);

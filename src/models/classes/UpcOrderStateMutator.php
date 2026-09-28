@@ -35,20 +35,12 @@ class UpcOrderStateMutator implements IOrderStateMutator
     private $dependencies;
     private $logger;
 
-    /**
-     * @description Store the dependencies and build the UPC logger
-     *
-     * @param mixed $dependencies
-     */
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
         $this->logger = new UpcLogger($dependencies);
     }
 
-    /**
-     * @description Update the order state matching a payment outcome, never regressing a paid order
-     */
     public function apply(string $orderId, string $outcome): void
     {
         if (!PaymentOutcome::isValid($outcome)) {
@@ -92,9 +84,6 @@ class UpcOrderStateMutator implements IOrderStateMutator
         $this->dependencies->getPlugin()->getOrderClass()->updateOrderState($order, $new_order_state);
     }
 
-    /**
-     * @description Map a payment outcome to an order state bucket
-     */
     private function bucketForOutcome(string $outcome): string
     {
         switch ($outcome) {

@@ -36,12 +36,14 @@ class getSourceUrlTest extends TestCase
         // tests non-deterministic).
         $this->setDotenvLoaded(true);
         unset($_ENV['HOSTED_FIELDS_URL']);
+        \PrestaShopLogger::$logs = [];
     }
 
     public function tearDown(): void
     {
         $this->setDotenvLoaded(false);
         unset($_ENV['HOSTED_FIELDS_URL']);
+        \PrestaShopLogger::$logs = [];
         \Mockery::close();
     }
 
@@ -87,6 +89,9 @@ class getSourceUrlTest extends TestCase
     public function testGetHostedFieldsUrlReturnsEmptyStringWhenNotConfigured()
     {
         $this->assertSame('', $this->service->getHostedFieldsUrl());
+        $this->assertCount(1, \PrestaShopLogger::$logs);
+        $this->assertSame('PayPlug: HOSTED_FIELDS_URL is not configured — hosted fields checkout will not load for non-EUR carts.', \PrestaShopLogger::$logs[0]['message']);
+        $this->assertSame(3, \PrestaShopLogger::$logs[0]['severity']);
     }
 
     private function setDotenvLoaded($value)
