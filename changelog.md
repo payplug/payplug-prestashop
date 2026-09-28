@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Unreleased
+- Feature :
+    - [PRE-3624](https://payplug-prod.atlassian.net/browse/PRE-3624): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
+
 ## Version 5.2.2
 - Bugfix :
   - [PRE-3736](https://github.com/payplug/payplug-prestashop/pull/138): Fix duplicate paid orders when the PayPlug notification and the customer's return reach order creation at the same time: serialise order creation per cart with a database lock
@@ -18,6 +22,8 @@
   - [PRE-3598](https://github.com/payplug/payplug-prestashop/pull/125): Only start the integrated card payment from its own checkout form
   - [PRE-3599](https://github.com/payplug/payplug-prestashop/pull/131): Fix duplicate customer/address with applepay express
   - [PRE-3649](https://github.com/payplug/payplug-prestashop/pull/132): Hide the Apple Pay button on the product and cart pages when a product (or pack) can't be ordered regarding its stock or minimal quantity, and refuse the Apple Pay payment request in that case
+  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state (every stored scope, multistore included)
+  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
 
 ## Version 5.1.0
 - Feature :

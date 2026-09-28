@@ -1104,23 +1104,6 @@ class PaymentMethod
     }
 
     /**
-     * @description Get the price limits authorized for the current payment method.
-     *              Sourced from GET /account (min_amounts/max_amounts per payment method,
-     *              in cents) and mapped in API::treatAccountResponse(). Payment methods the
-     *              account exposes no specific range for fall back on the account default.
-     *
-     * @return array Limits as `ISO:amount` strings, e.g. `['min' => 'EUR:500', 'max' => 'EUR:400000']`
-     */
-    public function getPriceLimit()
-    {
-        $this->setParameters();
-
-        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
-
-        return isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
-    }
-
-    /**
      * @description Set object property
      *
      * @param string $key
@@ -1419,7 +1402,8 @@ class PaymentMethod
         }
 
         // Check amount
-        $price_limit = $this->getPriceLimit();
+        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
+        $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
         $cart_amount = $this->context->cart->getOrderTotal(true);
         $is_valid_amount = $this->dependencies
             ->getHelpers()['amount']
@@ -1685,7 +1669,8 @@ class PaymentMethod
             }
         }
 
-        $price_limit = $this->getPriceLimit();
+        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
+        $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
         $cart_amount = $this->context->cart->getOrderTotal(true);
         if (false === strpos($this->name, 'oney')) {
             if (!$this->dependencies
