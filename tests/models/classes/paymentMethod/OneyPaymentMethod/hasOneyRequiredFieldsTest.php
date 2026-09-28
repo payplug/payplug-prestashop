@@ -59,6 +59,25 @@ class hasOneyRequiredFieldsTest extends BaseOneyPaymentMethod
     }
 
     /**
+     * PRE-3704: formatPhoneNumberSafely() now returns null (instead of '')
+     * for a phone number it can't format. Oney must keep treating that as a
+     * missing/invalid mobile number rather than let a null through — this
+     * relies on paymentValidator::isPhoneNumber()'s real, unstubbed
+     * !is_string() guard to reject null.
+     */
+    public function testReturnsTrueWhenShippingMobilePhoneNumberIsNull()
+    {
+        $shipping = [
+            'email' => 'test@example.com',
+            'mobile_phone_number' => null,
+            'country' => 'FR',
+            'city' => 'Paris',
+        ];
+        $this->class->shouldReceive('isValidOneyEmail')->andReturn(['result' => true]);
+        $this->assertTrue($this->class->hasOneyRequiredFields(['shipping' => $shipping]));
+    }
+
+    /**
      * Test that hasOneyRequiredFields returns true for city name longer than 32 characters.
      */
     public function testReturnsTrueForCityNameTooLong()
