@@ -81,13 +81,13 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
 
         // Directly test formatPhoneNumberSafely with a loose phone number
         $result = $this->class->formatPhoneNumberSafely('01 23 45 67 89 (bureau)', 'FR');
-        $this->assertSame('', $result);
+        $this->assertNull($result);
 
         // Also verify a properly formatted loose number (no trailing text) is accepted
         $result_valid = $this->class->formatPhoneNumberSafely('01 23 45 67 89', 'FR');
         // This should attempt formatting (not testing the full format here, just
         // that it's not immediately rejected by the regex guard)
-        $this->assertNotEquals('', $result_valid);
+        $this->assertNotNull($result_valid);
     }
 
     /**
@@ -116,6 +116,44 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
     {
         $result = $this->class->formatPhoneNumberSafely('+32470123456', 'FR');
 
-        $this->assertSame('', $result);
+        $this->assertNull($result);
+    }
+
+    /**
+     * @description Reproduces the PRE-3591 regression (Kibana signature: "Phone
+     * number is not a valid number for region \"DE\"" -> "Resource can't be
+     * created from given tab"): a French billing/shipping address whose phone
+     * numbers are only valid for FR gets a DE country resolved for it (e.g. a
+     * French customer shipping to Germany). Both landline_phone_number and
+     * mobile_phone_number must come out as null, not '', so the API request
+     * ends up with no phone number rather than two empty-string ones, which
+     * Payplug's API rejects outright.
+     */
+    public function testCrossBorderPhoneNumberFallsBackToNullInsteadOfEmptyString()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'getIsoCodeByCountryId' => 'DE',
+        ]);
+        $this->dependencies->configClass = $configClass;
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        $this->assertNull($payment_tab['billing']['landline_phone_number']);
+        $this->assertNull($payment_tab['billing']['mobile_phone_number']);
+        $this->assertNull($payment_tab['shipping']['landline_phone_number']);
+        $this->assertNull($payment_tab['shipping']['mobile_phone_number']);
+    }
+
+    /**
+     * @description maskPhoneNumberForLogging() must never write a customer's
+     * full phone number to the logs (Kibana/support exports), per code review
+     * on this PR: keep only enough of it (first 3, last 2 characters) to
+     * correlate a log line with a case.
+     */
+    public function testMaskPhoneNumberForLoggingKeepsOnlyPrefixAndSuffix()
+    {
+        $this->assertSame('+33*******78', $this->class->maskPhoneNumberForLogging('+33612345678'));
+        $this->assertSame('*****', $this->class->maskPhoneNumberForLogging('01234'));
     }
 }
