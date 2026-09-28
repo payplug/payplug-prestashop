@@ -26,15 +26,43 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_5_2_0($object)
 {
-    $flag = true;
-
     $logger = $object->payplug_dependencies->getPlugin()->getLogger();
     $logger->addLog('Start upgrade script 5.2.0');
 
-    // Empty means the merchant never narrowed the Scalapay range: the account's own
-    // authorized amounts from GET /account apply as-is.
-    $flag = $flag && Configuration::updateValue('PAYPLUG_SCALAPAY_CUSTOM_MIN_AMOUNTS', '');
-    $flag = $flag && Configuration::updateValue('PAYPLUG_SCALAPAY_CUSTOM_MAX_AMOUNTS', '');
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_upc_operation` (
+            `id_payplug_upc_operation` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `operation_id` VARCHAR(255) NOT NULL,
+            `order_id` VARCHAR(255) NOT NULL,
+            `exec_code` VARCHAR(20) NOT NULL,
+            `outcome` VARCHAR(30) NOT NULL,
+            `amount` INT(11) UNSIGNED NOT NULL,
+            `treated` TINYINT(1) NOT NULL DEFAULT 0,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL,
+            CONSTRAINT payplug_upc_operation_unique UNIQUE (operation_id),
+            KEY payplug_upc_operation_order_id (order_id)) ENGINE=' . _MYSQL_ENGINE_;
+
+    try {
+        $flag_operation = Db::getInstance()->Execute($sql);
+    } catch (PrestaShopDatabaseException $e) {
+        $flag_operation = false;
+    }
+
+    $sql_lock = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_upc_lock` (
+            `id_payplug_upc_lock` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `lock_key` VARCHAR(255) NOT NULL,
+            `expires_at` INT(11) UNSIGNED NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL,
+            CONSTRAINT payplug_upc_lock_unique UNIQUE (lock_key)) ENGINE=' . _MYSQL_ENGINE_;
+
+    try {
+        $flag_lock = Db::getInstance()->Execute($sql_lock);
+    } catch (PrestaShopDatabaseException $e) {
+        $flag_lock = false;
+    }
+
+    $flag = $flag_operation && $flag_lock;
 
     $logger->addLog('End upgrade script 5.2.0, result: ' . ($flag ? 'ok' : 'ko'));
 
