@@ -35,19 +35,11 @@ class UpcTokenCache implements ITokenCache
 
     private $dependencies;
 
-    /**
-     * @description Store the dependencies
-     *
-     * @param mixed $dependencies
-     */
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
     }
 
-    /**
-     * @description Get a cached value, deleting it when expired
-     */
     public function get(string $key): ?string
     {
         $repository = $this->dependencies->getPlugin()->getCacheRepository();
@@ -78,9 +70,6 @@ class UpcTokenCache implements ITokenCache
         return false !== $value ? $value : null;
     }
 
-    /**
-     * @description Create or update a cached value with its expiration
-     */
     public function set(string $key, string $value, int $ttlSeconds): void
     {
         $repository = $this->dependencies->getPlugin()->getCacheRepository();
@@ -110,17 +99,11 @@ class UpcTokenCache implements ITokenCache
         }
     }
 
-    /**
-     * @description Delete a cached value
-     */
     public function delete(string $key): void
     {
         $this->dependencies->getPlugin()->getCacheRepository()->deleteBy('cache_key', self::KEY_PREFIX . $key);
     }
 
-    /**
-     * @description Build the UPC logger
-     */
     private function logger(): UpcLogger
     {
         return new UpcLogger($this->dependencies);
