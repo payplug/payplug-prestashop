@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d03375aa41c2a18ebee123c432aa80a",
+    "content-hash": "6c3a4390f09d774d83c98b7e3361c4c2",
     "packages": [
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -287,9 +287,9 @@
             "description": "Core foundations shared library for Payplug e-commerce plugins.",
             "support": {
                 "issues": "https://github.com/payplug/unified-plugin-core/issues",
-                "source": "https://github.com/payplug/unified-plugin-core/tree/1.2.2"
+                "source": "https://github.com/payplug/unified-plugin-core/tree/0.0.7"
             },
-            "time": "2026-10-19T13:45:18+00:00"
+            "time": "2026-07-21T14:40:20+00:00"
         },
         {
             "name": "psr/container",
@@ -4697,6 +4697,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
+        "ext-curl": "*",
+        "ext-json": "*",
         "php": ">=7.4.0"
     },
     "platform-dev": {},

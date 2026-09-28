@@ -234,6 +234,8 @@ class ConfigurationAction
         // Install SQL
         $txt_log->info('Install SQL');
 
+        $this->forceAutoloadUpcRepositories();
+
         if (!$this->dependencies->getPlugin()->getEntityRepository()->initialize()) {
             $txt_log->info('Install failed: Install SQL tables.');
 
@@ -879,8 +881,6 @@ class ConfigurationAction
             'sandbox_mode' => 'payplug_sandbox',
             'oney_custom_min_amounts' => 'oney_min_amounts',
             'oney_custom_max_amounts' => 'oney_max_amounts',
-            'scalapay_custom_min_amounts' => 'scalapay_min_amounts',
-            'scalapay_custom_max_amounts' => 'scalapay_max_amounts',
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
@@ -1256,6 +1256,8 @@ class ConfigurationAction
         $txt_log->info('Remove module configuration successful');
 
         $txt_log->info('Drop module table');
+        $this->forceAutoloadUpcRepositories();
+
         if (!$this->dependencies
             ->getPlugin()
             ->getEntityRepository()
@@ -1385,5 +1387,23 @@ class ConfigurationAction
         }
 
         return $flag;
+    }
+
+    /**
+     * @description Force-autoload repositories registered only in config/services.yml (not
+     * wired into PluginInit) so EntityRepository's get_declared_classes() reflection walk
+     * (used by both initialize() on install and uninstall() on uninstall) can find them and
+     * create/drop their tables. Called from both installAction() and uninstallAction() so
+     * these tables are neither missed on install nor left as orphans on uninstall. Add one
+     * line here per such repository as new ones are introduced.
+     */
+    private function forceAutoloadUpcRepositories()
+    {
+        $module = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
+        $module->getService('payplug.models.repositories.operation');
+        $module->getService('payplug.models.repositories.upc_lock');
     }
 }
