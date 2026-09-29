@@ -79,6 +79,7 @@
     <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_container -saveCard">
         <label>
             <input type="checkbox" name="save_card" id="hf-save-card" />
+            <span></span>
             {l s='hook.checkout.payment.hosted_fields.save_card.label' mod='payplug'}
         </label>
     </div>

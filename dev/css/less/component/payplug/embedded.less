@@ -146,6 +146,15 @@
 
         input {
           display: none;
+          &:checked {
+            & + span {
+              border-color: #2b343d;
+
+              &:before {
+                opacity: 1;
+              }
+            }
+          }
         }
 
         &:hover {
