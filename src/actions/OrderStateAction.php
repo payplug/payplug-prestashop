@@ -227,7 +227,6 @@ class OrderStateAction
             'PS_OS_SHIPPING' => 'nothing',
             'PS_OS_REFUND' => 'refund',
             'PS_OS_WS_PAYMENT' => 'nothing',
-            'PS_CHECKOUT_STATE_PARTIALLY_REFUNDED' => 'refund',
         ];
         foreach ($prestashop_order_states as $config_key => $type) {
             $id_order_state = $configuration->getValue($config_key);
@@ -237,5 +236,107 @@ class OrderStateAction
         }
 
         return true;
+    }
+
+    /**
+     * @description Point the live partial refund state back to a Payplug one wherever it targets a state the module
+     * doesn't own (it used to be read from PS_CHECKOUT_STATE_PARTIALLY_REFUNDED), for every stored scope of the key
+     * (global, shop group, shop) so multistore shops are all repaired.
+     *
+     * @return bool
+     */
+    public function repairPartialRefundStateAction()
+    {
+        $plugin = $this->dependencies->getPlugin();
+        $logger = $plugin->getLogger();
+        $config_name = $plugin->getConfigurationClass()->getName('order_state_partial_refund');
+
+        $flag = true;
+        $repaired = false;
+        $cleaned_ids = [];
+        $id_own_state = 0;
+        foreach ($plugin->getOrderStateRepository()->getConfigurationsByName($config_name) as $row) {
+            $id_shop_group = (int) $row['id_shop_group'];
+            $id_shop = (int) $row['id_shop'];
+            $scope = 'shop group ' . $id_shop_group . ' / shop ' . $id_shop;
+            $id_order_state = (int) $row['value'];
+
+            $order_state = $plugin->getOrderStateAdapter()->get($id_order_state);
+            $is_loaded = $plugin->getValidate()->validate('isLoadedObject', $order_state)
+                && (!isset($order_state->deleted) || !$order_state->deleted);
+            if ($is_loaded && $order_state->module_name === $this->dependencies->name) {
+                continue;
+            }
+
+            $logger->addLog('OrderStateAction::repairPartialRefundStateAction() - ' . $scope . ': state ' . $id_order_state
+                . ($is_loaded ? ' belongs to module "' . $order_state->module_name . '"' : ' is missing or deleted'));
+
+            // Drop the type Payplug set on the foreign state: "refund" through PS_CHECKOUT_STATE_PARTIALLY_REFUNDED,
+            // "partial_refund" through runUpgradeModule() which retypes the configured state before the upgrade scripts.
+            // A native state gets its own type back from installTypeAction() below.
+            if ($is_loaded && !in_array($id_order_state, $cleaned_ids, true)) {
+                $state_type = $plugin->getStateRepository()->getBy('id_order_state', $id_order_state);
+                if (!empty($state_type)
+                    && in_array($state_type['type'], ['refund', 'partial_refund'], true)
+                    && !$plugin->getStateRepository()->deleteBy('id_order_state', $id_order_state)) {
+                    $logger->addLog('OrderStateAction::repairPartialRefundStateAction() - ' . $scope
+                        . ': failed to delete the type of state ' . $id_order_state, 'error');
+                    $flag = false;
+
+                    continue;
+                }
+                $cleaned_ids[] = $id_order_state;
+            }
+
+            if (!$id_own_state) {
+                $id_own_state = $this->getOwnPartialRefundStateId();
+                if (!$id_own_state) {
+                    $logger->addLog('OrderStateAction::repairPartialRefundStateAction() - '
+                        . 'failed to find or create the Payplug partial refund state', 'error');
+
+                    return false;
+                }
+            }
+
+            if (!$plugin->getConfiguration()->updateValue($config_name, (string) $id_own_state, $id_shop_group, $id_shop)) {
+                $logger->addLog('OrderStateAction::repairPartialRefundStateAction() - ' . $scope
+                    . ': failed to set ' . $config_name . ' to ' . $id_own_state, 'error');
+                $flag = false;
+
+                continue;
+            }
+
+            $logger->addLog('OrderStateAction::repairPartialRefundStateAction() - ' . $scope
+                . ': ' . $config_name . ' is now ' . $id_own_state);
+            $repaired = true;
+        }
+
+        if ($repaired) {
+            $this->installTypeAction();
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @description Get the live "Partially refunded [PayPlug]" state, creating it if it doesn't exist
+     *
+     * @return int
+     */
+    private function getOwnPartialRefundStateId()
+    {
+        $plugin = $this->dependencies->getPlugin();
+        $state = $plugin->getConfigurationClass()->order_states['partial_refund'];
+
+        $id_order_state = (int) $plugin->getOrderStateRepository()->getByName($state['name'], false);
+        if ($id_order_state) {
+            $order_state = $plugin->getOrderStateAdapter()->get($id_order_state);
+            if ($plugin->getValidate()->validate('isLoadedObject', $order_state)
+                && $order_state->module_name === $this->dependencies->name) {
+                return $id_order_state;
+            }
+        }
+
+        return (int) $plugin->getOrderState()->add('partial_refund', $state, false);
     }
 }
