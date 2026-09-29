@@ -51,6 +51,7 @@ class OperationEntity
             'outcome' => ['type' => 'string', 'required' => true],
             'amount' => ['type' => 'integer', 'required' => true],
             'treated' => ['type' => 'boolean'],
+            'payment_id' => ['type' => 'string'],
             'date_add' => ['type' => 'string'],
             'date_upd' => ['type' => 'string'],
         ],
@@ -70,6 +71,9 @@ class OperationEntity
 
     /** @var string */
     private $outcome;
+
+    /** @var string|null */
+    private $payment_id;
 
     /** @var bool */
     private $treated;
@@ -144,6 +148,14 @@ class OperationEntity
     public function getOutcome()
     {
         return $this->outcome;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPaymentId()
+    {
+        return $this->payment_id;
     }
 
     /**
@@ -278,6 +290,24 @@ class OperationEntity
         }
 
         $this->outcome = $outcome;
+
+        return $this;
+    }
+
+    /**
+     * @param $payment_id
+     *
+     * @throws BadParameterException
+     *
+     * @return $this
+     */
+    public function setPaymentId($payment_id)
+    {
+        if (!is_string($payment_id)) {
+            throw new BadParameterException('Invalid argument, $payment_id must be a string');
+        }
+
+        $this->payment_id = $payment_id;
 
         return $this;
     }

@@ -33,6 +33,7 @@ class BaseOperationRepository extends BaseRepository
                     'outcome' => ['type' => 'string', 'required' => true],
                     'amount' => ['type' => 'integer', 'required' => true],
                     'treated' => ['type' => 'boolean'],
+                    'payment_id' => ['type' => 'string'],
                     'date_add' => ['type' => 'string'],
                     'date_upd' => ['type' => 'string'],
                 ],
