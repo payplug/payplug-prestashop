@@ -24,6 +24,10 @@ services:
     class: PayPlug\src\actions\AliasAction
     public: true
 
+  payplug.action.unified_refund:
+    class: PayPlug\src\actions\UnifiedRefundAction
+    public: true
+
   payplug.models.classes.hook:
     class: PayPlug\src\models\classes\Hook
     public: true
@@ -44,6 +48,11 @@ services:
 
   payplug.models.repositories.alias:
     class: PayPlug\src\models\repositories\AliasRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+
+  payplug.models.repositories.upc_refund:
+    class: PayPlug\src\models\repositories\UpcRefundRepository
     arguments: ['@payplug.dependencies_class']
     public: true
 

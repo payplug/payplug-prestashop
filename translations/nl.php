@@ -508,3 +508,4 @@ $_MODULE['<{payplug}prestashop>translation_62d341932aa23af7ff594afbde234b64'] = 
 $_MODULE['<{payplug}prestashop>translation_057e88637ae8e4c9f795744ee14412c8'] = 'Please note that the minimum amount entered is greater than the maximum amount entered.';
 $_MODULE['<{payplug}prestashop>translation_d0c4453e26334eb8f886fe4748619b05'] = 'Unable to save the configuration. The Scalapay amounts must be within the range authorised by your Payplug account, and the minimum amount must not exceed the maximum amount.';
 $_MODULE['<{payplug}prestashop>translation_9b0c6d6c3cd66da8bba342344c4529e7'] = 'Ok';
+$_MODULE['<{payplug}prestashop>translation_dbc93d598178497af541cc6762291ebd'] = 'De status van de terugbetaling kon niet worden bevestigd. Controleer deze betaling in uw PayPlug-portaal voordat u het opnieuw probeert.';

@@ -46,6 +46,10 @@ class installActionTest extends BaseConfigurationAction
             ->andReturn(\Mockery::mock('AliasRepository'))
             ->byDefault();
 
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.upc_refund')
+            ->andReturn(\Mockery::mock('UpcRefundRepository'));
+
         $shop = \Mockery::mock('Shop');
         $shop->shouldReceive([
             'isFeatureActive' => true,
