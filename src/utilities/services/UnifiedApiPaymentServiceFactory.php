@@ -36,7 +36,6 @@ use PayPlug\src\models\classes\UpcTokenCache;
 use PayPlug\src\models\repositories\OperationRepository;
 use PayplugUnifiedCore\Auth\OAuth2Client;
 use PayplugUnifiedCore\Auth\TokenManager;
-use PayplugUnifiedCore\Contracts\IPaymentRepository;
 use PayplugUnifiedCore\Services\UnifiedApiPaymentService;
 
 class UnifiedApiPaymentServiceFactory
@@ -88,7 +87,7 @@ class UnifiedApiPaymentServiceFactory
         return new UpcTokenCache($this->dependencies);
     }
 
-    public function createPaymentRepository(): IPaymentRepository
+    public function createPaymentRepository(): OperationRepository
     {
         return new OperationRepository($this->dependencies);
     }

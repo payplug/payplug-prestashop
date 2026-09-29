@@ -103,6 +103,9 @@ class createActionTest extends TestCase
         $factory->shouldReceive('createLock')->andReturn($lock);
         $factory->shouldReceive('createTokenCache')->andReturn($token_cache);
         $factory->shouldReceive('create')->andReturn($payment_service);
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('bindPaymentId')->andReturn(true);
         $logger->shouldReceive('error')->never();
         $lock->shouldReceive('acquire')->with('uhf_cart:42', 60)->andReturn(true);
         $lock->shouldReceive('release')->with('uhf_cart:42')->once();
@@ -123,6 +126,8 @@ class createActionTest extends TestCase
 
         $link->shouldReceive('getModuleLink')->with('payplug', 'unified', $this->tokenActionParams('return'), true)
             ->andReturn('https://shop.example/module/payplug/unified?action=return&id_cart=42');
+        $link->shouldReceive('getModuleLink')->with('payplug', 'notify', [], true)
+            ->andReturn('https://shop.example/module/payplug/notify');
 
         $action->dependencies = $dependencies;
 
@@ -313,6 +318,113 @@ class createActionTest extends TestCase
         $this->expectExceptionMessage('cache db down');
 
         $action->createAction($this->defaultParams());
+    }
+
+    /**
+     * PRE-3627: the payment-creation response carries the payment's own "id" (the key the refund
+     * endpoint expects) next to "operationIds[0]" (the operation key used everywhere else). The
+     * payment id must be bound to the operation as soon as the payment exists, before any order.
+     */
+    public function testCreateActionBindsThePaymentIdToTheOperationRightAfterPaymentCreation()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
+            201,
+            '{"id":"pay_1","operationIds":["op_1"],"execCode":"0001"}',
+            'https://acs.example/challenge',
+            null,
+            null
+        ));
+        $mocks['payment_repository']->shouldReceive('bindPaymentId')->once()->with('op_1', 'pay_1', 42)->andReturn(true);
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_pending_operation:42', 'op_1', 600)->once();
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null, null);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Failed to persist pending operation cache/'));
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $result = $action->createAction($this->defaultParams());
+
+        $this->assertFalse($result['result']);
+    }
+
+    /**
+     * notificationUrl is part of the payload the UHF technical doc specifies (the platform itself
+     * routes notifications to the realm's Receiver): sent like the Woo/Sylius modules do.
+     */
+    public function testCreateActionSendsTheNotifyControllerAsNotificationUrl()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['link']->shouldReceive('getModuleLink')->with('payplug', 'notify', [], true)
+            ->andReturn('https://shop.example/module/payplug/notify');
+        $mocks['payment_service']->shouldReceive('createPayment')->once()
+            ->withArgs(function ($dto) {
+                $body = $dto->createPayloadBody();
+
+                return isset($body['notificationUrl']) && 'https://shop.example/module/payplug/notify' === $body['notificationUrl'];
+            })
+            ->andReturn(new PaymentOutput(201, '{"id":"pay_1","operationIds":["op_1"],"execCode":"0001"}', 'https://acs.example/challenge', null, null));
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_pending_operation:42', 'op_1', 600)->once();
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null, null);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Failed to persist pending operation cache/'));
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $result = $action->createAction($this->defaultParams());
+
+        $this->assertFalse($result['result']);
+    }
+
+    public function testCreateActionKeepsGoingAndLogsWhenThePaymentIdCannotBeBound()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
+            201,
+            '{"id":"pay_1","operationIds":["op_1"],"execCode":"0001"}',
+            'https://acs.example/challenge',
+            null,
+            null
+        ));
+        $mocks['payment_repository']->shouldReceive('bindPaymentId')->once()->andThrow(new \Exception('db down'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/payment id pay_1 .*op_1.* not recorded.*refunds/'));
+        // The payment itself still goes on to its challenge: the card may already be engaged.
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_pending_operation:42', 'op_1', 600)->once();
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null, null);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Failed to persist pending operation cache/'));
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $result = $action->createAction($this->defaultParams());
+
+        $this->assertFalse($result['result']);
+    }
+
+    /**
+     * The binding must also happen on the frictionless success path, before the order is created
+     * from the synchronous outcome - it is the only moment the payment id is known.
+     */
+    public function testCreateActionBindsThePaymentIdBeforeCreatingTheOrderOnAFrictionlessSuccess()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
+            200,
+            '{"id":"pay_1","operationIds":["op_1"],"execCode":"0000"}',
+            null,
+            null,
+            null
+        ));
+        $mocks['payment_repository']->shouldReceive('bindPaymentId')->once()->with('op_1', 'pay_1', 42)->andReturn(true)->globally()->ordered();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+        $order_action->shouldReceive('createFromOutcome')->once()->with(42, 'op_1', '0000', PaymentOutcome::PAID, 1234, null, [])
+            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99'])->globally()->ordered();
+        $mocks['logger']->shouldReceive('error')->never();
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $result = $action->createAction($this->defaultParams());
+
+        $this->assertTrue($result['result']);
+        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
     }
 
     /**
@@ -1172,6 +1284,9 @@ class createActionTest extends TestCase
         $factory->shouldReceive('createLock')->andReturn($lock);
         $factory->shouldReceive('createTokenCache')->andReturn($token_cache);
         $factory->shouldReceive('create')->andReturn($payment_service);
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('bindPaymentId')->andReturn(true)->byDefault();
         $lock->shouldReceive('acquire')->with('uhf_cart:42', 60)->andReturn(true);
         // Fix 2's pending-operation reconciliation check: no pending operation cached by default.
         // Tests that go on to cache one (via a redirectHtml/redirectUrl response) override this
@@ -1180,6 +1295,8 @@ class createActionTest extends TestCase
 
         $link->shouldReceive('getModuleLink')->with('payplug', 'unified', $this->tokenActionParams('return'), true)
             ->andReturn('https://shop.example/module/payplug/unified?action=return&id_cart=42');
+        $link->shouldReceive('getModuleLink')->with('payplug', 'notify', [], true)
+            ->andReturn('https://shop.example/module/payplug/notify')->byDefault();
 
         $action->dependencies = $dependencies;
 
@@ -1194,6 +1311,8 @@ class createActionTest extends TestCase
             'context' => $context,
             'configuration_class' => $configuration_class,
             'cookies' => $cookies,
+            'payment_repository' => $payment_repository,
+            'link' => $link,
         ]];
     }
 

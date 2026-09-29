@@ -146,8 +146,10 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   `createAction()`/`returnAction()` already use — via the shared `OperationAction::createOrderWithLock()`
   helper, which acquires `UpcLock` under the same `'uhf_cart:<id_cart>'` key with a short bounded
   retry before calling `createFromOutcome()`, and always releases it via `finally`; `notifyAction()`
-  uses the same retry (previously asymmetric with `returnAction()`, now shared code) and returns a
-  `409` if the lock still can't be acquired. `notifyAction()` also cross-checks the webhook's
+  uses the same helper with a longer budget (`NOTIFY_LOCK_RETRY_ATTEMPTS`, ~8s: its payment
+  notification typically lands while `returnAction()` holds the cart lock, and the Receiver does
+  not retry a `409` — observed on staging, 2026-09-29) and returns a `409` only if the lock still
+  can't be acquired after that. `notifyAction()` also cross-checks the webhook's
   `amount` against the cart's own computed total before creating an order (there's no independent
   `id_cart` to cross-check `orderId` against in that server-to-server context — `orderId` itself
   *is* the cart id there); `returnAction()`/the `createAction()` reconciliation path additionally
@@ -158,6 +160,66 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   UI exists yet to configure a webhook secret, matching the vendor library's own documented,
   deliberate, temporary stance on this (see `vendor/payplug/unified-plugin-core`'s own `CLAUDE.md`,
   `WebhookNotificationHelper` entry).
+- **Refund (PRE-3627)**: `UnifiedRefundAction::refundAction()` (`payplug.action.unified_refund`),
+  reached from the existing BO refund AJAX call in `AdminPayplugController` when the panel's hidden
+  `payment_type` field is `uhf` — set by `OrderAction::renderDetail()`'s `renderUnifiedDetail()`
+  branch for an order with no `payplug_payment` row but a `PAID` `payplug_upc_operation` row
+  (`OperationRepository::getPaidByOrderId()`, not `getByOrderId()`: an order can also carry a
+  `FAILED` operation). The refund endpoint is keyed by the payment's own `id` from the
+  payment-creation response, which differs from `operationIds[0]` (stored as `operation_id`,
+  used by `getOperation()`/the webhook) and can't be read back from the operation afterwards:
+  `OperationAction::createAction()` binds it right after payment creation via
+  `OperationRepository::bindPaymentId()` (new nullable `payment_id` column; creates a pending
+  `order_id = 'cart:<id>'` placeholder row when no row exists yet, which `save()` completes later
+  without touching `payment_id`, and that `bindPaymentId()` purges once older than 24 h; a failed
+insert retries as an update, in case the frictionless notification `save()`d the row meanwhile); sending the operation id instead gets a 400 "The reference
+  transaction has not been found." (found in QA, 2026-09-29). An order without a recorded
+  `payment_id` fails the refund before any lock/API call. The refund row is recorded `pending` under an
+  `intent:<uniqid>` id *before* `createRefund()` (no idempotency key on that endpoint: a refund the
+  API processed but whose answer was lost must still count as refunded), then renamed to the
+  refund's `operationIds[0]` (`UpcRefundRepository::bindRefundOperationId()`) — never the response's
+  top-level `id`, which is the refunded payment's (staging, 2026-09-29). Refund `execCode`s, sync or
+  notified, go through `UpcRefundExecCode`, not `ExecCodeMapper` (which maps every unknown code to
+  `FAILED`, freeing an amount that may have left): `0000`/`0002`/`0003`/`5004` accepted (`5004` =
+  timeout, result notified later), only the codes the platform's EXECCODES catalog documents as
+  failures decline (row `failed`, order state untouched), anything else is unknown. An unknown sync
+  code, a timeout (`ApiException` status 0), a 5xx or a 409 keep the row `pending`, leave the order
+  state alone and answer `refund.error.uncertain` (check the portal before retrying) instead of a
+  plain failure; a 4xx/local validation error marks it `failed`. `renderDetail()` checks for a
+  `PAID` UPC operation *before* the Retail `payplug_payment` lookup, because an abandoned Retail
+  attempt leaves that row on the cart — inside a `try/catch`, since it runs for Retail orders too. `payplug_upc_refund` is created on install only because
+  `ConfigurationAction::forceAutoloadUpcRepositories()` loads its repository. The Retail refund flow is untouched. The Unified API exposes no refundable
+  amount, so refunds are tracked locally in `payplug_upc_refund` (`UpcRefundRepository`, statuses
+  `pending`/`confirmed`/`failed`; `failed` rows don't count as refunded). `createRefund()` is called
+  under a `UpcLock` (`uhf_refund:<id_order>`, TTL 90 s, not 30: token fetch + POST + 401 refresh +
+  POST at a 15 s cURL timeout each can exceed 30 s), with `orderId` = cart id (mirrors the payment),
+  `currency` = the order's ISO code, `submerchantExternalId` = `null`; a response without
+  `operationIds[0]` keeps its `intent:` id (logged — its notification can't be matched). Order state moves to `order_state_refund[_test]` when nothing is
+  left to refund, `order_state_partial_refund[_test]` otherwise; it is updated inside the locked
+  section. If the intent row can't be recorded, nothing is sent; if renaming it fails after a successful
+  `createRefund()`, it is logged ("not recorded locally") and the BO still gets success, because the
+  money already moved. Refund notifications arrive on
+  `notify.php` with a payment-shaped body: `notifyAction()` matches them against
+  `payplug_upc_refund` right after its `THREE_DS_PENDING` filter and settles the row only (never the
+  order state, never `markTreated()`); a refund `getOperation()` re-read missing `execCode` or
+  `amount` returns `500` (row untouched; whether the Receiver retries a 5xx is unconfirmed); a re-read accepted-but-not-`0000` or unknown
+  `execCode` is a `200` no-op that leaves the row `pending` (unknown ones logged for a manual check);
+  an amount mismatch also leaves it `pending` (logged). `UpcOrderStateMutator::apply()` skips any transition on an order already in the
+  refund or partial-refund state, so a late PAID webhook of the same operation can't push a refunded
+  order back to "Payment accepted". An operation targeting an order
+  already paid by *another* operation (checked *before* the cart-amount cross-check, which a partial
+  refund never passes) is most likely a refund notification that beat `refundAction()` renaming its
+  row: `notifyAction()` waits for the `uhf_refund:<id_order>` lock (`UnifiedRefundAction::LOCK_KEY_PREFIX`,
+  same ~8 s budget as the cart lock, only probed) and matches it again. Still unmatched, a `PAID`
+  one gets a `409` and an error log (the Receiver does not retry a `409`, so manual check — e.g. a
+  refund that kept its `intent:` id), any other outcome a `200` no-op. Known limits: no idempotency key on
+  UPC's refund endpoint (a timed-out-but-processed refund retried refunds twice); refunds made from
+  the merchant portal are sent in `apiVersion=1` and never notified, so the local refunded amount
+  can be under-estimated (the API still rejects over-refunds with a 400); an asynchronously failed
+  refund doesn't restore the order state. Refunds/payments missing from the PayPlug portal while the Unified API returns
+  `0000`: the Retail API's operation ingestion fails on IPv6 client IPs (`attempts.remote_ip` is
+  `varchar(16)`, platform bug reported 2026-09-30) — `browser.ip` must stay the real client IP
+  (`Tools::getRemoteAddr()`); don't "fix" it by sending `REMOTE_ADDR`/a proxy or fake IPv4.
 - **Return/challenge cart resolution is token-based, not `id_cart`-based**: `challengeAction()` and
   `returnAction()` are reached via an unauthenticated cross-site ACS POST/redirect — there's no live
   PrestaShop session to check a cart id against (unlike `createAction()`'s own

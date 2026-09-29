@@ -42,6 +42,7 @@ function upgrade_module_5_2_0($object)
             `outcome` VARCHAR(30) NOT NULL,
             `amount` INT(11) UNSIGNED NOT NULL,
             `treated` TINYINT(1) NOT NULL DEFAULT 0,
+            `payment_id` VARCHAR(255) NULL,
             `date_add` DATETIME NULL,
             `date_upd` DATETIME NULL,
             CONSTRAINT payplug_upc_operation_unique UNIQUE (operation_id),
@@ -51,6 +52,23 @@ function upgrade_module_5_2_0($object)
         $flag_operation = Db::getInstance()->Execute($sql);
     } catch (PrestaShopDatabaseException $e) {
         $flag_operation = false;
+    }
+
+    // A table created before PRE-3627 is left as is by CREATE TABLE IF NOT EXISTS: add the
+    // column only when it is missing, so the script can run again safely.
+    if ($flag_operation) {
+        try {
+            $payment_id_column = Db::getInstance()->executeS(
+                'SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'payplug_upc_operation` LIKE "payment_id"'
+            );
+            if (empty($payment_id_column)) {
+                $flag_operation = (bool) Db::getInstance()->execute(
+                    'ALTER TABLE `' . _DB_PREFIX_ . 'payplug_upc_operation` ADD COLUMN `payment_id` VARCHAR(255) NULL AFTER `treated`'
+                );
+            }
+        } catch (PrestaShopDatabaseException $e) {
+            $flag_operation = false;
+        }
     }
 
     $sql_lock = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_upc_lock` (
@@ -87,7 +105,26 @@ function upgrade_module_5_2_0($object)
         $flag_alias = false;
     }
 
-    $flag = $flag_operation && $flag_lock && $flag_alias;
+    $sql_refund = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_upc_refund` (
+            `id_payplug_upc_refund` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `refund_operation_id` VARCHAR(255) NOT NULL,
+            `payment_operation_id` VARCHAR(255) NOT NULL,
+            `order_id` VARCHAR(255) NOT NULL,
+            `amount` INT(11) UNSIGNED NOT NULL,
+            `currency` VARCHAR(3) NOT NULL,
+            `status` VARCHAR(20) NOT NULL,
+            `date_add` DATETIME NULL,
+            `date_upd` DATETIME NULL,
+            CONSTRAINT payplug_upc_refund_unique UNIQUE (refund_operation_id),
+            KEY payplug_upc_refund_order_id (order_id)) ENGINE=' . _MYSQL_ENGINE_;
+
+    try {
+        $flag_refund = Db::getInstance()->Execute($sql_refund);
+    } catch (PrestaShopDatabaseException $e) {
+        $flag_refund = false;
+    }
+
+    $flag = $flag_operation && $flag_lock && $flag_alias && $flag_refund;
 
     // Empty means the merchant never narrowed the Scalapay range: the account's own
     // authorized amounts from GET /account apply as-is.

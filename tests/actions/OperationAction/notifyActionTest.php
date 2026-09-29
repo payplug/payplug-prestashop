@@ -5,6 +5,7 @@
 namespace PayPlug\tests\actions\OperationAction;
 
 use PayPlug\src\actions\OperationAction;
+use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PHPUnit\Framework\TestCase;
 
@@ -160,14 +161,41 @@ class notifyActionTest extends TestCase
         $this->assertSame(200, $result['http_status']);
     }
 
+    /**
+     * Observed on staging (2026-09-29): the payment notification lands while returnAction() is
+     * still creating the order under the cart lock, and the Receiver never retries a 409 - so the
+     * webhook must wait for that lock rather than give up after returnAction()'s short budget.
+     */
+    public function testWaitsForTheBrowserReturnToReleaseTheCartLockInsteadOfReturningConflict()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $action->lockRetryDelayUsec = 0;
+        $mocks['lock']->shouldReceive('acquire')->times(6)->with('uhf_cart:6', 60)
+            ->andReturn(false, false, false, false, false, true);
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:6');
+        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('359fe258-8264-4a90-9a40-d16e1736058d');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
     public function testReturnsConflictWhenLockCannotBeAcquired()
     {
         [$action, $mocks] = $this->mockActionForNotify();
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
         $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
-        // 1 initial attempt + OperationAction::LOCK_RETRY_ATTEMPTS (2) retries = 3 total.
-        $mocks['lock']->shouldReceive('acquire')->times(3)->with('uhf_cart:6', 60)->andReturn(false);
+        // 1 initial attempt + OperationAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries = 41 total:
+        // the webhook waits longer than returnAction() - the Receiver doesn't retry a 409.
+        $action->lockRetryDelayUsec = 0;
+        $mocks['lock']->shouldReceive('acquire')->times(41)->with('uhf_cart:6', 60)->andReturn(false);
         $mocks['lock']->shouldReceive('release')->never();
         $mocks['payment_repository']->shouldReceive('markTreated')->never();
         $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Could not acquire lock/'));
@@ -388,6 +416,313 @@ class notifyActionTest extends TestCase
         $this->assertSame(200, $result['http_status']);
     }
 
+    public function testConfirmsARecordedRefundWithoutEverTouchingTheOrder()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $this->mockGetOperationResponse($mocks, 'op_refund_1', '0000', '6', 1000);
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->once()->with('op_refund_1', 'confirmed')->andReturn(true);
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['payment_repository']->shouldReceive('isTreated')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testMarksARecordedRefundFailedOnANonSuccessOutcome()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"4001","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $this->mockGetOperationResponse($mocks, 'op_refund_1', '4001', '6', 1000);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Refund op_refund_1 reported a non-success outcome/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->once()->with('op_refund_1', 'failed')->andReturn(true);
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testIgnoresTheRedeliveryOfAnAlreadySettledRefund()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'confirmed']);
+        $mocks['factory']->shouldReceive('create')->never();
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testLeavesARecordedRefundUntouchedWhenTheAmountDiffers()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $this->mockGetOperationResponse($mocks, 'op_refund_1', '0000', '6', 999);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/amount mismatch/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testLeavesARecordedRefundUntouchedAndAsksForARetryWhenTheExecCodeIsMissing()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $payment_service = \Mockery::mock('UnifiedApiPaymentService');
+        $mocks['factory']->shouldReceive('create')->andReturn($payment_service);
+        $payment_service->shouldReceive('getOperation')->once()->with('op_refund_1')
+            ->andReturn(['body' => '{"orderId":"6","amount":1000}']);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/no execCode/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(500, $action->notifyAction()['http_status']);
+    }
+
+    public function testReturnsServerErrorWhenARecordedRefundCannotBeFetched()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $payment_service = \Mockery::mock('UnifiedApiPaymentService');
+        $mocks['factory']->shouldReceive('create')->andReturn($payment_service);
+        $payment_service->shouldReceive('getOperation')->once()->andThrow(new \Exception('timeout'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/getOperation failed for refund/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(500, $action->notifyAction()['http_status']);
+    }
+
+    public function testAsksForARetryWhenAPaidOperationTargetsAnOrderAlreadyPaidByAnotherOperation()
+    {
+        // e.g. a full refund notification arriving before refundAction() recorded its row
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
+        $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')
+            ->andReturn(new OperationData('op_original', '0000', PaymentOutcome::PAID, 2900, '99'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/is not the paid operation/'));
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(409, $action->notifyAction()['http_status']);
+    }
+
+    public function testIgnoresANonPaidOperationTargetingAnOrderAlreadyPaidByAnotherOperation()
+    {
+        // e.g. the late webhook of an earlier failed attempt on a cart that has since been paid
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_failed","execCode":"9999","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, 'op_failed', '9999', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
+        $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')
+            ->andReturn(new OperationData('op_original', '0000', PaymentOutcome::PAID, 2900, '99'));
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/ignored/'));
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['payment_repository']->shouldReceive('save')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testStillReconcilesAPendingOrderWithItsOwnFinalNotification()
+    {
+        // The order exists (created pending by returnAction()) but has no PAID operation yet.
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
+        $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')->andReturn(null);
+        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testStillCreatesTheOrderWhenTheNotifiedOperationIsTheOneThatAlreadyPaidIt()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
+        $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')
+            ->andReturn(new OperationData('359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, '99'));
+        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testLeavesARecordedRefundUntouchedAndAsksForARetryWhenTheAmountIsMissing()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $payment_service = \Mockery::mock('UnifiedApiPaymentService');
+        $mocks['factory']->shouldReceive('create')->andReturn($payment_service);
+        $payment_service->shouldReceive('getOperation')->once()->with('op_refund_1')
+            ->andReturn(['body' => '{"execCode":"0000","orderId":"6"}']);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/has no amount/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(500, $action->notifyAction()['http_status']);
+    }
+
+    public function testLeavesARecordedRefundPendingWhileItsReReadIsStillThreeDsPending()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $this->mockGetOperationResponse($mocks, 'op_refund_1', '0001', '6', 1000);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Refund op_refund_1 reported an undocumented execCode 0001, left pending/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    /**
+     * PRE-3627 review: ExecCodeMapper maps any code it doesn't know to FAILED, which would free
+     * an amount that may already have left for a second refund. Only documented failures fail it.
+     */
+    public function testLeavesARecordedRefundPendingOnAnUndocumentedExecCode()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"9999","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $this->mockGetOperationResponse($mocks, 'op_refund_1', '9999', '6', 1000);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/undocumented execCode 9999, left pending.*manual check needed/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    /**
+     * PRE-3627 review (M2): refundAction() holds the refund lock until the refund's row carries
+     * its operation id. A notification beating that is matched once the lock is free - even a
+     * partial one, which would otherwise be dropped by the cart-amount cross-check.
+     */
+    public function testMatchesAnEarlyRefundNotificationOnceTheRefundInProgressReleasesItsLock()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $action->lockRetryDelayUsec = 0;
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')->twice()
+            ->andReturn(null, ['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $payment_service = \Mockery::mock('UnifiedApiPaymentService');
+        $mocks['factory']->shouldReceive('create')->andReturn($payment_service);
+        $payment_service->shouldReceive('getOperation')->twice()->with('op_refund_1')
+            ->andReturn(['body' => '{"execCode":"0000","orderId":"6","amount":1000}']);
+        // The cart total (2900) differs from this partial refund's amount (1000).
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
+        $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')
+            ->andReturn(new OperationData('op_original', '0000', PaymentOutcome::PAID, 2900, '99'));
+        $mocks['lock']->shouldReceive('acquire')->times(3)->with('uhf_refund:99', 5)->andReturn(false, false, true);
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_refund:99');
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->once()->with('op_refund_1', 'confirmed')->andReturn(true);
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testStillAsksForARetryWhenTheRefundLockIsNeverReleased()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $action->lockRetryDelayUsec = 0;
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $this->mockGetOperationResponse($mocks, 'op_refund_1', '0000', '6', 1000);
+        // The cart total (2900) differs from this partial refund's amount (1000).
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
+        $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')
+            ->andReturn(new OperationData('op_original', '0000', PaymentOutcome::PAID, 2900, '99'));
+        // 1 initial attempt + OperationAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries.
+        $mocks['lock']->shouldReceive('acquire')->times(41)->with('uhf_refund:99', 5)->andReturn(false);
+        $mocks['lock']->shouldReceive('release')->never();
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/is not the paid operation/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(409, $action->notifyAction()['http_status']);
+    }
+
+    public function nonTerminalRefundExecCodeProvider()
+    {
+        return [
+            'waiting provider' => ['0002'],
+            'waiting status' => ['0003'],
+            'timeout, result notified later' => ['5004'],
+        ];
+    }
+
+    /**
+     * @dataProvider nonTerminalRefundExecCodeProvider
+     *
+     * @param string $exec_code
+     */
+    public function testLeavesARecordedRefundPendingWhileItsReReadIsANonTerminalExecCode($exec_code)
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $this->mockGetOperationResponse($mocks, 'op_refund_1', $exec_code, '6', 1000);
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/Refund op_refund_1 still in progress \(execCode ' . $exec_code . '\)/'));
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testIgnoresTheRedeliveryOfAnAlreadyFailedRefund()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'failed']);
+        $mocks['factory']->shouldReceive('create')->never();
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
     /**
      * @return array{0: OperationAction, 1: array<string, object>}
      */
@@ -425,6 +760,16 @@ class notifyActionTest extends TestCase
         $lock->shouldReceive('release')->byDefault();
         $payment_repository->shouldReceive('isTreated')->andReturn(false)->byDefault();
 
+        $refund_repository = \Mockery::mock('UpcRefundRepository');
+        $order_adapter = \Mockery::mock('OrderAdapter');
+        $module->shouldReceive('getService')
+            ->with('payplug.models.repositories.upc_refund')
+            ->andReturn($refund_repository);
+        $refund_repository->shouldReceive('getByRefundOperationId')->andReturn(null)->byDefault();
+        $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
+        $order_adapter->shouldReceive('getIdByCartId')->andReturn(0)->byDefault();
+        $payment_repository->shouldReceive('getPaidByOrderId')->andReturn(null)->byDefault();
+
         // Fix 7: cache cleanup after a terminal reconciliation - not asserted by every test, only
         // the ones specifically covering it.
         $token_cache = \Mockery::mock('TokenCache');
@@ -455,6 +800,8 @@ class notifyActionTest extends TestCase
             'token_cache' => $token_cache,
             'order_action' => $order_action,
             'factory' => $factory,
+            'refund_repository' => $refund_repository,
+            'order_adapter' => $order_adapter,
         ]];
     }
 
