@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 5.2.2
+- Bugfix :
+  - [PRE-3641](https://payplug-prod.atlassian.net/browse/PRE-3641): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state
+
 ## Version 5.2.1
 - Bugfix :
   - [PRE-3598](https://payplug-prod.atlassian.net/browse/PRE-3598): Only start the integrated card payment from its own checkout form
