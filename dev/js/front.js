@@ -662,6 +662,18 @@ var $document, $window, __moduleName__Module = {
                     payment_option_id = integrated.props.paymentOptionId,
                     isIntegrated = payment_option_id == $('input[name="payment-option"]:checked').attr('id');
 
+                // Only handle the integrated payment option form or the integrated card form itself, never any
+                // other form of the page (voucher, newsletter...). #pay-with-{id}-form is the wrapper PrestaShop
+                // submits on "Order" click (see order.init), and it only holds the option form: this relies on
+                // themes not nesting unrelated forms inside it, which would bypass this guard.
+                if (typeof event != 'undefined') {
+                    var target = event.target;
+                    if (!target.closest('#pay-with-' + payment_option_id + '-form')
+                        && !target.classList.contains(integrated.props.identifier)) {
+                        return;
+                    }
+                }
+
                 if (!$('#payment-confirmation:visible').length) {
                     return;
                 }
