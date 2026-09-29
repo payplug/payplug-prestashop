@@ -881,6 +881,8 @@ class ConfigurationAction
             'sandbox_mode' => 'payplug_sandbox',
             'oney_custom_min_amounts' => 'oney_min_amounts',
             'oney_custom_max_amounts' => 'oney_max_amounts',
+            'scalapay_custom_min_amounts' => 'scalapay_min_amounts',
+            'scalapay_custom_max_amounts' => 'scalapay_max_amounts',
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',

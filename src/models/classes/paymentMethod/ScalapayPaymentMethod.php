@@ -50,6 +50,9 @@ class ScalapayPaymentMethod extends PaymentMethod
     {
         $option = parent::getOption($current_configuration);
         $option['available_test_mode'] = false;
+        $option['advanced_options'] = [
+            $this->getThresholds(),
+        ];
 
         return $option;
     }
