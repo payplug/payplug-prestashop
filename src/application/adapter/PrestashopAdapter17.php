@@ -309,12 +309,13 @@ class PrestashopAdapter17
             ->getValue('oauth_company_id');
 
         $payment_methods = json_decode($this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'), true);
+        $is_one_click_activated = (bool) $payment_methods['one_click'];
         $translation = $this->dependencies->getPlugin()->getTranslationClass()->getFrontIntegratedPaymentTranslations();
         $privacyLink = $this->getPrivacyLink();
 
         $this->context->smarty->assign(array_merge(
             [
-                'is_one_click_activated' => (bool) $payment_methods['one_click'],
+                'is_one_click_activated' => $is_one_click_activated,
                 'privacy' => $translation['privacy'],
                 'secure' => $translation['secure'],
                 'privacyLink' => $privacyLink,
@@ -332,6 +333,7 @@ class PrestashopAdapter17
                     ['action' => 'create'],
                     true
                 ),
+                'saved_aliases' => $this->getSavedAliasesForCheckout($is_one_click_activated),
             ],
             $this->getEmbeddedPlaceholderTranslations()
         ));
@@ -531,6 +533,29 @@ class PrestashopAdapter17
         $this->context->smarty->assign([
             'payplug_switch' => $switch,
         ]);
+    }
+
+    /**
+     * @description Get the saved UHF aliases of the current customer usable for the cart currency
+     *
+     * @param bool $is_one_click_activated no saved card is offered when one-click is disabled
+     *
+     * @return array
+     */
+    private function getSavedAliasesForCheckout($is_one_click_activated)
+    {
+        if (!$is_one_click_activated) {
+            return [];
+        }
+
+        $iso_code = (string) $this->context->currency->iso_code;
+
+        return $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.action.alias')
+            ->renderCheckoutList($iso_code, $this->getHostedFieldsIdentifier($iso_code));
     }
 
     /**

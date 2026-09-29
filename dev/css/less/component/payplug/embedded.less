@@ -415,4 +415,31 @@
     width: 140px;
     height: 35px;
   }
+
+  &_container.-savedAliases {
+    flex-direction: column;
+  }
+
+  &_alias {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    cursor: pointer;
+
+    input {
+      margin: 0;
+    }
+  }
+
+  &_newCard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+
+    &.-hide {
+      display: none;
+    }
+  }
 }

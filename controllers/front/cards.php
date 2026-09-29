@@ -69,8 +69,18 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
             ['_ajax' => 1],
             true
         );
+        // Saved UHF aliases (payplug_alias) are listed on the same page as the Retail API cards.
+        $aliases = $this->dependencies->configClass->isValidFeature('feature_hosted_fields')
+            ? $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.action.alias')
+                ->renderList()
+            : [];
         $this->context_adapter->smarty->assign([
             'payplug_cards' => $cards,
+            'payplug_aliases' => $aliases,
             'payplug_delete_card_url' => $payplug_delete_card_url,
         ]);
         $translations = $this->dependencies

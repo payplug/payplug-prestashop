@@ -28,11 +28,14 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PayPlug\classes\DependenciesClass;
+use PayPlug\src\utilities\traits\ServiceGetter;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 
 class UnifiedOrderAction
 {
+    use ServiceGetter;
+
     public $dependencies;
 
     /**
@@ -59,10 +62,12 @@ class UnifiedOrderAction
      * @param string $exec_code
      * @param string $outcome
      * @param int $amount
+     * @param array{alias_id: string, brand: string}|null $pending_alias alias created by this operation, persisted on PAID
+     * @param array{last4?: string|null, exp_month?: string|null, exp_year?: string|null} $card_details
      *
      * @return array{result: bool, redirect_url: string}
      */
-    public function createFromOutcome($id_cart, $operation_id, $exec_code, $outcome, $amount)
+    public function createFromOutcome($id_cart, $operation_id, $exec_code, $outcome, $amount, $pending_alias = null, $card_details = [])
     {
         $plugin = $this->dependencies->getPlugin();
         $existing_order = $this->findExistingOrder($id_cart);
@@ -123,7 +128,9 @@ class UnifiedOrderAction
                 $outcome,
                 $amount,
                 $existing_order['secure_key'],
-                $id_cart
+                $id_cart,
+                $pending_alias,
+                $card_details
             );
         }
 
@@ -188,7 +195,17 @@ class UnifiedOrderAction
             ];
         }
 
-        return $this->persistAndApplyOutcome($new_order_id, $operation_id, $exec_code, $outcome, $amount, $secure_key, $id_cart);
+        return $this->persistAndApplyOutcome(
+            $new_order_id,
+            $operation_id,
+            $exec_code,
+            $outcome,
+            $amount,
+            $secure_key,
+            $id_cart,
+            $pending_alias,
+            $card_details
+        );
     }
 
     /**
@@ -285,10 +302,12 @@ class UnifiedOrderAction
      * @param int $amount
      * @param string $secure_key
      * @param int $id_cart
+     * @param array{alias_id: string, brand: string}|null $pending_alias
+     * @param array{last4?: string|null, exp_month?: string|null, exp_year?: string|null} $card_details
      *
      * @return array{result: bool, redirect_url: string, persisted: bool}
      */
-    private function persistAndApplyOutcome($order_id, $operation_id, $exec_code, $outcome, $amount, $secure_key, $id_cart)
+    private function persistAndApplyOutcome($order_id, $operation_id, $exec_code, $outcome, $amount, $secure_key, $id_cart, $pending_alias = null, $card_details = [])
     {
         $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $factory = $module->getService('payplug.utilities.service.unified_api_payment_service_factory');
@@ -330,11 +349,73 @@ class UnifiedOrderAction
             ];
         }
 
+        if (PaymentOutcome::PAID === $outcome && is_array($pending_alias)) {
+            $this->persistAlias($id_cart, $pending_alias, is_array($card_details) ? $card_details : []);
+        }
+
         return [
             'result' => true,
             'redirect_url' => $this->confirmationUrl($id_cart, $order_id, $secure_key),
             'persisted' => true,
         ];
+    }
+
+    /**
+     * @description Save the alias created by a paid operation, logging any failure
+     *
+     * The order is already validated and the customer charged: nothing here may change the
+     * confirmation result.
+     *
+     * @param int $id_cart
+     * @param array{alias_id: string, brand: string} $pending_alias
+     * @param array{last4?: string|null, exp_month?: string|null, exp_year?: string|null} $card_details
+     */
+    private function persistAlias($id_cart, array $pending_alias, array $card_details)
+    {
+        $alias_id = isset($pending_alias['alias_id']) ? (string) $pending_alias['alias_id'] : '';
+
+        try {
+            $plugin = $this->dependencies->getPlugin();
+            $cart = $plugin->getCart()->get((int) $id_cart);
+            $id_customer = $cart && isset($cart->id_customer) ? (int) $cart->id_customer : 0;
+            if ($id_customer <= 0) {
+                $this->logger()->error(
+                    'UnifiedOrderAction::persistAlias - failed to persist alias ' . $alias_id
+                    . ' for cart ' . $id_cart . ': no customer'
+                );
+
+                return;
+            }
+
+            $currency = $plugin->getCurrency()->getCurrency((int) $cart->id_currency);
+            $iso_code = $currency && isset($currency->iso_code) ? strtolower((string) $currency->iso_code) : '';
+            $prestashop_adapter = $this->dependencies->loadAdapterPresta();
+            $identifier = '' !== $iso_code && $prestashop_adapter
+                ? (string) $prestashop_adapter->getHostedFieldsIdentifier($iso_code)
+                : '';
+
+            $saved = $this->getService('payplug.models.repositories.alias')->saveIfAbsent(
+                $id_customer,
+                $alias_id,
+                $iso_code,
+                $identifier,
+                isset($pending_alias['brand']) ? (string) $pending_alias['brand'] : '',
+                isset($card_details['last4']) ? $card_details['last4'] : null,
+                isset($card_details['exp_month']) ? $card_details['exp_month'] : null,
+                isset($card_details['exp_year']) ? $card_details['exp_year'] : null
+            );
+
+            if (!$saved) {
+                $this->logger()->error(
+                    'UnifiedOrderAction::persistAlias - failed to persist alias ' . $alias_id . ' for cart ' . $id_cart
+                );
+            }
+        } catch (\Exception $exception) {
+            $this->logger()->error(
+                'UnifiedOrderAction::persistAlias - failed to persist alias ' . $alias_id
+                . ' for cart ' . $id_cart . ': ' . $exception->getMessage()
+            );
+        }
     }
 
     /**

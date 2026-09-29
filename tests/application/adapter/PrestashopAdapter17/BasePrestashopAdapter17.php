@@ -13,6 +13,9 @@ require_once __DIR__ . '/PaymentOptionStub.php';
 abstract class BasePrestashopAdapter17 extends TestCase
 {
     protected $adapter;
+    protected $alias_action;
+    protected $module;
+    protected $module_adapter;
     protected $dependencies;
     protected $config_class;
     protected $configuration;
@@ -59,11 +62,19 @@ abstract class BasePrestashopAdapter17 extends TestCase
         $this->context->smarty->shouldReceive('assign')->byDefault();
         $this->context->link = \Mockery::mock('Link');
 
+        $this->alias_action = \Mockery::mock('AliasAction');
+        $this->alias_action->shouldReceive('renderCheckoutList')->andReturn([])->byDefault();
+        $this->module = \Mockery::mock('Module');
+        $this->module->shouldReceive('getService')->with('payplug.action.alias')->andReturn($this->alias_action);
+        $this->module_adapter = \Mockery::mock('ModuleAdapter');
+        $this->module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($this->module);
+
         $this->plugin = \Mockery::mock('Plugin');
         $this->plugin->shouldReceive([
             'getRoutes' => $this->routes,
             'getTranslationClass' => $this->translation,
             'getConfigurationClass' => $this->config_class,
+            'getModule' => $this->module_adapter,
         ]);
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');

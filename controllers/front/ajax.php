@@ -76,18 +76,33 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     $cookie = $context->cookie;
                     $id_customer = (int) $cookie->id_customer;
                     if (0 == (int) $id_customer) {
-                        exit(false);
+                        exit('');
                     }
                     $id_payplug_card = $tools->tool('getValue', 'pc');
                     $deleted = $this->dependencies
                         ->getPlugin()
                         ->getCardAction()
                         ->deleteAction((int) $id_customer, (int) $id_payplug_card);
-                    if ($deleted) {
-                        exit(true);
-                    }
 
-                    exit(false);
+                    // '1' / empty body, as strings: PHP 8.4 no longer prints a bool passed to exit().
+                    exit($deleted ? '1' : '');
+                }
+            } elseif ($tools->tool('getIsset', 'pa')) {
+                // Saved UHF alias (payplug_alias), distinct from the pc (payplug_card) block above.
+                // Same response body as the pc block ('1' / empty).
+                if (1 == (int) $tools->tool('getValue', 'delete')) {
+                    $id_customer = (int) $context->cookie->id_customer;
+                    if (0 == $id_customer) {
+                        exit('');
+                    }
+                    $deleted = $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.action.alias')
+                        ->deleteAction($id_customer, (int) $tools->tool('getValue', 'pa'));
+
+                    exit($deleted ? '1' : '');
                 }
             } elseif ($tools->tool('getIsset', 'getOneyCta')) {
                 exit(json_encode([

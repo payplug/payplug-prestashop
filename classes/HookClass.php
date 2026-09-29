@@ -105,10 +105,15 @@ class HookClass
      */
     public function actionDeleteGDPRCustomer($customer)
     {
-        $deleted = $this->dependencies
+        $cards_deleted = $this->dependencies
             ->getPlugin()
             ->getCardAction()
             ->deleteByCustomerAction((int) $customer['id']);
+        $aliases_deleted = $this->module
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.action.alias')
+            ->deleteByCustomerAction((int) $customer['id']);
+        $deleted = $cards_deleted && $aliases_deleted;
         if (!$deleted) {
             return \json_encode($this->dependencies
                 ->getPlugin()

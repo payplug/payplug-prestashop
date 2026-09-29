@@ -382,6 +382,237 @@ class UnifiedOrderActionTest extends TestCase
         $this->assertStringContainsString('id_order=99', $result['redirect_url']);
     }
 
+    public function testPersistsThePendingAliasOnPaidOutcomeWhenCreatingTheOrder()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
+
+        $context_adapter = \Mockery::mock('ContextAdapter');
+        $context = (object) ['link' => new class() {
+            public function getPageLink($page, $ssl, $lang, $params)
+            {
+                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
+            }
+        }];
+        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
+        $context_adapter->shouldReceive('get')->andReturn($context);
+
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
+        $mocks['module']->shouldReceive('validateOrder')->once();
+
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+        $mocks['factory']->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('save')->once();
+        $mocks['factory']->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::PAID);
+
+        $alias_repository = $this->mockAliasCollaborators($dependencies, $mocks);
+        $alias_repository->shouldReceive('saveIfAbsent')
+            ->once()
+            ->with(7, 'alias_abc', 'usd', 'ident_usd', 'visa', '0001', '12', '2029')
+            ->andReturn(true);
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(
+            42,
+            'op_123',
+            '0000',
+            PaymentOutcome::PAID,
+            1234,
+            ['alias_id' => 'alias_abc', 'brand' => 'visa'],
+            ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']
+        );
+
+        $this->assertTrue($result['result']);
+        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+    }
+
+    public function testPersistsThePendingAliasOnPaidOutcomeWhenTheOrderAlreadyExists()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForExistingOrder();
+
+        $factory = \Mockery::mock('Factory');
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+        $cart_adapter = \Mockery::mock('CartAdapter');
+
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->andReturn($factory);
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('save')->once();
+        $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::PAID);
+        $mocks['plugin']->shouldReceive('getCart')->andReturn($cart_adapter);
+        $cart_adapter->shouldReceive('get')->with(42)->andReturn((object) ['id' => 42, 'id_currency' => 2, 'id_customer' => 7]);
+
+        $alias_repository = $this->mockAliasCollaborators($dependencies, $mocks);
+        $alias_repository->shouldReceive('saveIfAbsent')
+            ->once()
+            ->with(7, 'alias_abc', 'usd', 'ident_usd', 'visa', null, null, null)
+            ->andReturn(true);
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(
+            42,
+            'op_123',
+            '0000',
+            PaymentOutcome::PAID,
+            1234,
+            ['alias_id' => 'alias_abc', 'brand' => 'visa'],
+            []
+        );
+
+        $this->assertTrue($result['result']);
+        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+    }
+
+    public function testDoesNotPersistAnAliasWhenPendingAliasIsNull()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForExistingOrder();
+
+        $factory = \Mockery::mock('Factory');
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->andReturn($factory);
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('save')->once();
+        $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $state_mutator->shouldReceive('apply')->once();
+        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.alias')->never();
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, []);
+
+        $this->assertTrue($result['result']);
+    }
+
+    public function testDoesNotPersistAnAliasOnFailedOutcome()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForExistingOrder();
+
+        $factory = \Mockery::mock('Factory');
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->andReturn($factory);
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('save')->once();
+        $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::FAILED);
+        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.alias')->never();
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(
+            42,
+            'op_123',
+            '0002',
+            PaymentOutcome::FAILED,
+            1234,
+            ['alias_id' => 'alias_abc', 'brand' => 'visa'],
+            []
+        );
+
+        $this->assertFalse($result['result']);
+    }
+
+    public function testDoesNotPersistAnAliasOnThreeDsPendingOutcome()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
+
+        $context_adapter = \Mockery::mock('ContextAdapter');
+        $context = (object) ['link' => new class() {
+            public function getPageLink($page, $ssl, $lang, $params)
+            {
+                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
+            }
+        }];
+        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
+        $context_adapter->shouldReceive('get')->andReturn($context);
+
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
+        $mocks['module']->shouldReceive('validateOrder')->once();
+
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+        $mocks['factory']->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('save')->once();
+        $mocks['factory']->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::THREE_DS_PENDING);
+        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.alias')->never();
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(
+            42,
+            'op_123',
+            '0001',
+            PaymentOutcome::THREE_DS_PENDING,
+            1234,
+            ['alias_id' => 'alias_abc', 'brand' => 'visa'],
+            []
+        );
+
+        $this->assertTrue($result['result']);
+    }
+
+    /**
+     * @dataProvider aliasPersistenceFailureProvider
+     */
+    public function testKeepsTheConfirmationResultWhenAliasPersistenceFails(\Closure $configure_save)
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
+
+        $context_adapter = \Mockery::mock('ContextAdapter');
+        $context = (object) ['link' => new class() {
+            public function getPageLink($page, $ssl, $lang, $params)
+            {
+                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
+            }
+        }];
+        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
+        $context_adapter->shouldReceive('get')->andReturn($context);
+
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
+        $mocks['module']->shouldReceive('validateOrder')->once();
+
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+        $mocks['factory']->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('save')->once();
+        $mocks['factory']->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $state_mutator->shouldReceive('apply')->once();
+
+        $alias_repository = $this->mockAliasCollaborators($dependencies, $mocks);
+        $configure_save($alias_repository->shouldReceive('saveIfAbsent')->once());
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/failed to persist alias alias_abc/'));
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(
+            42,
+            'op_123',
+            '0000',
+            PaymentOutcome::PAID,
+            1234,
+            ['alias_id' => 'alias_abc', 'brand' => 'visa'],
+            []
+        );
+
+        $this->assertTrue($result['result']);
+        $this->assertTrue($result['persisted']);
+        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+    }
+
+    public function aliasPersistenceFailureProvider()
+    {
+        return [
+            'save throws' => [function ($expectation) {
+                $expectation->andThrow(new \Exception('db down'));
+            }],
+            'save returns false' => [function ($expectation) {
+                $expectation->andReturn(false);
+            }],
+        ];
+    }
+
     /**
      * Builds a UnifiedOrderAction instance without running its real constructor (which would
      * otherwise build a real DependenciesClass when called with no argument, unavailable in this
@@ -484,7 +715,7 @@ class UnifiedOrderActionTest extends TestCase
         $factory = \Mockery::mock('Factory');
         $logger = \Mockery::mock('Logger');
 
-        $cart = (object) ['id' => 42, 'id_currency' => 2, 'secure_key' => 'cart_secure_key'];
+        $cart = (object) ['id' => 42, 'id_currency' => 2, 'id_customer' => 7, 'secure_key' => 'cart_secure_key'];
 
         $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
         $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
@@ -520,5 +751,28 @@ class UnifiedOrderActionTest extends TestCase
             'factory' => $factory,
             'logger' => $logger,
         ]];
+    }
+
+    /**
+     * @param mixed $dependencies
+     * @param array<string, object> $mocks
+     *
+     * @return object the AliasRepository mock
+     */
+    private function mockAliasCollaborators($dependencies, array $mocks)
+    {
+        $currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $prestashop_adapter = \Mockery::mock('PrestashopAdapter17');
+        $alias_repository = \Mockery::mock('AliasRepository');
+
+        $mocks['plugin']->shouldReceive('getCurrency')->andReturn($currency_adapter);
+        $currency_adapter->shouldReceive('getCurrency')->with(2)->andReturn((object) ['iso_code' => 'USD']);
+        $dependencies->shouldReceive('loadAdapterPresta')->andReturn($prestashop_adapter);
+        $prestashop_adapter->shouldReceive('getHostedFieldsIdentifier')->with('usd')->andReturn('ident_usd');
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.models.repositories.alias')
+            ->andReturn($alias_repository);
+
+        return $alias_repository;
     }
 }

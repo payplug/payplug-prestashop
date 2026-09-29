@@ -1069,6 +1069,7 @@ var $document, $window, __moduleName__Module = {
             identifier: '__moduleName__Card',
             query: null,
             id_card: 0,
+            type: 'card',
         },
         init: function () {
             var card = __moduleName__Module.card,
@@ -1083,6 +1084,8 @@ var $document, $window, __moduleName__Module = {
             event.stopPropagation();
             var $elem = $(this);
             __moduleName__Module.card.props.id_card = $elem.data('id_card');
+            // Retail API card (payplug_card) or UHF alias (payplug_alias): ids can collide.
+            __moduleName__Module.card.props.type = 'alias' === $elem.data('type') ? 'alias' : 'card';
             __moduleName__Module.popup.set(card_confirm_deleted_msg);
         },
         //display second popup to announce the card's deletion success
@@ -1090,25 +1093,27 @@ var $document, $window, __moduleName__Module = {
 
             event.preventDefault();
             event.stopPropagation();
-            var id_card = __moduleName__Module.card.props.id_card,
-                url = window['__moduleName___delete_card_url'] + '&pc=' + id_card,
-                card = __moduleName__Module.card,
-                identifier = card.props.identifier;
+            var card = __moduleName__Module.card,
+                id_card = card.props.id_card,
+                type = card.props.type,
+                param = 'alias' === type ? 'pa' : 'pc',
+                url = window['__moduleName___delete_card_url'] + '&' + param + '=' + id_card,
+                identifier = card.props.identifier,
+                data = {delete: 1};
+
+            data[param] = id_card;
 
             $.ajax({
                 type: 'POST',
                 url: url,
                 dataType: 'json',
-                data: {
-                    delete: 1,
-                    pc: id_card
-                },
+                data: data,
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (result) {
-                        $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
+                        $('.' + identifier + '[data-type="' + type + '"][data-id_card="' + id_card + '"]').remove();
                         __moduleName__Module.popup.setDeleteCardPopup(card_deleted_msg);
                     }
                 }
@@ -1695,14 +1700,47 @@ var $document, $window, __moduleName__Module = {
             // via a later click - instead of unconditionally on every page load.
             if (typeof $document != 'undefined' && hosted.props.paymentOptionId) {
                 if ($('#' + hosted.props.paymentOptionId).attr('checked') == 'checked') {
-                    hosted.setup();
+                    hosted.mountIfNewCard();
                 } else {
-                    $document.on('click', '#' + hosted.props.paymentOptionId, hosted.setup);
+                    $document.on('click', '#' + hosted.props.paymentOptionId, hosted.mountIfNewCard);
                 }
             }
 
             hosted.bindCardholder();
+            hosted.bindSavedAliases();
             hosted.attachFormValidateListener();
+        },
+        // A preselected saved alias keeps the new-card wrapper hidden: never mount the iframes
+        // inside it, wait for "pay with a new card" instead.
+        mountIfNewCard: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (!hosted.isAliasSelected()) {
+                hosted.setup();
+            }
+        },
+        isAliasSelected: function () {
+            var $selected = $('.hf-alias-radio:checked');
+            return $selected.length > 0 && $selected.val() !== '';
+        },
+        bindSavedAliases: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (typeof $document == 'undefined' || !$('.hf-alias-radio').length) {
+                return;
+            }
+            // init() runs twice (document ready + hosted_fields.tpl): namespaced so off() drops
+            // the previous binding, same as bindCardholder().
+            $document.off('change.hostedFieldsAlias')
+                .on('change.hostedFieldsAlias', '.hf-alias-radio', hosted.onPaymentChoiceChange);
+        },
+        onPaymentChoiceChange: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                isNewCard = !hosted.isAliasSelected();
+            $('#hf-new-card-fields')[isNewCard ? 'removeClass' : 'addClass']('-hide');
+            $('.' + hosted.props.root + '_error.-payment').removeClass('-show').text('');
+            if (isNewCard) {
+                // The radios live in the selected, hence visible, payment option.
+                hosted.setup();
+            }
         },
         setup: function () {
             var hosted = __moduleName__Module.hosted_fields;
@@ -1850,6 +1888,12 @@ var $document, $window, __moduleName__Module = {
                     event.stopPropagation();
                 }
 
+                if (hosted.isAliasSelected()) {
+                    hosted.props.submited = true;
+                    hosted.form.submitAlias($('.hf-alias-radio:checked').val());
+                    return false;
+                }
+
                 var invalid = Object.keys(hosted.props.fieldsInvalid).some(function (key) {
                     return hosted.props.fieldsInvalid[key] || hosted.props.fieldsEmpty[key];
                 });
@@ -1975,28 +2019,48 @@ var $document, $window, __moduleName__Module = {
                         id_cart: $('input[name="id_cart"]').val(),
                         cardholderName: $('#hf-cardholder').val(),
                     },
-                    error: function () {
-                        hosted.props.submited = false;
-                        $('.' + hosted.props.root + '_error.-payment')
-                            .text(window['payplug_hosted_fields_error_generic'])
-                            .addClass('-show');
-                    },
-                    success: function (resp) {
-                        if (resp && resp.result) {
-                            if (resp.return_url) {
-                                window.location.href = resp.return_url;
-                                return;
-                            }
-                            hosted.props.submited = false;
-                            return;
-                        }
-                        hosted.props.submited = false;
-                        var message = (resp && resp.message) ? resp.message : window['payplug_hosted_fields_error_generic'];
-                        $('.' + hosted.props.root + '_error.-payment')
-                            .text(message)
-                            .addClass('-show');
-                    },
+                    error: hosted.form.onSubmitError,
+                    success: hosted.form.onSubmitResponse,
                 });
+            },
+            // Saved alias: no tokenization; ownership is checked server-side
+            // (OperationAction::createAction()).
+            submitAlias: function (aliasId) {
+                var hosted = __moduleName__Module.hosted_fields;
+                $.ajax({
+                    type: 'POST',
+                    url: window['payplug_hosted_fields_uhf_url'],
+                    dataType: 'json',
+                    data: {
+                        alias_id: aliasId,
+                        id_cart: $('input[name="id_cart"]').val(),
+                    },
+                    error: hosted.form.onSubmitError,
+                    success: hosted.form.onSubmitResponse,
+                });
+            },
+            onSubmitError: function () {
+                var hosted = __moduleName__Module.hosted_fields;
+                hosted.props.submited = false;
+                $('.' + hosted.props.root + '_error.-payment')
+                    .text(window['payplug_hosted_fields_error_generic'])
+                    .addClass('-show');
+            },
+            onSubmitResponse: function (resp) {
+                var hosted = __moduleName__Module.hosted_fields;
+                if (resp && resp.result) {
+                    if (resp.return_url) {
+                        window.location.href = resp.return_url;
+                        return;
+                    }
+                    hosted.props.submited = false;
+                    return;
+                }
+                hosted.props.submited = false;
+                var message = (resp && resp.message) ? resp.message : window['payplug_hosted_fields_error_generic'];
+                $('.' + hosted.props.root + '_error.-payment')
+                    .text(message)
+                    .addClass('-show');
             },
         },
     },

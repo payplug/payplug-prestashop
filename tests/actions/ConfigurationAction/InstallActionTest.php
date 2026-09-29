@@ -33,6 +33,19 @@ class installActionTest extends BaseConfigurationAction
 
         $this->entity_repository = \Mockery::mock('EntityRepository');
 
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.operation')
+            ->andReturn(\Mockery::mock('OperationRepository'));
+
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.upc_lock')
+            ->andReturn(\Mockery::mock('UpcLockRepository'));
+
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.alias')
+            ->andReturn(\Mockery::mock('AliasRepository'))
+            ->byDefault();
+
         $shop = \Mockery::mock('Shop');
         $shop->shouldReceive([
             'isFeatureActive' => true,
@@ -333,6 +346,41 @@ class installActionTest extends BaseConfigurationAction
             [
                 'result' => false,
                 'message' => 'Install failed: Install hook.',
+            ],
+            $this->action->installAction()
+        );
+    }
+
+    public function testLoadsTheAliasRepositoryBeforeCreatingTables()
+    {
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
+                ],
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->module->shouldReceive('getService')
+            ->once()
+            ->with('payplug.models.repositories.alias')
+            ->andReturn(\Mockery::mock('AliasRepository'));
+        $this->entity_repository->shouldReceive([
+            'initialize' => false,
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Install failed: Install SQL tables.',
             ],
             $this->action->installAction()
         );
