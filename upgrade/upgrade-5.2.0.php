@@ -64,6 +64,11 @@ function upgrade_module_5_2_0($object)
 
     $flag = $flag_operation && $flag_lock;
 
+    // Empty means the merchant never narrowed the Scalapay range: the account's own
+    // authorized amounts from GET /account apply as-is.
+    $flag = $flag && Configuration::updateValue('PAYPLUG_SCALAPAY_CUSTOM_MIN_AMOUNTS', '');
+    $flag = $flag && Configuration::updateValue('PAYPLUG_SCALAPAY_CUSTOM_MAX_AMOUNTS', '');
+
     $logger->addLog('End upgrade script 5.2.0, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;
