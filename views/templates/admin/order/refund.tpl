@@ -27,6 +27,9 @@
     <input type="hidden" name="pay_mode" value="{$refund.mode|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_customer" value="{$order->id_customer|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" name="id_order" value="{$order->id|escape:'htmlall':'UTF-8'}" />
+    {if isset($refund.payment_type) && $refund.payment_type}
+        <input type="hidden" name="payment_type" value="{$refund.payment_type|escape:'htmlall':'UTF-8'}" />
+    {/if}
 
     <div class="pp_list">
         <ul>

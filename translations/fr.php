@@ -509,3 +509,4 @@ $_MODULE['<{payplug}prestashop>translation_62d341932aa23af7ff594afbde234b64'] = 
 $_MODULE['<{payplug}prestashop>translation_057e88637ae8e4c9f795744ee14412c8'] = 'Attention, le montant minimal renseigné est supérieur au montant maximal renseigné.';
 $_MODULE['<{payplug}prestashop>translation_d0c4453e26334eb8f886fe4748619b05'] = 'Impossible d\'enregistrer la configuration. Les montants Scalapay doivent être compris dans les bornes autorisées par votre compte Payplug, et le montant minimal ne doit pas dépasser le montant maximal.';
 $_MODULE['<{payplug}prestashop>translation_9b0c6d6c3cd66da8bba342344c4529e7'] = 'Ok';
+$_MODULE['<{payplug}prestashop>translation_dbc93d598178497af541cc6762291ebd'] = 'Le statut du remboursement n\'a pas pu être confirmé. Vérifiez ce paiement dans votre portail PayPlug avant de réessayer.';

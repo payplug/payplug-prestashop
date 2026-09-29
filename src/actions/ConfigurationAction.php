@@ -1399,5 +1399,6 @@ class ConfigurationAction
         $module->getService('payplug.models.repositories.operation');
         $module->getService('payplug.models.repositories.upc_lock');
         $module->getService('payplug.models.repositories.alias');
+        $module->getService('payplug.models.repositories.upc_refund');
     }
 }
