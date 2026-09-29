@@ -25,6 +25,8 @@ namespace PayPlug\src\actions;
 
 use PayPlug\classes\DependenciesClass;
 use PayPlug\src\application\adapter\PrestashopAdapter17;
+use PayPlug\src\models\classes\UpcRefundExecCode;
+use PayPlug\src\models\repositories\UpcRefundRepository;
 use PayPlug\src\utilities\services\Props;
 use PayPlug\src\utilities\traits\ServiceGetter;
 use PayplugUnifiedCore\DataValues\OperationData;
@@ -55,9 +57,20 @@ class OperationAction
     private const ORDER_CREATION_LOCK_TTL = 60;
     private const LOCK_RETRY_ATTEMPTS = 2;
     private const LOCK_RETRY_DELAY_USEC = 200000;
+
+    /**
+     * notifyAction()'s own budget (~8s): its payment notification typically lands while
+     * returnAction() is still creating the order under the same cart lock, and the Receiver does
+     * not retry a 409 (observed on staging, 2026-09-29) - giving up after returnAction()'s short
+     * budget meant the notification was simply lost.
+     */
+    private const NOTIFY_LOCK_RETRY_ATTEMPTS = 40;
     private const MISSING_EXEC_CODE = 'MISSING';
     // Longer than the 600s pending-operation entries, to still cover a late notification.
     private const PENDING_ALIAS_TTL = 86400;
+    // Only probes the refund lock (released at once): it never guards anything itself.
+    private const REFUND_LOCK_PROBE_TTL = 5;
+    private const REFUND_REPOSITORY_SERVICE = 'payplug.models.repositories.upc_refund';
 
     public $dependencies;
 
@@ -69,6 +82,11 @@ class OperationAction
      * @var \PayPlug\src\actions\UnifiedOrderAction|null
      */
     public $orderAction;
+
+    /**
+     * Delay between two lock attempts, in microseconds (a property so tests don't really wait).
+     */
+    public $lockRetryDelayUsec = self::LOCK_RETRY_DELAY_USEC;
 
     /**
      * @description Build the module dependencies for this action
@@ -296,6 +314,10 @@ class OperationAction
                 );
                 $common->successUrl = $return_url;
                 $common->cancelUrl = $return_url;
+                // Part of the payload the UHF technical doc specifies (and the Woo/Sylius modules
+                // send), although the platform ignores it: notifications go to the Receiver
+                // configured per realm (see notify.php), not to this URL.
+                $common->notificationUrl = $context->link->getModuleLink($this->dependencies->name, 'notify', [], true);
                 $common->description = 'Payment with unified hosted fields for cart ' . (string) $cart->id;
 
                 // Fix 10 (PRE-3626 review): billing/shipping feed the Unified API's 3DS risk
@@ -387,6 +409,8 @@ class OperationAction
                     'brand' => strtolower($selected_brand),
                 ];
             }
+
+            $this->bindPaymentId($factory, $logger, $decoded_body, $operation_id, (int) $cart->id);
 
             if ($output->redirectHtml || $output->redirectUrl) {
                 $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
@@ -617,14 +641,14 @@ class OperationAction
         $headers = $this->resolveAuthorizationHeader();
         $expected_header = (string) ($factory->createConfigurationRepository()->get('webhook_authorization_header') ?? '');
 
-        // Unified API "Payment Operation" notifications only - refunds and any other event type
-        // are sent by the classic/GM API's own notifier (a different route: ipn.php), never here.
-        // WebhookNotificationHelper::parse() enforces this structurally (it only ever accepts a
-        // strict id/execCode/orderId/amount payload shape), and ExecCodeMapper::toPaymentOutcome()
-        // - the only source of $operation_data->outcome - never produces anything other than
-        // PAID/THREE_DS_PENDING/FAILED, so a refund can neither be parsed nor misclassified as one
-        // of those three here. See UnifiedOrderAction::createFromOutcome()'s own comment for what
-        // happens to an existing pending order for each of those three outcomes.
+        // WebhookNotificationHelper::parse() only accepts a strict id/execCode/orderId/amount
+        // payload shape, and ExecCodeMapper::toPaymentOutcome() - the only source of
+        // $operation_data->outcome - never produces anything other than PAID/THREE_DS_PENDING/FAILED:
+        // PaymentOutcome::REFUNDED is unreachable here. A refund initiated from the BO through the
+        // Unified API does arrive on this webhook, though, with a payment-shaped body (execCode 0000,
+        // orderId = cart), so it parses as a PAID payment: it is diverted by the payplug_upc_refund
+        // lookup below, before the payment path. See UnifiedOrderAction::createFromOutcome()'s own
+        // comment for what happens to an existing pending order for each of the three outcomes.
         try {
             $operation_data = WebhookNotificationHelper::parse($headers, $body, $expected_header);
         } catch (InvalidNotificationException $exception) {
@@ -635,6 +659,15 @@ class OperationAction
 
         if (PaymentOutcome::THREE_DS_PENDING === $operation_data->outcome) {
             return ['http_status' => 200];
+        }
+
+        // A refund initiated from the BO is notified on this same Receiver, with a payment-shaped
+        // body (execCode 0000, orderId = cart): it must never reach the payment path below, which
+        // would push the refunded order back to paid.
+        $refund_repository = $this->getService(self::REFUND_REPOSITORY_SERVICE);
+        $refund = $refund_repository->getByRefundOperationId($operation_data->operationId);
+        if (null !== $refund) {
+            return $this->handleRefundNotification($factory, $logger, $refund_repository, $refund, $operation_data->operationId);
         }
 
         $payment_repository = $factory->createPaymentRepository();
@@ -670,11 +703,45 @@ class OperationAction
         $cart = $plugin->getCart()->get($id_cart);
         $amount = is_array($decoded) && isset($decoded['amount']) ? (int) $decoded['amount'] : null;
 
-        if (null === $amount) {
+        $has_amount = null !== $amount;
+        if (!$has_amount) {
             $outcome = PaymentOutcome::FAILED;
             $logger->error('OperationAction::notifyAction - missing amount field in getOperation response for operation ' . $operation_data->operationId);
             $amount = 0;
-        } elseif (!$this->crossChecksOrderIdAndAmount($logger, $cart, $id_cart, $order_id_from_response, $amount, 'OperationAction::notifyAction')) {
+        }
+
+        // Before the cart-amount cross-check: a partial refund notification never matches the
+        // cart total, and would otherwise be dropped there before getting a chance to be matched.
+        $id_order = (int) $plugin->getOrder()->getIdByCartId($id_cart);
+        if ($this->isPaidByAnotherOperation($payment_repository, $id_order, $operation_data->operationId)) {
+            // Most likely a refund notification racing refundAction(), which holds the refund lock
+            // until the refund's row carries its operation id: wait for it, then match again.
+            $refund = $this->waitForRefundRecording($factory, $refund_repository, $id_order, $operation_data->operationId);
+            if (null !== $refund) {
+                return $this->handleRefundNotification($factory, $logger, $refund_repository, $refund, $operation_data->operationId);
+            }
+
+            if (PaymentOutcome::PAID === $outcome) {
+                // Still unmatched: a refund whose row never got its operation id, a refund made
+                // outside the module, or a second payment of the same cart. Never applied onto the
+                // paid order. The Receiver does not retry a 409 (observed on staging, 2026-09-29),
+                // so this notification is not delivered again: the log is the only trace.
+                $logger->error('OperationAction::notifyAction - Operation ' . $operation_data->operationId
+                    . ' is not the paid operation of the order of cart ' . $id_cart
+                    . ' and matches no recorded refund (early refund notification or duplicate payment), manual check needed');
+
+                return ['http_status' => 409];
+            }
+
+            // A 409 here would make the Receiver loop on the late webhook of an earlier failed
+            // attempt, and a non-paid outcome has nothing to apply on an already-paid order.
+            $logger->info('OperationAction::notifyAction - Non-paid operation ' . $operation_data->operationId
+                . ' for the already-paid order of cart ' . $id_cart . ' ignored');
+
+            return ['http_status' => 200];
+        }
+
+        if ($has_amount && !$this->crossChecksOrderIdAndAmount($logger, $cart, $id_cart, $order_id_from_response, $amount, 'OperationAction::notifyAction')) {
             return ['http_status' => 200];
         }
 
@@ -690,7 +757,8 @@ class OperationAction
             $outcome,
             $amount,
             $pending_alias,
-            $card_details
+            $card_details,
+            self::NOTIFY_LOCK_RETRY_ATTEMPTS
         );
 
         if (!empty($result['lock_conflict'])) {
@@ -727,6 +795,138 @@ class OperationAction
         $payment_repository->markTreated($operation_data->operationId);
 
         return ['http_status' => 200];
+    }
+
+    /**
+     * @description Settle a refund recorded by UnifiedRefundAction from its asynchronous
+     *              notification. Never changes the order state: a refund failing asynchronously
+     *              only becomes refundable again.
+     *
+     * @param mixed $factory
+     * @param mixed $logger
+     * @param UpcRefundRepository $refund_repository
+     * @param string $operation_id
+     *
+     * @return array{http_status: int}
+     */
+    private function handleRefundNotification($factory, $logger, $refund_repository, array $refund, $operation_id)
+    {
+        if (UpcRefundRepository::STATUS_PENDING !== $refund['status']) {
+            return ['http_status' => 200];
+        }
+
+        try {
+            $response = $factory->create()->getOperation($operation_id);
+        } catch (\Exception $exception) {
+            $logger->error('OperationAction::notifyAction - getOperation failed for refund ' . $operation_id . ': ' . $exception->getMessage());
+
+            return ['http_status' => 500];
+        }
+
+        $decoded = json_decode($response['body'], true);
+        if (!is_array($decoded) || !isset($decoded['execCode'])) {
+            // Settling on a guess would either hide a failed refund or make a real one refundable again.
+            $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' getOperation response has no execCode');
+
+            return ['http_status' => 500];
+        }
+
+        if (!isset($decoded['amount'])) {
+            $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' getOperation response has no amount');
+
+            return ['http_status' => 500];
+        }
+
+        $amount = (int) $decoded['amount'];
+        if ($amount !== (int) $refund['amount']) {
+            $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' amount mismatch: notified '
+                . $amount . ', recorded ' . (int) $refund['amount']);
+
+            return ['http_status' => 200];
+        }
+
+        // Not ExecCodeMapper: a code it doesn't know maps to FAILED, which would free an amount that
+        // may already have left for a second refund. See UpcRefundExecCode.
+        $exec_code = (string) $decoded['execCode'];
+        if (UpcRefundExecCode::SUCCESS === $exec_code) {
+            $refund_repository->updateStatusIfPending($operation_id, UpcRefundRepository::STATUS_CONFIRMED);
+
+            return ['http_status' => 200];
+        }
+
+        $classification = UpcRefundExecCode::classify($exec_code);
+        if (UpcRefundExecCode::ACCEPTED === $classification) {
+            $logger->info('OperationAction::notifyAction - Refund ' . $operation_id . ' still in progress (execCode ' . $exec_code . ')');
+
+            return ['http_status' => 200];
+        }
+
+        if (UpcRefundExecCode::UNKNOWN === $classification) {
+            $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' reported an undocumented execCode '
+                . $exec_code . ', left pending (still counted as refunded): manual check needed');
+
+            return ['http_status' => 200];
+        }
+
+        $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' reported a non-success outcome (execCode '
+            . $exec_code . '), marked failed: the order state is left unchanged');
+        $refund_repository->updateStatusIfPending($operation_id, UpcRefundRepository::STATUS_FAILED);
+
+        return ['http_status' => 200];
+    }
+
+    /**
+     * @description Whether the cart's order is already paid by an operation other than this one.
+     *              The only legitimate new operation on an existing order is the reconciliation
+     *              of an abandoned (error state) order, which has no PAID operation.
+     *
+     * @param mixed $payment_repository
+     * @param int $id_order the order of the notified cart, 0 when it has none
+     * @param string $operation_id
+     *
+     * @return bool
+     */
+    private function isPaidByAnotherOperation($payment_repository, $id_order, $operation_id)
+    {
+        if (!$id_order) {
+            return false;
+        }
+
+        $paid_operation = $payment_repository->getPaidByOrderId((string) $id_order);
+
+        return null !== $paid_operation && $paid_operation->operationId !== $operation_id;
+    }
+
+    /**
+     * @description Wait for a refund in progress on the order to record its operation id, then
+     *              look the notified operation up again among the recorded refunds. The refund lock
+     *              is only probed: acquired and released at once, as soon as it is free.
+     *
+     * @param mixed $factory
+     * @param UpcRefundRepository $refund_repository
+     * @param int $id_order
+     * @param string $operation_id
+     *
+     * @return array|null the recorded refund, null when the operation matches none
+     */
+    private function waitForRefundRecording($factory, $refund_repository, $id_order, $operation_id)
+    {
+        $lock = $factory->createLock();
+        $lock_key = UnifiedRefundAction::LOCK_KEY_PREFIX . (int) $id_order;
+
+        for ($attempt = 0; $attempt <= self::NOTIFY_LOCK_RETRY_ATTEMPTS; ++$attempt) {
+            if ($attempt > 0) {
+                usleep($this->lockRetryDelayUsec);
+            }
+
+            if ($lock->acquire($lock_key, self::REFUND_LOCK_PROBE_TTL)) {
+                $lock->release($lock_key);
+
+                return $refund_repository->getByRefundOperationId($operation_id);
+            }
+        }
+
+        return $refund_repository->getByRefundOperationId($operation_id);
     }
 
     /**
@@ -842,10 +1042,11 @@ class OperationAction
      * @param mixed $amount
      * @param array{alias_id: string, brand: string}|null $pending_alias
      * @param array<string, string|null> $card_details
+     * @param int $retry_attempts lock attempts after the first one
      *
      * @return array{result: bool, redirect_url: string, persisted?: bool, lock_conflict?: bool}
      */
-    private function createOrderWithLock($factory, $id_cart, $operation_id, $exec_code, $outcome, $amount, $pending_alias = null, $card_details = [])
+    private function createOrderWithLock($factory, $id_cart, $operation_id, $exec_code, $outcome, $amount, $pending_alias = null, $card_details = [], $retry_attempts = self::LOCK_RETRY_ATTEMPTS)
     {
         $logger = $factory->createLogger();
         $order_action = $this->orderAction();
@@ -853,8 +1054,8 @@ class OperationAction
         $lock_key = $this->lockKeyForCart($id_cart);
         $lock_acquired = $lock->acquire($lock_key, self::ORDER_CREATION_LOCK_TTL);
 
-        for ($attempt = 0; !$lock_acquired && $attempt < self::LOCK_RETRY_ATTEMPTS; ++$attempt) {
-            usleep(self::LOCK_RETRY_DELAY_USEC);
+        for ($attempt = 0; !$lock_acquired && $attempt < $retry_attempts; ++$attempt) {
+            usleep($this->lockRetryDelayUsec);
             $lock_acquired = $lock->acquire($lock_key, self::ORDER_CREATION_LOCK_TTL);
         }
 
@@ -1333,6 +1534,45 @@ class OperationAction
         }
 
         return '';
+    }
+
+    /**
+     * @description Bind the payment's own id to its operation, right after payment creation
+     *
+     * The refund endpoint is keyed by the payment's "id", which differs from "operationIds[0]"
+     * (the operation_id every other flow uses) and cannot be read back from the operation later.
+     * Never blocks the payment: it has already been created at this point, so a failure only
+     * costs the ability to refund it from the back-office, and is logged as such.
+     *
+     * @param mixed $factory
+     * @param mixed $logger
+     * @param mixed $decoded_body
+     * @param string $operation_id
+     * @param int $id_cart
+     */
+    private function bindPaymentId($factory, $logger, $decoded_body, $operation_id, $id_cart)
+    {
+        $payment_id = is_array($decoded_body) && isset($decoded_body['id']) && is_string($decoded_body['id'])
+            ? $decoded_body['id']
+            : '';
+
+        if ('' === $payment_id) {
+            $logger->error('OperationAction::createAction - payment creation response for operation ' . $operation_id
+                . ' carries no payment id: this payment cannot be refunded from the back-office');
+
+            return;
+        }
+
+        try {
+            $bound = $factory->createPaymentRepository()->bindPaymentId($operation_id, $payment_id, $id_cart);
+        } catch (\Throwable $exception) {
+            $bound = false;
+        }
+
+        if (!$bound) {
+            $logger->error('OperationAction::createAction - payment id ' . $payment_id . ' of operation ' . $operation_id
+                . ' (cart ' . $id_cart . ') not recorded: back-office refunds of this payment will fail');
+        }
     }
 
     /**

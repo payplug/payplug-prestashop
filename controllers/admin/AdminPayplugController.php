@@ -94,6 +94,18 @@ class AdminPayplugController extends ModuleAdminController
                         ->getPaymentAction()
                         ->getRefundAmountInCents($amount, (string) $resource_id)
                     : 0;
+
+                if ('uhf' === $this->tools->tool('getValue', 'payment_type')) {
+                    $refund = $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.action.unified_refund')
+                        ->refundAction((int) $id_order, (int) $amount_formated);
+
+                    exit(json_encode($refund));
+                }
+
                 $refund = $this->dependencies
                     ->getPlugin()
                     ->getPaymentAction()

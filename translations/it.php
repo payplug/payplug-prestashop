@@ -507,3 +507,4 @@ $_MODULE['<{payplug}prestashop>translation_62d341932aa23af7ff594afbde234b64'] = 
 $_MODULE['<{payplug}prestashop>translation_057e88637ae8e4c9f795744ee14412c8'] = 'Attenzione, l\'importo minimo inserito è superiore all\'importo massimo inserito.';
 $_MODULE['<{payplug}prestashop>translation_d0c4453e26334eb8f886fe4748619b05'] = 'Impossibile salvare la configurazione. Gli importi Scalapay devono essere compresi nei limiti autorizzati dal tuo account Payplug e l\'importo minimo non deve superare l\'importo massimo.';
 $_MODULE['<{payplug}prestashop>translation_9b0c6d6c3cd66da8bba342344c4529e7'] = 'Ok';
+$_MODULE['<{payplug}prestashop>translation_dbc93d598178497af541cc6762291ebd'] = 'Non è stato possibile confermare lo stato del rimborso. Verifica questo pagamento nel tuo portale PayPlug prima di riprovare.';

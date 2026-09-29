@@ -46,6 +46,10 @@ class uninstallActionTest extends BaseConfigurationAction
             ->andReturn(\Mockery::mock('AliasRepository'))
             ->byDefault();
 
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.upc_refund')
+            ->andReturn(\Mockery::mock('UpcRefundRepository'));
+
         $this->plugin->shouldReceive([
             'getCardAction' => $this->card_action,
             'getConstant' => $this->constant,
