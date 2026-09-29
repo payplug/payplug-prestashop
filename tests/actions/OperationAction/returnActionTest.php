@@ -231,6 +231,27 @@ class returnActionTest extends TestCase
         $this->assertTrue($result['result']);
     }
 
+    public function testClearsThePendingAliasKeyEvenWhenTheAliasCouldNotBeSavedOnAPaidOutcome()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        // The order is created but the card details were incomplete: the card is not saved and
+        // no trace is kept for a later notification.
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], ['alias_id' => 'alias_new_123', 'brand' => 'visa'], ['last4' => null, 'exp_month' => null, 'exp_year' => null]);
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_alias:op_123');
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
     public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone()
     {
         [$action, $mocks] = $this->mockActionForReturn();
@@ -243,13 +264,18 @@ class returnActionTest extends TestCase
                 'execCode' => '0000',
                 'amount' => 1234,
                 'orderId' => '42',
-                'paymentMethod' => ['card' => ['aliasId' => 'card_alias']],
+                // Real Unified API shape: the alias id is paymentMethod.id (no card.aliasId).
+                'paymentMethod' => [
+                    'id' => 'card_alias',
+                    'card' => ['code6x4' => '402205XXXXXX0001', 'network' => 'VISA'],
+                    'details' => ['fullName' => 'Jane Doe', 'validityDate' => '2029-12', 'selectedBrand' => 'VISA'],
+                ],
             ]),
         ]);
         $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
             'result' => true,
             'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
-        ], ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => null, 'exp_month' => null, 'exp_year' => null]);
+        ], ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
 
         $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
     }

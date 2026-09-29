@@ -101,7 +101,6 @@ class setHostedFieldsPaymentOptionTest extends BasePrestashopAdapter17
     {
         $aliases = [[
             'id_payplug_alias' => 1,
-            'alias_id' => 'alias_abc',
             'currency' => 'usd',
             'brand' => 'visa',
             'last4' => '0001',

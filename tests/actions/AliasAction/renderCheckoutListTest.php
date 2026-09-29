@@ -44,7 +44,7 @@ class renderCheckoutListTest extends BaseAliasAction
         $result = $this->action->renderCheckoutList('USD', 'ident_usd');
 
         $this->assertCount(1, $result);
-        $this->assertSame('alias_abc', $result[0]['alias_id']);
+        $this->assertSame(1, $result[0]['id_payplug_alias']);
         $this->assertTrue($result[0]['usable']);
     }
 }

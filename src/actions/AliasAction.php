@@ -177,6 +177,62 @@ class AliasAction
     }
 
     /**
+     * @description Export the saved aliases of a customer (GDPR), in the gdprCardExport() row format
+     *
+     * Without the '#' column: the caller numbers the card and alias rows together.
+     *
+     * @param int $id_customer
+     *
+     * @return array
+     */
+    public function gdprExportAction($id_customer = 0)
+    {
+        if (!is_int($id_customer) || $id_customer <= 0) {
+            return [];
+        }
+
+        $aliases = $this->getService(self::REPOSITORY_SERVICE)->getAllByCustomer($id_customer);
+        if (empty($aliases)) {
+            return [];
+        }
+
+        $translation = $this->dependencies->getPlugin()->getTranslationClass();
+        $result = [];
+        foreach ($aliases as $alias) {
+            $formatted = $this->formatAlias($alias, false);
+            $result[] = [
+                $translation->l('payplug.gdprCardExport.brand', 'configclass') => $formatted['brand'],
+                $translation->l('payplug.gdprCardExport.card', 'configclass') => '**** **** **** ' . $formatted['last4'],
+                $translation->l('payplug.gdprCardExport.expiryDate', 'configclass') => $formatted['expiry_date'],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @description Tell whether an alias has a known expiry date in the past
+     *
+     * Shared with OperationAction::createAction(), which refuses to pay with an expired alias.
+     *
+     * @param array $alias AliasRepository row
+     *
+     * @return bool
+     */
+    public function isExpired(array $alias)
+    {
+        if (empty($alias['exp_month']) || empty($alias['exp_year'])) {
+            return false;
+        }
+
+        $validity = $this->dependencies
+            ->getValidators()['card']
+            ->isValidExpiration((string) $alias['exp_month'], (string) $alias['exp_year']);
+
+        return !$validity['result'];
+    }
+
+    /**
      * @description Get the id of the current registered, non-guest customer
      *
      * @return int 0 for a guest or an anonymous visitor
@@ -194,24 +250,6 @@ class AliasAction
     }
 
     /**
-     * @description Tell whether an alias has a known expiry date in the past
-     *
-     * @return bool
-     */
-    private function isExpired(array $alias)
-    {
-        if (empty($alias['exp_month']) || empty($alias['exp_year'])) {
-            return false;
-        }
-
-        $validity = $this->dependencies
-            ->getValidators()['card']
-            ->isValidExpiration((string) $alias['exp_month'], (string) $alias['exp_year']);
-
-        return !$validity['result'];
-    }
-
-    /**
      * @description Format an alias row for the templates
      *
      * @param bool $usable
@@ -220,17 +258,14 @@ class AliasAction
      */
     private function formatAlias(array $alias, $usable)
     {
-        $has_expiry = !empty($alias['exp_month']) && !empty($alias['exp_year']);
-
+        // AliasRepository::saveIfAbsent() only stores complete aliases: every card detail is set.
+        // The Unified API alias id is left out: it never leaves the server.
         return [
             'id_payplug_alias' => (int) $alias['id_payplug_alias'],
-            'alias_id' => (string) $alias['alias_id'],
             'currency' => (string) $alias['currency'],
-            'brand' => isset($alias['brand']) ? (string) $alias['brand'] : '',
-            'last4' => !empty($alias['last4']) ? (string) $alias['last4'] : null,
-            'expiry_date' => $has_expiry
-                ? date('m / y', mktime(0, 0, 0, (int) $alias['exp_month'], 1, (int) $alias['exp_year']))
-                : null,
+            'brand' => (string) $alias['brand'],
+            'last4' => (string) $alias['last4'],
+            'expiry_date' => date('m / y', mktime(0, 0, 0, (int) $alias['exp_month'], 1, (int) $alias['exp_year'])),
             'usable' => (bool) $usable,
         ];
     }

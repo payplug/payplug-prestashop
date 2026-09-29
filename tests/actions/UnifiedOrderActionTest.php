@@ -448,7 +448,7 @@ class UnifiedOrderActionTest extends TestCase
         $alias_repository = $this->mockAliasCollaborators($dependencies, $mocks);
         $alias_repository->shouldReceive('saveIfAbsent')
             ->once()
-            ->with(7, 'alias_abc', 'usd', 'ident_usd', 'visa', null, null, null)
+            ->with(7, 'alias_abc', 'usd', 'ident_usd', 'visa', '0001', '12', '2029')
             ->andReturn(true);
 
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(
@@ -458,7 +458,7 @@ class UnifiedOrderActionTest extends TestCase
             PaymentOutcome::PAID,
             1234,
             ['alias_id' => 'alias_abc', 'brand' => 'visa'],
-            []
+            ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']
         );
 
         $this->assertTrue($result['result']);
@@ -657,7 +657,7 @@ class UnifiedOrderActionTest extends TestCase
             'id' => 99,
             'secure_key' => 'order_secure_key',
             'module' => 'payplug',
-       ];
+        ];
         $context = (object) ['link' => new class() {
             public function getPageLink($page, $ssl, $lang, $params)
             {

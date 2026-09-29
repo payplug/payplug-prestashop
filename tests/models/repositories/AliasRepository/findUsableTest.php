@@ -12,31 +12,33 @@ class findUsableTest extends BaseAliasRepository
     /**
      * @dataProvider invalidArgumentsProvider
      *
-     * @param mixed $alias_id
+     * @param mixed $id_payplug_alias
      * @param mixed $id_customer
      * @param mixed $currency
      * @param mixed $identifier
      */
-    public function testReturnsNullWithoutQueryingWhenAnArgumentIsInvalid($alias_id, $id_customer, $currency, $identifier)
+    public function testReturnsNullWithoutQueryingWhenAnArgumentIsInvalid($id_payplug_alias, $id_customer, $currency, $identifier)
     {
         $this->repository->shouldReceive('select')->never();
 
-        $this->assertNull($this->repository->findUsable($alias_id, $id_customer, $currency, $identifier));
+        $this->assertNull($this->repository->findUsable($id_payplug_alias, $id_customer, $currency, $identifier));
     }
 
     public function invalidArgumentsProvider()
     {
         return [
-            'empty alias id' => ['', 7, 'usd', 'ident_usd'],
-            'non string alias id' => [null, 7, 'usd', 'ident_usd'],
-            'zero customer' => ['alias_abc', 0, 'usd', 'ident_usd'],
-            'non int customer' => ['alias_abc', '7', 'usd', 'ident_usd'],
-            'empty currency' => ['alias_abc', 7, '', 'ident_usd'],
-            'empty identifier' => ['alias_abc', 7, 'usd', ''],
+            'zero alias id' => [0, 7, 'usd', 'ident_usd'],
+            'negative alias id' => [-1, 7, 'usd', 'ident_usd'],
+            'non int alias id' => ['1', 7, 'usd', 'ident_usd'],
+            'null alias id' => [null, 7, 'usd', 'ident_usd'],
+            'zero customer' => [1, 0, 'usd', 'ident_usd'],
+            'non int customer' => [1, '7', 'usd', 'ident_usd'],
+            'empty currency' => [1, 7, '', 'ident_usd'],
+            'empty identifier' => [1, 7, 'usd', ''],
         ];
     }
 
-    public function testFiltersOnAliasCustomerCurrencyAndIdentifier()
+    public function testFiltersOnAliasIdCustomerCurrencyAndIdentifier()
     {
         $this->repository->shouldReceive([
             'getEntityObject' => $this->entity,
@@ -44,13 +46,13 @@ class findUsableTest extends BaseAliasRepository
             'fields' => $this->repository,
             'from' => $this->repository,
         ]);
-        $this->repository->shouldReceive('where')->once()->with('`alias_id` = "alias_abc"')->andReturn($this->repository);
+        $this->repository->shouldReceive('where')->once()->with('`id_payplug_alias` = 1')->andReturn($this->repository);
         $this->repository->shouldReceive('where')->once()->with('`id_customer` = 7')->andReturn($this->repository);
         $this->repository->shouldReceive('where')->once()->with('`currency` = "usd"')->andReturn($this->repository);
         $this->repository->shouldReceive('where')->once()->with('`identifier` = "ident_usd"')->andReturn($this->repository);
         $this->repository->shouldReceive('build')->once()->with('unique_row')->andReturn([]);
 
-        $this->assertNull($this->repository->findUsable('alias_abc', 7, 'usd', 'ident_usd'));
+        $this->assertNull($this->repository->findUsable(1, 7, 'usd', 'ident_usd'));
     }
 
     /**
@@ -67,11 +69,16 @@ class findUsableTest extends BaseAliasRepository
             'select' => $this->repository,
             'fields' => $this->repository,
             'from' => $this->repository,
-            'where' => $this->repository,
-            'build' => [],
         ]);
+        // The query is scoped on the given values, not on the stored alias: a row of another
+        // customer, currency or identifier can't match, so the query finds nothing.
+        $this->repository->shouldReceive('where')->once()->with('`id_payplug_alias` = 1')->andReturn($this->repository);
+        $this->repository->shouldReceive('where')->once()->with('`id_customer` = ' . $id_customer)->andReturn($this->repository);
+        $this->repository->shouldReceive('where')->once()->with('`currency` = "' . $currency . '"')->andReturn($this->repository);
+        $this->repository->shouldReceive('where')->once()->with('`identifier` = "' . $identifier . '"')->andReturn($this->repository);
+        $this->repository->shouldReceive('build')->once()->with('unique_row')->andReturn([]);
 
-        $this->assertNull($this->repository->findUsable('alias_abc', $id_customer, $currency, $identifier));
+        $this->assertNull($this->repository->findUsable(1, $id_customer, $currency, $identifier));
     }
 
     public function mismatchingScopeProvider()
@@ -102,6 +109,6 @@ class findUsableTest extends BaseAliasRepository
             'build' => $row,
         ]);
 
-        $this->assertSame($row, $this->repository->findUsable('alias_abc', 7, 'usd', 'ident_usd'));
+        $this->assertSame($row, $this->repository->findUsable(1, 7, 'usd', 'ident_usd'));
     }
 }

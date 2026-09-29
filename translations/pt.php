@@ -109,7 +109,6 @@ $_MODULE['<{payplug}prestashop>hookrepository_c11baaee34076a1f642dcba68b7585e4']
 $_MODULE['<{payplug}prestashop>hookrepository_de812fb7f12df1b0d1d568575b09e71d'] = 'Payplug will interpret this status as a Pending order';
 $_MODULE['<{payplug}prestashop>hookrepository_f0cae2731f2d834467f3abd7d340411e'] = 'Payplug will interpret this status as a Refunded order';
 $_MODULE['<{payplug}prestashop>hosted_fields_41ee039783117bba8efa4465c7a1a83b'] = 'An error occurred while processing your payment. Please try again.';
-$_MODULE['<{payplug}prestashop>hosted_fields_4feef908ab0abbe87b40360b20e38614'] = 'Cartão guardado';
 $_MODULE['<{payplug}prestashop>hosted_fields_59cfdfd00b3ecb80f4c84d0b9ab394c6'] = 'Your card';
 $_MODULE['<{payplug}prestashop>hosted_fields_642ec55f312db4141839585b8b9f8f2d'] = 'Invalid CVV.';
 $_MODULE['<{payplug}prestashop>hosted_fields_6e2d256a4c9ec8a6496287356c19cf15'] = 'Mandatory field.';

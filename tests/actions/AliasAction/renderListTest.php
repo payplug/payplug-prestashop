@@ -37,7 +37,6 @@ class renderListTest extends BaseAliasAction
         $this->assertSame([
             [
                 'id_payplug_alias' => 1,
-                'alias_id' => 'alias_abc',
                 'currency' => 'usd',
                 'brand' => 'visa',
                 'last4' => '0001',
@@ -46,7 +45,6 @@ class renderListTest extends BaseAliasAction
             ],
             [
                 'id_payplug_alias' => 3,
-                'alias_id' => 'alias_gbp',
                 'currency' => 'gbp',
                 'brand' => 'visa',
                 'last4' => '0001',
@@ -56,18 +54,19 @@ class renderListTest extends BaseAliasAction
         ], $this->action->renderList());
     }
 
-    public function testKeepsAnAliasWithUnknownCardDetails()
+    public function testFormatsTheCardDetailsAsStringsWithoutTheUnifiedApiAliasId()
     {
         $this->alias_repository->shouldReceive('getAllByCustomer')->once()->with(7)->andReturn([
-            $this->aliasRow(['last4' => null, 'exp_month' => null, 'exp_year' => null]),
+            $this->aliasRow(['last4' => '4242', 'exp_month' => '3', 'exp_year' => '2031']),
         ]);
         $this->prestashop_adapter->shouldReceive('getHostedFieldsIdentifier')->with('usd')->andReturn('');
 
         $result = $this->action->renderList();
 
         $this->assertCount(1, $result);
-        $this->assertNull($result[0]['last4']);
-        $this->assertNull($result[0]['expiry_date']);
+        $this->assertArrayNotHasKey('alias_id', $result[0]);
+        $this->assertSame('4242', $result[0]['last4']);
+        $this->assertSame('03 / 31', $result[0]['expiry_date']);
         $this->assertFalse($result[0]['usable']);
     }
 }

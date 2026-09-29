@@ -85,16 +85,16 @@ class AliasRepository extends EntityRepository
      * One query for all four constraints: an unknown alias, another customer's alias, or an alias
      * created for another currency/identifier all resolve to the same null result.
      *
-     * @param string $alias_id
+     * @param int $id_payplug_alias internal primary key, not the Unified API alias id
      * @param int $id_customer
      * @param string $currency lowercase ISO code
      * @param string $identifier
      *
      * @return array|null
      */
-    public function findUsable($alias_id = '', $id_customer = 0, $currency = '', $identifier = '')
+    public function findUsable($id_payplug_alias = 0, $id_customer = 0, $currency = '', $identifier = '')
     {
-        if (!is_string($alias_id) || !$alias_id) {
+        if (!is_int($id_payplug_alias) || $id_payplug_alias <= 0) {
             return null;
         }
         if (!is_int($id_customer) || $id_customer <= 0) {
@@ -119,7 +119,7 @@ class AliasRepository extends EntityRepository
             ->select()
             ->fields('*')
             ->from($this->getTableName($definition['table']))
-            ->where('`alias_id` = "' . $this->escape($alias_id) . '"')
+            ->where('`id_payplug_alias` = ' . (int) $id_payplug_alias)
             ->where('`id_customer` = ' . (int) $id_customer)
             ->where('`currency` = "' . $this->escape($currency) . '"')
             ->where('`identifier` = "' . $this->escape($identifier) . '"')
@@ -164,6 +164,8 @@ class AliasRepository extends EntityRepository
      *
      * Idempotent: the same PAID outcome can be applied several times (return then notify). The
      * UNIQUE (alias_id) constraint covers the residual race between the read and the insert.
+     * An alias is only ever stored complete: without brand, last4 and expiry nothing is written,
+     * so a later PAID outcome carrying the full card details can still create it.
      *
      * @param int $id_customer
      * @param string $alias_id
@@ -199,24 +201,45 @@ class AliasRepository extends EntityRepository
             return false;
         }
 
-        if ($this->getBy('alias_id', $alias_id)) {
+        foreach ([$brand, $last4, $exp_month, $exp_year] as $value) {
+            if (!is_string($value) || '' === $value) {
+                return false;
+            }
+        }
+
+        if ($this->isOwnedBy($alias_id, $id_customer)) {
             return true;
         }
 
-        $fields = [
+        $created = $this->createEntity([
             'id_customer' => $id_customer,
             'alias_id' => $alias_id,
             'currency' => $currency,
             'identifier' => $identifier,
-            'brand' => (string) $brand,
+            'brand' => $brand,
+            'last4' => $last4,
+            'exp_month' => $exp_month,
+            'exp_year' => $exp_year,
             'date_add' => date('Y-m-d H:i:s'),
-        ];
-        foreach (['last4' => $last4, 'exp_month' => $exp_month, 'exp_year' => $exp_year] as $key => $value) {
-            if (is_string($value) && '' !== $value) {
-                $fields[$key] = $value;
-            }
-        }
+        ]);
 
-        return (bool) $this->createEntity($fields);
+        // A concurrent save (return vs notify) may have inserted it between the read and the
+        // insert: the UNIQUE (alias_id) constraint then rejects this one, but the alias exists.
+        return $created ? true : $this->isOwnedBy($alias_id, $id_customer);
+    }
+
+    /**
+     * @description Whether the alias exists and belongs to the given customer
+     *
+     * @param string $alias_id
+     * @param int $id_customer
+     *
+     * @return bool
+     */
+    private function isOwnedBy($alias_id, $id_customer)
+    {
+        $alias = $this->getBy('alias_id', $alias_id);
+
+        return !empty($alias) && (int) $alias['id_customer'] === $id_customer;
     }
 }

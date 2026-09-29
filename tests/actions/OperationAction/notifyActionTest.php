@@ -303,7 +303,8 @@ class notifyActionTest extends TestCase
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900, [
             'paymentMethod' => [
-                'card' => ['aliasId' => 'card_alias', 'code6x4' => '402205XXXXXX0001', 'type' => 'VISA', 'network' => 'VISA'],
+                'id' => 'card_alias',
+                'card' => ['code6x4' => '402205XXXXXX0001', 'type' => 'VISA', 'network' => 'VISA'],
                 'details' => ['validityDate' => '2029-12', 'selectedBrand' => 'VISA'],
             ],
         ]);
@@ -329,7 +330,7 @@ class notifyActionTest extends TestCase
             'execCode' => '0000',
             'orderId' => '6',
             'amount' => 2900,
-            'paymentMethod' => ['card' => ['aliasId' => 'forged_alias']],
+            'paymentMethod' => ['id' => 'forged_alias'],
         ]);
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn($forged_body);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
@@ -352,7 +353,7 @@ class notifyActionTest extends TestCase
         [$action, $mocks] = $this->mockActionForNotify();
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900, [
-            'paymentMethod' => ['card' => ['aliasId' => 'card_alias', 'code6x4' => '402205XXXXXX0001']],
+            'paymentMethod' => ['id' => 'card_alias', 'card' => ['code6x4' => '402205XXXXXX0001']],
         ]);
         $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
         $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [

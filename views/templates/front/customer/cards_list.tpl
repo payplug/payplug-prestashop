@@ -65,12 +65,12 @@
                 {assign var='payplug_row' value=$payplug_row+1}
                 <tr class="{$module_name|escape:'htmlall':'UTF-8'}Card {if $payplug_row == 1}first_item{elseif $payplug_row == $payplug_total}last_item{else}item{/if} {if $payplug_row % 2 == 0}alternate_item{/if}" data-type="alias" data-id_card="{$alias.id_payplug_alias|escape:'htmlall':'UTF-8'}" data-e2e-card="item">
                     <td class="id_payplug_card bold hidden-sm-down">{$payplug_row|escape:'htmlall':'UTF-8'}</td>
-                    <td class="brand bold hidden-sm-down">{if $alias.brand}{$alias.brand|escape:'htmlall':'UTF-8'}{else}{l s='card' mod='payplug'}{/if}</td>
+                    <td class="brand bold hidden-sm-down">{$alias.brand|escape:'htmlall':'UTF-8'}</td>
                     <td class="last4 bold">
-                        {if $alias.last4}**** **** **** {$alias.last4|escape:'htmlall':'UTF-8'}{else}{l s='card' mod='payplug'}{/if}
+                        **** **** **** {$alias.last4|escape:'htmlall':'UTF-8'}
                         {if !$alias.usable}<br/><small>{l s='Not usable for payment at the moment' mod='payplug'}</small>{/if}
                     </td>
-                    <td class="expiry_date bold">{if $alias.expiry_date}{$alias.expiry_date|escape:'htmlall':'UTF-8'}{/if}</td>
+                    <td class="expiry_date bold">{$alias.expiry_date|escape:'htmlall':'UTF-8'}</td>
                     <td class="delete bold"><a class="{$module_name|escape:'htmlall':'UTF-8'}Card_delete" data-type="alias" data-id_card="{$alias.id_payplug_alias|escape:'htmlall':'UTF-8'}" href="{$payplug_delete_card_url|escape:'htmlall':'UTF-8'}" title="{l s='Delete' mod='payplug'}" data-e2e-card="delete">{l s='Delete' mod='payplug'}</a></td>
                 </tr>
             {/foreach}

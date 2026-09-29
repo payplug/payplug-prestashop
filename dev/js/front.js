@@ -1714,9 +1714,16 @@ var $document, $window, __moduleName__Module = {
         // inside it, wait for "pay with a new card" instead.
         mountIfNewCard: function () {
             var hosted = __moduleName__Module.hosted_fields;
-            if (!hosted.isAliasSelected()) {
+            if (hosted.syncNewCardFields()) {
                 hosted.setup();
             }
+        },
+        // The server hides the new-card wrapper whenever saved aliases exist, but the browser may
+        // restore "pay with a new card" as checked (reload, back/forward): follow the radio state.
+        syncNewCardFields: function () {
+            var isNewCard = !__moduleName__Module.hosted_fields.isAliasSelected();
+            $('#hf-new-card-fields')[isNewCard ? 'removeClass' : 'addClass']('-hide');
+            return isNewCard;
         },
         isAliasSelected: function () {
             var $selected = $('.hf-alias-radio:checked');
@@ -1731,11 +1738,11 @@ var $document, $window, __moduleName__Module = {
             // the previous binding, same as bindCardholder().
             $document.off('change.hostedFieldsAlias')
                 .on('change.hostedFieldsAlias', '.hf-alias-radio', hosted.onPaymentChoiceChange);
+            hosted.syncNewCardFields();
         },
         onPaymentChoiceChange: function () {
             var hosted = __moduleName__Module.hosted_fields,
-                isNewCard = !hosted.isAliasSelected();
-            $('#hf-new-card-fields')[isNewCard ? 'removeClass' : 'addClass']('-hide');
+                isNewCard = hosted.syncNewCardFields();
             $('.' + hosted.props.root + '_error.-payment').removeClass('-show').text('');
             if (isNewCard) {
                 // The radios live in the selected, hence visible, payment option.
@@ -2025,14 +2032,15 @@ var $document, $window, __moduleName__Module = {
             },
             // Saved alias: no tokenization; ownership is checked server-side
             // (OperationAction::createAction()).
-            submitAlias: function (aliasId) {
+            // idPayplugAlias is the module's own row id: the Unified API alias never reaches the page.
+            submitAlias: function (idPayplugAlias) {
                 var hosted = __moduleName__Module.hosted_fields;
                 $.ajax({
                     type: 'POST',
                     url: window['payplug_hosted_fields_uhf_url'],
                     dataType: 'json',
                     data: {
-                        alias_id: aliasId,
+                        id_payplug_alias: idPayplugAlias,
                         id_cart: $('input[name="id_cart"]').val(),
                     },
                     error: hosted.form.onSubmitError,

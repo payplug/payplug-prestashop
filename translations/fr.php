@@ -61,7 +61,6 @@ $_MODULE['<{payplug}prestashop>hookclass_700f4cec19a6a40d29d581317202df50'] = 'C
 $_MODULE['<{payplug}prestashop>hookclass_9d94b82f904870aa08ca0d7a9c4bbd55'] = 'Payplug : Unable to export customer saved cards.';
 $_MODULE['<{payplug}prestashop>hookclass_d3475ad139b4c89229d1c914063e293a'] = 'Payplug : Unable to delete customer saved cards.';
 $_MODULE['<{payplug}prestashop>hosted_fields_41ee039783117bba8efa4465c7a1a83b'] = 'Une erreur est survenue lors du traitement de votre paiement. Veuillez réessayer.';
-$_MODULE['<{payplug}prestashop>hosted_fields_4feef908ab0abbe87b40360b20e38614'] = 'Carte enregistrée';
 $_MODULE['<{payplug}prestashop>hosted_fields_59cfdfd00b3ecb80f4c84d0b9ab394c6'] = 'Votre carte';
 $_MODULE['<{payplug}prestashop>hosted_fields_642ec55f312db4141839585b8b9f8f2d'] = 'CVV invalide.';
 $_MODULE['<{payplug}prestashop>hosted_fields_6e2d256a4c9ec8a6496287356c19cf15'] = 'Champ obligatoire.';

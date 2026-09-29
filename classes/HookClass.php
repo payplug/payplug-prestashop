@@ -131,11 +131,22 @@ class HookClass
      */
     public function actionExportGDPRData($customer)
     {
-        if (!$cards = $this->dependencies->configClass->gdprCardExport((int) $customer['id'])) {
+        $cards = $this->dependencies->configClass->gdprCardExport((int) $customer['id']);
+        $aliases = $this->module
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.action.alias')
+            ->gdprExportAction((int) $customer['id']);
+        $cards = array_merge($cards ?: [], $aliases ?: []);
+        if (!$cards) {
             return \json_encode($this->dependencies
                 ->getPlugin()
                 ->getTranslationClass()
                 ->l('hook.actionExportGDPRData.unableToExport', 'hookclass'));
+        }
+
+        // One numbering across saved cards (payplug_card) and saved aliases (payplug_alias).
+        foreach ($cards as $index => $card) {
+            $cards[$index]['#'] = $index + 1;
         }
 
         return \json_encode($cards);

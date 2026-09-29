@@ -39,11 +39,25 @@ class saveIfAbsentTest extends BaseAliasRepository
     {
         $this->repository->shouldReceive('getBy')->once()->with('alias_id', 'alias_abc')->andReturn([
             'id_payplug_alias' => '1',
+            'id_customer' => '7',
             'alias_id' => 'alias_abc',
         ]);
         $this->repository->shouldReceive('createEntity')->never();
 
         $this->assertTrue($this->repository->saveIfAbsent(7, 'alias_abc', 'usd', 'ident_usd', 'visa', '0001', '12', '2029'));
+    }
+
+    public function testReturnsFalseWhenTheAliasBelongsToAnotherCustomer()
+    {
+        // Found for customer 8, then the insert for customer 7 is rejected by UNIQUE (alias_id).
+        $this->repository->shouldReceive('getBy')->twice()->with('alias_id', 'alias_abc')->andReturn([
+            'id_payplug_alias' => '1',
+            'id_customer' => '8',
+            'alias_id' => 'alias_abc',
+        ]);
+        $this->repository->shouldReceive('createEntity')->once()->andReturn(0);
+
+        $this->assertFalse($this->repository->saveIfAbsent(7, 'alias_abc', 'usd', 'ident_usd', 'visa', '0001', '12', '2029'));
     }
 
     public function testCreatesTheAliasWithEveryKnownField()
@@ -67,26 +81,52 @@ class saveIfAbsentTest extends BaseAliasRepository
         $this->assertTrue($this->repository->saveIfAbsent(7, 'alias_abc', 'usd', 'ident_usd', 'visa', '0001', '12', '2029'));
     }
 
-    public function testOmitsTheUnknownCardDetails()
+    /**
+     * @dataProvider incompleteCardDetailsProvider
+     *
+     * @param mixed $brand
+     * @param mixed $last4
+     * @param mixed $exp_month
+     * @param mixed $exp_year
+     */
+    public function testReturnsFalseWithoutWritingWhenTheCardDetailsAreIncomplete($brand, $last4, $exp_month, $exp_year)
     {
-        $this->repository->shouldReceive('getBy')->once()->with('alias_id', 'alias_abc')->andReturn([]);
-        $this->repository->shouldReceive('createEntity')
-            ->once()
-            ->withArgs(function ($fields) {
-                return !array_key_exists('last4', $fields)
-                    && !array_key_exists('exp_month', $fields)
-                    && !array_key_exists('exp_year', $fields);
-            })
-            ->andReturn(3);
+        $this->repository->shouldReceive('getBy')->never();
+        $this->repository->shouldReceive('createEntity')->never();
 
-        $this->assertTrue($this->repository->saveIfAbsent(7, 'alias_abc', 'usd', 'ident_usd', 'visa', null, null, null));
+        $this->assertFalse($this->repository->saveIfAbsent(7, 'alias_abc', 'usd', 'ident_usd', $brand, $last4, $exp_month, $exp_year));
+    }
+
+    public function incompleteCardDetailsProvider()
+    {
+        return [
+            'no card details' => ['visa', null, null, null],
+            'empty brand' => ['', '0001', '12', '2029'],
+            'no last4' => ['visa', null, '12', '2029'],
+            'empty last4' => ['visa', '', '12', '2029'],
+            'no expiry month' => ['visa', '0001', null, '2029'],
+            'no expiry year' => ['visa', '0001', '12', null],
+        ];
     }
 
     public function testReturnsFalseWhenTheInsertFails()
     {
-        $this->repository->shouldReceive('getBy')->once()->with('alias_id', 'alias_abc')->andReturn([]);
+        $this->repository->shouldReceive('getBy')->twice()->with('alias_id', 'alias_abc')->andReturn([]);
         $this->repository->shouldReceive('createEntity')->once()->andReturn(0);
 
-        $this->assertFalse($this->repository->saveIfAbsent(7, 'alias_abc', 'usd', 'ident_usd', 'visa'));
+        $this->assertFalse($this->repository->saveIfAbsent(7, 'alias_abc', 'usd', 'ident_usd', 'visa', '0001', '12', '2029'));
+    }
+
+    public function testReturnsTrueWhenAConcurrentSaveInsertedTheAliasFirst()
+    {
+        // Read before the concurrent insert, rejected by UNIQUE (alias_id), then found.
+        $this->repository->shouldReceive('getBy')->twice()->with('alias_id', 'alias_abc')->andReturn([], [
+            'id_payplug_alias' => '1',
+            'id_customer' => '7',
+            'alias_id' => 'alias_abc',
+        ]);
+        $this->repository->shouldReceive('createEntity')->once()->andReturn(0);
+
+        $this->assertTrue($this->repository->saveIfAbsent(7, 'alias_abc', 'usd', 'ident_usd', 'visa', '0001', '12', '2029'));
     }
 }

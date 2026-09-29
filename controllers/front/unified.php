@@ -53,7 +53,7 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
         $params = [
             'hfToken' => $this->toolsAdapter->tool('getValue', 'hfToken'),
             'selectedBrand' => $this->toolsAdapter->tool('getValue', 'selectedBrand'),
-            'alias_id' => $this->toolsAdapter->tool('getValue', 'alias_id'),
+            'id_payplug_alias' => $this->toolsAdapter->tool('getValue', 'id_payplug_alias'),
             'save_card' => $this->toolsAdapter->tool('getValue', 'save_card'),
             'cardholder' => $this->toolsAdapter->tool('getValue', 'cardholder'),
             'cardholderName' => $this->toolsAdapter->tool('getValue', 'cardholderName'),

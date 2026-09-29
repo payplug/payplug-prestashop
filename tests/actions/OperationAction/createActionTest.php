@@ -261,7 +261,7 @@ class createActionTest extends TestCase
             ->once()
             ->withArgs(function ($hosted_field_dto) {
                 return true === $hosted_field_dto->paymentMethod['saveFutureUsage']
-                    && 'SUBSCRIPTION' === $hosted_field_dto->recurringMode
+                    && 'ONE_CLICK' === $hosted_field_dto->recurringMode
                     && 'Jane Doe' === $hosted_field_dto->paymentMethod['details']['fullName'];
             })
             ->andReturn(new PaymentOutput(201, '{"id":"op_123","execCode":"0000_SUCCESS"}', 'https://acs.example/challenge', null, null));
@@ -608,7 +608,7 @@ class createActionTest extends TestCase
 
         $this->assertSame([
             'result' => false,
-            'message' => 'Missing hfToken/selectedBrand or alias_id',
+            'message' => 'Missing hfToken/selectedBrand or id_payplug_alias',
         ], $action->createAction(['id_cart' => 42]));
     }
 
@@ -618,7 +618,7 @@ class createActionTest extends TestCase
 
         $mocks['alias_repository']->shouldReceive('findUsable')
             ->once()
-            ->with('alias_abc', 7, 'usd', 'ident_usd')
+            ->with(1, 7, 'usd', 'ident_usd')
             ->andReturn(['id_payplug_alias' => '1', 'alias_id' => 'alias_abc']);
         $mocks['payment_service']->shouldReceive('createPayment')
             ->once()
@@ -650,7 +650,7 @@ class createActionTest extends TestCase
         $order_action = \Mockery::mock('OrderAction');
         $action->orderAction = $order_action;
 
-        $mocks['alias_repository']->shouldReceive('findUsable')->once()->andReturn(['id_payplug_alias' => '1']);
+        $mocks['alias_repository']->shouldReceive('findUsable')->once()->andReturn(['id_payplug_alias' => '1', 'alias_id' => 'alias_abc']);
         $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(
             new PaymentOutput(201, '{"id":"op_123","execCode":"0000"}', null, null, 'alias_abc')
         );
@@ -673,7 +673,7 @@ class createActionTest extends TestCase
         // unknown / other customer / other currency / other identifier alike.
         $mocks['alias_repository']->shouldReceive('findUsable')
             ->once()
-            ->with('alias_abc', 7, 'usd', 'ident_usd')
+            ->with(1, 7, 'usd', 'ident_usd')
             ->andReturn(null);
         $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Unknown or unusable alias/'));
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->never();
@@ -685,6 +685,88 @@ class createActionTest extends TestCase
             'result' => false,
             'message' => 'The transaction was not completed and your card was not charged.',
         ], $action->createAction($this->aliasParams()));
+    }
+
+    /**
+     * @dataProvider malformedAliasIdProvider
+     *
+     * @param string $id_payplug_alias
+     */
+    public function testCreateActionRejectsAMalformedAliasIdLikeAnUnknownAlias($id_payplug_alias)
+    {
+        [$action, $mocks] = $this->mockActionForAliasPayment();
+
+        // Strict digits: never read '1abc' as alias 1; findUsable() refuses 0 without querying.
+        $mocks['alias_repository']->shouldReceive('findUsable')
+            ->once()
+            ->with(0, 7, 'usd', 'ident_usd')
+            ->andReturn(null);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Unknown or unusable alias/'));
+        $mocks['payment_service']->shouldReceive('createPayment')->never();
+        $mocks['lock']->shouldReceive('release')->never();
+
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The transaction was not completed and your card was not charged.',
+        ], $action->createAction($this->aliasParams(['id_payplug_alias' => $id_payplug_alias])));
+    }
+
+    public function malformedAliasIdProvider()
+    {
+        return [
+            'digits then letters' => ['1abc'],
+            'negative' => ['-1'],
+            'decimal' => ['1.5'],
+            'unified api alias id' => ['alias_abc'],
+        ];
+    }
+
+    public function testCreateActionRejectsAnExpiredAliasBeforeAnyApiCall()
+    {
+        [$action, $mocks] = $this->mockActionForAliasPayment();
+
+        $expired_alias = [
+            'id_payplug_alias' => '1',
+            'alias_id' => 'alias_abc',
+            'exp_month' => '01',
+            'exp_year' => '2020',
+        ];
+        $mocks['alias_repository']->shouldReceive('findUsable')->once()->andReturn($expired_alias);
+        $mocks['alias_action']->shouldReceive('isExpired')->once()->with($expired_alias)->andReturn(true);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/expired card/'));
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->never();
+        $mocks['payment_service']->shouldReceive('createPayment')->never();
+        $mocks['lock']->shouldReceive('release')->never();
+
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The transaction was not completed and your card was not charged.',
+        ], $action->createAction($this->aliasParams()));
+    }
+
+    public function testCreateActionPaysWithAnUnexpiredAlias()
+    {
+        [$action, $mocks] = $this->mockActionForAliasPayment();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+
+        $unexpired_alias = [
+            'id_payplug_alias' => '1',
+            'alias_id' => 'alias_abc',
+            'exp_month' => '12',
+            'exp_year' => '2029',
+        ];
+        $mocks['alias_repository']->shouldReceive('findUsable')->once()->andReturn($unexpired_alias);
+        $mocks['alias_action']->shouldReceive('isExpired')->once()->with($unexpired_alias)->andReturn(false);
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(
+            new PaymentOutput(201, '{"id":"op_123","execCode":"0000"}', null, null, 'alias_abc')
+        );
+        $order_action->shouldReceive('createFromOutcome')
+            ->once()
+            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $this->assertTrue($action->createAction($this->aliasParams())['result']);
     }
 
     public function testCreateActionRejectsAnAliasPaymentFromAGuestContextCustomer()
@@ -811,7 +893,41 @@ class createActionTest extends TestCase
         ];
     }
 
-    public function testCreateActionFallsBackToTheResponseBodyAliasIdOnADirectPaidResult()
+    public function testCreateActionFallsBackToTheFetchedOperationAliasIdOnADirectPaidResult()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(
+            new PaymentOutput(201, '{"id":"op_123","execCode":"0000"}', null, null, null)
+        );
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->once()->andReturn([
+            'body' => json_encode([
+                'execCode' => '0000',
+                'paymentMethod' => [
+                    'id' => 'card_alias',
+                    'card' => ['code6x4' => '402205XXXXXX0001'],
+                    'details' => ['validityDate' => '2029-12'],
+                ],
+            ]),
+        ]);
+        $order_action->shouldReceive('createFromOutcome')
+            ->once()
+            ->with(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, [])
+            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
+        $order_action->shouldReceive('persistAlias')
+            ->once()
+            ->with(42, ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
+        $mocks['logger']->shouldReceive('error')->never();
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $result = $action->createAction($this->defaultParams(['save_card' => 1, 'cardholder' => 'Jane Doe']));
+
+        $this->assertTrue($result['result']);
+    }
+
+    public function testCreateActionSavesTheDirectPaidAliasFromTheFetchedOperationOnceTheOrderExistsAndTheLockIsReleased()
     {
         [$action, $mocks] = $this->mockActionForPaymentCreation();
         $order_action = \Mockery::mock('OrderAction');
@@ -822,30 +938,69 @@ class createActionTest extends TestCase
             json_encode([
                 'id' => 'op_123',
                 'execCode' => '0000',
-                'paymentMethod' => ['card' => ['aliasId' => 'card_alias', 'code6x4' => '402205XXXXXX0001']],
+                'paymentMethod' => [
+                    'card' => ['code6x4' => '402205XXXXXX9999'],
+                    'details' => ['validityDate' => '2030-01'],
+                ],
             ]),
             null,
             null,
-            null
+            'alias_new_123'
         ));
+        // The order first, then the lock release, and only then the extra API call and the save.
         $order_action->shouldReceive('createFromOutcome')
             ->once()
-            ->with(
-                42,
-                'op_123',
-                '0000',
-                PaymentOutcome::PAID,
-                1234,
-                ['alias_id' => 'card_alias', 'brand' => 'visa'],
-                ['last4' => '0001', 'exp_month' => null, 'exp_year' => null]
-            )
-            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
+            ->with(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, [])
+            ->globally()->ordered()
+            ->andReturn([
+                'result' => true,
+                'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+                'persisted' => true,
+            ]);
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42')->globally()->ordered();
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->once()->globally()->ordered()->andReturn([
+            'body' => json_encode([
+                'execCode' => '0000',
+                'paymentMethod' => [
+                    'card' => ['code6x4' => '402205XXXXXX0001'],
+                    'details' => ['validityDate' => '2029-12'],
+                ],
+            ]),
+        ]);
+        $order_action->shouldReceive('persistAlias')
+            ->once()
+            ->with(42, ['alias_id' => 'alias_new_123', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029'])
+            ->globally()->ordered();
+        $mocks['token_cache']->shouldReceive('set')->with(\Mockery::pattern('/^uhf_pending_alias:/'), \Mockery::any(), \Mockery::any())->never();
         $mocks['logger']->shouldReceive('error')->never();
+
+        $result = $action->createAction($this->defaultParams(['save_card' => 1, 'cardholder' => 'Jane Doe']));
+
+        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+        // Internal keys never reach the browser.
+        $this->assertArrayNotHasKey('persisted', $result);
+    }
+
+    public function testCreateActionSavesNoAliasOnADirectPaidResultWhoseOrderCreationFailed()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(
+            new PaymentOutput(201, '{"id":"op_123","execCode":"0000"}', null, null, 'alias_new_123')
+        );
+        $mocks['payment_service']->shouldReceive('getOperation')->never();
+        $order_action->shouldReceive('createFromOutcome')
+            ->once()
+            ->andReturn(['result' => false, 'redirect_url' => 'index.php?controller=order&step=3&has_error=1&modulename=payplug']);
+        $order_action->shouldReceive('persistAlias')->never();
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')->once();
         $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
 
         $result = $action->createAction($this->defaultParams(['save_card' => 1, 'cardholder' => 'Jane Doe']));
 
-        $this->assertTrue($result['result']);
+        $this->assertFalse($result['result']);
     }
 
     public function testCreateActionCachesThePendingAliasByOperationIdWhenSavingACardHitsAChallenge()
@@ -873,47 +1028,7 @@ class createActionTest extends TestCase
         $this->assertTrue($result['result']);
     }
 
-    public function testCreateActionPassesThePendingAliasAndCardDetailsToCreateFromOutcomeOnADirectResult()
-    {
-        [$action, $mocks] = $this->mockActionForPaymentCreation();
-        $order_action = \Mockery::mock('OrderAction');
-        $action->orderAction = $order_action;
-
-        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
-            201,
-            json_encode([
-                'id' => 'op_123',
-                'execCode' => '0000',
-                'paymentMethod' => [
-                    'card' => ['code6x4' => '402205XXXXXX0001'],
-                    'details' => ['validityDate' => '2029-12'],
-                ],
-            ]),
-            null,
-            null,
-            'alias_new_123'
-        ));
-        $order_action->shouldReceive('createFromOutcome')
-            ->once()
-            ->with(
-                42,
-                'op_123',
-                '0000',
-                PaymentOutcome::PAID,
-                1234,
-                ['alias_id' => 'alias_new_123', 'brand' => 'visa'],
-                ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']
-            )
-            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
-        $mocks['token_cache']->shouldReceive('set')->with(\Mockery::pattern('/^uhf_pending_alias:/'), \Mockery::any(), \Mockery::any())->never();
-        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
-
-        $result = $action->createAction($this->defaultParams(['save_card' => 1, 'cardholder' => 'Jane Doe']));
-
-        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
-    }
-
-    public function testCreateActionContinuesWithoutAliasWhenTheResponseCarriesNoAliasId()
+    public function testCreateActionContinuesWithoutAliasWhenTheFetchedOperationCarriesNoAliasId()
     {
         [$action, $mocks] = $this->mockActionForPaymentCreation();
         $order_action = \Mockery::mock('OrderAction');
@@ -922,7 +1037,32 @@ class createActionTest extends TestCase
         $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(
             new PaymentOutput(201, '{"id":"op_123","execCode":"0000"}', null, null, null)
         );
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->once()->andReturn([
+            'body' => '{"execCode":"0000"}',
+        ]);
         $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/no alias id returned/'));
+        $order_action->shouldReceive('createFromOutcome')
+            ->once()
+            ->with(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, [])
+            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $result = $action->createAction($this->defaultParams(['save_card' => 1, 'cardholder' => 'Jane Doe']));
+
+        $this->assertTrue($result['result']);
+    }
+
+    public function testCreateActionStillCreatesTheOrderWithoutAliasWhenFetchingThePaidOperationFails()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(
+            new PaymentOutput(201, '{"id":"op_123","execCode":"0000"}', null, null, 'alias_new_123')
+        );
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->once()->andThrow(new \Exception('unified API down'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/getOperation failed, alias not saved/'));
         $order_action->shouldReceive('createFromOutcome')
             ->once()
             ->with(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, [])
@@ -992,10 +1132,11 @@ class createActionTest extends TestCase
 
         $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
         $dependencies->shouldReceive('loadAdapterPresta')->andReturn($prestashop_adapter);
+        $cookies = \Mockery::mock('CookiesHelper');
         $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
         $dependencies->shouldReceive('getHelpers')->andReturn([
             'amount' => $amount_helper,
-            'cookies' => \Mockery::mock('CookiesHelper'),
+            'cookies' => $cookies,
         ]);
 
         $plugin->shouldReceive('getCart')->andReturn($cart_adapter);
@@ -1052,6 +1193,7 @@ class createActionTest extends TestCase
             'customer_adapter' => $customer_adapter,
             'context' => $context,
             'configuration_class' => $configuration_class,
+            'cookies' => $cookies,
         ]];
     }
 
@@ -1110,14 +1252,19 @@ class createActionTest extends TestCase
         $mocks['module']->shouldReceive('getService')
             ->with('payplug.models.repositories.alias')
             ->andReturn($alias_repository);
+        $alias_action = \Mockery::mock('AliasAction');
+        $alias_action->shouldReceive('isExpired')->andReturn(false)->byDefault();
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.action.alias')
+            ->andReturn($alias_action);
 
-        return [$action, $mocks + ['alias_repository' => $alias_repository]];
+        return [$action, $mocks + ['alias_repository' => $alias_repository, 'alias_action' => $alias_action]];
     }
 
     private function aliasParams(array $overrides = [])
     {
         return array_merge([
-            'alias_id' => 'alias_abc',
+            'id_payplug_alias' => '1',
             'id_cart' => 42,
         ], $overrides);
     }
