@@ -1,16 +1,16 @@
 <?php
 
-namespace PayPlug\tests\models\repositories\OperationRepository;
+namespace PayPlug\tests\models\repositories\UpcRefundRepository;
 
-use PayPlug\src\models\repositories\OperationRepository;
+use PayPlug\src\models\repositories\UpcRefundRepository;
 use PayPlug\tests\models\repositories\BaseRepository;
 
-class BaseOperationRepository extends BaseRepository
+class BaseUpcRefundRepository extends BaseRepository
 {
     public function setUp(): void
     {
         parent::setUp();
-        $this->repository = \Mockery::mock(OperationRepository::class, [$this->dependencies])
+        $this->repository = \Mockery::mock(UpcRefundRepository::class, [$this->dependencies])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
         $this->repository->shouldReceive('escape')
@@ -24,16 +24,15 @@ class BaseOperationRepository extends BaseRepository
 
         $this->entity->shouldReceive([
             'getDefinition' => [
-                'table' => 'payplug_upc_operation',
-                'primary' => 'id_payplug_upc_operation',
+                'table' => 'payplug_upc_refund',
+                'primary' => 'id_payplug_upc_refund',
                 'fields' => [
-                    'operation_id' => ['type' => 'string', 'required' => true],
+                    'refund_operation_id' => ['type' => 'string', 'required' => true],
+                    'payment_operation_id' => ['type' => 'string', 'required' => true],
                     'order_id' => ['type' => 'string', 'required' => true],
-                    'exec_code' => ['type' => 'string', 'required' => true],
-                    'outcome' => ['type' => 'string', 'required' => true],
                     'amount' => ['type' => 'integer', 'required' => true],
-                    'treated' => ['type' => 'boolean'],
-                    'payment_id' => ['type' => 'string'],
+                    'currency' => ['type' => 'string', 'required' => true],
+                    'status' => ['type' => 'string', 'required' => true],
                     'date_add' => ['type' => 'string'],
                     'date_upd' => ['type' => 'string'],
                 ],

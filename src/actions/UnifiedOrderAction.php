@@ -103,11 +103,11 @@ class UnifiedOrderAction
             //     'error'/abandoned bucket).
             // PaymentOutcome::REFUNDED/AUTHORIZED/CAPTURE_REQUIRED are deliberately unreachable
             // from this call chain: ExecCodeMapper::toPaymentOutcome() (the only $outcome source
-            // here) never produces them. Refund notifications in particular are sent by the
-            // classic/GM API, not the Unified API's WebhookNotificationHelper this module's
-            // notifyAction() parses - they must not be handled by this reconciliation path, and
-            // today structurally can't be (a refund payload wouldn't parse as a
-            // WebhookNotificationHelper OperationData in the first place).
+            // here) never produces them. Back-office refunds made through the Unified API ARE
+            // notified on notify.php, with a payment-shaped body: OperationAction::notifyAction()
+            // diverts them through the payplug_upc_refund lookup before this path. A late payment
+            // webhook landing on an already-refunded order is neutralised by
+            // UpcOrderStateMutator's refunded-order guard.
             if (!$existing_order['owned_by_payplug']) {
                 $this->logger()->error(
                     'UnifiedOrderAction::createFromOutcome - refusing to reconcile operation '

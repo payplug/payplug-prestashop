@@ -508,3 +508,4 @@ $_MODULE['<{payplug}prestashop>translation_62d341932aa23af7ff594afbde234b64'] = 
 $_MODULE['<{payplug}prestashop>translation_057e88637ae8e4c9f795744ee14412c8'] = 'Tenga en cuenta que el monto mínimo ingresado es mayor que el monto máximo ingresado.';
 $_MODULE['<{payplug}prestashop>translation_d0c4453e26334eb8f886fe4748619b05'] = 'No se puede guardar la configuración. Los importes de Scalapay deben estar dentro del rango autorizado por su cuenta Payplug, y el importe mínimo no debe superar el importe máximo.';
 $_MODULE['<{payplug}prestashop>translation_9b0c6d6c3cd66da8bba342344c4529e7'] = 'De acuerdo';
+$_MODULE['<{payplug}prestashop>translation_dbc93d598178497af541cc6762291ebd'] = 'No se ha podido confirmar el estado del reembolso. Compruebe este pago en su portal PayPlug antes de volver a intentarlo.';

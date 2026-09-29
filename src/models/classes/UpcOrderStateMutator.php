@@ -81,6 +81,20 @@ class UpcOrderStateMutator implements IOrderStateMutator
             return;
         }
 
+        // Refunded-order guard: a BO refund can land before the late PAID webhook of the same
+        // (still untreated) operation, which must not push the order back to "Payment accepted".
+        // Any transition is skipped once the order is (partially) refunded.
+        $state_addons = $is_live ? '' : '_test';
+        $refund_states = array_filter([
+            isset($order_states['refund']) ? (int) $order_states['refund'] : 0,
+            (int) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('order_state_partial_refund' . $state_addons),
+        ]);
+        if (in_array((int) $order->getCurrentState(), $refund_states, true)) {
+            $this->logger->info('UpcOrderStateMutator::apply - Skipped state transition to bucket "' . $bucket . '" for already-refunded order id: ' . $orderId);
+
+            return;
+        }
+
         $this->dependencies->getPlugin()->getOrderClass()->updateOrderState($order, $new_order_state);
     }
 

@@ -101,6 +101,18 @@ class AdminPayplugController extends ModuleAdminController
                 $resource_id = $this->tools->tool('getValue', 'resource_id');
                 $id_customer = $this->tools->tool('getValue', 'id_customer');
                 $id_order = $this->tools->tool('getValue', 'id_order');
+
+                if ('uhf' === $this->tools->tool('getValue', 'payment_type')) {
+                    $refund = $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.action.unified_refund')
+                        ->refundAction((int) $id_order, (int) $amount_formated);
+
+                    exit(json_encode($refund));
+                }
+
                 $refund = $this->dependencies
                     ->getPlugin()
                     ->getPaymentAction()

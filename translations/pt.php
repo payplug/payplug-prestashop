@@ -506,6 +506,7 @@ $_MODULE['<{payplug}prestashop>translation_d96313656bea2b4673ff166ef8933a5f'] = 
 $_MODULE['<{payplug}prestashop>translation_d9ec21b5aa75ccf8d2bec80de8dbc3bc'] = 'Allow your customers to pay with their iDEAL cards. ';
 $_MODULE['<{payplug}prestashop>translation_da7566f4eaf172cd9164d47db7c92940'] = 'Bancontact is unavailable in TEST mode. To activate it, you must switch your Payplug module to LIVE mode.';
 $_MODULE['<{payplug}prestashop>translation_db9e1b05f134de8ab5d4bfd29b9d8a4a'] = 'Find out more.';
+$_MODULE['<{payplug}prestashop>translation_dbc93d598178497af541cc6762291ebd'] = 'Não foi possível confirmar o estado do reembolso. Verifique este pagamento no seu portal PayPlug antes de tentar novamente.';
 $_MODULE['<{payplug}prestashop>translation_de86f98da5f881387f131abb9a697907'] = 'Allow your customers to pay with their MyBank cards. ';
 $_MODULE['<{payplug}prestashop>translation_df9ddb6be023ec1dcea1052d84367b4f'] = 'Connect account';
 $_MODULE['<{payplug}prestashop>translation_e01e7c0b14f609d2154e68ae711b700e'] = 'Amount must be greater than 4€ and lower than 20000€.';

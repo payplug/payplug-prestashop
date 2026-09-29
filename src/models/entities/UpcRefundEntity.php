@@ -29,10 +29,13 @@ if (!defined('_PS_VERSION_')) {
 
 use PayPlug\src\exceptions\BadParameterException;
 
-class OperationEntity
+class UpcRefundEntity
 {
     /** @var int */
     private $amount;
+
+    /** @var string */
+    private $currency;
 
     /** @var string */
     private $date_add;
@@ -42,41 +45,34 @@ class OperationEntity
 
     /** @var array */
     private static $definition = [
-        'table' => 'payplug_upc_operation',
-        'primary' => 'id_payplug_upc_operation',
+        'table' => 'payplug_upc_refund',
+        'primary' => 'id_payplug_upc_refund',
         'fields' => [
-            'operation_id' => ['type' => 'string', 'required' => true],
+            'refund_operation_id' => ['type' => 'string', 'required' => true],
+            'payment_operation_id' => ['type' => 'string', 'required' => true],
             'order_id' => ['type' => 'string', 'required' => true],
-            'exec_code' => ['type' => 'string', 'required' => true],
-            'outcome' => ['type' => 'string', 'required' => true],
             'amount' => ['type' => 'integer', 'required' => true],
-            'treated' => ['type' => 'boolean'],
-            'payment_id' => ['type' => 'string'],
+            'currency' => ['type' => 'string', 'required' => true],
+            'status' => ['type' => 'string', 'required' => true],
             'date_add' => ['type' => 'string'],
             'date_upd' => ['type' => 'string'],
         ],
     ];
 
-    /** @var string */
-    private $exec_code;
-
     /** @var int */
     private $id;
-
-    /** @var string */
-    private $operation_id;
 
     /** @var string */
     private $order_id;
 
     /** @var string */
-    private $outcome;
+    private $payment_operation_id;
 
-    /** @var string|null */
-    private $payment_id;
+    /** @var string */
+    private $refund_operation_id;
 
-    /** @var bool */
-    private $treated;
+    /** @var string */
+    private $status;
 
     /**
      * @return int
@@ -84,6 +80,14 @@ class OperationEntity
     public function getAmount()
     {
         return $this->amount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
     }
 
     /**
@@ -111,27 +115,11 @@ class OperationEntity
     }
 
     /**
-     * @return string
-     */
-    public function getExecCode()
-    {
-        return $this->exec_code;
-    }
-
-    /**
      * @return int
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOperationId()
-    {
-        return $this->operation_id;
     }
 
     /**
@@ -145,25 +133,25 @@ class OperationEntity
     /**
      * @return string
      */
-    public function getOutcome()
+    public function getPaymentOperationId()
     {
-        return $this->outcome;
+        return $this->payment_operation_id;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getPaymentId()
+    public function getRefundOperationId()
     {
-        return $this->payment_id;
+        return $this->refund_operation_id;
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function getTreated()
+    public function getStatus()
     {
-        return $this->treated;
+        return $this->status;
     }
 
     /**
@@ -178,6 +166,22 @@ class OperationEntity
         }
 
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    /**
+     * @param $currency
+     *
+     * @return $this
+     */
+    public function setCurrency($currency)
+    {
+        if (!is_string($currency) || !$currency) {
+            throw new BadParameterException('Invalid argument, $currency must be a non empty string');
+        }
+
+        $this->currency = $currency;
 
         return $this;
     }
@@ -215,22 +219,6 @@ class OperationEntity
     }
 
     /**
-     * @param $exec_code
-     *
-     * @return $this
-     */
-    public function setExecCode($exec_code)
-    {
-        if (!is_string($exec_code)) {
-            throw new BadParameterException('Invalid argument, $exec_code must be a string');
-        }
-
-        $this->exec_code = $exec_code;
-
-        return $this;
-    }
-
-    /**
      * @param $id
      *
      * @return $this
@@ -247,30 +235,14 @@ class OperationEntity
     }
 
     /**
-     * @param $operation_id
-     *
-     * @return $this
-     */
-    public function setOperationId($operation_id)
-    {
-        if (!is_string($operation_id)) {
-            throw new BadParameterException('Invalid argument, $operation_id must be a string');
-        }
-
-        $this->operation_id = $operation_id;
-
-        return $this;
-    }
-
-    /**
      * @param $order_id
      *
      * @return $this
      */
     public function setOrderId($order_id)
     {
-        if (!is_string($order_id)) {
-            throw new BadParameterException('Invalid argument, $order_id must be a string');
+        if (!is_string($order_id) || !$order_id) {
+            throw new BadParameterException('Invalid argument, $order_id must be a non empty string');
         }
 
         $this->order_id = $order_id;
@@ -279,51 +251,49 @@ class OperationEntity
     }
 
     /**
-     * @param $outcome
+     * @param $payment_operation_id
      *
      * @return $this
      */
-    public function setOutcome($outcome)
+    public function setPaymentOperationId($payment_operation_id)
     {
-        if (!is_string($outcome)) {
-            throw new BadParameterException('Invalid argument, $outcome must be a string');
+        if (!is_string($payment_operation_id) || !$payment_operation_id) {
+            throw new BadParameterException('Invalid argument, $payment_operation_id must be a non empty string');
         }
 
-        $this->outcome = $outcome;
+        $this->payment_operation_id = $payment_operation_id;
 
         return $this;
     }
 
     /**
-     * @param $payment_id
-     *
-     * @throws BadParameterException
+     * @param $refund_operation_id
      *
      * @return $this
      */
-    public function setPaymentId($payment_id)
+    public function setRefundOperationId($refund_operation_id)
     {
-        if (!is_string($payment_id)) {
-            throw new BadParameterException('Invalid argument, $payment_id must be a string');
+        if (!is_string($refund_operation_id) || !$refund_operation_id) {
+            throw new BadParameterException('Invalid argument, $refund_operation_id must be a non empty string');
         }
 
-        $this->payment_id = $payment_id;
+        $this->refund_operation_id = $refund_operation_id;
 
         return $this;
     }
 
     /**
-     * @param $treated
+     * @param $status
      *
      * @return $this
      */
-    public function setTreated($treated)
+    public function setStatus($status)
     {
-        if (!is_bool($treated)) {
-            throw new BadParameterException('Invalid argument, $treated must be a boolean');
+        if (!is_string($status) || !$status) {
+            throw new BadParameterException('Invalid argument, $status must be a non empty string');
         }
 
-        $this->treated = $treated;
+        $this->status = $status;
 
         return $this;
     }
