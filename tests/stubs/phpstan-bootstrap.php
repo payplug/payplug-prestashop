@@ -34,6 +34,11 @@ namespace {
         {
             return false;
         }
+
+        public static function getCustomersByEmail($email)
+        {
+            return [];
+        }
     }
     class Order extends ObjectModel
     {

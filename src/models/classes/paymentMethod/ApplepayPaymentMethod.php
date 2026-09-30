@@ -970,7 +970,54 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'message' => 'The delivery address country is not active on the shop',
             ];
         }
-        $customer = $customer_adapter->get((int) $cart->id_customer);
+
+        // Check the selected carrier is available for the delivery address before creating any customer or address.
+        // The zone goes through Address::getZoneById so that zone modules hooked on actionGetIDZoneByAddressID
+        // are honoured, using a temporary address (with no customer) which keeps the database clean
+        // when the carrier is refused.
+        $address_adapter = $this->dependencies
+            ->getPlugin()
+            ->getAddress();
+        $tmp_address_id = (int) $this->dependencies
+            ->getPlugin()
+            ->getAddressClass()
+            ->checkAndSaveAddress($user_shipping_address);
+        if (!$tmp_address_id) {
+            return [
+                'result' => false,
+                'message' => 'Given carrier is not available for this delivery address',
+            ];
+        }
+        $id_zone = $address_adapter->getZoneById($tmp_address_id);
+
+        // delete the temporary address
+        $tmp_address = $address_adapter->get($tmp_address_id);
+        if (is_object($tmp_address) && (int) $tmp_address->id === $tmp_address_id && !$tmp_address->id_customer) {
+            $address_adapter->delete($tmp_address);
+        }
+
+        $carrier_object = $this->dependencies
+            ->getPlugin()
+            ->getCarrier()
+            ->get((int) $carrier['identifier']);
+        $carrier_in_range = $cart_adapter->isCarrierInRange(
+            (int) $carrier_object->id,
+            (int) $id_zone
+        );
+        $carrier_in_zone = $this->dependencies
+            ->getPlugin()
+            ->getCarrier()
+            ->checkCarrierZone(
+                (int) $carrier_object->id,
+                (int) $id_zone
+            );
+        if (!(bool) $carrier_in_range || !(bool) $carrier_in_zone) {
+            return [
+                'result' => false,
+                'message' => 'Given carrier is not available for this delivery address',
+            ];
+        }
+
         if ($this->context->customer->isLogged()) {
             // Prepare shipping and billing addresses data
             // Check if the addresses already exist for the customer
@@ -1000,17 +1047,32 @@ class ApplepayPaymentMethod extends PaymentMethod
             $id_address_invoice = $existing_billing_address;
             $id_address_delivery = $existing_shipping_address;
         } else {
-            // create guest user
-            $customer->is_guest = true;
-            $customer->firstname = $cart_data['shipping']['first_name'];
-            $customer->lastname = $cart_data['shipping']['last_name'];
-            $customer->email = $cart_data['shipping']['email'];
-            $customer->passwd = $this->tools->tool('passwdGen', 32, 'ALPHANUMERIC');
-            if (!$customer_adapter->add($customer)) {
-                return [
-                    'result' => false,
-                    'message' => 'Guest customer can\'t be created',
-                ];
+            $guest_id = $customer_adapter->getGuestIdByEmail($cart_data['shipping']['email']);
+            if ($guest_id) {
+                // reuse the existing guest account for this email
+                $customer = $customer_adapter->get((int) $guest_id);
+                $customer_addresses = $customer_adapter->getAddresses(
+                    (int) $customer->id,
+                    (int) $this->context->language->id
+                );
+                if (!is_array($customer_addresses)) {
+                    $customer_addresses = [];
+                }
+            } else {
+                // create guest user
+                $customer = $customer_adapter->get(0);
+                $customer->is_guest = true;
+                $customer->firstname = $cart_data['shipping']['first_name'];
+                $customer->lastname = $cart_data['shipping']['last_name'];
+                $customer->email = $cart_data['shipping']['email'];
+                $customer->passwd = $this->tools->tool('passwdGen', 32, 'ALPHANUMERIC');
+                if (!$customer_adapter->add($customer)) {
+                    return [
+                        'result' => false,
+                        'message' => 'Guest customer can\'t be created',
+                    ];
+                }
+                $customer_addresses = [];
             }
 
             $cart->id_customer = (int) $customer->id;
@@ -1026,10 +1088,11 @@ class ApplepayPaymentMethod extends PaymentMethod
             $shipping_address_id = $this->dependencies
                 ->getPlugin()
                 ->getAddressClass()
-                ->checkAndSaveAddress($user_shipping_address, (int) $customer->id);
+                ->checkAndSaveAddress($user_shipping_address, (int) $customer->id, $customer_addresses);
 
-            // Check if shipping address is different than billing address
-            if (hash('sha256', json_encode($user_shipping_address)) != hash('sha256', json_encode($user_billing_address))) {
+            // Check if shipping address is different than billing address (billing address has no phone)
+            $shipping_address_for_comparison = array_diff_key($user_shipping_address, ['phone_mobile' => null]);
+            if ($shipping_address_for_comparison != $user_billing_address) {
                 // Create billing address
                 $billing_address_id = $this->dependencies
                     ->getPlugin()
@@ -1037,7 +1100,7 @@ class ApplepayPaymentMethod extends PaymentMethod
                     ->checkAndSaveAddress(
                         $user_billing_address,
                         (int) $customer->id,
-                        []
+                        $customer_addresses
                     );
             } else {
                 // Use the same address for billing
@@ -1047,33 +1110,6 @@ class ApplepayPaymentMethod extends PaymentMethod
             // Update cart with address IDs
             $id_address_invoice = $billing_address_id;
             $id_address_delivery = $shipping_address_id;
-        }
-
-        // Set selected carrier in cart
-        $carrier = $this->dependencies
-            ->getPlugin()
-            ->getCarrier()
-            ->get((int) $carrier['identifier']);
-        $id_zone = $this->dependencies
-            ->getPlugin()
-            ->getAddress()
-            ->getZoneById((int) $id_address_delivery);
-        $carrier_in_range = $cart_adapter->isCarrierInRange(
-            (int) $carrier->id,
-            (int) $id_zone
-        );
-        $carrier_in_zone = $this->dependencies
-            ->getPlugin()
-            ->getCarrier()
-            ->checkCarrierZone(
-                (int) $carrier->id,
-                (int) $id_zone
-            );
-        if (!(bool) $carrier_in_range || !(bool) $carrier_in_zone) {
-            return [
-                'result' => false,
-                'message' => 'Given carrier is not available for this delivery address',
-            ];
         }
 
         // then update the cart
