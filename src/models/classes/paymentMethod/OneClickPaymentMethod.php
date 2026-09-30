@@ -270,6 +270,11 @@ class OneClickPaymentMethod extends PaymentMethod
 
         $this->setParameters();
 
+        // Retail API saved cards are EUR only: a non-EUR cart uses the UHF saved aliases instead.
+        if (!isset($this->context->currency->iso_code) || 'EUR' !== $this->context->currency->iso_code) {
+            return $payment_options;
+        }
+
         $cards = $this->dependencies
             ->getPlugin()
             ->getCardAction()

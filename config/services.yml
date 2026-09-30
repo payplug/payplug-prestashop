@@ -20,6 +20,10 @@ services:
     class: PayPlug\src\actions\UnifiedOrderAction
     public: true
 
+  payplug.action.alias:
+    class: PayPlug\src\actions\AliasAction
+    public: true
+
   payplug.models.classes.hook:
     class: PayPlug\src\models\classes\Hook
     public: true
@@ -35,6 +39,11 @@ services:
 
   payplug.models.repositories.upc_lock:
     class: PayPlug\src\models\repositories\UpcLockRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+
+  payplug.models.repositories.alias:
+    class: PayPlug\src\models\repositories\AliasRepository
     arguments: ['@payplug.dependencies_class']
     public: true
 

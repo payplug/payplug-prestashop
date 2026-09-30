@@ -63,14 +63,28 @@ class PayplugCardsModuleFrontController extends ModuleFrontController
     private function renderCardList()
     {
         $cards = $this->card_action->renderList();
+        // The customer static token is checked by ajax.php before any deletion (CSRF).
         $payplug_delete_card_url = $this->context_adapter->link->getModuleLink(
             'payplug',
             'ajax',
-            ['_ajax' => 1],
+            [
+                '_ajax' => 1,
+                'token' => $this->tools->tool('getToken', false),
+            ],
             true
         );
+        // Saved UHF aliases (payplug_alias) are listed on the same page as the Retail API cards.
+        $aliases = $this->dependencies->configClass->isValidFeature('feature_hosted_fields')
+            ? $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.action.alias')
+                ->renderList()
+            : [];
         $this->context_adapter->smarty->assign([
             'payplug_cards' => $cards,
+            'payplug_aliases' => $aliases,
             'payplug_delete_card_url' => $payplug_delete_card_url,
         ]);
         $translations = $this->dependencies

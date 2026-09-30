@@ -34,6 +34,7 @@ $_MODULE['<{payplug}prestashop>cards_list_5dd2199ad68327cc76d583b057aee7d5'] = '
 $_MODULE['<{payplug}prestashop>cards_list_807bcef3f33f11623310535338ef7afc'] = 'Tarjetas guardadas';
 $_MODULE['<{payplug}prestashop>cards_list_95b16127e70e8a90220404fb48343182'] = 'Fecha de caducidad';
 $_MODULE['<{payplug}prestashop>cards_list_c7d4153f748ba1dd21ae002c37c00906'] = 'Las últimas 4 cifras de la tarjeta';
+$_MODULE['<{payplug}prestashop>cards_list_e96725904e0377846db025ae482140a1'] = 'No disponible para el pago por el momento';
 $_MODULE['<{payplug}prestashop>cards_list_f2a6c498fb90ee345d997f888fce3b18'] = 'Borrar';
 $_MODULE['<{payplug}prestashop>configclass_39f046397ac91c1a81db199cbbdc2954'] = 'Fecha de caducidad';
 $_MODULE['<{payplug}prestashop>configclass_6a1b87ce4886b6d6b6a242b43656841f'] = 'País';
@@ -64,7 +65,9 @@ $_MODULE['<{payplug}prestashop>hosted_fields_59cfdfd00b3ecb80f4c84d0b9ab394c6'] 
 $_MODULE['<{payplug}prestashop>hosted_fields_642ec55f312db4141839585b8b9f8f2d'] = 'Invalid CVV.';
 $_MODULE['<{payplug}prestashop>hosted_fields_6e2d256a4c9ec8a6496287356c19cf15'] = 'Mandatory field.';
 $_MODULE['<{payplug}prestashop>hosted_fields_7cc7e6b91db6a6de03cb697fa3d83fa6'] = 'Mandatory field.';
+$_MODULE['<{payplug}prestashop>hosted_fields_96b0474e9ccd0e2889d69f07d0c60cbf'] = 'Pagar con una nueva tarjeta';
 $_MODULE['<{payplug}prestashop>hosted_fields_9d4b35b51f59da95d814e0f6958121eb'] = 'Invalid expiry date.';
+$_MODULE['<{payplug}prestashop>hosted_fields_b3cb0bdd0acefd55d780efce2d35f9df'] = 'Pagar con una tarjeta guardada';
 $_MODULE['<{payplug}prestashop>hosted_fields_b68d63b1743d433b7e5e4d188a550b0c'] = 'Invalid credit card number.';
 $_MODULE['<{payplug}prestashop>hosted_fields_c14e1160c70a62bbb03ee8dd3e22cb54'] = 'Mandatory field.';
 $_MODULE['<{payplug}prestashop>hosted_fields_d4455b8aa66670ee349126b4820c191b'] = 'Pago diferido';

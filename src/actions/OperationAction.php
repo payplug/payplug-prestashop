@@ -36,6 +36,7 @@ use PayplugUnifiedCore\Dto\CommonFieldsDto;
 use PayplugUnifiedCore\Dto\ContactDto;
 use PayplugUnifiedCore\Dto\CustomerDto;
 use PayplugUnifiedCore\Dto\HostedFieldDto;
+use PayplugUnifiedCore\Dto\PaymentDto;
 use PayplugUnifiedCore\Dto\ShippingDto;
 use PayplugUnifiedCore\Exceptions\InvalidNotificationException;
 use PayplugUnifiedCore\Utilities\Helpers\ExecCodeMapper;
@@ -55,6 +56,8 @@ class OperationAction
     private const LOCK_RETRY_ATTEMPTS = 2;
     private const LOCK_RETRY_DELAY_USEC = 200000;
     private const MISSING_EXEC_CODE = 'MISSING';
+    // Longer than the 600s pending-operation entries, to still cover a late notification.
+    private const PENDING_ALIAS_TTL = 86400;
 
     public $dependencies;
 
@@ -129,24 +132,33 @@ class OperationAction
     }
 
     /**
-     * @description Create the Unified API payment from the hosted fields token for the current cart
+     * @description Create the Unified API payment from the hosted fields token or a saved alias for the current cart
      *
      * @param mixed $params
      */
     public function createAction($params = [])
     {
+        // The internal id_payplug_alias, never the Unified API alias id: that one stays server-side.
+        $alias_param = isset($params['id_payplug_alias']) && is_string($params['id_payplug_alias']) ? $params['id_payplug_alias'] : '';
+        // Strict digits: '12abc' must not be read as alias 12; anything else resolves to 0 and
+        // is refused like an unknown alias by findUsable().
+        $id_payplug_alias = ctype_digit($alias_param) ? (int) $alias_param : 0;
         $hf_token = isset($params['hfToken']) && is_string($params['hfToken']) ? $params['hfToken'] : '';
         $selected_brand = isset($params['selectedBrand']) && is_string($params['selectedBrand']) ? $params['selectedBrand'] : '';
 
-        if (!$hf_token || !$selected_brand) {
-            return ['result' => false, 'message' => 'Missing hfToken or selectedBrand'];
-        }
-
-        if (!in_array(strtolower($selected_brand), PrestashopAdapter17::HOSTED_FIELDS_ACCEPTED_BRANDS, true)) {
-            return [
-                'result' => false,
-                'message' => $this->dependencies->l('This card brand is not supported.', 'uhf'),
-            ];
+        // id_payplug_alias wins when both are sent (the front never sends both). A future classic
+        // Retail API card payment would be another elseif here.
+        if ('' !== $alias_param) {
+            // Saved-alias payment: no hfToken/selectedBrand needed.
+        } elseif ($hf_token && $selected_brand) {
+            if (!in_array(strtolower($selected_brand), PrestashopAdapter17::HOSTED_FIELDS_ACCEPTED_BRANDS, true)) {
+                return [
+                    'result' => false,
+                    'message' => $this->dependencies->l('This card brand is not supported.', 'uhf'),
+                ];
+            }
+        } else {
+            return ['result' => false, 'message' => 'Missing hfToken/selectedBrand or id_payplug_alias'];
         }
 
         if (!$this->dependencies->configClass->isValidFeature('feature_hosted_fields')) {
@@ -193,6 +205,41 @@ class OperationAction
         $factory = $this->getService(self::FACTORY_SERVICE);
         $logger = $factory->createLogger();
         $token_cache = $factory->createTokenCache();
+
+        // Before reconciliation, locking and any Unified API call; one generic message for
+        // one-click disabled, guest, unknown, foreign, other-currency and other-identifier aliases
+        // (no enumeration).
+        if ('' !== $alias_param) {
+            if (!$this->isOneClickEnabled()) {
+                $logger->error('OperationAction::createAction - Alias payment refused, one-click disabled, cart ' . $cart->id);
+
+                return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+            }
+
+            if ($this->isGuestCustomer($context)) {
+                $logger->error('OperationAction::createAction - Alias payment refused for guest cart ' . $cart->id);
+
+                return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+            }
+
+            $usable_alias = $this->getService('payplug.models.repositories.alias')->findUsable(
+                $id_payplug_alias,
+                (int) $cart->id_customer,
+                strtolower((string) $currency->iso_code),
+                (string) $prestashop_adapter->getHostedFieldsIdentifier($currency->iso_code)
+            );
+            if (null === $usable_alias) {
+                $logger->error('OperationAction::createAction - Unknown or unusable alias for cart ' . $cart->id);
+
+                return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+            }
+
+            if ($this->getService('payplug.action.alias')->isExpired($usable_alias)) {
+                $logger->error('OperationAction::createAction - Alias payment refused, expired card, cart ' . $cart->id);
+
+                return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+            }
+        }
 
         // Fix 2 (PRE-3626 review): reconcile an already in-flight UPC payment for this cart
         // BEFORE acquiring the double-submit lock below and creating a brand-new payment.
@@ -276,37 +323,45 @@ class OperationAction
                     isset($customer_object->email) ? (string) $customer_object->email : ''
                 );
 
-                $payment_method_details = ['selectedBrand' => strtolower($selected_brand)];
-                $payment_method = ['details' => $payment_method_details];
-                $recurring_mode = null;
-                $save_card = !empty($params['save_card']);
-                $cardholder = $this->getCardholder($params);
+                if ('' !== $alias_param) {
+                    $save_card = false;
+                    $output = $factory->create()->createPayment(new PaymentDto(
+                        $common,
+                        (string) $usable_alias['alias_id'],
+                        'ONE_CLICK',
+                        $browser,
+                        $customer,
+                        null
+                    ));
+                } else {
+                    $payment_method_details = ['selectedBrand' => strtolower($selected_brand)];
+                    $payment_method = ['details' => $payment_method_details];
+                    $recurring_mode = null;
+                    $cardholder = $this->getCardholder($params);
+                    // Ignored (payment still proceeds) without cardholder, with one-click disabled or for a guest.
+                    $save_card = !empty($params['save_card'])
+                        && '' !== $cardholder
+                        && $this->isOneClickEnabled()
+                        && !$this->isGuestCustomer($context);
 
-                if ($save_card && '' !== $cardholder) {
-                    $payment_method_details['fullName'] = $cardholder;
-                    $payment_method = [
-                        'details' => $payment_method_details,
-                        'saveFutureUsage' => true,
-                    ];
-                    // Fix 9 (PRE-3626 review): SUBSCRIPTION (not ONE_CLICK, as this project's own
-                    // UHF technical design doc specifies) is used here deliberately - confirmed by
-                    // this suite's own testCreateActionRequestsSavedCardWhenSaveCardAndCardholderAreGiven().
-                    // The reason for diverging from the design doc isn't documented anywhere
-                    // (no commit message, PR description, or docs/superpowers/ doc explains it) -
-                    // flagging as a deliberate, confirmed-by-test choice pending confirmation from
-                    // the team owning the Unified API contract, so a future reader doesn't "fix" it
-                    // back to ONE_CLICK.
-                    $recurring_mode = 'SUBSCRIPTION';
+                    if ($save_card) {
+                        $payment_method_details['fullName'] = $cardholder;
+                        $payment_method = [
+                            'details' => $payment_method_details,
+                            'saveFutureUsage' => true,
+                        ];
+                        $recurring_mode = 'ONE_CLICK';
+                    }
+
+                    $output = $factory->create()->createPayment(new HostedFieldDto(
+                        $common,
+                        $hf_token,
+                        $recurring_mode,
+                        $browser,
+                        $customer,
+                        $payment_method
+                    ));
                 }
-
-                $output = $factory->create()->createPayment(new HostedFieldDto(
-                    $common,
-                    $hf_token,
-                    $recurring_mode,
-                    $browser,
-                    $customer,
-                    $payment_method
-                ));
             } catch (\Exception $exception) {
                 $logger->error('OperationAction::createAction - createPayment failed: ' . $exception->getMessage());
 
@@ -320,6 +375,17 @@ class OperationAction
                 $logger->error('OperationAction::createAction - missing operation identifier in payment creation response');
 
                 return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+            }
+
+            // Only a hfToken payment with an effective save_card creates an alias ($save_card is
+            // always false on the alias branch, whose $output->aliasId is a mere echo). The alias id
+            // may still be empty here: it is then resolved from getOperation() later.
+            $pending_alias = null;
+            if ($save_card) {
+                $pending_alias = [
+                    'alias_id' => is_string($output->aliasId) ? $output->aliasId : '',
+                    'brand' => strtolower($selected_brand),
+                ];
             }
 
             if ($output->redirectHtml || $output->redirectUrl) {
@@ -344,6 +410,10 @@ class OperationAction
                 $token_cache->set('uhf_token_cart:' . $token, (string) $cart->id, 600);
                 $token_cache->set('uhf_cart_token:' . $cart->id, $token, 600);
 
+                if (null !== $pending_alias) {
+                    $this->cachePendingAlias($token_cache, $logger, $operation_id, $pending_alias);
+                }
+
                 if ($output->redirectHtml) {
                     $token_cache->set('uhf_challenge_html:' . $cart->id, (string) $output->redirectHtml, 600);
                     $redirect_url = $context->link->getModuleLink(
@@ -366,12 +436,22 @@ class OperationAction
                 ? (string) $decoded_body['execCode']
                 : self::MISSING_EXEC_CODE;
             $outcome = ExecCodeMapper::toPaymentOutcome($exec_code);
+
+            // A pending card is never saved at creation: the marker lets the return/notification
+            // save it once PAID. A direct PAID saves it below, once the order exists and the lock
+            // is released, from the operation fetched back.
+            if (null !== $pending_alias && PaymentOutcome::THREE_DS_PENDING === $outcome) {
+                $this->cachePendingAlias($token_cache, $logger, $operation_id, $pending_alias);
+            }
+
             $result = $this->orderAction()->createFromOutcome(
                 (int) $cart->id,
                 $operation_id,
                 $exec_code,
                 $outcome,
-                $amount_cents
+                $amount_cents,
+                null,
+                []
             );
 
             if (!$result['result']) {
@@ -380,10 +460,19 @@ class OperationAction
                 ]);
             }
 
-            return $this->withReturnUrl($result);
+            $direct_paid_alias = null !== $pending_alias && PaymentOutcome::PAID === $outcome && $result['result']
+                ? $pending_alias
+                : null;
+            $response = $this->withReturnUrl($result);
         } finally {
             $lock->release($lock_key);
         }
+
+        if (null !== $direct_paid_alias) {
+            $this->persistDirectPaidAlias($factory, $logger, (int) $cart->id, $operation_id, $direct_paid_alias);
+        }
+
+        return $response;
     }
 
     /**
@@ -493,8 +582,10 @@ class OperationAction
             }
         }
 
-        $result = $this->createOrderWithLock($factory, $id_cart, $operation_id, $exec_code, $outcome, $amount);
-        unset($result['lock_conflict']);
+        $pending_alias = $this->resolvePendingAlias($token_cache, $operation_id, $decoded);
+        $card_details = null !== $pending_alias ? $this->extractCardDetails($decoded) : [];
+
+        $result = $this->createOrderWithLock($factory, $id_cart, $operation_id, $exec_code, $outcome, $amount, $pending_alias, $card_details);
 
         if ($result['result'] || PaymentOutcome::FAILED === $outcome) {
             // Single-use once resolved: closes the replay window on this token even if it leaked
@@ -587,13 +678,19 @@ class OperationAction
             return ['http_status' => 200];
         }
 
+        // $decoded is the re-fetched getOperation() response, never the unverified webhook $body.
+        $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $operation_data->operationId, $decoded);
+        $card_details = null !== $pending_alias ? $this->extractCardDetails($decoded) : [];
+
         $result = $this->createOrderWithLock(
             $factory,
             $id_cart,
             $operation_data->operationId,
             $exec_code,
             $outcome,
-            $amount
+            $amount,
+            $pending_alias,
+            $card_details
         );
 
         if (!empty($result['lock_conflict'])) {
@@ -715,14 +812,15 @@ class OperationAction
             }
         }
 
-        $result = $this->createOrderWithLock($factory, (int) $cart->id, $pending_operation_id, $exec_code, $outcome, $amount);
+        $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $pending_operation_id, $decoded);
+        $card_details = null !== $pending_alias ? $this->extractCardDetails($decoded) : [];
+
+        $result = $this->createOrderWithLock($factory, (int) $cart->id, $pending_operation_id, $exec_code, $outcome, $amount, $pending_alias, $card_details);
 
         if (!empty($result['lock_conflict'])) {
             // Someone else (another request, or the async webhook) is concurrently finalizing
             // this exact operation right now - don't also fall through to create a brand-new
             // payment on top of that race; fail safe and let the customer retry.
-            unset($result['lock_conflict']);
-
             return $this->withReturnUrl($result);
         }
 
@@ -742,10 +840,12 @@ class OperationAction
      * @param mixed $exec_code
      * @param mixed $outcome
      * @param mixed $amount
+     * @param array{alias_id: string, brand: string}|null $pending_alias
+     * @param array<string, string|null> $card_details
      *
-     * @return array{result: bool, redirect_url: string, lock_conflict?: bool}
+     * @return array{result: bool, redirect_url: string, persisted?: bool, lock_conflict?: bool}
      */
-    private function createOrderWithLock($factory, $id_cart, $operation_id, $exec_code, $outcome, $amount)
+    private function createOrderWithLock($factory, $id_cart, $operation_id, $exec_code, $outcome, $amount, $pending_alias = null, $card_details = [])
     {
         $logger = $factory->createLogger();
         $order_action = $this->orderAction();
@@ -767,8 +867,8 @@ class OperationAction
             $logger->error('OperationAction::createOrderWithLock - Could not acquire lock for cart ' . $id_cart);
 
             // 'lock_conflict' is an internal-only signal consumed by notifyAction() (to keep
-            // returning 409 for this specific case, as before) - every other caller ignores it and
-            // strips it before this array reaches a JSON response, so it never leaks externally.
+            // returning 409 for this specific case, as before) - every other caller passes its
+            // result through withReturnUrl(), which strips it, so it never leaks externally.
             return [
                 'result' => false,
                 'redirect_url' => $order_action->errorUrl(),
@@ -782,7 +882,9 @@ class OperationAction
                 $operation_id,
                 $exec_code,
                 $outcome,
-                $amount
+                $amount,
+                $pending_alias,
+                $card_details
             );
         } finally {
             $lock->release($lock_key);
@@ -792,6 +894,13 @@ class OperationAction
             $token_cache = $factory->createTokenCache();
             $token_cache->delete('uhf_pending_operation:' . $id_cart);
             $token_cache->delete('uhf_challenge_html:' . $id_cart);
+        }
+
+        // Not on THREE_DS_PENDING (the later PAID notification still needs it) nor on a failed
+        // PAID attempt (retry possible): the entry then expires with its own TTL. A PAID outcome
+        // whose alias could not be stored still clears it: a refused card leaves no trace.
+        if ((PaymentOutcome::PAID === $outcome && $result['result']) || PaymentOutcome::FAILED === $outcome) {
+            $factory->createTokenCache()->delete('uhf_pending_alias:' . $operation_id);
         }
 
         return $result;
@@ -817,6 +926,57 @@ class OperationAction
         $current_state = isset($order->current_state) ? (int) $order->current_state : 0;
 
         return $error_state > 0 && $current_state === $error_state;
+    }
+
+    /**
+     * @description Tell whether the checkout context has no registered, non-guest customer
+     *
+     * @param mixed $context
+     *
+     * @return bool
+     */
+    private function isGuestCustomer($context)
+    {
+        $customer = is_object($context) && isset($context->customer) && is_object($context->customer)
+            ? $context->customer
+            : null;
+
+        return !$customer || !isset($customer->id) || (int) $customer->id <= 0 || !empty($customer->is_guest);
+    }
+
+    /**
+     * @description Tell whether the merchant enabled one-click (saved cards)
+     *
+     * @return bool
+     */
+    private function isOneClickEnabled()
+    {
+        $payment_methods = json_decode(
+            (string) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('payment_methods'),
+            true
+        );
+
+        return is_array($payment_methods) && !empty($payment_methods['one_click']);
+    }
+
+    /**
+     * @description Cache the save-card opt-in of an operation for its later return/notification
+     *
+     * Keyed by operation, so another attempt on the same cart can never read it. A write failure
+     * only loses the saved card, never the payment.
+     *
+     * @param mixed $token_cache
+     * @param mixed $logger
+     * @param string $operation_id
+     * @param array{alias_id: string, brand: string} $pending_alias
+     */
+    private function cachePendingAlias($token_cache, $logger, $operation_id, array $pending_alias)
+    {
+        try {
+            $token_cache->set('uhf_pending_alias:' . $operation_id, (string) json_encode($pending_alias), self::PENDING_ALIAS_TTL);
+        } catch (\Exception $exception) {
+            $logger->error('OperationAction::createAction - Failed to cache pending alias for operation ' . $operation_id . ': ' . $exception->getMessage());
+        }
     }
 
     /**
@@ -988,6 +1148,142 @@ class OperationAction
     }
 
     /**
+     * @description Read the alias pending creation for an operation, if any
+     *
+     * No valid cached marker means no save-card opt-in: nothing is saved. The alias id comes from
+     * the module-fetched getOperation() response, else from the marker.
+     *
+     * @param mixed $token_cache
+     * @param string $operation_id
+     * @param mixed $decoded getOperation() response, never a webhook body
+     *
+     * @return array{alias_id: string, brand: string}|null
+     */
+    private function resolvePendingAlias($token_cache, $operation_id, $decoded)
+    {
+        $cached = $token_cache->get('uhf_pending_alias:' . $operation_id);
+        $marker = is_string($cached) && '' !== $cached ? json_decode($cached, true) : null;
+
+        if (!is_array($marker)
+            || !isset($marker['alias_id'], $marker['brand'])
+            || !is_string($marker['alias_id'])
+            || !is_string($marker['brand'])) {
+            return null;
+        }
+
+        $alias_id = $this->extractAliasId($decoded);
+        if ('' === $alias_id) {
+            $alias_id = $marker['alias_id'];
+        }
+
+        return '' === $alias_id ? null : ['alias_id' => $alias_id, 'brand' => $marker['brand']];
+    }
+
+    /**
+     * @description Save the alias of a directly PAID operation from the operation fetched back
+     *
+     * Runs once the order exists and the cart lock is released: failure only costs the saved card.
+     *
+     * @param mixed $factory
+     * @param mixed $logger
+     * @param int $id_cart
+     * @param string $operation_id
+     * @param array{alias_id: string, brand: string} $pending_alias
+     */
+    private function persistDirectPaidAlias($factory, $logger, $id_cart, $operation_id, array $pending_alias)
+    {
+        try {
+            $response = $factory->create()->getOperation($operation_id);
+        } catch (\Exception $exception) {
+            $logger->error('OperationAction::createAction - getOperation failed, alias not saved for operation ' . $operation_id . ': ' . $exception->getMessage());
+
+            return;
+        }
+
+        $decoded = is_array($response) && isset($response['body']) ? json_decode($response['body'], true) : null;
+        if (!is_array($decoded)) {
+            $logger->error('OperationAction::createAction - invalid getOperation response, alias not saved for operation ' . $operation_id);
+
+            return;
+        }
+
+        $alias_id = $this->extractAliasId($decoded);
+        if ('' !== $alias_id) {
+            $pending_alias['alias_id'] = $alias_id;
+        }
+        if ('' === $pending_alias['alias_id']) {
+            $logger->error('OperationAction::createAction - save_card requested but no alias id returned for operation ' . $operation_id);
+
+            return;
+        }
+
+        $this->orderAction()->persistAlias($id_cart, $pending_alias, $this->extractCardDetails($decoded));
+    }
+
+    /**
+     * @description Extract the card alias id from an operation response this module fetched
+     *
+     * The alias is paymentMethod.id, the same field the vendor maps to PaymentOutput::$aliasId.
+     *
+     * @param mixed $decoded
+     *
+     * @return string the alias id, or '' when absent
+     */
+    private function extractAliasId($decoded)
+    {
+        return is_array($decoded)
+            && isset($decoded['paymentMethod']['id'])
+            && is_string($decoded['paymentMethod']['id'])
+            ? $decoded['paymentMethod']['id']
+            : '';
+    }
+
+    /**
+     * @description Extract the best-effort card details from an operation response
+     *
+     * Only ever called with a getOperation() response this module fetched itself, never with a
+     * webhook body. Response shape: design doc §2.2 / open point §6.1.
+     *
+     * @param mixed $decoded
+     *
+     * @return array{last4: string|null, exp_month: string|null, exp_year: string|null}
+     */
+    private function extractCardDetails($decoded)
+    {
+        $details = ['last4' => null, 'exp_month' => null, 'exp_year' => null];
+        $payment_method = is_array($decoded) && isset($decoded['paymentMethod']) && is_array($decoded['paymentMethod'])
+            ? $decoded['paymentMethod']
+            : [];
+
+        $code6x4 = isset($payment_method['card']['code6x4']) && is_string($payment_method['card']['code6x4'])
+            ? $payment_method['card']['code6x4']
+            : '';
+        if (1 === preg_match('/(\d{4})$/', $code6x4, $matches)) {
+            $details['last4'] = $matches[1];
+        }
+
+        $validity_date = isset($payment_method['details']['validityDate']) && is_string($payment_method['details']['validityDate'])
+            ? trim($payment_method['details']['validityDate'])
+            : '';
+        if (1 === preg_match('/^(\d{4})-(\d{2})$/', $validity_date, $matches)) {
+            $year = $matches[1];
+            $month = $matches[2];
+        } elseif (1 === preg_match('/^(\d{2})(\d{2})$/', $validity_date, $matches)) {
+            $month = $matches[1];
+            $year = '20' . $matches[2];
+        } else {
+            return $details;
+        }
+
+        if ((int) $month >= 1 && (int) $month <= 12) {
+            $details['exp_month'] = $month;
+            $details['exp_year'] = $year;
+        }
+
+        return $details;
+    }
+
+    /**
      * @description Get the Authorization header from the server variables
      */
     private function resolveAuthorizationHeader()
@@ -1067,10 +1363,12 @@ class OperationAction
     }
 
     /**
-     * @description Add return_url to the result, mirroring redirect_url
+     * @description Shape a browser-facing result: add return_url mirroring redirect_url, drop internal keys
      */
     private function withReturnUrl(array $result)
     {
+        unset($result['persisted'], $result['lock_conflict']);
+
         if (isset($result['redirect_url']) && !isset($result['return_url'])) {
             $result['return_url'] = $result['redirect_url'];
         }

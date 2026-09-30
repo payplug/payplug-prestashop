@@ -202,6 +202,209 @@ class returnActionTest extends TestCase
         $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
     }
 
+    public function testForwardsThePendingAliasAndCardDetailsAndClearsTheAliasKeyOnPaidOutcome()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode([
+                'execCode' => '0000',
+                'amount' => 1234,
+                'orderId' => '42',
+                'paymentMethod' => [
+                    'card' => ['code6x4' => '402205XXXXXX0001'],
+                    'details' => ['validityDate' => '2029-12'],
+                ],
+            ]),
+        ]);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], ['alias_id' => 'alias_new_123', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_alias:op_123');
+
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertTrue($result['result']);
+    }
+
+    public function testClearsThePendingAliasKeyEvenWhenTheAliasCouldNotBeSavedOnAPaidOutcome()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        // The order is created but the card details were incomplete: the card is not saved and
+        // no trace is kept for a later notification.
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], ['alias_id' => 'alias_new_123', 'brand' => 'visa'], ['last4' => null, 'exp_month' => null, 'exp_year' => null]);
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_alias:op_123');
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn('{"alias_id":"","brand":"visa"}');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode([
+                'execCode' => '0000',
+                'amount' => 1234,
+                'orderId' => '42',
+                // Real Unified API shape: the alias id is paymentMethod.id (no card.aliasId).
+                'paymentMethod' => [
+                    'id' => 'card_alias',
+                    'card' => ['code6x4' => '402205XXXXXX0001', 'network' => 'VISA'],
+                    'details' => ['fullName' => 'Jane Doe', 'validityDate' => '2029-12', 'selectedBrand' => 'VISA'],
+                ],
+            ]),
+        ]);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    /**
+     * @dataProvider cardDetailsProvider
+     *
+     * @param array<string, mixed> $payment_method
+     * @param array<string, string|null> $expected
+     */
+    public function testExtractsBestEffortCardDetailsFromTheGetOperationResponse(array $payment_method, array $expected)
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'paymentMethod' => $payment_method]),
+        ]);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], ['alias_id' => 'alias_new_123', 'brand' => 'visa'], $expected);
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function cardDetailsProvider()
+    {
+        return [
+            'YYYY-MM validity' => [
+                ['card' => ['code6x4' => '402205XXXXXX0001'], 'details' => ['validityDate' => '2029-12']],
+                ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029'],
+            ],
+            'MMYY validity' => [
+                ['card' => ['code6x4' => '402205XXXXXX0001'], 'details' => ['validityDate' => '1225']],
+                ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2025'],
+            ],
+            'invalid month' => [
+                ['card' => ['code6x4' => '402205XXXXXX0001'], 'details' => ['validityDate' => '2029-13']],
+                ['last4' => '0001', 'exp_month' => null, 'exp_year' => null],
+            ],
+            'masked last digits' => [
+                ['card' => ['code6x4' => '402205XXXXXXXXXX'], 'details' => ['validityDate' => '2029-12']],
+                ['last4' => null, 'exp_month' => '12', 'exp_year' => '2029'],
+            ],
+            'no card block' => [
+                ['details' => ['selectedBrand' => 'visa']],
+                ['last4' => null, 'exp_month' => null, 'exp_year' => null],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider malformedPendingAliasProvider
+     *
+     * @param string|null $cached
+     */
+    public function testIgnoresAMissingOrMalformedPendingAliasEntry($cached)
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn($cached);
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], null, []);
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function malformedPendingAliasProvider()
+    {
+        return [
+            'missing' => [null],
+            'empty' => [''],
+            'not json' => ['not json'],
+            'empty alias id' => ['{"alias_id":"","brand":"visa"}'],
+            'non string alias id' => ['{"alias_id":123,"brand":"visa"}'],
+            'missing brand' => ['{"alias_id":"alias_new_123"}'],
+        ];
+    }
+
+    public function testKeepsThePendingAliasKeyWhenTheReturnIsStillThreeDsPending()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0001', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        // A pending order is created (result true) but the alias key must survive for the
+        // later PAID notification.
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0001', PaymentOutcome::THREE_DS_PENDING, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], ['alias_id' => 'alias_new_123', 'brand' => 'visa'], ['last4' => null, 'exp_month' => null, 'exp_year' => null]);
+        $mocks['token_cache']->shouldReceive('delete')->with('uhf_pending_alias:op_123')->never();
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function testKeepsThePendingAliasKeyWhenOrderCreationFailsForAPaidOutcome()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => false,
+            'redirect_url' => 'index.php?controller=order&step=3&has_error=1&modulename=payplug',
+        ], ['alias_id' => 'alias_new_123', 'brand' => 'visa'], ['last4' => null, 'exp_month' => null, 'exp_year' => null]);
+        $mocks['token_cache']->shouldReceive('delete')->with('uhf_pending_alias:op_123')->never();
+
+        $this->assertFalse($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
     private function mockDependencies()
     {
         $dependencies = \Mockery::mock('Dependencies');
@@ -261,6 +464,7 @@ class returnActionTest extends TestCase
         // Fix 7: cache cleanup after a terminal reconciliation - not asserted by every test, only
         // the ones specifically covering it.
         $token_cache->shouldReceive('delete')->byDefault();
+        $token_cache->shouldReceive('get')->with(\Mockery::pattern('/^uhf_pending_alias:/'))->andReturn(null)->byDefault();
 
         // UnifiedOrderAction now has its own dedicated test coverage (UnifiedOrderActionTest) -
         // this suite mocks it as an opaque collaborator OperationAction reads a result shape from,
@@ -321,12 +525,14 @@ class returnActionTest extends TestCase
      * @param string $outcome
      * @param int $amount
      * @param array{result: bool, redirect_url: string} $return
+     * @param array{alias_id: string, brand: string}|null $pending_alias
+     * @param array<string, string|null> $card_details
      */
-    private function mockCreateFromOutcome(array $mocks, $operation_id, $exec_code, $outcome, $amount, array $return)
+    private function mockCreateFromOutcome(array $mocks, $operation_id, $exec_code, $outcome, $amount, array $return, $pending_alias = null, array $card_details = [])
     {
         $mocks['order_action']->shouldReceive('createFromOutcome')
             ->once()
-            ->with(42, $operation_id, $exec_code, $outcome, $amount)
+            ->with(42, $operation_id, $exec_code, $outcome, $amount, $pending_alias, $card_details)
             ->andReturn($return);
     }
 }

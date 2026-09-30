@@ -321,6 +321,86 @@ class saveActionTest extends BaseConfigurationAction
         );
     }
 
+    public function testWhenIdentifierIsSaved()
+    {
+        $this->currencies = [['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_usd = 'ident_42';
+
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturn('{}');
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
+            ->once()
+            ->andReturn(true);
+
+        $this->mockSuccessfulHostedFieldsSave();
+
+        $this->assertSame(
+            true,
+            $this->action->saveAction($datas)['success']
+        );
+    }
+
+    public function testWhenIdentifierIsSavedWithoutExistingHostedFields()
+    {
+        $this->currencies = [['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_usd = 'ident_42';
+
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturn(false);
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
+            ->once()
+            ->andReturn(true);
+
+        $this->mockSuccessfulHostedFieldsSave();
+
+        $this->assertSame(
+            true,
+            $this->action->saveAction($datas)['success']
+        );
+    }
+
+    public function testWhenHostedFieldsCannotBeUpdated()
+    {
+        $this->currencies = [['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_usd = 'ident_42';
+
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturn('{}');
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', \Mockery::any())
+            ->andReturn(false);
+
+        $this->assertSame(
+            [
+                'success' => false,
+                'data' => [
+                    'message' => 'An error has occurred while register payplug_identifier_usd',
+                ],
+            ],
+            $this->action->saveAction($datas)
+        );
+    }
+
     /**
      * @description Wire up what the Scalapay branch of saveAction() needs: the account's
      *              authorized range and the euro/cent conversion.
@@ -468,86 +548,6 @@ class saveActionTest extends BaseConfigurationAction
         $datas->scalapay_max_amounts = $max;
 
         return $datas;
-    }
-
-    public function testWhenIdentifierIsSaved()
-    {
-        $this->currencies = [['iso_code' => 'USD']];
-
-        $datas = new \stdClass();
-        $datas->action = 'payplug_save_data';
-        $datas->payplug_standard = 1;
-        $datas->payplug_identifier_usd = 'ident_42';
-
-        $this->configuration_class->shouldReceive('getValue')
-            ->with('hosted_fields')
-            ->andReturn('{}');
-
-        $this->configuration_class->shouldReceive('set')
-            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
-            ->once()
-            ->andReturn(true);
-
-        $this->mockSuccessfulHostedFieldsSave();
-
-        $this->assertSame(
-            true,
-            $this->action->saveAction($datas)['success']
-        );
-    }
-
-    public function testWhenIdentifierIsSavedWithoutExistingHostedFields()
-    {
-        $this->currencies = [['iso_code' => 'USD']];
-
-        $datas = new \stdClass();
-        $datas->action = 'payplug_save_data';
-        $datas->payplug_standard = 1;
-        $datas->payplug_identifier_usd = 'ident_42';
-
-        $this->configuration_class->shouldReceive('getValue')
-            ->with('hosted_fields')
-            ->andReturn(false);
-
-        $this->configuration_class->shouldReceive('set')
-            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
-            ->once()
-            ->andReturn(true);
-
-        $this->mockSuccessfulHostedFieldsSave();
-
-        $this->assertSame(
-            true,
-            $this->action->saveAction($datas)['success']
-        );
-    }
-
-    public function testWhenHostedFieldsCannotBeUpdated()
-    {
-        $this->currencies = [['iso_code' => 'USD']];
-
-        $datas = new \stdClass();
-        $datas->action = 'payplug_save_data';
-        $datas->payplug_standard = 1;
-        $datas->payplug_identifier_usd = 'ident_42';
-
-        $this->configuration_class->shouldReceive('getValue')
-            ->with('hosted_fields')
-            ->andReturn('{}');
-
-        $this->configuration_class->shouldReceive('set')
-            ->with('hosted_fields', \Mockery::any())
-            ->andReturn(false);
-
-        $this->assertSame(
-            [
-                'success' => false,
-                'data' => [
-                    'message' => 'An error has occurred while register payplug_identifier_usd',
-                ],
-            ],
-            $this->action->saveAction($datas)
-        );
     }
 
     private function mockSuccessfulHostedFieldsSave()
