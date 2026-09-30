@@ -21,6 +21,24 @@
 *}
 
 <form class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields">
+    {if isset($saved_aliases) && !empty($saved_aliases)}
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_container -savedAliases" id="hf-saved-aliases">
+        <div>{l s='hook.checkout.payment.hosted_fields.saved_aliases.label' mod='payplug'}</div>
+        {foreach from=$saved_aliases item=saved_alias name=hfaliases}
+        <label class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_alias">
+            <input type="radio" name="hf_payment_choice" class="hf-alias-radio" value="{$saved_alias.id_payplug_alias|escape:'htmlall':'UTF-8'}"{if $smarty.foreach.hfaliases.first} checked="checked"{/if} />
+            {$saved_alias.brand|escape:'htmlall':'UTF-8'} &bull;&bull;&bull;&bull; {$saved_alias.last4|escape:'htmlall':'UTF-8'}
+            ({$saved_alias.expiry_date|escape:'htmlall':'UTF-8'})
+        </label>
+        {/foreach}
+        <label class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_alias">
+            <input type="radio" name="hf_payment_choice" class="hf-alias-radio" id="hf-pay-new-card" value="" />
+            {l s='hook.checkout.payment.hosted_fields.pay_with_new_card' mod='payplug'}
+        </label>
+    </div>
+    {/if}
+
+    <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_newCard{if isset($saved_aliases) && !empty($saved_aliases)} -hide{/if}" id="hf-new-card-fields">
     <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_container -cardHolder">
         <input type="text" name="cardholder" id="hf-cardholder" placeholder="{$placeholderCardholder|escape:'htmlall':'UTF-8'}" autocomplete="cc-name" />
     </div>
@@ -57,10 +75,12 @@
     <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_container -saveCard">
         <label>
             <input type="checkbox" name="save_card" id="hf-save-card" />
+            <span></span>
             {l s='hook.checkout.payment.hosted_fields.save_card.label' mod='payplug'}
         </label>
     </div>
     {/if}
+    </div>
 
     <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_error -payment"></div>
 
