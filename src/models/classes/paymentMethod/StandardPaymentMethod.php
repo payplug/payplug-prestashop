@@ -596,8 +596,12 @@ class StandardPaymentMethod extends PaymentMethod
             return [];
         }
 
+        $this->setParameters();
+
+        // Retail API saved cards (one_click_*) are only offered for an EUR cart.
+        $is_eur_cart = isset($this->context->currency->iso_code) && 'EUR' === $this->context->currency->iso_code;
         $has_saved_card = false;
-        if (!empty($payment_options)) {
+        if ($is_eur_cart && !empty($payment_options)) {
             foreach ($payment_options as $key => $payment_option) {
                 if (!$has_saved_card && false !== strpos($key, 'one_click')) {
                     $has_saved_card = true;

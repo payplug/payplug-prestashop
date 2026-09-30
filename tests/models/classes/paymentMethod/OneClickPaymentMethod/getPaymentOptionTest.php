@@ -32,6 +32,44 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
         $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
+    /**
+     * @dataProvider nonEurCurrencyDataProvider
+     *
+     * @param mixed $iso_code
+     */
+    public function testWhenCartCurrencyIsNotEur($iso_code)
+    {
+        $payment_options = [
+            'standard' => ['name' => 'standard'],
+        ];
+        $this->context->currency->iso_code = $iso_code;
+        // V1 cards must not even be loaded.
+        $this->card->shouldReceive('renderList')
+            ->andThrow(new \RuntimeException('CardAction::renderList() must not be called'));
+
+        $this->assertSame($payment_options, $this->class->getPaymentOption($payment_options));
+    }
+
+    public function testWhenCartCurrencyIsMissing()
+    {
+        $payment_options = [];
+        $this->context->currency = null;
+        // V1 cards must not even be loaded.
+        $this->card->shouldReceive('renderList')
+            ->andThrow(new \RuntimeException('CardAction::renderList() must not be called'));
+
+        $this->assertSame([], $this->class->getPaymentOption($payment_options));
+    }
+
+    public function nonEurCurrencyDataProvider()
+    {
+        yield ['USD'];
+
+        yield ['GBP'];
+
+        yield [''];
+    }
+
     public function testWhenNoCustomerCardsFound()
     {
         $payment_options = [];

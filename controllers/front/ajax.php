@@ -73,21 +73,38 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             // todo: Create a ajaxDispatcher to avoid this "infinite" list of condition
             if ($tools->tool('getIsset', 'pc')) {
                 if (1 == (int) $tools->tool('getValue', 'delete')) {
-                    $cookie = $context->cookie;
-                    $id_customer = (int) $cookie->id_customer;
-                    if (0 == (int) $id_customer) {
-                        exit(false);
+                    // The card must belong to the customer of the context (checked by deleteAction()),
+                    // and the request must carry the customer static token (CSRF, see isValidToken()).
+                    $id_customer = isset($context->customer->id) ? (int) $context->customer->id : 0;
+                    if (0 == $id_customer || !$this->isValidToken()) {
+                        exit('');
                     }
                     $id_payplug_card = $tools->tool('getValue', 'pc');
                     $deleted = $this->dependencies
                         ->getPlugin()
                         ->getCardAction()
                         ->deleteAction((int) $id_customer, (int) $id_payplug_card);
-                    if ($deleted) {
-                        exit(true);
-                    }
 
-                    exit(false);
+                    // '1' / empty body, as strings: PHP 8.4 no longer prints a bool passed to exit().
+                    exit($deleted ? '1' : '');
+                }
+            } elseif ($tools->tool('getIsset', 'pa')) {
+                // Saved UHF alias (payplug_alias), distinct from the pc (payplug_card) block above.
+                // Same response body as the pc block ('1' / empty).
+                if (1 == (int) $tools->tool('getValue', 'delete')) {
+                    // Same ownership and token rules as the pc block: the customer of the context.
+                    $id_customer = isset($context->customer->id) ? (int) $context->customer->id : 0;
+                    if (0 == $id_customer || !$this->isValidToken()) {
+                        exit('');
+                    }
+                    $deleted = $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.action.alias')
+                        ->deleteAction($id_customer, (int) $tools->tool('getValue', 'pa'));
+
+                    exit($deleted ? '1' : '');
                 }
             } elseif ($tools->tool('getIsset', 'getOneyCta')) {
                 exit(json_encode([
@@ -339,5 +356,21 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
             'result' => true,
             'message' => 'No ajax call',
         ]));
+    }
+
+    /**
+     * @description
+     * Check the customer static token (Tools::getToken(false)) sent with a state-changing request,
+     * so a third-party page can't make a logged-in customer's browser trigger it (CSRF).
+     *
+     * @return bool
+     */
+    private function isValidToken()
+    {
+        $token = $this->tools_adapter->tool('getValue', 'token');
+
+        return is_string($token)
+            && '' !== $token
+            && $token === (string) $this->tools_adapter->tool('getToken', false);
     }
 }

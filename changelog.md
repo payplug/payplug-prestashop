@@ -2,7 +2,13 @@
 
 ## Unreleased
 - Feature :
-    - [PRE-3624](https://payplug-prod.atlassian.net/browse/PRE-3624): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
+  - [PRE-3624](https://payplug-prod.atlassian.net/browse/PRE-3624): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
+  - [PRE-3625](https://payplug-prod.atlassian.net/browse/PRE-3625): Let customers save a card and pay with it again through Unified Hosted Fields for non-EUR carts
+
+- Bugfix :
+    - [PRE-3557](https://payplug-prod.atlassian.net/browse/PRE-3557): Don't create an order (and send the confirmation email) until a card payment is confirmed paid, deferred or Oney; let late payment failures cancel the order instead of being silently dropped
+    - [PRE-3580](https://payplug-prod.atlassian.net/browse/PRE-3580): Stop answering 500 (retried in a loop by PayPlug) to a replayed IPN for a failed payment whose cart association was already replaced by a newer attempt
+
 ## Version 5.2.0
 - Feature :
   - [PRE-3601](https://github.com/payplug/payplug-prestashop/pull/119): Let the merchant narrow the Scalapay amount range from the back office, and hide Scalapay at checkout for carts outside it

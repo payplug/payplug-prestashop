@@ -146,6 +146,15 @@
 
         input {
           display: none;
+          &:checked {
+            & + span {
+              border-color: #2b343d;
+
+              &:before {
+                opacity: 1;
+              }
+            }
+          }
         }
 
         &:hover {
@@ -414,5 +423,33 @@
   &_schemes {
     width: 140px;
     height: 35px;
+  }
+
+  &_container.-savedAliases {
+    flex-direction: column;
+  }
+
+  &_alias {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    cursor: pointer;
+
+    input {
+      margin: 0;
+      width: auto;
+    }
+  }
+
+  &_newCard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+
+    &.-hide {
+      display: none;
+    }
   }
 }
