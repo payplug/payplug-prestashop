@@ -24,6 +24,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * @description Create the UPC operation, lock and alias tables
+ *
+ * @param mixed $object
+ */
 function upgrade_module_5_2_0($object)
 {
     $logger = $object->payplug_dependencies->getPlugin()->getLogger();
@@ -62,7 +67,27 @@ function upgrade_module_5_2_0($object)
         $flag_lock = false;
     }
 
-    $flag = $flag_operation && $flag_lock;
+    $sql_alias = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payplug_alias` (
+            `id_payplug_alias` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `id_customer` INT(11) UNSIGNED NOT NULL,
+            `alias_id` VARCHAR(255) NOT NULL,
+            `currency` VARCHAR(3) NOT NULL,
+            `identifier` VARCHAR(255) NOT NULL,
+            `brand` VARCHAR(50) DEFAULT NULL,
+            `last4` VARCHAR(4) DEFAULT NULL,
+            `exp_month` VARCHAR(2) DEFAULT NULL,
+            `exp_year` VARCHAR(4) DEFAULT NULL,
+            `date_add` DATETIME NULL,
+            CONSTRAINT payplug_alias_unique UNIQUE (alias_id),
+            KEY payplug_alias_id_customer (id_customer)) ENGINE=' . _MYSQL_ENGINE_;
+
+    try {
+        $flag_alias = Db::getInstance()->Execute($sql_alias);
+    } catch (PrestaShopDatabaseException $e) {
+        $flag_alias = false;
+    }
+
+    $flag = $flag_operation && $flag_lock && $flag_alias;
 
     // Empty means the merchant never narrowed the Scalapay range: the account's own
     // authorized amounts from GET /account apply as-is.
