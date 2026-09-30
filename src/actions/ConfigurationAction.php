@@ -1398,5 +1398,6 @@ class ConfigurationAction
             ->getInstanceByName($this->dependencies->name);
         $module->getService('payplug.models.repositories.operation');
         $module->getService('payplug.models.repositories.upc_lock');
+        $module->getService('payplug.models.repositories.alias');
     }
 }

@@ -119,7 +119,7 @@ class CardAction
      *
      * @param int $customer_id
      *
-     * @return bool
+     * @return bool true when the customer has no card left (including when they had none)
      */
     public function deleteByCustomerAction($customer_id = 0)
     {
@@ -144,12 +144,8 @@ class CardAction
             ->getAllByCustomer((int) $customer_id, (int) $id_company, (bool) $is_sandbox);
 
         if (empty($cards)) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('CardAction::deleteByCustomerAction - No card found for given customer.', 'error');
-
-            return false;
+            // Nothing left to delete (e.g. a customer with only UHF aliases): success.
+            return true;
         }
 
         foreach ($cards as $card) {

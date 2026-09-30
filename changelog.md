@@ -2,6 +2,7 @@
 ## Unreleased
 - Feature :
   - [PRE-3624](https://payplug-prod.atlassian.net/browse/PRE-3624): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
+  - [PRE-3625](https://payplug-prod.atlassian.net/browse/PRE-3625): Let customers save a card and pay with it again through Unified Hosted Fields for non-EUR carts
 
 ## Version 5.2.0
 - Feature :

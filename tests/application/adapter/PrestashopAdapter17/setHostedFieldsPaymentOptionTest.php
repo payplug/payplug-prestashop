@@ -97,6 +97,63 @@ class setHostedFieldsPaymentOptionTest extends BasePrestashopAdapter17
         );
     }
 
+    public function testAssignsTheSavedAliasesUsableForTheCartCurrencyAndIdentifier()
+    {
+        $aliases = [[
+            'id_payplug_alias' => 1,
+            'currency' => 'usd',
+            'brand' => 'visa',
+            'last4' => '0001',
+            'expiry_date' => '12 / 29',
+            'usable' => true,
+        ]];
+        $this->enableOneClick();
+        $this->alias_action->shouldReceive('renderCheckoutList')->once()->with('USD', 'ident_42')->andReturn($aliases);
+
+        $assigned_vars = null;
+        $this->context->smarty->shouldReceive('assign')
+            ->once()
+            ->andReturnUsing(function ($vars) use (&$assigned_vars) {
+                $assigned_vars = $vars;
+            });
+
+        $this->adapter->setHostedFieldsPaymentOption($this->payment_options);
+
+        $this->assertSame($aliases, $assigned_vars['saved_aliases']);
+    }
+
+    public function testAssignsNoSavedAliasesWithoutCallingTheAliasServiceWhenOneClickIsDisabled()
+    {
+        $this->alias_action->shouldReceive('renderCheckoutList')->never();
+
+        $assigned_vars = null;
+        $this->context->smarty->shouldReceive('assign')
+            ->once()
+            ->andReturnUsing(function ($vars) use (&$assigned_vars) {
+                $assigned_vars = $vars;
+            });
+
+        $this->adapter->setHostedFieldsPaymentOption($this->payment_options);
+
+        $this->assertSame([], $assigned_vars['saved_aliases']);
+        $this->assertFalse($assigned_vars['is_one_click_activated']);
+    }
+
+    public function testAssignsAnEmptySavedAliasListWhenTheCustomerHasNone()
+    {
+        $this->enableOneClick();
+        $assigned_vars = null;
+        $this->context->smarty->shouldReceive('assign')
+            ->once()
+            ->andReturnUsing(function ($vars) use (&$assigned_vars) {
+                $assigned_vars = $vars;
+            });
+
+        $this->adapter->setHostedFieldsPaymentOption($this->payment_options);
+
+        $this->assertSame([], $assigned_vars['saved_aliases']);
+    }
+
     public function testFetchesTheHostedFieldsAdditionalInformationTemplate()
     {
         $this->config_class->shouldReceive('fetchTemplate')
@@ -129,5 +186,12 @@ class setHostedFieldsPaymentOptionTest extends BasePrestashopAdapter17
             ],
             $result['standard']['inputs']['id_cart']
         );
+    }
+
+    private function enableOneClick()
+    {
+        $this->config_class->shouldReceive('getValue')
+            ->with('payment_methods')
+            ->andReturn(json_encode(['one_click' => true, 'deferred' => false]));
     }
 }
