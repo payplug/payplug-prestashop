@@ -1841,6 +1841,7 @@ var $document, $window, __moduleName__Module = {
                 fields: {
                     brand: {
                         id: "hosted-brand-container",
+                        version: 2,
                         useInlineSelection: true, // to use the new version of the brand selector component
                     },
                     card: {
