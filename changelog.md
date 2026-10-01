@@ -3,6 +3,7 @@
 ## Version 5.2.1
 - Bugfix :
   - [PRE-3598](https://payplug-prod.atlassian.net/browse/PRE-3598): Only start the integrated card payment from its own checkout form
+  - [PRE-3649](https://github.com/payplug/payplug-prestashop/pull/132): Hide the Apple Pay button on the product and cart pages when a product (or pack) can't be ordered regarding its stock or minimal quantity, and refuse the Apple Pay payment request in that case
 
 ## Version 5.2.0
 - Feature :

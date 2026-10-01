@@ -289,4 +289,20 @@ class CartAdapter implements CartInterface
 
         return $cart->isCarrierInRange($id_carrier, $id_zone);
     }
+
+    /**
+     * @description Check that every product of the cart can be ordered regarding its stock
+     *
+     * @param \Cart $cart
+     *
+     * @return bool
+     */
+    public function checkQuantities($cart)
+    {
+        if (!\Validate::isLoadedObject($cart)) {
+            return false;
+        }
+
+        return (bool) $cart->checkQuantities();
+    }
 }
