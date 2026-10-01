@@ -50,4 +50,6 @@ interface CartInterface
     public function isCarrierInRange($id_carrier, $id_zone);
 
     public function updateQty($id_cart, $quantity, $id_product, $id_product_attribute, $id_customization, $operator, $id_address_delivery);
+
+    public function checkQuantities($cart);
 }

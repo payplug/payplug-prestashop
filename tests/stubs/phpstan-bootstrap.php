@@ -274,6 +274,9 @@ namespace {
     {
         public static $method;
 
+        /** @var int */
+        public $minimal_quantity = 1;
+
         // Ajout de $id_shop et passage des arguments avec des valeurs par défaut pour être flexible
         public static function getIdProductAttributesByIdAttributes($id_product, $id_attributes, $id_shop = null)
         {
@@ -306,6 +309,56 @@ namespace {
             $use_group_reduction = true
         ) {
             return 0.0;
+        }
+
+        public static function isAvailableWhenOutOfStock($out_of_stock)
+        {
+            return true;
+        }
+
+        public static function getDefaultAttribute($id_product, $minimum_quantity = 0, $reset = false)
+        {
+            return 0;
+        }
+    }
+
+    class Combination extends ObjectModel
+    {
+        /** @var int */
+        public $minimal_quantity = 1;
+    }
+
+    class Pack extends Product
+    {
+        public static function isPack($id_product)
+        {
+            return false;
+        }
+
+        public static function isInStock($idProduct, $wantedQuantity = 1, $cart = null)
+        {
+            return true;
+        }
+    }
+
+    class StockAvailable extends ObjectModel
+    {
+        public static function outOfStock($id_product, $id_shop = null)
+        {
+            return 2;
+        }
+
+        public static function getQuantityAvailableByProduct($id_product = null, $id_product_attribute = null, $id_shop = null)
+        {
+            return 0;
+        }
+    }
+
+    class Validate
+    {
+        public static function isLoadedObject($object)
+        {
+            return true;
         }
     }
 
