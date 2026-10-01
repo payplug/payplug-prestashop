@@ -778,6 +778,11 @@ var $document, $window, __moduleName__Module = {
 
             const request = applepay.getRequestDatas();
 
+            // The payment request has been refused (e.g. a product can't be ordered regarding its stock)
+            if (!request || false === request.result) {
+                return applepay.error();
+            }
+
             // Define the default carrier
             if (typeof request.carriers != 'undefined' && request.carriers.length) {
                 applepay.props.carrier = request.carriers[0];
@@ -959,6 +964,9 @@ var $document, $window, __moduleName__Module = {
                 applepay.props.carrier = shippingMethod;
 
                 const request = applepay.getUpdatedRequest();
+                if (!request) {
+                    return applepay.abortSession();
+                }
                 const update = {
                     'newTotal': {
                         "label": request.total.label,
@@ -988,6 +996,9 @@ var $document, $window, __moduleName__Module = {
                 };
 
                 const request = applepay.getUpdatedRequest();
+                if (!request) {
+                    return applepay.abortSession();
+                }
                 const update = {
                     'newTotal': {
                         "label": request.total.label,
@@ -1067,6 +1078,16 @@ var $document, $window, __moduleName__Module = {
                     },
                 });
             },
+        },
+        abortSession: () => {
+            // The updated request has been refused (e.g. a product can't be ordered regarding its stock anymore)
+            const {applepay} = __moduleName__Module;
+            try {
+                applepay.props.session.abort();
+            } catch (err) {
+                console.log('abortSession: ', err);
+            }
+            applepay.sessionHandler.oncancel();
         },
         error: () => {
             let {applepay} = __moduleName__Module;

@@ -45,4 +45,8 @@ interface ProductInterface
     );
 
     public function hasAttributes($id_product);
+
+    public function isOrderableRegardingStock($id_product, $id_product_attribute);
+
+    public function getDefaultAttribute($id_product);
 }

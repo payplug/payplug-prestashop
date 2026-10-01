@@ -68,20 +68,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             ];
         }
 
-        // Retrieve the previous cart
-        if (isset($this->context->cookie->previous_cart_id) && $this->context->cookie->previous_cart_id) {
-            $this->context->cart = $this->dependencies
-                ->getPlugin()
-                ->getCart()
-                ->get((int) $this->context->cookie->previous_cart_id);
-            $this->context->cookie->id_cart = $this->context->cart->id;
-            $this->context->cookie->previous_cart_id = null;
-            $this->dependencies
-                ->getPlugin()
-                ->getCartRule()
-                ->autoAddToCart($this->context);
-            $this->context->cookie->write();
-        }
+        $this->restorePreviousCart();
 
         return [
             'result' => true,
@@ -460,6 +447,7 @@ class ApplepayPaymentMethod extends PaymentMethod
         $current_invoice_id = null;
         $delivery_options = null;
         $carrier = null;
+        $is_new_cart = false;
 
         // Reload cart to ensure to get any update
         $current_cart = $cart_adapter->get((int) $this->context->cart->id);
@@ -488,19 +476,44 @@ class ApplepayPaymentMethod extends PaymentMethod
                     ->getProductAdapter()
                     ->getIdProductAttributeByIdAttributes($id_product, $group) :
                 0;
-            $cart_adapter->updateQty(
+            $is_product_added = $cart_adapter->updateQty(
                 (int) $current_cart->id,
                 (int) $this->tools->tool('getValue', 'qty'),
                 (int) $id_product,
                 (int) $id_product_attribute,
                 (int) $this->tools->tool('getValue', 'id_customization')
             );
+
+            // Cart::updateQty returns false or -1 (minimal quantity not reached) on failure
+            if (true !== $is_product_added) {
+                $this->restorePreviousCart();
+
+                return [
+                    'result' => false,
+                    'message' => 'The product can not be added to the cart',
+                ];
+            }
+
             $current_address_delivery = (int) $current_cart->id_address_delivery;
             $cart_adapter->update($current_cart);
             $cart_adapter->updateAddressId((int) $current_cart->id, $current_address_delivery, (int) $this->context->cart->id_address_delivery);
 
             // Reload cart in context after update
             $this->context->cart = $cart_adapter->get((int) $current_cart->id);
+            $current_cart = $this->context->cart;
+            $is_new_cart = true;
+        }
+
+        // Refuse the request if one of the cart products can't be ordered regarding its stock
+        if (!$cart_adapter->checkQuantities($current_cart)) {
+            if ($is_new_cart) {
+                $this->restorePreviousCart();
+            }
+
+            return [
+                'result' => false,
+                'message' => 'The cart products can not be ordered regarding their stock',
+            ];
         }
 
         if ('checkout' != $workflow) {
@@ -661,6 +674,28 @@ class ApplepayPaymentMethod extends PaymentMethod
         }
 
         return $prepared_data;
+    }
+
+    /**
+     * @description Retrieve the previous cart saved in the cookie (if any) and set it back in the context
+     */
+    protected function restorePreviousCart()
+    {
+        if (!isset($this->context->cookie->previous_cart_id) || !$this->context->cookie->previous_cart_id) {
+            return;
+        }
+
+        $this->context->cart = $this->dependencies
+            ->getPlugin()
+            ->getCart()
+            ->get((int) $this->context->cookie->previous_cart_id);
+        $this->context->cookie->id_cart = $this->context->cart->id;
+        $this->context->cookie->previous_cart_id = null;
+        $this->dependencies
+            ->getPlugin()
+            ->getCartRule()
+            ->autoAddToCart($this->context);
+        $this->context->cookie->write();
     }
 
     /**
@@ -1121,6 +1156,9 @@ class ApplepayPaymentMethod extends PaymentMethod
 
         // then get the new amount for the request
         $request = $this->getRequest();
+        if (isset($request['result']) && false === $request['result']) {
+            return $request;
+        }
         $cart_data['amount'] = $this->dependencies
             ->getPlugin()
             ->getModule()

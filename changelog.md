@@ -8,6 +8,7 @@
   - [PRE-3601](https://github.com/payplug/payplug-prestashop/pull/119): Stop `FilesHelper::clean()` from deleting `upgrade/upgrade-5.1.0.php`, which was missing from the module file list
   - [PRE-3598](https://github.com/payplug/payplug-prestashop/pull/125): Only start the integrated card payment from its own checkout form
   - [PRE-3599](https://github.com/payplug/payplug-prestashop/pull/131): Fix duplicate customer/address with applepay express
+  - [PRE-3649](https://github.com/payplug/payplug-prestashop/pull/132): Hide the Apple Pay button on the product and cart pages when a product (or pack) can't be ordered regarding its stock or minimal quantity, and refuse the Apple Pay payment request in that case
 
 ## Version 5.1.0
 - Feature :
