@@ -139,9 +139,14 @@ class OrderStateRepository extends BaseClass
             if ($id_order_state) {
                 // Valide order state
                 $os = $this->order_state_adapter->get((int) $id_order_state);
-                if ($this->validate->validate('isLoadedObject', $os) && (!isset($os->deleted) || !$os->deleted)) {
+                if ($this->validate->validate('isLoadedObject', $os)
+                    && (!isset($os->deleted) || !$os->deleted)
+                    && $this->isNativeOrOwnOrderState($os)) {
                     return $this->configuration->set($key_config, (string) $os->id);
                 }
+
+                // Unusable state: fall back on the template / name lookup below
+                $id_order_state = 0;
             }
         }
 
@@ -185,6 +190,25 @@ class OrderStateRepository extends BaseClass
         }
 
         return $this->configuration->set($key_config, (string) $id_order_state);
+    }
+
+    /**
+     * @description Check that an order state is a native PrestaShop one or belongs to the current module,
+     * so a state owned by another module is never reused
+     *
+     * @param object $order_state
+     *
+     * @return bool
+     */
+    public function isNativeOrOwnOrderState($order_state = null)
+    {
+        if (!is_object($order_state)) {
+            return false;
+        }
+
+        $module_name = isset($order_state->module_name) ? (string) $order_state->module_name : '';
+
+        return '' === $module_name || $module_name === $this->dependencies->name;
     }
 
     public function getConfigKey($name = false, $sandbox = false)
