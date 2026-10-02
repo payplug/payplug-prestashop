@@ -37,5 +37,7 @@ interface AddressInterface
 
     public function delete($address);
 
+    public function isUsed($address);
+
     public function getFirstCustomerAddressId($id_customer);
 }
