@@ -985,15 +985,18 @@ class ApplepayPaymentMethod extends PaymentMethod
         if (!$tmp_address_id) {
             return [
                 'result' => false,
-                'message' => 'Given carrier is not available for this delivery address',
+                'message' => 'The delivery address can\'t be saved',
             ];
         }
-        $id_zone = $address_adapter->getZoneById($tmp_address_id);
 
-        // delete the temporary address
-        $tmp_address = $address_adapter->get($tmp_address_id);
-        if (is_object($tmp_address) && (int) $tmp_address->id === $tmp_address_id && !$tmp_address->id_customer) {
-            $address_adapter->delete($tmp_address);
+        try {
+            $id_zone = $address_adapter->getZoneById($tmp_address_id);
+        } finally {
+            // delete the temporary address, even if the zone lookup fails
+            $tmp_address = $address_adapter->get($tmp_address_id);
+            if (is_object($tmp_address) && (int) $tmp_address->id === $tmp_address_id && !$tmp_address->id_customer) {
+                $address_adapter->delete($tmp_address);
+            }
         }
 
         $carrier_object = $this->dependencies
@@ -1088,7 +1091,7 @@ class ApplepayPaymentMethod extends PaymentMethod
             $shipping_address_id = $this->dependencies
                 ->getPlugin()
                 ->getAddressClass()
-                ->checkAndSaveAddress($user_shipping_address, (int) $customer->id, $customer_addresses);
+                ->checkAndSaveAddress($user_shipping_address, (int) $customer->id, $customer_addresses, true);
 
             // Check if shipping address is different than billing address (billing address has no phone)
             $shipping_address_for_comparison = array_diff_key($user_shipping_address, ['phone_mobile' => null]);
@@ -1100,7 +1103,8 @@ class ApplepayPaymentMethod extends PaymentMethod
                     ->checkAndSaveAddress(
                         $user_billing_address,
                         (int) $customer->id,
-                        $customer_addresses
+                        $customer_addresses,
+                        true
                     );
             } else {
                 // Use the same address for billing

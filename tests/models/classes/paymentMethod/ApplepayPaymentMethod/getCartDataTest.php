@@ -186,8 +186,36 @@ class getCartDataTest extends BaseApplepayPaymentMethod
 
         $this->assertSame([
             'result' => false,
-            'message' => 'Given carrier is not available for this delivery address',
+            'message' => 'The delivery address can\'t be saved',
         ], $this->callGetCartData());
+    }
+
+    public function testWhenZoneLookupThrowsTheTemporaryAddressIsStillDeleted()
+    {
+        $this->address_class->shouldReceive('checkAndSaveAddress')
+            ->once()
+            ->with($this->getExpectedShippingAddress())
+            ->andReturn($this->tmp_address_id);
+        $this->address_adapter->shouldReceive('getZoneById')
+            ->once()
+            ->with($this->tmp_address_id)
+            ->andThrow(new \RuntimeException('zone lookup failed'));
+        $this->address_adapter->shouldReceive('get')
+            ->once()
+            ->with($this->tmp_address_id)
+            ->andReturn($this->tmp_address);
+        $this->address_adapter->shouldReceive('delete')
+            ->once()
+            ->with($this->tmp_address)
+            ->andReturn(true);
+        $this->cart_adapter->shouldNotReceive('isCarrierInRange');
+        $this->customer_adapter->shouldNotReceive('add');
+        $this->cart_adapter->shouldNotReceive('updateAddresses');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('zone lookup failed');
+
+        $this->callGetCartData();
     }
 
     public function testWhenTemporaryAddressIsLinkedToACustomerItIsNotDeleted()
@@ -240,7 +268,7 @@ class getCartDataTest extends BaseApplepayPaymentMethod
             ->once()
             ->with(\Mockery::on(function ($address) {
                 return '+33612345678' === $address['phone_mobile'];
-            }), $guest_id, $guest_addresses)
+            }), $guest_id, $guest_addresses, true)
             ->andReturn(7);
         $this->cart_adapter->shouldReceive('updateAddresses')
             ->once()
@@ -279,7 +307,7 @@ class getCartDataTest extends BaseApplepayPaymentMethod
         // billing address differs from the shipping one: both are checked
         $this->address_class->shouldReceive('checkAndSaveAddress')
             ->twice()
-            ->with(\Mockery::type('array'), $guest_id, $guest_addresses)
+            ->with(\Mockery::type('array'), $guest_id, $guest_addresses, true)
             ->andReturn(7, 8);
         $this->cart_adapter->shouldReceive('updateAddresses')
             ->once()
@@ -319,7 +347,7 @@ class getCartDataTest extends BaseApplepayPaymentMethod
         // identical billing address: the shipping address is reused for billing
         $this->address_class->shouldReceive('checkAndSaveAddress')
             ->once()
-            ->with(\Mockery::type('array'), 43, [])
+            ->with(\Mockery::type('array'), 43, [], true)
             ->andReturn(9);
         $this->cart_adapter->shouldReceive('updateAddresses')
             ->once()
@@ -331,6 +359,42 @@ class getCartDataTest extends BaseApplepayPaymentMethod
         $this->assertTrue($new_guest->is_guest);
         $this->assertSame('guest@payplug.com', $new_guest->email);
         $this->assertSame(43, $this->cart->id_customer);
+    }
+
+    public function testWhenCustomerIsLoggedThePhoneIsNotCompleted()
+    {
+        $this->setAvailableCarrier();
+
+        $customer_addresses = [
+            [
+                'id_address' => 11,
+            ],
+        ];
+        $this->context->customer = \Mockery::mock('Customer');
+        $this->context->customer->id = 5;
+        $this->context->customer->shouldReceive([
+            'isLogged' => true,
+        ]);
+
+        $this->customer_adapter->shouldNotReceive('getGuestIdByEmail');
+        $this->customer_adapter->shouldNotReceive('add');
+        $this->customer_adapter->shouldReceive('getAddresses')
+            ->once()
+            ->with(5, 1)
+            ->andReturn($customer_addresses);
+
+        // registered customer flow: called with 3 arguments, so without the phone completion
+        $this->address_class->shouldReceive('checkAndSaveAddress')
+            ->once()
+            ->with(\Mockery::type('array'), 5, $customer_addresses)
+            ->andReturn(11);
+        $this->cart_adapter->shouldReceive('updateAddresses')
+            ->once()
+            ->with($this->cart, 11, 11);
+
+        $result = $this->callGetCartData();
+
+        $this->assertTrue($result['result']);
     }
 
     public function testWhenNewGuestCantBeCreated()

@@ -71,6 +71,21 @@ class checkAndSaveAddressTest extends BaseAddress
     }
 
     /**
+     * @description  test with invalid bool provider
+     * @dataProvider invalidBoolFormatDataProvider
+     *
+     * @param mixed $complete_phone_mobile
+     */
+    public function testWithInvalidCompletePhoneMobile($complete_phone_mobile)
+    {
+        $this->address_adapter->shouldNotReceive('saveAddress');
+
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, [], $complete_phone_mobile);
+
+        $this->assertEquals(0, $result);
+    }
+
+    /**
      * @description  test when address provided
      * does not exist in DB
      */
@@ -201,11 +216,32 @@ class checkAndSaveAddressTest extends BaseAddress
             ->with($loaded_address)
             ->andReturn(true);
 
-        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses, true);
 
         $this->assertEquals(7, $result);
         $this->assertSame('+33612345678', $loaded_address->phone_mobile);
         $this->address_adapter->mockery_verify();
+    }
+
+    /**
+     * @description  test when the matching address has no mobile phone
+     * and a mobile phone is given without asking for the completion (default, non guest flow):
+     * the existing address is kept unchanged
+     */
+    public function testCheckAndSaveAddressDoesNotCompleteExistingAddressByDefault()
+    {
+        $existing_addresses = [
+            $this->getExistingAddress(['id_address' => 7, 'phone_mobile' => '']),
+        ];
+        $this->user_address['phone_mobile'] = '+33612345678';
+
+        $this->address_adapter->shouldNotReceive('get');
+        $this->address_adapter->shouldNotReceive('isUsed');
+        $this->address_adapter->shouldNotReceive('saveAddress');
+
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses);
+
+        $this->assertEquals(7, $result);
     }
 
     /**
@@ -233,7 +269,7 @@ class checkAndSaveAddressTest extends BaseAddress
             ->andReturn(2);
         $this->address_adapter->shouldNotReceive('saveAddress');
 
-        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses, true);
 
         $this->assertEquals(7, $result);
         $this->assertSame('', $loaded_address->phone_mobile);
@@ -259,7 +295,7 @@ class checkAndSaveAddressTest extends BaseAddress
             ->andReturn($not_loaded_address);
         $this->address_adapter->shouldNotReceive('saveAddress');
 
-        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses, true);
 
         $this->assertEquals(7, $result);
     }
@@ -276,7 +312,7 @@ class checkAndSaveAddressTest extends BaseAddress
 
         $this->address_adapter->shouldNotReceive('saveAddress');
 
-        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses, true);
 
         $this->assertEquals(7, $result);
     }
@@ -294,7 +330,7 @@ class checkAndSaveAddressTest extends BaseAddress
 
         $this->address_adapter->shouldNotReceive('saveAddress');
 
-        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses, true);
 
         $this->assertEquals(7, $result);
     }
@@ -312,7 +348,7 @@ class checkAndSaveAddressTest extends BaseAddress
 
         $this->address_adapter->shouldNotReceive('saveAddress');
 
-        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses, true);
 
         $this->assertEquals(7, $result);
     }
@@ -330,7 +366,7 @@ class checkAndSaveAddressTest extends BaseAddress
 
         $this->address_adapter->shouldNotReceive('saveAddress');
 
-        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses);
+        $result = $this->class->checkAndSaveAddress($this->user_address, 123, $existing_addresses, true);
 
         $this->assertEquals(7, $result);
     }

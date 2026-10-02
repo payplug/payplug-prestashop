@@ -44,10 +44,11 @@ class Address
      * @param array $user_address
      * @param int $customer_id
      * @param array $customer_addresses
+     * @param bool $complete_phone_mobile complete a matching address which has no mobile phone (guest flow only)
      *
      * @return mixed|null
      */
-    public function checkAndSaveAddress($user_address = [], $customer_id = 0, $customer_addresses = [])
+    public function checkAndSaveAddress($user_address = [], $customer_id = 0, $customer_addresses = [], $complete_phone_mobile = false)
     {
         if (!is_array($user_address) || empty($user_address)) {
             return 0;
@@ -58,6 +59,10 @@ class Address
         }
 
         if (!is_int($customer_id)) {
+            return 0;
+        }
+
+        if (!is_bool($complete_phone_mobile)) {
             return 0;
         }
         $this->setParameters();
@@ -102,10 +107,10 @@ class Address
         }
 
         // Complete the existing address with the given mobile phone if it has none
-        // (an existing phone is never overwritten)
+        // (an existing phone is never overwritten, guest flow only)
         if ($existing_address_id) {
             $user_phone_mobile = isset($user_address['phone_mobile']) ? trim((string) $user_address['phone_mobile']) : '';
-            if ('' === $existing_phone_mobile && '' !== $user_phone_mobile) {
+            if ($complete_phone_mobile && '' === $existing_phone_mobile && '' !== $user_phone_mobile) {
                 $this->updateAddressPhoneMobile((int) $existing_address_id, $user_phone_mobile);
             }
 
