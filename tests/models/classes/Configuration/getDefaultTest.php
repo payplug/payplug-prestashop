@@ -33,4 +33,13 @@ class getDefaultTest extends BaseConfiguration
             (int) $this->class->getDefault($key)
         );
     }
+
+    public function testWhenHostedFieldsDefaultConfigurationIsReturned()
+    {
+        $key = 'hosted_fields';
+        $this->assertSame(
+            '{}',
+            $this->class->getDefault($key)
+        );
+    }
 }

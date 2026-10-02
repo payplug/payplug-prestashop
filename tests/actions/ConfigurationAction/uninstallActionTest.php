@@ -33,6 +33,23 @@ class uninstallActionTest extends BaseConfigurationAction
 
         $this->entity_repository = \Mockery::mock('EntityRepository');
 
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.operation')
+            ->andReturn(\Mockery::mock('OperationRepository'));
+
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.upc_lock')
+            ->andReturn(\Mockery::mock('UpcLockRepository'));
+
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.alias')
+            ->andReturn(\Mockery::mock('AliasRepository'))
+            ->byDefault();
+
+        $this->module->shouldReceive('getService')
+            ->with('payplug.models.repositories.upc_refund')
+            ->andReturn(\Mockery::mock('UpcRefundRepository'));
+
         $this->plugin->shouldReceive([
             'getCardAction' => $this->card_action,
             'getConstant' => $this->constant,
@@ -137,6 +154,31 @@ class uninstallActionTest extends BaseConfigurationAction
             [
                 'result' => true,
                 'message' => 'Uninstall successful',
+            ],
+            $this->action->uninstallAction()
+        );
+    }
+
+    public function testLoadsTheAliasRepositoryBeforeDroppingTables()
+    {
+        $this->card_action->shouldReceive([
+            'uninstallAction' => true,
+        ]);
+        $this->configuration_class->shouldReceive([
+            'deleteAll' => true,
+        ]);
+        $this->module->shouldReceive('getService')
+            ->once()
+            ->with('payplug.models.repositories.alias')
+            ->andReturn(\Mockery::mock('AliasRepository'));
+        $this->entity_repository->shouldReceive([
+            'uninstall' => false,
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Uninstall failed: Drop module table.',
             ],
             $this->action->uninstallAction()
         );

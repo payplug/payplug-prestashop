@@ -164,7 +164,8 @@ var $document, $window, __moduleName__Module = {
                     id_customer: $('input:hidden[name=id_customer]').val(),
                     resource_id: $('input:hidden[name=resource_id]').val(),
                     id_order: $('input:hidden[name=id_order]').val(),
-                    pay_mode: $('input:hidden[name=pay_mode]').val()
+                    pay_mode: $('input:hidden[name=pay_mode]').val(),
+                    payment_type: $('input:hidden[name=payment_type]').val() || ''
                 };
 
             $('#pppanel form p.pperror').hide();

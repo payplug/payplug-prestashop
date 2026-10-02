@@ -155,6 +155,16 @@ namespace {
         {
             return [];
         }
+
+        public function execute($s, $use_cache = true)
+        {
+            return true;
+        }
+
+        public function Affected_Rows()
+        {
+            return 0;
+        }
     }
 
     class Module extends ObjectModel
@@ -205,6 +215,11 @@ namespace {
         {
             return 1;
         }
+
+        public static function findAll($active = true, $groupBy = false, $currentShopOnly = true)
+        {
+            return [];
+        }
     }
     class Translate
     {
@@ -242,6 +257,20 @@ namespace {
     }
     class PrestaShopException extends Exception
     {
+    }
+    class PrestaShopLogger
+    {
+        public static function addLog(
+            $message,
+            $severity = 1,
+            $error_code = null,
+            $object_type = null,
+            $object_id = null,
+            $allow_duplicate = false,
+            $id_employee = null
+        ) {
+            return true;
+        }
     }
     class CartRule extends ObjectModel
     {
