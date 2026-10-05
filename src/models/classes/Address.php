@@ -44,10 +44,11 @@ class Address
      * @param array $user_address
      * @param int $customer_id
      * @param array $customer_addresses
+     * @param bool $complete_phone_mobile complete a matching address which has no mobile phone (guest flow only)
      *
      * @return mixed|null
      */
-    public function checkAndSaveAddress($user_address = [], $customer_id = 0, $customer_addresses = [])
+    public function checkAndSaveAddress($user_address = [], $customer_id = 0, $customer_addresses = [], $complete_phone_mobile = false)
     {
         if (!is_array($user_address) || empty($user_address)) {
             return 0;
@@ -60,8 +61,13 @@ class Address
         if (!is_int($customer_id)) {
             return 0;
         }
+
+        if (!is_bool($complete_phone_mobile)) {
+            return 0;
+        }
         $this->setParameters();
         $existing_address_id = 0;
+        $existing_phone_mobile = '';
 
         $user_address_hash = hash('sha256', json_encode([
             'firstname' => $user_address['firstname'],
@@ -93,31 +99,73 @@ class Address
                 // If the address exists, set the existing address ID
                 if ($customer_address_hash === $user_address_hash) {
                     $existing_address_id = $address['id_address'];
+                    $existing_phone_mobile = isset($address['phone_mobile']) ? trim((string) $address['phone_mobile']) : '';
 
                     break;
                 }
             }
         }
 
-        // Save the address if it doesn't exist
-        if (!$existing_address_id) {
-            $address = $this->address_adapter->get();
-            $address->firstname = $user_address['firstname'];
-            $address->lastname = $user_address['lastname'];
-            $address->id_country = $user_address['id_country'];
-            $address->address1 = $user_address['address1'];
-            $address->address2 = isset($user_address['address2']) ? $user_address['address2'] : '';
-            $address->postcode = $user_address['postcode'];
-            $address->city = $user_address['city'];
-            $address->phone_mobile = isset($user_address['phone_mobile']) ? $user_address['phone_mobile'] : '';
-            // Hash-based alias gives each distinct Apple Pay address a unique alias,
-            $address->alias = 'Apple Pay - ' . substr($user_address_hash, 0, 8);
-            $address->id_customer = $customer_id;
-            $this->address_adapter->saveAddress($address);
-            $existing_address_id = $address->id;
+        // Complete the existing address with the given mobile phone if it has none
+        // (an existing phone is never overwritten, guest flow only)
+        if ($existing_address_id) {
+            $user_phone_mobile = isset($user_address['phone_mobile']) ? trim((string) $user_address['phone_mobile']) : '';
+            if ($complete_phone_mobile && '' === $existing_phone_mobile && '' !== $user_phone_mobile) {
+                $this->updateAddressPhoneMobile((int) $existing_address_id, $user_phone_mobile);
+            }
+
+            return $existing_address_id;
         }
 
-        return $existing_address_id;
+        // Save the address as it doesn't exist
+        $address = $this->address_adapter->get();
+        $address->firstname = $user_address['firstname'];
+        $address->lastname = $user_address['lastname'];
+        $address->id_country = $user_address['id_country'];
+        $address->address1 = $user_address['address1'];
+        $address->address2 = isset($user_address['address2']) ? $user_address['address2'] : '';
+        $address->postcode = $user_address['postcode'];
+        $address->city = $user_address['city'];
+        $address->phone_mobile = isset($user_address['phone_mobile']) ? $user_address['phone_mobile'] : '';
+        // Hash-based alias gives each distinct Apple Pay address a unique alias,
+        $address->alias = 'Apple Pay - ' . substr($user_address_hash, 0, 8);
+        $address->id_customer = $customer_id;
+        $this->address_adapter->saveAddress($address);
+
+        return $address->id;
+    }
+
+    /**
+     * @description Set the mobile phone of an existing address
+     *
+     * @param int $id_address
+     * @param string $phone_mobile
+     *
+     * @return bool
+     */
+    protected function updateAddressPhoneMobile($id_address = 0, $phone_mobile = '')
+    {
+        if (!is_int($id_address) || !$id_address) {
+            return false;
+        }
+        if (!is_string($phone_mobile) || '' === $phone_mobile) {
+            return false;
+        }
+
+        $address = $this->address_adapter->get($id_address);
+        // Do not save an address that couldn't be loaded, it would create a new one
+        if (!is_object($address) || (int) $address->id !== $id_address) {
+            return false;
+        }
+
+        // Keep an address already used by an order unchanged, otherwise past orders would show the new phone
+        if ($this->address_adapter->isUsed($address)) {
+            return false;
+        }
+
+        $address->phone_mobile = $phone_mobile;
+
+        return (bool) $this->address_adapter->saveAddress($address);
     }
 
     /**
