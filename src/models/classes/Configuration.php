@@ -450,7 +450,9 @@ class Configuration
             'type' => 'refund',
         ],
         'partial_refund' => [
-            'cfg' => 'PS_CHECKOUT_STATE_PARTIALLY_REFUNDED',
+            // PrestaShop has no native partial refund state: never borrow another module's one
+            // (e.g. PS_CHECKOUT_STATE_PARTIALLY_REFUNDED), Payplug creates its own.
+            'cfg' => null,
             'template' => null,
             'logable' => false,
             'send_email' => false,
