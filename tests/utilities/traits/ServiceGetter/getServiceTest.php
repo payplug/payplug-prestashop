@@ -53,18 +53,18 @@ class getServiceTest extends TestCase
     {
         $service = new \stdClass();
         $this->module_adapter->shouldReceive('getInstanceByName')->once()->with('payplug')->andReturn($this->module);
-        $this->module->shouldReceive('getService')->once()->with('payplug.models.repositories.unified_operation')->andReturn($service);
+        $this->module->shouldReceive('getService')->once()->with('payplug.models.repositories.operation')->andReturn($service);
 
-        $this->assertSame($service, $this->user_of_trait->callGetService('payplug.models.repositories.unified_operation'));
+        $this->assertSame($service, $this->user_of_trait->callGetService('payplug.models.repositories.operation'));
     }
 
     public function testUsesTheCurrentModuleName()
     {
         $this->dependencies->name = 'pspaylater';
         $this->module_adapter->shouldReceive('getInstanceByName')->once()->with('pspaylater')->andReturn($this->module);
-        $this->module->shouldReceive('getService')->once()->with('payplug.action.unified_payment')->andReturn('service');
+        $this->module->shouldReceive('getService')->once()->with('payplug.action.operation')->andReturn('service');
 
-        $this->assertSame('service', $this->user_of_trait->callGetService('payplug.action.unified_payment'));
+        $this->assertSame('service', $this->user_of_trait->callGetService('payplug.action.operation'));
     }
 
     public function testLetsTheContainerExceptionPropagateForAnUnregisteredService()
