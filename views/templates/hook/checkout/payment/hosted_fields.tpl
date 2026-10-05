@@ -84,12 +84,6 @@
 
     <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_error -payment"></div>
 
-{*    {if isset($is_deferred_activated) && $is_deferred_activated }*}
-{*        <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_container -deferred">*}
-{*            {l s='hook.HostedFields.deferred' mod='payplug'}*}
-{*        </div>*}
-{*    {/if}*}
-
     <div class="{$module_name|escape:'htmlall':'UTF-8'}HostedFields_privacy_policy">
         <img class="-lock" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/integrated/lock.svg"/>
         <span>{$secure|escape:'htmlall':'UTF-8'}</span>
@@ -112,24 +106,18 @@
     // a hardcoded PHP constant - never use nofilter for dynamic/user-controlled data.
     window['payplug_hosted_fields_accepted_brands'] = {/literal}{$hosted_fields_accepted_brands nofilter}{literal};
     window['payplug_hosted_fields_uhf_url'] = '{/literal}{$hosted_fields_uhf_url|escape:'javascript':'UTF-8'}{literal}';
-    window['payplug_hosted_fields_error_generic'] = '{/literal}{l s='hook.checkout.payment.hosted_fields.payment.error' mod='payplug' js=1}{literal}';
-    window['payplug_hosted_fields_error_unsupported_brand'] = '{/literal}{l s='hook.checkout.payment.hosted_fields.payment.error.unsupported_brand' mod='payplug' js=1}{literal}';
+    window['payplug_hosted_fields_error_generic'] = '{/literal}{l s='hook.checkout.payment.hosted_fields.payment.error' js=1 mod='payplug'}{literal}';
+    window['payplug_hosted_fields_error_unsupported_brand'] = '{/literal}{l s='hook.checkout.payment.hosted_fields.payment.error.unsupported_brand' js=1 mod='payplug'}{literal}';
 
     var loadHostedFields = function() {
         if (typeof window['payplug_utilities'] != 'undefined') {
             window['payplug_utilities'].loadScript('{/literal}{$hosted_fields_js_url|escape:'javascript':'UTF-8'}{literal}', function() {
                 if (typeof window['payplugModule'] != 'undefined' && typeof window['payplugModule'].hosted_fields != 'undefined') {
                     window['payplugModule'].hosted_fields.init();
-                } else {
-                    console.log('Type of payplugModule : ' + typeof window['payplugModule']);
                 }
             }, function() {
-                // loadScript()'s onerror fires for a network failure, a 404, or (the case
-                // this complements) an empty src - i.e. HOSTED_FIELDS_URL unset server-side
-                // (see Routes::getHostedFieldsUrl(), which logs that misconfiguration for
-                // ops). Without this, the form was left silently broken for the customer.
-                // Same generic-error convention as every other failure path in this
-                // sub-module (see dev/js/front.js, __moduleName__Module.hosted_fields).
+                // The SDK script failed to load (network failure, 404, blocked CDN): show the
+                // generic payment error instead of leaving an unusable form.
                 console.error('[HostedFields] Failed to load hosted fields SDK script');
                 if (typeof $ != 'undefined') {
                     $('.{/literal}{$module_name|escape:'javascript':'UTF-8'}{literal}HostedFields_error.-payment')
@@ -137,8 +125,6 @@
                         .addClass('-show');
                 }
             });
-        } else {
-            console.log('Type of payplug_utilities : ' + typeof window['payplug_utilities']);
         }
     }
     if (typeof window['payplug_utilities'] != 'undefined' && typeof window['payplugModule'] != 'undefined') {

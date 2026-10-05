@@ -3,6 +3,7 @@
 namespace PayPlug\tests\actions;
 
 use PayPlug\src\actions\UnifiedOrderAction;
+use PayPlug\src\utilities\helpers\AmountHelper;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PHPUnit\Framework\TestCase;
 
@@ -45,6 +46,7 @@ class UnifiedOrderActionTest extends TestCase
         $this->assertTrue($result['result']);
         $this->assertStringContainsString('key=order_secure_key', $result['redirect_url']);
         $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+        $this->assertTrue($result['outcome_applied']);
     }
 
     public function testCreateFromOutcomeAbandonsTheOrderWhenOutcomeIsFailedAndOrderAlreadyExists()
@@ -135,6 +137,7 @@ class UnifiedOrderActionTest extends TestCase
 
         $this->assertTrue($result['result']);
         $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+        $this->assertFalse($result['outcome_applied']);
     }
 
     /**
@@ -163,6 +166,32 @@ class UnifiedOrderActionTest extends TestCase
 
         $this->assertFalse($result['result']);
         $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertFalse($result['outcome_applied']);
+    }
+
+    public function testReportsTheOutcomeAsNotAppliedWhenTheStateMutationRaisesAnError()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForExistingOrder();
+
+        $factory = \Mockery::mock('Factory');
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+        $logger = \Mockery::mock('Logger');
+
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->andReturn($factory);
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('save')->once();
+        $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $state_mutator->shouldReceive('apply')->once()->andThrow(new \TypeError('bad state'));
+        $factory->shouldReceive('createLogger')->andReturn($logger);
+        $logger->shouldReceive('error')->once()->with(\Mockery::pattern('/bad state/'));
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
+
+        $this->assertTrue($result['result']);
+        $this->assertFalse($result['outcome_applied']);
     }
 
     public function testExistingOrderRedirectReturnsConfirmationUrlWhenOrderAlreadyExists()
@@ -267,6 +296,20 @@ class UnifiedOrderActionTest extends TestCase
         $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
     }
 
+    public function testReturnsErrorUrlWhenValidateOrderRaisesAnError()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
+
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0);
+        $mocks['module']->shouldReceive('validateOrder')->once()->andThrow(new \TypeError('bad argument'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/bad argument/'));
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
+
+        $this->assertFalse($result['result']);
+        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+    }
+
     public function testReturnsErrorUrlWhenNewOrderIdCannotBeResolved()
     {
         [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
@@ -341,13 +384,14 @@ class UnifiedOrderActionTest extends TestCase
         $mocks['factory']->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once();
         $mocks['factory']->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
-        $state_mutator->shouldReceive('apply')->once()->andThrow(new \Exception('state mutation failed'));
+        $state_mutator->shouldReceive('apply')->once()->andThrow(new \RuntimeException('state mutation failed'));
         $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/state mutation failed/'));
 
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
 
         $this->assertTrue($result['result']);
         $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+        $this->assertFalse($result['outcome_applied']);
     }
 
     public function testCreatesTheOrderAndPersistsTheOperationOnSuccess()
@@ -380,6 +424,23 @@ class UnifiedOrderActionTest extends TestCase
 
         $this->assertTrue($result['result']);
         $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+    }
+
+    public function testValidatesTheOrderWithTheAmountOfAZeroDecimalCurrencyUnscaled()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
+
+        $dependencies->shouldReceive('getHelpers')->andReturn(['amount' => new AmountHelper($dependencies)]);
+        $mocks['currency_adapter']->shouldReceive('getCurrency')->with(2)->andReturn((object) ['iso_code' => 'JPY']);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 0);
+        $validated_amount = null;
+        $mocks['module']->shouldReceive('validateOrder')->once()->andReturnUsing(function ($id_cart, $state, $amount) use (&$validated_amount) {
+            $validated_amount = $amount;
+        });
+
+        $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
+
+        $this->assertSame(1234.0, $validated_amount);
     }
 
     public function testPersistsThePendingAliasOnPaidOutcomeWhenCreatingTheOrder()
@@ -719,8 +780,11 @@ class UnifiedOrderActionTest extends TestCase
 
         $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
         $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
-        $dependencies->shouldReceive('getHelpers')->andReturn(['amount' => $amount_helper]);
+        $dependencies->shouldReceive('getHelpers')->andReturn(['amount' => $amount_helper])->byDefault();
 
+        $currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $plugin->shouldReceive('getCurrency')->andReturn($currency_adapter)->byDefault();
+        $currency_adapter->shouldReceive('getCurrency')->with(2)->andReturn((object) ['iso_code' => 'USD'])->byDefault();
         $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
         $plugin->shouldReceive('getCart')->andReturn($cart_adapter);
         $plugin->shouldReceive('getConfigurationClass')->andReturn($configuration_class);
@@ -733,7 +797,7 @@ class UnifiedOrderActionTest extends TestCase
         $configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn(0);
         $order_class->shouldReceive('getOrderStates')->with(true)->andReturn(['pending' => 5]);
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
-        $amount_helper->shouldReceive('convertAmount')->with(1234, true)->andReturn(12.34);
+        $amount_helper->shouldReceive('convertAmount')->with(1234, true, 'USD')->andReturn(12.34);
 
         // Shared factory/logger (used by the validateOrder()-throws logging path, and reused as-is
         // by tests exercising persistAndApplyOutcome() further down the happy path) - a single
@@ -750,6 +814,7 @@ class UnifiedOrderActionTest extends TestCase
             'module' => $module,
             'factory' => $factory,
             'logger' => $logger,
+            'currency_adapter' => $currency_adapter,
         ]];
     }
 

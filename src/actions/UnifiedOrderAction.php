@@ -65,7 +65,7 @@ class UnifiedOrderAction
      * @param array{alias_id: string, brand: string}|null $pending_alias alias created by this operation, persisted on PAID
      * @param array{last4?: string|null, exp_month?: string|null, exp_year?: string|null} $card_details
      *
-     * @return array{result: bool, redirect_url: string, persisted?: bool}
+     * @return array{result: bool, redirect_url: string, persisted?: bool, outcome_applied?: bool}
      */
     public function createFromOutcome($id_cart, $operation_id, $exec_code, $outcome, $amount, $pending_alias = null, $card_details = [])
     {
@@ -160,9 +160,11 @@ class UnifiedOrderAction
 
         $order_adapter = $plugin->getOrder();
         $module = $plugin->getModule()->getInstanceByName($this->dependencies->name);
-        $amount_float = (float) $this->dependencies->getHelpers()['amount']->convertAmount((int) $amount, true);
 
         try {
+            $currency = $plugin->getCurrency()->getCurrency((int) $cart->id_currency);
+            $currency_iso = is_object($currency) && isset($currency->iso_code) ? (string) $currency->iso_code : '';
+            $amount_float = (float) $this->dependencies->getHelpers()['amount']->convertAmount((int) $amount, true, $currency_iso);
             $module->validateOrder(
                 (int) $cart->id,
                 $initial_state,
@@ -174,7 +176,7 @@ class UnifiedOrderAction
                 false,
                 $secure_key
             );
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->logger()->error(
                 'UnifiedOrderAction::createFromOutcome - validateOrder() failed for cart ' . $id_cart
                 . ' (operation ' . $operation_id . '): ' . $exception->getMessage()
@@ -365,12 +367,15 @@ class UnifiedOrderAction
      * @param array{alias_id: string, brand: string}|null $pending_alias
      * @param array{last4?: string|null, exp_month?: string|null, exp_year?: string|null} $card_details
      *
-     * @return array{result: bool, redirect_url: string, persisted: bool}
+     * @return array{result: bool, redirect_url: string, persisted: bool, outcome_applied: bool}
+     *                       'outcome_applied' is false when the operation or the order state could not be
+     *                       recorded: the order exists, but a retry is needed to bring it up to date
      */
     private function persistAndApplyOutcome($order_id, $operation_id, $exec_code, $outcome, $amount, $secure_key, $id_cart, $pending_alias = null, $card_details = [])
     {
         $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $factory = $module->getService('payplug.utilities.service.unified_api_payment_service_factory');
+        $outcome_applied = true;
 
         try {
             $factory->createPaymentRepository()->save(new OperationData(
@@ -381,31 +386,25 @@ class UnifiedOrderAction
                 (string) $order_id
             ));
             $factory->createOrderStateMutator()->apply((string) $order_id, $outcome);
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
+            // Throwable: the order exists and the customer may be charged, a TypeError must be reported too.
             $factory->createLogger()->error(
                 'UnifiedOrderAction::persistAndApplyOutcome - order ' . $order_id
                 . ' (operation ' . $operation_id . ') exists but persisting/applying its '
                 . 'payment state failed: ' . $exception->getMessage()
             );
-
-            if (PaymentOutcome::FAILED === $outcome) {
-                return [
-                    'result' => false,
-                    'redirect_url' => $this->errorUrl(),
-                    // Whether or not save() itself made it through before apply() (or save()
-                    // itself) threw, this method is the only place that ever attempts to persist
-                    // this operation_id with the correct order_id - callers (notifyAction()) must
-                    // never also blindly re-save over this attempt with a different order_id.
-                    'persisted' => true,
-                ];
-            }
+            $outcome_applied = false;
         }
 
         if (PaymentOutcome::FAILED === $outcome) {
             return [
                 'result' => false,
                 'redirect_url' => $this->errorUrl(),
+                // Whether or not save() went through, this method is the only place that persists
+                // this operation_id with the real order_id: callers (notifyAction()) must never
+                // re-save it with another order_id.
                 'persisted' => true,
+                'outcome_applied' => $outcome_applied,
             ];
         }
 
@@ -413,10 +412,12 @@ class UnifiedOrderAction
             $this->persistAlias($id_cart, $pending_alias, is_array($card_details) ? $card_details : []);
         }
 
+        // The order exists: the customer gets its confirmation even when its state is not up to date.
         return [
             'result' => true,
             'redirect_url' => $this->confirmationUrl($id_cart, $order_id, $secure_key),
             'persisted' => true,
+            'outcome_applied' => $outcome_applied,
         ];
     }
 

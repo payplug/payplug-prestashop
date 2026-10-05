@@ -2,6 +2,7 @@
 
 namespace PayPlug\tests\actions\OrderAction;
 
+use PayPlug\src\utilities\helpers\AmountHelper;
 use PayPlug\tests\mock\OrderMock;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
@@ -172,6 +173,19 @@ class renderDetailTest extends BaseOrderAction
         $this->assertFalse($result['update']);
     }
 
+    public function testUhfOrderInAZeroDecimalCurrencyExposesItsAmountsUnscaled()
+    {
+        $this->mockUhfOrder('JPY');
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 1000);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+
+        $result = $this->action->renderDetail(42);
+
+        $this->assertSame(1000.0, $result['refund']['refunded']);
+        $this->assertSame(1900.0, $result['refund']['available']);
+        $this->assertSame('JPY 1,900.00', $result['refund']['available_display']);
+    }
+
     public function testUhfSuggestedAmountIsNotThousandsSeparatedForLargeAmounts()
     {
         $this->mockUhfOrder();
@@ -273,7 +287,7 @@ class renderDetailTest extends BaseOrderAction
         $this->assertArrayNotHasKey('payment', $result);
     }
 
-    private function mockUhfOrder()
+    private function mockUhfOrder($iso_code = 'USD')
     {
         $adminClass = \Mockery::mock('AdminClass');
         $adminClass->shouldReceive(['getAdminAjaxUrl' => '/ajax']);
@@ -288,7 +302,7 @@ class renderDetailTest extends BaseOrderAction
         $this->validate_adapter->shouldReceive(['validate' => true]);
 
         $currency = new \stdClass();
-        $currency->iso_code = 'USD';
+        $currency->iso_code = $iso_code;
         $currency_adapter = \Mockery::mock('CurrencyAdapter');
         $currency_adapter->shouldReceive('get')->with(2)->andReturn($currency);
         $this->plugin->shouldReceive(['getCurrency' => $currency_adapter]);
@@ -308,7 +322,7 @@ class renderDetailTest extends BaseOrderAction
         $factory = \Mockery::mock('Factory');
         $operation_repository = \Mockery::mock('OperationRepository');
         $refund_repository = \Mockery::mock('UpcRefundRepository');
-        $amount_helper = \Mockery::mock('AmountHelper');
+        $amount_helper = new AmountHelper(\Mockery::mock('Dependencies'));
         $price_adapter = \Mockery::mock('PriceAdapter');
 
         $this->module->shouldReceive('getService')
@@ -320,9 +334,6 @@ class renderDetailTest extends BaseOrderAction
         $factory->shouldReceive('createPaymentRepository')->andReturn($operation_repository);
         $operation_repository->shouldReceive('getPaidByOrderId')->with('42')->andReturn($paid_operation);
         $refund_repository->shouldReceive('getRefundedAmount')->with('42')->andReturn($refunded_cents);
-        $amount_helper->shouldReceive('convertAmount')->andReturnUsing(function ($cents, $to_float) {
-            return $cents / 100;
-        });
         $price_adapter->shouldReceive('formatPrice')->andReturnUsing(function ($price, $iso_code) {
             return $iso_code . ' ' . number_format($price, 2);
         });

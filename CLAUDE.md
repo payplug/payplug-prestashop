@@ -94,7 +94,7 @@ $operation_repository = $this->getService('payplug.models.repositories.operation
 
 - `PayplugLock` uses a `sleep()`-based polling loop by design, to prevent a race between the IPN webhook and the customer redirect both trying to finalize the same order.
 - IPN payloads must go through `PayPlug\classes\ConfigClass::setNotification()->treat()` — this wraps `php://input` reading and SDK signature verification. Never read/act on raw `php://input` outside of it.
-- `AmountHelper::convertAmount()` multiplies by 1000 then divides by 10 before rounding (e.g. `17.90 → 1789`) specifically to avoid floating-point drift; don't simplify the arithmetic. The PayPlug API expects integer amounts in cents; `convertAmount($amount, true)` converts cents back to a float. Passing an unconverted float, or converting twice, is a bug.
+- `AmountHelper::convertAmount($amount, $from_cents = false, $iso_code = 'EUR')` delegates to UPC's currency-aware `AmountHelper::toCents()`/`fromCents()` (PRE-3531) — don't reimplement the arithmetic locally. It applies the shop's `PS_PRICE_ROUND_MODE` (half-* modes go to UPC's rounding mode; `PS_ROUND_UP`/`DOWN` scale by the currency's minor-unit factor, then `ps_round`). The PayPlug APIs expect integer amounts in the currency's minor units (100 per unit for EUR, 1 for JPY; UPC rejects 3-decimal currencies); `convertAmount($amount, true, $iso_code)` converts back to a float. Always pass the real currency outside the EUR-only Retail flow. Passing an unconverted float, converting twice, or converting with the wrong currency is a bug.
 - Payment methods that don't support saved cards (iDEAL, MyBank, Bancontact, Satispay, Apple Pay, email link, SMS link, installment) explicitly unset/force `allow_save_card = false` — expected, not an oversight.
 - Front-office controllers/AJAX endpoints under `controllers/front/` must respond with JSON containing `redirect_url` rather than an HTTP redirect, for headless-storefront compatibility. `validation.php` and `dispatcher.php` are known pre-existing exceptions — don't replicate that pattern in new code.
 - New payment methods need: a class extending `PaymentMethod` in `src/models/classes/paymentMethod/`, correct `allow_save_card` handling, currency validation before the API call (EUR-only enforcement), `payment_context.cart` in the payload for Oney/Scalapay-style financing, registration in `config/services.yml`, templates, and translations in all 8 locales (`en`, `gb`, `fr`, `de`, `it`, `es`, `nl`, `pt`).
@@ -149,7 +149,10 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   uses the same helper with a longer budget (`NOTIFY_LOCK_RETRY_ATTEMPTS`, ~8s: its payment
   notification typically lands while `returnAction()` holds the cart lock, and the Receiver does
   not retry a `409` — observed on staging, 2026-09-29) and returns a `409` only if the lock still
-  can't be acquired after that. `notifyAction()` also cross-checks the webhook's
+  can't be acquired after that. When the outcome could not be applied to the order
+  (`UpcOrderStateMutator::apply()` throws, except for its documented already-paid/already-refunded
+  no-op guards), `notifyAction()` answers `500` without `markTreated()`, so a redelivery is
+  reprocessed. `notifyAction()` also cross-checks the webhook's
   `amount` against the cart's own computed total before creating an order (there's no independent
   `id_cart` to cross-check `orderId` against in that server-to-server context — `orderId` itself
   *is* the cart id there); `returnAction()`/the `createAction()` reconciliation path additionally
@@ -235,6 +238,14 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `UnifiedOrderAction::confirmationUrl()`'s `secure_key`+`id_order` — exactly what
   `order-confirmation` accepts — could leak via `handleReturn()`'s JSON branch
   (`wantsJsonResponse()`/`&ajax=1`).
+- **`createAction()` request checks and failures**: `createAction()` only accepts a POST carrying the
+  customer static token (`Tools::getToken(false)`) in its body, checked with `hash_equals` (CSRF); the
+  token is never put in the URL. On a `createPayment()` failure, an `ApiException` with status 0, 408,
+  409 or 5xx is "uncertain" and gets the "Please check with your bank before trying again" message;
+  any other failure gets "your card was not charged".
+- **Amounts**: `AmountHelper::convertAmount()` takes the currency ISO code (default `EUR`) and the UHF
+  call sites pass the cart's or order's currency, so JPY and other 0-decimal currencies are converted
+  correctly.
 - **`createAction()` re-entrancy**: if `createAction()` runs again for a cart that already has an
   in-flight UPC payment (e.g. the customer abandoned a 3DS challenge and hit back/refresh, or opened
   a second tab), it no longer creates a second payment. It checks `uhf_pending_operation:<cart>`
@@ -243,7 +254,7 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `createOrderWithLock()` path `returnAction()`/`notifyAction()` use; a still-`THREE_DS_PENDING`
   outcome redirects back to the *same* challenge (same token, via the `uhf_cart_token` reverse
   mapping) instead of starting a duplicate one.
-- **JS SDK**: `dev/js/front.js` gained a `hosted_fields` submodule initializing the `dalenys.hostedFields` widget (card/expiry/CVV fields), with per-field validation, brand allow-listing, an anti-double-submit guard with a safety timeout, and tokenization before POSTing to `unified.php?action=create` (the URL is server-injected as `hosted_fields_uhf_url`/`payplug_hosted_fields_uhf_url`, built by `PrestashopAdapter17::setHostedFieldsPaymentOption()` — the JS-side variable name kept its original `uhf` naming even though it no longer points at `uhf.php`).
+- **JS SDK**: `dev/js/front.js` gained a `hosted_fields` submodule initializing the `dalenys.hostedFields` widget (card/expiry/CVV fields), with per-field validation, brand allow-listing, an anti-double-submit guard with a safety timeout, and tokenization before POSTing to `unified.php?action=create`, with the customer static token (`prestashop.static_token`, set by PrestaShop core on every front page) in the POST body for both the card and saved-alias submits (the URL is server-injected as `hosted_fields_uhf_url`/`payplug_hosted_fields_uhf_url`, built by `PrestashopAdapter17::setHostedFieldsPaymentOption()` — the JS-side variable name kept its original `uhf` naming even though it no longer points at `uhf.php`).
 - **Routes**: `Routes::getHostedFieldsUrl()` reads `HOSTED_FIELDS_URL` from `payplugroutes/.env` if present, else falls back to a hardcoded `https://cdn.payplug.com/js/hosted-fields/v1@1/index.js`, the same pattern `getOneyLoaderUrl()` already uses. **This default's validity is unconfirmed** (PR123 review) — an earlier version of this method deliberately had no hardcoded fallback at all, on the grounds that the real production CDN URL wasn't confirmed and a guessed-but-wrong URL would fail silently; that safety property no longer holds now that a default is hardcoded, until someone who can confirm the real production URL against PayPlug's actual hosted-fields CDN does so (and updates this bullet once confirmed).
 - The pre-existing Retail API flow (`dispatcher.php`, `PaymentAction`, resource creation) is untouched by this work so far.
 

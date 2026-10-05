@@ -5,9 +5,6 @@ namespace PayPlug\tests\utilities\services\Routes;
 use PayPlug\src\utilities\services\Routes;
 use PHPUnit\Framework\TestCase;
 
-// getHostedFieldsUrl() logs via \PrestaShopLogger when HOSTED_FIELDS_URL isn't
-// configured; nothing in this test suite's bootstrap defines PrestaShop core
-// classes, so stub the one static call this test path actually reaches.
 require_once __DIR__ . '/../../../stubs/PrestaShopLogger.php';
 
 /**
@@ -68,7 +65,7 @@ class getSourceUrlTest extends TestCase
         );
     }
 
-    public function testHostedFieldsKeyIsEmptyWhenSdkUrlIsNotConfigured()
+    public function testHostedFieldsKeyFallsBackToDefaultSdkUrlWhenNotConfigured()
     {
         $this->service->shouldReceive('getApiUrl')->andReturn('https://api.test');
         $this->service->shouldReceive('getCDNUrl')->andReturn('https://cdn.test');
@@ -76,7 +73,7 @@ class getSourceUrlTest extends TestCase
 
         $routes = $this->service->getSourceUrl();
 
-        $this->assertSame('', $routes['hosted_fields']);
+        $this->assertSame('https://cdn.payplug.com/js/hosted-fields/v1@1/index.js', $routes['hosted_fields']);
     }
 
     public function testGetHostedFieldsUrlReturnsEnvValueWhenConfigured()
@@ -86,12 +83,17 @@ class getSourceUrlTest extends TestCase
         $this->assertSame('https://hosted-fields.example/sdk.js', $this->service->getHostedFieldsUrl());
     }
 
-    public function testGetHostedFieldsUrlReturnsEmptyStringWhenNotConfigured()
+    public function testGetHostedFieldsUrlReturnsDefaultSdkUrlWhenNotConfigured()
     {
-        $this->assertSame('', $this->service->getHostedFieldsUrl());
-        $this->assertCount(1, \PrestaShopLogger::$logs);
-        $this->assertSame('PayPlug: HOSTED_FIELDS_URL is not configured — hosted fields checkout will not load for non-EUR carts.', \PrestaShopLogger::$logs[0]['message']);
-        $this->assertSame(3, \PrestaShopLogger::$logs[0]['severity']);
+        $this->assertSame('https://cdn.payplug.com/js/hosted-fields/v1@1/index.js', $this->service->getHostedFieldsUrl());
+        $this->assertSame([], \PrestaShopLogger::$logs);
+    }
+
+    public function testGetHostedFieldsUrlReturnsDefaultSdkUrlWhenConfiguredEmpty()
+    {
+        $_ENV['HOSTED_FIELDS_URL'] = '';
+
+        $this->assertSame('https://cdn.payplug.com/js/hosted-fields/v1@1/index.js', $this->service->getHostedFieldsUrl());
     }
 
     private function setDotenvLoaded($value)

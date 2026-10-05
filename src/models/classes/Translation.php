@@ -291,6 +291,11 @@ class Translation
                     'submit' => $this->l('modal.scalapay.thresholds.submit', 'translation'),
                 ],
             ],
+            'hosted_fields' => [
+                'identifier' => [
+                    'text' => $this->l('modal.hosted_fields.identifier.text', 'translation'),
+                ],
+            ],
             'error' => [
                 'text' => $this->l('modal.error.text', 'translation'),
                 'submit' => $this->l('modal.error.submit', 'translation'),

@@ -40,6 +40,7 @@ use PayplugUnifiedCore\Dto\CustomerDto;
 use PayplugUnifiedCore\Dto\HostedFieldDto;
 use PayplugUnifiedCore\Dto\PaymentDto;
 use PayplugUnifiedCore\Dto\ShippingDto;
+use PayplugUnifiedCore\Exceptions\ApiException;
 use PayplugUnifiedCore\Exceptions\InvalidNotificationException;
 use PayplugUnifiedCore\Utilities\Helpers\ExecCodeMapper;
 use PayplugUnifiedCore\Utilities\Helpers\WebhookNotificationHelper;
@@ -53,7 +54,7 @@ class OperationAction
     use ServiceGetter;
 
     private const FACTORY_SERVICE = 'payplug.utilities.service.unified_api_payment_service_factory';
-    // would let the lock expire and be stolen mid-request.
+    // Covers a payment creation or order creation round-trip: a lock expiring mid-request could be stolen.
     private const ORDER_CREATION_LOCK_TTL = 60;
     private const LOCK_RETRY_ATTEMPTS = 2;
     private const LOCK_RETRY_DELAY_USEC = 200000;
@@ -179,6 +180,10 @@ class OperationAction
             return ['result' => false, 'message' => 'Missing hfToken/selectedBrand or id_payplug_alias'];
         }
 
+        if (!$this->isTrustedCreateRequest($params)) {
+            return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+        }
+
         if (!$this->dependencies->configClass->isValidFeature('feature_hosted_fields')) {
             return ['result' => false, 'message' => 'This payment method is not available'];
         }
@@ -213,10 +218,7 @@ class OperationAction
             return ['result' => false, 'message' => 'This payment method is not available'];
         }
 
-        $order_adapter = $plugin->getOrder();
-        $order = $order_adapter->get((int) $order_adapter->getIdByCartId((int) $cart->id));
-        $order_exists = $this->dependencies->getValidators()['order']->isCreated($order, (int) $cart->id);
-        if ($order_exists['result'] && !$this->isAbandonedPayplugOrder($plugin, $order)) {
+        if ($this->hasLiveOrder($plugin, $cart)) {
             return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
         }
 
@@ -259,13 +261,10 @@ class OperationAction
             }
         }
 
-        // Fix 2 (PRE-3626 review): reconcile an already in-flight UPC payment for this cart
-        // BEFORE acquiring the double-submit lock below and creating a brand-new payment.
-        // Scenario this guards against: a customer gets a 3DS challenge, abandons it, then hits
-        // back/refresh (or opens a second tab) - the PrestaShop order still doesn't exist (payment
-        // not finalized), so without this check execution would sail past the order_exists check
-        // above and call createPayment() a second time while the first payment can still
-        // independently complete via the abandoned challenge, creating two live payments.
+        // Reconcile an already in-flight payment for this cart before creating a new one: a
+        // customer who abandons a 3DS challenge and hits back/refresh (or opens a second tab) has
+        // no order yet, while the first payment can still complete through the abandoned
+        // challenge - creating another one would leave two live payments.
         $pending_operation_id = $token_cache->get('uhf_pending_operation:' . $cart->id);
         if ($pending_operation_id) {
             $reconciliation_result = $this->reconcilePendingOperation($factory, $logger, $cart, $context, $pending_operation_id);
@@ -287,16 +286,42 @@ class OperationAction
             ];
         }
 
-        // Fix 3 (PRE-3626 review): the entire flow from here through to the final return is now
-        // wrapped so the lock is released exactly once, on every exit path (success, the
-        // createPayment-specific error below, or any other exception) - previously, everything
-        // past the inner catch (json_decode, extractOperationId, the token_cache->set() calls,
-        // the final createFromOutcome() call) ran unprotected: an exception there (e.g. a DB error
-        // inside UpcTokenCache::set()) would skip every $lock->release() call and leave the cart
-        // locked out for the full 30s TTL.
+        // Checked again under the lock: a concurrent request for this cart may have created its
+        // order or its payment between the checks above and the lock, and would be charged twice.
+        try {
+            $order_created_meanwhile = $this->hasLiveOrder($plugin, $cart);
+            $concurrent_operation_id = $order_created_meanwhile
+                ? null
+                : $token_cache->get('uhf_pending_operation:' . $cart->id);
+        } catch (\Throwable $exception) {
+            $lock->release($lock_key);
+
+            throw $exception;
+        }
+
+        if ($order_created_meanwhile) {
+            $lock->release($lock_key);
+
+            return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+        }
+
+        // The operation already handled above, if any, could not be reconciled: only a new one counts.
+        if ($concurrent_operation_id && $concurrent_operation_id !== $pending_operation_id) {
+            // Released first: reconciliation takes the same cart lock to create the order.
+            $lock->release($lock_key);
+            $reconciliation_result = $this->reconcilePendingOperation($factory, $logger, $cart, $context, $concurrent_operation_id);
+
+            return null !== $reconciliation_result
+                ? $reconciliation_result
+                : $this->errorResult($this->dependencies->l('Please wait, your previous request is still being processed.', 'uhf'));
+        }
+
+        // The lock is released exactly once on every exit path, including an exception thrown
+        // after the payment was created (e.g. a DB error in UpcTokenCache::set()), which would
+        // otherwise lock the cart out for the whole TTL.
         try {
             try {
-                $amount_cents = (int) $this->dependencies->getHelpers()['amount']->convertAmount((float) $cart->getOrderTotal(true, \Cart::BOTH));
+                $amount_cents = (int) $this->dependencies->getHelpers()['amount']->convertAmount((float) $cart->getOrderTotal(true, \Cart::BOTH), false, (string) $currency->iso_code);
                 $token = bin2hex(random_bytes(32));
                 $return_url = $context->link->getModuleLink(
                     $this->dependencies->name,
@@ -320,10 +345,9 @@ class OperationAction
                 $common->notificationUrl = $context->link->getModuleLink($this->dependencies->name, 'notify', [], true);
                 $common->description = 'Payment with unified hosted fields for cart ' . (string) $cart->id;
 
-                // Fix 10 (PRE-3626 review): billing/shipping feed the Unified API's 3DS risk
-                // scoring - omitting them likely pushes frictionless-eligible payments into an
-                // unnecessary challenge. Enrichment only: left null when unresolvable (e.g. no
-                // invoice address yet on the cart) rather than failing the payment over it.
+                // Billing/shipping feed the Unified API's 3DS risk scoring: without them,
+                // frictionless-eligible payments likely get an unnecessary challenge. Enrichment
+                // only: left null when unresolvable (e.g. no invoice address yet on the cart).
                 [$billing, $shipping] = $this->buildBillingAndShipping($plugin, $cart);
                 if (null !== $billing) {
                     $common->billing = $billing;
@@ -385,7 +409,16 @@ class OperationAction
                     ));
                 }
             } catch (\Exception $exception) {
-                $logger->error('OperationAction::createAction - createPayment failed: ' . $exception->getMessage());
+                // A timeout, a conflict or a server error may come after the payment was created: the customer
+                // must not be told the card was not charged, nor be pushed into paying again.
+                if ($this->isUncertainCreationFailure($exception)) {
+                    $logger->error('OperationAction::createAction - createPayment outcome unknown for cart ' . $cart->id
+                        . ': ' . $exception->getMessage());
+
+                    return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
+                }
+
+                $logger->error('OperationAction::createAction - createPayment failed for cart ' . $cart->id . ': ' . $exception->getMessage());
 
                 return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
             }
@@ -415,11 +448,9 @@ class OperationAction
             if ($output->redirectHtml || $output->redirectUrl) {
                 $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
 
-                // Fix 6 (PRE-3626 review): cheap read-after-write check. UpcTokenCache::set() can't
-                // propagate a write failure through ITokenCache's void return type, so without this
-                // a silent DB error/truncation/duplicate key here would redirect the customer into
-                // a flow (returnAction()/the challenge) that depends on finding this cache entry
-                // and won't find anything - stranding them on the error page despite being charged.
+                // Read-after-write check: UpcTokenCache::set() can't report a write failure through
+                // ITokenCache's void return type, and the return/challenge flow depends on finding
+                // this entry - without it the customer would land on the error page once charged.
                 if ($operation_id !== $token_cache->get('uhf_pending_operation:' . $cart->id)) {
                     $logger->error('OperationAction::createAction - Failed to persist pending operation cache for cart ' . $cart->id);
 
@@ -594,10 +625,8 @@ class OperationAction
             $logger->error('OperationAction::returnAction - missing amount field in getOperation response for operation ' . $operation_id);
             $amount = 0;
         } else {
-            // Fix 4 (PRE-3626 review): per this project's own UHF technical design doc, in the
-            // absence of full signature verification "the only remaining protection is the
-            // orderId+amount cross-check" - without it, both fields are trusted blindly from an
-            // external response.
+            // Without full signature verification, the orderId+amount cross-check is the only
+            // protection against trusting both fields blindly from an external response.
             $order_id_from_response = is_array($decoded) && isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
             $cart = $this->dependencies->getPlugin()->getCart()->get($id_cart);
 
@@ -763,6 +792,16 @@ class OperationAction
 
         if (!empty($result['lock_conflict'])) {
             return ['http_status' => 409];
+        }
+
+        // Any outcome, FAILED included: an unapplied FAILED leaves a pending order in the wrong state.
+        // Whether the Receiver retries a 5xx is unconfirmed; the operation stays untreated, so a
+        // redelivery is reprocessed.
+        if (isset($result['outcome_applied']) && false === $result['outcome_applied']) {
+            $logger->error('OperationAction::notifyAction - Outcome ' . $outcome . ' of operation ' . $operation_data->operationId
+                . ' could not be applied to the order of cart ' . $id_cart);
+
+            return ['http_status' => 500];
         }
 
         if (!$result['result'] && PaymentOutcome::FAILED !== $outcome) {
@@ -1003,8 +1042,7 @@ class OperationAction
             $logger->error('OperationAction::reconcilePendingOperation - missing amount field in getOperation response for operation ' . $pending_operation_id);
             $amount = 0;
         } else {
-            // Fix 4 (PRE-3626 review): same orderId+amount cross-check as returnAction(), applied
-            // here too - convenient since createAction() already has $cart in scope.
+            // Same orderId+amount cross-check as returnAction().
             $order_id_from_response = is_array($decoded) && isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
 
             if (!$this->crossChecksOrderIdAndAmount($logger, $cart, (int) $cart->id, $order_id_from_response, $amount, 'OperationAction::reconcilePendingOperation')) {
@@ -1044,7 +1082,7 @@ class OperationAction
      * @param array<string, string|null> $card_details
      * @param int $retry_attempts lock attempts after the first one
      *
-     * @return array{result: bool, redirect_url: string, persisted?: bool, lock_conflict?: bool}
+     * @return array{result: bool, redirect_url: string, persisted?: bool, outcome_applied?: bool, lock_conflict?: bool}
      */
     private function createOrderWithLock($factory, $id_cart, $operation_id, $exec_code, $outcome, $amount, $pending_alias = null, $card_details = [], $retry_attempts = self::LOCK_RETRY_ATTEMPTS)
     {
@@ -1105,6 +1143,62 @@ class OperationAction
         }
 
         return $result;
+    }
+
+    /**
+     * @description Whether a createPayment() exception leaves the payment outcome unknown: a timeout
+     *              (status 0), a 408, a 409 or a 5xx, as for UnifiedRefundAction::isDefiniteFailure()
+     *
+     * @param \Exception $exception
+     *
+     * @return bool
+     */
+    private function isUncertainCreationFailure($exception)
+    {
+        if (!$exception instanceof ApiException) {
+            return false;
+        }
+
+        $status = (int) $exception->getCode();
+
+        return 0 === $status || $status >= 500 || in_array($status, [408, 409], true);
+    }
+
+    /**
+     * @description Tell whether a payment creation request is a POST carrying the customer static
+     *              token, so a third-party page can't make the customer's browser charge their card (CSRF)
+     *
+     * @return bool
+     */
+    private function isTrustedCreateRequest(array $params)
+    {
+        $props = new Props();
+        if ('POST' !== strtoupper((string) $props->getServerProp('REQUEST_METHOD'))) {
+            return false;
+        }
+
+        $token = isset($params['static_token']) ? $params['static_token'] : '';
+
+        return is_string($token)
+            && '' !== $token
+            && hash_equals((string) $this->dependencies->getPlugin()->getTools()->tool('getToken', false), $token);
+    }
+
+    /**
+     * @description Tell whether the cart already has an order other than an abandoned PayPlug one
+     *
+     * @param mixed $plugin
+     * @param mixed $cart
+     *
+     * @return bool
+     */
+    private function hasLiveOrder($plugin, $cart)
+    {
+        $order_adapter = $plugin->getOrder();
+        $order = $order_adapter->get((int) $order_adapter->getIdByCartId((int) $cart->id));
+        $order_exists = $this->dependencies->getValidators()['order']->isCreated($order, (int) $cart->id);
+
+        return $order_exists['result'] && !$this->isAbandonedPayplugOrder($plugin, $order);
     }
 
     /**
@@ -1183,10 +1277,10 @@ class OperationAction
     /**
      * @description Check the response orderId and amount match the cart
      *
-     * Fix 4 (PRE-3626 review): cross-checks a getOperation()/notification response's orderId and
-     * amount against the cart's own actual values - per this project's UHF technical design doc,
-     * in the absence of full signature verification "the only remaining protection is the
-     * orderId+amount cross-check". Logs both the expected and received values on a mismatch.
+     * Cross-checks a getOperation()/notification response's orderId and amount against the cart,
+     * the amount in the minor units of the cart's currency. Without full signature verification,
+     * this is the only protection against a forged or mismatched response. Logs both the
+     * expected and received values on a mismatch.
      *
      * @param mixed $logger
      * @param mixed $cart
@@ -1209,7 +1303,20 @@ class OperationAction
             return false;
         }
 
-        $expected_amount = (int) $this->dependencies->getHelpers()['amount']->convertAmount((float) $cart->getOrderTotal(true, \Cart::BOTH));
+        $currency = $this->dependencies->getPlugin()->getCurrency()->getCurrency((int) $cart->id_currency);
+        $currency_iso = is_object($currency) && isset($currency->iso_code) ? (string) $currency->iso_code : '';
+
+        try {
+            $expected_amount = (int) $this->dependencies->getHelpers()['amount']->convertAmount(
+                (float) $cart->getOrderTotal(true, \Cart::BOTH),
+                false,
+                $currency_iso
+            );
+        } catch (\Exception $exception) {
+            $logger->error($context_label . ' - cart ' . $id_cart . ' total could not be converted: ' . $exception->getMessage());
+
+            return false;
+        }
 
         if ($expected_amount !== (int) $response_amount) {
             $logger->error($context_label . ' - amount mismatch: expected ' . $expected_amount . ', received ' . (int) $response_amount);
@@ -1242,10 +1349,9 @@ class OperationAction
     /**
      * @description Build the billing and shipping DTOs from the cart addresses
      *
-     * Fix 10 (PRE-3626 review): resolves the cart's invoice/delivery addresses (when set) into a
-     * BillingDto/ShippingDto pair for the payment payload - same address-resolution pattern
-     * already used by OneyPaymentMethod/BancontactPaymentMethod/ApplepayPaymentMethod for the
-     * Retail API flow (plugin->getAddress()->get($id_address), configClass->getIsoCodeByCountryId()).
+     * Resolves the cart's invoice/delivery addresses (when set) into a BillingDto/ShippingDto pair
+     * for the payment payload, with the same address resolution as the Retail API payment methods
+     * (plugin->getAddress()->get($id_address), configClass->getIsoCodeByCountryId()).
      *
      * @param mixed $plugin
      * @param mixed $cart
@@ -1332,7 +1438,7 @@ class OperationAction
      * Resolves the opaque, high-entropy token minted by createAction() (see its own comment) back
      * to the id_cart it belongs to, via the token cache - the only way returnAction()/
      * challengeAction() learn which cart a request is for, since neither can trust a
-     * client-supplied id_cart directly (see createAction()'s "Security fix" comment).
+     * client-supplied id_cart directly.
      *
      * @param mixed $token_cache
      * @param mixed $token
@@ -1607,7 +1713,7 @@ class OperationAction
      */
     private function withReturnUrl(array $result)
     {
-        unset($result['persisted'], $result['lock_conflict']);
+        unset($result['persisted'], $result['lock_conflict'], $result['outcome_applied']);
 
         if (isset($result['redirect_url']) && !isset($result['return_url'])) {
             $result['return_url'] = $result['redirect_url'];

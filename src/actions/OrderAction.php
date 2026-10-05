@@ -639,8 +639,8 @@ class OrderAction
             ->getService('payplug.models.repositories.upc_refund')
             ->getRefundedAmount((string) $order->id);
         $available_cents = max(0, (int) $payment_operation->amount - $refunded_cents);
-        $refunded = (float) $amount_helper->convertAmount($refunded_cents, true);
-        $available = (float) $amount_helper->convertAmount($available_cents, true);
+        $refunded = (float) $amount_helper->convertAmount($refunded_cents, true, $currency->iso_code);
+        $available = (float) $amount_helper->convertAmount($available_cents, true, $currency->iso_code);
 
         $order_details = [
             'logo_url' => $this->plugin->getConstant()->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/payplug.svg',

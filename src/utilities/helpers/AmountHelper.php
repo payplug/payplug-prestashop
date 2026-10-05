@@ -24,6 +24,7 @@
 namespace PayPlug\src\utilities\helpers;
 
 use PayPlug\classes\DependenciesClass;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper as UpcAmountHelper;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -43,17 +44,20 @@ class AmountHelper
      *
      * @param $amount
      * @param bool $from_cents
+     * @param string $iso_code ISO 4217 code of the amount's currency, which sets its number of minor units
+     *
+     * @throws \PayplugUnifiedCore\Exceptions\InvalidCurrencyException for a malformed or 3-decimal currency
      *
      * @return float|int
      */
-    public function convertAmount($amount = 0, $from_cents = false)
+    public function convertAmount($amount = 0, $from_cents = false, $iso_code = 'EUR')
     {
         if (!$amount) {
             return 0;
         }
 
         if ($from_cents) {
-            return \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::fromCents((int) $amount);
+            return UpcAmountHelper::fromCents((int) $amount, (string) $iso_code);
         }
 
         $round_mode = (int) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('PS_PRICE_ROUND_MODE');
@@ -75,7 +79,8 @@ class AmountHelper
         switch ($round_mode) {
             case $roundUp:
             case $roundDown:
-                $amount = $amount * 100;
+                // toCents(1.0) is the currency's number of minor units per major unit (100, or 1 for JPY).
+                $amount = $amount * UpcAmountHelper::toCents(1.0, (string) $iso_code);
                 $amount_to_cent = $this->dependencies->getPlugin()->getTools()->tool('ps_round', $amount);
 
                 break;
@@ -85,7 +90,7 @@ class AmountHelper
             case $roundHalfEven:
             case $roundHalfOdd:
             default:
-                $amount_to_cent = \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::toCents((float) $amount, $mode);
+                $amount_to_cent = UpcAmountHelper::toCents((float) $amount, (string) $iso_code, $mode);
         }
 
         return (int) $amount_to_cent;

@@ -141,6 +141,31 @@ class returnActionTest extends TestCase
         $this->assertTrue($result['result']);
     }
 
+    public function testStillSendsThePaidCustomerToTheConfirmationWhenTheOrderStateCouldNotBeApplied()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+            'outcome_applied' => false,
+        ]);
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')->never();
+
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertSame([
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'return_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], $result);
+    }
+
     public function testReturnsErrorWhenLockCannotBeAcquiredAfterRetries()
     {
         [$action, $mocks] = $this->mockActionForReturn();
@@ -442,6 +467,7 @@ class returnActionTest extends TestCase
         // tests exercising the success path don't also have to wire a mismatch.
         $cart = new class() {
             public $id = 42;
+            public $id_currency = 2;
 
             public function getOrderTotal($withTaxes, $type)
             {
@@ -481,7 +507,10 @@ class returnActionTest extends TestCase
         // Fix 4's cross-check baseline (see $cart above).
         $plugin->shouldReceive('getCart')->andReturn($cart_adapter)->byDefault();
         $cart_adapter->shouldReceive('get')->with(42)->andReturn($cart)->byDefault();
-        $amount_helper->shouldReceive('convertAmount')->with(12.34)->andReturn(1234)->byDefault();
+        $currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $plugin->shouldReceive('getCurrency')->andReturn($currency_adapter)->byDefault();
+        $currency_adapter->shouldReceive('getCurrency')->with(2)->andReturn((object) ['iso_code' => 'USD'])->byDefault();
+        $amount_helper->shouldReceive('convertAmount')->with(12.34, false, 'USD')->andReturn(1234)->byDefault();
 
         $action->dependencies = $dependencies;
 

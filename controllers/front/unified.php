@@ -58,6 +58,7 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
             'cardholder' => $this->toolsAdapter->tool('getValue', 'cardholder'),
             'cardholderName' => $this->toolsAdapter->tool('getValue', 'cardholderName'),
             'id_cart' => $this->toolsAdapter->tool('getValue', 'id_cart'),
+            'static_token' => $this->toolsAdapter->tool('getValue', 'static_token'),
             // 'challenge'/'return' resolve their cart from this opaque, unguessable token instead
             // of a client-supplied id_cart - see OperationAction::createAction()/resolveIdCartFromToken().
             'token' => $this->toolsAdapter->tool('getValue', 'token'),
