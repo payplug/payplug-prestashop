@@ -3,6 +3,7 @@
 namespace PayPlug\Tests\utilities\helpers\AmountHelper;
 
 use PayPlug\src\utilities\helpers\AmountHelper;
+use PayplugUnifiedCore\Exceptions\InvalidCurrencyException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -169,5 +170,90 @@ class convertAmountTest extends TestCase
             $amount_expected,
             $this->amountHelper->convertAmount($amount)
         );
+    }
+
+    public function testWhenGivenAmountIsFromCentsInAZeroDecimalCurrency()
+    {
+        $this->assertSame(1000.0, $this->amountHelper->convertAmount(1000, true, 'JPY'));
+    }
+
+    public function testWhenGivenAmountIsFromCentsInAThreeDecimalCurrencyThenThrows()
+    {
+        $this->expectException(InvalidCurrencyException::class);
+
+        $this->amountHelper->convertAmount(1000, true, 'KWD');
+    }
+
+    public function testWhenGivenAmountIsToCentsInATwoDecimalCurrency()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_HALF_UP);
+
+        $this->assertSame(1790, $this->amountHelper->convertAmount(17.90, false, 'EUR'));
+        $this->assertSame(1999, $this->amountHelper->convertAmount(19.99, false, 'usd'));
+    }
+
+    public function testWhenGivenAmountIsToCentsInAZeroDecimalCurrency()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_HALF_UP);
+
+        $this->assertSame(1000, $this->amountHelper->convertAmount(1000.0, false, 'JPY'));
+        $this->assertSame(1001, $this->amountHelper->convertAmount(1000.5, false, 'JPY'));
+    }
+
+    public function testWhenGivenAmountIsToCentsInAThreeDecimalCurrencyThenThrows()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_HALF_UP);
+
+        $this->expectException(InvalidCurrencyException::class);
+
+        $this->amountHelper->convertAmount(12.345, false, 'KWD');
+    }
+
+    public function testWhenGivenAmountIsToCentsWithRoundUpInAZeroDecimalCurrency()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_UP);
+        $this->toolsAdapter
+            ->shouldReceive('tool')
+            ->with('ps_round', 1000.2)
+            ->andReturnUsing(function ($arg, $amount) {
+                return ceil($amount);
+            });
+
+        $this->assertSame(1001, $this->amountHelper->convertAmount(1000.2, false, 'JPY'));
+    }
+
+    public function testWhenGivenAmountIsToCentsWithRoundDownInAZeroDecimalCurrency()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_DOWN);
+        $this->toolsAdapter
+            ->shouldReceive('tool')
+            ->with('ps_round', 1000.8)
+            ->andReturnUsing(function ($arg, $amount) {
+                return floor($amount);
+            });
+
+        $this->assertSame(1000, $this->amountHelper->convertAmount(1000.8, false, 'JPY'));
+    }
+
+    public function testWhenGivenAmountIsToCentsWithRoundUpInAThreeDecimalCurrencyThenThrows()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_UP);
+        $this->toolsAdapter->shouldNotReceive('tool');
+
+        $this->expectException(InvalidCurrencyException::class);
+
+        $this->amountHelper->convertAmount(12.345, false, 'KWD');
     }
 }

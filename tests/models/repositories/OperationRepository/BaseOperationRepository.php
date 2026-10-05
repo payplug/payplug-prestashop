@@ -34,6 +34,7 @@ class BaseOperationRepository extends BaseRepository
                     'amount' => ['type' => 'integer', 'required' => true],
                     'treated' => ['type' => 'boolean'],
                     'payment_id' => ['type' => 'string'],
+                    'requested_amount' => ['type' => 'integer'],
                     'date_add' => ['type' => 'string'],
                     'date_upd' => ['type' => 'string'],
                 ],
