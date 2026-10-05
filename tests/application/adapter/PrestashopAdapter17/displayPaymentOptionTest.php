@@ -107,6 +107,9 @@ class displayPaymentOptionTest extends BasePrestashopAdapter17
             ->with('embedded_mode')->andReturn('redirect');
         $this->configuration->shouldReceive('getValue')
             ->with('hosted_fields')->andReturn('{"usd":"ident_42"}');
+        $this->routes->shouldReceive('getSourceUrl')
+            ->andReturn(['hosted_fields' => 'https://hosted-fields.test/sdk.js']);
+        $this->logger->shouldReceive('addLog')->never();
 
         $this->adapter->shouldReceive('setIntegratedPaymentOption')->never();
         $this->adapter->shouldReceive('setHostedFieldsPaymentOption')
@@ -127,6 +130,37 @@ class displayPaymentOptionTest extends BasePrestashopAdapter17
             $result[0]->getAction()
         );
         $this->assertSame('hosted_fields', $result[0]->getInputs()['method']['value']);
+    }
+
+    /**
+     * Without a configured SDK URL the hosted fields form could not load: the non-EUR cart gets
+     * no hosted fields option at all, and the missing configuration is logged.
+     */
+    public function testHostedFieldsPathIsNotTakenAndTheMissingSdkUrlIsLoggedWhenItIsNotConfigured()
+    {
+        $this->context->currency->iso_code = 'USD';
+        $this->config_class->shouldReceive('isValidFeature')
+            ->with('feature_standard')->andReturn(true);
+        $this->config_class->shouldReceive('isValidFeature')
+            ->with('feature_integrated')->andReturn(true);
+        $this->config_class->shouldReceive('isValidFeature')
+            ->with('feature_hosted_fields')->andReturn(true);
+        $this->configuration->shouldReceive('getValue')
+            ->with('embedded_mode')->andReturn('redirect');
+        $this->configuration->shouldReceive('getValue')
+            ->with('hosted_fields')->andReturn('{"usd":"ident_42"}');
+        $this->routes->shouldReceive('getSourceUrl')->andReturn(['hosted_fields' => '']);
+        $this->logger->shouldReceive('addLog')
+            ->once()
+            ->with(\Mockery::pattern('/HOSTED_FIELDS_URL is not configured/'), 'error');
+
+        $this->adapter->shouldReceive('setIntegratedPaymentOption')->never();
+        $this->adapter->shouldReceive('setHostedFieldsPaymentOption')->never();
+
+        $result = $this->adapter->displayPaymentOption($this->payment_options);
+
+        $this->assertSame('standard', $result[0]->getInputs()['method']['value']);
+        $this->assertNull($result[0]->getAction());
     }
 
     /**

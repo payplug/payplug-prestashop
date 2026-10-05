@@ -38,4 +38,6 @@ interface CurrencyInterface
     public function findAll($active = true, $groupBy = false, $currentShopOnly = true);
 
     public function hasEurCurrency();
+
+    public function hasOtherCurrency();
 }

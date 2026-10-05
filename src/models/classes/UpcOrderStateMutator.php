@@ -41,19 +41,21 @@ class UpcOrderStateMutator implements IOrderStateMutator
         $this->logger = new UpcLogger($dependencies);
     }
 
+    /**
+     * Skipping a transition the guards below refuse is not a failure; anything that leaves the
+     * order without the state the outcome requires is, so that the caller can report it.
+     *
+     * @throws \RuntimeException when the outcome could not be applied to the order
+     */
     public function apply(string $orderId, string $outcome): void
     {
         if (!PaymentOutcome::isValid($outcome)) {
-            $this->logger->error('UpcOrderStateMutator::apply - Invalid outcome given: ' . $outcome);
-
-            return;
+            throw new \RuntimeException('UpcOrderStateMutator::apply - Invalid outcome given: ' . $outcome);
         }
 
         $order = $this->dependencies->getPlugin()->getOrder()->get((int) $orderId);
         if (!$order || !(int) $order->id) {
-            $this->logger->error('UpcOrderStateMutator::apply - Order not found for id: ' . $orderId);
-
-            return;
+            throw new \RuntimeException('UpcOrderStateMutator::apply - Order not found for id: ' . $orderId);
         }
 
         $is_live = !(bool) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('sandbox_mode');
@@ -62,9 +64,7 @@ class UpcOrderStateMutator implements IOrderStateMutator
         $new_order_state = isset($order_states[$bucket]) ? (int) $order_states[$bucket] : 0;
 
         if (!$new_order_state) {
-            $this->logger->error('UpcOrderStateMutator::apply - No order state configured for bucket: ' . $bucket);
-
-            return;
+            throw new \RuntimeException('UpcOrderStateMutator::apply - No order state configured for bucket: ' . $bucket);
         }
 
         // Terminal-state guard: an order already marked paid must not be pushed backward to
@@ -95,7 +95,9 @@ class UpcOrderStateMutator implements IOrderStateMutator
             return;
         }
 
-        $this->dependencies->getPlugin()->getOrderClass()->updateOrderState($order, $new_order_state);
+        if (true !== $this->dependencies->getPlugin()->getOrderClass()->updateOrderState($order, $new_order_state)) {
+            throw new \RuntimeException('UpcOrderStateMutator::apply - Could not move to bucket "' . $bucket . '" order id: ' . $orderId);
+        }
     }
 
     private function bucketForOutcome(string $outcome): string

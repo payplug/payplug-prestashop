@@ -18,6 +18,7 @@ abstract class BasePrestashopAdapter17 extends TestCase
     protected $module_adapter;
     protected $dependencies;
     protected $config_class;
+    protected $logger;
     protected $configuration;
     protected $constant;
     protected $context;
@@ -44,6 +45,7 @@ abstract class BasePrestashopAdapter17 extends TestCase
         $this->configuration = \Mockery::mock(Configuration::class);
         $this->constant = \Mockery::mock('Constant');
         $this->routes = \Mockery::mock('Routes');
+        $this->logger = \Mockery::mock('Logger');
         $this->translation = \Mockery::mock('Translation');
         $this->translation->shouldReceive('l')
             ->andReturnUsing(function ($string) {
@@ -75,6 +77,7 @@ abstract class BasePrestashopAdapter17 extends TestCase
             'getTranslationClass' => $this->translation,
             'getConfigurationClass' => $this->config_class,
             'getModule' => $this->module_adapter,
+            'getLogger' => $this->logger,
         ]);
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');

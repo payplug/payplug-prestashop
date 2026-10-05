@@ -85,6 +85,24 @@ class AdminPayplugController extends ModuleAdminController
         if ($this->tools->tool('getValue', '_ajax')) {
             if ($this->tools->tool('getValue', 'refund')) {
                 $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
+                $resource_id = $this->tools->tool('getValue', 'resource_id');
+                $id_customer = $this->tools->tool('getValue', 'id_customer');
+                $id_order = $this->tools->tool('getValue', 'id_order');
+
+                if ('uhf' === $this->tools->tool('getValue', 'payment_type')) {
+                    $unified_refund_action = $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.action.unified_refund');
+                    $refund = $unified_refund_action->refundAction(
+                        (int) $id_order,
+                        $unified_refund_action->convertRefundAmount((int) $id_order, $amount)
+                    );
+
+                    exit(json_encode($refund));
+                }
+
                 $amount_formated = is_numeric($amount)
                     ? $this->dependencies
                         ->getPlugin()
@@ -93,20 +111,6 @@ class AdminPayplugController extends ModuleAdminController
                         ->getService('payplug.utilities.helper.amount')
                         ->convertAmount($amount)
                     : 0;
-                $resource_id = $this->tools->tool('getValue', 'resource_id');
-                $id_customer = $this->tools->tool('getValue', 'id_customer');
-                $id_order = $this->tools->tool('getValue', 'id_order');
-
-                if ('uhf' === $this->tools->tool('getValue', 'payment_type')) {
-                    $refund = $this->dependencies
-                        ->getPlugin()
-                        ->getModule()
-                        ->getInstanceByName($this->dependencies->name)
-                        ->getService('payplug.action.unified_refund')
-                        ->refundAction((int) $id_order, (int) $amount_formated);
-
-                    exit(json_encode($refund));
-                }
 
                 $refund = $this->dependencies
                     ->getPlugin()

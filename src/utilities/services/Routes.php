@@ -65,13 +65,13 @@ class Routes
     }
 
     /**
-     * @description Get the UHF (hosted fields) widget SDK url
+     * @description Get the UHF (hosted fields) widget SDK url, configured in payplugroutes/.env
      *
-     * @return string
+     * @return string empty when HOSTED_FIELDS_URL is not configured: there is no default
      */
     public function getHostedFieldsUrl()
     {
-        return $this->getEnv('HOSTED_FIELDS_URL') ?: 'https://cdn.payplug.com/js/hosted-fields/v1@1/index.js';
+        return $this->getEnv('HOSTED_FIELDS_URL');
     }
 
     /**

@@ -141,6 +141,31 @@ class returnActionTest extends TestCase
         $this->assertTrue($result['result']);
     }
 
+    public function testStillSendsThePaidCustomerToTheConfirmationWhenTheOrderStateCouldNotBeApplied()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+            'outcome_applied' => false,
+        ]);
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')->never();
+
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertSame([
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'return_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ], $result);
+    }
+
     public function testReturnsErrorWhenLockCannotBeAcquiredAfterRetries()
     {
         [$action, $mocks] = $this->mockActionForReturn();
@@ -200,6 +225,77 @@ class returnActionTest extends TestCase
 
         $this->assertFalse($result['result']);
         $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+    }
+
+    /**
+     * The cart was edited in another tab during the 3DS challenge (its total now converts to
+     * 1234): the operation captured the 1500 requested at its creation, so the order is created.
+     */
+    public function testCreatesTheOrderWhenThePaidAmountIsTheRequestedOneAlthoughTheCartChanged()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1500, 'orderId' => '42']),
+        ]);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')->with('op_123')->andReturn(1500);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1500, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ]);
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')->never();
+
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertTrue($result['result']);
+        $this->assertSame('https://shop.example/order-confirmation?id_order=99', $result['redirect_url']);
+    }
+
+    public function testRefusesAndAsksForAManualReviewWhenThePaidAmountDiffersFromTheRequestedOne()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        // The cart total still matches the paid amount: the reference amount alone decides.
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')->with('op_123')->andReturn(1000);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::on(function ($message) {
+            return false !== strpos($message, 'manual review')
+                && false !== strpos($message, 'op_123')
+                && false !== strpos($message, 'cart 42')
+                && false !== strpos($message, '1234')
+                && false !== strpos($message, '1000');
+        }));
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')->once()->with(['An unexpected error occurred. Please try again.']);
+
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertFalse($result['result']);
+        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+    }
+
+    public function testFallsBackToTheCartTotalWhenNoRequestedAmountWasRecorded()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1500, 'orderId' => '42']),
+        ]);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')->with('op_123')->andReturn(null);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/amount mismatch: expected 1234, received 1500/'));
+
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertFalse($result['result']);
     }
 
     public function testForwardsThePendingAliasAndCardDetailsAndClearsTheAliasKeyOnPaidOutcome()
@@ -365,25 +461,33 @@ class returnActionTest extends TestCase
         ];
     }
 
-    public function testKeepsThePendingAliasKeyWhenTheReturnIsStillThreeDsPending()
+    /**
+     * PRE-3557 rule, as on the Retail return (ValidationAction::checkAction()): a payment neither
+     * paid nor failed creates no order, and the customer is sent back to the checkout with the
+     * payment error message. Everything a later return, a retry or the notification needs to
+     * finish the payment is kept.
+     */
+    public function testCreatesNoOrderAndKeepsThePendingEntriesWhenTheReturnIsStillThreeDsPending()
     {
         [$action, $mocks] = $this->mockActionForReturn();
 
         $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
-        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_123')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
         $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
             'body' => json_encode(['execCode' => '0001', 'amount' => 1234, 'orderId' => '42']),
         ]);
-        // A pending order is created (result true) but the alias key must survive for the
-        // later PAID notification.
-        $this->mockCreateFromOutcome($mocks, 'op_123', '0001', PaymentOutcome::THREE_DS_PENDING, 1234, [
-            'result' => true,
-            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
-        ], ['alias_id' => 'alias_new_123', 'brand' => 'visa'], ['last4' => null, 'exp_month' => null, 'exp_year' => null]);
-        $mocks['token_cache']->shouldReceive('delete')->with('uhf_pending_alias:op_123')->never();
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['lock']->shouldReceive('acquire')->never();
+        $mocks['token_cache']->shouldReceive('delete')->never();
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/op_123.*still pending 3DS.*cart 42/'));
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')
+            ->once()
+            ->with(['The transaction was not completed and your card was not charged.']);
 
-        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertFalse($result['result']);
+        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
     }
 
     public function testKeepsThePendingAliasKeyWhenOrderCreationFailsForAPaidOutcome()
@@ -442,6 +546,7 @@ class returnActionTest extends TestCase
         // tests exercising the success path don't also have to wire a mismatch.
         $cart = new class() {
             public $id = 42;
+            public $id_currency = 2;
 
             public function getOrderTotal($withTaxes, $type)
             {
@@ -459,6 +564,9 @@ class returnActionTest extends TestCase
         $factory->shouldReceive('createTokenCache')->andReturn($token_cache);
         $factory->shouldReceive('create')->andReturn($payment_service);
         $factory->shouldReceive('createLock')->andReturn($lock);
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         // Fix 7: cache cleanup after a terminal reconciliation - not asserted by every test, only
@@ -481,7 +589,10 @@ class returnActionTest extends TestCase
         // Fix 4's cross-check baseline (see $cart above).
         $plugin->shouldReceive('getCart')->andReturn($cart_adapter)->byDefault();
         $cart_adapter->shouldReceive('get')->with(42)->andReturn($cart)->byDefault();
-        $amount_helper->shouldReceive('convertAmount')->with(12.34)->andReturn(1234)->byDefault();
+        $currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $plugin->shouldReceive('getCurrency')->andReturn($currency_adapter)->byDefault();
+        $currency_adapter->shouldReceive('getCurrency')->with(2)->andReturn((object) ['iso_code' => 'USD'])->byDefault();
+        $amount_helper->shouldReceive('convertAmount')->with(12.34, false, 'USD')->andReturn(1234)->byDefault();
 
         $action->dependencies = $dependencies;
 
@@ -493,6 +604,7 @@ class returnActionTest extends TestCase
             'plugin' => $plugin,
             'order_action' => $order_action,
             'cookies' => $cookie_helper,
+            'payment_repository' => $payment_repository,
         ]];
     }
 

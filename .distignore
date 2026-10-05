@@ -1,5 +1,6 @@
 # Dev tooling & config
 .act-artifacts/
+.claude/
 .gemini/
 .git/
 .github/
@@ -25,6 +26,10 @@ node_modules/
 
 # Tests
 tests/
+
+# Dev documentation
+CLAUDE.md
+docs/
 
 # Dev assets (compiled ones go to views/)
 dev/

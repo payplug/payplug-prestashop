@@ -97,6 +97,27 @@ class setHostedFieldsPaymentOptionTest extends BasePrestashopAdapter17
         );
     }
 
+    public function testKeepsTheCustomerStaticTokenOutOfTheCreateUrl()
+    {
+        $this->context->link->shouldReceive('getModuleLink')
+            ->with('payplug', 'unified', \Mockery::on(function ($params) {
+                return is_array($params) && array_key_exists('static_token', $params);
+            }), true)
+            ->never();
+
+        $assigned_vars = null;
+        $this->context->smarty->shouldReceive('assign')
+            ->once()
+            ->andReturnUsing(function ($vars) use (&$assigned_vars) {
+                $assigned_vars = $vars;
+            });
+
+        $this->adapter->setHostedFieldsPaymentOption($this->payment_options);
+
+        $this->assertStringNotContainsString('static_token', $assigned_vars['hosted_fields_uhf_url']);
+        $this->assertArrayNotHasKey('static_token', $assigned_vars);
+    }
+
     public function testAssignsTheSavedAliasesUsableForTheCartCurrencyAndIdentifier()
     {
         $aliases = [[

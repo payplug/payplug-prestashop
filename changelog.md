@@ -9,6 +9,14 @@
 - Bugfix :
   - [PRE-3627](https://payplug-prod.atlassian.net/browse/PRE-3627): Never move a refunded Unified Hosted Fields order back to paid on a late payment notification
   - [PRE-3627](https://payplug-prod.atlassian.net/browse/PRE-3627): Wait for the browser return to finish creating the order instead of losing the Unified Hosted Fields payment notification with a 409
+  - [PRE-3441](https://payplug-prod.atlassian.net/browse/PRE-3441): Create the order of a Unified Hosted Fields payment whose cart was edited during 3DS, in "Payment error" for the merchant to review, instead of dropping a captured payment
+  - [PRE-3441](https://payplug-prod.atlassian.net/browse/PRE-3441): Create a Unified Hosted Fields order only once the payment is paid, never while 3DS is still pending
+  - [PRE-3441](https://payplug-prod.atlassian.net/browse/PRE-3441): Update a pending Unified Hosted Fields order from its payment when it is opened in the back office
+
+## Version 5.2.2
+- Bugfix :
+  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state (every stored scope, multistore included)
+  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
     - [PRE-3557](https://payplug-prod.atlassian.net/browse/PRE-3557): Don't create an order (and send the confirmation email) until a card payment is confirmed paid, deferred or Oney; let late payment failures cancel the order instead of being silently dropped
     - [PRE-3580](https://payplug-prod.atlassian.net/browse/PRE-3580): Stop answering 500 (retried in a loop by PayPlug) to a replayed IPN for a failed payment whose cart association was already replaced by a newer attempt
 
@@ -30,8 +38,6 @@
   - [PRE-3598](https://github.com/payplug/payplug-prestashop/pull/125): Only start the integrated card payment from its own checkout form
   - [PRE-3599](https://github.com/payplug/payplug-prestashop/pull/131): Fix duplicate customer/address with applepay express
   - [PRE-3649](https://github.com/payplug/payplug-prestashop/pull/132): Hide the Apple Pay button on the product and cart pages when a product (or pack) can't be ordered regarding its stock or minimal quantity, and refuse the Apple Pay payment request in that case
-  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state (every stored scope, multistore included)
-  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
 
 ## Version 5.1.0
 - Feature :
