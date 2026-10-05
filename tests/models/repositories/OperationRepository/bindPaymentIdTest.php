@@ -108,6 +108,49 @@ class bindPaymentIdTest extends BaseOperationRepository
         $this->assertFalse($this->repository->bindPaymentId('op_1', '', 42));
     }
 
+    public function testRecordsTheRequestedAmountOnThePlaceholder()
+    {
+        $this->repository->shouldReceive('getBy')->with('operation_id', 'op_1')->andReturn([]);
+        $this->repository->shouldReceive('createEntity')
+            ->once()
+            ->with(\Mockery::on(function (array $fields) {
+                return 0 === $fields['amount'] && 1234 === $fields['requested_amount'];
+            }))
+            ->andReturn(7);
+        $this->mockPurge();
+
+        $this->assertTrue($this->repository->bindPaymentId('op_1', 'pay_1', 42, 1234));
+    }
+
+    public function testRecordsTheRequestedAmountOnAnExistingOperationRow()
+    {
+        $this->repository->shouldReceive('getBy')->with('operation_id', 'op_1')->andReturn([
+            'id_payplug_upc_operation' => '12',
+            'operation_id' => 'op_1',
+        ]);
+        $this->repository->shouldReceive('updateEntity')
+            ->once()
+            ->with(12, ['payment_id' => 'pay_1', 'requested_amount' => 1234])
+            ->andReturn(true);
+
+        $this->assertTrue($this->repository->bindPaymentId('op_1', 'pay_1', 42, 1234));
+    }
+
+    public function testRecordsTheRequestedAmountOnTheRowSavedConcurrently()
+    {
+        $this->repository->shouldReceive('getBy')->with('operation_id', 'op_1')->twice()->andReturn([], [
+            'id_payplug_upc_operation' => '12',
+            'operation_id' => 'op_1',
+        ]);
+        $this->repository->shouldReceive('createEntity')->once()->andThrow(new \Exception('Duplicate entry'));
+        $this->repository->shouldReceive('updateEntity')
+            ->once()
+            ->with(12, ['payment_id' => 'pay_1', 'requested_amount' => 1234])
+            ->andReturn(true);
+
+        $this->assertTrue($this->repository->bindPaymentId('op_1', 'pay_1', 42, 1234));
+    }
+
     private function mockPurge()
     {
         $this->repository->shouldReceive([

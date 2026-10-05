@@ -94,7 +94,7 @@ $operation_repository = $this->getService('payplug.models.repositories.operation
 
 - `PayplugLock` uses a `sleep()`-based polling loop by design, to prevent a race between the IPN webhook and the customer redirect both trying to finalize the same order.
 - IPN payloads must go through `PayPlug\classes\ConfigClass::setNotification()->treat()` — this wraps `php://input` reading and SDK signature verification. Never read/act on raw `php://input` outside of it.
-- `AmountHelper::convertAmount()` multiplies by 1000 then divides by 10 before rounding (e.g. `17.90 → 1789`) specifically to avoid floating-point drift; don't simplify the arithmetic. The PayPlug API expects integer amounts in cents; `convertAmount($amount, true)` converts cents back to a float. Passing an unconverted float, or converting twice, is a bug.
+- `AmountHelper::convertAmount($amount, $from_cents = false, $iso_code = 'EUR')` delegates to UPC's currency-aware `AmountHelper::toCents()`/`fromCents()` (PRE-3531) — don't reimplement the arithmetic locally. It applies the shop's `PS_PRICE_ROUND_MODE` (half-* modes go to UPC's rounding mode; `PS_ROUND_UP`/`DOWN` scale by the currency's minor-unit factor, then `ps_round`). The PayPlug APIs expect integer amounts in the currency's minor units (100 per unit for EUR, 1 for JPY; UPC rejects 3-decimal currencies); `convertAmount($amount, true, $iso_code)` converts back to a float. Always pass the real currency outside the EUR-only Retail flow. Passing an unconverted float, converting twice, or converting with the wrong currency is a bug.
 - Payment methods that don't support saved cards (iDEAL, MyBank, Bancontact, Satispay, Apple Pay, email link, SMS link, installment) explicitly unset/force `allow_save_card = false` — expected, not an oversight.
 - Front-office controllers/AJAX endpoints under `controllers/front/` must respond with JSON containing `redirect_url` rather than an HTTP redirect, for headless-storefront compatibility. `validation.php` and `dispatcher.php` are known pre-existing exceptions — don't replicate that pattern in new code.
 - New payment methods need: a class extending `PaymentMethod` in `src/models/classes/paymentMethod/`, correct `allow_save_card` handling, currency validation before the API call (EUR-only enforcement), `payment_context.cart` in the payload for Oney/Scalapay-style financing, registration in `config/services.yml`, templates, and translations in all 8 locales (`en`, `gb`, `fr`, `de`, `it`, `es`, `nl`, `pt`).
@@ -107,7 +107,7 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
 
 - **Config**: a single `Configuration` key, `hosted_fields` (JSON, defaults to `{}`), maps lowercase currency ISO code → UHF identifier for that currency (e.g. `{"usd":"...","gbp":"..."}`). `ConfigurationAction::saveAction()` derives one `payplug_identifier_<iso>` field per active non-EUR currency and merges each into that JSON blob (merge, not replace — don't collapse this back into a single flat key).
 - **Admin UI gating**: `CurrencyAdapter::hasOtherCurrency()` (shop has at least one non-EUR active currency) controls whether the per-currency identifier inputs are even shown on `StandardPaymentMethod::getOption()`. Conversely, `PaymentMethod::getAvailablePaymentMethod()` returns only `['standard']` when `feature_hosted_fields` is on and the shop has **no** EUR currency at all — other payment methods are EUR-only and get disabled outright in that case. `StandardPaymentMethod::getOption()` was refactored to extract `getEmbeddedOptions()` / `getWarningOptions()` / `getAliasingOptions()`; the `integrated`/`popup`/`redirect` embedded-mode selector itself (`getEmbeddedOptions()`) is hidden whenever the shop has no EUR currency, since it's meaningless for non-EUR-only shops.
-- **Checkout routing**: `PrestashopAdapter17::displayPaymentOption()` branches on the cart's currency, not the shop's — the existing `integrated` embedded mode is now explicitly restricted to `'EUR' === $this->context->currency->iso_code`; a non-EUR cart instead goes through `setHostedFieldsPaymentOption()` (mirrors `setIntegratedPaymentOption()`) when `feature_hosted_fields` is on and an identifier is configured for that cart's currency. It renders `views/templates/hook/checkout/payment/hosted_fields.tpl`.
+- **Checkout routing**: `PrestashopAdapter17::displayPaymentOption()` branches on the cart's currency, not the shop's — the existing `integrated` embedded mode is now explicitly restricted to `'EUR' === $this->context->currency->iso_code`; a non-EUR cart instead goes through `setHostedFieldsPaymentOption()` (mirrors `setIntegratedPaymentOption()`) when `feature_hosted_fields` is on, an identifier is configured for that cart's currency and `HOSTED_FIELDS_URL` is set (see Routes below). It renders `views/templates/hook/checkout/payment/hosted_fields.tpl`.
 - **Front controllers**: `controllers/front/unified.php` (`PayplugUnifiedModuleFrontController`,
   replaced `uhf.php` in an earlier ticket) dispatches the three browser-facing UHF operations, on an
   `action` request parameter: `create` (receives `hfToken`/`selectedBrand`/`save_card`/`id_cart`
@@ -124,6 +124,31 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   notification, no error anywhere) and as mixing a server-to-server webhook with browser-facing
   endpoints on one URL, two different trust domains. It calls the exact same
   `OperationAction::notifyAction()` via the same service, unchanged.
+- **Order creation rule (PRE-3557, applies to UHF)**: an order is created only for a `PAID`
+  outcome. `FAILED` creates nothing, and neither does `THREE_DS_PENDING`, from any path
+  (`createAction()`'s synchronous result, `reconcilePendingOperation()`, `returnAction()`,
+  `notifyAction()`), with no 3DS exception: a cardholder back from 3DS already knows its result.
+  `UnifiedOrderAction::createFromOutcome()` refuses any non-`PAID` outcome when no order exists
+  (it validates the order in the module's `pending` state, then applies `PAID`: an implementation
+  detail, never a resting state). A return landing while the operation is still `THREE_DS_PENDING`
+  mirrors the Retail return of an unresolved payment (`ValidationAction::checkAction()`): no order,
+  redirect to the checkout error page with the "transaction was not completed" payment error
+  cookie; the `uhf_pending_operation`/token/challenge/pending-alias cache entries are kept, so a
+  later return, a retry (which resumes the same challenge) or the `PAID` notification
+  (`createOrderWithLock()`) still finishes the payment.
+- **Back-office resync of a pending UHF order**: a UHF order left in the module's `pending` state
+  (its `PAID` state could not be applied, or the notification was lost) is brought up to date when
+  opened in the BO, as the Retail payment methods already do from `getResourceDetail()`
+  (`EmailLinkPaymentMethod`/`SmsLinkPaymentMethod`/`OneyPaymentMethod::updateOrderStateFromPendingToPaid()`,
+  then `redirectAdmin` to reload the order page). `OrderAction::renderDetail()` calls
+  `resyncPendingUnifiedOrder()` before `renderUnifiedDetail()`: only for an order in the pending
+  state (read from `sandbox_mode`, like `UpcOrderStateMutator`), it calls
+  `OperationAction::resyncPendingOrder()`, which re-reads the order's operation
+  (`getPaidByOrderId()`, else `getByOrderId()`; none for a Retail order, so no API call) with
+  `getOperation()`, runs the same orderId/amount cross-check, routes `PAID`/`FAILED` through
+  `createOrderWithLock()` (existing-order branch of `createFromOutcome()`, then `markTreated()`),
+  and leaves a `THREE_DS_PENDING` order as is. The page reloads only when the order actually left
+  the pending state; any failure is logged and the order page still renders.
 - **Asynchronous confirmation (PRE-3626)**: `OperationAction::notifyAction()`, reached via
   `controllers/front/notify.php` (`module/payplug/notify`) — a fixed URL, no per-order parameter,
   matching PayPlug's Unified API notifier ("Receiver"), which is configured once per merchant
@@ -133,15 +158,9 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   outcome (execCode `0001`) is a strict no-op: it must never consume `OperationRepository`'s
   `isTreated()`/`markTreated()` idempotency tracking, since a genuine async webhook can carry this
   code *before* the real, final notification for the same operation (a known PayPlug platform
-  behavior, documented on the vendor's `WebhookNotificationHelper` itself). `returnAction()` has
-  no equivalent `THREE_DS_PENDING` filter of its own — it's intentional: a synchronous return
-  arriving while the payment is still `THREE_DS_PENDING` creates the order in a `pending` state
-  regardless, and the async notification (this section) is what later reconciles it to its real,
-  final outcome. See `UnifiedOrderAction::createFromOutcome()`'s own comment (its existing-order
-  branch) for exactly which of the three outcomes `ExecCodeMapper` can ever produce reconcile an
-  already-`pending` order to what state, and why `PaymentOutcome::REFUNDED` (sent by the
-  classic/GM API on a different route — `ipn.php` — never the Unified API this module parses) is
-  structurally unreachable here. A terminal outcome
+  behavior, documented on the vendor's `WebhookNotificationHelper` itself). `PaymentOutcome::REFUNDED`
+  (sent by the classic/GM API on a different route — `ipn.php` — never the Unified API this
+  module parses) is structurally unreachable here. A terminal outcome
   reuses `UnifiedOrderAction::createFromOutcome()` — the same order-creation/confirmation sequence
   `createAction()`/`returnAction()` already use — via the shared `OperationAction::createOrderWithLock()`
   helper, which acquires `UpcLock` under the same `'uhf_cart:<id_cart>'` key with a short bounded
@@ -149,11 +168,20 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   uses the same helper with a longer budget (`NOTIFY_LOCK_RETRY_ATTEMPTS`, ~8s: its payment
   notification typically lands while `returnAction()` holds the cart lock, and the Receiver does
   not retry a `409` — observed on staging, 2026-09-29) and returns a `409` only if the lock still
-  can't be acquired after that. `notifyAction()` also cross-checks the webhook's
-  `amount` against the cart's own computed total before creating an order (there's no independent
+  can't be acquired after that. When the outcome could not be applied to the order
+  (`UpcOrderStateMutator::apply()` throws, except for its documented already-paid/already-refunded
+  no-op guards), `notifyAction()` answers `500` without `markTreated()`, so a redelivery is
+  reprocessed. `notifyAction()` also cross-checks the webhook's
+  `amount` against the amount requested at payment creation (`requested_amount` on the
+  `payplug_upc_operation` row, recorded by `bindPaymentId()`; the cart's live total only for a row
+  without it) before creating an order (there's no independent
   `id_cart` to cross-check `orderId` against in that server-to-server context — `orderId` itself
-  *is* the cart id there); `returnAction()`/the `createAction()` reconciliation path additionally
-  cross-check `orderId`. `UpcLock::acquire()`'s steal-an-expired-lock path is now an atomic
+  *is* the cart id there); `returnAction()`/the `createAction()` reconciliation path run the same
+  amount check and additionally cross-check `orderId`. A paid amount other than the requested one
+  is refused with a "manual review" error log; a requested amount paid on a cart edited during 3DS
+  still creates the order, in "Payment error": `UnifiedOrderAction` validates it in the paid state so
+  `validateOrder()` flags it (as the Retail flow does), and never lets a PAID outcome mark paid an
+  order whose total differs from the amount captured. `UpcLock::acquire()`'s steal-an-expired-lock path is now an atomic
   `UPDATE ... WHERE lock_key = ? AND expires_at < ?` (via `UpcLockRepository::stealExpired()` +
   `QueryAdapter::getAffectedRows()`), closing the prior two-concurrent-stealers race. Signature
   verification (`WebhookNotificationHelper::verifySignature()`) is currently *fail-open*: no admin
@@ -235,6 +263,14 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `UnifiedOrderAction::confirmationUrl()`'s `secure_key`+`id_order` — exactly what
   `order-confirmation` accepts — could leak via `handleReturn()`'s JSON branch
   (`wantsJsonResponse()`/`&ajax=1`).
+- **`createAction()` request checks and failures**: `createAction()` only accepts a POST carrying the
+  customer static token (`Tools::getToken(false)`) in its body, checked with `hash_equals` (CSRF); the
+  token is never put in the URL. On a `createPayment()` failure, an `ApiException` with status 0, 408,
+  409 or 5xx is "uncertain" and gets the "Please check with your bank before trying again" message;
+  any other failure gets "your card was not charged".
+- **Amounts**: `AmountHelper::convertAmount()` takes the currency ISO code (default `EUR`) and the UHF
+  call sites pass the cart's or order's currency, so JPY and other 0-decimal currencies are converted
+  correctly.
 - **`createAction()` re-entrancy**: if `createAction()` runs again for a cart that already has an
   in-flight UPC payment (e.g. the customer abandoned a 3DS challenge and hit back/refresh, or opened
   a second tab), it no longer creates a second payment. It checks `uhf_pending_operation:<cart>`
@@ -243,8 +279,8 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `createOrderWithLock()` path `returnAction()`/`notifyAction()` use; a still-`THREE_DS_PENDING`
   outcome redirects back to the *same* challenge (same token, via the `uhf_cart_token` reverse
   mapping) instead of starting a duplicate one.
-- **JS SDK**: `dev/js/front.js` gained a `hosted_fields` submodule initializing the `dalenys.hostedFields` widget (card/expiry/CVV fields), with per-field validation, brand allow-listing, an anti-double-submit guard with a safety timeout, and tokenization before POSTing to `unified.php?action=create` (the URL is server-injected as `hosted_fields_uhf_url`/`payplug_hosted_fields_uhf_url`, built by `PrestashopAdapter17::setHostedFieldsPaymentOption()` — the JS-side variable name kept its original `uhf` naming even though it no longer points at `uhf.php`).
-- **Routes**: `Routes::getHostedFieldsUrl()` reads `HOSTED_FIELDS_URL` from `payplugroutes/.env` if present, else falls back to a hardcoded `https://cdn.payplug.com/js/hosted-fields/v1@1/index.js`, the same pattern `getOneyLoaderUrl()` already uses. **This default's validity is unconfirmed** (PR123 review) — an earlier version of this method deliberately had no hardcoded fallback at all, on the grounds that the real production CDN URL wasn't confirmed and a guessed-but-wrong URL would fail silently; that safety property no longer holds now that a default is hardcoded, until someone who can confirm the real production URL against PayPlug's actual hosted-fields CDN does so (and updates this bullet once confirmed).
+- **JS SDK**: `dev/js/front.js` gained a `hosted_fields` submodule initializing the `dalenys.hostedFields` widget (card/expiry/CVV fields), with per-field validation, brand allow-listing, an anti-double-submit guard with a safety timeout, and tokenization before POSTing to `unified.php?action=create`, with the customer static token (`prestashop.static_token`, set by PrestaShop core on every front page) in the POST body for both the card and saved-alias submits (the URL is server-injected as `hosted_fields_uhf_url`/`payplug_hosted_fields_uhf_url`, built by `PrestashopAdapter17::setHostedFieldsPaymentOption()` — the JS-side variable name kept its original `uhf` naming even though it no longer points at `uhf.php`).
+- **Routes**: `Routes::getHostedFieldsUrl()` reads `HOSTED_FIELDS_URL` from `payplugroutes/.env` and has **no hardcoded default** until the production hosted-fields SDK URL is confirmed (a guessed-but-wrong URL would fail silently): unset, it returns `''`. `PrestashopAdapter17::displayPaymentOption()` then doesn't display the hosted fields option at all (`isHostedFieldsSdkUrlConfigured()`, a non-EUR cart gets no UHF option rather than a broken form) and logs an error through the module logger. The log is there and not in `Routes`: `getSourceUrl()` is built on every front page by `HookClass`'s header hook.
 - The pre-existing Retail API flow (`dispatcher.php`, `PaymentAction`, resource creation) is untouched by this work so far.
 
 ### Design docs

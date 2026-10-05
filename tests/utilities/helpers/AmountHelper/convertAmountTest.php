@@ -3,6 +3,7 @@
 namespace PayPlug\Tests\utilities\helpers\AmountHelper;
 
 use PayPlug\src\utilities\helpers\AmountHelper;
+use PayplugUnifiedCore\Exceptions\InvalidCurrencyException;
 use PHPUnit\Framework\TestCase;
 
 /**

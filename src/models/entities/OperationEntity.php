@@ -52,6 +52,7 @@ class OperationEntity
             'amount' => ['type' => 'integer', 'required' => true],
             'treated' => ['type' => 'boolean'],
             'payment_id' => ['type' => 'string'],
+            'requested_amount' => ['type' => 'integer'],
             'date_add' => ['type' => 'string'],
             'date_upd' => ['type' => 'string'],
         ],
@@ -74,6 +75,9 @@ class OperationEntity
 
     /** @var string|null */
     private $payment_id;
+
+    /** @var int|null */
+    private $requested_amount;
 
     /** @var bool */
     private $treated;
@@ -156,6 +160,14 @@ class OperationEntity
     public function getPaymentId()
     {
         return $this->payment_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRequestedAmount()
+    {
+        return $this->requested_amount;
     }
 
     /**
@@ -308,6 +320,24 @@ class OperationEntity
         }
 
         $this->payment_id = $payment_id;
+
+        return $this;
+    }
+
+    /**
+     * @param $requested_amount
+     *
+     * @throws BadParameterException
+     *
+     * @return $this
+     */
+    public function setRequestedAmount($requested_amount)
+    {
+        if (!is_int($requested_amount)) {
+            throw new BadParameterException('Invalid argument, $requested_amount must be an int');
+        }
+
+        $this->requested_amount = $requested_amount;
 
         return $this;
     }

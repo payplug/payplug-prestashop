@@ -24,6 +24,7 @@
 namespace PayPlug\src\utilities\helpers;
 
 use PayPlug\classes\DependenciesClass;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper as UpcAmountHelper;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -43,7 +44,9 @@ class AmountHelper
      *
      * @param $amount
      * @param bool $from_cents
-     * @param string $currency ISO 4217 code of the amount's currency
+     * @param string $iso_code ISO 4217 code of the amount's currency, which sets its number of minor units
+     *
+     * @throws \PayplugUnifiedCore\Exceptions\InvalidCurrencyException for a malformed or 3-decimal currency
      *
      * @return float|int 0 when $currency is not a supported ISO 4217 code
      */

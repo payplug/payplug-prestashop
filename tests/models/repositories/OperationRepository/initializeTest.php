@@ -62,4 +62,23 @@ class initializeTest extends BaseOperationRepository
             ]);
         $this->assertTrue($this->repository->initialize($this->engine));
     }
+
+    public function testCreatesTheRequestedAmountColumn()
+    {
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'create' => $this->repository,
+            'table' => $this->repository,
+            'condition' => $this->repository,
+            'engine' => $this->repository,
+            'build' => true,
+        ]);
+        $this->repository->shouldReceive('fields')
+            ->once()
+            ->with('`requested_amount` INT(11) UNSIGNED NULL')
+            ->andReturn($this->repository);
+        $this->repository->shouldReceive('fields')->andReturn($this->repository);
+
+        $this->assertTrue($this->repository->initialize($this->engine));
+    }
 }

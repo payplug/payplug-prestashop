@@ -1927,8 +1927,9 @@ var $document, $window, __moduleName__Module = {
             // Mirrors integrated.form.init() listener (line 610): attach validate()
             // to the global form submit event so it fires every time the form is
             // submitted, not just the first time. This allows retrying after
-            // switching payment methods or recovering from errors.
-            $document.on('submit', 'form', hosted.form.validate);
+            // switching payment methods or recovering from errors. Namespaced and unbound
+            // first: init() runs twice, and a second binding would submit the payment twice.
+            $document.off('submit.hostedFields').on('submit.hostedFields', 'form', hosted.form.validate);
         },
         form: {
             validate: function (event) {
@@ -2091,6 +2092,7 @@ var $document, $window, __moduleName__Module = {
                         // being able to verify against the actual DOM.
                         id_cart: $('input[name="id_cart"]').val(),
                         cardholderName: $('#hf-cardholder').val(),
+                        static_token: (window['prestashop'] || {}).static_token,
                     },
                     error: hosted.form.onSubmitError,
                     success: hosted.form.onSubmitResponse,
@@ -2108,6 +2110,7 @@ var $document, $window, __moduleName__Module = {
                     data: {
                         id_payplug_alias: idPayplugAlias,
                         id_cart: $('input[name="id_cart"]').val(),
+                        static_token: (window['prestashop'] || {}).static_token,
                     },
                     error: hosted.form.onSubmitError,
                     success: hosted.form.onSubmitResponse,

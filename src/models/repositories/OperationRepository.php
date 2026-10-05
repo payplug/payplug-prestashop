@@ -79,6 +79,7 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
             ->fields('`amount` INT(11) UNSIGNED NOT NULL')
             ->fields('`treated` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`payment_id` VARCHAR(255) NULL')
+            ->fields('`requested_amount` INT(11) UNSIGNED NULL')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
             ->condition('CONSTRAINT payplug_upc_operation_unique UNIQUE (operation_id), KEY payplug_upc_operation_order_id (order_id)')
@@ -152,9 +153,12 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
      * response carries the payment's own "id" (the key POST /payments/{id}/refund expects) and
      * "operationIds[0]" (the key getOperation() and the webhook use, stored as operation_id).
      * OperationData has no room for the former, so it is bound here, right after the payment is
-     * created - before any order exists for a 3DS payment. When the operation isn't persisted yet,
-     * a pending placeholder row is created; save() later completes it (order_id, outcome, amount)
-     * and, since it never writes payment_id, keeps the binding.
+     * created - before any order exists for a 3DS payment. The amount sent at creation is recorded
+     * with it as requested_amount, the reference the return and the notification check the paid
+     * amount against (a webhook can arrive long after the cart was edited). When the operation
+     * isn't persisted yet, a pending placeholder row is created; save() later completes it
+     * (order_id, outcome, amount) and, since it never writes payment_id nor requested_amount,
+     * keeps both.
      *
      * The placeholder (order_id 'cart:<id_cart>', exec_code '0001', outcome three_ds_pending,
      * amount 0) is never completed when no order is ever created for the payment: a frictionless
@@ -165,32 +169,36 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
      * should not read them as payments still in progress. They are purged once older than
      * PLACEHOLDER_MAX_AGE, each time a new placeholder is created (no cron needed).
      */
-    public function bindPaymentId(string $operationId, string $paymentId, int $idCart): bool
+    public function bindPaymentId(string $operationId, string $paymentId, int $idCart, ?int $requestedAmount = null): bool
     {
         if ('' === $operationId || '' === $paymentId) {
             return false;
         }
 
+        $binding = ['payment_id' => $paymentId];
+        if (null !== $requestedAmount) {
+            $binding['requested_amount'] = $requestedAmount;
+        }
+
         $existing = $this->getBy('operation_id', $operationId);
 
         if ($existing) {
-            return (bool) $this->updateEntity((int) $existing['id_payplug_upc_operation'], ['payment_id' => $paymentId]);
+            return (bool) $this->updateEntity((int) $existing['id_payplug_upc_operation'], $binding);
         }
 
         $now = date('Y-m-d H:i:s');
 
         try {
-            $created = (bool) $this->createEntity([
+            $created = (bool) $this->createEntity(array_merge([
                 'operation_id' => $operationId,
                 'order_id' => self::PLACEHOLDER_ORDER_PREFIX . $idCart,
                 'exec_code' => '0001',
                 'outcome' => PaymentOutcome::THREE_DS_PENDING,
                 'amount' => 0,
-                'payment_id' => $paymentId,
                 'treated' => false,
                 'date_add' => $now,
                 'date_upd' => $now,
-            ]);
+            ], $binding));
         } catch (\Throwable $exception) {
             $created = false;
         }
@@ -201,7 +209,7 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
             $existing = $this->getBy('operation_id', $operationId);
 
             return $existing
-                && (bool) $this->updateEntity((int) $existing['id_payplug_upc_operation'], ['payment_id' => $paymentId]);
+                && (bool) $this->updateEntity((int) $existing['id_payplug_upc_operation'], $binding);
         }
 
         $this->purgeStalePlaceholders();
@@ -215,6 +223,19 @@ class OperationRepository extends EntityRepository implements IPaymentRepository
 
         return $row && isset($row['payment_id']) && is_string($row['payment_id']) && '' !== $row['payment_id']
             ? $row['payment_id']
+            : null;
+    }
+
+    /**
+     * @return int|null the amount sent when the payment was created, null for an unknown operation
+     *                  or one recorded without it
+     */
+    public function getRequestedAmountByOperationId(string $operationId): ?int
+    {
+        $row = $this->getBy('operation_id', $operationId);
+
+        return $row && isset($row['requested_amount']) && is_numeric($row['requested_amount'])
+            ? (int) $row['requested_amount']
             : null;
     }
 

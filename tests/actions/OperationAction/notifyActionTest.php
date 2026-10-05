@@ -5,6 +5,7 @@
 namespace PayPlug\tests\actions\OperationAction;
 
 use PayPlug\src\actions\OperationAction;
+use PayPlug\src\utilities\helpers\AmountHelper;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PHPUnit\Framework\TestCase;
@@ -107,6 +108,66 @@ class notifyActionTest extends TestCase
         $result = $action->notifyAction();
 
         $this->assertSame(500, $result['http_status']);
+    }
+
+    public function testReturnsServerErrorAndDoesNotMarkTreatedWhenThePaidStateCouldNotBeApplied()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+            'outcome_applied' => false,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/could not be applied/'));
+
+        $result = $action->notifyAction();
+
+        $this->assertSame(500, $result['http_status']);
+    }
+
+    public function testReturnsServerErrorAndDoesNotMarkTreatedWhenTheFailedStateCouldNotBeApplied()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_failed","execCode":"9999","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, 'op_failed', '9999', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, 'op_failed', '9999', PaymentOutcome::FAILED, 2900, [
+            'result' => false,
+            'redirect_url' => 'index.php?controller=order&step=3&has_error=1&modulename=payplug',
+            'persisted' => true,
+            'outcome_applied' => false,
+        ]);
+        $mocks['payment_repository']->shouldReceive('save')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/could not be applied/'));
+
+        $result = $action->notifyAction();
+
+        $this->assertSame(500, $result['http_status']);
+    }
+
+    public function testCrossChecksTheAmountInTheMinorUnitsOfAZeroDecimalCartCurrency()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 29);
+        $this->mockCartForAmountCrossCheck($action->dependencies, null, 'JPY');
+        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 29, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $result = $action->notifyAction();
+
+        $this->assertSame(200, $result['http_status']);
     }
 
     public function testReturnsBadRequestWhenPayloadIsMalformed()
@@ -221,6 +282,54 @@ class notifyActionTest extends TestCase
         $result = $action->notifyAction();
 
         $this->assertSame(200, $result['http_status']);
+    }
+
+    /**
+     * The cart was edited during the 3DS challenge (its total now converts to 1500): the operation
+     * captured the 2900 requested at its creation, so the order is created and the notification
+     * treated.
+     */
+    public function testCreatesTheOrderWhenThePaidAmountIsTheRequestedOneAlthoughTheCartChanged()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 1500);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')
+            ->with('359fe258-8264-4a90-9a40-d16e1736058d')
+            ->andReturn(2900);
+        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('359fe258-8264-4a90-9a40-d16e1736058d');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testRefusesAndAsksForAManualReviewWhenThePaidAmountDiffersFromTheRequestedOne()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        // The cart total still matches the paid amount: the reference amount alone decides.
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')
+            ->with('359fe258-8264-4a90-9a40-d16e1736058d')
+            ->andReturn(2500);
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['payment_repository']->shouldReceive('save')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::on(function ($message) {
+            return false !== strpos($message, 'manual review')
+                && false !== strpos($message, '359fe258-8264-4a90-9a40-d16e1736058d')
+                && false !== strpos($message, 'cart 6')
+                && false !== strpos($message, '2900')
+                && false !== strpos($message, '2500');
+        }));
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
     }
 
     public function testAcceptsMatchingAuthorizationHeaderWhenSecretIsConfigured()
@@ -759,6 +868,7 @@ class notifyActionTest extends TestCase
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         $payment_repository->shouldReceive('isTreated')->andReturn(false)->byDefault();
+        $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
 
         $refund_repository = \Mockery::mock('UpcRefundRepository');
         $order_adapter = \Mockery::mock('OrderAdapter');
@@ -837,14 +947,24 @@ class notifyActionTest extends TestCase
      * do) - OperationAction's own logic, unrelated to the (now mocked) order creator.
      *
      * @param mixed $dependencies
+     * @param mixed $expected_cents
+     * @param mixed $iso_code
      */
-    private function mockCartForAmountCrossCheck($dependencies, int $expected_cents)
+
+    /**
+     * @param mixed $dependencies
+     * @param int|null $expected_cents null to convert with the real AmountHelper
+     * @param string $iso_code
+     */
+    private function mockCartForAmountCrossCheck($dependencies, $expected_cents, $iso_code = 'USD')
     {
         $plugin = $dependencies->getPlugin();
         $cart_adapter = \Mockery::mock('CartAdapter');
         $amount_helper = \Mockery::mock('AmountHelper');
+        $currency_adapter = \Mockery::mock('CurrencyAdapter');
         $cart = new class() {
             public $id = 6;
+            public $id_currency = 2;
 
             public function getOrderTotal($withTaxes, $type)
             {
@@ -852,10 +972,24 @@ class notifyActionTest extends TestCase
             }
         };
 
-        $dependencies->shouldReceive('getHelpers')->andReturn(['amount' => $amount_helper]);
         $plugin->shouldReceive('getCart')->andReturn($cart_adapter);
+        $plugin->shouldReceive('getCurrency')->andReturn($currency_adapter);
         $cart_adapter->shouldReceive('get')->with(6)->andReturn($cart);
-        $amount_helper->shouldReceive('convertAmount')->with(29.0)->andReturn($expected_cents);
+        $currency_adapter->shouldReceive('getCurrency')->with(2)->andReturn((object) ['iso_code' => $iso_code]);
+        if (null === $expected_cents) {
+            $configuration_class = \Mockery::mock('ConfigurationClass');
+            $constant_adapter = \Mockery::mock('ConstantAdapter');
+            $plugin->shouldReceive('getConfigurationClass')->andReturn($configuration_class);
+            $plugin->shouldReceive('getConstant')->andReturn($constant_adapter);
+            $configuration_class->shouldReceive('getValue')->with('PS_PRICE_ROUND_MODE')->andReturn(2);
+            $constant_adapter->shouldReceive('get')->andReturnUsing(function ($name) {
+                return array_search($name, ['PS_ROUND_UP', 'PS_ROUND_DOWN', 'PS_ROUND_HALF_UP', 'PS_ROUND_HALF_DOWN', 'PS_ROUND_HALF_EVEN', 'PS_ROUND_HALF_ODD'], true);
+            });
+            $amount_helper = new AmountHelper($dependencies);
+        } else {
+            $amount_helper->shouldReceive('convertAmount')->with(29.0, false, $iso_code)->andReturn($expected_cents);
+        }
+        $dependencies->shouldReceive('getHelpers')->andReturn(['amount' => $amount_helper]);
     }
 
     /**

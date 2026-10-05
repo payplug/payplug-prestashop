@@ -69,6 +69,39 @@ class UnifiedRefundAction
     }
 
     /**
+     * @description Convert a back-office refund amount into the minor units of the order's currency
+     *
+     * @param int $id_order
+     * @param mixed $amount major-unit amount, '.' as decimal separator
+     *
+     * @return int 0 when the amount, the order or its currency can't be resolved
+     */
+    public function convertRefundAmount($id_order = 0, $amount = 0)
+    {
+        if (!is_numeric($amount)) {
+            return 0;
+        }
+
+        $plugin = $this->dependencies->getPlugin();
+        $order = $plugin->getOrder()->get((int) $id_order);
+        if (!$plugin->getValidate()->validate('isLoadedObject', $order)) {
+            return 0;
+        }
+
+        $currency = $plugin->getCurrency()->get((int) $order->id_currency);
+        $currency_iso = is_object($currency) && isset($currency->iso_code) ? (string) $currency->iso_code : '';
+
+        try {
+            return (int) $this->dependencies->getHelpers()['amount']->convertAmount((float) $amount, false, $currency_iso);
+        } catch (\Exception $exception) {
+            $this->getService(self::FACTORY_SERVICE)->createLogger()->error('UnifiedRefundAction::convertRefundAmount - Order '
+                . (int) $id_order . ': ' . $exception->getMessage());
+
+            return 0;
+        }
+    }
+
+    /**
      * @description Refund, fully or partially, an order paid with Unified Hosted Fields
      *
      * No idempotency key exists on the Unified API refund endpoint, so the refund is recorded as

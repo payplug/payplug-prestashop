@@ -96,15 +96,27 @@ class AdminPayplugController extends ModuleAdminController
                     : 0;
 
                 if ('uhf' === $this->tools->tool('getValue', 'payment_type')) {
-                    $refund = $this->dependencies
+                    $unified_refund_action = $this->dependencies
                         ->getPlugin()
                         ->getModule()
                         ->getInstanceByName($this->dependencies->name)
-                        ->getService('payplug.action.unified_refund')
-                        ->refundAction((int) $id_order, (int) $amount_formated);
+                        ->getService('payplug.action.unified_refund');
+                    $refund = $unified_refund_action->refundAction(
+                        (int) $id_order,
+                        $unified_refund_action->convertRefundAmount((int) $id_order, $amount)
+                    );
 
                     exit(json_encode($refund));
                 }
+
+                $amount_formated = is_numeric($amount)
+                    ? $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.utilities.helper.amount')
+                        ->convertAmount($amount)
+                    : 0;
 
                 $refund = $this->dependencies
                     ->getPlugin()

@@ -893,6 +893,9 @@ class ConfigurationAction
             ->getCurrency()
             ->findAll();
         foreach ($currencies as $currency) {
+            if ('EUR' === strtoupper($currency['iso_code'])) {
+                continue;
+            }
             $name = 'identifier_' . strtolower($currency['iso_code']);
             $configuration_keys[$name] = 'payplug_' . $name;
         }
@@ -903,13 +906,17 @@ class ConfigurationAction
                 if (0 === strpos($config, 'payplug_identifier_')) {
                     $hosted_fields = json_decode($configuration->getValue('hosted_fields') ?: '{}', true);
                     $name = str_replace('payplug_identifier_', '', $config);
-                    $hosted_fields[$name] = (string) $value;
+                    $hosted_fields[$name] = trim((string) $value);
                     if (!$configuration->set('hosted_fields', (string) json_encode($hosted_fields))) {
+                        $logger->addLog('ConfigurationAction::saveAction: Unable to save ' . $config . '.');
+
                         return [
                             'success' => false,
                             'data' => [
-                                // todo: add translation
-                                'message' => 'An error has occurred while register ' . $config,
+                                'title' => null,
+                                'msg' => $translation['hosted_fields']['identifier']['text'],
+                                'close' => $translation['error']['submit'],
+                                'class' => '-error',
                             ],
                         ];
                     }
