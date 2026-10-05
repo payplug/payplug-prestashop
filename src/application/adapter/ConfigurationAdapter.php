@@ -47,11 +47,19 @@ class ConfigurationAdapter implements ConfigurationInterface
         return $config::get($configuration_name);
     }
 
-    public function updateValue($key, $value)
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @param int|null $id_shop_group null: current context, 0 with $id_shop 0: global value
+     * @param int|null $id_shop null: current context
+     *
+     * @return bool
+     */
+    public function updateValue($key, $value, $id_shop_group = null, $id_shop = null)
     {
         $config = $this->configuration;
 
-        return $config::updateValue($key, $value);
+        return $config::updateValue($key, $value, false, $id_shop_group, $id_shop);
     }
 
     public function deleteByName($key)
