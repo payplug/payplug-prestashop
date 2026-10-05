@@ -25,8 +25,8 @@ namespace PayPlug\src\actions;
 
 use PayPlug\classes\DependenciesClass;
 use PayPlug\src\application\adapter\PrestashopAdapter17;
-use PayPlug\src\models\repositories\UnifiedRefundRepository;
-use PayPlug\src\unified\helpers\UnifiedRefundExecCode;
+use PayPlug\src\models\classes\UpcRefundExecCode;
+use PayPlug\src\models\repositories\UpcRefundRepository;
 use PayPlug\src\utilities\services\Props;
 use PayPlug\src\utilities\traits\ServiceGetter;
 use PayplugUnifiedCore\DataValues\OperationData;
@@ -42,7 +42,6 @@ use PayplugUnifiedCore\Dto\PaymentDto;
 use PayplugUnifiedCore\Dto\ShippingDto;
 use PayplugUnifiedCore\Exceptions\ApiException;
 use PayplugUnifiedCore\Exceptions\InvalidNotificationException;
-use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
 use PayplugUnifiedCore\Utilities\Helpers\ExecCodeMapper;
 use PayplugUnifiedCore\Utilities\Helpers\WebhookNotificationHelper;
 
@@ -50,11 +49,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class UnifiedPaymentAction
+class OperationAction
 {
     use ServiceGetter;
 
-    private const FACTORY_SERVICE = 'payplug.unified.payment_service_factory';
+    private const FACTORY_SERVICE = 'payplug.utilities.service.unified_api_payment_service_factory';
     // Covers a payment creation or order creation round-trip: a lock expiring mid-request could be stolen.
     private const ORDER_CREATION_LOCK_TTL = 60;
     private const LOCK_RETRY_ATTEMPTS = 2;
@@ -72,7 +71,7 @@ class UnifiedPaymentAction
     private const PENDING_ALIAS_TTL = 86400;
     // Only probes the refund lock (released at once): it never guards anything itself.
     private const REFUND_LOCK_PROBE_TTL = 5;
-    private const REFUND_REPOSITORY_SERVICE = 'payplug.models.repositories.unified_refund';
+    private const REFUND_REPOSITORY_SERVICE = 'payplug.models.repositories.upc_refund';
 
     public $dependencies;
 
@@ -124,7 +123,7 @@ class UnifiedPaymentAction
         if (!is_callable([$this, $method_name])) {
             return [
                 'result' => false,
-                'message' => 'Method not found in object UnifiedPaymentAction',
+                'message' => 'Method not found in object OperationAction',
             ];
         }
 
@@ -132,7 +131,7 @@ class UnifiedPaymentAction
             return $this->{$method_name}($parameters);
         } catch (\Exception $exception) {
             $this->dependencies->getPlugin()->getLogger()->addLog(
-                'UnifiedPaymentAction::dispatchAction - Exception thrown: ' . $exception->getMessage(),
+                'OperationAction::dispatchAction - Exception thrown: ' . $exception->getMessage(),
                 'error'
             );
 
@@ -232,31 +231,31 @@ class UnifiedPaymentAction
         // (no enumeration).
         if ('' !== $alias_param) {
             if (!$this->isOneClickEnabled()) {
-                $logger->error('UnifiedPaymentAction::createAction - Alias payment refused, one-click disabled, cart ' . $cart->id);
+                $logger->error('OperationAction::createAction - Alias payment refused, one-click disabled, cart ' . $cart->id);
 
                 return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
             }
 
             if ($this->isGuestCustomer($context)) {
-                $logger->error('UnifiedPaymentAction::createAction - Alias payment refused for guest cart ' . $cart->id);
+                $logger->error('OperationAction::createAction - Alias payment refused for guest cart ' . $cart->id);
 
                 return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
             }
 
-            $usable_alias = $this->getService('payplug.models.repositories.unified_alias')->findUsable(
+            $usable_alias = $this->getService('payplug.models.repositories.alias')->findUsable(
                 $id_payplug_alias,
                 (int) $cart->id_customer,
                 strtolower((string) $currency->iso_code),
                 (string) $prestashop_adapter->getHostedFieldsIdentifier($currency->iso_code)
             );
             if (null === $usable_alias) {
-                $logger->error('UnifiedPaymentAction::createAction - Unknown or unusable alias for cart ' . $cart->id);
+                $logger->error('OperationAction::createAction - Unknown or unusable alias for cart ' . $cart->id);
 
                 return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
             }
 
-            if ($this->getService('payplug.action.unified_alias')->isExpired($usable_alias)) {
-                $logger->error('UnifiedPaymentAction::createAction - Alias payment refused, expired card, cart ' . $cart->id);
+            if ($this->getService('payplug.action.alias')->isExpired($usable_alias)) {
+                $logger->error('OperationAction::createAction - Alias payment refused, expired card, cart ' . $cart->id);
 
                 return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
             }
@@ -318,7 +317,7 @@ class UnifiedPaymentAction
         }
 
         // The lock is released exactly once on every exit path, including an exception thrown
-        // after the payment was created (e.g. a DB error in UnifiedTokenCache::set()), which would
+        // after the payment was created (e.g. a DB error in UpcTokenCache::set()), which would
         // otherwise lock the cart out for the whole TTL.
         try {
             try {
@@ -413,13 +412,13 @@ class UnifiedPaymentAction
                 // A timeout, a conflict or a server error may come after the payment was created: the customer
                 // must not be told the card was not charged, nor be pushed into paying again.
                 if ($this->isUncertainCreationFailure($exception)) {
-                    $logger->error('UnifiedPaymentAction::createAction - createPayment outcome unknown for cart ' . $cart->id
+                    $logger->error('OperationAction::createAction - createPayment outcome unknown for cart ' . $cart->id
                         . ': ' . $exception->getMessage());
 
                     return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
                 }
 
-                $logger->error('UnifiedPaymentAction::createAction - createPayment failed for cart ' . $cart->id . ': ' . $exception->getMessage());
+                $logger->error('OperationAction::createAction - createPayment failed for cart ' . $cart->id . ': ' . $exception->getMessage());
 
                 return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
             }
@@ -428,7 +427,7 @@ class UnifiedPaymentAction
             $operation_id = $this->extractOperationId($decoded_body);
 
             if ('' === $operation_id) {
-                $logger->error('UnifiedPaymentAction::createAction - missing operation identifier in payment creation response');
+                $logger->error('OperationAction::createAction - missing operation identifier in payment creation response');
 
                 return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
             }
@@ -444,16 +443,16 @@ class UnifiedPaymentAction
                 ];
             }
 
-            $this->bindPaymentId($factory, $logger, $decoded_body, $operation_id, (int) $cart->id, $amount_cents);
+            $this->bindPaymentId($factory, $logger, $decoded_body, $operation_id, (int) $cart->id);
 
             if ($output->redirectHtml || $output->redirectUrl) {
                 $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
 
-                // Read-after-write check: UnifiedTokenCache::set() can't report a write failure through
+                // Read-after-write check: UpcTokenCache::set() can't report a write failure through
                 // ITokenCache's void return type, and the return/challenge flow depends on finding
                 // this entry - without it the customer would land on the error page once charged.
                 if ($operation_id !== $token_cache->get('uhf_pending_operation:' . $cart->id)) {
-                    $logger->error('UnifiedPaymentAction::createAction - Failed to persist pending operation cache for cart ' . $cart->id);
+                    $logger->error('OperationAction::createAction - Failed to persist pending operation cache for cart ' . $cart->id);
 
                     return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
                 }
@@ -500,13 +499,6 @@ class UnifiedPaymentAction
                 $this->cachePendingAlias($token_cache, $logger, $operation_id, $pending_alias);
             }
 
-            // PRE-3557 rule: no order for a payment still pending, the notification creates it once paid.
-            if (PaymentOutcome::THREE_DS_PENDING === $outcome) {
-                $logger->info('UnifiedPaymentAction::createAction - Operation ' . $operation_id . ' still pending 3DS, no order created for cart ' . $cart->id);
-
-                return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
-            }
-
             $result = $this->orderAction()->createFromOutcome(
                 (int) $cart->id,
                 $operation_id,
@@ -551,7 +543,7 @@ class UnifiedPaymentAction
         $token = isset($params['token']) && is_string($params['token']) ? $params['token'] : '';
         $id_cart = $this->resolveIdCartFromToken($token_cache, $token);
         if ($id_cart <= 0) {
-            $factory->createLogger()->error('UnifiedPaymentAction::challengeAction - Invalid or expired token');
+            $factory->createLogger()->error('OperationAction::challengeAction - Invalid or expired token');
 
             return ['result' => false];
         }
@@ -559,7 +551,7 @@ class UnifiedPaymentAction
         $html = $token_cache->get('uhf_challenge_html:' . $id_cart);
 
         if (null === $html || '' === $html) {
-            $factory->createLogger()->error('UnifiedPaymentAction::challengeAction - No pending 3DS challenge for cart ' . $id_cart);
+            $factory->createLogger()->error('OperationAction::challengeAction - No pending 3DS challenge for cart ' . $id_cart);
 
             return ['result' => false];
         }
@@ -582,7 +574,7 @@ class UnifiedPaymentAction
         $token = isset($params['token']) && is_string($params['token']) ? $params['token'] : '';
         $id_cart = $this->resolveIdCartFromToken($token_cache, $token);
         if ($id_cart <= 0) {
-            $logger->error('UnifiedPaymentAction::returnAction - Invalid or expired token');
+            $logger->error('OperationAction::returnAction - Invalid or expired token');
 
             return $this->withReturnUrl([
                 'result' => false,
@@ -604,7 +596,7 @@ class UnifiedPaymentAction
         $operation_id = $token_cache->get('uhf_pending_operation:' . $id_cart);
 
         if (!$operation_id) {
-            $logger->error('UnifiedPaymentAction::returnAction - No pending UPC operation for cart ' . $id_cart);
+            $logger->error('OperationAction::returnAction - No pending UPC operation for cart ' . $id_cart);
 
             return $this->withReturnUrl([
                 'result' => false,
@@ -615,7 +607,7 @@ class UnifiedPaymentAction
         try {
             $response = $factory->create()->getOperation($operation_id);
         } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::returnAction - getOperation failed: ' . $exception->getMessage());
+            $logger->error('OperationAction::returnAction - getOperation failed: ' . $exception->getMessage());
 
             return $this->withReturnUrl([
                 'result' => false,
@@ -626,27 +618,11 @@ class UnifiedPaymentAction
         $decoded = json_decode($response['body'], true);
         $exec_code = is_array($decoded) && isset($decoded['execCode']) ? (string) $decoded['execCode'] : self::MISSING_EXEC_CODE;
         $outcome = ExecCodeMapper::toPaymentOutcome($exec_code);
-
-        // PRE-3557 rule, as on the Retail return: no order for a payment neither paid nor failed,
-        // and the customer is sent back to the checkout. The cache entries are kept for a later
-        // return, a retry (reconcilePendingOperation()) or the notification of the final outcome.
-        if (PaymentOutcome::THREE_DS_PENDING === $outcome) {
-            $logger->info('UnifiedPaymentAction::returnAction - Operation ' . $operation_id . ' still pending 3DS, no order created for cart ' . $id_cart);
-            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
-                $this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'),
-            ]);
-
-            return $this->withReturnUrl([
-                'result' => false,
-                'redirect_url' => $order_action->errorUrl(),
-            ]);
-        }
-
         $amount = is_array($decoded) && isset($decoded['amount']) ? (int) $decoded['amount'] : null;
 
         if (null === $amount) {
             $outcome = PaymentOutcome::FAILED;
-            $logger->error('UnifiedPaymentAction::returnAction - missing amount field in getOperation response for operation ' . $operation_id);
+            $logger->error('OperationAction::returnAction - missing amount field in getOperation response for operation ' . $operation_id);
             $amount = 0;
         } else {
             // Without full signature verification, the orderId+amount cross-check is the only
@@ -654,9 +630,7 @@ class UnifiedPaymentAction
             $order_id_from_response = is_array($decoded) && isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
             $cart = $this->dependencies->getPlugin()->getCart()->get($id_cart);
 
-            $requested_amount = $this->getRequestedAmount($factory, $logger, $operation_id);
-
-            if (!$this->crossChecksOrderIdAndAmount($logger, $cart, $id_cart, $order_id_from_response, $amount, 'UnifiedPaymentAction::returnAction', $operation_id, $requested_amount)) {
+            if (!$this->crossChecksOrderIdAndAmount($logger, $cart, $id_cart, $order_id_from_response, $amount, 'OperationAction::returnAction')) {
                 return $this->crossCheckMismatchResult($order_action);
             }
         }
@@ -701,13 +675,13 @@ class UnifiedPaymentAction
         // $operation_data->outcome - never produces anything other than PAID/THREE_DS_PENDING/FAILED:
         // PaymentOutcome::REFUNDED is unreachable here. A refund initiated from the BO through the
         // Unified API does arrive on this webhook, though, with a payment-shaped body (execCode 0000,
-        // orderId = cart), so it parses as a PAID payment: it is diverted by the payplug_unified_refund
-        // lookup below, before the payment path. A THREE_DS_PENDING outcome is a no-op (PRE-3557
-        // rule: no order for a payment still pending): only the final outcome creates the order.
+        // orderId = cart), so it parses as a PAID payment: it is diverted by the payplug_upc_refund
+        // lookup below, before the payment path. See UnifiedOrderAction::createFromOutcome()'s own
+        // comment for what happens to an existing pending order for each of the three outcomes.
         try {
             $operation_data = WebhookNotificationHelper::parse($headers, $body, $expected_header);
         } catch (InvalidNotificationException $exception) {
-            $logger->error('UnifiedPaymentAction::notifyAction - Invalid notification: ' . $exception->getMessage());
+            $logger->error('OperationAction::notifyAction - Invalid notification: ' . $exception->getMessage());
 
             return ['http_status' => 400];
         }
@@ -733,7 +707,7 @@ class UnifiedPaymentAction
         try {
             $response = $factory->create()->getOperation($operation_data->operationId);
         } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::notifyAction - getOperation failed: ' . $exception->getMessage());
+            $logger->error('OperationAction::notifyAction - getOperation failed: ' . $exception->getMessage());
 
             return ['http_status' => 500];
         }
@@ -749,7 +723,7 @@ class UnifiedPaymentAction
         $order_id_from_response = is_array($decoded) && isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
         $id_cart = (int) $order_id_from_response;
         if ($id_cart <= 0) {
-            $logger->error('UnifiedPaymentAction::notifyAction - Invalid orderId in getOperation response: ' . $order_id_from_response);
+            $logger->error('OperationAction::notifyAction - Invalid orderId in getOperation response: ' . $order_id_from_response);
 
             return ['http_status' => 400];
         }
@@ -761,7 +735,7 @@ class UnifiedPaymentAction
         $has_amount = null !== $amount;
         if (!$has_amount) {
             $outcome = PaymentOutcome::FAILED;
-            $logger->error('UnifiedPaymentAction::notifyAction - missing amount field in getOperation response for operation ' . $operation_data->operationId);
+            $logger->error('OperationAction::notifyAction - missing amount field in getOperation response for operation ' . $operation_data->operationId);
             $amount = 0;
         }
 
@@ -781,7 +755,7 @@ class UnifiedPaymentAction
                 // outside the module, or a second payment of the same cart. Never applied onto the
                 // paid order. The Receiver does not retry a 409 (observed on staging, 2026-09-29),
                 // so this notification is not delivered again: the log is the only trace.
-                $logger->error('UnifiedPaymentAction::notifyAction - Operation ' . $operation_data->operationId
+                $logger->error('OperationAction::notifyAction - Operation ' . $operation_data->operationId
                     . ' is not the paid operation of the order of cart ' . $id_cart
                     . ' and matches no recorded refund (early refund notification or duplicate payment), manual check needed');
 
@@ -790,22 +764,13 @@ class UnifiedPaymentAction
 
             // A 409 here would make the Receiver loop on the late webhook of an earlier failed
             // attempt, and a non-paid outcome has nothing to apply on an already-paid order.
-            $logger->info('UnifiedPaymentAction::notifyAction - Non-paid operation ' . $operation_data->operationId
+            $logger->info('OperationAction::notifyAction - Non-paid operation ' . $operation_data->operationId
                 . ' for the already-paid order of cart ' . $id_cart . ' ignored');
 
             return ['http_status' => 200];
         }
 
-        if ($has_amount && !$this->crossChecksOrderIdAndAmount(
-            $logger,
-            $cart,
-            $id_cart,
-            $order_id_from_response,
-            $amount,
-            'UnifiedPaymentAction::notifyAction',
-            $operation_data->operationId,
-            $this->getRequestedAmount($factory, $logger, $operation_data->operationId)
-        )) {
+        if ($has_amount && !$this->crossChecksOrderIdAndAmount($logger, $cart, $id_cart, $order_id_from_response, $amount, 'OperationAction::notifyAction')) {
             return ['http_status' => 200];
         }
 
@@ -829,18 +794,18 @@ class UnifiedPaymentAction
             return ['http_status' => 409];
         }
 
-        // Any outcome, FAILED included: an unapplied FAILED leaves the existing order in the wrong state.
+        // Any outcome, FAILED included: an unapplied FAILED leaves a pending order in the wrong state.
         // Whether the Receiver retries a 5xx is unconfirmed; the operation stays untreated, so a
         // redelivery is reprocessed.
         if (isset($result['outcome_applied']) && false === $result['outcome_applied']) {
-            $logger->error('UnifiedPaymentAction::notifyAction - Outcome ' . $outcome . ' of operation ' . $operation_data->operationId
+            $logger->error('OperationAction::notifyAction - Outcome ' . $outcome . ' of operation ' . $operation_data->operationId
                 . ' could not be applied to the order of cart ' . $id_cart);
 
             return ['http_status' => 500];
         }
 
         if (!$result['result'] && PaymentOutcome::FAILED !== $outcome) {
-            $logger->error('UnifiedPaymentAction::notifyAction - createFromOutcome failed for operation ' . $operation_data->operationId);
+            $logger->error('OperationAction::notifyAction - createFromOutcome failed for operation ' . $operation_data->operationId);
 
             return ['http_status' => 500];
         }
@@ -872,122 +837,27 @@ class UnifiedPaymentAction
     }
 
     /**
-     * @description Bring a Unified Hosted Fields order left in the pending state up to date with
-     *              its operation, when the order is opened in the back office
-     *
-     * A terminal outcome goes through createOrderWithLock(), as the return and the notification
-     * do; a payment still pending, an unreadable operation or a failed cross-check leaves the
-     * order as is.
-     *
-     * @param int $id_order
-     *
-     * @return bool true when the order left the pending state
-     */
-    public function resyncPendingOrder($id_order)
-    {
-        $plugin = $this->dependencies->getPlugin();
-        $order = $plugin->getOrder()->get((int) $id_order);
-        if (!is_object($order) || !isset($order->module) || $order->module !== $this->dependencies->name) {
-            return false;
-        }
-
-        $is_live = !(bool) $plugin->getConfigurationClass()->getValue('sandbox_mode');
-        $order_states = $plugin->getOrderClass()->getOrderStates($is_live);
-        $pending_state = isset($order_states['pending']) ? (int) $order_states['pending'] : 0;
-        if (!$pending_state || $pending_state !== (int) $order->current_state) {
-            return false;
-        }
-
-        $factory = $this->getService(self::FACTORY_SERVICE);
-        $logger = $factory->createLogger();
-        $operation_id = $this->findOrderOperationId($factory->createPaymentRepository(), (int) $id_order);
-        if ('' === $operation_id) {
-            return false;
-        }
-
-        try {
-            $response = $factory->create()->getOperation($operation_id);
-        } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::resyncPendingOrder - getOperation failed for order ' . (int) $id_order
-                . ' (operation ' . $operation_id . '): ' . $exception->getMessage());
-
-            return false;
-        }
-
-        $decoded = json_decode($response['body'], true);
-        $exec_code = is_array($decoded) && isset($decoded['execCode']) ? (string) $decoded['execCode'] : self::MISSING_EXEC_CODE;
-        $outcome = ExecCodeMapper::toPaymentOutcome($exec_code);
-        if (PaymentOutcome::THREE_DS_PENDING === $outcome) {
-            return false;
-        }
-
-        if (!is_array($decoded) || !isset($decoded['amount'])) {
-            $logger->error('UnifiedPaymentAction::resyncPendingOrder - missing amount field in getOperation response for operation '
-                . $operation_id . ', order ' . (int) $id_order . ' left as is');
-
-            return false;
-        }
-
-        $amount = (int) $decoded['amount'];
-        $id_cart = (int) $order->id_cart;
-        $order_id_from_response = isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
-        if (!$this->crossChecksOrderIdAndAmount(
-            $logger,
-            $plugin->getCart()->get($id_cart),
-            $id_cart,
-            $order_id_from_response,
-            $amount,
-            'UnifiedPaymentAction::resyncPendingOrder',
-            $operation_id,
-            $this->getRequestedAmount($factory, $logger, $operation_id)
-        )) {
-            return false;
-        }
-
-        $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $operation_id, $decoded);
-        $card_details = null !== $pending_alias ? $this->extractCardDetails($decoded) : [];
-
-        $result = $this->createOrderWithLock($factory, $id_cart, $operation_id, $exec_code, $outcome, $amount, $pending_alias, $card_details);
-        if (!empty($result['lock_conflict'])) {
-            return false;
-        }
-
-        if (empty($result['persisted']) || (isset($result['outcome_applied']) && false === $result['outcome_applied'])) {
-            $logger->error('UnifiedPaymentAction::resyncPendingOrder - Outcome ' . $outcome . ' of operation ' . $operation_id
-                . ' could not be applied to order ' . (int) $id_order);
-
-            return false;
-        }
-
-        $factory->createPaymentRepository()->markTreated($operation_id);
-
-        $updated_order = $plugin->getOrder()->get((int) $id_order);
-
-        return is_object($updated_order) && $pending_state !== (int) $updated_order->current_state;
-    }
-
-    /**
      * @description Settle a refund recorded by UnifiedRefundAction from its asynchronous
      *              notification. Never changes the order state: a refund failing asynchronously
      *              only becomes refundable again.
      *
      * @param mixed $factory
      * @param mixed $logger
-     * @param UnifiedRefundRepository $refund_repository
+     * @param UpcRefundRepository $refund_repository
      * @param string $operation_id
      *
      * @return array{http_status: int}
      */
     private function handleRefundNotification($factory, $logger, $refund_repository, array $refund, $operation_id)
     {
-        if (UnifiedRefundRepository::STATUS_PENDING !== $refund['status']) {
+        if (UpcRefundRepository::STATUS_PENDING !== $refund['status']) {
             return ['http_status' => 200];
         }
 
         try {
             $response = $factory->create()->getOperation($operation_id);
         } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::notifyAction - getOperation failed for refund ' . $operation_id . ': ' . $exception->getMessage());
+            $logger->error('OperationAction::notifyAction - getOperation failed for refund ' . $operation_id . ': ' . $exception->getMessage());
 
             return ['http_status' => 500];
         }
@@ -995,51 +865,51 @@ class UnifiedPaymentAction
         $decoded = json_decode($response['body'], true);
         if (!is_array($decoded) || !isset($decoded['execCode'])) {
             // Settling on a guess would either hide a failed refund or make a real one refundable again.
-            $logger->error('UnifiedPaymentAction::notifyAction - Refund ' . $operation_id . ' getOperation response has no execCode');
+            $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' getOperation response has no execCode');
 
             return ['http_status' => 500];
         }
 
         if (!isset($decoded['amount'])) {
-            $logger->error('UnifiedPaymentAction::notifyAction - Refund ' . $operation_id . ' getOperation response has no amount');
+            $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' getOperation response has no amount');
 
             return ['http_status' => 500];
         }
 
         $amount = (int) $decoded['amount'];
         if ($amount !== (int) $refund['amount']) {
-            $logger->error('UnifiedPaymentAction::notifyAction - Refund ' . $operation_id . ' amount mismatch: notified '
+            $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' amount mismatch: notified '
                 . $amount . ', recorded ' . (int) $refund['amount']);
 
             return ['http_status' => 200];
         }
 
         // Not ExecCodeMapper: a code it doesn't know maps to FAILED, which would free an amount that
-        // may already have left for a second refund. See UnifiedRefundExecCode.
+        // may already have left for a second refund. See UpcRefundExecCode.
         $exec_code = (string) $decoded['execCode'];
-        if (UnifiedRefundExecCode::SUCCESS === $exec_code) {
-            $refund_repository->updateStatusIfPending($operation_id, UnifiedRefundRepository::STATUS_CONFIRMED);
+        if (UpcRefundExecCode::SUCCESS === $exec_code) {
+            $refund_repository->updateStatusIfPending($operation_id, UpcRefundRepository::STATUS_CONFIRMED);
 
             return ['http_status' => 200];
         }
 
-        $classification = UnifiedRefundExecCode::classify($exec_code);
-        if (UnifiedRefundExecCode::ACCEPTED === $classification) {
-            $logger->info('UnifiedPaymentAction::notifyAction - Refund ' . $operation_id . ' still in progress (execCode ' . $exec_code . ')');
+        $classification = UpcRefundExecCode::classify($exec_code);
+        if (UpcRefundExecCode::ACCEPTED === $classification) {
+            $logger->info('OperationAction::notifyAction - Refund ' . $operation_id . ' still in progress (execCode ' . $exec_code . ')');
 
             return ['http_status' => 200];
         }
 
-        if (UnifiedRefundExecCode::UNKNOWN === $classification) {
-            $logger->error('UnifiedPaymentAction::notifyAction - Refund ' . $operation_id . ' reported an undocumented execCode '
+        if (UpcRefundExecCode::UNKNOWN === $classification) {
+            $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' reported an undocumented execCode '
                 . $exec_code . ', left pending (still counted as refunded): manual check needed');
 
             return ['http_status' => 200];
         }
 
-        $logger->error('UnifiedPaymentAction::notifyAction - Refund ' . $operation_id . ' reported a non-success outcome (execCode '
+        $logger->error('OperationAction::notifyAction - Refund ' . $operation_id . ' reported a non-success outcome (execCode '
             . $exec_code . '), marked failed: the order state is left unchanged');
-        $refund_repository->updateStatusIfPending($operation_id, UnifiedRefundRepository::STATUS_FAILED);
+        $refund_repository->updateStatusIfPending($operation_id, UpcRefundRepository::STATUS_FAILED);
 
         return ['http_status' => 200];
     }
@@ -1072,7 +942,7 @@ class UnifiedPaymentAction
      *              is only probed: acquired and released at once, as soon as it is free.
      *
      * @param mixed $factory
-     * @param UnifiedRefundRepository $refund_repository
+     * @param UpcRefundRepository $refund_repository
      * @param int $id_order
      * @param string $operation_id
      *
@@ -1096,28 +966,6 @@ class UnifiedPaymentAction
         }
 
         return $refund_repository->getByRefundOperationId($operation_id);
-    }
-
-    /**
-     * @description Get the operation recorded for an order, the paid one first
-     *
-     * @param mixed $payment_repository
-     * @param int $id_order
-     *
-     * @return string empty when the order has no Unified Hosted Fields operation
-     */
-    private function findOrderOperationId($payment_repository, $id_order)
-    {
-        $paid_operation = $payment_repository->getPaidByOrderId((string) $id_order);
-        if (null !== $paid_operation) {
-            return (string) $paid_operation->operationId;
-        }
-
-        try {
-            return (string) $payment_repository->getByOrderId((string) $id_order)->operationId;
-        } catch (PaymentNotFoundException $exception) {
-            return '';
-        }
     }
 
     /**
@@ -1149,7 +997,7 @@ class UnifiedPaymentAction
         try {
             $response = $factory->create()->getOperation($pending_operation_id);
         } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::reconcilePendingOperation - getOperation failed: ' . $exception->getMessage());
+            $logger->error('OperationAction::reconcilePendingOperation - getOperation failed: ' . $exception->getMessage());
 
             return null;
         }
@@ -1169,7 +1017,7 @@ class UnifiedPaymentAction
             $token = (string) $token_cache->get('uhf_cart_token:' . $cart->id);
 
             if ('' === $token) {
-                $logger->error('UnifiedPaymentAction::reconcilePendingOperation - Missing token mapping for cart ' . $cart->id . ', cannot rebuild challenge URL');
+                $logger->error('OperationAction::reconcilePendingOperation - Missing token mapping for cart ' . $cart->id . ', cannot rebuild challenge URL');
 
                 return null;
             }
@@ -1191,15 +1039,13 @@ class UnifiedPaymentAction
 
         if (null === $amount) {
             $outcome = PaymentOutcome::FAILED;
-            $logger->error('UnifiedPaymentAction::reconcilePendingOperation - missing amount field in getOperation response for operation ' . $pending_operation_id);
+            $logger->error('OperationAction::reconcilePendingOperation - missing amount field in getOperation response for operation ' . $pending_operation_id);
             $amount = 0;
         } else {
             // Same orderId+amount cross-check as returnAction().
             $order_id_from_response = is_array($decoded) && isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
 
-            $requested_amount = $this->getRequestedAmount($factory, $logger, $pending_operation_id);
-
-            if (!$this->crossChecksOrderIdAndAmount($logger, $cart, (int) $cart->id, $order_id_from_response, $amount, 'UnifiedPaymentAction::reconcilePendingOperation', $pending_operation_id, $requested_amount)) {
+            if (!$this->crossChecksOrderIdAndAmount($logger, $cart, (int) $cart->id, $order_id_from_response, $amount, 'OperationAction::reconcilePendingOperation')) {
                 return $this->crossCheckMismatchResult($this->orderAction());
             }
         }
@@ -1257,7 +1103,7 @@ class UnifiedPaymentAction
             // check-then-act, so racing it against a still-running concurrent createFromOutcome()
             // call could create two orders for the same cart. Failing safe here (even though the
             // payment may well have succeeded on the other side) is preferable to that risk.
-            $logger->error('UnifiedPaymentAction::createOrderWithLock - Could not acquire lock for cart ' . $id_cart);
+            $logger->error('OperationAction::createOrderWithLock - Could not acquire lock for cart ' . $id_cart);
 
             // 'lock_conflict' is an internal-only signal consumed by notifyAction() (to keep
             // returning 409 for this specific case, as before) - every other caller passes its
@@ -1289,8 +1135,9 @@ class UnifiedPaymentAction
             $token_cache->delete('uhf_challenge_html:' . $id_cart);
         }
 
-        // Not on a failed PAID attempt (retry possible): the entry then expires with its own TTL.
-        // A PAID outcome whose alias could not be stored still clears it: a refused card leaves no trace.
+        // Not on THREE_DS_PENDING (the later PAID notification still needs it) nor on a failed
+        // PAID attempt (retry possible): the entry then expires with its own TTL. A PAID outcome
+        // whose alias could not be stored still clears it: a refused card leaves no trace.
         if ((PaymentOutcome::PAID === $outcome && $result['result']) || PaymentOutcome::FAILED === $outcome) {
             $factory->createTokenCache()->delete('uhf_pending_alias:' . $operation_id);
         }
@@ -1423,21 +1270,17 @@ class UnifiedPaymentAction
         try {
             $token_cache->set('uhf_pending_alias:' . $operation_id, (string) json_encode($pending_alias), self::PENDING_ALIAS_TTL);
         } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::createAction - Failed to cache pending alias for operation ' . $operation_id . ': ' . $exception->getMessage());
+            $logger->error('OperationAction::createAction - Failed to cache pending alias for operation ' . $operation_id . ': ' . $exception->getMessage());
         }
     }
 
     /**
-     * @description Check the response orderId matches the cart and its amount the one requested
+     * @description Check the response orderId and amount match the cart
      *
-     * Cross-checks a getOperation()/notification response's orderId against the cart, and its
-     * amount, in the minor units of the cart's currency, against the amount requested when the
-     * payment was created. That reference is fixed: a cart edited during the 3DS challenge no
-     * longer matches the amount captured, and the order is then created for what was paid
-     * (UnifiedOrderAction flags the difference). An operation recorded without it is checked
-     * against the live cart total instead. Without full signature verification, this is the only
-     * protection against a forged or mismatched response. Logs both the expected and received
-     * values on a mismatch.
+     * Cross-checks a getOperation()/notification response's orderId and amount against the cart,
+     * the amount in the minor units of the cart's currency. Without full signature verification,
+     * this is the only protection against a forged or mismatched response. Logs both the
+     * expected and received values on a mismatch.
      *
      * @param mixed $logger
      * @param mixed $cart
@@ -1445,10 +1288,8 @@ class UnifiedPaymentAction
      * @param mixed $response_order_id
      * @param mixed $response_amount
      * @param mixed $context_label
-     * @param string $operation_id
-     * @param int|null $requested_amount
      */
-    private function crossChecksOrderIdAndAmount($logger, $cart, $id_cart, $response_order_id, $response_amount, $context_label, $operation_id, $requested_amount)
+    private function crossChecksOrderIdAndAmount($logger, $cart, $id_cart, $response_order_id, $response_amount, $context_label)
     {
         if (!$cart || !(int) $cart->id) {
             $logger->error($context_label . ' - Cart not found for cross-check, id_cart ' . $id_cart);
@@ -1460,18 +1301,6 @@ class UnifiedPaymentAction
             $logger->error($context_label . ' - orderId mismatch: expected ' . $id_cart . ', received ' . (string) $response_order_id);
 
             return false;
-        }
-
-        if (null !== $requested_amount) {
-            if ($requested_amount !== (int) $response_amount) {
-                $logger->error($context_label . ' - paid amount differs from the requested amount, manual review needed: operation '
-                    . $operation_id . ' of cart ' . $id_cart . ' paid ' . (int) $response_amount . ', ' . $requested_amount
-                    . ' requested at creation, no order created');
-
-                return false;
-            }
-
-            return true;
         }
 
         $currency = $this->dependencies->getPlugin()->getCurrency()->getCurrency((int) $cart->id_currency);
@@ -1673,14 +1502,14 @@ class UnifiedPaymentAction
         try {
             $response = $factory->create()->getOperation($operation_id);
         } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::createAction - getOperation failed, alias not saved for operation ' . $operation_id . ': ' . $exception->getMessage());
+            $logger->error('OperationAction::createAction - getOperation failed, alias not saved for operation ' . $operation_id . ': ' . $exception->getMessage());
 
             return;
         }
 
         $decoded = is_array($response) && isset($response['body']) ? json_decode($response['body'], true) : null;
         if (!is_array($decoded)) {
-            $logger->error('UnifiedPaymentAction::createAction - invalid getOperation response, alias not saved for operation ' . $operation_id);
+            $logger->error('OperationAction::createAction - invalid getOperation response, alias not saved for operation ' . $operation_id);
 
             return;
         }
@@ -1690,7 +1519,7 @@ class UnifiedPaymentAction
             $pending_alias['alias_id'] = $alias_id;
         }
         if ('' === $pending_alias['alias_id']) {
-            $logger->error('UnifiedPaymentAction::createAction - save_card requested but no alias id returned for operation ' . $operation_id);
+            $logger->error('OperationAction::createAction - save_card requested but no alias id returned for operation ' . $operation_id);
 
             return;
         }
@@ -1826,51 +1655,29 @@ class UnifiedPaymentAction
      * @param mixed $decoded_body
      * @param string $operation_id
      * @param int $id_cart
-     * @param int $requested_amount amount sent at creation, in minor units
      */
-    private function bindPaymentId($factory, $logger, $decoded_body, $operation_id, $id_cart, $requested_amount)
+    private function bindPaymentId($factory, $logger, $decoded_body, $operation_id, $id_cart)
     {
         $payment_id = is_array($decoded_body) && isset($decoded_body['id']) && is_string($decoded_body['id'])
             ? $decoded_body['id']
             : '';
 
         if ('' === $payment_id) {
-            $logger->error('UnifiedPaymentAction::createAction - payment creation response for operation ' . $operation_id
+            $logger->error('OperationAction::createAction - payment creation response for operation ' . $operation_id
                 . ' carries no payment id: this payment cannot be refunded from the back-office');
 
             return;
         }
 
         try {
-            $bound = $factory->createPaymentRepository()->bindPaymentId($operation_id, $payment_id, $id_cart, (int) $requested_amount);
+            $bound = $factory->createPaymentRepository()->bindPaymentId($operation_id, $payment_id, $id_cart);
         } catch (\Throwable $exception) {
             $bound = false;
         }
 
         if (!$bound) {
-            $logger->error('UnifiedPaymentAction::createAction - payment id ' . $payment_id . ' of operation ' . $operation_id
+            $logger->error('OperationAction::createAction - payment id ' . $payment_id . ' of operation ' . $operation_id
                 . ' (cart ' . $id_cart . ') not recorded: back-office refunds of this payment will fail');
-        }
-    }
-
-    /**
-     * @description Get the amount requested when the operation's payment was created
-     *
-     * @param mixed $factory
-     * @param mixed $logger
-     * @param string $operation_id
-     *
-     * @return int|null null when none was recorded or it cannot be read
-     */
-    private function getRequestedAmount($factory, $logger, $operation_id)
-    {
-        try {
-            return $factory->createPaymentRepository()->getRequestedAmountByOperationId($operation_id);
-        } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction - requested amount of operation ' . $operation_id
-                . ' could not be read, checked against the cart total: ' . $exception->getMessage());
-
-            return null;
         }
     }
 

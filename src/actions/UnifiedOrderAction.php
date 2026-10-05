@@ -46,7 +46,7 @@ class UnifiedOrderAction
     public function __construct($dependencies = null)
     {
         // Accepts an already-built DependenciesClass so callers that have one (any front
-        // controller, UnifiedPaymentAction) can hand it over instead of paying for a second full
+        // controller, OperationAction) can hand it over instead of paying for a second full
         // PluginInit object-graph construction; falls back to building its own so this class
         // stays a normal no-argument src/actions/*Action per this repo's own convention for
         // any caller that doesn't have one at hand (e.g. tests using newInstanceWithoutConstructor
@@ -73,24 +73,41 @@ class UnifiedOrderAction
         $existing_order = $this->findExistingOrder($id_cart);
 
         if (null !== $existing_order) {
-            // The order already exists: an abandoned one (error state) reconciled by a later
-            // operation, or one whose paid state could not be applied (see
-            // UnifiedPaymentAction::resyncPendingOrder()). This call may carry newer information for
-            // the SAME operation_id, so it is persisted/applied here, not discarded.
-            // UnifiedOperationRepository::save() upserts by operation_id, and UnifiedOrderStateMutator's own
-            // guards make a stale/out-of-order replay (e.g. a late FAILED after a PAID) safe.
+            // The order already exists (created by an earlier returnAction()/createAction()
+            // reconciliation call for this cart, possibly still in a THREE_DS_PENDING/pending
+            // state). This call may carry newer information for the SAME operation_id - most
+            // notably notifyAction() delivering the real, final outcome after a synchronous
+            // return created the order prematurely - so it must still be persisted/applied here,
+            // not silently discarded. OperationRepository::save() upserts by operation_id, and
+            // UpcOrderStateMutator::apply()'s own terminal-state guard makes re-applying a stale/
+            // out-of-order replay (e.g. a late FAILED after a PAID already landed) safe.
             //
-            // ExecCodeMapper, the only source of $outcome for every caller, produces three outcomes:
-            //   - PAID: the order moves to the 'paid' bucket, and the alias this operation created,
-            //     if any, is saved (persistAlias()).
-            //   - THREE_DS_PENDING: every caller filters it out before calling this method, since
-            //     a payment still pending never creates nor updates an order (PRE-3557 rule).
-            //   - FAILED (anything else): the order moves to the 'error' bucket.
-            // REFUNDED/AUTHORIZED/CAPTURE_REQUIRED are unreachable here. Back-office refunds made
-            // through the Unified API are notified on notify.php with a payment-shaped body:
-            // UnifiedPaymentAction::notifyAction() diverts them through the payplug_unified_refund lookup
-            // before this path, and UnifiedOrderStateMutator's refunded-order guard neutralises a late
-            // payment webhook on an already-refunded order.
+            // The three outcomes ExecCodeMapper can ever hand this method (it's the only source
+            // of $outcome for every caller - createAction(), returnAction(), notifyAction()):
+            //   - SUCCESS_EXEC_CODE ('0000') -> PaymentOutcome::PAID: the order is updated (moved
+            //     to the 'paid' bucket by UpcOrderStateMutator), and the alias this operation
+            //     created, if any, is saved (persistAlias()).
+            //   - PENDING_THREE_DS_EXEC_CODE ('0001') -> PaymentOutcome::THREE_DS_PENDING: never
+            //     reaches THIS branch specifically (an existing order). notifyAction() and the
+            //     createAction() reconciliation path (reconcilePendingOperation()) both
+            //     special-case it as a strict no-op before ever calling createFromOutcome(). And
+            //     while returnAction() does NOT filter it - it computes $outcome from its own
+            //     synchronous getOperation() call with no THREE_DS_PENDING guard at all - it only
+            //     ever reaches createFromOutcome() when existingOrderRedirect() found no order yet
+            //     (checked first, returning immediately otherwise), so any THREE_DS_PENDING it
+            //     passes in always lands in the OTHER branch below (no existing order:
+            //     validateOrder() creates a fresh order in the 'pending' state; this is the
+            //     intended behavior - the later webhook notification is what confirms/finalizes
+            //     it, not this synchronous return), never in this one.
+            //   - anything else -> PaymentOutcome::FAILED: the order is updated too (moved to the
+            //     'error'/abandoned bucket).
+            // PaymentOutcome::REFUNDED/AUTHORIZED/CAPTURE_REQUIRED are deliberately unreachable
+            // from this call chain: ExecCodeMapper::toPaymentOutcome() (the only $outcome source
+            // here) never produces them. Back-office refunds made through the Unified API ARE
+            // notified on notify.php, with a payment-shaped body: OperationAction::notifyAction()
+            // diverts them through the payplug_upc_refund lookup before this path. A late payment
+            // webhook landing on an already-refunded order is neutralised by
+            // UpcOrderStateMutator's refunded-order guard.
             if (!$existing_order['owned_by_payplug']) {
                 $this->logger()->error(
                     'UnifiedOrderAction::createFromOutcome - refusing to reconcile operation '
@@ -118,10 +135,7 @@ class UnifiedOrderAction
             );
         }
 
-        // PRE-3557 rule: an order is created only for a paid payment. A failed one never gets an
-        // order, nor does a THREE_DS_PENDING one: the cardholder back from 3DS knows its result,
-        // and the notification of the final outcome creates the order once paid.
-        if (PaymentOutcome::PAID !== $outcome) {
+        if (PaymentOutcome::FAILED === $outcome) {
             return [
                 'result' => false,
                 'redirect_url' => $this->errorUrl(),
@@ -142,7 +156,6 @@ class UnifiedOrderAction
 
         $is_live = !(bool) $plugin->getConfigurationClass()->getValue('sandbox_mode');
         $order_states = $plugin->getOrderClass()->getOrderStates($is_live);
-        // Validated in the pending state, then moved to paid by persistAndApplyOutcome().
         $initial_state = isset($order_states['pending']) ? (int) $order_states['pending'] : 0;
 
         $order_adapter = $plugin->getOrder();
@@ -152,12 +165,6 @@ class UnifiedOrderAction
             $currency = $plugin->getCurrency()->getCurrency((int) $cart->id_currency);
             $currency_iso = is_object($currency) && isset($currency->iso_code) ? (string) $currency->iso_code : '';
             $amount_float = (float) $this->dependencies->getHelpers()['amount']->convertAmount((int) $amount, true, $currency_iso);
-            $paid_state = isset($order_states['paid']) ? (int) $order_states['paid'] : 0;
-            if ($paid_state && $this->differsFromCartTotal($cart, $currency_iso, (int) $amount)) {
-                // As in the Retail flow: validated in the logable paid state, the order is switched
-                // to PS_OS_ERROR by validateOrder() itself, which records the payment actually received.
-                $initial_state = $paid_state;
-            }
             $module->validateOrder(
                 (int) $cart->id,
                 $initial_state,
@@ -272,7 +279,7 @@ class UnifiedOrderAction
                 ? (string) $prestashop_adapter->getHostedFieldsIdentifier($iso_code)
                 : '';
 
-            $saved = $this->getService('payplug.models.repositories.unified_alias')->saveIfAbsent(
+            $saved = $this->getService('payplug.models.repositories.alias')->saveIfAbsent(
                 $id_customer,
                 $alias_id,
                 $iso_code,
@@ -367,23 +374,8 @@ class UnifiedOrderAction
     private function persistAndApplyOutcome($order_id, $operation_id, $exec_code, $outcome, $amount, $secure_key, $id_cart, $pending_alias = null, $card_details = [])
     {
         $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-        $factory = $module->getService('payplug.unified.payment_service_factory');
+        $factory = $module->getService('payplug.utilities.service.unified_api_payment_service_factory');
         $outcome_applied = true;
-
-        // An order whose total differs from the amount captured is never marked paid: it is put
-        // in the error state ("Payment error"), as PrestaShop does when validating such an order.
-        $state_outcome = $outcome;
-        if (PaymentOutcome::PAID === $outcome) {
-            $orders_total = $this->ordersTotal($order_id, $factory);
-            if (null !== $orders_total && $orders_total !== (int) $amount) {
-                $factory->createLogger()->error(
-                    'UnifiedOrderAction::persistAndApplyOutcome - order ' . $order_id . ' total ' . $orders_total
-                    . ' differs from the amount ' . (int) $amount . ' paid by operation ' . $operation_id
-                    . ': set to payment error instead of paid, manual review needed'
-                );
-                $state_outcome = PaymentOutcome::FAILED;
-            }
-        }
 
         try {
             $factory->createPaymentRepository()->save(new OperationData(
@@ -393,7 +385,7 @@ class UnifiedOrderAction
                 (int) $amount,
                 (string) $order_id
             ));
-            $factory->createOrderStateMutator()->apply((string) $order_id, $state_outcome);
+            $factory->createOrderStateMutator()->apply((string) $order_id, $outcome);
         } catch (\Throwable $exception) {
             // Throwable: the order exists and the customer may be charged, a TypeError must be reported too.
             $factory->createLogger()->error(
@@ -430,72 +422,13 @@ class UnifiedOrderAction
     }
 
     /**
-     * @description Tell whether the cart total differs from the amount paid, in minor units
-     *
-     * @param mixed $cart
-     * @param string $currency_iso
-     * @param int $amount
-     *
-     * @return bool false when the total cannot be computed: persistAndApplyOutcome() still checks the order
-     */
-    private function differsFromCartTotal($cart, $currency_iso, $amount)
-    {
-        try {
-            $cart_total = (int) $this->dependencies->getHelpers()['amount']->convertAmount(
-                (float) $cart->getOrderTotal(true, \Cart::BOTH),
-                false,
-                $currency_iso
-            );
-        } catch (\Exception $exception) {
-            return false;
-        }
-
-        return $cart_total !== $amount;
-    }
-
-    /**
-     * @description Get the total of all the orders created from the order's cart, in minor units
-     *
-     * @param int $order_id
-     * @param mixed $factory
-     *
-     * @return int|null null when it cannot be computed (logged)
-     */
-    private function ordersTotal($order_id, $factory)
-    {
-        try {
-            $plugin = $this->dependencies->getPlugin();
-            $order = $plugin->getOrder()->get((int) $order_id);
-            if (!is_object($order) || !isset($order->id_currency)) {
-                return null;
-            }
-
-            $currency = $plugin->getCurrency()->getCurrency((int) $order->id_currency);
-            $currency_iso = is_object($currency) && isset($currency->iso_code) ? (string) $currency->iso_code : '';
-
-            return (int) $this->dependencies->getHelpers()['amount']->convertAmount(
-                (float) $order->getOrdersTotalPaid(),
-                false,
-                $currency_iso
-            );
-        } catch (\Throwable $exception) {
-            $factory->createLogger()->error(
-                'UnifiedOrderAction::persistAndApplyOutcome - total of order ' . $order_id
-                . ' could not be compared with the amount paid: ' . $exception->getMessage()
-            );
-
-            return null;
-        }
-    }
-
-    /**
      * @description Get the UPC logger from the unified API payment service factory
      */
     private function logger()
     {
         $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
 
-        return $module->getService('payplug.unified.payment_service_factory')->createLogger();
+        return $module->getService('payplug.utilities.service.unified_api_payment_service_factory')->createLogger();
     }
 
     /**

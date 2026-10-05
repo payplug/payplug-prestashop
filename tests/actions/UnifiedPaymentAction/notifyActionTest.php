@@ -1,10 +1,10 @@
 <?php
 
-// tests/actions/UnifiedPaymentAction/notifyActionTest.php
+// tests/actions/OperationAction/notifyActionTest.php
 
-namespace PayPlug\tests\actions\UnifiedPaymentAction;
+namespace PayPlug\tests\actions\OperationAction;
 
-use PayPlug\src\actions\UnifiedPaymentAction;
+use PayPlug\src\actions\OperationAction;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../stubs/Cart.php';
 /**
  * @group unit
  * @group action
- * @group unified_payment_action
+ * @group operation_action
  */
 class notifyActionTest extends TestCase
 {
@@ -253,7 +253,7 @@ class notifyActionTest extends TestCase
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
         $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
-        // 1 initial attempt + UnifiedPaymentAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries = 41 total:
+        // 1 initial attempt + OperationAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries = 41 total:
         // the webhook waits longer than returnAction() - the Receiver doesn't retry a 409.
         $action->lockRetryDelayUsec = 0;
         $mocks['lock']->shouldReceive('acquire')->times(41)->with('uhf_cart:6', 60)->andReturn(false);
@@ -282,54 +282,6 @@ class notifyActionTest extends TestCase
         $result = $action->notifyAction();
 
         $this->assertSame(200, $result['http_status']);
-    }
-
-    /**
-     * The cart was edited during the 3DS challenge (its total now converts to 1500): the operation
-     * captured the 2900 requested at its creation, so the order is created and the notification
-     * treated.
-     */
-    public function testCreatesTheOrderWhenThePaidAmountIsTheRequestedOneAlthoughTheCartChanged()
-    {
-        [$action, $mocks] = $this->mockActionForNotify();
-        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
-        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
-        $this->mockCartForAmountCrossCheck($action->dependencies, 1500);
-        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')
-            ->with('359fe258-8264-4a90-9a40-d16e1736058d')
-            ->andReturn(2900);
-        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
-            'result' => true,
-            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
-            'persisted' => true,
-        ]);
-        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('359fe258-8264-4a90-9a40-d16e1736058d');
-
-        $this->assertSame(200, $action->notifyAction()['http_status']);
-    }
-
-    public function testRefusesAndAsksForAManualReviewWhenThePaidAmountDiffersFromTheRequestedOne()
-    {
-        [$action, $mocks] = $this->mockActionForNotify();
-        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
-        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
-        // The cart total still matches the paid amount: the reference amount alone decides.
-        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
-        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')
-            ->with('359fe258-8264-4a90-9a40-d16e1736058d')
-            ->andReturn(2500);
-        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
-        $mocks['payment_repository']->shouldReceive('save')->never();
-        $mocks['payment_repository']->shouldReceive('markTreated')->never();
-        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::on(function ($message) {
-            return false !== strpos($message, 'manual review')
-                && false !== strpos($message, '359fe258-8264-4a90-9a40-d16e1736058d')
-                && false !== strpos($message, 'cart 6')
-                && false !== strpos($message, '2900')
-                && false !== strpos($message, '2500');
-        }));
-
-        $this->assertSame(200, $action->notifyAction()['http_status']);
     }
 
     public function testAcceptsMatchingAuthorizationHeaderWhenSecretIsConfigured()
@@ -782,7 +734,7 @@ class notifyActionTest extends TestCase
         $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
         $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')
             ->andReturn(new OperationData('op_original', '0000', PaymentOutcome::PAID, 2900, '99'));
-        // 1 initial attempt + UnifiedPaymentAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries.
+        // 1 initial attempt + OperationAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries.
         $mocks['lock']->shouldReceive('acquire')->times(41)->with('uhf_refund:99', 5)->andReturn(false);
         $mocks['lock']->shouldReceive('release')->never();
         $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/is not the paid operation/'));
@@ -833,11 +785,11 @@ class notifyActionTest extends TestCase
     }
 
     /**
-     * @return array{0: UnifiedPaymentAction, 1: array<string, object>}
+     * @return array{0: OperationAction, 1: array<string, object>}
      */
     private function mockActionForNotify()
     {
-        $action = (new \ReflectionClass(UnifiedPaymentAction::class))->newInstanceWithoutConstructor();
+        $action = (new \ReflectionClass(OperationAction::class))->newInstanceWithoutConstructor();
 
         $dependencies = \Mockery::mock('Dependencies');
         $dependencies->name = 'payplug';
@@ -858,7 +810,7 @@ class notifyActionTest extends TestCase
         $plugin->shouldReceive('getModule')->andReturn($module_adapter);
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->shouldReceive('getService')
-            ->with('payplug.unified.payment_service_factory')
+            ->with('payplug.utilities.service.unified_api_payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createLogger')->andReturn($logger);
         $factory->shouldReceive('createConfigurationRepository')->andReturn($configuration_repository);
@@ -868,12 +820,11 @@ class notifyActionTest extends TestCase
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         $payment_repository->shouldReceive('isTreated')->andReturn(false)->byDefault();
-        $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
 
-        $refund_repository = \Mockery::mock('UnifiedRefundRepository');
+        $refund_repository = \Mockery::mock('UpcRefundRepository');
         $order_adapter = \Mockery::mock('OrderAdapter');
         $module->shouldReceive('getService')
-            ->with('payplug.models.repositories.unified_refund')
+            ->with('payplug.models.repositories.upc_refund')
             ->andReturn($refund_repository);
         $refund_repository->shouldReceive('getByRefundOperationId')->andReturn(null)->byDefault();
         $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
@@ -891,7 +842,7 @@ class notifyActionTest extends TestCase
         // this suite mocks it as an opaque collaborator instead of re-exercising its internal
         // order-creation logic (order adapter, validator, module validateOrder(), context link,
         // order state mutator, ...). errorUrl() is stubbed by default since it's reached directly
-        // by UnifiedPaymentAction's own lock-acquisition-failure path (createOrderWithLock()), not only
+        // by OperationAction's own lock-acquisition-failure path (createOrderWithLock()), not only
         // through createFromOutcome()'s own mocked return value.
         $action->orderAction = $order_action;
         $order_action->shouldReceive('errorUrl')
@@ -944,7 +895,7 @@ class notifyActionTest extends TestCase
     /**
      * Fix 4 (PRE-3626 review): wires notifyAction()'s own amount cross-check
      * ($plugin->getCart()->get($id_cart), converted the same way createAction()/returnAction()
-     * do) - UnifiedPaymentAction's own logic, unrelated to the (now mocked) order creator.
+     * do) - OperationAction's own logic, unrelated to the (now mocked) order creator.
      *
      * @param mixed $dependencies
      * @param mixed $expected_cents
@@ -994,8 +945,8 @@ class notifyActionTest extends TestCase
 
     /**
      * Stubs the order creator's createFromOutcome() for tests that drive notifyAction() through
-     * to UnifiedPaymentAction::createOrderWithLock() - the mocked order creator is an opaque
-     * collaborator here, so only the arguments UnifiedPaymentAction itself is responsible for
+     * to OperationAction::createOrderWithLock() - the mocked order creator is an opaque
+     * collaborator here, so only the arguments OperationAction itself is responsible for
      * assembling (id_cart is always 6 in this suite; operation_id/exec_code/outcome/amount vary
      * per test) and the result shape the rest of the test needs are wired.
      *

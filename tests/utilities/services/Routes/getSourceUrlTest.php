@@ -65,7 +65,7 @@ class getSourceUrlTest extends TestCase
         );
     }
 
-    public function testHostedFieldsKeyIsEmptyWhenNotConfigured()
+    public function testHostedFieldsKeyFallsBackToDefaultSdkUrlWhenNotConfigured()
     {
         $this->service->shouldReceive('getApiUrl')->andReturn('https://api.test');
         $this->service->shouldReceive('getCDNUrl')->andReturn('https://cdn.test');
@@ -73,7 +73,7 @@ class getSourceUrlTest extends TestCase
 
         $routes = $this->service->getSourceUrl();
 
-        $this->assertSame('', $routes['hosted_fields']);
+        $this->assertSame('https://cdn.payplug.com/js/hosted-fields/v1@1/index.js', $routes['hosted_fields']);
     }
 
     public function testGetHostedFieldsUrlReturnsEnvValueWhenConfigured()
@@ -83,21 +83,17 @@ class getSourceUrlTest extends TestCase
         $this->assertSame('https://hosted-fields.example/sdk.js', $this->service->getHostedFieldsUrl());
     }
 
-    /**
-     * getSourceUrl() is built on every front page (HookClass header hook): the missing URL is
-     * logged where the hosted fields option would be displayed, not here.
-     */
-    public function testGetHostedFieldsUrlReturnsAnEmptyStringWithoutLoggingWhenNotConfigured()
+    public function testGetHostedFieldsUrlReturnsDefaultSdkUrlWhenNotConfigured()
     {
-        $this->assertSame('', $this->service->getHostedFieldsUrl());
+        $this->assertSame('https://cdn.payplug.com/js/hosted-fields/v1@1/index.js', $this->service->getHostedFieldsUrl());
         $this->assertSame([], \PrestaShopLogger::$logs);
     }
 
-    public function testGetHostedFieldsUrlReturnsAnEmptyStringWhenConfiguredEmpty()
+    public function testGetHostedFieldsUrlReturnsDefaultSdkUrlWhenConfiguredEmpty()
     {
         $_ENV['HOSTED_FIELDS_URL'] = '';
 
-        $this->assertSame('', $this->service->getHostedFieldsUrl());
+        $this->assertSame('https://cdn.payplug.com/js/hosted-fields/v1@1/index.js', $this->service->getHostedFieldsUrl());
     }
 
     private function setDotenvLoaded($value)
