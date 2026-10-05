@@ -92,4 +92,40 @@ class CustomerAdapter implements CustomerInterface
 
         return \Customer::customerExists($email, $return_id);
     }
+
+    /**
+     * @description Get the most recent active guest customer id for a given email
+     * (registered accounts are ignored)
+     *
+     * @param string $email
+     *
+     * @return int
+     */
+    public function getGuestIdByEmail($email = '')
+    {
+        if (!is_string($email) || empty($email)) {
+            return 0;
+        }
+
+        $customers = \Customer::getCustomersByEmail($email);
+        if (!is_array($customers) || empty($customers)) {
+            return 0;
+        }
+
+        $guest_id = 0;
+        foreach ($customers as $customer) {
+            if (!is_array($customer)
+                || !isset($customer['id_customer'], $customer['is_guest'], $customer['deleted'], $customer['active'])) {
+                continue;
+            }
+            if (!(bool) $customer['is_guest'] || (bool) $customer['deleted'] || !(bool) $customer['active']) {
+                continue;
+            }
+            if ((int) $customer['id_customer'] > $guest_id) {
+                $guest_id = (int) $customer['id_customer'];
+            }
+        }
+
+        return $guest_id;
+    }
 }
