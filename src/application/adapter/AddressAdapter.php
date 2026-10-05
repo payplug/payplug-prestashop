@@ -77,6 +77,19 @@ class AddressAdapter implements AddressInterface
     }
 
     /**
+     * @description adapter to check if an address object
+     * is used by at least one order
+     *
+     * @param $address
+     *
+     * @return bool|int number of orders using the address, false if none
+     */
+    public function isUsed($address)
+    {
+        return $address->isUsed();
+    }
+
+    /**
      * @description retrieve the id of the first address
      * for a given customer
      *
