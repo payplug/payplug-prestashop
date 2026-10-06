@@ -53,6 +53,9 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->getPaymentRepository()
             ->getBy('id_cart', (int) $this->context->cart->id);
 
+        // The customer gets their previous cart back even if the payment resource can't be aborted
+        $this->restorePreviousCart();
+
         if (empty($payment)) {
             return [
                 'result' => false,
@@ -67,8 +70,6 @@ class ApplepayPaymentMethod extends PaymentMethod
                 'message' => $aborted['message'],
             ];
         }
-
-        $this->restorePreviousCart();
 
         return [
             'result' => true,
@@ -486,6 +487,7 @@ class ApplepayPaymentMethod extends PaymentMethod
 
             // Cart::updateQty returns false or -1 (minimal quantity not reached) on failure
             if (true !== $is_product_added) {
+                $this->logger->addLog('ApplepayPaymentMethod::getRequest() - The product can not be added to the cart (cart id: ' . (int) $current_cart->id . ')', 'error');
                 $this->restorePreviousCart();
 
                 return [
@@ -506,6 +508,7 @@ class ApplepayPaymentMethod extends PaymentMethod
 
         // Refuse the request if one of the cart products can't be ordered regarding its stock
         if (!$cart_adapter->checkQuantities($current_cart)) {
+            $this->logger->addLog('ApplepayPaymentMethod::getRequest() - The cart products can not be ordered regarding their stock (cart id: ' . (int) $current_cart->id . ')', 'error');
             if ($is_new_cart) {
                 $this->restorePreviousCart();
             }

@@ -196,7 +196,46 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->once()
             ->with(42, 7)
             ->andReturn(false);
-        $this->payment_method->shouldNotReceive('hasCompatibleCarriersForProduct');
+        $this->configClass->shouldNotReceive('fetchTemplate');
+
+        $this->assertFalse($this->action->renderApplePayCheckout());
+    }
+
+    /**
+     * test renderApplePayCheckout still defines the JS vars when the product can't be ordered regarding its stock,
+     * as the CTA can be displayed later by the AJAX refresh of the product page (another combination selected).
+     */
+    public function testWhenProductIsNotOrderableRegardingStockJsDefIsAdded()
+    {
+        $this->mockProductPage();
+        $this->mockNoRequestedAttribute();
+        $this->product_adapter->shouldReceive('getDefaultAttribute')
+            ->with(42)
+            ->andReturn(7);
+        $this->product_adapter->shouldReceive('isOrderableRegardingStock')
+            ->once()
+            ->with(42, 7)
+            ->andReturn(false);
+        $this->media->shouldReceive('addJsDef')
+            ->once()
+            ->with(\Mockery::on(function ($js_def) {
+                return isset($js_def['applePayPaymentRequestAjaxURL'], $js_def['applePayMerchantSessionAjaxURL'], $js_def['applePayPaymentAjaxURL'])
+                    && 1 === $js_def['applePayIdCart'];
+            }))
+            ->andReturn(true);
+        $this->configClass->shouldNotReceive('fetchTemplate');
+
+        $this->assertFalse($this->action->renderApplePayCheckout());
+    }
+
+    /**
+     * test renderApplePayCheckout when the product has no compatible carriers.
+     */
+    public function testWhenProductHasNoCompatibleCarriers()
+    {
+        $this->mockProductPage(false);
+        $this->product_adapter->shouldNotReceive('isOrderableRegardingStock');
+        $this->media->shouldNotReceive('addJsDef');
         $this->configClass->shouldNotReceive('fetchTemplate');
 
         $this->assertFalse($this->action->renderApplePayCheckout());
@@ -214,7 +253,6 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->once()
             ->with(42, 13)
             ->andReturn(false);
-        $this->payment_method->shouldNotReceive('hasCompatibleCarriersForProduct');
 
         $params = [
             'product' => new \ArrayObject([
@@ -266,7 +304,6 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->once()
             ->with(42, 9)
             ->andReturn(false);
-        $this->payment_method->shouldNotReceive('hasCompatibleCarriersForProduct');
 
         $this->assertFalse($this->action->renderApplePayCheckout());
     }
@@ -295,6 +332,11 @@ class renderApplePayCheckoutTest extends BaseCartAction
             ->once()
             ->with($this->context->cart)
             ->andReturn(false);
+        $this->mockCheckoutAssets();
+        // the JS vars are still defined as the CTA can be displayed later by the AJAX refresh of the cart
+        $this->media->shouldReceive('addJsDef')
+            ->once()
+            ->andReturn(true);
         $this->configClass->shouldNotReceive('fetchTemplate');
 
         $this->assertFalse($this->action->renderApplePayCheckout());
@@ -302,8 +344,10 @@ class renderApplePayCheckoutTest extends BaseCartAction
 
     /**
      * @description Mock a logged customer on the product page of product 42
+     *
+     * @param bool $has_compatible_carriers
      */
-    private function mockProductPage()
+    private function mockProductPage($has_compatible_carriers = true)
     {
         $this->configuration->shouldReceive('getValue')
             ->with('PS_GUEST_CHECKOUT_ENABLED')
@@ -323,6 +367,33 @@ class renderApplePayCheckoutTest extends BaseCartAction
         $this->tools_adapter->shouldReceive('tool')
             ->with('getValue', 'id_product')
             ->andReturn('42');
+        $this->payment_method->shouldReceive('hasCompatibleCarriersForProduct')
+            ->with(42)
+            ->andReturn($has_compatible_carriers);
+        $this->mockCheckoutAssets();
+    }
+
+    /**
+     * @description Mock the assets needed by the applepay CTA (js url, smarty and js vars)
+     */
+    private function mockCheckoutAssets()
+    {
+        $this->routes->shouldReceive([
+            'getSourceUrl' => [
+                'applepay' => 'source_url',
+            ],
+        ]);
+        $this->assign->shouldReceive([
+            'assign' => true,
+        ]);
+        $this->media->shouldReceive([
+            'addJsDef' => true,
+        ])->byDefault();
+        $this->link->shouldReceive([
+            'getModuleLink' => 'module_link',
+        ]);
+        $this->context->link = $this->link;
+        $this->context->language = (object) ['iso_code' => 'fr'];
     }
 
     /**

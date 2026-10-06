@@ -159,6 +159,9 @@ class getRequestTest extends BaseApplepayPaymentMethod
             'result' => false,
             'message' => 'The product can not be added to the cart',
         ], $this->class->getRequest('product'));
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('ApplepayPaymentMethod::getRequest() - The product can not be added to the cart (cart id: 2)', 'error')
+            ->once();
 
         // The previous cart has been restored
         $this->assertSame(1, $this->context->cart->id);
@@ -197,6 +200,9 @@ class getRequestTest extends BaseApplepayPaymentMethod
             'result' => false,
             'message' => 'The cart products can not be ordered regarding their stock',
         ], $this->class->getRequest('product'));
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('ApplepayPaymentMethod::getRequest() - The cart products can not be ordered regarding their stock (cart id: 1)', 'error')
+            ->once();
 
         // The previous cart has been restored
         $this->assertSame(1, $this->context->cookie->id_cart);
@@ -222,6 +228,9 @@ class getRequestTest extends BaseApplepayPaymentMethod
             'result' => false,
             'message' => 'The cart products can not be ordered regarding their stock',
         ], $this->class->getRequest('shopping-cart'));
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('ApplepayPaymentMethod::getRequest() - The cart products can not be ordered regarding their stock (cart id: 1)', 'error')
+            ->once();
     }
 
     public function testWhenProductIsAddedToTheNewCart()
