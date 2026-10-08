@@ -91,4 +91,64 @@ class ProductAdapter implements ProductInterface
 
         return $product->hasAttributes();
     }
+
+    /**
+     * @description Check if a product (or combination) can be ordered regarding its stock,
+     * its minimal quantity and the shop / product out of stock configuration
+     *
+     * @param int $id_product
+     * @param int $id_product_attribute
+     *
+     * @return bool
+     */
+    public function isOrderableRegardingStock($id_product, $id_product_attribute = 0)
+    {
+        $minimal_quantity = $this->getMinimalQuantity($id_product, $id_product_attribute);
+
+        // Pack::isInStock handles the out of stock configuration and the pack stock type (PS_PACK_STOCK_TYPE)
+        if (\Pack::isPack((int) $id_product)) {
+            return (bool) \Pack::isInStock((int) $id_product, $minimal_quantity);
+        }
+
+        if (\Product::isAvailableWhenOutOfStock(\StockAvailable::outOfStock((int) $id_product))) {
+            return true;
+        }
+
+        $available_quantity = (int) \StockAvailable::getQuantityAvailableByProduct((int) $id_product, (int) $id_product_attribute);
+
+        return $available_quantity >= $minimal_quantity;
+    }
+
+    /**
+     * @description Get the default attribute (combination) of a product
+     *
+     * @param int $id_product
+     *
+     * @return int
+     */
+    public function getDefaultAttribute($id_product)
+    {
+        return (int) \Product::getDefaultAttribute((int) $id_product);
+    }
+
+    /**
+     * @description Get the minimal quantity required to order a product (or combination)
+     *
+     * @param int $id_product
+     * @param int $id_product_attribute
+     *
+     * @return int
+     */
+    private function getMinimalQuantity($id_product, $id_product_attribute = 0)
+    {
+        if (0 < (int) $id_product_attribute) {
+            $combination = new \Combination((int) $id_product_attribute);
+
+            return max(1, (int) $combination->minimal_quantity);
+        }
+
+        $product = new \Product((int) $id_product);
+
+        return max(1, (int) $product->minimal_quantity);
+    }
 }

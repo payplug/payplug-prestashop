@@ -101,8 +101,11 @@ class RequestAction
             ->getPaymentMethod('applepay')
             ->getRequest($workflow);
 
+        // getRequest returns an error (result false) when the cart can't be ordered anymore, e.g. regarding its stock
+        $is_refused = isset($request['result']) && false === $request['result'];
+
         return [
-            'result' => is_array($request) && !empty($request),
+            'result' => is_array($request) && !empty($request) && !$is_refused,
             'request' => $request,
         ];
     }
