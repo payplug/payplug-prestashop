@@ -10,11 +10,19 @@ namespace PayPlug\tests\models\classes\paymentMethod\ApplepayPaymentMethod;
  */
 class cancelPaymentResourceTest extends BaseApplepayPaymentMethod
 {
+    public function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
+    }
+
     public function testWhenNoPaymentRetrieveForContextCart()
     {
         $this->payment_repository->shouldReceive([
             'getBy' => [],
         ]);
+        $this->class->shouldReceive('restorePreviousCart')
+            ->once();
         $this->assertSame([
             'result' => false,
             'message' => 'No payment id for given cart id',
@@ -41,6 +49,8 @@ class cancelPaymentResourceTest extends BaseApplepayPaymentMethod
                 'message' => 'Payment can not be aborded',
             ],
         ]);
+        $this->class->shouldReceive('restorePreviousCart')
+            ->once();
         $this->assertSame([
             'result' => false,
             'message' => 'Payment can not be aborded',
@@ -67,6 +77,8 @@ class cancelPaymentResourceTest extends BaseApplepayPaymentMethod
                 'resource' => 'PaymentResource',
             ],
         ]);
+        $this->class->shouldReceive('restorePreviousCart')
+            ->once();
         $this->assertSame([
             'result' => true,
             'message' => '',

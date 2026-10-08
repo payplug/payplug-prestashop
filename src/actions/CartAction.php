@@ -44,9 +44,11 @@ class CartAction
      * @description Generic method for rendering payment
      * actions elements for the cart and product pages
      *
+     * @param array $params hook parameters
+     *
      * @return false|string
      */
-    public function renderPaymentCTA()
+    public function renderPaymentCTA($params = [])
     {
         $this->setParameters();
         $payment_methods = $this->configuration->getValue('payment_methods');
@@ -66,7 +68,7 @@ class CartAction
             return false;
         }
 
-        return $this->renderApplepayCheckout();
+        return $this->renderApplepayCheckout($params);
     }
 
     /**
@@ -80,12 +82,17 @@ class CartAction
      * The function handles rendering for both the cart and product pages by determining
      * the current controller and setting the workflow accordingly.
      *
+     * The button is not displayed if the product (or combination) on the product page,
+     * or one of the cart products on the cart page, can't be ordered regarding its stock
+     * and the shop / product out of stock configuration.
+     *
+     * @param array $params hook parameters
+     *
      * @return false|string
      */
-    public function renderApplePayCheckout()
+    public function renderApplePayCheckout($params = [])
     {
         $this->setParameters();
-
         // if customer is not logged and the shop is configured to refuse guest order then return false
         $guest_checkout_enabled = $this->plugin
             ->getConfigurationClass()
@@ -110,11 +117,14 @@ class CartAction
         if (empty($carriers_list) && 'product' != $controller) {
             return false;
         }
+
+        $id_product = 0;
         if ('product' == $controller) {
             $id_product = (int) $this->dependencies
                 ->getPlugin()
                 ->getTools()
                 ->tool('getValue', 'id_product');
+
             $has_compatible_carriers = $this->dependencies
                 ->getPlugin()
                 ->getPaymentMethodClass()
@@ -130,9 +140,6 @@ class CartAction
             ->getRoutes()
             ->getSourceUrl()['applepay'];
 
-        $controller = $this->dispatcher
-            ->getInstance()
-            ->getController();
         $applepay_workflow = 'cart' === $controller ? 'shopping-cart' : 'product';
 
         $this->dependencies
@@ -144,6 +151,8 @@ class CartAction
                 'iso_lang' => $this->context->language->iso_code,
             ]);
 
+        // The JS vars must be defined even if the CTA is hidden regarding the stock: they are only emitted on full page render,
+        // while the CTA can be displayed later by an AJAX refresh (other combination selected, out of stock product removed from the cart)
         $this->dependencies
             ->getPlugin()
             ->getMedia()
@@ -154,8 +163,57 @@ class CartAction
                 'applePayIdCart' => $this->context->cart->id,
             ]);
 
+        // Do not display the CTA if the product (or combination) can't be ordered regarding its stock
+        if ('product' == $controller) {
+            $id_product_attribute = $this->getCurrentProductAttributeId($id_product, $params);
+            if (!$this->plugin->getProductAdapter()->isOrderableRegardingStock($id_product, $id_product_attribute)) {
+                return false;
+            }
+        }
+
+        // Do not display the CTA if one of the cart products can't be ordered regarding its stock
+        if ('cart' == $controller && !$this->plugin->getCart()->checkQuantities($this->context->cart)) {
+            return false;
+        }
+
         return $this->dependencies->configClass
             ->fetchTemplate('checkout/payment/applepay.tpl');
+    }
+
+    /**
+     * @description Get the product attribute (combination) currently displayed on the product page
+     *
+     * @param int $id_product
+     * @param array $params hook parameters
+     *
+     * @return int
+     */
+    private function getCurrentProductAttributeId($id_product, $params = [])
+    {
+        // $params['product'] may be a ProductLazyArray (ArrayAccess), so array_key_exists can't be used
+        if (isset($params['product']['id_product_attribute'])) {
+            return (int) $params['product']['id_product_attribute'];
+        }
+
+        $tools = $this->dependencies
+            ->getPlugin()
+            ->getTools();
+
+        $group = $tools->tool('getValue', 'group');
+        if (!empty($group)) {
+            return (int) $this->plugin
+                ->getProductAdapter()
+                ->getIdProductAttributeByIdAttributes($id_product, $group);
+        }
+
+        $id_product_attribute = $tools->tool('getValue', 'id_product_attribute');
+        if (!empty($id_product_attribute)) {
+            return (int) $id_product_attribute;
+        }
+
+        return $this->plugin
+            ->getProductAdapter()
+            ->getDefaultAttribute($id_product);
     }
 
     /**
