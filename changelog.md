@@ -2,6 +2,7 @@
 
 ## Version 5.2.2
 - Bugfix :
+  - [PRE-3729](https://payplug-prod.atlassian.net/browse/PRE-3729): Fix reflected XSS on the front `ajax` controller: answer with a JSON content type, accept `addLogger` on POST only and stop reflecting the logged message
   - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state (every stored scope, multistore included)
   - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
 
