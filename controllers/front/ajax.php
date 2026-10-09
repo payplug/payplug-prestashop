@@ -56,6 +56,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         $this->logger = $this->plugin->getLogger();
         $this->tools_adapter = $this->plugin->getTools();
 
+        // Every answer of this controller is JSON: never let the browser render it as HTML
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+            header('X-Content-Type-Options: nosniff');
+        }
+
         if (1 == $this->tools_adapter->tool('getValue', '_ajax')) {
             $this->configurationAdapter = $this->plugin->getConfiguration();
 
@@ -313,18 +319,20 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'message' => 'Success',
                 ]));
             } elseif ($tools->tool('getIsset', 'addLogger')) {
-                $message = $tools->tool('getValue', 'message');
+                // The logger is only fed by our own front script, which posts: refuse GET (crafted links)
+                $message = 'POST' === $_SERVER['REQUEST_METHOD'] ? $tools->tool('getValue', 'message') : null;
                 if (!$message || !is_string($message)) {
                     exit(json_encode([
                         'result' => true,
                         'message' => 'Failed to add log', // adapter error
                     ]));
                 }
-                $this->logger->addLog($message);
+                $this->logger->addLog(substr(strip_tags($message), 0, 1000));
 
+                // Do not reflect user input back
                 exit(json_encode([
                     'result' => true,
-                    'message' => $message, // adapter error
+                    'message' => 'Log added',
                 ]));
             } elseif ($tools->tool('getValue', 'method')) {
                 $method = $tools->tool('getValue', 'method');
