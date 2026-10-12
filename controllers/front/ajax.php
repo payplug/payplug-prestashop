@@ -320,14 +320,22 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 ]));
             } elseif ($tools->tool('getIsset', 'addLogger')) {
                 // The logger is only fed by our own front script, which posts: refuse GET (crafted links)
-                $message = 'POST' === $_SERVER['REQUEST_METHOD'] ? $tools->tool('getValue', 'message') : null;
-                if (!$message || !is_string($message)) {
+                $request_method = $this->dependencies
+                    ->getPlugin()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.utilities.service.props')
+                    ->getServerProp('REQUEST_METHOD');
+                $message = 'POST' === $request_method ? $tools->tool('getValue', 'message') : null;
+                // Sanitize before the emptiness check: a message made only of tags becomes empty
+                $message = is_string($message) ? $tools->substr(strip_tags($message), 0, 1000) : null;
+                if (!$message) {
                     exit(json_encode([
                         'result' => true,
                         'message' => 'Failed to add log', // adapter error
                     ]));
                 }
-                $this->logger->addLog(substr(strip_tags($message), 0, 1000));
+                $this->logger->addLog($message);
 
                 // Do not reflect user input back
                 exit(json_encode([
