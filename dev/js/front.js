@@ -1054,10 +1054,10 @@ var $document, $window, __moduleName__Module = {
                         patchPayment: 1,
                         method: 'applepayPatch',
                     },
-                    success: (json) => {
-                        var result = JSON.parse(json);
-
-                        if (!result.result) {
+                    dataType: 'json',
+                    success: (result) => {
+                        // Never leave the payment sheet hanging on an unexpected answer
+                        if (!result || !result.result) {
                             return failPayment();
                         }
 
