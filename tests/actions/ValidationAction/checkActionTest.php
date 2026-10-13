@@ -27,6 +27,10 @@ class checkActionTest extends BaseValidationAction
             'clearLock' => true,
         ]);
 
+        // checkAction() serializes its last_try critical section with a MySQL named lock.
+        \Mockery::mock('alias:Db')->shouldReceive('getInstance')
+            ->andReturn(\Mockery::mock(['getValue' => true, 'execute' => true]));
+
         $this->order_adapter = \Mockery::mock('OrderAdapter');
         $this->queue_repository = \Mockery::mock('QueueRepository');
 

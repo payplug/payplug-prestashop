@@ -128,24 +128,11 @@ class ValidationAction
             ];
         }
 
-        $fields = [
-            'treated' => true,
-            'date_upd' => date('Y-m-d H:i:s'),
-        ];
-
-        // If queueing system allowed, update the current event queue else clear the current lock
-        if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
-            $update = (bool) $this->dependencies
-                ->getPlugin()
-                ->getQueueRepository()
-                ->updateBy('id_cart', (int) $cart_id, $fields);
-        } else {
-            $update = (bool) $this->dependencies
-                ->getPlugin()
-                ->getLockRepository()
-                ->deleteBy('id_cart', (int) $cart_id);
-        }
-        if (!$update) {
+        // Serialize lock-clear + order-creation per cart: two concurrent callers (e.g. the
+        // browser redirect and a concurrent IPN) could otherwise both observe no lock and no
+        // order yet, and each create their own paid order for the same payment.
+        $lock_name = 'payplug_validation_cart_' . (int) $cart_id;
+        if (!(bool) \Db::getInstance()->getValue("SELECT GET_LOCK('" . pSQL($lock_name) . "', 5)")) {
             return [
                 'result' => false,
                 'action' => 'redirect',
@@ -153,50 +140,79 @@ class ValidationAction
             ];
         }
 
-        // Then create order before redirect user
-        $order_create = $this->createOrder((int) $cart_id);
-
-        // if result is false an error has been occured
-        if (!$order_create['result']) {
-            return [
-                'result' => false,
-                'action' => 'redirect',
-                'redirected_url' => $this->getOrderLinks()['error'],
+        try {
+            $fields = [
+                'treated' => true,
+                'date_upd' => date('Y-m-d H:i:s'),
             ];
-        }
 
-        // Clear lock before rendering it
-        $this->clearLock((int) $cart_id);
-
-        if (empty($order_create['id_order'])) {
-            // An order may already exist (e.g. a concurrent IPN notification created
-            // it, or createAction() found one already there) even though createOrder()
-            // didn't return its id — don't tell a customer who was actually charged
-            // that their card was not charged.
-            $existing_id_order = $this->dependencies
-                ->getPlugin()
-                ->getOrder()
-                ->getIdByCartId((int) $cart_id);
-            if ($existing_id_order) {
+            // If queueing system allowed, update the current event queue else clear the current lock
+            if ($this->dependencies->configClass->isValidFeature('feature_queueing_system')) {
+                $update = (bool) $this->dependencies
+                    ->getPlugin()
+                    ->getQueueRepository()
+                    ->updateBy('id_cart', (int) $cart_id, $fields);
+            } else {
+                $update = (bool) $this->dependencies
+                    ->getPlugin()
+                    ->getLockRepository()
+                    ->deleteBy('id_cart', (int) $cart_id);
+            }
+            if (!$update) {
                 return [
-                    'result' => true,
+                    'result' => false,
                     'action' => 'redirect',
-                    'redirected_url' => $this->getOrderLinks((int) $existing_id_order)['confirm'],
+                    'redirected_url' => $this->getOrderLinks()['error'],
+                ];
+            }
+
+            // Then create order before redirect user
+            $order_create = $this->createOrder((int) $cart_id);
+
+            // if result is false an error has been occured
+            if (!$order_create['result']) {
+                return [
+                    'result' => false,
+                    'action' => 'redirect',
+                    'redirected_url' => $this->getOrderLinks()['error'],
+                ];
+            }
+
+            // Clear lock before rendering it
+            $this->clearLock((int) $cart_id);
+
+            if (empty($order_create['id_order'])) {
+                // An order may already exist (e.g. a concurrent IPN notification created
+                // it, or createAction() found one already there) even though createOrder()
+                // didn't return its id — don't tell a customer who was actually charged
+                // that their card was not charged.
+                $existing_id_order = $this->dependencies
+                    ->getPlugin()
+                    ->getOrder()
+                    ->getIdByCartId((int) $cart_id);
+                if ($existing_id_order) {
+                    return [
+                        'result' => true,
+                        'action' => 'redirect',
+                        'redirected_url' => $this->getOrderLinks((int) $existing_id_order)['confirm'],
+                    ];
+                }
+
+                return [
+                    'result' => false,
+                    'action' => 'redirect',
+                    'redirected_url' => $this->getOrderLinks()['error'],
                 ];
             }
 
             return [
-                'result' => false,
+                'result' => true,
                 'action' => 'redirect',
-                'redirected_url' => $this->getOrderLinks()['error'],
+                'redirected_url' => $this->getOrderLinks((int) $order_create['id_order'])['confirm'],
             ];
+        } finally {
+            \Db::getInstance()->execute("SELECT RELEASE_LOCK('" . pSQL($lock_name) . "')");
         }
-
-        return [
-            'result' => true,
-            'action' => 'redirect',
-            'redirected_url' => $this->getOrderLinks((int) $order_create['id_order'])['confirm'],
-        ];
     }
 
     /**
