@@ -49,11 +49,6 @@ class AdminPayplugController extends ModuleAdminController
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->tools = $this->dependencies->getPlugin()->getTools();
-
-        // If referer is from development server, trigger api rest renderer
-        if (isset($_SERVER['HTTP_REFERER']) && null != strpos($_SERVER['HTTP_REFERER'], 'localhost')) {
-            $this->renderApiRest();
-        }
     }
 
     /**
