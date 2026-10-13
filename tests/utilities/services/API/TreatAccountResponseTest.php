@@ -204,4 +204,30 @@ class TreatAccountResponseTest extends BaseApi
         self::assertSame(json_encode($countries_metadata), $this->captured_configuration['oney_countries_metadata']);
         self::assertSame('FR', $this->captured_configuration['oney_allowed_countries']);
     }
+
+    public function testWhenResponseContainsPaymentMethodsLimitsAreMappedAndSyncIsStamped()
+    {
+        $this->json_answer['payment_methods'] = [
+            'bancontact' => [
+                'enabled' => true,
+                'allowed_countries' => ['ALL'],
+                'min_amounts' => ['EUR' => 30],
+                'max_amounts' => ['EUR' => 2000000],
+            ],
+            'satispay' => [
+                'enabled' => true,
+                'allowed_countries' => ['IT'],
+                'min_amounts' => ['EUR' => 30],
+                'max_amounts' => ['EUR' => 2000000],
+            ],
+        ];
+
+        $this->service->treatAccountResponse($this->json_answer);
+
+        self::assertSame(
+            '{"bancontact":{"min":"EUR:30","max":"EUR:2000000"},"satispay":{"min":"EUR:30","max":"EUR:2000000"}}',
+            $this->captured_configuration['amounts']
+        );
+        self::assertSame('{"satispay":["IT"]}', $this->captured_configuration['countries']);
+    }
 }

@@ -17,13 +17,12 @@ class BaseScalapayPaymentMethod extends BasePaymentMethod
     }
 
     /**
-     * @description Stub the merchant's own Scalapay limits. An empty string means the
-     *              merchant never customised them.
+     * @description Stub the `scalapay_custom_*` configuration keys.
      *
      * @param string $min
      * @param string $max
      */
-    protected function stubCustomLimits($min = '', $max = '')
+    protected function stubLegacyCustomLimits($min = '', $max = '')
     {
         $this->configuration->shouldReceive('getValue')
             ->with('scalapay_custom_min_amounts')

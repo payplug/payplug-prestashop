@@ -141,4 +141,30 @@ class getPaymentOptionTest extends BaseBancontactPaymentMethod
         ];
         $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
+
+    public function testMerchantCountryRestrictionHidesBancontactEvenWithoutTheBelgianRule()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('bancontact_country')
+            ->andReturn(false);
+        $this->configuration->shouldReceive('getValue')
+            ->with('apm_custom_settings')
+            ->andReturn('{"bancontact":{"countries":["BE"]}}');
+
+        $this->assertSame([], $this->class->getPaymentOption([]));
+    }
+
+    public function testBelgianRuleStillAppliesWhenTheBillingCountryIsEligible()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('bancontact_country')
+            ->andReturn(true);
+        $this->validators['payment']->shouldReceive('isAllowedCountry')
+            ->with('BE', 'FR')
+            ->andReturn([
+                'result' => false,
+            ]);
+
+        $this->assertSame([], $this->class->getPaymentOption([]));
+    }
 }

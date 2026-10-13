@@ -1,5 +1,15 @@
 # Payplug module changelog
 
+## Version 5.3.0
+- Feature :
+  - [PRE-3675](https://payplug-prod.atlassian.net/browse/PRE-3675): Show Satispay, Bancontact, iDEAL, MyBank, Wero, Bizum and Scalapay at checkout only when the cart amount and the billing country are within the limits of the Payplug account and of the merchant settings, and check them again when the payment is created
+  - [PRE-3675](https://payplug-prod.atlassian.net/browse/PRE-3675): Let the merchant narrow the amount range and restrict the billing countries of Satispay, Bancontact, iDEAL, MyBank, Wero, Bizum and Scalapay from the back office within the limits of the Payplug account, a maximum amount having to be greater than the minimum; the Scalapay amount range already set is carried over on upgrade
+  - [PRE-3675](https://payplug-prod.atlassian.net/browse/PRE-3675): Refresh the payment method limits from the Payplug account when the merchant logs in or opens the module configuration, and on upgrade; the checkout never calls the Payplug API for them and keeps using the last known limits when they could not be refreshed
+
+- Bugfix :
+  - [PRE-3675](https://payplug-prod.atlassian.net/browse/PRE-3675): Lift the country restriction of a payment method when the Payplug account no longer restricts it (`allowed_countries` set to `ALL`), and keep the amount limits of every currency the account returns instead of EUR only
+  - [PRE-3675](https://payplug-prod.atlassian.net/browse/PRE-3675): Keep the card payment methods available at checkout when no amount limit was ever retrieved from the Payplug account
+
 ## Version 5.2.2
 - Bugfix :
   - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state (every stored scope, multistore included)
