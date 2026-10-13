@@ -63,6 +63,8 @@ class Configuration
         'bancontact_country' => [
             'type' => 'integer',
             'name' => 'BANCONTACT_COUNTRY',
+            // Legacy "Belgium only" Bancontact setting: kept only as the source of
+            // ApmEligibility::importLegacyBancontactCountry() and for rollback.
             'defaultValue' => 0,
             'setConf' => 1,
         ],

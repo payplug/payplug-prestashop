@@ -92,6 +92,7 @@ class getPaymentOptionTest extends BasePaymentMethod
     {
         $this->class->set('name', 'satispay');
         $this->stubPproContext('{"satispay":["IT"]}', 'IT');
+        $this->api_service->shouldNotReceive('getAccount');
 
         $this->assertTrue(array_key_exists('satispay', $this->class->getPaymentOption([])));
     }

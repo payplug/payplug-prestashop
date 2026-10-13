@@ -3,6 +3,7 @@
 namespace PayPlug\tests\models\classes\paymentMethod\SatispayPaymentMethod;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PayPlug\src\models\classes\ApmEligibility;
 
 /**
  * @group unit
@@ -27,11 +28,6 @@ class getDefaultPaymentTabTest extends BaseSatispayPaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->helpers['amount']->shouldReceive([
-            'validateAmount' => [
-                'result' => true,
-            ],
-        ]);
         $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $arg) {
                 return 'getShopDomainSsl' == $method;
@@ -81,5 +77,32 @@ class getDefaultPaymentTabTest extends BaseSatispayPaymentMethod
 
         $this->assertSame(4242, (int) $payment_tab['amount']);
         $this->assertSame('EUR', $payment_tab['currency']);
+    }
+
+    public function testAnApiEntryWithASingleBoundDoesNotRefuseAnEligiblePayment()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('amounts')
+            ->andReturn('{"satispay":{"min":"EUR:30"}}');
+        $this->configuration->shouldReceive('getValue')
+            ->with('countries')
+            ->andReturn('{"satispay":["FR"]}');
+        $this->class->set('apm_eligibility', new ApmEligibility($this->dependencies));
+        $this->api_service->shouldNotReceive('getAccount');
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        $this->assertSame(4242, (int) $payment_tab['amount']);
+        $this->assertSame('FR', $payment_tab['billing']['country']);
+    }
+
+    public function testTheCartAmountIsOnlyCheckedAgainstTheApmLimits()
+    {
+        $this->apm_eligibility->shouldReceive('isEligible')
+            ->once()
+            ->andReturn(['result' => true, 'reason' => 'ok']);
+        $this->helpers['amount']->shouldNotReceive('validateAmount');
+
+        $this->assertNotEmpty($this->class->getDefaultPaymentTab());
     }
 }

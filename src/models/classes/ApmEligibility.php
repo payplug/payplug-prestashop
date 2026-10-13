@@ -444,6 +444,34 @@ class ApmEligibility
     }
 
     /**
+     * @description Restrict the Bancontact billing countries to Belgium in the merchant
+     *              settings when the `bancontact_country` setting is enabled. Countries
+     *              already in the merchant settings are kept, and the source key is left
+     *              untouched.
+     *
+     * @return bool false when the merchant settings could not be written
+     */
+    public function importLegacyBancontactCountry()
+    {
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        if (!(bool) $configuration->getValue('bancontact_country')) {
+            return true;
+        }
+
+        $stored = $this->getJsonConfiguration('apm_custom_settings');
+        $entry = isset($stored['bancontact']) && is_array($stored['bancontact']) ? $stored['bancontact'] : [];
+        if (array_key_exists('countries', $entry)) {
+            return true;
+        }
+
+        $entry['countries'] = ['BE'];
+        $stored['bancontact'] = $entry;
+        ksort($stored);
+
+        return (bool) $configuration->set('apm_custom_settings', json_encode($stored));
+    }
+
+    /**
      * @param string $key
      *
      * @return array

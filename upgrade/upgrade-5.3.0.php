@@ -40,8 +40,15 @@ function upgrade_module_5_3_0($object)
     try {
         $apm_eligibility = new \PayPlug\src\models\classes\ApmEligibility($object->payplug_dependencies);
         $logger->addLog('Upgrade 5.3.0: Scalapay amounts import ' . ($apm_eligibility->importLegacyScalapaySettings() ? 'ok' : 'ko'));
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         $logger->addLog('Upgrade 5.3.0: Scalapay amounts import failed with code ' . (int) $e->getCode(), 'warning');
+    }
+
+    try {
+        $apm_eligibility = new \PayPlug\src\models\classes\ApmEligibility($object->payplug_dependencies);
+        $logger->addLog('Upgrade 5.3.0: Bancontact countries import ' . ($apm_eligibility->importLegacyBancontactCountry() ? 'ok' : 'ko'));
+    } catch (\Throwable $e) {
+        $logger->addLog('Upgrade 5.3.0: Bancontact countries import failed with code ' . (int) $e->getCode(), 'warning');
     }
 
     // The cached amounts and countries are kept as the last known limits; the API being
@@ -53,7 +60,7 @@ function upgrade_module_5_3_0($object)
             ->getService('payplug.utilities.service.api')
             ->getAccount();
         $logger->addLog('Upgrade 5.3.0: payment method limits refresh ' . (empty($permissions) ? 'skipped' : 'ok'));
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         $logger->addLog('Upgrade 5.3.0: payment method limits refresh failed with code ' . (int) $e->getCode(), 'warning');
     }
 

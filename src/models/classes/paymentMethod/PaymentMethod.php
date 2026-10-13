@@ -1438,19 +1438,7 @@ class PaymentMethod
             return [];
         }
 
-        // Check amount
-        $price_limit = $this->getPriceLimit();
         $cart_amount = $this->context->cart->getOrderTotal(true);
-        if (!empty($price_limit)) {
-            $is_valid_amount = $this->dependencies
-                ->getHelpers()['amount']
-                ->validateAmount($price_limit, (float) $cart_amount, $this->context->currency->iso_code);
-            if (!$is_valid_amount['result']) {
-                $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
-
-                return [];
-            }
-        }
 
         // The cart or the billing address may have changed since the payment options were displayed
         if ($this->getApmEligibility()->isPpro($this->name)) {
@@ -1459,6 +1447,18 @@ class PaymentMethod
                 $this->logger->addLog('PaymentMethod::getPaymentTab() - ' . $this->name . ' is not eligible for the current cart: ' . $eligibility['reason'] . '.');
 
                 return [];
+            }
+        } else {
+            $price_limit = $this->getPriceLimit();
+            if (!empty($price_limit)) {
+                $is_valid_amount = $this->dependencies
+                    ->getHelpers()['amount']
+                    ->validateAmount($price_limit, (float) $cart_amount, $this->context->currency->iso_code);
+                if (!$is_valid_amount['result']) {
+                    $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
+
+                    return [];
+                }
             }
         }
 

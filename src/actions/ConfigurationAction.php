@@ -879,7 +879,6 @@ class ConfigurationAction
             'sandbox_mode' => 'payplug_sandbox',
             'oney_custom_min_amounts' => 'oney_min_amounts',
             'oney_custom_max_amounts' => 'oney_max_amounts',
-            'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
         ];
@@ -957,19 +956,6 @@ class ConfigurationAction
                                     ],
                                 ];
                             }
-                        }
-
-                        break;
-
-                    case 'enable_bancontact_country':
-                        if ((bool) $datas->enable_bancontact && !$configuration->set($key, (string) $value)) {
-                            return [
-                                'success' => false,
-                                'data' => [
-                                    // todo: add translation
-                                    'message' => 'An error has occurred while register ' . $config,
-                                ],
-                            ];
                         }
 
                         break;

@@ -623,10 +623,6 @@ class Translation
                     'sandbox' => $this->l('paymentmethods.bancontact.descriptions.sandbox', 'translation'),
                 ],
                 'link' => $this->l('paymentmethods.bancontact.link', 'translation'),
-                'user' => [
-                    'title' => $this->l('paymentmethods.bancontact.user.title', 'translation'),
-                    'description' => $this->l('paymentmethods.bancontact.user.description', 'translation'),
-                ],
                 'call_to_action' => $this->l('paymentmethods.bancontact.call_to_action', 'translation'),
             ],
             'satispay' => [
