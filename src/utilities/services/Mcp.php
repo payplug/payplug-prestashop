@@ -163,12 +163,22 @@ class Mcp
             ->getService('payplug.utilities.service.api')
             ->getMcpApiBearer(!(bool)$configuration->getValue('sandbox_mode'));
 
-        $base_url = $this->context->shop->getBaseURL(true);
         $module_name = $this->dependencies->name;
+        $cart_id = (int) $this->context->cart->id;
         $attributes['urls'] = [
-            'return' => $base_url . "module/$module_name/validation",
-            'cancel' => $base_url . "module/$module_name/cancel",
-            'notification' => $base_url . "module/$module_name/notification",
+            'return' => $this->context->link->getModuleLink(
+                $module_name,
+                'validation',
+                ['ps' => 1, 'cartid' => $cart_id],
+                true
+            ),
+            'cancel' => $this->context->link->getModuleLink(
+                $module_name,
+                'validation',
+                ['ps' => 2, 'cartid' => $cart_id],
+                true
+            ),
+            'notification' => $this->context->link->getModuleLink($module_name, 'ipn', [], true),
         ];
 
         // Set meta data and potential required context
