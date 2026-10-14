@@ -41,4 +41,15 @@ class BaseUnifiedOperationRepository extends BaseRepository
             ],
         ]);
     }
+
+    protected function mockPurge()
+    {
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'delete' => $this->repository,
+            'from' => $this->repository,
+            'where' => $this->repository,
+            'build' => true,
+        ]);
+    }
 }

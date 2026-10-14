@@ -180,41 +180,39 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
             $binding['requested_amount'] = $requestedAmount;
         }
 
-        $existing = $this->getBy('operation_id', $operationId);
+        return $this->bind($binding, $operationId, $idCart);
+    }
 
-        if ($existing) {
-            return (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+    /**
+     * Records the amount sent at creation for a payment whose creation response carried no
+     * payment id, with the same row handling as bindPaymentId().
+     */
+    public function bindRequestedAmount(string $operationId, int $requestedAmount, int $idCart): bool
+    {
+        if ('' === $operationId) {
+            return false;
         }
 
-        $now = date('Y-m-d H:i:s');
+        return $this->bind(['requested_amount' => $requestedAmount], $operationId, $idCart);
+    }
 
-        try {
-            $created = (bool) $this->createEntity(array_merge([
-                'operation_id' => $operationId,
-                'order_id' => self::PLACEHOLDER_ORDER_PREFIX . $idCart,
-                'exec_code' => '0001',
-                'outcome' => PaymentOutcome::THREE_DS_PENDING,
-                'amount' => 0,
-                'treated' => false,
-                'date_add' => $now,
-                'date_upd' => $now,
-            ], $binding));
-        } catch (\Throwable $exception) {
-            $created = false;
+    /**
+     * Records a payment id read back from the operation itself, for a payment whose creation
+     * response carried none. Write-once: a payment id already on the row, written by
+     * bindPaymentId() from the creation response, is never overwritten, even by a concurrent call.
+     */
+    public function bindPaymentIdIfMissing(string $operationId, string $paymentId, int $idCart): bool
+    {
+        if ('' === $operationId || '' === $paymentId) {
+            return false;
         }
 
-        if (!$created) {
-            // The notification of a frictionless payment may have save()d the row between getBy()
-            // and the insert, which then hits UNIQUE (operation_id): bind onto that row instead.
-            $existing = $this->getBy('operation_id', $operationId);
-
-            return $existing
-                && (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+        if (!$this->getBy('operation_id', $operationId)
+            && $this->createPlaceholder(['payment_id' => $paymentId], $operationId, $idCart)) {
+            return true;
         }
 
-        $this->purgeStalePlaceholders();
-
-        return true;
+        return $this->updatePaymentIdIfMissing($operationId, $paymentId);
     }
 
     public function getPaymentIdByOperationId(string $operationId): ?string
@@ -258,7 +256,93 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
     }
 
     /**
-     * @description Delete the placeholders bindPaymentId() created for payments that never got
+     * @description Write the binding onto the operation's row, or onto a pending placeholder row
+     *              when the operation is not persisted yet
+     *
+     * @param array<string, int|string> $binding
+     */
+    private function bind(array $binding, string $operationId, int $idCart): bool
+    {
+        $existing = $this->getBy('operation_id', $operationId);
+
+        if ($existing) {
+            return (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+        }
+
+        if ($this->createPlaceholder($binding, $operationId, $idCart)) {
+            return true;
+        }
+
+        // The notification of a frictionless payment may have save()d the row between getBy()
+        // and the insert, which then hits UNIQUE (operation_id): bind onto that row instead.
+        $existing = $this->getBy('operation_id', $operationId);
+
+        return $existing
+            && (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+    }
+
+    /**
+     * @description Insert a pending placeholder row carrying the binding, then purge the stale ones
+     *
+     * @param array<string, int|string> $binding
+     *
+     * @return bool false when the insert failed, e.g. on UNIQUE (operation_id)
+     */
+    private function createPlaceholder(array $binding, string $operationId, int $idCart): bool
+    {
+        $now = date('Y-m-d H:i:s');
+
+        try {
+            $created = (bool) $this->createEntity(array_merge([
+                'operation_id' => $operationId,
+                'order_id' => self::PLACEHOLDER_ORDER_PREFIX . $idCart,
+                'exec_code' => '0001',
+                'outcome' => PaymentOutcome::THREE_DS_PENDING,
+                'amount' => 0,
+                'treated' => false,
+                'date_add' => $now,
+                'date_upd' => $now,
+            ], $binding));
+        } catch (\Throwable $exception) {
+            $created = false;
+        }
+
+        if ($created) {
+            $this->purgeStalePlaceholders();
+        }
+
+        return $created;
+    }
+
+    /**
+     * @description Set the payment id of the operation's row in a single conditional UPDATE, only
+     *              while the row has none
+     *
+     * @return bool true when the row was updated
+     */
+    private function updatePaymentIdIfMissing(string $operationId, string $paymentId): bool
+    {
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+
+        $definition = $entity->getDefinition();
+
+        $this
+            ->update()
+            ->table($this->getTableName($definition['table']))
+            ->set('`payment_id` = "' . $this->escape($paymentId) . '"')
+            ->where('`operation_id` = "' . $this->escape($operationId) . '"')
+            ->where('`payment_id` IS NULL OR `payment_id` = ""');
+
+        $this->build();
+
+        return 1 === $this->dependencies->getPlugin()->getQueryAdapter()->getAffectedRows();
+    }
+
+    /**
+     * @description Delete the placeholders bind() created for payments that never got
      *              an order; a failure only delays the purge to the next placeholder
      */
     private function purgeStalePlaceholders(): void

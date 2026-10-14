@@ -730,6 +730,7 @@ class Translation
                 'upper' => $this->l('refund.error.upper', 'translation'),
                 'default' => $this->l('refund.error.default', 'translation'),
                 'uncertain' => $this->l('refund.error.uncertain', 'translation'),
+                'no_payment_id' => $this->l('refund.error.no_payment_id', 'translation'),
             ],
             'success' => $this->l('refund.success', 'translation'),
         ];

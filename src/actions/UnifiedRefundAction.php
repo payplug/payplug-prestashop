@@ -157,7 +157,7 @@ class UnifiedRefundAction
             $logger->error('UnifiedRefundAction::refundAction - Order ' . $order->id
                 . ' cannot be refunded: no Unified API payment id recorded for operation ' . $payment_operation->operationId);
 
-            return $this->errorResult($translations['error']['default']);
+            return $this->errorResult($translations['error']['no_payment_id']);
         }
 
         $currency = $plugin->getCurrency()->get((int) $order->id_currency);

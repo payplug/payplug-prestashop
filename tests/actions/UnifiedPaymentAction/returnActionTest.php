@@ -15,6 +15,8 @@ require_once __DIR__ . '/../../stubs/Cart.php';
  */
 class returnActionTest extends TestCase
 {
+    private const PAYMENT_ID = 'd4293432-a0ac-4d4f-ae5b-8b12253ecbec';
+
     public function tearDown(): void
     {
         \Mockery::close();
@@ -348,7 +350,13 @@ class returnActionTest extends TestCase
         $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
     }
 
-    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone()
+    /**
+     * @dataProvider operationAliasProvider
+     *
+     * @param array<string, mixed> $alias_fields
+     * @param string $expected_alias_id
+     */
+    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone(array $alias_fields, $expected_alias_id)
     {
         [$action, $mocks] = $this->mockActionForReturn();
 
@@ -360,9 +368,7 @@ class returnActionTest extends TestCase
                 'execCode' => '0000',
                 'amount' => 1234,
                 'orderId' => '42',
-                // Real Unified API shape: the alias id is paymentMethod.id (no card.aliasId).
-                'paymentMethod' => [
-                    'id' => 'card_alias',
+                'paymentMethod' => $alias_fields + [
                     'card' => ['code6x4' => '402205XXXXXX0001', 'network' => 'VISA'],
                     'details' => ['fullName' => 'Jane Doe', 'validityDate' => '2029-12', 'selectedBrand' => 'VISA'],
                 ],
@@ -371,9 +377,20 @@ class returnActionTest extends TestCase
         $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
             'result' => true,
             'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
-        ], ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
+        ], ['alias_id' => $expected_alias_id, 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
 
         $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function operationAliasProvider()
+    {
+        return [
+            'storedId only' => [['storedId' => 'card_stored'], 'card_stored'],
+            'storedId and id' => [['storedId' => 'card_stored', 'id' => 'card_legacy'], 'card_stored'],
+            'id only' => [['id' => 'card_legacy'], 'card_legacy'],
+            'non string storedId' => [['storedId' => 123, 'id' => 'card_legacy'], 'card_legacy'],
+            'empty storedId' => [['storedId' => '', 'id' => 'card_legacy'], 'card_legacy'],
+        ];
     }
 
     /**
@@ -509,6 +526,86 @@ class returnActionTest extends TestCase
         $this->assertFalse($action->returnAction(['token' => 'good-token'])['result']);
     }
 
+    public function testRecordsThePaymentIdOfThePaidOperationBeforeCreatingTheOrder()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
+        ]);
+        $bound = false;
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with('op_123', self::PAYMENT_ID, 42)
+            ->andReturnUsing(function () use (&$bound) {
+                $bound = true;
+
+                return true;
+            });
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/payment id ' . self::PAYMENT_ID . ' of operation op_123 recorded/'));
+        $mocks['order_action']->shouldReceive('createFromOutcome')
+            ->once()
+            ->with(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, [])
+            ->andReturnUsing(function () use (&$bound) {
+                $this->assertTrue($bound, 'payment id recorded before the order is created');
+
+                return ['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99'];
+            });
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function testKeepsThePaymentIdAlreadyRecordedOnTheReturn()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
+        ]);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with('op_123')->andReturn(self::PAYMENT_ID);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ]);
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function testNeverRecordsThePaymentIdOfAFailedReturn()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '9999', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
+        ]);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '9999', PaymentOutcome::FAILED, 1234, [
+            'result' => false,
+            'redirect_url' => 'index.php?controller=order&step=3&has_error=1&modulename=payplug',
+        ]);
+
+        $this->assertFalse($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function testNeverRecordsThePaymentIdWhileTheReturnIsStillThreeDsPending()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0001', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
+        ]);
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/still pending 3DS/'));
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['token_cache']->shouldReceive('delete')->never();
+
+        $this->assertFalse($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
     private function mockDependencies()
     {
         $dependencies = \Mockery::mock('Dependencies');
@@ -561,12 +658,15 @@ class returnActionTest extends TestCase
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->shouldReceive('getService')->with('payplug.unified.payment_service_factory')->andReturn($factory);
         $factory->shouldReceive('createLogger')->andReturn($logger);
+        $logger->shouldReceive('info')->byDefault();
         $factory->shouldReceive('createTokenCache')->andReturn($token_cache);
         $factory->shouldReceive('create')->andReturn($payment_service);
         $factory->shouldReceive('createLock')->andReturn($lock);
         $payment_repository = \Mockery::mock('PaymentRepository');
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
+        $payment_repository->shouldReceive('getPaymentIdByOperationId')->andReturn(null)->byDefault();
+        $payment_repository->shouldReceive('bindPaymentIdIfMissing')->never()->byDefault();
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         // Fix 7: cache cleanup after a terminal reconciliation - not asserted by every test, only

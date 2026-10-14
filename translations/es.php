@@ -457,6 +457,7 @@ $_MODULE['<{payplug}prestashop>translation_e055b8792650ac9989ede4d59bc229af'] = 
 $_MODULE['<{payplug}prestashop>translation_e0c59c10aca3262cfaea791119399785'] = 'Asegúrese de no seleccionar estas opciones en su configuración.';
 $_MODULE['<{payplug}prestashop>translation_e1351273c77fec250d504e85a4cb52fb'] = 'Amex';
 $_MODULE['<{payplug}prestashop>translation_e349c0d693ce1830684d55ee91641182'] = 'Dirección de correo electrónico';
+$_MODULE['<{payplug}prestashop>translation_e41a4d8dd24374cff0d12deff1413d86'] = 'Este pago no se puede reembolsar desde el back office: PayPlug no devolvió su referencia al crearlo. Reembólselo desde su portal PayPlug.';
 $_MODULE['<{payplug}prestashop>translation_e41b6f01f23402b568d62f0a542e88e1'] = 'autorizado';
 $_MODULE['<{payplug}prestashop>translation_e531b94ae9de4c04308e349b47a89cbc'] = 'Ventana emergente';
 $_MODULE['<{payplug}prestashop>translation_e543705432e2e2d0c50c1e79e6082cff'] = 'Wero';

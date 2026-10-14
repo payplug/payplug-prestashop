@@ -1,10 +1,10 @@
 <?php
 
-// tests/actions/OperationAction/notifyActionTest.php
+// tests/actions/UnifiedPaymentAction/notifyActionTest.php
 
-namespace PayPlug\tests\actions\OperationAction;
+namespace PayPlug\tests\actions\UnifiedPaymentAction;
 
-use PayPlug\src\actions\OperationAction;
+use PayPlug\src\actions\UnifiedPaymentAction;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
@@ -15,11 +15,13 @@ require_once __DIR__ . '/../../stubs/Cart.php';
 /**
  * @group unit
  * @group action
- * @group operation_action
+ * @group unified_payment_action
  */
 class notifyActionTest extends TestCase
 {
     private const VALID_BODY = '{"id":"359fe258-8264-4a90-9a40-d16e1736058d","execCode":"0000","orderId":"6","amount":2900}';
+    private const OPERATION_ID = '359fe258-8264-4a90-9a40-d16e1736058d';
+    private const PAYMENT_ID = 'd4293432-a0ac-4d4f-ae5b-8b12253ecbec';
 
     public function tearDown(): void
     {
@@ -214,6 +216,8 @@ class notifyActionTest extends TestCase
         [$action, $mocks] = $this->mockActionForNotify();
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $mocks['payment_repository']->shouldReceive('isTreated')->with('359fe258-8264-4a90-9a40-d16e1736058d')->andReturn(true);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with(self::OPERATION_ID)->andReturn(self::PAYMENT_ID);
+        $mocks['factory']->shouldReceive('create')->never();
         $mocks['payment_repository']->shouldReceive('markTreated')->never();
         $mocks['lock']->shouldReceive('acquire')->never();
 
@@ -253,7 +257,7 @@ class notifyActionTest extends TestCase
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
         $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
-        // 1 initial attempt + OperationAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries = 41 total:
+        // 1 initial attempt + UnifiedPaymentAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries = 41 total:
         // the webhook waits longer than returnAction() - the Receiver doesn't retry a 409.
         $action->lockRetryDelayUsec = 0;
         $mocks['lock']->shouldReceive('acquire')->times(41)->with('uhf_cart:6', 60)->andReturn(false);
@@ -282,6 +286,54 @@ class notifyActionTest extends TestCase
         $result = $action->notifyAction();
 
         $this->assertSame(200, $result['http_status']);
+    }
+
+    /**
+     * The cart was edited during the 3DS challenge (its total now converts to 1500): the operation
+     * captured the 2900 requested at its creation, so the order is created and the notification
+     * treated.
+     */
+    public function testCreatesTheOrderWhenThePaidAmountIsTheRequestedOneAlthoughTheCartChanged()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 1500);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')
+            ->with('359fe258-8264-4a90-9a40-d16e1736058d')
+            ->andReturn(2900);
+        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('359fe258-8264-4a90-9a40-d16e1736058d');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testRefusesAndAsksForAManualReviewWhenThePaidAmountDiffersFromTheRequestedOne()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        // The cart total still matches the paid amount: the reference amount alone decides.
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')
+            ->with('359fe258-8264-4a90-9a40-d16e1736058d')
+            ->andReturn(2500);
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['payment_repository']->shouldReceive('save')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::on(function ($message) {
+            return false !== strpos($message, 'manual review')
+                && false !== strpos($message, '359fe258-8264-4a90-9a40-d16e1736058d')
+                && false !== strpos($message, 'cart 6')
+                && false !== strpos($message, '2900')
+                && false !== strpos($message, '2500');
+        }));
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
     }
 
     public function testAcceptsMatchingAuthorizationHeaderWhenSecretIsConfigured()
@@ -386,13 +438,18 @@ class notifyActionTest extends TestCase
         $this->assertSame(200, $result['http_status']);
     }
 
-    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone()
+    /**
+     * @dataProvider operationAliasProvider
+     *
+     * @param array<string, mixed> $alias_fields
+     * @param string $expected_alias_id
+     */
+    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone(array $alias_fields, $expected_alias_id)
     {
         [$action, $mocks] = $this->mockActionForNotify();
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900, [
-            'paymentMethod' => [
-                'id' => 'card_alias',
+            'paymentMethod' => $alias_fields + [
                 'card' => ['code6x4' => '402205XXXXXX0001', 'type' => 'VISA', 'network' => 'VISA'],
                 'details' => ['validityDate' => '2029-12', 'selectedBrand' => 'VISA'],
             ],
@@ -405,10 +462,19 @@ class notifyActionTest extends TestCase
             'result' => true,
             'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
             'persisted' => true,
-        ], ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
+        ], ['alias_id' => $expected_alias_id, 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
         $mocks['payment_repository']->shouldReceive('markTreated')->once();
 
         $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function operationAliasProvider()
+    {
+        return [
+            'storedId only' => [['storedId' => 'card_stored'], 'card_stored'],
+            'storedId and id' => [['storedId' => 'card_stored', 'id' => 'card_legacy'], 'card_stored'],
+            'id only' => [['id' => 'card_legacy'], 'card_legacy'],
+        ];
     }
 
     public function testNeverReadsTheAliasIdFromTheWebhookBody()
@@ -419,7 +485,7 @@ class notifyActionTest extends TestCase
             'execCode' => '0000',
             'orderId' => '6',
             'amount' => 2900,
-            'paymentMethod' => ['id' => 'forged_alias'],
+            'paymentMethod' => ['storedId' => 'forged_alias', 'id' => 'forged_alias'],
         ]);
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn($forged_body);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
@@ -442,7 +508,7 @@ class notifyActionTest extends TestCase
         [$action, $mocks] = $this->mockActionForNotify();
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900, [
-            'paymentMethod' => ['id' => 'card_alias', 'card' => ['code6x4' => '402205XXXXXX0001']],
+            'paymentMethod' => ['storedId' => 'card_alias', 'card' => ['code6x4' => '402205XXXXXX0001']],
         ]);
         $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
         $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
@@ -734,7 +800,7 @@ class notifyActionTest extends TestCase
         $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
         $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')
             ->andReturn(new OperationData('op_original', '0000', PaymentOutcome::PAID, 2900, '99'));
-        // 1 initial attempt + OperationAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries.
+        // 1 initial attempt + UnifiedPaymentAction::NOTIFY_LOCK_RETRY_ATTEMPTS (40) retries.
         $mocks['lock']->shouldReceive('acquire')->times(41)->with('uhf_refund:99', 5)->andReturn(false);
         $mocks['lock']->shouldReceive('release')->never();
         $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/is not the paid operation/'));
@@ -784,12 +850,494 @@ class notifyActionTest extends TestCase
         $this->assertSame(200, $action->notifyAction()['http_status']);
     }
 
+    public function testBindsThePaymentIdOfTheReReadOperationWhenNoneIsRecorded()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with(self::OPERATION_ID)->andReturn(null);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with(self::OPERATION_ID, self::PAYMENT_ID, 6)->andReturn(true);
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/payment id ' . self::PAYMENT_ID . ' of operation ' . self::OPERATION_ID . ' recorded/'));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with(self::OPERATION_ID);
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testRecordsThePaymentIdBeforeTheOrderEvenWhenTheCartLockIsNeverReleased()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $action->lockRetryDelayUsec = 0;
+        $mocks['lock']->shouldReceive('acquire')->andReturn(false);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with(self::OPERATION_ID, self::PAYMENT_ID, 6)->andReturn(true);
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/recorded/'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Could not acquire lock/'));
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(409, $action->notifyAction()['http_status']);
+    }
+
+    public function testKeepsTheRecordedPaymentIdWhenItEqualsTheOperationOne()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with(self::OPERATION_ID)->andReturn(self::PAYMENT_ID);
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testKeepsTheRecordedPaymentIdAndLogsAMismatch()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with(self::OPERATION_ID)->andReturn('pay_from_creation');
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::on(function ($message) {
+            return false !== strpos($message, 'payment id mismatch')
+                && false !== strpos($message, self::OPERATION_ID)
+                && false !== strpos($message, 'pay_from_creation')
+                && false !== strpos($message, self::PAYMENT_ID);
+        }));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testBindsThePaymentIdOfTheReReadOperationNeverTheOneOfTheWebhookBody()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"' . self::OPERATION_ID . '","paymentId":"forged","execCode":"0000","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with(self::OPERATION_ID, self::PAYMENT_ID, 6)->andReturn(true);
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/recorded/'));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testNeverBindsThePaymentIdOfTheWebhookBodyWhenTheReReadCarriesNone()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"' . self::OPERATION_ID . '","paymentId":"forged","execCode":"0000","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
     /**
-     * @return array{0: OperationAction, 1: array<string, object>}
+     * @dataProvider malformedPaymentIdProvider
+     *
+     * @param mixed $payment_id
+     */
+    public function testIgnoresAMalformedPaymentId($payment_id)
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => $payment_id]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/operation ' . self::OPERATION_ID . ' .*no payment id/'));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function malformedPaymentIdProvider()
+    {
+        return [
+            'empty' => [''],
+            'with a space' => ['pay 1'],
+            'with a quote' => ['pay_1"'],
+            'with a trailing newline' => ["pay_1\n"],
+            'too long' => [str_repeat('a', 256)],
+            'integer' => [123],
+            'array' => [['pay_1']],
+            'null' => [null],
+        ];
+    }
+
+    /**
+     * @dataProvider reReadWithoutPaymentIdProvider
+     *
+     * @param array<string, mixed> $extra
+     */
+    public function testNeverBindsAndLogsOnceWhenThePaidReReadCarriesNoPaymentId(array $extra)
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, $extra);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/operation ' . self::OPERATION_ID . ' .*no payment id/'));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function reReadWithoutPaymentIdProvider()
+    {
+        return [
+            'no id nor operationType' => [[]],
+            'operationType missing' => [['id' => self::PAYMENT_ID]],
+            'operationType REFUND' => [['operationType' => 'REFUND', 'id' => self::PAYMENT_ID]],
+            'operationType lowercase' => [['operationType' => 'payment', 'id' => self::PAYMENT_ID]],
+            'operationType not a string' => [['operationType' => ['PAYMENT'], 'id' => self::PAYMENT_ID]],
+            'id missing' => [['operationType' => 'PAYMENT', 'paymentId' => self::PAYMENT_ID]],
+        ];
+    }
+
+    public function testNeverBindsAnIdEqualToTheReReadOperationId()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, [
+            'operationType' => 'PAYMENT',
+            'id' => self::OPERATION_ID,
+            'paymentId' => self::PAYMENT_ID,
+        ]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/operation ' . self::OPERATION_ID . ' .*no payment id.*operation id/'));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testLogsNothingWhenTheReReadCarriesNoPaymentIdButOneIsRecorded()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::OPERATION_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with(self::OPERATION_ID)->andReturn(self::PAYMENT_ID);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['logger']->shouldReceive('info')->never();
+        $mocks['logger']->shouldReceive('error')->never();
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testLogsNothingWhenAConcurrentBindRecordedTheSamePaymentId()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with(self::OPERATION_ID)->andReturn(null, self::PAYMENT_ID);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with(self::OPERATION_ID, self::PAYMENT_ID, 6)->andReturn(false);
+        $mocks['logger']->shouldReceive('info')->never();
+        $mocks['logger']->shouldReceive('error')->never();
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testLogsAMismatchWhenAConcurrentBindRecordedAnotherPaymentId()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with(self::OPERATION_ID)->andReturn(null, 'pay_from_creation');
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with(self::OPERATION_ID, self::PAYMENT_ID, 6)->andReturn(false);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::on(function ($message) {
+            return false !== strpos($message, 'payment id mismatch')
+                && false !== strpos($message, 'pay_from_creation')
+                && false !== strpos($message, self::PAYMENT_ID);
+        }));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testLogsThePaymentIdAsNotRecordedWhenTheBindWritesNothingAndNoneIsRecorded()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with(self::OPERATION_ID)->twice()->andReturn(null);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with(self::OPERATION_ID, self::PAYMENT_ID, 6)->andReturn(false);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/payment id ' . self::PAYMENT_ID . ' of operation ' . self::OPERATION_ID . ' not recorded/'));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testNeverBindsForAFailedOutcome()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_failed","execCode":"9999","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, 'op_failed', '9999', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $this->mockCreateFromOutcome($mocks, 'op_failed', '9999', PaymentOutcome::FAILED, 2900, [
+            'result' => false,
+            'redirect_url' => 'index.php?controller=order&step=3&has_error=1&modulename=payplug',
+            'persisted' => false,
+        ]);
+        $mocks['payment_repository']->shouldReceive('save')->once();
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_failed');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testStillCreatesTheOrderAndAnswers200WhenRecordingThePaymentIdThrows()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->andThrow(new \Exception('db down'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/payment id ' . self::PAYMENT_ID . ' of operation ' . self::OPERATION_ID . ' not recorded/'));
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testNeverBindsForARefundNotification()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_refund_1","execCode":"0000","orderId":"6","amount":1000}');
+        $mocks['refund_repository']->shouldReceive('getByRefundOperationId')->with('op_refund_1')
+            ->andReturn(['refund_operation_id' => 'op_refund_1', 'amount' => '1000', 'status' => 'pending']);
+        $this->mockGetOperationResponse($mocks, 'op_refund_1', '0000', '6', 1000, ['operationType' => 'REFUND', 'id' => 'op_refund_1', 'paymentId' => self::PAYMENT_ID]);
+        $mocks['refund_repository']->shouldReceive('updateStatusIfPending')->once()->with('op_refund_1', 'confirmed')->andReturn(true);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->never();
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testNeverBindsForAThreeDsPendingReRead()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0001', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->never();
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testNeverBindsWhenThePaidOperationTargetsAnOrderAlreadyPaidByAnotherOperation()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(6)->andReturn(99);
+        $mocks['payment_repository']->shouldReceive('getPaidByOrderId')->with('99')
+            ->andReturn(new OperationData('op_original', '0000', PaymentOutcome::PAID, 2900, '99'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/is not the paid operation/'));
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+
+        $this->assertSame(409, $action->notifyAction()['http_status']);
+    }
+
+    public function testNeverBindsWhenTheAmountCrossCheckFails()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 1500);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/amount mismatch/'));
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testRecordsThePaymentIdOfAnAlreadyTreatedOperationThatHasNone()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $mocks['payment_repository']->shouldReceive('isTreated')->with(self::OPERATION_ID)->andReturn(true);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with(self::OPERATION_ID, self::PAYMENT_ID, 6)->andReturn(true);
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/recorded/'));
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['lock']->shouldReceive('acquire')->never();
+        $mocks['payment_repository']->shouldReceive('save')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testAnswers200WhenTheTreatedOperationCannotBeReRead()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $mocks['payment_repository']->shouldReceive('isTreated')->with(self::OPERATION_ID)->andReturn(true);
+        $payment_service = \Mockery::mock('UnifiedApiPaymentService');
+        $mocks['factory']->shouldReceive('create')->andReturn($payment_service);
+        $payment_service->shouldReceive('getOperation')->once()->andThrow(new \Exception('timeout'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/' . self::OPERATION_ID . '.*timeout/'));
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    /**
+     * @dataProvider nonPaidExecCodeProvider
+     *
+     * @param string $exec_code
+     */
+    public function testNeverBindsATreatedOperationWhoseReReadIsNotPaid($exec_code)
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $mocks['payment_repository']->shouldReceive('isTreated')->with(self::OPERATION_ID)->andReturn(true);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, $exec_code, '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function nonPaidExecCodeProvider()
+    {
+        return [
+            'failed' => ['9999'],
+            '3DS pending' => ['0001'],
+        ];
+    }
+
+    public function testNeverBindsATreatedOperationWhoseReReadFailsTheCrossCheck()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $mocks['payment_repository']->shouldReceive('isTreated')->with(self::OPERATION_ID)->andReturn(true);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')->with(self::OPERATION_ID)->andReturn(2500);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/manual review/'));
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testAnswers200WhenTheCartOfATreatedOperationCannotBeLoaded()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $mocks['payment_repository']->shouldReceive('isTreated')->with(self::OPERATION_ID)->andReturn(true);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $action->dependencies->getPlugin()->shouldReceive('getCart')->andThrow(new \TypeError('cart adapter unavailable'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/' . self::OPERATION_ID . '.*cart adapter unavailable/'));
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testAnswers200WhenTheRequestedAmountOfATreatedOperationThrowsAnError()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $mocks['payment_repository']->shouldReceive('isTreated')->with(self::OPERATION_ID)->andReturn(true);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $mocks['payment_repository']->shouldReceive('getRequestedAmountByOperationId')->andThrow(new \Error('repository broken'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/' . self::OPERATION_ID . '.*repository broken/'));
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->never();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    /**
+     * @return array{0: UnifiedPaymentAction, 1: array<string, object>}
      */
     private function mockActionForNotify()
     {
-        $action = (new \ReflectionClass(OperationAction::class))->newInstanceWithoutConstructor();
+        $action = (new \ReflectionClass(UnifiedPaymentAction::class))->newInstanceWithoutConstructor();
 
         $dependencies = \Mockery::mock('Dependencies');
         $dependencies->name = 'payplug';
@@ -810,9 +1358,10 @@ class notifyActionTest extends TestCase
         $plugin->shouldReceive('getModule')->andReturn($module_adapter);
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createLogger')->andReturn($logger);
+        $logger->shouldReceive('info')->byDefault();
         $factory->shouldReceive('createConfigurationRepository')->andReturn($configuration_repository);
         $configuration_repository->shouldReceive('get')->with('webhook_authorization_header')->andReturn(null)->byDefault();
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
@@ -820,11 +1369,14 @@ class notifyActionTest extends TestCase
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         $payment_repository->shouldReceive('isTreated')->andReturn(false)->byDefault();
+        $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
+        $payment_repository->shouldReceive('getPaymentIdByOperationId')->andReturn(null)->byDefault();
+        $payment_repository->shouldReceive('bindPaymentIdIfMissing')->never()->byDefault();
 
-        $refund_repository = \Mockery::mock('UpcRefundRepository');
+        $refund_repository = \Mockery::mock('UnifiedRefundRepository');
         $order_adapter = \Mockery::mock('OrderAdapter');
         $module->shouldReceive('getService')
-            ->with('payplug.models.repositories.upc_refund')
+            ->with('payplug.models.repositories.unified_refund')
             ->andReturn($refund_repository);
         $refund_repository->shouldReceive('getByRefundOperationId')->andReturn(null)->byDefault();
         $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
@@ -842,7 +1394,7 @@ class notifyActionTest extends TestCase
         // this suite mocks it as an opaque collaborator instead of re-exercising its internal
         // order-creation logic (order adapter, validator, module validateOrder(), context link,
         // order state mutator, ...). errorUrl() is stubbed by default since it's reached directly
-        // by OperationAction's own lock-acquisition-failure path (createOrderWithLock()), not only
+        // by UnifiedPaymentAction's own lock-acquisition-failure path (createOrderWithLock()), not only
         // through createFromOutcome()'s own mocked return value.
         $action->orderAction = $order_action;
         $order_action->shouldReceive('errorUrl')
@@ -895,7 +1447,7 @@ class notifyActionTest extends TestCase
     /**
      * Fix 4 (PRE-3626 review): wires notifyAction()'s own amount cross-check
      * ($plugin->getCart()->get($id_cart), converted the same way createAction()/returnAction()
-     * do) - OperationAction's own logic, unrelated to the (now mocked) order creator.
+     * do) - UnifiedPaymentAction's own logic, unrelated to the (now mocked) order creator.
      *
      * @param mixed $dependencies
      * @param mixed $expected_cents
@@ -945,8 +1497,8 @@ class notifyActionTest extends TestCase
 
     /**
      * Stubs the order creator's createFromOutcome() for tests that drive notifyAction() through
-     * to OperationAction::createOrderWithLock() - the mocked order creator is an opaque
-     * collaborator here, so only the arguments OperationAction itself is responsible for
+     * to UnifiedPaymentAction::createOrderWithLock() - the mocked order creator is an opaque
+     * collaborator here, so only the arguments UnifiedPaymentAction itself is responsible for
      * assembling (id_cart is always 6 in this suite; operation_id/exec_code/outcome/amount vary
      * per test) and the result shape the rest of the test needs are wired.
      *

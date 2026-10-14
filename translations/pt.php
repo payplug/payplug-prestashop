@@ -522,6 +522,7 @@ $_MODULE['<{payplug}prestashop>translation_df9ddb6be023ec1dcea1052d84367b4f'] = 
 $_MODULE['<{payplug}prestashop>translation_e01e7c0b14f609d2154e68ae711b700e'] = 'Amount must be greater than 4€ and lower than 20000€.';
 $_MODULE['<{payplug}prestashop>translation_e02babd6337643c3b8d2268215b7eebf'] = 'Your customers can choose to pay for their orders in 3 or 4 instalments. Choose whether or not you want to pay all the fees. ';
 $_MODULE['<{payplug}prestashop>translation_e349c0d693ce1830684d55ee91641182'] = 'E-mail address';
+$_MODULE['<{payplug}prestashop>translation_e41a4d8dd24374cff0d12deff1413d86'] = 'Este pagamento não pode ser reembolsado a partir do back-office: a sua referência não foi devolvida pela PayPlug aquando da criação. Reembolse-o a partir do seu portal PayPlug.';
 $_MODULE['<{payplug}prestashop>translation_e531b94ae9de4c04308e349b47a89cbc'] = 'Pop-up';
 $_MODULE['<{payplug}prestashop>translation_e74545a087d834f417fe2d576af43ab8'] = 'Bancontact';
 $_MODULE['<{payplug}prestashop>translation_e779dbfe7d39481bb72e6912f68844a4'] = 'Any changes made to the checkout may prevent the display or performance of this feature. We recommend that you test the compatibility of your store with the Integrated Payment feature on your preprod environment first.';
