@@ -59,8 +59,8 @@ The admin configuration UI itself (Vue.js) lives in a separate repo (`payplug-ui
 For a class whose constructor already expects an injected `$dependencies` (e.g. anything extending `EntityRepository`/`QueryRepository` — their base constructor is `__construct($dependencies = null)`, stored as-is with **no fallback** to building its own), register it with an explicit argument reference to the existing `payplug.dependencies_class` service, e.g.:
 
 ```yaml
-  payplug.models.repositories.operation:
-    class: PayPlug\src\models\repositories\OperationRepository
+  payplug.models.repositories.unified_operation:
+    class: PayPlug\src\models\repositories\UnifiedOperationRepository
     arguments: ['@payplug.dependencies_class']
     public: true
 ```
@@ -74,15 +74,16 @@ $operation_repository = $this->dependencies
     ->getPlugin()
     ->getModule()
     ->getInstanceByName($this->dependencies->name)
-    ->getService('payplug.models.repositories.operation');
+    ->getService('payplug.models.repositories.unified_operation');
 // or, inside a class using ServiceGetter:
-$operation_repository = $this->getService('payplug.models.repositories.operation');
+$operation_repository = $this->getService('payplug.models.repositories.unified_operation');
 ```
 
 ### Layers under `src/`
 
 - `src/actions/` — business logic entry points (`PaymentAction`, `ValidationAction`, `OrderAction`, `CartAction`, `OneyAction`, `CardAction`, `QueueAction`, `HookAction`, ...). Controllers and hooks call into these rather than touching models/adapters directly.
-- `src/application/adapter/` — thin wrappers around **CMS-native classes** (PrestaShop's `Product`, `Order`, `Cart`, `Context`, `Tools`, ...), each with a matching interface in `src/interfaces/`. The criterion for a file/method belonging here is narrow: it must directly call a CMS core class/static. E.g. `ProductAdapter::getIdProductAttributeByIdAttributes()` calls `\Product::getIdProductAttributeByIdAttributes(...)` directly — if this module were ported to a CMS where the equivalent class is `Item`, only that one line inside the adapter changes (`\Product::...` → `\Item::...`); every business-logic call site (`$this->productAdapter->getIdProductAttributeByIdAttributes(...)`) stays identical. This indirection exists for testability and CMS-version/CMS-portability isolation; do not bypass it to call CMS core statics directly from business logic. Conversely, a class that only orchestrates *other* module classes/repositories (no direct CMS static/class call of its own) is not an adapter, even if it implements a third-party vendor interface (e.g. a `payplug/unified-plugin-core` contract) — that's domain logic and belongs in `src/models/classes/` instead (see `UpcLogger`/`UpcLock`/`UpcConfigurationRepository`/etc., PRE-3624).
+- `src/application/adapter/` — thin wrappers around **CMS-native classes** (PrestaShop's `Product`, `Order`, `Cart`, `Context`, `Tools`, ...), each with a matching interface in `src/interfaces/`. The criterion for a file/method belonging here is narrow: it must directly call a CMS core class/static. E.g. `ProductAdapter::getIdProductAttributeByIdAttributes()` calls `\Product::getIdProductAttributeByIdAttributes(...)` directly — if this module were ported to a CMS where the equivalent class is `Item`, only that one line inside the adapter changes (`\Product::...` → `\Item::...`); every business-logic call site (`$this->productAdapter->getIdProductAttributeByIdAttributes(...)`) stays identical. This indirection exists for testability and CMS-version/CMS-portability isolation; do not bypass it to call CMS core statics directly from business logic. Conversely, a class that only orchestrates *other* module classes/repositories (no direct CMS static/class call of its own) is not a CMS adapter, even if it implements a third-party vendor interface (e.g. a `payplug/unified-plugin-core` contract) — it does not belong here. The implementations of UPC's contracts live in `src/unified/contract/` instead (see below).
+- `src/unified/` — the module's side of `payplug/unified-plugin-core` (UPC): `contract/` holds the implementations of UPC's contracts (`UnifiedLock`, `UnifiedLogger`, `UnifiedTokenCache`, `UnifiedOrderStateMutator`, `UnifiedConfigurationRepository`, `UnifiedHttpClient`), `helpers/` holds `UnifiedRefundExecCode`, and `UnifiedApiPaymentServiceFactory` (`payplug.unified.payment_service_factory`) wires them into UPC's `UnifiedApiPaymentService`. The Unified flow's actions stay in `src/actions/` (`UnifiedPaymentAction`, `UnifiedOrderAction`, `UnifiedRefundAction`, `UnifiedAliasAction`) and its persistence in `src/models/repositories/` (`UnifiedOperationRepository`, `UnifiedAliasRepository`, `UnifiedLockRepository`, `UnifiedRefundRepository`, all `EntityRepository` subclasses).
 - `src/models/classes/` — domain model classes (`Order`, `Configuration`, `ApiRest`, `Merchant`, ...) and, under `paymentMethod/`, one class per payment method extending `PaymentMethod`.
 - `src/models/repositories/` and `src/repositories/` — two parallel repository layers (the `models/repositories` ones are the newer, DI-wired versions constructed in `PluginInit::setRepositories()`; `src/repositories/*` plus `classes/*` are older repositories still constructed directly in `PluginInit::setOldRepositories()`/`DependenciesClass`). Check which one a given entity already uses before adding new persistence code for it.
 - `src/utilities/services/` — cross-cutting services: `API.php` (the only allowed entry point to the PayPlug PHP SDK — never instantiate SDK classes directly elsewhere), `Core.php`, `Mail.php`, `PhoneNumber.php`, `Routes.php`, `MerchantTelemetry.php`, `Mcp.php` (MCP integration, PHP 8+ only, excluded from phpstan/cs-fixer on PHP < 8).
@@ -105,6 +106,8 @@ $operation_repository = $this->getService('payplug.models.repositories.operation
 
 New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behind the `feature_hosted_fields` flag in `features.json`. It coexists with the existing Retail API flow rather than replacing it.
 
+Naming rule: `Unified` names anything that talks to the Unified API or implements its flow (actions, repositories, tables `payplug_unified_operation`/`_alias`/`_lock`/`_refund`, the UPC contract implementations in `src/unified/contract/`); `HostedFields` names only the card tokenization UI (`hosted_fields.tpl`, the `hosted_fields` JS module, `Routes::getHostedFieldsUrl()`, `setHostedFieldsPaymentOption()`, `feature_hosted_fields`, the `hosted_fields` configuration key).
+
 - **Config**: a single `Configuration` key, `hosted_fields` (JSON, defaults to `{}`), maps lowercase currency ISO code → UHF identifier for that currency (e.g. `{"usd":"...","gbp":"..."}`). `ConfigurationAction::saveAction()` derives one `payplug_identifier_<iso>` field per active non-EUR currency and merges each into that JSON blob (merge, not replace — don't collapse this back into a single flat key).
 - **Admin UI gating**: `CurrencyAdapter::hasOtherCurrency()` (shop has at least one non-EUR active currency) controls whether the per-currency identifier inputs are even shown on `StandardPaymentMethod::getOption()`. Conversely, `PaymentMethod::getAvailablePaymentMethod()` returns only `['standard']` when `feature_hosted_fields` is on and the shop has **no** EUR currency at all — other payment methods are EUR-only and get disabled outright in that case. `StandardPaymentMethod::getOption()` was refactored to extract `getEmbeddedOptions()` / `getWarningOptions()` / `getAliasingOptions()`; the `integrated`/`popup`/`redirect` embedded-mode selector itself (`getEmbeddedOptions()`) is hidden whenever the shop has no EUR currency, since it's meaningless for non-EUR-only shops.
 - **Checkout routing**: `PrestashopAdapter17::displayPaymentOption()` branches on the cart's currency, not the shop's — the existing `integrated` embedded mode is now explicitly restricted to `'EUR' === $this->context->currency->iso_code`; a non-EUR cart instead goes through `setHostedFieldsPaymentOption()` (mirrors `setIntegratedPaymentOption()`) when `feature_hosted_fields` is on, an identifier is configured for that cart's currency and `HOSTED_FIELDS_URL` is set (see Routes below). It renders `views/templates/hook/checkout/payment/hosted_fields.tpl`.
@@ -113,8 +116,8 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   `action` request parameter: `create` (receives `hfToken`/`selectedBrand`/`save_card`/`id_cart`
   from the client-side SDK, creates the Unified API payment), `challenge` (serves the cached 3DS
   challenge HTML), and `return` (resolves the bank's 3DS return synchronously — a single
-  `getOperation()` call, not a polling loop). All three dispatch to `OperationAction`
-  (`payplug.action.operation`); the controller itself does no business logic, only HTTP response
+  `getOperation()` call, not a polling loop). All three dispatch to `UnifiedPaymentAction`
+  (`payplug.action.unified_payment`); the controller itself does no business logic, only HTTP response
   shaping per action. The async webhook confirmation (PRE-3626, see below) has its own dedicated,
   parameter-free `controllers/front/notify.php` (`PayplugNotifyModuleFrontController`, exposed at
   `module/payplug/notify`) instead of a fourth `unified.php?action=notify` branch — mirroring the
@@ -123,7 +126,7 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   the Receiver configuration (a forgotten or mistyped query string fails silently — no
   notification, no error anywhere) and as mixing a server-to-server webhook with browser-facing
   endpoints on one URL, two different trust domains. It calls the exact same
-  `OperationAction::notifyAction()` via the same service, unchanged.
+  `UnifiedPaymentAction::notifyAction()` via the same service, unchanged.
 - **Order creation rule (PRE-3557, applies to UHF)**: an order is created only for a `PAID`
   outcome. `FAILED` creates nothing, and neither does `THREE_DS_PENDING`, from any path
   (`createAction()`'s synchronous result, `reconcilePendingOperation()`, `returnAction()`,
@@ -142,38 +145,38 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   (`EmailLinkPaymentMethod`/`SmsLinkPaymentMethod`/`OneyPaymentMethod::updateOrderStateFromPendingToPaid()`,
   then `redirectAdmin` to reload the order page). `OrderAction::renderDetail()` calls
   `resyncPendingUnifiedOrder()` before `renderUnifiedDetail()`: only for an order in the pending
-  state (read from `sandbox_mode`, like `UpcOrderStateMutator`), it calls
-  `OperationAction::resyncPendingOrder()`, which re-reads the order's operation
+  state (read from `sandbox_mode`, like `UnifiedOrderStateMutator`), it calls
+  `UnifiedPaymentAction::resyncPendingOrder()`, which re-reads the order's operation
   (`getPaidByOrderId()`, else `getByOrderId()`; none for a Retail order, so no API call) with
   `getOperation()`, runs the same orderId/amount cross-check, routes `PAID`/`FAILED` through
   `createOrderWithLock()` (existing-order branch of `createFromOutcome()`, then `markTreated()`),
   and leaves a `THREE_DS_PENDING` order as is. The page reloads only when the order actually left
   the pending state; any failure is logged and the order page still renders.
-- **Asynchronous confirmation (PRE-3626)**: `OperationAction::notifyAction()`, reached via
+- **Asynchronous confirmation (PRE-3626)**: `UnifiedPaymentAction::notifyAction()`, reached via
   `controllers/front/notify.php` (`module/payplug/notify`) — a fixed URL, no per-order parameter,
   matching PayPlug's Unified API notifier ("Receiver"), which is configured once per merchant
   account, not per payment. Parses/
   validates the webhook via the vendor's `WebhookNotificationHelper::parse()`/`ExecCodeMapper`
   (`payplug/unified-plugin-core`) — no duplicated verification/mapping logic. A `THREE_DS_PENDING`
-  outcome (execCode `0001`) is a strict no-op: it must never consume `OperationRepository`'s
+  outcome (execCode `0001`) is a strict no-op: it must never consume `UnifiedOperationRepository`'s
   `isTreated()`/`markTreated()` idempotency tracking, since a genuine async webhook can carry this
   code *before* the real, final notification for the same operation (a known PayPlug platform
   behavior, documented on the vendor's `WebhookNotificationHelper` itself). `PaymentOutcome::REFUNDED`
   (sent by the classic/GM API on a different route — `ipn.php` — never the Unified API this
   module parses) is structurally unreachable here. A terminal outcome
   reuses `UnifiedOrderAction::createFromOutcome()` — the same order-creation/confirmation sequence
-  `createAction()`/`returnAction()` already use — via the shared `OperationAction::createOrderWithLock()`
-  helper, which acquires `UpcLock` under the same `'uhf_cart:<id_cart>'` key with a short bounded
+  `createAction()`/`returnAction()` already use — via the shared `UnifiedPaymentAction::createOrderWithLock()`
+  helper, which acquires `UnifiedLock` under the same `'uhf_cart:<id_cart>'` key with a short bounded
   retry before calling `createFromOutcome()`, and always releases it via `finally`; `notifyAction()`
   uses the same helper with a longer budget (`NOTIFY_LOCK_RETRY_ATTEMPTS`, ~8s: its payment
   notification typically lands while `returnAction()` holds the cart lock, and the Receiver does
   not retry a `409` — observed on staging, 2026-09-29) and returns a `409` only if the lock still
   can't be acquired after that. When the outcome could not be applied to the order
-  (`UpcOrderStateMutator::apply()` throws, except for its documented already-paid/already-refunded
+  (`UnifiedOrderStateMutator::apply()` throws, except for its documented already-paid/already-refunded
   no-op guards), `notifyAction()` answers `500` without `markTreated()`, so a redelivery is
   reprocessed. `notifyAction()` also cross-checks the webhook's
   `amount` against the amount requested at payment creation (`requested_amount` on the
-  `payplug_upc_operation` row, recorded by `bindPaymentId()`; the cart's live total only for a row
+  `payplug_unified_operation` row, recorded by `bindPaymentId()`; the cart's live total only for a row
   without it) before creating an order (there's no independent
   `id_cart` to cross-check `orderId` against in that server-to-server context — `orderId` itself
   *is* the cart id there); `returnAction()`/the `createAction()` reconciliation path run the same
@@ -181,8 +184,8 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
   is refused with a "manual review" error log; a requested amount paid on a cart edited during 3DS
   still creates the order, in "Payment error": `UnifiedOrderAction` validates it in the paid state so
   `validateOrder()` flags it (as the Retail flow does), and never lets a PAID outcome mark paid an
-  order whose total differs from the amount captured. `UpcLock::acquire()`'s steal-an-expired-lock path is now an atomic
-  `UPDATE ... WHERE lock_key = ? AND expires_at < ?` (via `UpcLockRepository::stealExpired()` +
+  order whose total differs from the amount captured. `UnifiedLock::acquire()`'s steal-an-expired-lock path is now an atomic
+  `UPDATE ... WHERE lock_key = ? AND expires_at < ?` (via `UnifiedLockRepository::stealExpired()` +
   `QueryAdapter::getAffectedRows()`), closing the prior two-concurrent-stealers race. Signature
   verification (`WebhookNotificationHelper::verifySignature()`) is currently *fail-open*: no admin
   UI exists yet to configure a webhook secret, matching the vendor library's own documented,
@@ -191,13 +194,13 @@ New, in-progress payment flow for non-EUR carts (PRE-3622/PRE-3623), gated behin
 - **Refund (PRE-3627)**: `UnifiedRefundAction::refundAction()` (`payplug.action.unified_refund`),
   reached from the existing BO refund AJAX call in `AdminPayplugController` when the panel's hidden
   `payment_type` field is `uhf` — set by `OrderAction::renderDetail()`'s `renderUnifiedDetail()`
-  branch for an order with no `payplug_payment` row but a `PAID` `payplug_upc_operation` row
-  (`OperationRepository::getPaidByOrderId()`, not `getByOrderId()`: an order can also carry a
+  branch for an order with no `payplug_payment` row but a `PAID` `payplug_unified_operation` row
+  (`UnifiedOperationRepository::getPaidByOrderId()`, not `getByOrderId()`: an order can also carry a
   `FAILED` operation). The refund endpoint is keyed by the payment's own `id` from the
   payment-creation response, which differs from `operationIds[0]` (stored as `operation_id`,
   used by `getOperation()`/the webhook) and can't be read back from the operation afterwards:
-  `OperationAction::createAction()` binds it right after payment creation via
-  `OperationRepository::bindPaymentId()` (new nullable `payment_id` column; creates a pending
+  `UnifiedPaymentAction::createAction()` binds it right after payment creation via
+  `UnifiedOperationRepository::bindPaymentId()` (new nullable `payment_id` column; creates a pending
   `order_id = 'cart:<id>'` placeholder row when no row exists yet, which `save()` completes later
   without touching `payment_id`, and that `bindPaymentId()` purges once older than 24 h; a failed
 insert retries as an update, in case the frictionless notification `save()`d the row meanwhile); sending the operation id instead gets a 400 "The reference
@@ -205,9 +208,9 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `payment_id` fails the refund before any lock/API call. The refund row is recorded `pending` under an
   `intent:<uniqid>` id *before* `createRefund()` (no idempotency key on that endpoint: a refund the
   API processed but whose answer was lost must still count as refunded), then renamed to the
-  refund's `operationIds[0]` (`UpcRefundRepository::bindRefundOperationId()`) — never the response's
+  refund's `operationIds[0]` (`UnifiedRefundRepository::bindRefundOperationId()`) — never the response's
   top-level `id`, which is the refunded payment's (staging, 2026-09-29). Refund `execCode`s, sync or
-  notified, go through `UpcRefundExecCode`, not `ExecCodeMapper` (which maps every unknown code to
+  notified, go through `UnifiedRefundExecCode`, not `ExecCodeMapper` (which maps every unknown code to
   `FAILED`, freeing an amount that may have left): `0000`/`0002`/`0003`/`5004` accepted (`5004` =
   timeout, result notified later), only the codes the platform's EXECCODES catalog documents as
   failures decline (row `failed`, order state untouched), anything else is unknown. An unknown sync
@@ -215,11 +218,11 @@ insert retries as an update, in case the frictionless notification `save()`d the
   state alone and answer `refund.error.uncertain` (check the portal before retrying) instead of a
   plain failure; a 4xx/local validation error marks it `failed`. `renderDetail()` checks for a
   `PAID` UPC operation *before* the Retail `payplug_payment` lookup, because an abandoned Retail
-  attempt leaves that row on the cart — inside a `try/catch`, since it runs for Retail orders too. `payplug_upc_refund` is created on install only because
-  `ConfigurationAction::forceAutoloadUpcRepositories()` loads its repository. The Retail refund flow is untouched. The Unified API exposes no refundable
-  amount, so refunds are tracked locally in `payplug_upc_refund` (`UpcRefundRepository`, statuses
+  attempt leaves that row on the cart — inside a `try/catch`, since it runs for Retail orders too. `payplug_unified_refund` is created on install only because
+  `ConfigurationAction::forceAutoloadUnifiedRepositories()` loads its repository. The Retail refund flow is untouched. The Unified API exposes no refundable
+  amount, so refunds are tracked locally in `payplug_unified_refund` (`UnifiedRefundRepository`, statuses
   `pending`/`confirmed`/`failed`; `failed` rows don't count as refunded). `createRefund()` is called
-  under a `UpcLock` (`uhf_refund:<id_order>`, TTL 90 s, not 30: token fetch + POST + 401 refresh +
+  under a `UnifiedLock` (`uhf_refund:<id_order>`, TTL 90 s, not 30: token fetch + POST + 401 refresh +
   POST at a 15 s cURL timeout each can exceed 30 s), with `orderId` = cart id (mirrors the payment),
   `currency` = the order's ISO code, `submerchantExternalId` = `null`; a response without
   `operationIds[0]` keeps its `intent:` id (logged — its notification can't be matched). Order state moves to `order_state_refund[_test]` when nothing is
@@ -228,11 +231,11 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `createRefund()`, it is logged ("not recorded locally") and the BO still gets success, because the
   money already moved. Refund notifications arrive on
   `notify.php` with a payment-shaped body: `notifyAction()` matches them against
-  `payplug_upc_refund` right after its `THREE_DS_PENDING` filter and settles the row only (never the
+  `payplug_unified_refund` right after its `THREE_DS_PENDING` filter and settles the row only (never the
   order state, never `markTreated()`); a refund `getOperation()` re-read missing `execCode` or
   `amount` returns `500` (row untouched; whether the Receiver retries a 5xx is unconfirmed); a re-read accepted-but-not-`0000` or unknown
   `execCode` is a `200` no-op that leaves the row `pending` (unknown ones logged for a manual check);
-  an amount mismatch also leaves it `pending` (logged). `UpcOrderStateMutator::apply()` skips any transition on an order already in the
+  an amount mismatch also leaves it `pending` (logged). `UnifiedOrderStateMutator::apply()` skips any transition on an order already in the
   refund or partial-refund state, so a late PAID webhook of the same operation can't push a refunded
   order back to "Payment accepted". An operation targeting an order
   already paid by *another* operation (checked *before* the cart-amount cross-check, which a partial
@@ -256,7 +259,7 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `cancelUrl` and the challenge redirect URL, and caches both directions of the mapping
   (`uhf_token_cart:<token>` → cart, `uhf_cart_token:<cart>` → token, same 600s TTL as the pending-
   operation/challenge-HTML entries they're tied to). `returnAction()`/`challengeAction()` resolve
-  `id_cart` server-side via `OperationAction::resolveIdCartFromToken()` and reject an unknown/expired
+  `id_cart` server-side via `UnifiedPaymentAction::resolveIdCartFromToken()` and reject an unknown/expired
   token outright; `returnAction()` deletes both cache directions once it reaches a terminal outcome
   (single-use). Without this, a client-supplied `id_cart` alone was enough to reach another
   customer's `returnAction()`, and once that cart's order existed,
@@ -275,7 +278,7 @@ insert retries as an update, in case the frictionless notification `save()`d the
   in-flight UPC payment (e.g. the customer abandoned a 3DS challenge and hit back/refresh, or opened
   a second tab), it no longer creates a second payment. It checks `uhf_pending_operation:<cart>`
   *before* acquiring its own double-submit lock and, if found, reconciles via
-  `OperationAction::reconcilePendingOperation()`: a terminal outcome goes through the same
+  `UnifiedPaymentAction::reconcilePendingOperation()`: a terminal outcome goes through the same
   `createOrderWithLock()` path `returnAction()`/`notifyAction()` use; a still-`THREE_DS_PENDING`
   outcome redirects back to the *same* challenge (same token, via the `uhf_cart_token` reverse
   mapping) instead of starting a duplicate one.

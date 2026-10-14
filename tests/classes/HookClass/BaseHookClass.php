@@ -17,7 +17,7 @@ abstract class BaseHookClass extends TestCase
 
     public function setUp(): void
     {
-        $this->alias_action = \Mockery::mock('AliasAction');
+        $this->alias_action = \Mockery::mock('UnifiedAliasAction');
         $this->card_action = \Mockery::mock('CardAction');
         $this->config_class = \Mockery::mock('ConfigClass');
         $this->translation = \Mockery::mock('TranslationClass');
@@ -26,7 +26,7 @@ abstract class BaseHookClass extends TestCase
         });
 
         $module = \Mockery::mock('Module');
-        $module->shouldReceive('getService')->with('payplug.action.alias')->andReturn($this->alias_action);
+        $module->shouldReceive('getService')->with('payplug.action.unified_alias')->andReturn($this->alias_action);
         $module_adapter = \Mockery::mock('ModuleAdapter');
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $context_adapter = \Mockery::mock('ContextAdapter');

@@ -90,7 +90,7 @@ class convertRefundAmountTest extends TestCase
 
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createLogger')->andReturn($logger);
         $logger->shouldReceive('error');
