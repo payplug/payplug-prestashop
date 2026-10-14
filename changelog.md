@@ -1,6 +1,6 @@
 # Payplug module changelog
 
-## Unreleased
+## Version 5.3.0
 - Feature :
   - [PRE-3624](https://payplug-prod.atlassian.net/browse/PRE-3624): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
   - [PRE-3625](https://payplug-prod.atlassian.net/browse/PRE-3625): Let customers save a card and pay with it again through Unified Hosted Fields for non-EUR carts
@@ -9,9 +9,6 @@
 - Bugfix :
   - [PRE-3627](https://payplug-prod.atlassian.net/browse/PRE-3627): Never move a refunded Unified Hosted Fields order back to paid on a late payment notification
   - [PRE-3627](https://payplug-prod.atlassian.net/browse/PRE-3627): Wait for the browser return to finish creating the order instead of losing the Unified Hosted Fields payment notification with a 409
-  - [PRE-3441](https://payplug-prod.atlassian.net/browse/PRE-3441): Create the order of a Unified Hosted Fields payment whose cart was edited during 3DS, in "Payment error" for the merchant to review, instead of dropping a captured payment
-  - [PRE-3441](https://payplug-prod.atlassian.net/browse/PRE-3441): Create a Unified Hosted Fields order only once the payment is paid, never while 3DS is still pending
-  - [PRE-3441](https://payplug-prod.atlassian.net/browse/PRE-3441): Update a pending Unified Hosted Fields order from its payment when it is opened in the back office
 
 ## Version 5.2.2
 - Bugfix :
