@@ -2,13 +2,10 @@
 
 ## Version 5.3.0
 - Feature :
-  - [PRE-3624](https://payplug-prod.atlassian.net/browse/PRE-3624): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
-  - [PRE-3625](https://payplug-prod.atlassian.net/browse/PRE-3625): Let customers save a card and pay with it again through Unified Hosted Fields for non-EUR carts
-  - [PRE-3627](https://payplug-prod.atlassian.net/browse/PRE-3627): Refund Unified Hosted Fields orders, fully or partially, from the back office
-
-- Bugfix :
-  - [PRE-3627](https://payplug-prod.atlassian.net/browse/PRE-3627): Never move a refunded Unified Hosted Fields order back to paid on a late payment notification
-  - [PRE-3627](https://payplug-prod.atlassian.net/browse/PRE-3627): Wait for the browser return to finish creating the order instead of losing the Unified Hosted Fields payment notification with a 409
+  - [PRE-3624](https://github.com/payplug/payplug-prestashop/pull/123): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
+  - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Let customers save a card and pay with it again through Unified Hosted Fields for non-EUR carts
+  - [PRE-3627](https://github.com/payplug/payplug-prestashop/pull/130): Refund Unified Hosted Fields orders, fully or partially, from the back office
+  - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Keep Unified Hosted Fields payments, saved cards and back-office refunds working with the new Unified API contract (unified-plugin-core ^1.2.1)
 
 ## Version 5.2.2
 - Bugfix :

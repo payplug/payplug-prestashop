@@ -150,15 +150,4 @@ class bindPaymentIdTest extends BaseUnifiedOperationRepository
 
         $this->assertTrue($this->repository->bindPaymentId('op_1', 'pay_1', 42, 1234));
     }
-
-    private function mockPurge()
-    {
-        $this->repository->shouldReceive([
-            'getEntityObject' => $this->entity,
-            'delete' => $this->repository,
-            'from' => $this->repository,
-            'where' => $this->repository,
-            'build' => true,
-        ]);
-    }
 }

@@ -87,7 +87,7 @@ class refundActionTest extends TestCase
         $result = $action->refundAction(42, 1000);
 
         $this->assertFalse($result['result']);
-        $this->assertSame('refund.error.default', $result['message']);
+        $this->assertSame('refund.error.no_payment_id', $result['message']);
     }
 
     public function testRejectsWhenAnotherRefundHoldsTheLock()
@@ -563,6 +563,7 @@ class refundActionTest extends TestCase
                 'upper' => 'refund.error.upper',
                 'default' => 'refund.error.default',
                 'uncertain' => 'refund.error.uncertain',
+                'no_payment_id' => 'refund.error.no_payment_id',
             ],
             'success' => 'refund.success',
         ]);
