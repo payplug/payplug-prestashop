@@ -1895,20 +1895,24 @@ class UnifiedPaymentAction
     /**
      * @description Extract the payment id from an operation response this module fetched
      *
-     * Only ever called with a getOperation() response, never with a webhook body: signature
+     * The payment id is the top-level "id" of an operation whose "operationType" is PAYMENT. Only
+     * ever called with a getOperation() response, never with a webhook body: signature
      * verification is fail-open, and the payment id is what a back-office refund targets.
      *
      * @param mixed $decoded
      *
-     * @return string the payment id, or '' when absent or malformed
+     * @return string the payment id, or '' when absent, malformed or not a payment's
      */
     private function extractPaymentId($decoded)
     {
-        if (!is_array($decoded) || !isset($decoded['paymentId']) || !is_string($decoded['paymentId'])) {
+        if (!is_array($decoded)
+            || !isset($decoded['operationType'], $decoded['id'])
+            || 'PAYMENT' !== $decoded['operationType']
+            || !is_string($decoded['id'])) {
             return '';
         }
 
-        return 1 === preg_match('/^[A-Za-z0-9_-]{1,255}$/', $decoded['paymentId']) ? $decoded['paymentId'] : '';
+        return 1 === preg_match('/^[A-Za-z0-9_-]{1,255}\z/', $decoded['id']) ? $decoded['id'] : '';
     }
 
     /**
@@ -1916,7 +1920,8 @@ class UnifiedPaymentAction
      *              fetched back
      *
      * Called only for a PAID getOperation() response whose orderId and amount passed the
-     * cross-check. A recorded payment id is kept, even when it differs. Never blocks the caller:
+     * cross-check. An id equal to the operation id is not a payment id: the refund endpoint
+     * rejects it. A recorded payment id is kept, even when it differs. Never blocks the caller:
      * a failure is only logged.
      *
      * @param mixed $factory
@@ -1928,33 +1933,49 @@ class UnifiedPaymentAction
     private function backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart)
     {
         $payment_id = $this->extractPaymentId($decoded);
-        if ('' === $payment_id) {
-            return;
+        $is_operation_id = (string) $operation_id === $payment_id;
+        if ($is_operation_id) {
+            $payment_id = '';
         }
 
         try {
             $payment_repository = $factory->createPaymentRepository();
             $recorded = $payment_repository->getPaymentIdByOperationId($operation_id);
-            if (null !== $recorded) {
-                if ($recorded !== $payment_id) {
-                    $logger->error('UnifiedPaymentAction - payment id mismatch for operation ' . $operation_id . ': ' . $recorded
-                        . ' recorded at creation, ' . $payment_id . ' in the operation, recorded value kept');
+            if (null === $recorded && '' !== $payment_id) {
+                if ($payment_repository->bindPaymentIdIfMissing($operation_id, $payment_id, (int) $id_cart)) {
+                    $logger->info('UnifiedPaymentAction - payment id ' . $payment_id . ' of operation ' . $operation_id . ' recorded from the operation');
+
+                    return;
                 }
 
-                return;
+                $recorded = $payment_repository->getPaymentIdByOperationId($operation_id);
+            }
+        } catch (\Throwable $exception) {
+            $logger->error('UnifiedPaymentAction - payment id ' . ('' !== $payment_id ? $payment_id . ' ' : '') . 'of operation ' . $operation_id
+                . ' not recorded: back-office refunds of this payment will fail: ' . $exception->getMessage());
+
+            return;
+        }
+
+        if (null !== $recorded) {
+            if ('' !== $payment_id && $recorded !== $payment_id) {
+                $logger->error('UnifiedPaymentAction - payment id mismatch for operation ' . $operation_id . ': ' . $recorded
+                    . ' recorded, ' . $payment_id . ' in the operation, recorded value kept');
             }
 
-            $bound = $payment_repository->bindPaymentIdIfMissing($operation_id, $payment_id, (int) $id_cart);
-        } catch (\Throwable $exception) {
-            $bound = false;
+            return;
         }
 
-        if ($bound) {
-            $logger->info('UnifiedPaymentAction - payment id ' . $payment_id . ' of operation ' . $operation_id . ' recorded from the operation');
-        } else {
-            $logger->error('UnifiedPaymentAction - payment id ' . $payment_id . ' of operation ' . $operation_id
-                . ' not recorded: back-office refunds of this payment will fail');
+        if ('' === $payment_id) {
+            $logger->info('UnifiedPaymentAction - paid operation ' . $operation_id . ' carries no payment id'
+                . ($is_operation_id ? ' (its id is the operation id)' : '')
+                . ': back-office refunds of this payment are not possible until one is recorded');
+
+            return;
         }
+
+        $logger->error('UnifiedPaymentAction - payment id ' . $payment_id . ' of operation ' . $operation_id
+            . ' not recorded: back-office refunds of this payment will fail');
     }
 
     /**
@@ -1978,35 +1999,32 @@ class UnifiedPaymentAction
             }
 
             $response = $factory->create()->getOperation($operation_id);
-        } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::notifyAction - treated operation ' . $operation_id
-                . ' could not be re-read for its payment id: ' . $exception->getMessage());
+            $decoded = json_decode($response['body'], true);
+            $exec_code = is_array($decoded) && isset($decoded['execCode']) ? (string) $decoded['execCode'] : self::MISSING_EXEC_CODE;
+            if (PaymentOutcome::PAID !== ExecCodeMapper::toPaymentOutcome($exec_code) || !isset($decoded['amount'])) {
+                return ['http_status' => 200];
+            }
 
-            return ['http_status' => 200];
+            $order_id_from_response = isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
+            $id_cart = (int) $order_id_from_response;
+            if ($id_cart <= 0 || !$this->crossChecksOrderIdAndAmount(
+                $logger,
+                $this->dependencies->getPlugin()->getCart()->get($id_cart),
+                $id_cart,
+                $order_id_from_response,
+                (int) $decoded['amount'],
+                'UnifiedPaymentAction::notifyAction',
+                $operation_id,
+                $this->getRequestedAmount($factory, $logger, $operation_id)
+            )) {
+                return ['http_status' => 200];
+            }
+
+            $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
+        } catch (\Throwable $exception) {
+            $logger->error('UnifiedPaymentAction::notifyAction - payment id of treated operation ' . $operation_id
+                . ' not recovered: ' . $exception->getMessage());
         }
-
-        $decoded = json_decode($response['body'], true);
-        $exec_code = is_array($decoded) && isset($decoded['execCode']) ? (string) $decoded['execCode'] : self::MISSING_EXEC_CODE;
-        if (PaymentOutcome::PAID !== ExecCodeMapper::toPaymentOutcome($exec_code) || !isset($decoded['amount'])) {
-            return ['http_status' => 200];
-        }
-
-        $order_id_from_response = isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
-        $id_cart = (int) $order_id_from_response;
-        if ($id_cart <= 0 || !$this->crossChecksOrderIdAndAmount(
-            $logger,
-            $this->dependencies->getPlugin()->getCart()->get($id_cart),
-            $id_cart,
-            $order_id_from_response,
-            (int) $decoded['amount'],
-            'UnifiedPaymentAction::notifyAction',
-            $operation_id,
-            $this->getRequestedAmount($factory, $logger, $operation_id)
-        )) {
-            return ['http_status' => 200];
-        }
-
-        $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
 
         return ['http_status' => 200];
     }

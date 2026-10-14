@@ -15,6 +15,8 @@ require_once __DIR__ . '/../../stubs/Cart.php';
  */
 class returnActionTest extends TestCase
 {
+    private const PAYMENT_ID = 'd4293432-a0ac-4d4f-ae5b-8b12253ecbec';
+
     public function tearDown(): void
     {
         \Mockery::close();
@@ -531,16 +533,16 @@ class returnActionTest extends TestCase
         $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
         $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
-            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_123']),
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
         ]);
         $bound = false;
-        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with('op_123', 'pay_123', 42)
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with('op_123', self::PAYMENT_ID, 42)
             ->andReturnUsing(function () use (&$bound) {
                 $bound = true;
 
                 return true;
             });
-        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/payment id pay_123 of operation op_123 recorded/'));
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/payment id ' . self::PAYMENT_ID . ' of operation op_123 recorded/'));
         $mocks['order_action']->shouldReceive('createFromOutcome')
             ->once()
             ->with(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, [])
@@ -560,9 +562,9 @@ class returnActionTest extends TestCase
         $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
         $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
-            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_123']),
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
         ]);
-        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with('op_123')->andReturn('pay_123');
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with('op_123')->andReturn(self::PAYMENT_ID);
         $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
             'result' => true,
             'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
@@ -578,7 +580,7 @@ class returnActionTest extends TestCase
         $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
         $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
-            'body' => json_encode(['execCode' => '9999', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_123']),
+            'body' => json_encode(['execCode' => '9999', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
         ]);
         $this->mockCreateFromOutcome($mocks, 'op_123', '9999', PaymentOutcome::FAILED, 1234, [
             'result' => false,
@@ -595,7 +597,7 @@ class returnActionTest extends TestCase
         $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
         $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
-            'body' => json_encode(['execCode' => '0001', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_123']),
+            'body' => json_encode(['execCode' => '0001', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
         ]);
         $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/still pending 3DS/'));
         $mocks['order_action']->shouldReceive('createFromOutcome')->never();
@@ -656,6 +658,7 @@ class returnActionTest extends TestCase
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->shouldReceive('getService')->with('payplug.unified.payment_service_factory')->andReturn($factory);
         $factory->shouldReceive('createLogger')->andReturn($logger);
+        $logger->shouldReceive('info')->byDefault();
         $factory->shouldReceive('createTokenCache')->andReturn($token_cache);
         $factory->shouldReceive('create')->andReturn($payment_service);
         $factory->shouldReceive('createLock')->andReturn($lock);

@@ -212,8 +212,8 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `id` is logged and still records `requested_amount`, via `bindRequestedAmount()` (same private
   `bind()` row handling as `bindPaymentId()`), so the amount cross-checks don't fall back to the live
   cart total. Such a payment's id is recovered afterwards by `UnifiedPaymentAction::backfillPaymentId()`
-  from the top-level `paymentId` of the module-fetched `getOperation()` response (format-checked),
-  on every path that re-reads a `PAID` operation and passed the orderId/amount cross-check:
+  from the top-level `id` of the module-fetched `getOperation()` response, only when its
+  `operationType` is `PAYMENT` and the `id` differs from the operation id (format-checked), on every path that re-reads a `PAID` operation and passed the orderId/amount cross-check:
   `notifyAction()`, `returnAction()`, `reconcilePendingOperation()`, `resyncPendingOrder()`, and the
   redelivered notification of an already treated operation whose `payment_id` is still empty (one
   `getOperation()`, no order work, no `markTreated()`, always `200`; a treated operation that has a
@@ -222,8 +222,7 @@ insert retries as an update, in case the frictionless notification `save()`d the
   placeholder row); a recorded value that differs is kept and the mismatch logged. Never read from the
   raw webhook body (signature verification is fail-open), never for `FAILED`, `THREE_DS_PENDING` or
   refund notifications; a binding failure is logged and changes neither the answer nor the order flow.
-  Whether `getOperation()` carries `paymentId` is not confirmed yet (staging check pending): without it,
-  nothing is bound. An order without a recorded `payment_id` fails the refund before any lock/API call, with
+  A paid re-read without a usable payment id, none recorded, logs one info line. An order without a recorded `payment_id` fails the refund before any lock/API call, with
   the dedicated `refund.error.no_payment_id` BO message (the refund form stays visible). The refund
   row is recorded `pending` under an
   `intent:<uniqid>` id *before* `createRefund()` (no idempotency key on that endpoint: a refund the

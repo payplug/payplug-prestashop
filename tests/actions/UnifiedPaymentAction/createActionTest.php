@@ -19,6 +19,7 @@ require_once __DIR__ . '/../../stubs/Cart.php';
 class createActionTest extends TestCase
 {
     private const STATIC_TOKEN = 'static_token_123';
+    private const PAYMENT_ID = 'd4293432-a0ac-4d4f-ae5b-8b12253ecbec';
 
     public function setUp(): void
     {
@@ -776,15 +777,15 @@ class createActionTest extends TestCase
 
     public function testCreateActionRecordsThePaymentIdOfAReconciledPaidOperationBeforeCreatingTheOrder()
     {
-        [$action, $mocks] = $this->mockActionForReconciliation(1234, 1234, ['paymentId' => 'pay_pending']);
+        [$action, $mocks] = $this->mockActionForReconciliation(1234, 1234, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
         $bound = false;
-        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with('op_pending', 'pay_pending', 42)
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with('op_pending', self::PAYMENT_ID, 42)
             ->andReturnUsing(function () use (&$bound) {
                 $bound = true;
 
                 return true;
             });
-        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/payment id pay_pending of operation op_pending recorded/'));
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/payment id ' . self::PAYMENT_ID . ' of operation op_pending recorded/'));
         $mocks['order_action']->shouldReceive('createFromOutcome')
             ->once()
             ->with(42, 'op_pending', '0000', PaymentOutcome::PAID, 1234, null, [])
@@ -799,8 +800,8 @@ class createActionTest extends TestCase
 
     public function testCreateActionKeepsThePaymentIdAlreadyRecordedWhenReconciling()
     {
-        [$action, $mocks] = $this->mockActionForReconciliation(1234, 1234, ['paymentId' => 'pay_pending']);
-        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with('op_pending')->andReturn('pay_pending');
+        [$action, $mocks] = $this->mockActionForReconciliation(1234, 1234, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with('op_pending')->andReturn(self::PAYMENT_ID);
         $mocks['order_action']->shouldReceive('createFromOutcome')
             ->once()
             ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
@@ -810,7 +811,7 @@ class createActionTest extends TestCase
 
     public function testCreateActionNeverRecordsThePaymentIdOfAReconciledOperationThatFailsTheCrossCheck()
     {
-        [$action, $mocks] = $this->mockActionForReconciliation(1500, 1234, ['paymentId' => 'pay_pending']);
+        [$action, $mocks] = $this->mockActionForReconciliation(1500, 1234, ['operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]);
         $mocks['order_action']->shouldReceive('createFromOutcome')->never();
         $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/manual review/'));
         $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')->once();
@@ -828,7 +829,7 @@ class createActionTest extends TestCase
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_stale')->andReturn(null);
         $mocks['token_cache']->shouldReceive('delete');
         $mocks['payment_service']->shouldReceive('getOperation')->with('op_stale')->once()->andReturn([
-            'body' => json_encode(['execCode' => '9999', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_stale']),
+            'body' => json_encode(['execCode' => '9999', 'amount' => 1234, 'orderId' => '42', 'operationType' => 'PAYMENT', 'id' => self::PAYMENT_ID]),
         ]);
         $order_action->shouldReceive('createFromOutcome')
             ->once()
@@ -954,13 +955,16 @@ class createActionTest extends TestCase
         $validator->shouldReceive('isCreated')->with(null, 42)->andReturn(['result' => false]);
         $amount_helper->shouldReceive('convertAmount')->with(12.34, false, 'USD')->andReturn(1234);
 
-        $factory->shouldReceive('createLogger')->andReturn(\Mockery::mock('Logger'));
+        $logger = \Mockery::mock('Logger');
+        $logger->shouldReceive('info')->once()->with(\Mockery::pattern('/operation op_pending carries no payment id/'));
+        $factory->shouldReceive('createLogger')->andReturn($logger);
         $factory->shouldReceive('createLock')->andReturn($lock);
         $factory->shouldReceive('createTokenCache')->andReturn($token_cache);
         $factory->shouldReceive('create')->andReturn($payment_service);
         $payment_repository = \Mockery::mock('PaymentRepository');
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('getRequestedAmountByOperationId')->with('op_pending')->andReturn(null);
+        $payment_repository->shouldReceive('getPaymentIdByOperationId')->with('op_pending')->andReturn(null);
 
         $token_cache->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_pending');
         $token_cache->shouldReceive('get')->with('uhf_pending_alias:op_pending')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
@@ -1700,6 +1704,7 @@ class createActionTest extends TestCase
         $amount_helper->shouldReceive('convertAmount')->with(12.34, false, 'USD')->andReturn(1234);
 
         $factory->shouldReceive('createLogger')->andReturn($logger);
+        $logger->shouldReceive('info')->byDefault();
         $factory->shouldReceive('createLock')->andReturn($lock);
         $factory->shouldReceive('createTokenCache')->andReturn($token_cache);
         $factory->shouldReceive('create')->andReturn($payment_service);
