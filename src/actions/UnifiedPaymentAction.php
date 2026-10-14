@@ -444,7 +444,7 @@ class UnifiedPaymentAction
                 ];
             }
 
-            $this->bindPaymentId($factory, $logger, $decoded_body, $operation_id, (int) $cart->id, $amount_cents);
+            $this->bindPaymentReferences($factory, $logger, $decoded_body, $operation_id, (int) $cart->id, $amount_cents);
 
             if ($output->redirectHtml || $output->redirectUrl) {
                 $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
@@ -1701,8 +1701,8 @@ class UnifiedPaymentAction
     /**
      * @description Extract the card alias id from an operation response this module fetched
      *
-     * The alias is paymentMethod.storedId, else paymentMethod.id: the fields and precedence the
-     * vendor maps to PaymentOutput::$aliasId.
+     * The alias is paymentMethod.storedId, else paymentMethod.id; an empty or non-string value
+     * is ignored and the next field is read.
      *
      * @param mixed $decoded
      *
@@ -1823,13 +1823,14 @@ class UnifiedPaymentAction
     }
 
     /**
-     * @description Bind the payment's own id to its operation, right after payment creation
+     * @description Record the payment's own id and the requested amount on its operation, right
+     * after payment creation
      *
      * The refund endpoint is keyed by the payment's "id", which differs from "operationIds[0]"
      * (the operation_id every other flow uses) and cannot be read back from the operation later.
-     * Never blocks the payment: it has already been created at this point, so a failure only
-     * costs the ability to refund it from the back-office, and is logged as such. Without a
-     * payment id in the response, the requested amount is still recorded for the amount checks.
+     * The requested amount is what the paid amount is checked against. Without a payment id in
+     * the response, only the requested amount is recorded. Never blocks the payment: it has
+     * already been created at this point, so a failure is only logged.
      *
      * @param mixed $factory
      * @param mixed $logger
@@ -1838,7 +1839,7 @@ class UnifiedPaymentAction
      * @param int $id_cart
      * @param int $requested_amount amount sent at creation, in minor units
      */
-    private function bindPaymentId($factory, $logger, $decoded_body, $operation_id, $id_cart, $requested_amount)
+    private function bindPaymentReferences($factory, $logger, $decoded_body, $operation_id, $id_cart, $requested_amount)
     {
         $payment_id = is_array($decoded_body) && isset($decoded_body['id']) && is_string($decoded_body['id'])
             ? $decoded_body['id']

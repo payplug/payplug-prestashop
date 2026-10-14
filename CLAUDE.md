@@ -176,8 +176,9 @@ Naming rule: `Unified` names anything that talks to the Unified API or implement
   no-op guards), `notifyAction()` answers `500` without `markTreated()`, so a redelivery is
   reprocessed. `notifyAction()` also cross-checks the webhook's
   `amount` against the amount requested at payment creation (`requested_amount` on the
-  `payplug_unified_operation` row, recorded by `bindPaymentId()`; the cart's live total only for a row
-  without it) before creating an order (there's no independent
+  `payplug_unified_operation` row, recorded by `bindPaymentId()`, or by `bindRequestedAmount()` when
+  the creation response has no payment id; the cart's live total only for a row without it) before
+  creating an order (there's no independent
   `id_cart` to cross-check `orderId` against in that server-to-server context — `orderId` itself
   *is* the cart id there); `returnAction()`/the `createAction()` reconciliation path run the same
   amount check and additionally cross-check `orderId`. A paid amount other than the requested one
@@ -202,10 +203,14 @@ Naming rule: `Unified` names anything that talks to the Unified API or implement
   `UnifiedPaymentAction::createAction()` binds it right after payment creation via
   `UnifiedOperationRepository::bindPaymentId()` (new nullable `payment_id` column; creates a pending
   `order_id = 'cart:<id>'` placeholder row when no row exists yet, which `save()` completes later
-  without touching `payment_id`, and that `bindPaymentId()` purges once older than 24 h; a failed
+  without touching `payment_id`, and that `bind()` (shared by `bindPaymentId()` and `bindRequestedAmount()`) purges once older than 24 h; a failed
 insert retries as an update, in case the frictionless notification `save()`d the row meanwhile); sending the operation id instead gets a 400 "The reference
-  transaction has not been found." (found in QA, 2026-09-29). An order without a recorded
-  `payment_id` fails the refund before any lock/API call. The refund row is recorded `pending` under an
+  transaction has not been found." (found in QA, 2026-09-29). A creation response without a top-level
+  `id` is logged and still records `requested_amount`, via `bindRequestedAmount()` (same private
+  `bind()` row handling as `bindPaymentId()`), so the amount cross-checks don't fall back to the live
+  cart total. An order without a recorded `payment_id` fails the refund before any lock/API call, with
+  the dedicated `refund.error.no_payment_id` BO message (the refund form stays visible). The refund
+  row is recorded `pending` under an
   `intent:<uniqid>` id *before* `createRefund()` (no idempotency key on that endpoint: a refund the
   API processed but whose answer was lost must still count as refunded), then renamed to the
   refund's `operationIds[0]` (`UnifiedRefundRepository::bindRefundOperationId()`) — never the response's
@@ -282,6 +287,8 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `createOrderWithLock()` path `returnAction()`/`notifyAction()` use; a still-`THREE_DS_PENDING`
   outcome redirects back to the *same* challenge (same token, via the `uhf_cart_token` reverse
   mapping) instead of starting a duplicate one.
+- **Card alias**: read from the operation's `paymentMethod.storedId`, falling back to
+  `paymentMethod.id` (Unified API contract change, PRE-3717/PRE-3721; UPC `^1.2.1`).
 - **JS SDK**: `dev/js/front.js` gained a `hosted_fields` submodule initializing the `dalenys.hostedFields` widget (card/expiry/CVV fields), with per-field validation, brand allow-listing, an anti-double-submit guard with a safety timeout, and tokenization before POSTing to `unified.php?action=create`, with the customer static token (`prestashop.static_token`, set by PrestaShop core on every front page) in the POST body for both the card and saved-alias submits (the URL is server-injected as `hosted_fields_uhf_url`/`payplug_hosted_fields_uhf_url`, built by `PrestashopAdapter17::setHostedFieldsPaymentOption()` — the JS-side variable name kept its original `uhf` naming even though it no longer points at `uhf.php`).
 - **Routes**: `Routes::getHostedFieldsUrl()` reads `HOSTED_FIELDS_URL` from `payplugroutes/.env` and has **no hardcoded default** until the production hosted-fields SDK URL is confirmed (a guessed-but-wrong URL would fail silently): unset, it returns `''`. `PrestashopAdapter17::displayPaymentOption()` then doesn't display the hosted fields option at all (`isHostedFieldsSdkUrlConfigured()`, a non-EUR cart gets no UHF option rather than a broken form) and logs an error through the module logger. The log is there and not in `Routes`: `getSourceUrl()` is built on every front page by `HookClass`'s header hook.
 - The pre-existing Retail API flow (`dispatcher.php`, `PaymentAction`, resource creation) is untouched by this work so far.
