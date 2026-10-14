@@ -180,41 +180,20 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
             $binding['requested_amount'] = $requestedAmount;
         }
 
-        $existing = $this->getBy('operation_id', $operationId);
+        return $this->bind($binding, $operationId, $idCart);
+    }
 
-        if ($existing) {
-            return (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+    /**
+     * Records the amount sent at creation for a payment whose creation response carried no
+     * payment id, with the same row handling as bindPaymentId().
+     */
+    public function bindRequestedAmount(string $operationId, int $requestedAmount, int $idCart): bool
+    {
+        if ('' === $operationId) {
+            return false;
         }
 
-        $now = date('Y-m-d H:i:s');
-
-        try {
-            $created = (bool) $this->createEntity(array_merge([
-                'operation_id' => $operationId,
-                'order_id' => self::PLACEHOLDER_ORDER_PREFIX . $idCart,
-                'exec_code' => '0001',
-                'outcome' => PaymentOutcome::THREE_DS_PENDING,
-                'amount' => 0,
-                'treated' => false,
-                'date_add' => $now,
-                'date_upd' => $now,
-            ], $binding));
-        } catch (\Throwable $exception) {
-            $created = false;
-        }
-
-        if (!$created) {
-            // The notification of a frictionless payment may have save()d the row between getBy()
-            // and the insert, which then hits UNIQUE (operation_id): bind onto that row instead.
-            $existing = $this->getBy('operation_id', $operationId);
-
-            return $existing
-                && (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
-        }
-
-        $this->purgeStalePlaceholders();
-
-        return true;
+        return $this->bind(['requested_amount' => $requestedAmount], $operationId, $idCart);
     }
 
     public function getPaymentIdByOperationId(string $operationId): ?string
@@ -258,7 +237,52 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
     }
 
     /**
-     * @description Delete the placeholders bindPaymentId() created for payments that never got
+     * @description Write the binding onto the operation's row, or onto a pending placeholder row
+     *              when the operation is not persisted yet
+     *
+     * @param array<string, int|string> $binding
+     */
+    private function bind(array $binding, string $operationId, int $idCart): bool
+    {
+        $existing = $this->getBy('operation_id', $operationId);
+
+        if ($existing) {
+            return (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+        }
+
+        $now = date('Y-m-d H:i:s');
+
+        try {
+            $created = (bool) $this->createEntity(array_merge([
+                'operation_id' => $operationId,
+                'order_id' => self::PLACEHOLDER_ORDER_PREFIX . $idCart,
+                'exec_code' => '0001',
+                'outcome' => PaymentOutcome::THREE_DS_PENDING,
+                'amount' => 0,
+                'treated' => false,
+                'date_add' => $now,
+                'date_upd' => $now,
+            ], $binding));
+        } catch (\Throwable $exception) {
+            $created = false;
+        }
+
+        if (!$created) {
+            // The notification of a frictionless payment may have save()d the row between getBy()
+            // and the insert, which then hits UNIQUE (operation_id): bind onto that row instead.
+            $existing = $this->getBy('operation_id', $operationId);
+
+            return $existing
+                && (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+        }
+
+        $this->purgeStalePlaceholders();
+
+        return true;
+    }
+
+    /**
+     * @description Delete the placeholders bind() created for payments that never got
      *              an order; a failure only delays the purge to the next placeholder
      */
     private function purgeStalePlaceholders(): void

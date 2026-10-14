@@ -434,13 +434,18 @@ class notifyActionTest extends TestCase
         $this->assertSame(200, $result['http_status']);
     }
 
-    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone()
+    /**
+     * @dataProvider operationAliasProvider
+     *
+     * @param array<string, mixed> $alias_fields
+     * @param string $expected_alias_id
+     */
+    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone(array $alias_fields, $expected_alias_id)
     {
         [$action, $mocks] = $this->mockActionForNotify();
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900, [
-            'paymentMethod' => [
-                'id' => 'card_alias',
+            'paymentMethod' => $alias_fields + [
                 'card' => ['code6x4' => '402205XXXXXX0001', 'type' => 'VISA', 'network' => 'VISA'],
                 'details' => ['validityDate' => '2029-12', 'selectedBrand' => 'VISA'],
             ],
@@ -453,10 +458,19 @@ class notifyActionTest extends TestCase
             'result' => true,
             'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
             'persisted' => true,
-        ], ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
+        ], ['alias_id' => $expected_alias_id, 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
         $mocks['payment_repository']->shouldReceive('markTreated')->once();
 
         $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function operationAliasProvider()
+    {
+        return [
+            'storedId only' => [['storedId' => 'card_stored'], 'card_stored'],
+            'storedId and id' => [['storedId' => 'card_stored', 'id' => 'card_legacy'], 'card_stored'],
+            'id only' => [['id' => 'card_legacy'], 'card_legacy'],
+        ];
     }
 
     public function testNeverReadsTheAliasIdFromTheWebhookBody()
@@ -467,7 +481,7 @@ class notifyActionTest extends TestCase
             'execCode' => '0000',
             'orderId' => '6',
             'amount' => 2900,
-            'paymentMethod' => ['id' => 'forged_alias'],
+            'paymentMethod' => ['storedId' => 'forged_alias', 'id' => 'forged_alias'],
         ]);
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn($forged_body);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
@@ -490,7 +504,7 @@ class notifyActionTest extends TestCase
         [$action, $mocks] = $this->mockActionForNotify();
         $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
         $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900, [
-            'paymentMethod' => ['id' => 'card_alias', 'card' => ['code6x4' => '402205XXXXXX0001']],
+            'paymentMethod' => ['storedId' => 'card_alias', 'card' => ['code6x4' => '402205XXXXXX0001']],
         ]);
         $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
         $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [

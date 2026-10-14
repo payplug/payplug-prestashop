@@ -1701,7 +1701,8 @@ class UnifiedPaymentAction
     /**
      * @description Extract the card alias id from an operation response this module fetched
      *
-     * The alias is paymentMethod.id, the same field the vendor maps to PaymentOutput::$aliasId.
+     * The alias is paymentMethod.storedId, else paymentMethod.id: the fields and precedence the
+     * vendor maps to PaymentOutput::$aliasId.
      *
      * @param mixed $decoded
      *
@@ -1709,11 +1710,19 @@ class UnifiedPaymentAction
      */
     private function extractAliasId($decoded)
     {
-        return is_array($decoded)
-            && isset($decoded['paymentMethod']['id'])
-            && is_string($decoded['paymentMethod']['id'])
-            ? $decoded['paymentMethod']['id']
-            : '';
+        if (!is_array($decoded) || !isset($decoded['paymentMethod']) || !is_array($decoded['paymentMethod'])) {
+            return '';
+        }
+
+        foreach (['storedId', 'id'] as $key) {
+            if (isset($decoded['paymentMethod'][$key])
+                && is_string($decoded['paymentMethod'][$key])
+                && '' !== $decoded['paymentMethod'][$key]) {
+                return $decoded['paymentMethod'][$key];
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -1819,7 +1828,8 @@ class UnifiedPaymentAction
      * The refund endpoint is keyed by the payment's "id", which differs from "operationIds[0]"
      * (the operation_id every other flow uses) and cannot be read back from the operation later.
      * Never blocks the payment: it has already been created at this point, so a failure only
-     * costs the ability to refund it from the back-office, and is logged as such.
+     * costs the ability to refund it from the back-office, and is logged as such. Without a
+     * payment id in the response, the requested amount is still recorded for the amount checks.
      *
      * @param mixed $factory
      * @param mixed $logger
@@ -1837,6 +1847,17 @@ class UnifiedPaymentAction
         if ('' === $payment_id) {
             $logger->error('UnifiedPaymentAction::createAction - payment creation response for operation ' . $operation_id
                 . ' carries no payment id: this payment cannot be refunded from the back-office');
+
+            try {
+                $recorded = $factory->createPaymentRepository()->bindRequestedAmount($operation_id, (int) $requested_amount, $id_cart);
+            } catch (\Throwable $exception) {
+                $recorded = false;
+            }
+
+            if (!$recorded) {
+                $logger->error('UnifiedPaymentAction::createAction - requested amount of operation ' . $operation_id
+                    . ' (cart ' . $id_cart . ') not recorded: the paid amount will be checked against the cart total');
+            }
 
             return;
         }

@@ -348,7 +348,13 @@ class returnActionTest extends TestCase
         $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
     }
 
-    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone()
+    /**
+     * @dataProvider operationAliasProvider
+     *
+     * @param array<string, mixed> $alias_fields
+     * @param string $expected_alias_id
+     */
+    public function testResolvesTheAliasIdFromTheGetOperationResponseWhenTheMarkerHasNone(array $alias_fields, $expected_alias_id)
     {
         [$action, $mocks] = $this->mockActionForReturn();
 
@@ -360,9 +366,7 @@ class returnActionTest extends TestCase
                 'execCode' => '0000',
                 'amount' => 1234,
                 'orderId' => '42',
-                // Real Unified API shape: the alias id is paymentMethod.id (no card.aliasId).
-                'paymentMethod' => [
-                    'id' => 'card_alias',
+                'paymentMethod' => $alias_fields + [
                     'card' => ['code6x4' => '402205XXXXXX0001', 'network' => 'VISA'],
                     'details' => ['fullName' => 'Jane Doe', 'validityDate' => '2029-12', 'selectedBrand' => 'VISA'],
                 ],
@@ -371,9 +375,20 @@ class returnActionTest extends TestCase
         $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
             'result' => true,
             'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
-        ], ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
+        ], ['alias_id' => $expected_alias_id, 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
 
         $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function operationAliasProvider()
+    {
+        return [
+            'storedId only' => [['storedId' => 'card_stored'], 'card_stored'],
+            'storedId and id' => [['storedId' => 'card_stored', 'id' => 'card_legacy'], 'card_stored'],
+            'id only' => [['id' => 'card_legacy'], 'card_legacy'],
+            'non string storedId' => [['storedId' => 123, 'id' => 'card_legacy'], 'card_legacy'],
+            'empty storedId' => [['storedId' => '', 'id' => 'card_legacy'], 'card_legacy'],
+        ];
     }
 
     /**

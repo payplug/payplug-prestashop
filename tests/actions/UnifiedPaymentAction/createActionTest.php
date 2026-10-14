@@ -116,6 +116,7 @@ class createActionTest extends TestCase
         $payment_repository = \Mockery::mock('PaymentRepository');
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('bindPaymentId')->andReturn(true);
+        $payment_repository->shouldReceive('bindRequestedAmount')->andReturn(true)->byDefault();
         $logger->shouldReceive('error')->never();
         $lock->shouldReceive('acquire')->with('uhf_cart:42', 60)->andReturn(true);
         $lock->shouldReceive('release')->with('uhf_cart:42')->once();
@@ -603,6 +604,72 @@ class createActionTest extends TestCase
         $result = $action->createAction($this->defaultParams());
 
         $this->assertFalse($result['result']);
+    }
+
+    public function testCreateActionRecordsTheRequestedAmountAndLogsWhenTheCreationResponseHasNoPaymentId()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
+            200,
+            '{"operationIds":["op_1"],"execCode":"0000"}',
+            null,
+            null,
+            null
+        ));
+        $mocks['payment_repository']->shouldReceive('bindPaymentId')->never();
+        $mocks['payment_repository']->shouldReceive('bindRequestedAmount')->once()->with('op_1', 1234, 42)->andReturn(true)->globally()->ordered();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+        $order_action->shouldReceive('createFromOutcome')->once()->with(42, 'op_1', '0000', PaymentOutcome::PAID, 1234, null, [])
+            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99'])->globally()->ordered();
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/operation op_1 carries no payment id.*cannot be refunded/'));
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $result = $action->createAction($this->defaultParams());
+
+        $this->assertTrue($result['result']);
+        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+    }
+
+    /**
+     * @dataProvider requestedAmountFailureProvider
+     */
+    public function testCreateActionStillSucceedsWhenRecordingTheRequestedAmountFails(callable $failure)
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
+            200,
+            '{"operationIds":["op_1"],"execCode":"0000"}',
+            null,
+            null,
+            null
+        ));
+        $failure($mocks['payment_repository']->shouldReceive('bindRequestedAmount')->once()->with('op_1', 1234, 42));
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+        $order_action->shouldReceive('createFromOutcome')->once()->with(42, 'op_1', '0000', PaymentOutcome::PAID, 1234, null, [])
+            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/carries no payment id/'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/requested amount of operation op_1 \(cart 42\) not recorded/'));
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $result = $action->createAction($this->defaultParams());
+
+        $this->assertTrue($result['result']);
+    }
+
+    public function requestedAmountFailureProvider()
+    {
+        return [
+            'repository throws' => [function ($expectation) {
+                $expectation->andThrow(new \Exception('db down'));
+            }],
+            'repository returns false' => [function ($expectation) {
+                $expectation->andReturn(false);
+            }],
+        ];
     }
 
     /**
@@ -1267,7 +1334,13 @@ class createActionTest extends TestCase
         ];
     }
 
-    public function testCreateActionFallsBackToTheFetchedOperationAliasIdOnADirectPaidResult()
+    /**
+     * @dataProvider fetchedOperationAliasProvider
+     *
+     * @param array<string, mixed> $alias_fields
+     * @param string $expected_alias_id
+     */
+    public function testCreateActionFallsBackToTheFetchedOperationAliasIdOnADirectPaidResult(array $alias_fields, $expected_alias_id)
     {
         [$action, $mocks] = $this->mockActionForPaymentCreation();
         $order_action = \Mockery::mock('OrderAction');
@@ -1279,8 +1352,7 @@ class createActionTest extends TestCase
         $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->once()->andReturn([
             'body' => json_encode([
                 'execCode' => '0000',
-                'paymentMethod' => [
-                    'id' => 'card_alias',
+                'paymentMethod' => $alias_fields + [
                     'card' => ['code6x4' => '402205XXXXXX0001'],
                     'details' => ['validityDate' => '2029-12'],
                 ],
@@ -1292,13 +1364,22 @@ class createActionTest extends TestCase
             ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
         $order_action->shouldReceive('persistAlias')
             ->once()
-            ->with(42, ['alias_id' => 'card_alias', 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
+            ->with(42, ['alias_id' => $expected_alias_id, 'brand' => 'visa'], ['last4' => '0001', 'exp_month' => '12', 'exp_year' => '2029']);
         $mocks['logger']->shouldReceive('error')->never();
         $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
 
         $result = $action->createAction($this->defaultParams(['save_card' => 1, 'cardholder' => 'Jane Doe']));
 
         $this->assertTrue($result['result']);
+    }
+
+    public function fetchedOperationAliasProvider()
+    {
+        return [
+            'storedId only' => [['storedId' => 'card_stored'], 'card_stored'],
+            'storedId and id' => [['storedId' => 'card_stored', 'id' => 'card_legacy'], 'card_stored'],
+            'id only' => [['id' => 'card_legacy'], 'card_legacy'],
+        ];
     }
 
     public function testCreateActionSavesTheDirectPaidAliasFromTheFetchedOperationOnceTheOrderExistsAndTheLockIsReleased()
@@ -1550,6 +1631,7 @@ class createActionTest extends TestCase
         $payment_repository = \Mockery::mock('PaymentRepository');
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('bindPaymentId')->andReturn(true)->byDefault();
+        $payment_repository->shouldReceive('bindRequestedAmount')->andReturn(true)->byDefault();
         $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
         $lock->shouldReceive('acquire')->with('uhf_cart:42', 60)->andReturn(true);
         // Fix 2's pending-operation reconciliation check: no pending operation cached by default.
