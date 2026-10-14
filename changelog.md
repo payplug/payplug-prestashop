@@ -11,6 +11,7 @@
   - [PRE-3627](https://payplug-prod.atlassian.net/browse/PRE-3627): Wait for the browser return to finish creating the order instead of losing the Unified Hosted Fields payment notification with a 409
   - [PRE-3721](https://payplug-prod.atlassian.net/browse/PRE-3721): Stop the Unified API from refusing every Unified Hosted Fields payment (new card or saved card) by requiring unified-plugin-core ^1.2.1, and save the card from the alias now returned in `paymentMethod.storedId`
   - [PRE-3721](https://payplug-prod.atlassian.net/browse/PRE-3721): Tell the merchant to refund from the PayPlug portal when a Unified Hosted Fields payment was created without a payment reference, and still check its paid amount against the requested one
+  - [PRE-3721](https://payplug-prod.atlassian.net/browse/PRE-3721): Make such a Unified Hosted Fields payment refundable from the back office once its confirmed operation provides the payment reference, read from PayPlug and never from the notification body
 
 ## Version 5.2.2
 - Bugfix :

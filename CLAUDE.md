@@ -185,7 +185,10 @@ Naming rule: `Unified` names anything that talks to the Unified API or implement
   is refused with a "manual review" error log; a requested amount paid on a cart edited during 3DS
   still creates the order, in "Payment error": `UnifiedOrderAction` validates it in the paid state so
   `validateOrder()` flags it (as the Retail flow does), and never lets a PAID outcome mark paid an
-  order whose total differs from the amount captured. `UnifiedLock::acquire()`'s steal-an-expired-lock path is now an atomic
+  order whose total differs from the amount captured. A `PAID` operation that passed the cross-check
+  gets its payment id recorded from the re-read (`backfillPaymentId()`, see Refund below) before
+  `createOrderWithLock()`, so it is kept even on a `409`/`500`; the `THREE_DS_PENDING` no-op filter
+  and the refund diversion run before it, unchanged. `UnifiedLock::acquire()`'s steal-an-expired-lock path is now an atomic
   `UPDATE ... WHERE lock_key = ? AND expires_at < ?` (via `UnifiedLockRepository::stealExpired()` +
   `QueryAdapter::getAffectedRows()`), closing the prior two-concurrent-stealers race. Signature
   verification (`WebhookNotificationHelper::verifySignature()`) is currently *fail-open*: no admin
@@ -199,8 +202,8 @@ Naming rule: `Unified` names anything that talks to the Unified API or implement
   (`UnifiedOperationRepository::getPaidByOrderId()`, not `getByOrderId()`: an order can also carry a
   `FAILED` operation). The refund endpoint is keyed by the payment's own `id` from the
   payment-creation response, which differs from `operationIds[0]` (stored as `operation_id`,
-  used by `getOperation()`/the webhook) and can't be read back from the operation afterwards:
-  `UnifiedPaymentAction::createAction()` binds it right after payment creation via
+  used by `getOperation()`/the webhook): `UnifiedPaymentAction::createAction()` binds it right
+  after payment creation via
   `UnifiedOperationRepository::bindPaymentId()` (new nullable `payment_id` column; creates a pending
   `order_id = 'cart:<id>'` placeholder row when no row exists yet, which `save()` completes later
   without touching `payment_id`, and that `bind()` (shared by `bindPaymentId()` and `bindRequestedAmount()`) purges once older than 24 h; a failed
@@ -208,7 +211,19 @@ insert retries as an update, in case the frictionless notification `save()`d the
   transaction has not been found." (found in QA, 2026-09-29). A creation response without a top-level
   `id` is logged and still records `requested_amount`, via `bindRequestedAmount()` (same private
   `bind()` row handling as `bindPaymentId()`), so the amount cross-checks don't fall back to the live
-  cart total. An order without a recorded `payment_id` fails the refund before any lock/API call, with
+  cart total. Such a payment's id is recovered afterwards by `UnifiedPaymentAction::backfillPaymentId()`
+  from the top-level `paymentId` of the module-fetched `getOperation()` response (format-checked),
+  on every path that re-reads a `PAID` operation and passed the orderId/amount cross-check:
+  `notifyAction()`, `returnAction()`, `reconcilePendingOperation()`, `resyncPendingOrder()`, and the
+  redelivered notification of an already treated operation whose `payment_id` is still empty (one
+  `getOperation()`, no order work, no `markTreated()`, always `200`; a treated operation that has a
+  `payment_id` makes no API call). Write-once, via `UnifiedOperationRepository::bindPaymentIdIfMissing()`
+  (conditional `UPDATE ... WHERE payment_id IS NULL OR payment_id = ''` + `getAffectedRows()`, or the
+  placeholder row); a recorded value that differs is kept and the mismatch logged. Never read from the
+  raw webhook body (signature verification is fail-open), never for `FAILED`, `THREE_DS_PENDING` or
+  refund notifications; a binding failure is logged and changes neither the answer nor the order flow.
+  Whether `getOperation()` carries `paymentId` is not confirmed yet (staging check pending): without it,
+  nothing is bound. An order without a recorded `payment_id` fails the refund before any lock/API call, with
   the dedicated `refund.error.no_payment_id` BO message (the refund form stays visible). The refund
   row is recorded `pending` under an
   `intent:<uniqid>` id *before* `createRefund()` (no idempotency key on that endpoint: a refund the

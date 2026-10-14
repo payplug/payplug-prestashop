@@ -202,6 +202,73 @@ class resyncPendingOrderTest extends TestCase
         $this->assertFalse($action->resyncPendingOrder(99));
     }
 
+    public function testRecordsThePaymentIdOfThePaidOperationBeforeApplyingTheOutcome()
+    {
+        [$action, $mocks] = $this->mockAction();
+        $this->mockPaidOperationRow($mocks);
+        $this->mockGetOperation($mocks, ['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_123']);
+        $bound = false;
+        $mocks['payment_repository']->shouldReceive('bindPaymentIdIfMissing')->once()->with('op_123', 'pay_123', 42)
+            ->andReturnUsing(function () use (&$bound) {
+                $bound = true;
+
+                return true;
+            });
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/payment id pay_123 of operation op_123 recorded/'));
+        $mocks['order_action']->shouldReceive('createFromOutcome')
+            ->once()
+            ->with(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, [])
+            ->andReturnUsing(function () use (&$bound) {
+                $this->assertTrue($bound, 'payment id recorded before the outcome is applied');
+
+                return ['result' => true, 'redirect_url' => 'confirmation', 'persisted' => true, 'outcome_applied' => true];
+            });
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_123');
+        $this->mockOrderStates($mocks, self::PENDING_STATE, self::PAID_STATE);
+
+        $this->assertTrue($action->resyncPendingOrder(99));
+    }
+
+    public function testKeepsThePaymentIdAlreadyRecordedOnResync()
+    {
+        [$action, $mocks] = $this->mockAction();
+        $this->mockPaidOperationRow($mocks);
+        $this->mockGetOperation($mocks, ['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_123']);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with('op_123')->andReturn('pay_123');
+        $mocks['order_action']->shouldReceive('createFromOutcome')
+            ->once()
+            ->andReturn(['result' => true, 'redirect_url' => 'confirmation', 'persisted' => true, 'outcome_applied' => true]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_123');
+        $this->mockOrderStates($mocks, self::PENDING_STATE, self::PAID_STATE);
+
+        $this->assertTrue($action->resyncPendingOrder(99));
+    }
+
+    public function testNeverRecordsThePaymentIdOfAFailedOperationOnResync()
+    {
+        [$action, $mocks] = $this->mockAction();
+        $this->mockPaidOperationRow($mocks);
+        $this->mockGetOperation($mocks, ['execCode' => '4001', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_123']);
+        $mocks['order_action']->shouldReceive('createFromOutcome')
+            ->once()
+            ->andReturn(['result' => false, 'redirect_url' => 'error', 'persisted' => true, 'outcome_applied' => true]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_123');
+        $this->mockOrderStates($mocks, self::PENDING_STATE, self::ERROR_STATE);
+
+        $this->assertTrue($action->resyncPendingOrder(99));
+    }
+
+    public function testNeverRecordsThePaymentIdWhileThePaymentIsStillThreeDsPendingOnResync()
+    {
+        [$action, $mocks] = $this->mockAction();
+        $this->mockPaidOperationRow($mocks);
+        $this->mockGetOperation($mocks, ['execCode' => '0001', 'amount' => 1234, 'orderId' => '42', 'paymentId' => 'pay_123']);
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $this->mockOrderStates($mocks, self::PENDING_STATE);
+
+        $this->assertFalse($action->resyncPendingOrder(99));
+    }
+
     /**
      * @param array<string, object> $mocks
      */
@@ -313,6 +380,8 @@ class resyncPendingOrderTest extends TestCase
         $factory->shouldReceive('createLock')->andReturn($lock);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
+        $payment_repository->shouldReceive('getPaymentIdByOperationId')->andReturn(null)->byDefault();
+        $payment_repository->shouldReceive('bindPaymentIdIfMissing')->never()->byDefault();
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         $token_cache->shouldReceive('delete')->byDefault();

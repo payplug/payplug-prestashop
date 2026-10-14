@@ -661,6 +661,10 @@ class UnifiedPaymentAction
             }
         }
 
+        if (PaymentOutcome::PAID === $outcome) {
+            $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
+        }
+
         $pending_alias = $this->resolvePendingAlias($token_cache, $operation_id, $decoded);
         $card_details = null !== $pending_alias ? $this->extractCardDetails($decoded) : [];
 
@@ -727,7 +731,7 @@ class UnifiedPaymentAction
 
         $payment_repository = $factory->createPaymentRepository();
         if ($payment_repository->isTreated($operation_data->operationId)) {
-            return ['http_status' => 200];
+            return $this->backfillTreatedOperation($factory, $logger, $payment_repository, $operation_data->operationId);
         }
 
         try {
@@ -810,6 +814,10 @@ class UnifiedPaymentAction
         }
 
         // $decoded is the re-fetched getOperation() response, never the unverified webhook $body.
+        if (PaymentOutcome::PAID === $outcome) {
+            $this->backfillPaymentId($factory, $logger, $operation_data->operationId, $decoded, $id_cart);
+        }
+
         $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $operation_data->operationId, $decoded);
         $card_details = null !== $pending_alias ? $this->extractCardDetails($decoded) : [];
 
@@ -942,6 +950,10 @@ class UnifiedPaymentAction
             $this->getRequestedAmount($factory, $logger, $operation_id)
         )) {
             return false;
+        }
+
+        if (PaymentOutcome::PAID === $outcome) {
+            $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
         }
 
         $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $operation_id, $decoded);
@@ -1202,6 +1214,10 @@ class UnifiedPaymentAction
             if (!$this->crossChecksOrderIdAndAmount($logger, $cart, (int) $cart->id, $order_id_from_response, $amount, 'UnifiedPaymentAction::reconcilePendingOperation', $pending_operation_id, $requested_amount)) {
                 return $this->crossCheckMismatchResult($this->orderAction());
             }
+        }
+
+        if (PaymentOutcome::PAID === $outcome) {
+            $this->backfillPaymentId($factory, $logger, $pending_operation_id, $decoded, (int) $cart->id);
         }
 
         $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $pending_operation_id, $decoded);
@@ -1827,10 +1843,11 @@ class UnifiedPaymentAction
      * after payment creation
      *
      * The refund endpoint is keyed by the payment's "id", which differs from "operationIds[0]"
-     * (the operation_id every other flow uses) and cannot be read back from the operation later.
-     * The requested amount is what the paid amount is checked against. Without a payment id in
-     * the response, only the requested amount is recorded. Never blocks the payment: it has
-     * already been created at this point, so a failure is only logged.
+     * (the operation_id every other flow uses). The requested amount is what the paid amount is
+     * checked against. Without a payment id in the response, only the requested amount is
+     * recorded, and the payment id is recorded later from the paid operation fetched back
+     * (backfillPaymentId()), when it carries one. Never blocks the payment: it has already been
+     * created at this point, so a failure is only logged.
      *
      * @param mixed $factory
      * @param mixed $logger
@@ -1847,7 +1864,7 @@ class UnifiedPaymentAction
 
         if ('' === $payment_id) {
             $logger->error('UnifiedPaymentAction::createAction - payment creation response for operation ' . $operation_id
-                . ' carries no payment id: this payment cannot be refunded from the back-office');
+                . ' carries no payment id: this payment cannot be refunded from the back-office until its operation provides one');
 
             try {
                 $recorded = $factory->createPaymentRepository()->bindRequestedAmount($operation_id, (int) $requested_amount, $id_cart);
@@ -1873,6 +1890,125 @@ class UnifiedPaymentAction
             $logger->error('UnifiedPaymentAction::createAction - payment id ' . $payment_id . ' of operation ' . $operation_id
                 . ' (cart ' . $id_cart . ') not recorded: back-office refunds of this payment will fail');
         }
+    }
+
+    /**
+     * @description Extract the payment id from an operation response this module fetched
+     *
+     * Only ever called with a getOperation() response, never with a webhook body: signature
+     * verification is fail-open, and the payment id is what a back-office refund targets.
+     *
+     * @param mixed $decoded
+     *
+     * @return string the payment id, or '' when absent or malformed
+     */
+    private function extractPaymentId($decoded)
+    {
+        if (!is_array($decoded) || !isset($decoded['paymentId']) || !is_string($decoded['paymentId'])) {
+            return '';
+        }
+
+        return 1 === preg_match('/^[A-Za-z0-9_-]{1,255}$/', $decoded['paymentId']) ? $decoded['paymentId'] : '';
+    }
+
+    /**
+     * @description Record the payment id of a paid operation that has none, from the operation
+     *              fetched back
+     *
+     * Called only for a PAID getOperation() response whose orderId and amount passed the
+     * cross-check. A recorded payment id is kept, even when it differs. Never blocks the caller:
+     * a failure is only logged.
+     *
+     * @param mixed $factory
+     * @param mixed $logger
+     * @param string $operation_id
+     * @param mixed $decoded getOperation() response, never a webhook body
+     * @param int $id_cart
+     */
+    private function backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart)
+    {
+        $payment_id = $this->extractPaymentId($decoded);
+        if ('' === $payment_id) {
+            return;
+        }
+
+        try {
+            $payment_repository = $factory->createPaymentRepository();
+            $recorded = $payment_repository->getPaymentIdByOperationId($operation_id);
+            if (null !== $recorded) {
+                if ($recorded !== $payment_id) {
+                    $logger->error('UnifiedPaymentAction - payment id mismatch for operation ' . $operation_id . ': ' . $recorded
+                        . ' recorded at creation, ' . $payment_id . ' in the operation, recorded value kept');
+                }
+
+                return;
+            }
+
+            $bound = $payment_repository->bindPaymentIdIfMissing($operation_id, $payment_id, (int) $id_cart);
+        } catch (\Throwable $exception) {
+            $bound = false;
+        }
+
+        if ($bound) {
+            $logger->info('UnifiedPaymentAction - payment id ' . $payment_id . ' of operation ' . $operation_id . ' recorded from the operation');
+        } else {
+            $logger->error('UnifiedPaymentAction - payment id ' . $payment_id . ' of operation ' . $operation_id
+                . ' not recorded: back-office refunds of this payment will fail');
+        }
+    }
+
+    /**
+     * @description Answer the redelivered notification of an already treated operation, recording
+     *              its payment id from the operation fetched back when none is recorded yet
+     *
+     * No order work and no markTreated(): the answer is always 200.
+     *
+     * @param mixed $factory
+     * @param mixed $logger
+     * @param mixed $payment_repository
+     * @param string $operation_id
+     *
+     * @return array{http_status: int}
+     */
+    private function backfillTreatedOperation($factory, $logger, $payment_repository, $operation_id)
+    {
+        try {
+            if (null !== $payment_repository->getPaymentIdByOperationId($operation_id)) {
+                return ['http_status' => 200];
+            }
+
+            $response = $factory->create()->getOperation($operation_id);
+        } catch (\Exception $exception) {
+            $logger->error('UnifiedPaymentAction::notifyAction - treated operation ' . $operation_id
+                . ' could not be re-read for its payment id: ' . $exception->getMessage());
+
+            return ['http_status' => 200];
+        }
+
+        $decoded = json_decode($response['body'], true);
+        $exec_code = is_array($decoded) && isset($decoded['execCode']) ? (string) $decoded['execCode'] : self::MISSING_EXEC_CODE;
+        if (PaymentOutcome::PAID !== ExecCodeMapper::toPaymentOutcome($exec_code) || !isset($decoded['amount'])) {
+            return ['http_status' => 200];
+        }
+
+        $order_id_from_response = isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
+        $id_cart = (int) $order_id_from_response;
+        if ($id_cart <= 0 || !$this->crossChecksOrderIdAndAmount(
+            $logger,
+            $this->dependencies->getPlugin()->getCart()->get($id_cart),
+            $id_cart,
+            $order_id_from_response,
+            (int) $decoded['amount'],
+            'UnifiedPaymentAction::notifyAction',
+            $operation_id,
+            $this->getRequestedAmount($factory, $logger, $operation_id)
+        )) {
+            return ['http_status' => 200];
+        }
+
+        $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
+
+        return ['http_status' => 200];
     }
 
     /**

@@ -196,6 +196,25 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
         return $this->bind(['requested_amount' => $requestedAmount], $operationId, $idCart);
     }
 
+    /**
+     * Records a payment id read back from the operation itself, for a payment whose creation
+     * response carried none. Write-once: a payment id already on the row, written by
+     * bindPaymentId() from the creation response, is never overwritten, even by a concurrent call.
+     */
+    public function bindPaymentIdIfMissing(string $operationId, string $paymentId, int $idCart): bool
+    {
+        if ('' === $operationId || '' === $paymentId) {
+            return false;
+        }
+
+        if (!$this->getBy('operation_id', $operationId)
+            && $this->createPlaceholder(['payment_id' => $paymentId], $operationId, $idCart)) {
+            return true;
+        }
+
+        return $this->updatePaymentIdIfMissing($operationId, $paymentId);
+    }
+
     public function getPaymentIdByOperationId(string $operationId): ?string
     {
         $row = $this->getBy('operation_id', $operationId);
@@ -250,6 +269,27 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
             return (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
         }
 
+        if ($this->createPlaceholder($binding, $operationId, $idCart)) {
+            return true;
+        }
+
+        // The notification of a frictionless payment may have save()d the row between getBy()
+        // and the insert, which then hits UNIQUE (operation_id): bind onto that row instead.
+        $existing = $this->getBy('operation_id', $operationId);
+
+        return $existing
+            && (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+    }
+
+    /**
+     * @description Insert a pending placeholder row carrying the binding, then purge the stale ones
+     *
+     * @param array<string, int|string> $binding
+     *
+     * @return bool false when the insert failed, e.g. on UNIQUE (operation_id)
+     */
+    private function createPlaceholder(array $binding, string $operationId, int $idCart): bool
+    {
         $now = date('Y-m-d H:i:s');
 
         try {
@@ -267,18 +307,38 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
             $created = false;
         }
 
-        if (!$created) {
-            // The notification of a frictionless payment may have save()d the row between getBy()
-            // and the insert, which then hits UNIQUE (operation_id): bind onto that row instead.
-            $existing = $this->getBy('operation_id', $operationId);
-
-            return $existing
-                && (bool) $this->updateEntity((int) $existing['id_payplug_unified_operation'], $binding);
+        if ($created) {
+            $this->purgeStalePlaceholders();
         }
 
-        $this->purgeStalePlaceholders();
+        return $created;
+    }
 
-        return true;
+    /**
+     * @description Set the payment id of the operation's row in a single conditional UPDATE, only
+     *              while the row has none
+     *
+     * @return bool true when the row was updated
+     */
+    private function updatePaymentIdIfMissing(string $operationId, string $paymentId): bool
+    {
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+
+        $definition = $entity->getDefinition();
+
+        $this
+            ->update()
+            ->table($this->getTableName($definition['table']))
+            ->set('`payment_id` = "' . $this->escape($paymentId) . '"')
+            ->where('`operation_id` = "' . $this->escape($operationId) . '"')
+            ->where('`payment_id` IS NULL OR `payment_id` = ""');
+
+        $this->build();
+
+        return 1 === $this->dependencies->getPlugin()->getQueryAdapter()->getAffectedRows();
     }
 
     /**
