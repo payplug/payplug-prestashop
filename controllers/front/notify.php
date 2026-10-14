@@ -34,15 +34,15 @@ use PayPlug\src\utilities\traits\ServiceGetter;
  * implementation: like ipn.php, this is a fixed, query-string-free URL a merchant/support can
  * hand to PayPlug's webhook configuration without it being one branch of a multi-action
  * controller - but unlike ipn.php (a bare two-line call into ConfigClass's static notification
- * handling), this endpoint still needs OperationAction/ServiceGetter's DI wiring, since it's
- * dispatching into this module's own `payplug.action.operation` service rather than a static
+ * handling), this endpoint still needs UnifiedPaymentAction/ServiceGetter's DI wiring, since it's
+ * dispatching into this module's own `payplug.action.unified_payment` service rather than a static
  * classic-API helper. Previously a branch of unified.php?action=notify, shared with the
  * browser-facing create/challenge/return actions; split out because that query string is
  * fragile to hand off to support/Cockpit for the Receiver configuration (a forgotten or
  * mistyped ?action=notify fails silently - no notification, no error anywhere) and because a
  * server-to-server webhook and browser endpoints are two different trust domains that don't
  * belong on the same URL. The business logic itself is untouched: this controller only calls
- * OperationAction::notifyAction() via the same service and shapes the HTTP response the same
+ * UnifiedPaymentAction::notifyAction() via the same service and shapes the HTTP response the same
  * way unified.php's own handleNotify() used to.
  */
 class PayplugNotifyModuleFrontController extends ModuleFrontController
@@ -61,11 +61,11 @@ class PayplugNotifyModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * @description Forward the Unified API webhook to OperationAction::notifyAction() and reply with its HTTP status
+     * @description Forward the Unified API webhook to UnifiedPaymentAction::notifyAction() and reply with its HTTP status
      */
     public function postProcess()
     {
-        $result = $this->getService('payplug.action.operation')->dispatchAction('notify', []);
+        $result = $this->getService('payplug.action.unified_payment')->dispatchAction('notify', []);
 
         // dispatchAction()'s own try/catch (generic to every action) returns
         // {result: false, message: ...} on an unexpected exception, with no 'http_status' key —

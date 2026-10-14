@@ -627,7 +627,7 @@ class OrderAction
             $updated = $this->plugin
                 ->getModule()
                 ->getInstanceByName($this->dependencies->name)
-                ->getService('payplug.action.operation')
+                ->getService('payplug.action.unified_payment')
                 ->resyncPendingOrder((int) $order->id);
             if (!$updated) {
                 return;
@@ -659,7 +659,7 @@ class OrderAction
     {
         $module = $this->plugin->getModule()->getInstanceByName($this->dependencies->name);
         $payment_operation = $module
-            ->getService('payplug.utilities.service.unified_api_payment_service_factory')
+            ->getService('payplug.unified.payment_service_factory')
             ->createPaymentRepository()
             ->getPaidByOrderId((string) $order->id);
         if (null === $payment_operation) {
@@ -676,7 +676,7 @@ class OrderAction
         $amount_helper = $module->getService('payplug.utilities.helper.amount');
         $price_adapter = $module->getService('payplug.application.adapter.price');
         $refunded_cents = (int) $module
-            ->getService('payplug.models.repositories.upc_refund')
+            ->getService('payplug.models.repositories.unified_refund')
             ->getRefundedAmount((string) $order->id);
         $available_cents = max(0, (int) $payment_operation->amount - $refunded_cents);
         $refunded = (float) $amount_helper->convertAmount($refunded_cents, true, $currency->iso_code);

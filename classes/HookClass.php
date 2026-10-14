@@ -111,7 +111,7 @@ class HookClass
             ->deleteByCustomerAction((int) $customer['id']);
         $aliases_deleted = $this->module
             ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.action.alias')
+            ->getService('payplug.action.unified_alias')
             ->deleteByCustomerAction((int) $customer['id']);
         $deleted = $cards_deleted && $aliases_deleted;
         if (!$deleted) {
@@ -134,7 +134,7 @@ class HookClass
         $cards = $this->dependencies->configClass->gdprCardExport((int) $customer['id']);
         $aliases = $this->module
             ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.action.alias')
+            ->getService('payplug.action.unified_alias')
             ->gdprExportAction((int) $customer['id']);
         $cards = array_merge($cards ?: [], $aliases ?: []);
         if (!$cards) {
@@ -144,7 +144,7 @@ class HookClass
                 ->l('hook.actionExportGDPRData.unableToExport', 'hookclass'));
         }
 
-        // One numbering across saved cards (payplug_card) and saved aliases (payplug_alias).
+        // One numbering across saved cards (payplug_card) and saved aliases (payplug_unified_alias).
         foreach ($cards as $index => $card) {
             $cards[$index]['#'] = $index + 1;
         }

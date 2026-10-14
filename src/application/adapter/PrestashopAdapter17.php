@@ -576,7 +576,7 @@ class PrestashopAdapter17
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.action.alias')
+            ->getService('payplug.action.unified_alias')
             ->renderCheckoutList($iso_code, $this->getHostedFieldsIdentifier($iso_code));
     }
 

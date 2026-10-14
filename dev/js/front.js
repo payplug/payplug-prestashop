@@ -1142,7 +1142,7 @@ var $document, $window, __moduleName__Module = {
             event.stopPropagation();
             var $elem = $(this);
             __moduleName__Module.card.props.id_card = $elem.data('id_card');
-            // Retail API card (payplug_card) or UHF alias (payplug_alias): ids can collide.
+            // Retail API card (payplug_card) or UHF alias (payplug_unified_alias): ids can collide.
             __moduleName__Module.card.props.type = 'alias' === $elem.data('type') ? 'alias' : 'card';
             __moduleName__Module.popup.set(card_confirm_deleted_msg);
         },
@@ -2092,7 +2092,7 @@ var $document, $window, __moduleName__Module = {
                 });
             },
             // Saved alias: no tokenization; ownership is checked server-side
-            // (OperationAction::createAction()).
+            // (UnifiedPaymentAction::createAction()).
             // idPayplugAlias is the module's own row id: the Unified API alias never reaches the page.
             submitAlias: function (idPayplugAlias) {
                 var hosted = __moduleName__Module.hosted_fields;

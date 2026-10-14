@@ -12,16 +12,16 @@ services:
     class: PayPlug\src\actions\RequestAction
     public: true
 
-  payplug.action.operation:
-    class: PayPlug\src\actions\OperationAction
+  payplug.action.unified_payment:
+    class: PayPlug\src\actions\UnifiedPaymentAction
     public: true
 
   payplug.action.unified_order:
     class: PayPlug\src\actions\UnifiedOrderAction
     public: true
 
-  payplug.action.alias:
-    class: PayPlug\src\actions\AliasAction
+  payplug.action.unified_alias:
+    class: PayPlug\src\actions\UnifiedAliasAction
     public: true
 
   payplug.action.unified_refund:
@@ -36,23 +36,23 @@ services:
     class: PayPlug\src\models\classes\Merchant
     public: true
 
-  payplug.models.repositories.operation:
-    class: PayPlug\src\models\repositories\OperationRepository
+  payplug.models.repositories.unified_operation:
+    class: PayPlug\src\models\repositories\UnifiedOperationRepository
     arguments: ['@payplug.dependencies_class']
     public: true
 
-  payplug.models.repositories.upc_lock:
-    class: PayPlug\src\models\repositories\UpcLockRepository
+  payplug.models.repositories.unified_lock:
+    class: PayPlug\src\models\repositories\UnifiedLockRepository
     arguments: ['@payplug.dependencies_class']
     public: true
 
-  payplug.models.repositories.alias:
-    class: PayPlug\src\models\repositories\AliasRepository
+  payplug.models.repositories.unified_alias:
+    class: PayPlug\src\models\repositories\UnifiedAliasRepository
     arguments: ['@payplug.dependencies_class']
     public: true
 
-  payplug.models.repositories.upc_refund:
-    class: PayPlug\src\models\repositories\UpcRefundRepository
+  payplug.models.repositories.unified_refund:
+    class: PayPlug\src\models\repositories\UnifiedRefundRepository
     arguments: ['@payplug.dependencies_class']
     public: true
 
@@ -72,8 +72,8 @@ services:
     class: PayPlug\src\utilities\services\Props
     public: true
 
-  payplug.utilities.service.unified_api_payment_service_factory:
-    class: PayPlug\src\utilities\services\UnifiedApiPaymentServiceFactory
+  payplug.unified.payment_service_factory:
+    class: PayPlug\src\unified\UnifiedApiPaymentServiceFactory
     public: true
 
   payplug.utilities.validator.regex:
