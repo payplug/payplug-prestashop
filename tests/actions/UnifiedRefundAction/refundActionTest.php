@@ -405,7 +405,7 @@ class refundActionTest extends TestCase
     }
 
     /**
-     * PRE-3627 review (M1): a timeout (CurlHttpClient's status 0), a 5xx or a 409 may come after
+     * PRE-3627 review (M1): a timeout (UnifiedHttpClient's status 0), a 5xx or a 409 may come after
      * the API processed the refund. Reporting a plain failure would invite the merchant to refund
      * again: the row stays pending (still counted as refunded) and the portal must be checked.
      *
@@ -507,7 +507,7 @@ class refundActionTest extends TestCase
         $logger = \Mockery::mock('Logger');
         $lock = \Mockery::mock('Lock');
         $payment_repository = \Mockery::mock('PaymentRepository');
-        $refund_repository = \Mockery::mock('UpcRefundRepository');
+        $refund_repository = \Mockery::mock('UnifiedRefundRepository');
         $payment_service = \Mockery::mock('UnifiedApiPaymentService');
         $order_adapter = \Mockery::mock('OrderAdapter');
         $validate_adapter = \Mockery::mock('ValidateAdapter');
@@ -545,10 +545,10 @@ class refundActionTest extends TestCase
 
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $module->shouldReceive('getService')
-            ->with('payplug.models.repositories.upc_refund')
+            ->with('payplug.models.repositories.unified_refund')
             ->andReturn($refund_repository);
 
         $factory->shouldReceive('createLogger')->andReturn($logger);

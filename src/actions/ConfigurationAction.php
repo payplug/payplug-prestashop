@@ -234,7 +234,7 @@ class ConfigurationAction
         // Install SQL
         $txt_log->info('Install SQL');
 
-        $this->forceAutoloadUpcRepositories();
+        $this->forceAutoloadUnifiedRepositories();
 
         if (!$this->dependencies->getPlugin()->getEntityRepository()->initialize()) {
             $txt_log->info('Install failed: Install SQL tables.');
@@ -1256,7 +1256,7 @@ class ConfigurationAction
         $txt_log->info('Remove module configuration successful');
 
         $txt_log->info('Drop module table');
-        $this->forceAutoloadUpcRepositories();
+        $this->forceAutoloadUnifiedRepositories();
 
         if (!$this->dependencies
             ->getPlugin()
@@ -1397,15 +1397,15 @@ class ConfigurationAction
      * these tables are neither missed on install nor left as orphans on uninstall. Add one
      * line here per such repository as new ones are introduced.
      */
-    private function forceAutoloadUpcRepositories()
+    private function forceAutoloadUnifiedRepositories()
     {
         $module = $this->dependencies
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name);
-        $module->getService('payplug.models.repositories.operation');
-        $module->getService('payplug.models.repositories.upc_lock');
-        $module->getService('payplug.models.repositories.alias');
-        $module->getService('payplug.models.repositories.upc_refund');
+        $module->getService('payplug.models.repositories.unified_operation');
+        $module->getService('payplug.models.repositories.unified_lock');
+        $module->getService('payplug.models.repositories.unified_alias');
+        $module->getService('payplug.models.repositories.unified_refund');
     }
 }

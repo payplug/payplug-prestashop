@@ -64,10 +64,10 @@ abstract class BasePrestashopAdapter17 extends TestCase
         $this->context->smarty->shouldReceive('assign')->byDefault();
         $this->context->link = \Mockery::mock('Link');
 
-        $this->alias_action = \Mockery::mock('AliasAction');
+        $this->alias_action = \Mockery::mock('UnifiedAliasAction');
         $this->alias_action->shouldReceive('renderCheckoutList')->andReturn([])->byDefault();
         $this->module = \Mockery::mock('Module');
-        $this->module->shouldReceive('getService')->with('payplug.action.alias')->andReturn($this->alias_action);
+        $this->module->shouldReceive('getService')->with('payplug.action.unified_alias')->andReturn($this->alias_action);
         $this->module_adapter = \Mockery::mock('ModuleAdapter');
         $this->module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($this->module);
 

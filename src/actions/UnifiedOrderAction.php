@@ -46,7 +46,7 @@ class UnifiedOrderAction
     public function __construct($dependencies = null)
     {
         // Accepts an already-built DependenciesClass so callers that have one (any front
-        // controller, OperationAction) can hand it over instead of paying for a second full
+        // controller, UnifiedPaymentAction) can hand it over instead of paying for a second full
         // PluginInit object-graph construction; falls back to building its own so this class
         // stays a normal no-argument src/actions/*Action per this repo's own convention for
         // any caller that doesn't have one at hand (e.g. tests using newInstanceWithoutConstructor
@@ -75,9 +75,9 @@ class UnifiedOrderAction
         if (null !== $existing_order) {
             // The order already exists: an abandoned one (error state) reconciled by a later
             // operation, or one whose paid state could not be applied (see
-            // OperationAction::resyncPendingOrder()). This call may carry newer information for
+            // UnifiedPaymentAction::resyncPendingOrder()). This call may carry newer information for
             // the SAME operation_id, so it is persisted/applied here, not discarded.
-            // OperationRepository::save() upserts by operation_id, and UpcOrderStateMutator's own
+            // UnifiedOperationRepository::save() upserts by operation_id, and UnifiedOrderStateMutator's own
             // guards make a stale/out-of-order replay (e.g. a late FAILED after a PAID) safe.
             //
             // ExecCodeMapper, the only source of $outcome for every caller, produces three outcomes:
@@ -88,8 +88,8 @@ class UnifiedOrderAction
             //   - FAILED (anything else): the order moves to the 'error' bucket.
             // REFUNDED/AUTHORIZED/CAPTURE_REQUIRED are unreachable here. Back-office refunds made
             // through the Unified API are notified on notify.php with a payment-shaped body:
-            // OperationAction::notifyAction() diverts them through the payplug_upc_refund lookup
-            // before this path, and UpcOrderStateMutator's refunded-order guard neutralises a late
+            // UnifiedPaymentAction::notifyAction() diverts them through the payplug_unified_refund lookup
+            // before this path, and UnifiedOrderStateMutator's refunded-order guard neutralises a late
             // payment webhook on an already-refunded order.
             if (!$existing_order['owned_by_payplug']) {
                 $this->logger()->error(
@@ -272,7 +272,7 @@ class UnifiedOrderAction
                 ? (string) $prestashop_adapter->getHostedFieldsIdentifier($iso_code)
                 : '';
 
-            $saved = $this->getService('payplug.models.repositories.alias')->saveIfAbsent(
+            $saved = $this->getService('payplug.models.repositories.unified_alias')->saveIfAbsent(
                 $id_customer,
                 $alias_id,
                 $iso_code,
@@ -367,7 +367,7 @@ class UnifiedOrderAction
     private function persistAndApplyOutcome($order_id, $operation_id, $exec_code, $outcome, $amount, $secure_key, $id_cart, $pending_alias = null, $card_details = [])
     {
         $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
-        $factory = $module->getService('payplug.utilities.service.unified_api_payment_service_factory');
+        $factory = $module->getService('payplug.unified.payment_service_factory');
         $outcome_applied = true;
 
         // An order whose total differs from the amount captured is never marked paid: it is put
@@ -495,7 +495,7 @@ class UnifiedOrderAction
     {
         $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
 
-        return $module->getService('payplug.utilities.service.unified_api_payment_service_factory')->createLogger();
+        return $module->getService('payplug.unified.payment_service_factory')->createLogger();
     }
 
     /**

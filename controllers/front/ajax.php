@@ -95,7 +95,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     exit($deleted ? '1' : '');
                 }
             } elseif ($tools->tool('getIsset', 'pa')) {
-                // Saved UHF alias (payplug_alias), distinct from the pc (payplug_card) block above.
+                // Saved UHF alias (payplug_unified_alias), distinct from the pc (payplug_card) block above.
                 // Same response body as the pc block ('1' / empty).
                 if (1 == (int) $tools->tool('getValue', 'delete')) {
                     // Same ownership and token rules as the pc block: the customer of the context.
@@ -107,7 +107,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                         ->getPlugin()
                         ->getModule()
                         ->getInstanceByName($this->dependencies->name)
-                        ->getService('payplug.action.alias')
+                        ->getService('payplug.action.unified_alias')
                         ->deleteAction($id_customer, (int) $tools->tool('getValue', 'pa'));
 
                     exit($deleted ? '1' : '');

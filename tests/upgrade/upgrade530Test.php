@@ -36,7 +36,7 @@ class upgrade530Test extends TestCase
         ]);
 
         $this->assertContains(
-            'ALTER TABLE `ps_payplug_upc_operation` ADD COLUMN `requested_amount` INT(11) UNSIGNED NULL AFTER `payment_id`',
+            'ALTER TABLE `ps_payplug_unified_operation` ADD COLUMN `requested_amount` INT(11) UNSIGNED NULL AFTER `payment_id`',
             $queries
         );
     }

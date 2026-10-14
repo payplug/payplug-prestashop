@@ -28,8 +28,8 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PayPlug\classes\DependenciesClass;
-use PayPlug\src\models\classes\UpcRefundExecCode;
-use PayPlug\src\models\repositories\UpcRefundRepository;
+use PayPlug\src\models\repositories\UnifiedRefundRepository;
+use PayPlug\src\unified\helpers\UnifiedRefundExecCode;
 use PayPlug\src\utilities\traits\ServiceGetter;
 use PayplugUnifiedCore\Exceptions\ApiException;
 use PayplugUnifiedCore\Exceptions\InvalidRefundRequestException;
@@ -46,8 +46,8 @@ class UnifiedRefundAction
      */
     public const LOCK_KEY_PREFIX = 'uhf_refund:';
 
-    private const FACTORY_SERVICE = 'payplug.utilities.service.unified_api_payment_service_factory';
-    private const REFUND_REPOSITORY_SERVICE = 'payplug.models.repositories.upc_refund';
+    private const FACTORY_SERVICE = 'payplug.unified.payment_service_factory';
+    private const REFUND_REPOSITORY_SERVICE = 'payplug.models.repositories.unified_refund';
 
     /**
      * Placeholder refund_operation_id of the row recorded before createRefund() is called,
@@ -57,7 +57,7 @@ class UnifiedRefundAction
 
     /**
      * Above the worst case of token fetch + refund POST + 401 token refresh + refund POST,
-     * with CurlHttpClient's 15 s timeout per call (about 60 s).
+     * with UnifiedHttpClient's 15 s timeout per call (about 60 s).
      */
     private const REFUND_LOCK_TTL = 90;
 
@@ -150,7 +150,7 @@ class UnifiedRefundAction
         }
 
         // The refund endpoint is keyed by the payment's own id, bound to the operation by
-        // OperationAction::createAction() - the operation id is rejected with a 400
+        // UnifiedPaymentAction::createAction() - the operation id is rejected with a 400
         // ("The reference transaction has not been found.").
         $payment_id = $payment_repository->getPaymentIdByOperationId($payment_operation->operationId);
         if (null === $payment_id) {
@@ -245,8 +245,8 @@ class UnifiedRefundAction
                     . ' carries no execCode, assumed accepted (response keys: '
                     . (is_array($decoded) ? implode(', ', array_keys($decoded)) : 'none, not JSON') . ')');
             } else {
-                $classification = UpcRefundExecCode::classify($exec_code);
-                if (UpcRefundExecCode::DECLINED === $classification) {
+                $classification = UnifiedRefundExecCode::classify($exec_code);
+                if (UnifiedRefundExecCode::DECLINED === $classification) {
                     // A synchronous decline moved no money: the order state is left untouched.
                     $logger->error('UnifiedRefundAction::refundAction - Refund of ' . $amount . ' declined for order ' . $order->id
                         . ' (execCode ' . $exec_code . ')');
@@ -254,7 +254,7 @@ class UnifiedRefundAction
 
                     return $this->errorResult($translations['error']['default']);
                 }
-                if (UpcRefundExecCode::UNKNOWN === $classification) {
+                if (UnifiedRefundExecCode::UNKNOWN === $classification) {
                     return $this->uncertainResult($logger, $translations, $intent_id, $amount, $order->id, 'undocumented execCode ' . $exec_code);
                 }
             }
@@ -373,7 +373,7 @@ class UnifiedRefundAction
      * @description Free the amount of a refund that did not go through; when that fails, the row
      *              stays pending (still counted as refunded), the safe direction
      *
-     * @param UpcRefundRepository $refund_repository
+     * @param UnifiedRefundRepository $refund_repository
      * @param object $logger
      * @param string $intent_id
      * @param int $id_order
@@ -381,7 +381,7 @@ class UnifiedRefundAction
     private function markFailed($refund_repository, $logger, $intent_id, $id_order)
     {
         try {
-            $failed = $refund_repository->updateStatusIfPending($intent_id, UpcRefundRepository::STATUS_FAILED);
+            $failed = $refund_repository->updateStatusIfPending($intent_id, UnifiedRefundRepository::STATUS_FAILED);
         } catch (\Throwable $exception) {
             $failed = false;
         }

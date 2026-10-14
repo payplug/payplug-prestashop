@@ -60,7 +60,7 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
             'id_cart' => $this->toolsAdapter->tool('getValue', 'id_cart'),
             'static_token' => $this->toolsAdapter->tool('getValue', 'static_token'),
             // 'challenge'/'return' resolve their cart from this opaque, unguessable token instead
-            // of a client-supplied id_cart - see OperationAction::createAction()/resolveIdCartFromToken().
+            // of a client-supplied id_cart - see UnifiedPaymentAction::createAction()/resolveIdCartFromToken().
             'token' => $this->toolsAdapter->tool('getValue', 'token'),
         ];
 
@@ -101,7 +101,7 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
      */
     private function handleCreate($params)
     {
-        $result = $this->getService('payplug.action.operation')->dispatchAction('create', $params);
+        $result = $this->getService('payplug.action.unified_payment')->dispatchAction('create', $params);
 
         header('Content-Type: application/json');
 
@@ -115,7 +115,7 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
      */
     private function handleChallenge($params)
     {
-        $result = $this->getService('payplug.action.operation')->dispatchAction('challenge', $params);
+        $result = $this->getService('payplug.action.unified_payment')->dispatchAction('challenge', $params);
 
         if (!$result['result']) {
             $this->renderClientRedirect($this->getService('payplug.action.unified_order')->errorUrl());
@@ -138,7 +138,7 @@ class PayplugUnifiedModuleFrontController extends ModuleFrontController
      */
     private function handleReturn($params)
     {
-        $result = $this->getService('payplug.action.operation')->dispatchAction('return', $params);
+        $result = $this->getService('payplug.action.unified_payment')->dispatchAction('return', $params);
 
         $redirect_url = isset($result['redirect_url']) ? $result['redirect_url'] : $this->getService('payplug.action.unified_order')->errorUrl();
 

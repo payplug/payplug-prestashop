@@ -26,9 +26,9 @@ class renderDetailTest extends BaseOrderAction
             'getConstant' => $this->constant,
         ]);
         $this->configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn('0');
-        $this->operation_action = \Mockery::mock('OperationAction');
+        $this->operation_action = \Mockery::mock('UnifiedPaymentAction');
         $this->operation_action->shouldReceive('resyncPendingOrder')->andReturn(false)->byDefault();
-        $this->module->shouldReceive('getService')->with('payplug.action.operation')->andReturn($this->operation_action);
+        $this->module->shouldReceive('getService')->with('payplug.action.unified_payment')->andReturn($this->operation_action);
     }
 
     public function tearDown(): void
@@ -344,8 +344,8 @@ class renderDetailTest extends BaseOrderAction
         $this->payment_repository->shouldReceive(['getBy' => ['resource_id' => 'pay_azerty12345', 'method' => 'standard']]);
         $this->validate_adapter->shouldReceive(['validate' => true]);
         $this->module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
-            ->andThrow(new \Exception("Table 'ps_payplug_upc_operation' doesn't exist"));
+            ->with('payplug.unified.payment_service_factory')
+            ->andThrow(new \Exception("Table 'ps_payplug_unified_operation' doesn't exist"));
 
         $result = $this->action->renderDetail(42);
 
@@ -412,15 +412,15 @@ class renderDetailTest extends BaseOrderAction
     private function mockUnifiedServices($paid_operation, $refunded_cents)
     {
         $factory = \Mockery::mock('Factory');
-        $operation_repository = \Mockery::mock('OperationRepository');
-        $refund_repository = \Mockery::mock('UpcRefundRepository');
+        $operation_repository = \Mockery::mock('UnifiedOperationRepository');
+        $refund_repository = \Mockery::mock('UnifiedRefundRepository');
         $amount_helper = new AmountHelper(\Mockery::mock('Dependencies'));
         $price_adapter = \Mockery::mock('PriceAdapter');
 
         $this->module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
-        $this->module->shouldReceive('getService')->with('payplug.models.repositories.upc_refund')->andReturn($refund_repository);
+        $this->module->shouldReceive('getService')->with('payplug.models.repositories.unified_refund')->andReturn($refund_repository);
         $this->module->shouldReceive('getService')->with('payplug.utilities.helper.amount')->andReturn($amount_helper);
         $this->module->shouldReceive('getService')->with('payplug.application.adapter.price')->andReturn($price_adapter);
         $factory->shouldReceive('createPaymentRepository')->andReturn($operation_repository);

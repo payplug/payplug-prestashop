@@ -34,21 +34,21 @@ class uninstallActionTest extends BaseConfigurationAction
         $this->entity_repository = \Mockery::mock('EntityRepository');
 
         $this->module->shouldReceive('getService')
-            ->with('payplug.models.repositories.operation')
-            ->andReturn(\Mockery::mock('OperationRepository'));
+            ->with('payplug.models.repositories.unified_operation')
+            ->andReturn(\Mockery::mock('UnifiedOperationRepository'));
 
         $this->module->shouldReceive('getService')
-            ->with('payplug.models.repositories.upc_lock')
-            ->andReturn(\Mockery::mock('UpcLockRepository'));
+            ->with('payplug.models.repositories.unified_lock')
+            ->andReturn(\Mockery::mock('UnifiedLockRepository'));
 
         $this->module->shouldReceive('getService')
-            ->with('payplug.models.repositories.alias')
-            ->andReturn(\Mockery::mock('AliasRepository'))
+            ->with('payplug.models.repositories.unified_alias')
+            ->andReturn(\Mockery::mock('UnifiedAliasRepository'))
             ->byDefault();
 
         $this->module->shouldReceive('getService')
-            ->with('payplug.models.repositories.upc_refund')
-            ->andReturn(\Mockery::mock('UpcRefundRepository'));
+            ->with('payplug.models.repositories.unified_refund')
+            ->andReturn(\Mockery::mock('UnifiedRefundRepository'));
 
         $this->plugin->shouldReceive([
             'getCardAction' => $this->card_action,
@@ -159,7 +159,7 @@ class uninstallActionTest extends BaseConfigurationAction
         );
     }
 
-    public function testLoadsTheAliasRepositoryBeforeDroppingTables()
+    public function testLoadsTheUnifiedAliasRepositoryBeforeDroppingTables()
     {
         $this->card_action->shouldReceive([
             'uninstallAction' => true,
@@ -169,8 +169,8 @@ class uninstallActionTest extends BaseConfigurationAction
         ]);
         $this->module->shouldReceive('getService')
             ->once()
-            ->with('payplug.models.repositories.alias')
-            ->andReturn(\Mockery::mock('AliasRepository'));
+            ->with('payplug.models.repositories.unified_alias')
+            ->andReturn(\Mockery::mock('UnifiedAliasRepository'));
         $this->entity_repository->shouldReceive([
             'uninstall' => false,
         ]);
