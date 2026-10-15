@@ -83,6 +83,11 @@ You also could replace all the line :
 
     ajax_url: '/admin-dev/index.php?controller=AdminPayplug&token=c53743c9dea09997bfb2d06ee2a4612a',
 
+### Log in to the back office first
+The REST routes (`rest_route=...`) are only answered for an authenticated employee, like any other back-office request: the module no longer serves them to requests whose `Referer` contains `localhost` (PRE-3735).
+Before using the dev server, log in to the PrestaShop back office in the same browser, on the same host as the dev server (cookies are shared between ports of a host, not between hosts: use `localhost` for both, not `localhost` and `127.0.0.1`), and keep a valid `token` for `AdminPayplug` in `ajax_url`.
+If the dev server gets a `302` to `AdminLogin` or an "Invalid token" page instead of JSON, the session cookie or the token is missing.
+
 
 ### Update the library
 When your development are done, it last the update of your branch.
