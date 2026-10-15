@@ -309,7 +309,7 @@ class QueryRepository
         return $this->dependencies->getPlugin()->getQueryAdapter()->getValue($id);
     }
 
-    public function build($param = false)
+    public function build($param = false, $use_cache = true)
     {
         if ('SELECT' == $this->query['type']) {
             $sql = 'SELECT ' . ($this->query['fields'] ? implode(",\n", $this->query['fields']) : '*') . "\n";
@@ -430,7 +430,7 @@ class QueryRepository
         }
 
         try {
-            $result = $this->dependencies->getPlugin()->getQueryAdapter()->query($sql);
+            $result = $this->dependencies->getPlugin()->getQueryAdapter()->query($sql, $use_cache);
         } catch (\Exception $e) {
             $this->dependencies
                 ->getPlugin()

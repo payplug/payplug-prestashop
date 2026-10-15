@@ -58,10 +58,11 @@ class OrderRepository extends EntityRepository
      * @description Get all order for a given cart id
      *
      * @param int $cart_id
+     * @param bool $use_cache false reads from the database even when the PrestaShop SQL cache is enabled
      *
      * @return array
      */
-    public function getByIdCart($cart_id = 0)
+    public function getByIdCart($cart_id = 0, $use_cache = true)
     {
         if (!is_int($cart_id) || !$cart_id) {
             return [];
@@ -72,7 +73,7 @@ class OrderRepository extends EntityRepository
             ->fields('*')
             ->from($this->getTableName($this->table_name))
             ->where('id_cart = ' . (int) $cart_id)
-            ->build();
+            ->build(false, $use_cache);
 
         return $result ?: [];
     }

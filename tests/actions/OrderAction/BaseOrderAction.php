@@ -21,6 +21,7 @@ abstract class BaseOrderAction extends TestCase
     protected $module_adapter;
     protected $order_adapter;
     protected $order_class;
+    protected $order_lock;
     protected $order_repository;
     protected $payment_method;
     protected $payment_method_class;
@@ -54,6 +55,18 @@ abstract class BaseOrderAction extends TestCase
         $this->module_adapter->shouldReceive([
             'getInstanceByName' => $this->module,
         ]);
+
+        $this->order_lock = \Mockery::mock('OrderLock');
+        $this->order_lock->shouldReceive('acquire')
+            ->andReturn(true)
+            ->byDefault();
+        $this->order_lock->shouldReceive('release')
+            ->andReturn(true)
+            ->byDefault();
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.models.classes.order_lock')
+            ->andReturn($this->order_lock);
 
         $this->payment_method_class->shouldReceive([
             'getPaymentMethod' => $this->payment_method,

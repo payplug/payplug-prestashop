@@ -33,6 +33,8 @@ class QueryAdapter implements QueryInterface
 {
     private $db;
 
+    private $last_error = '';
+
     public function __construct()
     {
         try {
@@ -47,10 +49,11 @@ class QueryAdapter implements QueryInterface
      * @description Called from src/repositories/QueryRepository.php
      *
      * @param $SQLRequest
+     * @param bool $use_cache false reads from the database even when the PrestaShop SQL cache is enabled
      *
      * @return mixed
      */
-    public function query($SQLRequest)
+    public function query($SQLRequest, $use_cache = true)
     {
         try {
             $action = 'execute';
@@ -60,7 +63,11 @@ class QueryAdapter implements QueryInterface
                 $action = 'executeS';
             }
 
-            return $this->db->{$action}($SQLRequest);
+            if ('executeS' == $action) {
+                return $this->db->executeS($SQLRequest, true, (bool) $use_cache);
+            }
+
+            return $this->db->execute($SQLRequest, (bool) $use_cache);
         } catch (\Exception $e) {
             // todo add log
             return false;
@@ -81,5 +88,65 @@ class QueryAdapter implements QueryInterface
     public function escape($string, $htmlOK = false)
     {
         return $this->db->escape($string, $htmlOK);
+    }
+
+    /**
+     * @description Take a MySQL named lock, waiting up to $timeout seconds.
+     * The SQL cache is bypassed so a stale result is never returned.
+     *
+     * @param string $name
+     * @param int $timeout
+     *
+     * @return mixed '1' when acquired, '0' on timeout, null or false on error
+     */
+    public function getNamedLock($name = '', $timeout = 0)
+    {
+        return $this->getLockValue("SELECT GET_LOCK('" . pSQL($name) . "', " . (int) $timeout . ')');
+    }
+
+    /**
+     * @description Release a MySQL named lock held by the current connection
+     *
+     * @param string $name
+     *
+     * @return mixed '1' when released, '0' or null when the lock was not held, false on error
+     */
+    public function releaseNamedLock($name = '')
+    {
+        return $this->getLockValue("SELECT RELEASE_LOCK('" . pSQL($name) . "')");
+    }
+
+    /**
+     * @description Cause of the last failed named lock query, empty when it succeeded
+     *
+     * @return string
+     */
+    public function getLastError()
+    {
+        return $this->last_error;
+    }
+
+    /**
+     * @param string $sql
+     *
+     * @return mixed
+     */
+    private function getLockValue($sql)
+    {
+        $this->last_error = '';
+
+        try {
+            $value = $this->db->getValue($sql, false);
+        } catch (\Exception $e) {
+            $this->last_error = $e->getMessage();
+
+            return false;
+        }
+
+        if (false === $value) {
+            $this->last_error = (string) $this->db->getMsgError();
+        }
+
+        return $value;
     }
 }

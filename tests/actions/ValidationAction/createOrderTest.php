@@ -67,6 +67,7 @@ class createOrderTest extends BaseValidationAction
             [
                 'result' => true,
                 'id_order' => 0,
+                'locked' => true,
             ],
             $this->action->createOrder($this->cart_id)
         );
