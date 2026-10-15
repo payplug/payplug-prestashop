@@ -28,6 +28,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\utilities\helpers\PhoneFormatHelper;
 
 class PaymentMethod
 {
@@ -1089,7 +1090,7 @@ class PaymentMethod
         $payment = $this->api_service->createPayment($payment_tab);
 
         if (200 != (int) $payment['code']) {
-            return $this->processPaymentError((int) $payment['code'], $payment_tab);
+            return $this->processPaymentError((int) $payment['code'], $payment_tab, $payment);
         }
 
         return $payment;
@@ -1532,8 +1533,7 @@ class PaymentMethod
             $billing['company_name'] = empty($billing['company_name'])
                 ? $billing['first_name'] . ' ' . $billing['last_name']
                 : $billing['company_name'];
-            $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: $billing['mobile_phone_number'];
-            $billing['mobile_phone_number'] = $billing['mobile_phone_number'] ?: $billing['landline_phone_number'];
+            $billing = $this->completePhoneNumbers($billing);
 
             // Set shipping informations
             $delivery_type = 'NEW';
@@ -1565,8 +1565,7 @@ class PaymentMethod
             $shipping['company_name'] = empty($shipping['company_name'])
                 ? $shipping['first_name'] . ' ' . $shipping['last_name']
                 : $shipping['company_name'];
-            $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: $shipping['mobile_phone_number'];
-            $shipping['mobile_phone_number'] = $shipping['mobile_phone_number'] ?: $shipping['landline_phone_number'];
+            $shipping = $this->completePhoneNumbers($shipping);
 
             $payment_tab['shipping'] = $shipping;
             $payment_tab['billing'] = $billing;
@@ -1576,17 +1575,39 @@ class PaymentMethod
     }
 
     /**
-     * Formats a phone number to E.164 for the Payplug API, returning null
-     * if it cannot be parsed or is not valid for the given country — the
-     * safe-fallback contract previously provided by the deprecated
-     * PhoneNumber::formatPhoneNumber() service.
+     * @description Copy the available phone number into the empty phone field of an
+     *              address; a field without a number is null, never an empty string.
      *
-     * Returning null rather than an empty string matters downstream: an
-     * empty string reads as "a phone number was supplied and it's blank",
-     * while null reads as "no phone number available" — the contract every
-     * other caller here (ApplepayPaymentMethod, OneyPaymentMethod, and the
-     * billing/shipping arrays built by getDefaultPaymentTab()) already uses
-     * for an absent phone number.
+     * @return array
+     */
+    protected function completePhoneNumbers(array $address)
+    {
+        $landline = !empty($address['landline_phone_number']) ? $address['landline_phone_number'] : null;
+        $mobile = !empty($address['mobile_phone_number']) ? $address['mobile_phone_number'] : null;
+
+        $address['landline_phone_number'] = $landline ?: $mobile;
+        $address['mobile_phone_number'] = $mobile ?: $landline;
+
+        return $address;
+    }
+
+    /**
+     * @description Whether the phone numbers sent for this payment method must belong
+     *              to the address country (see PhoneFormatHelper::toE164()).
+     *
+     * @return bool
+     */
+    protected function isPhoneRegionStrict()
+    {
+        return false;
+    }
+
+    /**
+     * Formats a phone number to E.164 for the Payplug API, returning null
+     * if it cannot be parsed or is not accepted for the given country.
+     *
+     * The Payplug API refuses an empty string phone number but accepts a
+     * null one, which reads as "no phone number available".
      *
      * @param string $phone_number
      * @param string $iso_code
@@ -1600,7 +1621,11 @@ class PaymentMethod
         }
 
         try {
-            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164((string) $phone_number, (string) $iso_code);
+            return PhoneFormatHelper::toE164(
+                (string) $phone_number,
+                (string) $iso_code,
+                $this->isPhoneRegionStrict()
+            );
         } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
             $this->dependencies
                 ->getPlugin()
@@ -1637,6 +1662,54 @@ class PaymentMethod
         $visible_suffix = substr($phone_number, -2);
 
         return $visible_prefix . str_repeat('*', $length - 5) . $visible_suffix;
+    }
+
+    /**
+     * @description Mask every phone-number-like sequence of a text for logging.
+     *
+     * @param string $text
+     *
+     * @return string
+     */
+    protected function maskPhoneNumbersInText($text)
+    {
+        return preg_replace_callback('/\+?\d[\d .()\/-]{6,}\d/', function ($matches) {
+            return $this->maskPhoneNumberForLogging($matches[0]);
+        }, (string) $text);
+    }
+
+    /**
+     * @description Build the refusal reason to log from a failed API call response:
+     *              the API error message and its error type and field details.
+     *
+     * @param array $api_response
+     *
+     * @return string
+     */
+    protected function getApiRefusalReason($api_response = [])
+    {
+        if (!is_array($api_response)) {
+            return '';
+        }
+
+        $details = isset($api_response['details']) && is_array($api_response['details'])
+            ? $api_response['details']
+            : [];
+
+        $message = '';
+        if (isset($details['message']) && is_string($details['message'])) {
+            $message = $details['message'];
+        } elseif (isset($api_response['message']) && is_string($api_response['message'])) {
+            $message = $api_response['message'];
+        }
+
+        $reason = '' !== $message ? ': ' . $message : '';
+        $error_details = array_intersect_key($details, array_flip(['error_type', 'details']));
+        if (!empty($error_details)) {
+            $reason .= '; details: ' . json_encode($error_details, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
+        return $reason;
     }
 
     /**
@@ -1816,11 +1889,21 @@ class PaymentMethod
      *
      * @param $error_code
      * @param $payment_tab
+     * @param array $api_response response of the failed API call
      *
      * @return array
      */
-    protected function processPaymentError($error_code = 0, $payment_tab = [])
+    protected function processPaymentError($error_code = 0, $payment_tab = [], $api_response = [])
     {
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog(
+                'PaymentMethod::processPaymentError() - Payment resource creation failed (HTTP ' . (int) $error_code . ')'
+                    . $this->maskPhoneNumbersInText($this->getApiRefusalReason($api_response)),
+                'error'
+            );
+
         // If the payment resource can't be created due to bad permission, we update the feature activation
         if (403 == $error_code) {
             $cart = $this->dependencies

@@ -24,6 +24,7 @@
 namespace PayPlug\src\models\classes\paymentMethod;
 
 use PayPlug\src\models\classes\Oney\OneyAccountData;
+use PayPlug\src\utilities\helpers\PhoneFormatHelper;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -1269,13 +1270,18 @@ class OneyPaymentMethod extends PaymentMethod
     }
 
     /**
-     * Determines whether a phone number is a mobile line for the given
-     * country, returning false if it cannot be parsed or is not valid —
-     * the safe-fallback contract previously provided by the deprecated
-     * PhoneHelper::isMobilePhoneNumber() helper and paymentValidator::
-     * isValidMobilePhoneNumber() validator (using only its boolean
-     * result, since every call site only ever used ['result'], never
-     * ['message']) — both now delegate to the same underlying check.
+     * @description Oney only accepts phone numbers belonging to the address country.
+     *
+     * @return bool
+     */
+    protected function isPhoneRegionStrict()
+    {
+        return true;
+    }
+
+    /**
+     * Determines whether a phone number is a mobile line accepted for the
+     * given country, returning false if it cannot be parsed or is not valid.
      *
      * @param string $iso_code
      * @param string $phone_number
@@ -1288,11 +1294,7 @@ class OneyPaymentMethod extends PaymentMethod
             return false;
         }
 
-        try {
-            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::isMobile((string) $phone_number, (string) $iso_code);
-        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
-            return false;
-        }
+        return PhoneFormatHelper::isMobile((string) $phone_number, $iso_code, $this->isPhoneRegionStrict());
     }
 
     /**
