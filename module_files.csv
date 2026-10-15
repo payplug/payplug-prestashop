@@ -13759,6 +13759,7 @@ src/interfaces/ValidateInterface.php
 src/interfaces/index.php
 src/models/classes/Address.php
 src/models/classes/ApiRest.php
+src/models/classes/ApmEligibility.php
 src/models/classes/Configuration.php
 src/models/classes/Country.php
 src/models/classes/Hook.php
@@ -14379,6 +14380,7 @@ upgrade/upgrade-4.9.0.php
 upgrade/upgrade-5.1.0.php
 upgrade/upgrade-5.2.0.php
 upgrade/upgrade-5.2.2.php
+upgrade/upgrade-5.3.0.php
 vendor/autoload.php
 vendor/composer/ClassLoader.php
 vendor/composer/InstalledVersions.php

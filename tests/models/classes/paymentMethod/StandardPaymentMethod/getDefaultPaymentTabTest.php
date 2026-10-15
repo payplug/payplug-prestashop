@@ -2,6 +2,8 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
 /**
  * @group unit
  * @group class
@@ -10,6 +12,10 @@ namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
  */
 class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
 {
+    use MockeryPHPUnitIntegration;
+
+    protected $validate_amount_calls;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -23,11 +29,15 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR');
-        $this->helpers['amount']->shouldReceive([
-            'validateAmount' => [
-                'result' => true,
-            ],
-        ]);
+        $this->validate_amount_calls = [];
+        $this->helpers['amount']->shouldReceive('validateAmount')
+            ->andReturnUsing(function () {
+                $this->validate_amount_calls[] = func_get_args();
+
+                return [
+                    'result' => true,
+                ];
+            });
         $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $arg) {
                 switch ($method) {
@@ -155,5 +165,37 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
     {
         $this->assertSame('+33*******78', $this->class->maskPhoneNumberForLogging('+33612345678'));
         $this->assertSame('*****', $this->class->maskPhoneNumberForLogging('01234'));
+    }
+
+    public function testCardPaymentIsNotCheckedAgainstApmLimits()
+    {
+        $apm_eligibility = \Mockery::mock('ApmEligibility');
+        $apm_eligibility->shouldReceive([
+            'isPpro' => false,
+        ]);
+        $apm_eligibility->shouldNotReceive('isEligible');
+        $this->class->set('apm_eligibility', $apm_eligibility);
+
+        $this->assertNotEmpty($this->class->getDefaultPaymentTab());
+    }
+
+    public function testTheCartAmountIsValidatedInTheCartCurrency()
+    {
+        $this->class->getDefaultPaymentTab();
+
+        $this->assertSame(
+            [[['min' => 'EUR:30', 'max' => 'EUR:2000000'], 42.42, 'EUR']],
+            $this->validate_amount_calls
+        );
+    }
+
+    public function testCardAmountIsLeftToTheApiWhenNoLimitIsCached()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('amounts')
+            ->andReturn('{}');
+
+        $this->assertNotEmpty($this->class->getDefaultPaymentTab());
+        $this->assertSame([], $this->validate_amount_calls);
     }
 }

@@ -541,6 +541,83 @@ class API
     }
 
     /**
+     * @description Map the amount bounds and allowed countries of each payment method
+     *              returned by GET /account onto the stored `amounts` and `countries`
+     *              configurations. Bounds are stored as `ISO:cents` entries joined by `;`,
+     *              in the order the API returns the currencies. `allowed_countries` set to
+     *              `ALL` or empty lifts the stored restriction; a missing or malformed
+     *              field keeps the stored value.
+     *
+     * @param array $payment_methods `payment_methods` object of the account response
+     * @param array $amounts currently stored amounts
+     * @param array $countries currently stored countries
+     *
+     * @return array ['amounts' => array, 'countries' => array]
+     */
+    public function mapPaymentMethodsLimits($payment_methods = [], $amounts = [], $countries = [])
+    {
+        $amounts = is_array($amounts) ? $amounts : [];
+        $countries = is_array($countries) ? $countries : [];
+
+        if (!is_array($payment_methods)) {
+            return [
+                'amounts' => $amounts,
+                'countries' => $countries,
+            ];
+        }
+
+        foreach ($payment_methods as $name => $payment_method) {
+            if (!is_array($payment_method)) {
+                continue;
+            }
+
+            foreach (['min', 'max'] as $bound) {
+                $key = $bound . '_amounts';
+                if (!isset($payment_method[$key]) || !is_array($payment_method[$key])) {
+                    continue;
+                }
+
+                $entries = [];
+                foreach ($payment_method[$key] as $currency => $value) {
+                    if (is_string($currency) && is_numeric($value)) {
+                        $entries[] = strtoupper($currency) . ':' . (int) $value;
+                    }
+                }
+                if (!empty($entries)) {
+                    $amounts[$name][$bound] = implode(';', $entries);
+                }
+            }
+
+            if (!isset($payment_method['allowed_countries']) || !is_array($payment_method['allowed_countries'])) {
+                continue;
+            }
+
+            $allowed_countries = $payment_method['allowed_countries'];
+            if (empty($allowed_countries) || in_array('ALL', $allowed_countries, true)) {
+                unset($countries[$name]);
+
+                continue;
+            }
+
+            $iso_codes = [];
+            foreach ($allowed_countries as $iso_code) {
+                $iso_code = is_string($iso_code) ? strtoupper(trim($iso_code)) : '';
+                if (preg_match('/^[A-Z]{2}$/', $iso_code) && !in_array($iso_code, $iso_codes, true)) {
+                    $iso_codes[] = $iso_code;
+                }
+            }
+            if (!empty($iso_codes)) {
+                $countries[$name] = $iso_codes;
+            }
+        }
+
+        return [
+            'amounts' => $amounts,
+            'countries' => $countries,
+        ];
+    }
+
+    /**
      * @description get the api url
      *
      * @return string
@@ -1359,23 +1436,11 @@ class API
                 if ('apple_pay' == $payment_method_name && isset($payment_method['allowed_domain_names'])) {
                     $permissions['apple_pay_allowed_domains'] = $payment_method['allowed_domain_names'];
                 }
-
-                // then check the amount related to the feature..
-                if (array_key_exists('min_amounts', $payment_method)) {
-                    $configuration['amounts'][$payment_method_name]['min'] = 'EUR:' . $payment_method['min_amounts']['EUR'];
-                }
-                if (array_key_exists('max_amounts', $payment_method)) {
-                    $configuration['amounts'][$payment_method_name]['max'] = 'EUR:' . $payment_method['max_amounts']['EUR'];
-                }
-
-                // then check the country restriction related to the feature
-                if (array_key_exists('allowed_countries', $payment_method)) {
-                    $allowed_countries = $payment_method['allowed_countries'];
-                    if (!empty($allowed_countries) && !in_array('ALL', $allowed_countries)) {
-                        $configuration['countries'][$payment_method_name] = $payment_method['allowed_countries'];
-                    }
-                }
             }
+
+            $limits = $this->mapPaymentMethodsLimits($payment_methods, $configuration['amounts'], $configuration['countries']);
+            $configuration['amounts'] = $limits['amounts'];
+            $configuration['countries'] = $limits['countries'];
 
             // Check oney onboarding
             if ($configuration_class->getValue('live_api_key')) {

@@ -28,6 +28,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PayPlug\src\exceptions\BadParameterException;
+use PayPlug\src\models\classes\ApmEligibility;
 
 class PaymentMethod
 {
@@ -39,6 +40,10 @@ class PaymentMethod
 
     /** @var bool */
     public $refundable;
+
+    /** @var object */
+    protected $apm_eligibility;
+
     /** @var object */
     protected $api_service;
 
@@ -307,7 +312,7 @@ class PaymentMethod
             $current_configuration[$this->name] = $default_payment_method[$this->name];
         }
 
-        return [
+        $option = [
             'type' => 'payment_method',
             'name' => $this->name,
             'title' => $this->translation[$this->name]['title'],
@@ -333,6 +338,12 @@ class PaymentMethod
                 ],
             ],
         ];
+
+        if ($this->getApmEligibility()->isPpro($this->name)) {
+            $option = $this->addApmRestrictionOptions($option);
+        }
+
+        return $option;
     }
 
     /**
@@ -1101,7 +1112,8 @@ class PaymentMethod
      *              in cents) and mapped in API::treatAccountResponse(). Payment methods the
      *              account exposes no specific range for fall back on the account default.
      *
-     * @return array Limits as `ISO:amount` strings, e.g. `['min' => 'EUR:500', 'max' => 'EUR:400000']`
+     * @return array Limits as `ISO:amount` strings, e.g. `['min' => 'EUR:500', 'max' => 'EUR:400000']`,
+     *               empty when no limit is cached
      */
     public function getPriceLimit()
     {
@@ -1109,7 +1121,23 @@ class PaymentMethod
 
         $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
 
-        return isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
+        if (isset($payplug_amounts[$this->name])) {
+            return $payplug_amounts[$this->name];
+        }
+
+        return isset($payplug_amounts['default']) ? $payplug_amounts['default'] : [];
+    }
+
+    /**
+     * @return ApmEligibility
+     */
+    public function getApmEligibility()
+    {
+        if (null === $this->apm_eligibility) {
+            $this->apm_eligibility = new ApmEligibility($this->dependencies);
+        }
+
+        return $this->apm_eligibility;
     }
 
     /**
@@ -1410,16 +1438,28 @@ class PaymentMethod
             return [];
         }
 
-        // Check amount
-        $price_limit = $this->getPriceLimit();
         $cart_amount = $this->context->cart->getOrderTotal(true);
-        $is_valid_amount = $this->dependencies
-            ->getHelpers()['amount']
-            ->validateAmount($price_limit, (float) $cart_amount);
-        if (!$is_valid_amount['result']) {
-            $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
 
-            return [];
+        // The cart or the billing address may have changed since the payment options were displayed
+        if ($this->getApmEligibility()->isPpro($this->name)) {
+            $eligibility = $this->checkApmEligibility();
+            if (!$eligibility['result']) {
+                $this->logger->addLog('PaymentMethod::getPaymentTab() - ' . $this->name . ' is not eligible for the current cart: ' . $eligibility['reason'] . '.');
+
+                return [];
+            }
+        } else {
+            $price_limit = $this->getPriceLimit();
+            if (!empty($price_limit)) {
+                $is_valid_amount = $this->dependencies
+                    ->getHelpers()['amount']
+                    ->validateAmount($price_limit, (float) $cart_amount, $this->context->currency->iso_code);
+                if (!$is_valid_amount['result']) {
+                    $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
+
+                    return [];
+                }
+            }
         }
 
         $payment_tab = [
@@ -1640,6 +1680,167 @@ class PaymentMethod
     }
 
     /**
+     * @description Add the back office fields letting the merchant narrow the amount range
+     *              and the billing countries of a PPRO payment method within the limits
+     *              of the Payplug account. `countries.value` lists the selected countries
+     *              (every selectable country by default, possibly none); amounts are in
+     *              the back office currency unit.
+     *
+     * @param array $option
+     *
+     * @return array
+     */
+    protected function addApmRestrictionOptions($option = [])
+    {
+        $apm_eligibility = $this->getApmEligibility();
+        $currency = $apm_eligibility->getBackOfficeCurrency($this->name);
+        $api_limits = $apm_eligibility->getApiLimits($this->name, $currency);
+        if (!$api_limits['configured']) {
+            return $option;
+        }
+
+        $limits = $apm_eligibility->getEffectiveLimits($this->name, $currency);
+        $translation = $this->translation['apm'];
+
+        $api_min = $this->formatCentsForDisplay($api_limits['min']);
+        $api_max = $this->formatCentsForDisplay($api_limits['max']);
+        $option['advanced_options'][] = [
+            'name' => 'thresholds',
+            'image_url' => $this->img_path . 'oney/' . $this->dependencies->name . '-thresholds.jpg',
+            'title' => $translation['thresholds']['title'],
+            'descriptions' => [
+                'description' => $translation['thresholds']['description'],
+                'min_amount' => [
+                    'name' => $this->name . '_min_amounts',
+                    'label' => $translation['thresholds']['min'],
+                    'value' => $this->formatCentsForDisplay($limits['min']),
+                    'placeholder' => $this->formatCentsForDisplay($limits['min']),
+                    'default' => $api_min,
+                ],
+                'inter' => $translation['thresholds']['inter'],
+                'max_amount' => [
+                    'name' => $this->name . '_max_amounts',
+                    'label' => $translation['thresholds']['max'],
+                    'value' => $this->formatCentsForDisplay($limits['max']),
+                    'placeholder' => $this->formatCentsForDisplay($limits['max']),
+                    'default' => $api_max,
+                ],
+                'error' => [
+                    'text' => sprintf($translation['thresholds']['error']['default'], $api_min, $api_max),
+                    'maxtext' => $translation['thresholds']['error']['max'],
+                    'mintext' => $translation['thresholds']['error']['min'],
+                ],
+            ],
+            'switch' => false,
+        ];
+
+        $selectable = $apm_eligibility->getSelectableCountries($this->name, (int) $this->context->language->id);
+        if (empty($selectable)) {
+            return $option;
+        }
+
+        $merchant_countries = $apm_eligibility->getMerchantSettings($this->name, $currency)['countries'];
+        $country_options = [];
+        foreach ($selectable as $iso_code => $country_name) {
+            $country_options[] = [
+                'value' => $iso_code,
+                'label' => $country_name,
+            ];
+        }
+
+        $option['countries'] = [
+            'name' => $this->name . '_countries',
+            'title' => $translation['countries']['title'],
+            'description' => $translation['countries']['description'],
+            'options' => $country_options,
+            'value' => null === $merchant_countries
+                ? array_keys($selectable)
+                : array_values(array_intersect($merchant_countries, array_keys($selectable))),
+            'default' => array_keys($selectable),
+            'labels' => [
+                'search' => $translation['countries']['search'],
+                'select_all' => $translation['countries']['select_all'],
+                'unselect_all' => $translation['countries']['unselect_all'],
+                'all' => $translation['countries']['all'],
+                'selected' => $translation['countries']['selected'],
+                'none' => $translation['countries']['none'],
+                'no_match' => $translation['countries']['no_match'],
+                'remove' => $translation['countries']['remove'],
+            ],
+            'warning' => $translation['countries']['warning'],
+        ];
+
+        return $option;
+    }
+
+    /**
+     * @param int|null $cents
+     *
+     * @return float
+     */
+    protected function formatCentsForDisplay($cents)
+    {
+        if (null === $cents) {
+            return 0.0;
+        }
+
+        return (float) $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount')
+            ->convertAmount((int) $cents, true);
+    }
+
+    /**
+     * @description Check the current cart amount, currency and billing country against
+     *              the limits of the payment method.
+     *
+     * @return array ['result' => bool, 'reason' => string]
+     */
+    protected function checkApmEligibility()
+    {
+        $this->setParameters();
+
+        $cart_amount = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount')
+            ->convertAmount((float) $this->context->cart->getOrderTotal(true));
+        $currency = isset($this->context->currency->iso_code) ? (string) $this->context->currency->iso_code : '';
+
+        return $this->getApmEligibility()->isEligible($this->name, (int) $cart_amount, $currency, $this->getBillingIsoCode());
+    }
+
+    /**
+     * @description Get the ISO code of the cart billing country.
+     *
+     * @return string empty when the cart has no billing address yet
+     */
+    protected function getBillingIsoCode()
+    {
+        $this->setParameters();
+
+        $id_address = (int) $this->context->cart->id_address_invoice;
+        if (!$id_address) {
+            return '';
+        }
+
+        $address = $this->dependencies
+            ->getPlugin()
+            ->getAddress()
+            ->get($id_address);
+        if (!is_object($address) || empty($address->id_country)) {
+            return '';
+        }
+
+        return (string) $this->dependencies
+            ->configClass
+            ->getIsoCodeByCountryId((int) $address->id_country);
+    }
+
+    /**
      * @description Get payment option
      *
      * @param array $payment_options
@@ -1659,31 +1860,32 @@ class PaymentMethod
             return [];
         }
 
-        $payplug_countries = json_decode($this->configuration->getValue('countries'), true);
-
-        if (isset($payplug_countries[$this->name])) {
-            $address = $this->dependencies
-                ->getPlugin()
-                ->getAddress()
-                ->get((int) $this->context->cart->id_address_invoice);
-            $iso = $this->dependencies
-                ->configClass
-                ->getIsoCodeByCountryId((int) $address->id_country);
-
-            if (!$this->dependencies
-                ->getValidators()['payment']
-                ->isAllowedCountry(implode(',', $payplug_countries[$this->name]), $iso)['result']) {
+        if ($this->getApmEligibility()->isPpro($this->name)) {
+            if (!$this->checkApmEligibility()['result']) {
                 return $payment_options;
             }
-        }
+        } else {
+            $payplug_countries = json_decode($this->configuration->getValue('countries'), true);
 
-        $price_limit = $this->getPriceLimit();
-        $cart_amount = $this->context->cart->getOrderTotal(true);
-        if (false === strpos($this->name, 'oney')) {
-            if (!$this->dependencies
-                ->getHelpers()['amount']
-                ->validateAmount($price_limit, (float) $cart_amount)['result']) {
-                return $payment_options;
+            if (isset($payplug_countries[$this->name])) {
+                $iso = $this->getBillingIsoCode();
+
+                if (!$this->dependencies
+                    ->getValidators()['payment']
+                    ->isAllowedCountry(implode(',', $payplug_countries[$this->name]), $iso)['result']) {
+                    return $payment_options;
+                }
+            }
+
+            // Without any cached limit the API still validates the amount when the payment is created.
+            $price_limit = $this->getPriceLimit();
+            $cart_amount = $this->context->cart->getOrderTotal(true);
+            if (!empty($price_limit) && false === strpos($this->name, 'oney')) {
+                if (!$this->dependencies
+                    ->getHelpers()['amount']
+                    ->validateAmount($price_limit, (float) $cart_amount)['result']) {
+                    return $payment_options;
+                }
             }
         }
 

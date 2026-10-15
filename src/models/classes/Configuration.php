@@ -42,6 +42,12 @@ class Configuration
             'defaultValue' => '{}',
             'setConf' => 1,
         ],
+        'apm_custom_settings' => [
+            'type' => 'string',
+            'name' => 'APM_CUSTOM_SETTINGS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'applepay_carriers' => [
             'type' => 'string',
             'name' => 'APPLEPAY_CARRIERS',
@@ -57,6 +63,8 @@ class Configuration
         'bancontact_country' => [
             'type' => 'integer',
             'name' => 'BANCONTACT_COUNTRY',
+            // Legacy "Belgium only" Bancontact setting: kept only as the source of
+            // ApmEligibility::importLegacyBancontactCountry() and for rollback.
             'defaultValue' => 0,
             'setConf' => 1,
         ],
@@ -381,9 +389,8 @@ class Configuration
         'scalapay_custom_max_amounts' => [
             'type' => 'string',
             'name' => 'SCALAPAY_CUSTOM_MAX_AMOUNTS',
-            // Empty means the merchant never customised the limit: the account's own
-            // authorized range from GET /account applies as-is. It must NOT default to a
-            // concrete amount, or that amount would read as an explicit override.
+            // Legacy Scalapay bounds, with scalapay_custom_min_amounts: kept only as the
+            // source of ApmEligibility::importLegacyScalapaySettings() and for rollback.
             'defaultValue' => '',
             'setConf' => 1,
         ],

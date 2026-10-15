@@ -16,7 +16,7 @@ class getOptionTest extends BaseBancontactPaymentMethod
     {
         parent::setUp();
         $this->config = [
-            'bancontact_country' => true,
+            'bancontact' => true,
         ];
     }
 
@@ -25,35 +25,22 @@ class getOptionTest extends BaseBancontactPaymentMethod
         $this->assertFalse($this->class->getOption($this->config)['available_test_mode']);
     }
 
-    public function testWhenGivenOptionHasValidOption()
+    public function testTheBelgiumOnlySwitchIsNoLongerOffered()
     {
-        $expected = [
-            [
-                'type' => 'payment_option',
-                'sub_type' => 'switch',
-                'name' => 'bancontact_country',
-                'title' => 'paymentmethods.bancontact.user.title',
-                'descriptions' => [
-                    'live' => [
-                        'description' => 'paymentmethods.bancontact.user.description',
-                        'link_know_more' => [
-                            'text' => 'paymentmethods.bancontact.link',
-                            'url' => 'https://support.payplug.com/hc/fr/articles/4408157435794',
-                            'target' => '_blank',
-                        ],
-                    ],
-                    'sandbox' => [
-                        'description' => 'paymentmethods.bancontact.user.description',
-                        'link_know_more' => [
-                            'text' => 'paymentmethods.bancontact.link',
-                            'url' => 'https://support.payplug.com/hc/fr/articles/4408157435794',
-                            'target' => '_blank',
-                        ],
-                    ],
-                ],
-                'checked' => true,
-            ],
-        ];
-        $this->assertSame($expected, $this->class->getOption($this->config)['options']);
+        $this->assertArrayNotHasKey('options', $this->class->getOption($this->config));
+    }
+
+    public function testTheMerchantCanSelectTheBillingCountries()
+    {
+        $this->country_adapter->shouldReceive('getCountries')
+            ->andReturn([
+                ['iso_code' => 'BE', 'name' => 'Belgique'],
+                ['iso_code' => 'FR', 'name' => 'France'],
+            ]);
+
+        $countries = $this->class->getOption($this->config)['countries'];
+
+        $this->assertSame('bancontact_countries', $countries['name']);
+        $this->assertSame(['BE', 'FR'], $countries['value']);
     }
 }

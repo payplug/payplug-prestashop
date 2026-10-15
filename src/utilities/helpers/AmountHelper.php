@@ -118,10 +118,11 @@ class AmountHelper
      *
      * @param array $price_limit
      * @param float $amount
+     * @param string $currency ISO code of the amount; the first entry of each limit applies when empty
      *
      * @return array
      */
-    public function validateAmount($price_limit = [], $amount = 0)
+    public function validateAmount($price_limit = [], $amount = 0, $currency = '')
     {
         if (!is_array($price_limit) || empty($price_limit)) {
             return [
@@ -137,11 +138,8 @@ class AmountHelper
             ];
         }
 
-        $min = explode(':', $price_limit['min']);
-        $min_amount = isset($min[1]) ? $min[1] : null;
-
-        $max = explode(':', $price_limit['max']);
-        $max_amount = isset($max[1]) ? $max[1] : null;
+        $min_amount = $this->getAmountForCurrency(isset($price_limit['min']) ? $price_limit['min'] : '', $currency);
+        $max_amount = $this->getAmountForCurrency(isset($price_limit['max']) ? $price_limit['max'] : '', $currency);
 
         $formated_amount = $this->convertAmount($amount);
 
@@ -163,5 +161,32 @@ class AmountHelper
             'result' => true,
             'message' => '',
         ];
+    }
+
+    /**
+     * @description Read the amount of a given currency from an `ISO:cents[;ISO:cents]` limit.
+     *
+     * @param string $limit
+     * @param string $currency ISO code; the first entry is returned when empty
+     *
+     * @return int|null amount in cents, null when the limit holds no amount for the currency
+     */
+    public function getAmountForCurrency($limit = '', $currency = '')
+    {
+        if (!is_string($limit) || '' === $limit) {
+            return null;
+        }
+
+        $currency = is_string($currency) ? strtoupper($currency) : '';
+        foreach (explode(';', $limit) as $entry) {
+            $parts = explode(':', $entry);
+            if (2 !== count($parts) || ('' !== $currency && strtoupper($parts[0]) !== $currency)) {
+                continue;
+            }
+
+            return preg_match('/^\d+$/', $parts[1]) ? (int) $parts[1] : null;
+        }
+
+        return null;
     }
 }

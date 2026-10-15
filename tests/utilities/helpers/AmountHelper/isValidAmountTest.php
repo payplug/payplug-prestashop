@@ -113,4 +113,54 @@ class validateAmountTest extends TestCase
             $this->helper->validateAmount($price_limit, $amount)
         );
     }
+
+    public function testWhenCurrencyGivenUsesTheMatchingEntry()
+    {
+        $price_limit = [
+            'min' => 'EUR:500;GBP:400',
+            'max' => 'EUR:9000;GBP:8000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->andReturn(450);
+
+        $this->assertTrue($this->helper->validateAmount($price_limit, 4.50, 'GBP')['result']);
+        $this->assertFalse($this->helper->validateAmount($price_limit, 4.50, 'EUR')['result']);
+    }
+
+    public function testWhenNoCurrencyGivenTheFirstEntryApplies()
+    {
+        $price_limit = [
+            'min' => 'EUR:500;GBP:400',
+            'max' => 'EUR:9000;GBP:8000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->andReturn(8500);
+
+        $this->assertTrue($this->helper->validateAmount($price_limit, 85.00)['result']);
+    }
+
+    public function testBoundsAreInclusive()
+    {
+        $price_limit = [
+            'min' => 'EUR:500',
+            'max' => 'EUR:9000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->andReturn(500, 9000);
+
+        $this->assertTrue($this->helper->validateAmount($price_limit, 5.00, 'EUR')['result']);
+        $this->assertTrue($this->helper->validateAmount($price_limit, 90.00, 'EUR')['result']);
+    }
+
+    public function testWhenCurrencyIsMissingFromTheMaxBoundTheAmountIsRefused()
+    {
+        $price_limit = [
+            'min' => 'EUR:500',
+            'max' => 'EUR:9000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->andReturn(1000);
+
+        $this->assertFalse($this->helper->validateAmount($price_limit, 10.00, 'USD')['result']);
+    }
 }
