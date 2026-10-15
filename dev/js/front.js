@@ -1618,6 +1618,8 @@ var $document, $window, __moduleName__Module = {
             attemps: {
                 current: 0,
                 limit: 5,
+                // last tries allowed while the order is still being created elsewhere
+                extra: 5,
                 interval: 2000,
             },
             query: null
@@ -1656,7 +1658,7 @@ var $document, $window, __moduleName__Module = {
                                 validation.actions.redirect(data.redirected_url);
                                 break;
                             case 'wait':
-                                validation.actions.wait();
+                                validation.actions.wait(data.redirected_url);
                                 break;
                             default:
                                 break;
@@ -1669,7 +1671,7 @@ var $document, $window, __moduleName__Module = {
             redirect: function (url) {
                 window.location.href = url;
             },
-            wait: function () {
+            wait: function (fallback_url) {
                 let {validation} = __moduleName__Module,
                     {props} = validation,
                     {attemps} = props;
@@ -1677,6 +1679,11 @@ var $document, $window, __moduleName__Module = {
                 // update attemps
                 attemps.current++;
                 props.attemps = attemps;
+
+                if (fallback_url && attemps.current > attemps.limit + attemps.extra) {
+                    validation.actions.redirect(fallback_url);
+                    return;
+                }
 
                 let last_try = attemps.current >= attemps.limit;
                 setTimeout(() => {
