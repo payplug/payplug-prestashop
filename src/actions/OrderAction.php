@@ -132,127 +132,25 @@ class OrderAction
             ];
         }
 
-        $res_nb_orders = $this->plugin
-            ->getOrderRepository()
-            ->getByIdCart((int) $cart->id);
-        if (count($res_nb_orders) > 0) {
-            $this->logger->addLog('OrderAction::createAction - Order cannot be created because an order already exists ', 'info');
-
-            return [
-                'result' => true,
-                'message' => 'Order already exists for the given cart',
-            ];
-        }
-
-        // Get the related Customer
-        $customer = $this->plugin
-            ->getCustomer()
-            ->get((int) $cart->id_customer);
-        if (!$this->validate_adapter->validate('isLoadedObject', $customer)) {
-            $this->logger->addLog('OrderAction::createAction - $customer should be a valid Customer Object', 'error');
-
-            return [
-                'result' => false,
-                'message' => '$customer should be a valid Customer Object',
-            ];
-        }
-
-        // Get props from PaymentMethod
-        $order_tab = $payment_method->getOrderTab($retrieve);
-        if (empty($order_tab)) {
-            $this->logger->addLog('OrderAction::createAction - $order_tab must be an non empty array', 'error');
-
-            return [
-                'result' => false,
-                'message' => '$order_tab must be an non empty array',
-            ];
-        }
-
-        $secure_key = isset($cart->secure_key) && $cart->secure_key
-            ? $cart->secure_key
-            : (isset($customer->secure_key) && $customer->secure_key ? $customer->secure_key : '');
-
-        // Create the order
-        $module = $this->plugin
+        $order_lock = $this->plugin
             ->getModule()
-            ->getInstanceByName($this->dependencies->name);
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.models.classes.order_lock');
+        if (!$order_lock->acquire((int) $cart->id)) {
+            $this->logger->addLog('OrderAction::createAction - Order creation already in progress for cart ' . (int) $cart->id, 'info');
 
-        $can_save_card = $this->dependencies
-            ->getValidators()['payment']
-            ->canSaveCard($resource);
-        if ($can_save_card) {
-            $this->dependencies
-                ->getPlugin()
-                ->getCardAction()
-                ->saveAction($resource);
+            return [
+                'result' => false,
+                'locked' => true,
+                'message' => 'Order creation already in progress for the given cart',
+            ];
         }
 
         try {
-            $module->validateOrder(
-                $cart->id,
-                $order_tab['order_state'],
-                $order_tab['amount'],
-                $order_tab['module_name'],
-                null,
-                ['transaction_id' => $resource_id],
-                (int) $cart->id_currency,
-                false,
-                $secure_key // get from cart or customer
-            );
-        } catch (\Exception $exception) {
-            $this->logger->addLog('OrderAction::createAction - Order cannot be validated: ' . $exception->getMessage(), 'error');
-
-            return [
-                'result' => false,
-                'message' => 'Order cannot be validated: ' . $exception->getMessage(),
-            ];
+            return $this->placeOrder($resource_id, $cart, $payment_method, $retrieve, $resource);
+        } finally {
+            $order_lock->release((int) $cart->id);
         }
-
-        // Get the related Order
-        $order = $this->plugin
-            ->getOrder()
-            ->get((int) $module->currentOrder);
-        if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
-            $this->logger->addLog('OrderAction::createAction - $order should be a valid Order Object', 'error');
-
-            return [
-                'result' => false,
-                'message' => '$order should be a valid Order Object',
-            ];
-        }
-
-        // Post process
-        $post_process = $payment_method->postProcessOrder($retrieve, (int) $order->id);
-        if (!$post_process) {
-            $this->logger->addLog('OrderAction::createAction - Can\'t post process the order', 'error');
-        }
-
-        // Add prestashop OrderPayment
-        $order_payments = $order->getOrderPayments();
-        if (!$order_payments) {
-            $order->addOrderPayment($order_tab['amount'], null, $resource_id);
-        }
-
-        // Check number of order using this cart
-        $res_nb_orders = $this->plugin
-            ->getOrderRepository()
-            ->getByIdCart((int) $cart->id);
-        if (!$res_nb_orders) {
-            $this->logger->addLog('OrderAction::createAction - No order created for the given cart id', 'error');
-
-            return [
-                'result' => false,
-                'message' => 'No order created for the given cart id',
-            ];
-        } elseif (count($res_nb_orders) > 1) {
-            $this->logger->addLog('OrderAction::createAction - ' . count($res_nb_orders) . ' orders created for the given cart id', 'error');
-        }
-
-        return [
-            'result' => true,
-            'id_order' => $order->id,
-            'message' => '',
-        ];
     }
 
     /**
@@ -587,6 +485,143 @@ class OrderAction
         }
 
         return $order_details;
+    }
+
+    /**
+     * @description Create the order of a cart, under the order creation lock of that cart
+     *
+     * @param string $resource_id
+     * @param object $cart
+     * @param object $payment_method
+     * @param array $retrieve
+     * @param object $resource
+     *
+     * @return array
+     */
+    private function placeOrder($resource_id, $cart, $payment_method, $retrieve, $resource)
+    {
+        // Read without the SQL cache: a stale answer would let a second order through the lock
+        $res_nb_orders = $this->plugin
+            ->getOrderRepository()
+            ->getByIdCart((int) $cart->id, false);
+        if (count($res_nb_orders) > 0) {
+            $this->logger->addLog('OrderAction::createAction - Order cannot be created because an order already exists ', 'info');
+
+            return [
+                'result' => true,
+                'message' => 'Order already exists for the given cart',
+            ];
+        }
+
+        // Get the related Customer
+        $customer = $this->plugin
+            ->getCustomer()
+            ->get((int) $cart->id_customer);
+        if (!$this->validate_adapter->validate('isLoadedObject', $customer)) {
+            $this->logger->addLog('OrderAction::createAction - $customer should be a valid Customer Object', 'error');
+
+            return [
+                'result' => false,
+                'message' => '$customer should be a valid Customer Object',
+            ];
+        }
+
+        // Get props from PaymentMethod
+        $order_tab = $payment_method->getOrderTab($retrieve);
+        if (empty($order_tab)) {
+            $this->logger->addLog('OrderAction::createAction - $order_tab must be an non empty array', 'error');
+
+            return [
+                'result' => false,
+                'message' => '$order_tab must be an non empty array',
+            ];
+        }
+
+        $secure_key = isset($cart->secure_key) && $cart->secure_key
+            ? $cart->secure_key
+            : (isset($customer->secure_key) && $customer->secure_key ? $customer->secure_key : '');
+
+        // Create the order
+        $module = $this->plugin
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
+
+        $can_save_card = $this->dependencies
+            ->getValidators()['payment']
+            ->canSaveCard($resource);
+        if ($can_save_card) {
+            $this->dependencies
+                ->getPlugin()
+                ->getCardAction()
+                ->saveAction($resource);
+        }
+
+        try {
+            $module->validateOrder(
+                $cart->id,
+                $order_tab['order_state'],
+                $order_tab['amount'],
+                $order_tab['module_name'],
+                null,
+                ['transaction_id' => $resource_id],
+                (int) $cart->id_currency,
+                false,
+                $secure_key // get from cart or customer
+            );
+        } catch (\Exception $exception) {
+            $this->logger->addLog('OrderAction::createAction - Order cannot be validated: ' . $exception->getMessage(), 'error');
+
+            return [
+                'result' => false,
+                'message' => 'Order cannot be validated: ' . $exception->getMessage(),
+            ];
+        }
+
+        // Get the related Order
+        $order = $this->plugin
+            ->getOrder()
+            ->get((int) $module->currentOrder);
+        if (!$this->validate_adapter->validate('isLoadedObject', $order)) {
+            $this->logger->addLog('OrderAction::createAction - $order should be a valid Order Object', 'error');
+
+            return [
+                'result' => false,
+                'message' => '$order should be a valid Order Object',
+            ];
+        }
+
+        // Post process
+        $post_process = $payment_method->postProcessOrder($retrieve, (int) $order->id);
+        if (!$post_process) {
+            $this->logger->addLog('OrderAction::createAction - Can\'t post process the order', 'error');
+        }
+
+        // Add prestashop OrderPayment
+        $order_payments = $order->getOrderPayments();
+        if (!$order_payments) {
+            $order->addOrderPayment($order_tab['amount'], null, $resource_id);
+        }
+
+        // Check number of order using this cart
+        $res_nb_orders = $this->plugin
+            ->getOrderRepository()
+            ->getByIdCart((int) $cart->id, false);
+        if (!$res_nb_orders) {
+            $this->logger->addLog('OrderAction::createAction - No order created for the given cart id', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'No order created for the given cart id',
+            ];
+        } elseif (count($res_nb_orders) > 1) {
+            $this->logger->addLog('OrderAction::createAction - ' . count($res_nb_orders) . ' orders created for the given cart id', 'error');
+        }
+
+        return [
+            'result' => true,
+            'id_order' => $order->id,
+            'message' => '',
+        ];
     }
 
     /**

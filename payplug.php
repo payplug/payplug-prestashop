@@ -59,7 +59,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = 0;
         $this->tab = 'payments_gateways';
-        $this->version = '5.1.0';
+        $this->version = '5.1.1';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -377,15 +377,17 @@ class Payplug extends PaymentModule
     /**
      * @description  display applepay button on product page
      *
+     * @param array $params
+     *
      * @return mixed
      */
-    public function hookDisplayProductAdditionalInfo()
+    public function hookDisplayProductAdditionalInfo($params = [])
     {
         if ($this->payplug_dependencies) {
             return $this->payplug_dependencies
                 ->getPlugin()
                 ->getCartAction()
-                ->renderPaymentCTA();
+                ->renderPaymentCTA($params);
         }
     }
 

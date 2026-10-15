@@ -13764,6 +13764,7 @@ src/models/classes/Country.php
 src/models/classes/Hook.php
 src/models/classes/Merchant.php
 src/models/classes/Order.php
+src/models/classes/OrderLock.php
 src/models/classes/Translation.php
 src/models/classes/index.php
 src/models/classes/paymentMethod/AmexPaymentMethod.php
@@ -13881,6 +13882,7 @@ tests/actions/OneyAction/renderCTATest.php
 tests/actions/OneyAction/renderRequiredFieldsTest.php
 tests/actions/OneyAction/renderScheduleTest.php
 tests/actions/OrderAction/BaseOrderAction.php
+tests/actions/OrderAction/createActionLockTest.php
 tests/actions/OrderAction/createActionTest.php
 tests/actions/OrderAction/renderDetailTest.php
 tests/actions/OrderAction/updateActionTest.php
@@ -13906,11 +13908,14 @@ tests/actions/RequestAction/applepayPatchActionTest.php
 tests/actions/RequestAction/applepayUpdateActionTest.php
 tests/actions/RequestAction/dispatchActionTest.php
 tests/actions/ValidationAction/BaseValidationAction.php
+tests/actions/ValidationAction/checkActionLockedTest.php
 tests/actions/ValidationAction/checkActionTest.php
 tests/actions/ValidationAction/clearLockTest.php
+tests/actions/ValidationAction/createOrderLockedTest.php
 tests/actions/ValidationAction/createOrderTest.php
 tests/actions/ValidationAction/setLockTest.php
 tests/actions/ValidationAction/validateActionTest.php
+tests/application/adapter/QueryAdapter/QueryAdapterTest.php
 tests/bootstrap.php
 tests/mock/AddressMock.php
 tests/mock/CarrierMock.php
@@ -13966,6 +13971,8 @@ tests/models/classes/Order/getOrderStateFromResourceTest.php
 tests/models/classes/Order/getOrderStateTest.php
 tests/models/classes/Order/getTotalRefundedTest.php
 tests/models/classes/Order/updateOrderStateTest.php
+tests/models/classes/OrderLock/BaseOrderLock.php
+tests/models/classes/OrderLock/OrderLockTest.php
 tests/models/classes/Translation/BaseTranslation.php
 tests/models/classes/Translation/getDefaultTranslationTest.php
 tests/models/classes/Translation/getTranslationsTest.php
@@ -14376,6 +14383,8 @@ upgrade/upgrade-4.4.0.php
 upgrade/upgrade-4.7.1.php
 upgrade/upgrade-4.8.0.php
 upgrade/upgrade-4.9.0.php
+upgrade/upgrade-5.1.0.php
+upgrade/upgrade-5.1.1.php
 vendor/autoload.php
 vendor/composer/ClassLoader.php
 vendor/composer/InstalledVersions.php

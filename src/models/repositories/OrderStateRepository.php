@@ -156,6 +156,30 @@ class OrderStateRepository extends EntityRepository
     }
 
     /**
+     * @description Find every stored value of a configuration key, whatever its scope (global, shop group or shop).
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getConfigurationsByName($name = '')
+    {
+        if (!is_string($name) || !$name) {
+            return [];
+        }
+
+        $result = $this
+            ->select()
+            ->fields('c.id_shop_group, c.id_shop, c.value')
+            ->from($this->getTableName('configuration'), 'c')
+            ->where('c.name = \'' . $this->escape($name) . '\'')
+            ->build()
+        ;
+
+        return $result ?: [];
+    }
+
+    /**
      * @description Find an id_order_state by template.
      *
      * @param string $template

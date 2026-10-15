@@ -21,6 +21,7 @@ abstract class BaseCartAction extends TestCase
     protected $dispatcher;
     protected $instance;
     protected $plugin;
+    protected $product_adapter;
     protected $tools_adapter;
 
     public function setUp(): void
@@ -52,6 +53,8 @@ abstract class BaseCartAction extends TestCase
         $this->controller = \Mockery::mock('Controller');
 
         $this->tools_adapter = \Mockery::mock('ToolsAdapter');
+        $this->cartAdapter = \Mockery::mock('CartAdapter');
+        $this->product_adapter = \Mockery::mock('ProductAdapter');
 
         $this->dispatcher->shouldReceive([
             'getInstance' => $this->instance,
@@ -63,6 +66,7 @@ abstract class BaseCartAction extends TestCase
             'getCustomer' => $this->customer_adapter,
             'getConfigurationClass' => $this->configuration,
             'getDispatcher' => $this->dispatcher,
+            'getProductAdapter' => $this->product_adapter,
             'getTools' => $this->tools_adapter,
         ]);
 
@@ -73,5 +77,11 @@ abstract class BaseCartAction extends TestCase
         ]);
 
         $this->action = \Mockery::mock(CartAction::class, [$this->dependencies])->makePartial();
+    }
+
+    public function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
     }
 }

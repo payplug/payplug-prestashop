@@ -24,6 +24,7 @@
 namespace PayPlug\src\utilities\services;
 
 use PayPlug\classes\DependenciesClass;
+use PayPlug\src\utilities\helpers\LinkHelper;
 use PayPlugPluginMcp\Models\Entities\PaymentInputDTO;
 use PayPlugPluginMcp\Models\Entities\RefundInputDTO;
 use PrestaShop\Module\PsMcpServer\Server\Attributes\PsMcpTool;
@@ -163,13 +164,13 @@ class Mcp
             ->getService('payplug.utilities.service.api')
             ->getMcpApiBearer(!(bool)$configuration->getValue('sandbox_mode'));
 
-        $base_url = $this->context->shop->getBaseURL(true);
-        $module_name = $this->dependencies->name;
-        $attributes['urls'] = [
-            'return' => $base_url . "module/$module_name/validation",
-            'cancel' => $base_url . "module/$module_name/cancel",
-            'notification' => $base_url . "module/$module_name/notification",
-        ];
+        $cart_id = isset($attributes['cart_id']) ? $attributes['cart_id'] : null;
+        unset($attributes['cart_id']);
+        $attributes['urls'] = LinkHelper::getPaymentLinkUrls(
+            $this->context->link,
+            $this->dependencies->name,
+            $cart_id
+        );
 
         // Set meta data and potential required context
         $attributes['metadata'] = [
@@ -388,6 +389,7 @@ class Mcp
             $cart_total = $current_cart->getOrderTotal();
             $currency = $this->currency->get((int)$current_cart->id_currency);
             $dto_params = [
+                'cart_id' => (int)$current_cart->id,
                 'amount' => (int)round($cart_total * 100),
                 'currency_iso_code' => $currency->iso_code,
                 'customer' => [

@@ -85,6 +85,32 @@ class LinkHelper
     }
 
     /**
+     * Build the return, cancel and notification URLs of a payment link,
+     * on the same front controllers as the checkout payments (validation and ipn).
+     *
+     * @param \Link $link
+     * @param string $module_name
+     * @param int $cart_id
+     *
+     * @throws \InvalidArgumentException when no cart id is given
+     *
+     * @return array
+     */
+    public static function getPaymentLinkUrls($link, $module_name, $cart_id)
+    {
+        $cart_id = (int) $cart_id;
+        if ($cart_id <= 0) {
+            throw new \InvalidArgumentException('A cart id is required to build the payment link URLs');
+        }
+
+        return [
+            'return' => $link->getModuleLink($module_name, 'validation', ['ps' => 1, 'cartid' => $cart_id], true),
+            'cancel' => $link->getModuleLink($module_name, 'validation', ['ps' => 2, 'cartid' => $cart_id], true),
+            'notification' => $link->getModuleLink($module_name, 'ipn', [], true),
+        ];
+    }
+
+    /**
      * Generate a cryptographically random OAuth state nonce, store it
      * server-side, and return it.  Only called in admin context.
      *
