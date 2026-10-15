@@ -13822,6 +13822,7 @@ src/utilities/helpers/CookiesHelper.php
 src/utilities/helpers/FilesHelper.php
 src/utilities/helpers/LanguageHelper.php
 src/utilities/helpers/LinkHelper.php
+src/utilities/helpers/PhoneFormatHelper.php
 src/utilities/helpers/PhoneHelper.php
 src/utilities/helpers/UserHelper.php
 src/utilities/helpers/index.php
@@ -13997,6 +13998,8 @@ tests/models/classes/paymentMethod/BancontactPaymentMethod/getOptionTest.php
 tests/models/classes/paymentMethod/BancontactPaymentMethod/getPaymentOptionTest.php
 tests/models/classes/paymentMethod/BancontactPaymentMethod/getPaymentTabTest.php
 tests/models/classes/paymentMethod/BasePaymentMethod.php
+tests/models/classes/paymentMethod/BizumPaymentMethod/BaseBizumPaymentMethod.php
+tests/models/classes/paymentMethod/BizumPaymentMethod/formatPhoneNumberSafelyTest.php
 tests/models/classes/paymentMethod/IdealPaymentMethod/BaseIdealPaymentMethod.php
 tests/models/classes/paymentMethod/IdealPaymentMethod/getOptionTest.php
 tests/models/classes/paymentMethod/IdealPaymentMethod/getPaymentTabTest.php
@@ -14023,6 +14026,7 @@ tests/models/classes/paymentMethod/OneyPaymentMethod/BaseOneyPaymentMethod.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/checkOneyRequiredFieldsTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/formatOneyResourceTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/formatOverseaCountryIsoTest.php
+tests/models/classes/paymentMethod/OneyPaymentMethod/formatPhoneNumberSafelyTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/getCartCallToActionTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/getErrorLabelTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/getOneyPaymentOptionsListTest.php
@@ -14036,6 +14040,8 @@ tests/models/classes/paymentMethod/OneyPaymentMethod/getProductCallToActionTest.
 tests/models/classes/paymentMethod/OneyPaymentMethod/getScheduleTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/getThresholdsTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/hasOneyRequiredFieldsTest.php
+tests/models/classes/paymentMethod/OneyPaymentMethod/hydratePaymentTabFromPaymentDataTest.php
+tests/models/classes/paymentMethod/OneyPaymentMethod/isMobilePhoneNumberSafelyTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/isValidOneyEmailTest.php
 tests/models/classes/paymentMethod/OneyPaymentMethod/updateOrderStateFromPendingToPaidTest.php
 tests/models/classes/paymentMethod/PaymentMethod/abortTest.php
@@ -14055,6 +14061,7 @@ tests/models/classes/paymentMethod/PaymentMethod/getResourceDetailTest.php
 tests/models/classes/paymentMethod/PaymentMethod/getReturnUrlTest.php
 tests/models/classes/paymentMethod/PaymentMethod/isValidResourceTest.php
 tests/models/classes/paymentMethod/PaymentMethod/postProcessOrderTest.php
+tests/models/classes/paymentMethod/PaymentMethod/processPaymentErrorTest.php
 tests/models/classes/paymentMethod/PaymentMethod/refundTest.php
 tests/models/classes/paymentMethod/PaymentMethod/resetPaymentMethodFromPermissionTest.php
 tests/models/classes/paymentMethod/PaymentMethod/retrieveTest.php
@@ -14065,6 +14072,7 @@ tests/models/classes/paymentMethod/SatispayPaymentMethod/getOptionTest.php
 tests/models/classes/paymentMethod/SatispayPaymentMethod/getOrderTabTest.php
 tests/models/classes/paymentMethod/SatispayPaymentMethod/getPaymentTabTest.php
 tests/models/classes/paymentMethod/StandardPaymentMethod/BaseStandardPaymentMethod.php
+tests/models/classes/paymentMethod/StandardPaymentMethod/completePhoneNumbersTest.php
 tests/models/classes/paymentMethod/StandardPaymentMethod/getDeferredStateTest.php
 tests/models/classes/paymentMethod/StandardPaymentMethod/getOptionTest.php
 tests/models/classes/paymentMethod/StandardPaymentMethod/getPaymentTabTest.php
@@ -14236,6 +14244,9 @@ tests/utilities/helpers/AmountHelper/isValidAmountTest.php
 tests/utilities/helpers/LinkHelper/getAdminReturnUrlTest.php
 tests/utilities/helpers/LinkHelper/getOAuthCallbackUrlTest.php
 tests/utilities/helpers/LinkHelper/getStoredOAuthStateTest.php
+tests/utilities/helpers/PhoneFormatHelper/isMobileTest.php
+tests/utilities/helpers/PhoneFormatHelper/toE164TerritoryTest.php
+tests/utilities/helpers/PhoneFormatHelper/toE164Test.php
 tests/utilities/helpers/UserHelper/isLoggedTest.php
 tests/utilities/services/API/AbortInstallmentTest.php
 tests/utilities/services/API/AbortPaymentTest.php

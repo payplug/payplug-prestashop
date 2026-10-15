@@ -92,4 +92,39 @@ class prepareAddressDataTest extends BaseApplepayPaymentMethod
         ];
         $this->assertEquals($expected_data, $this->class->prepareAddressData($this->address_data));
     }
+
+    /**
+     * @dataProvider phoneNumberProvider
+     *
+     * @param string $phone_number
+     * @param string $country_code
+     * @param string|null $expected
+     */
+    public function testPhoneNumberIsFormattedOrNull($phone_number, $country_code, $expected)
+    {
+        $this->address_data['phoneNumber'] = $phone_number;
+        $this->address_data['countryCode'] = $country_code;
+
+        $prepared_data = $this->class->prepareAddressData($this->address_data);
+
+        $this->assertArrayHasKey('mobile_phone_number', $prepared_data);
+        $this->assertSame($expected, $prepared_data['mobile_phone_number']);
+    }
+
+    public function testPhoneNumberKeyIsAbsentWithoutPhoneNumber()
+    {
+        unset($this->address_data['phoneNumber']);
+
+        $this->assertArrayNotHasKey('mobile_phone_number', $this->class->prepareAddressData($this->address_data));
+    }
+
+    public function phoneNumberProvider()
+    {
+        return [
+            'FR mobile on a DE address' => ['+33612345678', 'DE', '+33612345678'],
+            'metropolitan national mobile on a MQ address' => ['0612345678', 'MQ', '+33612345678'],
+            'invalid number' => ['234234234', 'IT', null],
+            'empty number' => ['', 'FR', null],
+        ];
+    }
 }

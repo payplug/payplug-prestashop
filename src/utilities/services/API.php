@@ -258,6 +258,9 @@ class API
                 'code' => (int) $e->getCode(),
                 'message' => $e->getMessage(),
             ];
+            if ($e instanceof \Payplug\Exception\HttpException) {
+                $response['details'] = $e->getErrorObject();
+            }
         }
 
         return $response;
@@ -304,6 +307,9 @@ class API
                 'code' => (int) $e->getCode(),
                 'message' => $e->getMessage(),
             ];
+            if ($e instanceof \Payplug\Exception\HttpException) {
+                $response['details'] = $e->getErrorObject();
+            }
         }
 
         return $response;

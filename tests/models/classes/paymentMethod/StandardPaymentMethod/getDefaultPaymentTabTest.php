@@ -103,33 +103,52 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
         $this->assertSame('+49301234567', $result);
     }
 
-    /**
-     * @description Documents the cross-border behavior tightening this PR
-     * introduces on the live checkout path (PRE-3591): formatPhoneNumberSafely()
-     * now rejects a phone number that is valid, but not for the given country,
-     * instead of formatting it through as-is. '+32470123456' is a genuine
-     * Belgian mobile number, submitted here with country 'FR' to reproduce the
-     * scenario flagged in the PR description (a Belgian/Swiss mobile number on
-     * a French address).
-     */
-    public function testFormatPhoneNumberSafelyRejectsPhoneNumberValidForADifferentCountry()
+    public function testFormatPhoneNumberSafelyAcceptsPhoneNumberValidForADifferentCountry()
     {
-        $result = $this->class->formatPhoneNumberSafely('+32470123456', 'FR');
+        $this->assertSame('+32470123456', $this->class->formatPhoneNumberSafely('+32470123456', 'FR'));
+        $this->assertSame('+33609860479', $this->class->formatPhoneNumberSafely('0033609860479', 'BE'));
+    }
 
-        $this->assertNull($result);
+    public function testFormatPhoneNumberSafelyAcceptsMetropolitanNumberOnFrenchTerritory()
+    {
+        $this->assertSame('+33612345678', $this->class->formatPhoneNumberSafely('0612345678', 'MQ'));
     }
 
     /**
-     * @description Reproduces the PRE-3591 regression (Kibana signature: "Phone
-     * number is not a valid number for region \"DE\"" -> "Resource can't be
-     * created from given tab"): a French billing/shipping address whose phone
-     * numbers are only valid for FR gets a DE country resolved for it (e.g. a
-     * French customer shipping to Germany). Both landline_phone_number and
-     * mobile_phone_number must come out as null, not '', so the API request
-     * ends up with no phone number rather than two empty-string ones, which
-     * Payplug's API rejects outright.
+     * @dataProvider invalidPhoneNumberProvider
+     *
+     * @param string $phone_number
+     * @param string $iso_code
      */
-    public function testCrossBorderPhoneNumberFallsBackToNullInsteadOfEmptyString()
+    public function testFormatPhoneNumberSafelyReturnsNullForInvalidNumber($phone_number, $iso_code)
+    {
+        $this->assertNull($this->class->formatPhoneNumberSafely($phone_number, $iso_code));
+    }
+
+    public function testFormatPhoneNumberSafelyLogsInvalidNumberMasked()
+    {
+        $this->class->formatPhoneNumberSafely('+3362345678', 'DE');
+
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::on(function ($message) {
+                return false !== strpos($message, '+33******78')
+                    && false === strpos($message, '+3362345678')
+                    && false !== strpos($message, '"DE"');
+            }), 'error')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testStandardPaymentMethodIsNotPhoneRegionStrict()
+    {
+        $this->assertFalse($this->class->isPhoneRegionStrict());
+    }
+
+    /**
+     * @description French numbers on an address resolved to DE (a French customer
+     * shipping to Germany) are valid numbers, so they are sent in E.164.
+     */
+    public function testCrossBorderPhoneNumbersAreSentInE164()
     {
         $configClass = \Mockery::mock('Config');
         $configClass->shouldReceive([
@@ -139,10 +158,84 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
 
         $payment_tab = $this->class->getDefaultPaymentTab();
 
+        $this->assertSame('DE', $payment_tab['billing']['country']);
+        $this->assertSame('+33123456789', $payment_tab['billing']['landline_phone_number']);
+        $this->assertSame('+33623456789', $payment_tab['billing']['mobile_phone_number']);
+        $this->assertSame('+33123456789', $payment_tab['shipping']['landline_phone_number']);
+        $this->assertSame('+33623456789', $payment_tab['shipping']['mobile_phone_number']);
+    }
+
+    /**
+     * @description The Payplug API refuses an empty string phone number (HTTP 400)
+     * but accepts a null one.
+     */
+    public function testInvalidPhoneNumbersAreNullNeverEmptyString()
+    {
+        $address = $this->address_adapter->get(42);
+        $address->phone = '0612345';
+        $address->phone_mobile = '+3362345678';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        foreach (['billing', 'shipping'] as $type) {
+            foreach (['landline_phone_number', 'mobile_phone_number'] as $field) {
+                $this->assertArrayHasKey($field, $payment_tab[$type]);
+                $this->assertNull($payment_tab[$type][$field]);
+            }
+        }
+    }
+
+    public function testForeignMobileIsCopiedToEmptyLandline()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'getIsoCodeByCountryId' => 'BE',
+        ]);
+        $this->dependencies->configClass = $configClass;
+        $address = $this->address_adapter->get(42);
+        $address->phone = '';
+        $address->phone_mobile = '0033609860479';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        foreach (['billing', 'shipping'] as $type) {
+            $this->assertSame('+33609860479', $payment_tab[$type]['landline_phone_number']);
+            $this->assertSame('+33609860479', $payment_tab[$type]['mobile_phone_number']);
+        }
+    }
+
+    /**
+     * @description Billing and shipping share the address fixture: the mobile is
+     * only valid for the shipping country.
+     */
+    public function testInvalidBillingPhoneDoesNotAffectShippingPhone()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('getIsoCodeByCountryId')
+            ->andReturn('BE', 'FR');
+        $this->dependencies->configClass = $configClass;
+        $address = $this->address_adapter->get(42);
+        $address->phone = '';
+        $address->phone_mobile = '0612345678';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        $this->assertSame('BE', $payment_tab['billing']['country']);
         $this->assertNull($payment_tab['billing']['landline_phone_number']);
         $this->assertNull($payment_tab['billing']['mobile_phone_number']);
-        $this->assertNull($payment_tab['shipping']['landline_phone_number']);
-        $this->assertNull($payment_tab['shipping']['mobile_phone_number']);
+        $this->assertSame('FR', $payment_tab['shipping']['country']);
+        $this->assertSame('+33612345678', $payment_tab['shipping']['landline_phone_number']);
+        $this->assertSame('+33612345678', $payment_tab['shipping']['mobile_phone_number']);
+    }
+
+    public function invalidPhoneNumberProvider()
+    {
+        return [
+            'too short for IT' => ['234234234', 'IT'],
+            'truncated FR number on a DE address' => ['+3362345678', 'DE'],
+            'metropolitan national number on a BE address' => ['0612345678', 'BE'],
+            'empty iso' => ['0612345678', ''],
+        ];
     }
 
     /**

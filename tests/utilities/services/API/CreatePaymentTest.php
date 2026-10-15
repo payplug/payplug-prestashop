@@ -63,6 +63,59 @@ class CreatePaymentTest extends BaseApi
         );
     }
 
+    public function testWhenTheApiRefusesTheRequestItsErrorBodyIsReturned()
+    {
+        $this->service->shouldReceive([
+            'initialize' => true,
+        ]);
+
+        $this->payment
+            ->shouldReceive('create')
+            ->andThrow(new \Payplug\Exception\BadRequestException(
+                'Bad request.',
+                '{"object":"error","error_type":"invalid_request_error","message":"The phone number format is invalid.","details":{"billing.landline_phone_number":"invalid"}}',
+                400
+            ));
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'code' => 400,
+                'message' => 'Bad request.',
+                'details' => [
+                    'object' => 'error',
+                    'error_type' => 'invalid_request_error',
+                    'message' => 'The phone number format is invalid.',
+                    'details' => [
+                        'billing.landline_phone_number' => 'invalid',
+                    ],
+                ],
+            ],
+            $this->service->createPayment($this->resource_attribute)
+        );
+    }
+
+    public function testWhenTheApiErrorBodyIsNotJsonDetailsAreNull()
+    {
+        $this->service->shouldReceive([
+            'initialize' => true,
+        ]);
+
+        $this->payment
+            ->shouldReceive('create')
+            ->andThrow(new \Payplug\Exception\PayplugServerException('Unexpected server error during the request.', '<html>502 Bad Gateway</html>', 502));
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'code' => 502,
+                'message' => 'Unexpected server error during the request.',
+                'details' => null,
+            ],
+            $this->service->createPayment($this->resource_attribute)
+        );
+    }
+
     public function testWhenPaymentIsCreated()
     {
         $this->service->shouldReceive([
