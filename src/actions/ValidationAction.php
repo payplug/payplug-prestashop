@@ -185,6 +185,16 @@ class ValidationAction
                 ];
             }
 
+            // Another request is creating the order: keep polling, with the error page
+            // as the fallback once the front gives up (see validation.actions.wait)
+            if (!empty($order_create['locked'])) {
+                return [
+                    'result' => true,
+                    'action' => 'wait',
+                    'redirected_url' => $this->getOrderLinks()['error'],
+                ];
+            }
+
             return [
                 'result' => false,
                 'action' => 'redirect',
@@ -277,6 +287,7 @@ class ValidationAction
             return [
                 'result' => true,
                 'id_order' => 0,
+                'locked' => true,
             ];
         }
 
@@ -284,6 +295,19 @@ class ValidationAction
             ->getPlugin()
             ->getOrderAction()
             ->createAction($stored_payment['resource_id'], true);
+        if (!$order_create['result'] && !empty($order_create['locked'])) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('ValidationAction::createOrder - Order creation in progress elsewhere.');
+
+            return [
+                'result' => true,
+                'id_order' => 0,
+                'locked' => true,
+            ];
+        }
+
         if (!$order_create['result']) {
             $this->dependencies
                 ->getPlugin()
