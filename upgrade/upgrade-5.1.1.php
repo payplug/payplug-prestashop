@@ -24,19 +24,22 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_5_2_0($object)
+function upgrade_module_5_1_1($object)
 {
-    $flag = true;
-
-    $logger = $object->payplug_dependencies->getPlugin()->getLogger();
-    $logger->addLog('Start upgrade script 5.2.0');
+    $plugin = $object->payplug_dependencies->getPlugin();
+    $logger = $plugin->getLogger();
+    $logger->addLog('Start upgrade script 5.1.1');
 
     // Empty means the merchant never narrowed the Scalapay range: the account's own
     // authorized amounts from GET /account apply as-is.
-    $flag = $flag && Configuration::updateValue('PAYPLUG_SCALAPAY_CUSTOM_MIN_AMOUNTS', '');
+    $flag = Configuration::updateValue('PAYPLUG_SCALAPAY_CUSTOM_MIN_AMOUNTS', '');
     $flag = $flag && Configuration::updateValue('PAYPLUG_SCALAPAY_CUSTOM_MAX_AMOUNTS', '');
 
-    $logger->addLog('End upgrade script 5.2.0, result: ' . ($flag ? 'ok' : 'ko'));
+    // The live partial refund state used to be read from PS_CHECKOUT_STATE_PARTIALLY_REFUNDED, which belongs
+    // to PrestaShop Checkout and may point to any state (even a merchant's shipping one). Give it back its own state.
+    $flag = $plugin->getOrderStateAction()->repairPartialRefundStateAction() && $flag;
+
+    $logger->addLog('End upgrade script 5.1.1, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;
 }
