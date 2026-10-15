@@ -1,24 +1,17 @@
 <?php
 
-namespace PayPlug\tests\actions;
+namespace PayPlug\tests\actions\UnifiedOrderAction;
 
-use PayPlug\src\actions\UnifiedOrderAction;
 use PayPlug\src\utilities\helpers\AmountHelper;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group unit
  * @group action
  * @group unified_order_action
  */
-class UnifiedOrderActionTest extends TestCase
+class createFromOutcomeTest extends BaseUnifiedOrderAction
 {
-    public function tearDown(): void
-    {
-        \Mockery::close();
-    }
-
     public function testCreateFromOutcomePersistsAndAppliesTheOutcomeWhenOrderAlreadyExists()
     {
         [$dependencies, $mocks] = $this->mockDependenciesForExistingOrder();
@@ -27,12 +20,10 @@ class UnifiedOrderActionTest extends TestCase
         $payment_repository = \Mockery::mock('PaymentRepository');
         $state_mutator = \Mockery::mock('OrderStateMutator');
 
-        // This is the fix under test: previously createFromOutcome() short-circuited on an
-        // existing order WITHOUT ever calling save()/apply() again, so an order created early
-        // (e.g. by returnAction() while a payment was still THREE_DS_PENDING) never got the real,
-        // final outcome recorded when the confirming notifyAction() webhook arrived afterward.
+        // An existing order (e.g. one whose paid state could not be applied) still gets the
+        // outcome persisted and applied.
         $mocks['module']->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once()->withArgs(function ($operation_data) {
@@ -58,7 +49,7 @@ class UnifiedOrderActionTest extends TestCase
         $state_mutator = \Mockery::mock('OrderStateMutator');
 
         $mocks['module']->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once()->withArgs(function ($operation_data) {
@@ -104,7 +95,7 @@ class UnifiedOrderActionTest extends TestCase
         $validator->shouldReceive('isCreated')->with($existing_order, 42)->andReturn(['result' => true]);
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createLogger')->andReturn($logger);
         $logger->shouldReceive('error')->once()->with(\Mockery::pattern('/refusing to reconcile/'));
@@ -126,7 +117,7 @@ class UnifiedOrderActionTest extends TestCase
         $logger = \Mockery::mock('Logger');
 
         $mocks['module']->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once()->andThrow(new \Exception('db down'));
@@ -155,7 +146,7 @@ class UnifiedOrderActionTest extends TestCase
         $logger = \Mockery::mock('Logger');
 
         $mocks['module']->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once()->andThrow(new \Exception('db down'));
@@ -179,7 +170,7 @@ class UnifiedOrderActionTest extends TestCase
         $logger = \Mockery::mock('Logger');
 
         $mocks['module']->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once();
@@ -192,70 +183,6 @@ class UnifiedOrderActionTest extends TestCase
 
         $this->assertTrue($result['result']);
         $this->assertFalse($result['outcome_applied']);
-    }
-
-    public function testExistingOrderRedirectReturnsConfirmationUrlWhenOrderAlreadyExists()
-    {
-        [$dependencies] = $this->mockDependenciesForExistingOrder();
-
-        $result = $this->mockOrderAction($dependencies)->existingOrderRedirect(42);
-
-        $this->assertNotNull($result);
-        $this->assertTrue($result['result']);
-        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
-    }
-
-    public function testExistingOrderRedirectReturnsNullWhenExistingOrderIsAbandoned()
-    {
-        $dependencies = \Mockery::mock('Dependencies');
-        $dependencies->name = 'payplug';
-
-        $plugin = \Mockery::mock('Plugin');
-        $order_adapter = \Mockery::mock('OrderAdapter');
-        $validator = \Mockery::mock('OrderValidator');
-        $configuration_class = \Mockery::mock('ConfigurationClass');
-        $order_class = \Mockery::mock('OrderClass');
-
-        $existing_order = (object) [
-            'id' => 99,
-            'secure_key' => 'order_secure_key',
-            'module' => 'payplug',
-            'current_state' => 5,
-        ];
-
-        $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
-        $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
-        $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
-        $plugin->shouldReceive('getConfigurationClass')->andReturn($configuration_class);
-        $configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn(false);
-        $plugin->shouldReceive('getOrderClass')->andReturn($order_class);
-        $order_class->shouldReceive('getOrderStates')->with(true)->andReturn(['error' => 5, 'paid' => 2, 'pending' => 1]);
-
-        $order_adapter->shouldReceive('getIdByCartId')->with(42)->andReturn(99);
-        $order_adapter->shouldReceive('get')->with(99)->andReturn($existing_order);
-        $validator->shouldReceive('isCreated')->with($existing_order, 42)->andReturn(['result' => true]);
-
-        $this->assertNull($this->mockOrderAction($dependencies)->existingOrderRedirect(42));
-    }
-
-    public function testExistingOrderRedirectReturnsNullWhenNoOrderExistsYet()
-    {
-        $dependencies = \Mockery::mock('Dependencies');
-        $dependencies->name = 'payplug';
-
-        $plugin = \Mockery::mock('Plugin');
-        $order_adapter = \Mockery::mock('OrderAdapter');
-        $validator = \Mockery::mock('OrderValidator');
-
-        $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
-        $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
-        $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
-
-        $order_adapter->shouldReceive('getIdByCartId')->with(42)->andReturn(0);
-        $order_adapter->shouldReceive('get')->with(0)->andReturn(null);
-        $validator->shouldReceive('isCreated')->with(null, 42)->andReturn(['result' => false]);
-
-        $this->assertNull($this->mockOrderAction($dependencies)->existingOrderRedirect(42));
     }
 
     public function testReturnsErrorUrlWhenOutcomeIsFailed()
@@ -426,6 +353,127 @@ class UnifiedOrderActionTest extends TestCase
         $this->assertStringContainsString('id_order=99', $result['redirect_url']);
     }
 
+    public function testCreatesTheOrderInThePendingStateWhenThePaidAmountMatchesTheCartTotal()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
+        $this->mockConfirmationLink($mocks);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
+        $mocks['module']->shouldReceive('validateOrder')->once()->with(42, 5, 12.34, 'payplug', null, ['transaction_id' => 'op_123'], 2, false, 'cart_secure_key');
+        $state_mutator = $this->mockPersistence($mocks);
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::PAID);
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
+
+        $this->assertTrue($result['result']);
+    }
+
+    /**
+     * The cart changed during the 3DS challenge (total 12.34) while the payment captured the 15.00
+     * requested at its creation. Like the Retail flow, the order is validated in the logable paid
+     * state with the amount actually paid, so validateOrder() itself switches it to PS_OS_ERROR
+     * and records the payment; the PAID outcome must then never move it to "Payment accepted".
+     */
+    public function testLetsPrestaShopFlagTheOrderWhenThePaidAmountDiffersFromTheCartTotal()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
+        $this->mockConfirmationLink($mocks);
+        $mocks['amount_helper']->shouldReceive('convertAmount')->with(1500, true, 'USD')->andReturn(15.0);
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
+        $mocks['module']->shouldReceive('validateOrder')->once()->with(42, 2, 15.0, 'payplug', null, ['transaction_id' => 'op_123'], 2, false, 'cart_secure_key');
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = $this->mockPersistence($mocks, $payment_repository);
+        $payment_repository->shouldReceive('save')->once()->withArgs(function ($operation_data) {
+            return PaymentOutcome::PAID === $operation_data->outcome && 1500 === $operation_data->amount && '99' === $operation_data->orderId;
+        });
+        $state_mutator->shouldReceive('apply')->with('99', PaymentOutcome::PAID)->never();
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::FAILED);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::on(function ($message) {
+            return false !== strpos($message, 'manual review')
+                && false !== strpos($message, 'order 99')
+                && false !== strpos($message, 'op_123')
+                && false !== strpos($message, '1234')
+                && false !== strpos($message, '1500');
+        }));
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1500);
+
+        $this->assertTrue($result['result']);
+        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+        $this->assertTrue($result['outcome_applied']);
+    }
+
+    /**
+     * A notification replaying the PAID outcome onto the order flagged by the return (or the
+     * PAID notification of an order created pending) must not overwrite the payment error.
+     */
+    public function testNeverMovesAnExistingOrderToPaidWhenItsTotalDiffersFromThePaidAmount()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForExistingOrder();
+        $factory = \Mockery::mock('Factory');
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+        $logger = \Mockery::mock('Logger');
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.unified.payment_service_factory')
+            ->andReturn($factory);
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $factory->shouldReceive('createLogger')->andReturn($logger);
+        $payment_repository->shouldReceive('save')->once()->withArgs(function ($operation_data) {
+            return PaymentOutcome::PAID === $operation_data->outcome && 1500 === $operation_data->amount;
+        });
+        $state_mutator->shouldReceive('apply')->with('99', PaymentOutcome::PAID)->never();
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::FAILED);
+        $logger->shouldReceive('error')->once()->with(\Mockery::pattern('/manual review/'));
+
+        $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1500);
+
+        $this->assertTrue($result['result']);
+        $this->assertStringContainsString('id_order=99', $result['redirect_url']);
+    }
+
+    /**
+     * A cart split into several orders (one per carrier): the payment covers all of them.
+     */
+    public function testComparesThePaidAmountWithTheTotalOfAllTheOrdersOfTheCart()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForExistingOrder();
+        $mocks['existing_order']->total_paid = 6.17;
+        $factory = \Mockery::mock('Factory');
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.unified.payment_service_factory')
+            ->andReturn($factory);
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $payment_repository->shouldReceive('save')->once();
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::PAID);
+
+        $this->assertTrue($this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234)['result']);
+    }
+
+    public function testAppliesThePaidOutcomeAndLogsWhenTheOrderTotalCannotBeCompared()
+    {
+        [$dependencies, $mocks] = $this->mockDependenciesForExistingOrder();
+        $mocks['amount_helper']->shouldReceive('convertAmount')->with(12.34, false, 'USD')->andThrow(new \Exception('unknown currency'));
+        $factory = \Mockery::mock('Factory');
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $state_mutator = \Mockery::mock('OrderStateMutator');
+        $logger = \Mockery::mock('Logger');
+        $mocks['module']->shouldReceive('getService')
+            ->with('payplug.unified.payment_service_factory')
+            ->andReturn($factory);
+        $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
+        $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
+        $factory->shouldReceive('createLogger')->andReturn($logger);
+        $payment_repository->shouldReceive('save')->once();
+        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::PAID);
+        $logger->shouldReceive('error')->once()->with(\Mockery::pattern('/unknown currency/'));
+
+        $this->assertTrue($this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234)['result']);
+    }
+
     public function testValidatesTheOrderWithTheAmountOfAZeroDecimalCurrencyUnscaled()
     {
         [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
@@ -497,7 +545,7 @@ class UnifiedOrderActionTest extends TestCase
         $cart_adapter = \Mockery::mock('CartAdapter');
 
         $mocks['module']->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once();
@@ -535,13 +583,13 @@ class UnifiedOrderActionTest extends TestCase
         $state_mutator = \Mockery::mock('OrderStateMutator');
 
         $mocks['module']->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once();
         $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
         $state_mutator->shouldReceive('apply')->once();
-        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.alias')->never();
+        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.unified_alias')->never();
 
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234, null, []);
 
@@ -557,13 +605,13 @@ class UnifiedOrderActionTest extends TestCase
         $state_mutator = \Mockery::mock('OrderStateMutator');
 
         $mocks['module']->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('save')->once();
         $factory->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
         $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::FAILED);
-        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.alias')->never();
+        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.unified_alias')->never();
 
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(
             42,
@@ -578,30 +626,19 @@ class UnifiedOrderActionTest extends TestCase
         $this->assertFalse($result['result']);
     }
 
-    public function testDoesNotPersistAnAliasOnThreeDsPendingOutcome()
+    /**
+     * PRE-3557 rule: an order is created only for a paid payment. A cardholder back from 3DS
+     * already knows its result, so a THREE_DS_PENDING outcome never creates one.
+     */
+    public function testCreatesNoOrderForAThreeDsPendingOutcome()
     {
         [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
 
-        $context_adapter = \Mockery::mock('ContextAdapter');
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
-            }
-        }];
-        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
-        $context_adapter->shouldReceive('get')->andReturn($context);
-
-        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
-        $mocks['module']->shouldReceive('validateOrder')->once();
-
-        $payment_repository = \Mockery::mock('PaymentRepository');
-        $state_mutator = \Mockery::mock('OrderStateMutator');
-        $mocks['factory']->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
-        $payment_repository->shouldReceive('save')->once();
-        $mocks['factory']->shouldReceive('createOrderStateMutator')->andReturn($state_mutator);
-        $state_mutator->shouldReceive('apply')->once()->with('99', PaymentOutcome::THREE_DS_PENDING);
-        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.alias')->never();
+        $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0);
+        $mocks['module']->shouldReceive('validateOrder')->never();
+        $mocks['factory']->shouldReceive('createPaymentRepository')->never();
+        $mocks['factory']->shouldReceive('createOrderStateMutator')->never();
+        $mocks['module']->shouldReceive('getService')->with('payplug.models.repositories.unified_alias')->never();
 
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(
             42,
@@ -613,7 +650,9 @@ class UnifiedOrderActionTest extends TestCase
             []
         );
 
-        $this->assertTrue($result['result']);
+        $this->assertFalse($result['result']);
+        $this->assertFalse($result['persisted']);
+        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
     }
 
     /**
@@ -672,172 +711,5 @@ class UnifiedOrderActionTest extends TestCase
                 $expectation->andReturn(false);
             }],
         ];
-    }
-
-    /**
-     * Builds a UnifiedOrderAction instance without running its real constructor (which would
-     * otherwise build a real DependenciesClass when called with no argument, unavailable in this
-     * unit-test environment), assigning the mocked $dependencies directly onto its public
-     * property instead - same pattern OperationAction's own test suite already uses for that
-     * class. (The constructor does accept an optional $dependencies now, but going through
-     * newInstanceWithoutConstructor() here keeps every test in this file uniform.).
-     *
-     * @param mixed $dependencies
-     */
-    private function mockOrderAction($dependencies)
-    {
-        $order_action = (new \ReflectionClass(UnifiedOrderAction::class))->newInstanceWithoutConstructor();
-        $order_action->dependencies = $dependencies;
-
-        return $order_action;
-    }
-
-    /**
-     * Common mocks for the "an order already exists for this cart" branch shared by several
-     * tests above (createFromOutcome()'s reconciliation path and existingOrderRedirect()), up to
-     * (but not including) whatever each test's own scenario configures on top (the
-     * payment-repository/order-state-mutator factory wiring for createFromOutcome() tests).
-     *
-     * @return array{0: object, 1: array<string, object>}
-     */
-    private function mockDependenciesForExistingOrder()
-    {
-        $dependencies = \Mockery::mock('Dependencies');
-        $dependencies->name = 'payplug';
-
-        $plugin = \Mockery::mock('Plugin');
-        $order_adapter = \Mockery::mock('OrderAdapter');
-        $context_adapter = \Mockery::mock('ContextAdapter');
-        $module_adapter = \Mockery::mock('ModuleAdapter');
-        $module = \Mockery::mock('Module');
-        $validator = \Mockery::mock('OrderValidator');
-        $configuration_class = \Mockery::mock('ConfigurationClass');
-        $order_class = \Mockery::mock('OrderClass');
-
-        $existing_order = (object) [
-            'id' => 99,
-            'secure_key' => 'order_secure_key',
-            'module' => 'payplug',
-        ];
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?key=' . $params['key'] . '&id_order=' . $params['id_order'];
-            }
-        }];
-
-        $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
-        $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
-
-        $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
-        $plugin->shouldReceive('getContext')->andReturn($context_adapter);
-        $plugin->shouldReceive('getModule')->andReturn($module_adapter);
-        $plugin->shouldReceive('getConfigurationClass')->andReturn($configuration_class)->byDefault();
-        $configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn(false)->byDefault();
-        $plugin->shouldReceive('getOrderClass')->andReturn($order_class)->byDefault();
-        $order_class->shouldReceive('getOrderStates')->with(true)->andReturn(['error' => 5, 'paid' => 2, 'pending' => 1])->byDefault();
-
-        $order_adapter->shouldReceive('getIdByCartId')->with(42)->andReturn(99);
-        $order_adapter->shouldReceive('get')->with(99)->andReturn($existing_order);
-        $validator->shouldReceive('isCreated')->with($existing_order, 42)->andReturn(['result' => true]);
-        $context_adapter->shouldReceive('get')->andReturn($context);
-        $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
-        $module->id = 17;
-
-        return [$dependencies, [
-            'plugin' => $plugin,
-            'module' => $module,
-            'order_class' => $order_class,
-            'configuration_class' => $configuration_class,
-        ]];
-    }
-
-    /**
-     * Common mocks for the "no order exists yet, proceed to validateOrder()" branch shared by
-     * several tests above, up to (but not including) the getIdByCartId()/validateOrder() calls
-     * each test configures differently.
-     *
-     * @return array{0: object, 1: array<string, object>}
-     */
-    private function mockDependenciesForOrderCreation()
-    {
-        $dependencies = \Mockery::mock('Dependencies');
-        $dependencies->name = 'payplug';
-
-        $plugin = \Mockery::mock('Plugin');
-        $order_adapter = \Mockery::mock('OrderAdapter');
-        $cart_adapter = \Mockery::mock('CartAdapter');
-        $validator = \Mockery::mock('OrderValidator');
-        $configuration_class = \Mockery::mock('ConfigurationClass');
-        $order_class = \Mockery::mock('OrderClass');
-        $module_adapter = \Mockery::mock('ModuleAdapter');
-        $module = \Mockery::mock('Module');
-        $amount_helper = \Mockery::mock('AmountHelper');
-        $factory = \Mockery::mock('Factory');
-        $logger = \Mockery::mock('Logger');
-
-        $cart = (object) ['id' => 42, 'id_currency' => 2, 'id_customer' => 7, 'secure_key' => 'cart_secure_key'];
-
-        $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
-        $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
-        $dependencies->shouldReceive('getHelpers')->andReturn(['amount' => $amount_helper])->byDefault();
-
-        $currency_adapter = \Mockery::mock('CurrencyAdapter');
-        $plugin->shouldReceive('getCurrency')->andReturn($currency_adapter)->byDefault();
-        $currency_adapter->shouldReceive('getCurrency')->with(2)->andReturn((object) ['iso_code' => 'USD'])->byDefault();
-        $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
-        $plugin->shouldReceive('getCart')->andReturn($cart_adapter);
-        $plugin->shouldReceive('getConfigurationClass')->andReturn($configuration_class);
-        $plugin->shouldReceive('getOrderClass')->andReturn($order_class);
-        $plugin->shouldReceive('getModule')->andReturn($module_adapter);
-
-        $order_adapter->shouldReceive('get')->with(0)->andReturn(null);
-        $validator->shouldReceive('isCreated')->with(null, 42)->andReturn(['result' => false]);
-        $cart_adapter->shouldReceive('get')->with(42)->andReturn($cart);
-        $configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn(0);
-        $order_class->shouldReceive('getOrderStates')->with(true)->andReturn(['pending' => 5]);
-        $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
-        $amount_helper->shouldReceive('convertAmount')->with(1234, true, 'USD')->andReturn(12.34);
-
-        // Shared factory/logger (used by the validateOrder()-throws logging path, and reused as-is
-        // by tests exercising persistAndApplyOutcome() further down the happy path) - a single
-        // 'getService' expectation here, matched by every test in this group, avoids ambiguous
-        // duplicate expectations on the same mocked call.
-        $module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
-            ->andReturn($factory);
-        $factory->shouldReceive('createLogger')->andReturn($logger);
-
-        return [$dependencies, [
-            'plugin' => $plugin,
-            'order_adapter' => $order_adapter,
-            'module' => $module,
-            'factory' => $factory,
-            'logger' => $logger,
-            'currency_adapter' => $currency_adapter,
-        ]];
-    }
-
-    /**
-     * @param mixed $dependencies
-     * @param array<string, object> $mocks
-     *
-     * @return object the AliasRepository mock
-     */
-    private function mockAliasCollaborators($dependencies, array $mocks)
-    {
-        $currency_adapter = \Mockery::mock('CurrencyAdapter');
-        $prestashop_adapter = \Mockery::mock('PrestashopAdapter17');
-        $alias_repository = \Mockery::mock('AliasRepository');
-
-        $mocks['plugin']->shouldReceive('getCurrency')->andReturn($currency_adapter);
-        $currency_adapter->shouldReceive('getCurrency')->with(2)->andReturn((object) ['iso_code' => 'USD']);
-        $dependencies->shouldReceive('loadAdapterPresta')->andReturn($prestashop_adapter);
-        $prestashop_adapter->shouldReceive('getHostedFieldsIdentifier')->with('usd')->andReturn('ident_usd');
-        $mocks['module']->shouldReceive('getService')
-            ->with('payplug.models.repositories.alias')
-            ->andReturn($alias_repository);
-
-        return $alias_repository;
     }
 }
