@@ -21,7 +21,7 @@
  *  International Registered Trademark & Property of Payplug SAS
  */
 
-namespace PayPlug\src\models\classes;
+namespace PayPlug\src\unified\contract;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 use PayplugUnifiedCore\Contracts\IOrderStateMutator;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 
-class UpcOrderStateMutator implements IOrderStateMutator
+class UnifiedOrderStateMutator implements IOrderStateMutator
 {
     private $dependencies;
     private $logger;
@@ -38,7 +38,7 @@ class UpcOrderStateMutator implements IOrderStateMutator
     public function __construct($dependencies)
     {
         $this->dependencies = $dependencies;
-        $this->logger = new UpcLogger($dependencies);
+        $this->logger = new UnifiedLogger($dependencies);
     }
 
     /**
@@ -50,12 +50,12 @@ class UpcOrderStateMutator implements IOrderStateMutator
     public function apply(string $orderId, string $outcome): void
     {
         if (!PaymentOutcome::isValid($outcome)) {
-            throw new \RuntimeException('UpcOrderStateMutator::apply - Invalid outcome given: ' . $outcome);
+            throw new \RuntimeException('UnifiedOrderStateMutator::apply - Invalid outcome given: ' . $outcome);
         }
 
         $order = $this->dependencies->getPlugin()->getOrder()->get((int) $orderId);
         if (!$order || !(int) $order->id) {
-            throw new \RuntimeException('UpcOrderStateMutator::apply - Order not found for id: ' . $orderId);
+            throw new \RuntimeException('UnifiedOrderStateMutator::apply - Order not found for id: ' . $orderId);
         }
 
         $is_live = !(bool) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('sandbox_mode');
@@ -64,7 +64,7 @@ class UpcOrderStateMutator implements IOrderStateMutator
         $new_order_state = isset($order_states[$bucket]) ? (int) $order_states[$bucket] : 0;
 
         if (!$new_order_state) {
-            throw new \RuntimeException('UpcOrderStateMutator::apply - No order state configured for bucket: ' . $bucket);
+            throw new \RuntimeException('UnifiedOrderStateMutator::apply - No order state configured for bucket: ' . $bucket);
         }
 
         // Terminal-state guard: an order already marked paid must not be pushed backward to
@@ -76,7 +76,7 @@ class UpcOrderStateMutator implements IOrderStateMutator
         $is_regressive_bucket = in_array($bucket, ['error', 'refund'], true);
 
         if ($paid_order_state && $is_regressive_bucket && $paid_order_state === (int) $order->getCurrentState()) {
-            $this->logger->error('UpcOrderStateMutator::apply - Skipped regressive state transition to bucket "' . $bucket . '" for already-paid order id: ' . $orderId);
+            $this->logger->error('UnifiedOrderStateMutator::apply - Skipped regressive state transition to bucket "' . $bucket . '" for already-paid order id: ' . $orderId);
 
             return;
         }
@@ -90,13 +90,13 @@ class UpcOrderStateMutator implements IOrderStateMutator
             (int) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('order_state_partial_refund' . $state_addons),
         ]);
         if (in_array((int) $order->getCurrentState(), $refund_states, true)) {
-            $this->logger->info('UpcOrderStateMutator::apply - Skipped state transition to bucket "' . $bucket . '" for already-refunded order id: ' . $orderId);
+            $this->logger->info('UnifiedOrderStateMutator::apply - Skipped state transition to bucket "' . $bucket . '" for already-refunded order id: ' . $orderId);
 
             return;
         }
 
         if (true !== $this->dependencies->getPlugin()->getOrderClass()->updateOrderState($order, $new_order_state)) {
-            throw new \RuntimeException('UpcOrderStateMutator::apply - Could not move to bucket "' . $bucket . '" order id: ' . $orderId);
+            throw new \RuntimeException('UnifiedOrderStateMutator::apply - Could not move to bucket "' . $bucket . '" order id: ' . $orderId);
         }
     }
 

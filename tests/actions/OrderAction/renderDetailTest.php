@@ -15,6 +15,7 @@ use PayplugUnifiedCore\DataValues\PaymentOutcome;
 class renderDetailTest extends BaseOrderAction
 {
     protected $constant;
+    protected $operation_action;
 
     public function setUp(): void
     {
@@ -24,6 +25,15 @@ class renderDetailTest extends BaseOrderAction
         $this->plugin->shouldReceive([
             'getConstant' => $this->constant,
         ]);
+        $this->configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn('0');
+        $this->operation_action = \Mockery::mock('UnifiedPaymentAction');
+        $this->operation_action->shouldReceive('resyncPendingOrder')->andReturn(false)->byDefault();
+        $this->module->shouldReceive('getService')->with('payplug.action.unified_payment')->andReturn($this->operation_action);
+    }
+
+    public function tearDown(): void
+    {
+        \Mockery::close();
     }
 
     /**
@@ -146,7 +156,85 @@ class renderDetailTest extends BaseOrderAction
         $this->order_adapter->shouldReceive(['get' => $order]);
         $this->payment_repository->shouldReceive(['getBy' => []]);
         $this->validate_adapter->shouldReceive(['validate' => true]);
+        $this->configuration_class->shouldReceive('getValue')->with('order_state_pending')->andReturn('1');
         $this->mockUnifiedServices(null, 0);
+
+        $this->assertSame([], $this->action->renderDetail(42));
+    }
+
+    /**
+     * Same as the Retail payment methods' getResourceDetail(): a pending order is brought up to
+     * date with its payment when opened, then the order page is reloaded to show its new state.
+     */
+    public function testReloadsTheOrderPageOnceAPendingUhfOrderIsResynced()
+    {
+        $this->mockUhfOrder('USD', '42');
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 0);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->operation_action->shouldReceive('resyncPendingOrder')->once()->with(42)->andReturn(true);
+        $link = \Mockery::mock('Link');
+        $link->shouldReceive('getAdminLink')
+            ->with('AdminOrders', true, [], ['vieworder' => 1, 'id_order' => 42])
+            ->andReturn('admin/orders/42/view');
+        $this->plugin->getContext()->get()->link = $link;
+        $tools = \Mockery::mock('ToolsAdapter');
+        $tools->shouldReceive('tool')->once()->with('redirectAdmin', 'admin/orders/42/view');
+        $this->plugin->shouldReceive(['getTools' => $tools]);
+
+        $this->assertSame('uhf', $this->action->renderDetail(42)['refund']['payment_type']);
+    }
+
+    public function testRendersThePendingUhfOrderWithoutReloadingWhenItsStateIsUnchanged()
+    {
+        $this->mockUhfOrder('USD', '42');
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 0);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->operation_action->shouldReceive('resyncPendingOrder')->once()->with(42)->andReturn(false);
+        $this->plugin->shouldReceive('getTools')->never();
+
+        $result = $this->action->renderDetail(42);
+
+        $this->assertSame('uhf', $result['refund']['payment_type']);
+    }
+
+    public function testStillRendersTheOrderAndLogsWhenThePendingOrderResyncFails()
+    {
+        $this->mockUhfOrder('USD', '42');
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 0);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->operation_action->shouldReceive('resyncPendingOrder')->once()->andThrow(new \Exception('unified API down'));
+        $this->plugin->shouldReceive('getTools')->never();
+
+        $result = $this->action->renderDetail(42);
+
+        $this->assertSame('uhf', $result['refund']['payment_type']);
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::pattern('/order 42 could not be resynced.*unified API down/'), 'error')
+            ->once();
+    }
+
+    public function testNeverResyncsAnOrderThatIsNotPending()
+    {
+        $this->mockUhfOrder('USD', '1');
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 0);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->operation_action->shouldReceive('resyncPendingOrder')->never();
+
+        $this->assertSame('uhf', $this->action->renderDetail(42)['refund']['payment_type']);
+    }
+
+    public function testComparesTheOrderWithTheTestModePendingStateInSandbox()
+    {
+        $order = OrderMock::get();
+        $this->order_adapter->shouldReceive(['get' => $order]);
+        $this->payment_repository->shouldReceive(['getBy' => []]);
+        $this->validate_adapter->shouldReceive(['validate' => true]);
+        $configuration_class = \Mockery::mock('ConfigurationClass');
+        $configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn('1');
+        $configuration_class->shouldReceive('getValue')->with('order_state_pending_test')->andReturn('42');
+        $this->setPrivateProperty('configuration', $configuration_class);
+        $this->mockUnifiedServices(null, 0);
+        $this->operation_action->shouldReceive('resyncPendingOrder')->once()->with(42)->andReturn(false);
 
         $this->assertSame([], $this->action->renderDetail(42));
     }
@@ -256,8 +344,8 @@ class renderDetailTest extends BaseOrderAction
         $this->payment_repository->shouldReceive(['getBy' => ['resource_id' => 'pay_azerty12345', 'method' => 'standard']]);
         $this->validate_adapter->shouldReceive(['validate' => true]);
         $this->module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
-            ->andThrow(new \Exception("Table 'ps_payplug_upc_operation' doesn't exist"));
+            ->with('payplug.unified.payment_service_factory')
+            ->andThrow(new \Exception("Table 'ps_payplug_unified_operation' doesn't exist"));
 
         $result = $this->action->renderDetail(42);
 
@@ -287,7 +375,11 @@ class renderDetailTest extends BaseOrderAction
         $this->assertArrayNotHasKey('payment', $result);
     }
 
-    private function mockUhfOrder($iso_code = 'USD')
+    /**
+     * @param string $iso_code
+     * @param string $pending_state order_state_pending, the order mock being in state 42
+     */
+    private function mockUhfOrder($iso_code = 'USD', $pending_state = '1')
     {
         $adminClass = \Mockery::mock('AdminClass');
         $adminClass->shouldReceive(['getAdminAjaxUrl' => '/ajax']);
@@ -307,8 +399,8 @@ class renderDetailTest extends BaseOrderAction
         $currency_adapter->shouldReceive('get')->with(2)->andReturn($currency);
         $this->plugin->shouldReceive(['getCurrency' => $currency_adapter]);
 
-        $this->configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn('0');
         $this->configuration_class->shouldReceive('getValue')->with('order_state_refund')->andReturn('7');
+        $this->configuration_class->shouldReceive('getValue')->with('order_state_pending')->andReturn($pending_state);
 
         return $order;
     }
@@ -320,15 +412,15 @@ class renderDetailTest extends BaseOrderAction
     private function mockUnifiedServices($paid_operation, $refunded_cents)
     {
         $factory = \Mockery::mock('Factory');
-        $operation_repository = \Mockery::mock('OperationRepository');
-        $refund_repository = \Mockery::mock('UpcRefundRepository');
+        $operation_repository = \Mockery::mock('UnifiedOperationRepository');
+        $refund_repository = \Mockery::mock('UnifiedRefundRepository');
         $amount_helper = new AmountHelper(\Mockery::mock('Dependencies'));
         $price_adapter = \Mockery::mock('PriceAdapter');
 
         $this->module->shouldReceive('getService')
-            ->with('payplug.utilities.service.unified_api_payment_service_factory')
+            ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
-        $this->module->shouldReceive('getService')->with('payplug.models.repositories.upc_refund')->andReturn($refund_repository);
+        $this->module->shouldReceive('getService')->with('payplug.models.repositories.unified_refund')->andReturn($refund_repository);
         $this->module->shouldReceive('getService')->with('payplug.utilities.helper.amount')->andReturn($amount_helper);
         $this->module->shouldReceive('getService')->with('payplug.application.adapter.price')->andReturn($price_adapter);
         $factory->shouldReceive('createPaymentRepository')->andReturn($operation_repository);
@@ -337,5 +429,12 @@ class renderDetailTest extends BaseOrderAction
         $price_adapter->shouldReceive('formatPrice')->andReturnUsing(function ($price, $iso_code) {
             return $iso_code . ' ' . number_format($price, 2);
         });
+    }
+
+    private function setPrivateProperty($name, $value)
+    {
+        $property = new \ReflectionProperty(\PayPlug\src\actions\OrderAction::class, $name);
+        $property->setAccessible(true);
+        $property->setValue($this->action, $value);
     }
 }
