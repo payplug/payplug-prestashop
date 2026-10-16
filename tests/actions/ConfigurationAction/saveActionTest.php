@@ -321,6 +321,166 @@ class saveActionTest extends BaseConfigurationAction
         );
     }
 
+    public function testWhenIdentifierIsSaved()
+    {
+        $this->currencies = [['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_usd = 'ident_42';
+
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturn('{}');
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
+            ->once()
+            ->andReturn(true);
+
+        $this->mockSuccessfulHostedFieldsSave();
+
+        $this->assertSame(
+            true,
+            $this->action->saveAction($datas)['success']
+        );
+    }
+
+    public function testWhenIdentifierIsSavedWithoutExistingHostedFields()
+    {
+        $this->currencies = [['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_usd = 'ident_42';
+
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturn(false);
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
+            ->once()
+            ->andReturn(true);
+
+        $this->mockSuccessfulHostedFieldsSave();
+
+        $this->assertSame(
+            true,
+            $this->action->saveAction($datas)['success']
+        );
+    }
+
+    public function testWhenHostedFieldsCannotBeUpdated()
+    {
+        $this->currencies = [['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_usd = 'ident_42';
+
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturn('{}');
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', \Mockery::any())
+            ->andReturn(false);
+
+        $this->assertSame(
+            [
+                'success' => false,
+                'data' => [
+                    'title' => null,
+                    'msg' => 'modal.hosted_fields.identifier.text',
+                    'close' => 'modal.error.submit',
+                    'class' => '-error',
+                ],
+            ],
+            $this->action->saveAction($datas)
+        );
+    }
+
+    public function testWhenIdentifierIsSavedItIsTrimmed()
+    {
+        $this->currencies = [['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_usd = "  ident_42 \n";
+
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturn('{}');
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', json_encode(['usd' => 'ident_42']))
+            ->once()
+            ->andReturn(true);
+
+        $this->mockSuccessfulHostedFieldsSave();
+
+        $this->assertTrue($this->action->saveAction($datas)['success']);
+    }
+
+    public function testWhenIdentifierIsSavedItKeepsOtherCurrencies()
+    {
+        $this->currencies = [['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_usd = 'ident_42';
+
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturn(json_encode(['gbp' => 'ident_gbp', 'usd' => 'ident_old']));
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', json_encode(['gbp' => 'ident_gbp', 'usd' => 'ident_42']))
+            ->once()
+            ->andReturn(true);
+
+        $this->mockSuccessfulHostedFieldsSave();
+
+        $this->assertTrue($this->action->saveAction($datas)['success']);
+    }
+
+    public function testWhenEurIdentifierIsGivenItIsNotSaved()
+    {
+        $this->currencies = [['iso_code' => 'EUR'], ['iso_code' => 'USD']];
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->payplug_standard = 1;
+        $datas->payplug_identifier_eur = 'ident_eur';
+        $datas->payplug_identifier_usd = 'ident_42';
+
+        $hosted_fields = '{}';
+        $this->configuration_class->shouldReceive('getValue')
+            ->with('hosted_fields')
+            ->andReturnUsing(function () use (&$hosted_fields) {
+                return $hosted_fields;
+            });
+
+        $this->configuration_class->shouldReceive('set')
+            ->with('hosted_fields', \Mockery::any())
+            ->andReturnUsing(function ($key, $value) use (&$hosted_fields) {
+                $hosted_fields = $value;
+
+                return true;
+            });
+
+        $this->mockSuccessfulHostedFieldsSave();
+
+        $this->assertTrue($this->action->saveAction($datas)['success']);
+        $this->assertSame(json_encode(['usd' => 'ident_42']), $hosted_fields);
+    }
+
     /**
      * @description Wire up what the Scalapay branch of saveAction() needs: the account's
      *              authorized range and the euro/cent conversion.
@@ -468,5 +628,27 @@ class saveActionTest extends BaseConfigurationAction
         $datas->scalapay_max_amounts = $max;
 
         return $datas;
+    }
+
+    private function mockSuccessfulHostedFieldsSave()
+    {
+        $this->configuration_class->shouldReceive('set')
+            ->with('payment_methods', \Mockery::any())
+            ->andReturn(true);
+
+        $this->configuration->shouldReceive([
+            'updateValue' => true,
+        ]);
+
+        $this->action->shouldReceive([
+            'renderConfiguration' => [
+                'success' => true,
+                'data' => [],
+            ],
+        ]);
+
+        $this->api_service->shouldReceive([
+            'initialize' => true,
+        ]);
     }
 }
