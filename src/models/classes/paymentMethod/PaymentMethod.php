@@ -1135,7 +1135,9 @@ class PaymentMethod
         $this->setParameters();
 
         $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
-
+        if (empty($payplug_amounts)) {
+            return [];
+        }
         return isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
     }
 
