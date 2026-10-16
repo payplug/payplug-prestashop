@@ -10,23 +10,7 @@
   - [PRE-3627](https://github.com/payplug/payplug-prestashop/pull/130): Refund Unified Hosted Fields orders, fully or partially, from the back office
   - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Keep Unified Hosted Fields payments, saved cards and back-office refunds working with the new Unified API contract (unified-plugin-core ^1.2.1)
 
-- Bugfix :
-  - [PRE-3729](https://github.com/payplug/payplug-prestashop/pull/134): Fix reflected XSS on the front `ajax` controller: answer with a JSON content type, accept `addLogger` on POST only and stop reflecting the logged message
-  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state (every stored scope, multistore included)
-  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
-    - [PRE-3557](https://payplug-prod.atlassian.net/browse/PRE-3557): Don't create an order (and send the confirmation email) until a card payment is confirmed paid, deferred or Oney; let late payment failures cancel the order instead of being silently dropped
-    - [PRE-3580](https://payplug-prod.atlassian.net/browse/PRE-3580): Stop answering 500 (retried in a loop by PayPlug) to a replayed IPN for a failed payment whose cart association was already replaced by a newer attempt
-
-## Version 5.2.2
-- Bugfix :
-  - [PRE-3736](https://github.com/payplug/payplug-prestashop/pull/138): Fix duplicate paid orders when the PayPlug notification and the customer's return reach order creation at the same time: serialise order creation per cart with a database lock
-  - [PRE-3729](https://github.com/payplug/payplug-prestashop/pull/134): Fix reflected XSS on the front `ajax` controller: answer with a JSON content type, accept `addLogger` on POST only and stop reflecting the logged message
-  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state (every stored scope, multistore included)
-  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
-  - [PRE-3735](https://github.com/payplug/payplug-prestashop/pull/135): Stop running the back-office REST routes (login, logout, configuration) for unauthenticated requests whose Referer header contains "localhost"
-  - [PRE-3735](https://github.com/payplug/payplug-prestashop/pull/135): Fix the return, cancel and notification URLs of MCP payment links, so a paid link updates the order
-
-## Version 5.2.0
+## Version 5.1.1
 - Feature :
   - [PRE-3601](https://github.com/payplug/payplug-prestashop/pull/119): Let the merchant narrow the Scalapay amount range from the back office, and hide Scalapay at checkout for carts outside it
 
@@ -35,6 +19,12 @@
   - [PRE-3598](https://github.com/payplug/payplug-prestashop/pull/125): Only start the integrated card payment from its own checkout form
   - [PRE-3599](https://github.com/payplug/payplug-prestashop/pull/131): Fix duplicate customer/address with applepay express
   - [PRE-3649](https://github.com/payplug/payplug-prestashop/pull/132): Hide the Apple Pay button on the product and cart pages when a product (or pack) can't be ordered regarding its stock or minimal quantity, and refuse the Apple Pay payment request in that case
+  - [PRE-3736](https://github.com/payplug/payplug-prestashop/pull/138): Fix duplicate paid orders when the PayPlug notification and the customer's return reach order creation at the same time: serialise order creation per cart with a database lock
+  - [PRE-3729](https://github.com/payplug/payplug-prestashop/pull/134): Fix reflected XSS on the front `ajax` controller: answer with a JSON content type, accept `addLogger` on POST only and stop reflecting the logged message
+  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): Stop reusing PrestaShop Checkout's partially refunded state (`PS_CHECKOUT_STATE_PARTIALLY_REFUNDED`) for Payplug partial refunds; create a dedicated "Partially refunded [PayPlug]" state and repair shops already pointing to another module's state (every stored scope, multistore included)
+  - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
+  - [PRE-3735](https://github.com/payplug/payplug-prestashop/pull/135): Stop running the back-office REST routes (login, logout, configuration) for unauthenticated requests whose Referer header contains "localhost"
+  - [PRE-3735](https://github.com/payplug/payplug-prestashop/pull/135): Fix the return, cancel and notification URLs of MCP payment links, so a paid link updates the order
 
 ## Version 5.1.0
 - Feature :
