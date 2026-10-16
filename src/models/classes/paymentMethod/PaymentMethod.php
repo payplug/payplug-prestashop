@@ -1108,7 +1108,7 @@ class PaymentMethod
         $payment = $this->api_service->createPayment($payment_tab);
 
         if (200 != (int) $payment['code']) {
-            return $this->processPaymentError((int) $payment['code'], $payment_tab);
+            return $this->processPaymentError((int) $payment['code'], $payment_tab, $payment);
         }
 
         return $payment;
@@ -1551,8 +1551,7 @@ class PaymentMethod
             $billing['company_name'] = empty($billing['company_name'])
                 ? $billing['first_name'] . ' ' . $billing['last_name']
                 : $billing['company_name'];
-            $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: $billing['mobile_phone_number'];
-            $billing['mobile_phone_number'] = $billing['mobile_phone_number'] ?: $billing['landline_phone_number'];
+            $billing = $this->completePhoneNumbers($billing);
 
             // Set shipping informations
             $delivery_type = 'NEW';
@@ -1584,14 +1583,30 @@ class PaymentMethod
             $shipping['company_name'] = empty($shipping['company_name'])
                 ? $shipping['first_name'] . ' ' . $shipping['last_name']
                 : $shipping['company_name'];
-            $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: $shipping['mobile_phone_number'];
-            $shipping['mobile_phone_number'] = $shipping['mobile_phone_number'] ?: $shipping['landline_phone_number'];
+            $shipping = $this->completePhoneNumbers($shipping);
 
             $payment_tab['shipping'] = $shipping;
             $payment_tab['billing'] = $billing;
         }
 
         return $payment_tab;
+    }
+
+    /**
+     * @description Copy the available phone number into the empty phone field of an
+     *              address; a field without a number is null, never an empty string.
+     *
+     * @return array
+     */
+    protected function completePhoneNumbers(array $address)
+    {
+        $landline = !empty($address['landline_phone_number']) ? $address['landline_phone_number'] : null;
+        $mobile = !empty($address['mobile_phone_number']) ? $address['mobile_phone_number'] : null;
+
+        $address['landline_phone_number'] = $landline ?: $mobile;
+        $address['mobile_phone_number'] = $mobile ?: $landline;
+
+        return $address;
     }
 
     /**
@@ -1694,6 +1709,69 @@ class PaymentMethod
         $visible_suffix = substr($phone_number, -2);
 
         return $visible_prefix . str_repeat('*', $length - 5) . $visible_suffix;
+    }
+
+    /**
+     * @description Mask every email-like and phone-number-like sequence of a text for logging.
+     *
+     * @param string $text
+     *
+     * @return string
+     */
+    protected function maskPersonalDataInText($text)
+    {
+        // The local part of an email is fully masked; its domain is kept to correlate refusals.
+        $text = (string) preg_replace(
+            '/(?<![^\s@"\'<>(),;:])[^\s@"\'<>(),;:]++@(?=[^\s@"\'<>(),;:]+\.[^\s@"\'<>(),;:]+)/',
+            '***@',
+            (string) $text
+        );
+
+        // Long numeric ids or timestamps match as well and are masked too, which is accepted.
+        return (string) preg_replace_callback('/\+?\d[\d .()\/-]{6,}\d/', function ($matches) {
+            return $this->maskPhoneNumberForLogging($matches[0]);
+        }, $text);
+    }
+
+    /**
+     * @description Build the refusal reason to log from a failed API call response:
+     *              the API error message and its error type and field details,
+     *              with personal data masked and the details capped in length.
+     *
+     * @param array $api_response
+     *
+     * @return string
+     */
+    protected function getApiRefusalReason($api_response = [])
+    {
+        if (!is_array($api_response)) {
+            return '';
+        }
+
+        $details = isset($api_response['details']) && is_array($api_response['details'])
+            ? $api_response['details']
+            : [];
+
+        $message = '';
+        if (isset($details['message']) && is_string($details['message'])) {
+            $message = $details['message'];
+        } elseif (isset($api_response['message']) && is_string($api_response['message'])) {
+            $message = $api_response['message'];
+        }
+
+        $reason = '' !== $message ? ': ' . $this->maskPersonalDataInText($message) : '';
+        $error_details = array_intersect_key($details, array_flip(['error_type', 'details']));
+        if (!empty($error_details)) {
+            $encoded_details = $this->maskPersonalDataInText(
+                json_encode($error_details, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            );
+            if (mb_strlen($encoded_details, 'UTF-8') > 500) {
+                $encoded_details = mb_substr($encoded_details, 0, 500, 'UTF-8') . '…';
+            }
+            $reason .= '; details: ' . $encoded_details;
+        }
+
+        return $reason;
     }
 
     /**
@@ -1877,11 +1955,21 @@ class PaymentMethod
      *
      * @param $error_code
      * @param $payment_tab
+     * @param array $api_response response of the failed API call
      *
      * @return array
      */
-    protected function processPaymentError($error_code = 0, $payment_tab = [])
+    protected function processPaymentError($error_code = 0, $payment_tab = [], $api_response = [])
     {
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog(
+                'PaymentMethod::processPaymentError() - Payment resource creation failed (HTTP ' . (int) $error_code . ')'
+                    . $this->getApiRefusalReason($api_response),
+                'error'
+            );
+
         // If the payment resource can't be created due to bad permission, we update the feature activation
         if (403 == $error_code) {
             $cart = $this->dependencies

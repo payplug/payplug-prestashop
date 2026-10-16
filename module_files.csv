@@ -14073,6 +14073,7 @@ tests/models/classes/paymentMethod/PaymentMethod/getResourceDetailTest.php
 tests/models/classes/paymentMethod/PaymentMethod/getReturnUrlTest.php
 tests/models/classes/paymentMethod/PaymentMethod/isValidResourceTest.php
 tests/models/classes/paymentMethod/PaymentMethod/postProcessOrderTest.php
+tests/models/classes/paymentMethod/PaymentMethod/processPaymentErrorTest.php
 tests/models/classes/paymentMethod/PaymentMethod/refundTest.php
 tests/models/classes/paymentMethod/PaymentMethod/resetPaymentMethodFromPermissionTest.php
 tests/models/classes/paymentMethod/PaymentMethod/retrieveTest.php
@@ -14085,6 +14086,7 @@ tests/models/classes/paymentMethod/SatispayPaymentMethod/getPaymentTabTest.php
 tests/models/classes/paymentMethod/ScalapayPaymentMethod/getScalapayLimitsCurrencyTest.php
 tests/models/classes/paymentMethod/ScalapayPaymentMethod/getScalapayPaymentContextTest.php
 tests/models/classes/paymentMethod/StandardPaymentMethod/BaseStandardPaymentMethod.php
+tests/models/classes/paymentMethod/StandardPaymentMethod/completePhoneNumbersTest.php
 tests/models/classes/paymentMethod/StandardPaymentMethod/formatPhoneNumberSafelyTerritoryTest.php
 tests/models/classes/paymentMethod/StandardPaymentMethod/getDeferredStateTest.php
 tests/models/classes/paymentMethod/StandardPaymentMethod/getOptionTest.php
