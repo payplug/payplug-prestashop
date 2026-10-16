@@ -794,7 +794,7 @@ class InstallmentPaymentMethod extends PaymentMethod
             ->createInstallment($payment_tab);
 
         if (200 != (int) $payment['code']) {
-            return $this->processPaymentError((int) $payment['code'], $payment_tab);
+            return $this->processPaymentError((int) $payment['code'], $payment_tab, $payment);
         }
 
         return $this->retrieveSchedules($payment);

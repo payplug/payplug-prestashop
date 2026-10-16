@@ -8,6 +8,8 @@
   - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
   - [PRE-3735](https://github.com/payplug/payplug-prestashop/pull/135): Stop running the back-office REST routes (login, logout, configuration) for unauthenticated requests whose Referer header contains "localhost"
   - [PRE-3735](https://github.com/payplug/payplug-prestashop/pull/135): Fix the return, cancel and notification URLs of MCP payment links, so a paid link updates the order
+  - [PRE-3704](https://payplug-prod.atlassian.net/browse/PRE-3704): Log the reason returned by Payplug when it refuses to create a payment or an installment plan, with phone numbers masked
+  - [PRE-3704](https://payplug-prod.atlassian.net/browse/PRE-3704): Fix payments refused ("Resource can't be created from given tab") when the customer's phone number cannot be formatted for the address country (invalid number, or number from another country): no phone number is sent instead of an empty one, so the payment is created
 
 ## Version 5.2.0
 - Feature :
