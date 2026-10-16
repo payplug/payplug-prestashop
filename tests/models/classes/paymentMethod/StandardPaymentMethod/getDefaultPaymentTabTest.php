@@ -228,6 +228,63 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
         ];
     }
 
+    public function testMobileIsCopiedToEmptyLandline()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'getIsoCodeByCountryId' => 'BE',
+        ]);
+        $this->dependencies->configClass = $configClass;
+        $address = $this->address_adapter->get(42);
+        $address->phone = '';
+        $address->phone_mobile = '0470 12 34 56';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        foreach (['billing', 'shipping'] as $type) {
+            $this->assertSame('+32470123456', $payment_tab[$type]['landline_phone_number']);
+            $this->assertSame('+32470123456', $payment_tab[$type]['mobile_phone_number']);
+        }
+    }
+
+    public function testValidMobileIsCopiedToInvalidLandline()
+    {
+        $address = $this->address_adapter->get(42);
+        $address->phone = '0612345';
+        $address->phone_mobile = '0612345678';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        foreach (['billing', 'shipping'] as $type) {
+            $this->assertSame('+33612345678', $payment_tab[$type]['landline_phone_number']);
+            $this->assertSame('+33612345678', $payment_tab[$type]['mobile_phone_number']);
+        }
+    }
+
+    /**
+     * @description Billing and shipping share the address fixture: the mobile is
+     * only valid for the shipping country.
+     */
+    public function testInvalidBillingPhoneDoesNotAffectShippingPhone()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('getIsoCodeByCountryId')
+            ->andReturn('BE', 'FR');
+        $this->dependencies->configClass = $configClass;
+        $address = $this->address_adapter->get(42);
+        $address->phone = '';
+        $address->phone_mobile = '0612345678';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        $this->assertSame('BE', $payment_tab['billing']['country']);
+        $this->assertNull($payment_tab['billing']['landline_phone_number']);
+        $this->assertNull($payment_tab['billing']['mobile_phone_number']);
+        $this->assertSame('FR', $payment_tab['shipping']['country']);
+        $this->assertSame('+33612345678', $payment_tab['shipping']['landline_phone_number']);
+        $this->assertSame('+33612345678', $payment_tab['shipping']['mobile_phone_number']);
+    }
+
     /**
      * @description maskPhoneNumberForLogging() must never write a customer's
      * full phone number to the logs (Kibana/support exports), per code review
