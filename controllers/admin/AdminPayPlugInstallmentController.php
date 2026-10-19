@@ -244,11 +244,15 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                 ->getCustomer()
                 ->get((int) $order['id_customer']);
 
-            $amount = $this->dependencies
+            $cart = $this->dependencies
                 ->getPlugin()
                 ->getCart()
-                ->get((int) $payment['id_cart'])
-                ->getOrderTotal(true);
+                ->get((int) $payment['id_cart']);
+            $amount = $cart->getOrderTotal(true);
+            $currency = $this->dependencies
+                ->getPlugin()
+                ->getCurrency()
+                ->get((int) $cart->id_currency);
 
             foreach ($schedules as $schedule) {
                 $this->_list[] = [
@@ -264,7 +268,7 @@ class AdminPayPlugInstallmentController extends ModuleAdminController
                         ->getModule()
                         ->getInstanceByName($this->dependencies->name)
                         ->getService('payplug.utilities.helper.amount')
-                        ->convertAmount($schedule['amount'], true),
+                        ->convertAmount($schedule['amount'], true, $currency->iso_code),
                     'status' => $this->getPaymentStatusById($schedule['status']),
                     'scheduled_date' => $schedule['scheduled_date'],
                 ];

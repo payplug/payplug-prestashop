@@ -388,9 +388,22 @@ class Mcp
             $this->context->cart = $cart_adapter->get((int)$current_cart->id);
             $cart_total = $current_cart->getOrderTotal();
             $currency = $this->currency->get((int)$current_cart->id_currency);
+            $amount = (int)$this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.helper.amount')
+                ->convertAmount($cart_total, false, $currency->iso_code);
+            if (!$amount) {
+                return [
+                    'result' => false,
+                    'code' => 500,
+                    'message' => 'The cart amount cannot be converted.',
+                ];
+            }
             $dto_params = [
                 'cart_id' => (int)$current_cart->id,
-                'amount' => (int)round($cart_total * 100),
+                'amount' => $amount,
                 'currency_iso_code' => $currency->iso_code,
                 'customer' => [
                     'identifier' => $customer_id, // Non mandatory

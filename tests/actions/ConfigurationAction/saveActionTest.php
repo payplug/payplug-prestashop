@@ -197,6 +197,15 @@ class saveActionTest extends BaseConfigurationAction
         $this->assertSame('EUR:200000', $stored['scalapay_custom_max_amounts']);
     }
 
+    public function testScalapayAmountsAreConvertedInTheAccountLimitsCurrency()
+    {
+        $stored = &$this->stubScalapaySave(['min' => 500, 'max' => 400000], 'JPY');
+
+        $this->assertTrue($this->action->saveAction($this->scalapaySaveData(1000, 200000))['success']);
+        $this->assertSame('JPY:1000', $stored['scalapay_custom_min_amounts']);
+        $this->assertSame('JPY:200000', $stored['scalapay_custom_max_amounts']);
+    }
+
     public function testWhenScalapayMinAmountIsSubmittedAloneAboveTheMaximumInForce()
     {
         // The merchant already capped Scalapay at 2000 EUR. A payload carrying the
@@ -291,6 +300,19 @@ class saveActionTest extends BaseConfigurationAction
         $this->assertSame('EUR:20000', $stored['oney_custom_min_amounts']);
     }
 
+    public function testOneyAmountIsConvertedInTheOneyLimitsCurrency()
+    {
+        $stored = &$this->stubOneySave('JPY');
+
+        $datas = new \stdClass();
+        $datas->action = 'payplug_save_data';
+        $datas->enable_oney = true;
+        $datas->oney_min_amounts = 20000;
+
+        $this->assertTrue($this->action->saveAction($datas)['success']);
+        $this->assertSame('JPY:20000', $stored['oney_custom_min_amounts']);
+    }
+
     public function testWhenConfigurationCanBeUpdate()
     {
         $datas = new \stdClass();
@@ -329,10 +351,11 @@ class saveActionTest extends BaseConfigurationAction
      *                               account's range already narrowed by their own custom
      *                               amounts. Defaults to the account's own range, as for
      *                               a merchant who never narrowed anything.
+     * @param string $currency currency of the account's limits
      *
      * @return array the configuration keys saveAction() persisted, by key
      */
-    private function &stubScalapaySave($limits_in_force = ['min' => 500, 'max' => 400000])
+    private function &stubScalapaySave($limits_in_force = ['min' => 500, 'max' => 400000], $currency = 'EUR')
     {
         $scalapay = \Mockery::mock('ScalapayPaymentMethod');
         $scalapay->shouldReceive('getScalapayPriceLimit')
@@ -345,9 +368,11 @@ class saveActionTest extends BaseConfigurationAction
             ->withNoArgs()
             ->andReturn($limits_in_force);
         $scalapay->shouldReceive('setCustomScalapayLimit')
-            ->andReturnUsing(function ($amount) {
-                return 'EUR:' . (int) $amount;
+            ->andReturnUsing(function ($amount) use ($currency) {
+                return $currency . ':' . (int) $amount;
             });
+        $scalapay->shouldReceive('getScalapayLimitsCurrency')
+            ->andReturn($currency);
 
         $payment_method_class = \Mockery::mock('PaymentMethodClass');
         $payment_method_class->shouldReceive('getPaymentMethod')
@@ -359,8 +384,8 @@ class saveActionTest extends BaseConfigurationAction
 
         $amount_helper = \Mockery::mock('AmountHelper');
         $amount_helper->shouldReceive('convertAmount')
-            ->andReturnUsing(function ($amount) {
-                return (int) round($amount * 100);
+            ->andReturnUsing(function ($amount, $from_cents, $currency) {
+                return (int) round($amount * ('JPY' === $currency ? 1 : 100));
             });
         $this->module
             ->shouldReceive('getService')
@@ -398,9 +423,11 @@ class saveActionTest extends BaseConfigurationAction
      * @description Wire up what the Oney branch of saveAction() needs: the account's
      *              authorized range and the euro/cent conversion.
      *
+     * @param string $currency currency of the Oney limits
+     *
      * @return array the configuration keys saveAction() persisted, by key
      */
-    private function &stubOneySave()
+    private function &stubOneySave($currency = 'EUR')
     {
         $oney = \Mockery::mock('OneyPaymentMethod');
         $oney->shouldReceive('getOneyPriceLimit')
@@ -410,9 +437,11 @@ class saveActionTest extends BaseConfigurationAction
                 'max' => 300000,
             ]);
         $oney->shouldReceive('setCustomOneyLimit')
-            ->andReturnUsing(function ($amount) {
-                return 'EUR:' . (int) $amount;
+            ->andReturnUsing(function ($amount) use ($currency) {
+                return $currency . ':' . (int) $amount;
             });
+        $oney->shouldReceive('getOneyLimitsCurrency')
+            ->andReturn($currency);
 
         $payment_method_class = \Mockery::mock('PaymentMethodClass');
         $payment_method_class->shouldReceive('getPaymentMethod')
@@ -424,8 +453,8 @@ class saveActionTest extends BaseConfigurationAction
 
         $amount_helper = \Mockery::mock('AmountHelper');
         $amount_helper->shouldReceive('convertAmount')
-            ->andReturnUsing(function ($amount) {
-                return (int) round($amount * 100);
+            ->andReturnUsing(function ($amount, $from_cents, $currency) {
+                return (int) round($amount * ('JPY' === $currency ? 1 : 100));
             });
         $this->module
             ->shouldReceive('getService')

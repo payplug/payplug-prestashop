@@ -2,6 +2,7 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\PaymentMethod;
 
+use Payplug\Resource\Payment;
 use PayPlug\tests\mock\PaymentMock;
 use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
@@ -70,5 +71,42 @@ class getOrderTabTest extends BasePaymentMethod
             'module_name' => 'order.module.default',
         ];
         $this->assertSame($expected, $this->class->getOrderTab($retrieve));
+    }
+
+    public function testAmountIsConvertedInTheResourceCurrency()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('order_state_pending')
+            ->andReturn('6');
+
+        $this->class->getOrderTab([
+            'result' => true,
+            'resource' => PaymentMock::getStandard(['currency' => 'JPY']),
+        ]);
+
+        $this->amountHelper->shouldHaveReceived('convertAmount')
+            ->with(31320, true, 'JPY')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testAmountOfAResourceWithoutCurrencyIsConvertedWithoutCurrency()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('order_state_pending')
+            ->andReturn('6');
+        $attributes = PaymentMock::getDefault([]);
+        unset($attributes['currency']);
+        $resource = Payment::fromAttributes($attributes);
+
+        $this->class->getOrderTab([
+            'result' => true,
+            'resource' => $resource,
+        ]);
+
+        $this->amountHelper->shouldHaveReceived('convertAmount')
+            ->with(31320, true, '')
+            ->once();
+        $this->addToAssertionCount(1);
     }
 }

@@ -72,4 +72,31 @@ class getErrorLabelTest extends BaseOneyPaymentMethod
             $this->class->getErrorLabel($error)
         );
     }
+
+    public function testAmountLimitsAreFormattedInTheShopDefaultCurrency()
+    {
+        $currency = new \stdClass();
+        $currency->iso_code = 'jpy';
+        $this->configuration->shouldReceive('getValue')
+            ->with('PS_CURRENCY_DEFAULT')
+            ->andReturn('42');
+        $this->currency_adapter->shouldReceive('get')
+            ->with(42)
+            ->andReturn($currency);
+        $this->validate_adapter->shouldReceive('validate')->andReturn(true);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('strtoupper', 'jpy')
+            ->andReturn('JPY');
+        $this->class->shouldReceive('getOneyPriceLimit')
+            ->with(true)
+            ->andReturn(['min' => 10000, 'max' => 300000]);
+        $this->amountHelper->shouldReceive('formatOneyAmount')
+            ->andReturn(['result' => 0.0, 'message' => '']);
+
+        $this->class->getErrorLabel('amount');
+
+        $this->amountHelper->shouldHaveReceived('formatOneyAmount')->with(10000, 'JPY')->once();
+        $this->amountHelper->shouldHaveReceived('formatOneyAmount')->with(300000, 'JPY')->once();
+        $this->addToAssertionCount(1);
+    }
 }

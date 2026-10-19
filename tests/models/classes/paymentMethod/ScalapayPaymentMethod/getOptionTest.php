@@ -66,4 +66,16 @@ class getOptionTest extends BaseScalapayPaymentMethod
         $this->assertSame(2000.0, $descriptions['max_amount']['value']);
         $this->assertSame(4000.0, $descriptions['max_amount']['default']);
     }
+
+    public function testThresholdsAreConvertedInTheAccountLimitsCurrency()
+    {
+        $this->stubCustomLimits('', '');
+
+        $this->class->getOption([]);
+
+        $this->amountHelper->shouldHaveReceived('convertAmount')->with(500, true, 'EUR');
+        $this->amountHelper->shouldHaveReceived('convertAmount')->with(400000, true, 'EUR');
+        $this->amountHelper->shouldNotHaveReceived('convertAmount', [\Mockery::any(), true, '']);
+        $this->addToAssertionCount(1);
+    }
 }

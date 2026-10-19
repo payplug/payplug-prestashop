@@ -31,6 +31,21 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class PaymentMethod
 {
+    /**
+     * Overseas territories sharing the French numbering, where shoppers often enter a
+     * metropolitan number in national format.
+     */
+    const FRENCH_NUMBERING_TERRITORIES = ['GP', 'MQ', 'RE', 'GF', 'YT', 'PM', 'BL', 'MF', 'NC', 'PF', 'WF'];
+
+    /**
+     * Territories sharing the +590 numbering with Guadeloupe: libphonenumber attributes
+     * a shared number to the first of these regions it is valid in.
+     */
+    const SHARED_NUMBERING_REGIONS = [
+        'BL' => ['GP', 'MF'],
+        'MF' => ['GP', 'BL'],
+    ];
+
     /** @var bool */
     public $cancellable = true;
 
@@ -401,7 +416,7 @@ class PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount')
-            ->convertAmount($resource->amount, true);
+            ->convertAmount($resource->amount, true, isset($resource->currency) ? $resource->currency : '');
 
         $state_addons = $resource->is_live ? '' : '_test';
         $state = (bool) $resource->is_paid ? 'order_state_paid' : 'order_state_pending';
@@ -811,15 +826,19 @@ class PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount');
-        $refunded = $amountHelper->convertAmount($resource->amount_refunded, true);
+        $currency = isset($resource->currency) ? $resource->currency : '';
+        $display_currency = is_string($currency) && '' !== $currency
+            ? $currency
+            : (isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : '');
+        $refunded = $amountHelper->convertAmount($resource->amount_refunded, true, $currency);
         $available = 10 <= $amount_available
-            ? $amountHelper->convertAmount($amount_available, true)
+            ? $amountHelper->convertAmount($amount_available, true, $currency)
             : 0;
         $refund = [
             'refunded' => $refunded,
-            'refunded_display' => $price_adapter->formatPrice($refunded, $this->context->currency->iso_code),
+            'refunded_display' => $price_adapter->formatPrice($refunded, $display_currency),
             'available' => $available,
-            'available_display' => $price_adapter->formatPrice($available, $this->context->currency->iso_code),
+            'available_display' => $price_adapter->formatPrice($available, $display_currency),
             'is_refunded' => (bool) $resource->is_refunded,
         ];
         $can_be_refund = $resource->is_paid
@@ -829,8 +848,8 @@ class PaymentMethod
             $refund['available'] = 0;
         }
 
-        $amount = $amountHelper->convertAmount($resource->amount, true);
-        $amount_display = $price_adapter->formatPrice($amount, $this->context->currency->iso_code);
+        $amount = $amountHelper->convertAmount($resource->amount, true, $currency);
+        $amount_display = $price_adapter->formatPrice($amount, $display_currency);
 
         return [
             'id' => $resource->id,
@@ -1415,7 +1434,7 @@ class PaymentMethod
         $cart_amount = $this->context->cart->getOrderTotal(true);
         $is_valid_amount = $this->dependencies
             ->getHelpers()['amount']
-            ->validateAmount($price_limit, (float) $cart_amount);
+            ->validateAmount($price_limit, (float) $cart_amount, $this->context->currency->iso_code);
         if (!$is_valid_amount['result']) {
             $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
 
@@ -1428,7 +1447,7 @@ class PaymentMethod
                 ->getModule()
                 ->getInstanceByName($this->dependencies->name)
                 ->getService('payplug.utilities.helper.amount')
-                ->convertAmount($cart_amount),
+                ->convertAmount($cart_amount, false, $this->context->currency->iso_code),
             'currency' => $this->context->currency->iso_code,
             'notification_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ipn', [], true),
             'force_3ds' => false,
@@ -1576,17 +1595,46 @@ class PaymentMethod
     }
 
     /**
-     * Formats a phone number to E.164 for the Payplug API, returning null
-     * if it cannot be parsed or is not valid for the given country — the
-     * safe-fallback contract previously provided by the deprecated
-     * PhoneNumber::formatPhoneNumber() service.
+     * @description Whether the phone numbers sent for this payment method must belong
+     *              to the address country.
      *
-     * Returning null rather than an empty string matters downstream: an
-     * empty string reads as "a phone number was supplied and it's blank",
-     * while null reads as "no phone number available" — the contract every
-     * other caller here (ApplepayPaymentMethod, OneyPaymentMethod, and the
-     * billing/shipping arrays built by getDefaultPaymentTab()) already uses
-     * for an absent phone number.
+     * @return bool
+     */
+    protected function isPhoneRegionStrict()
+    {
+        return false;
+    }
+
+    /**
+     * @description Get the regions a phone number of an address in the given country
+     *              is read in, in order: the country itself, then the regions sharing its
+     *              numbering, then FR for an overseas territory sharing the French numbering.
+     *
+     * @param string $iso_code
+     *
+     * @return array
+     */
+    protected function getPhoneNumberRegions($iso_code)
+    {
+        $iso_code = strtoupper((string) $iso_code);
+
+        if (!in_array($iso_code, self::FRENCH_NUMBERING_TERRITORIES, true)) {
+            return [$iso_code];
+        }
+
+        $shared_regions = isset(self::SHARED_NUMBERING_REGIONS[$iso_code])
+            ? self::SHARED_NUMBERING_REGIONS[$iso_code]
+            : [];
+
+        return array_merge([$iso_code], $shared_regions, ['FR']);
+    }
+
+    /**
+     * Formats a phone number to E.164 for the Payplug API, returning null
+     * if it cannot be parsed or is not accepted for the given country.
+     *
+     * The Payplug API refuses an empty string phone number but accepts a
+     * null one, which reads as "no phone number available".
      *
      * @param string $phone_number
      * @param string $iso_code
@@ -1599,21 +1647,30 @@ class PaymentMethod
             return null;
         }
 
-        try {
-            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164((string) $phone_number, (string) $iso_code);
-        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog(
-                    static::class . '::formatPhoneNumberSafely() - Phone number "'
-                        . $this->maskPhoneNumberForLogging($phone_number)
-                        . '" could not be formatted for country "' . $iso_code . '": ' . $e->getMessage(),
-                    'error'
+        $exception = null;
+        foreach ($this->getPhoneNumberRegions($iso_code) as $region) {
+            try {
+                return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164(
+                    (string) $phone_number,
+                    $region,
+                    $this->isPhoneRegionStrict()
                 );
-
-            return null;
+            } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
+                $exception = $exception ?: $e;
+            }
         }
+
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog(
+                static::class . '::formatPhoneNumberSafely() - Phone number "'
+                    . $this->maskPhoneNumberForLogging($phone_number)
+                    . '" could not be formatted for country "' . $iso_code . '": ' . $exception->getMessage(),
+                'error'
+            );
+
+        return null;
     }
 
     /**
@@ -1682,7 +1739,11 @@ class PaymentMethod
         if (false === strpos($this->name, 'oney')) {
             if (!$this->dependencies
                 ->getHelpers()['amount']
-                ->validateAmount($price_limit, (float) $cart_amount)['result']) {
+                ->validateAmount(
+                    $price_limit,
+                    (float) $cart_amount,
+                    isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : ''
+                )['result']) {
                 return $payment_options;
             }
         }

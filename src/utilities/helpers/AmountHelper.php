@@ -43,17 +43,140 @@ class AmountHelper
      *
      * @param $amount
      * @param bool $from_cents
+     * @param string $currency ISO 4217 code of the amount's currency
      *
-     * @return float|int
+     * @return float|int 0 when $currency is not a supported ISO 4217 code
      */
-    public function convertAmount($amount = 0, $from_cents = false)
+    public function convertAmount($amount = 0, $from_cents = false, $currency = '')
     {
         if (!$amount) {
             return 0;
         }
 
+        if (null === $currency || '' === $currency) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('AmountHelper::convertAmount() - $currency is required, the amount is not converted', 'error');
+
+            return 0;
+        }
+
+        try {
+            return $this->convertAmountForCurrency($amount, $from_cents, is_string($currency) ? $currency : '');
+        } catch (\PayplugUnifiedCore\Exceptions\InvalidCurrencyException $e) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('AmountHelper::convertAmount() - ' . $e->getMessage(), 'error');
+
+            return 0;
+        }
+    }
+
+    /**
+     * @description Format the Oney thresholds amount
+     *
+     * @param $amount
+     * @param string $currency ISO 4217 code of the amount's currency
+     *
+     * @return array
+     */
+    public function formatOneyAmount($amount, $currency = '')
+    {
+        if (!is_int($amount)) {
+            return [
+                'result' => false,
+                'message' => '$amount must be a int type',
+            ];
+        }
+
+        if (!is_string($currency) || '' === $currency) {
+            return [
+                'result' => false,
+                'message' => '$currency must be a non empty string',
+            ];
+        }
+
+        return [
+            'result' => (float) $this->convertAmount($amount, true, $currency),
+            'message' => '$amount is formatted',
+        ];
+    }
+
+    /**
+     * @description Check is given amount is valid with price limit
+     *
+     * @param array $price_limit
+     * @param float $amount
+     * @param string $currency ISO 4217 code of the amount's currency
+     *
+     * @return array
+     */
+    public function validateAmount($price_limit = [], $amount = 0, $currency = '')
+    {
+        if (!is_array($price_limit) || empty($price_limit)) {
+            return [
+                'result' => false,
+                'message' => 'Wrong paramaters given, $price_limit must be a non empty array',
+            ];
+        }
+
+        if (!is_float($amount)) {
+            return [
+                'result' => false,
+                'message' => 'Wrong paramaters given, $amount must be a non null float',
+            ];
+        }
+
+        if (!is_string($currency) || '' === $currency) {
+            return [
+                'result' => false,
+                'message' => 'Wrong paramaters given, $currency must be a non empty string',
+            ];
+        }
+
+        $min = explode(':', $price_limit['min']);
+        $min_amount = isset($min[1]) ? $min[1] : null;
+
+        $max = explode(':', $price_limit['max']);
+        $max_amount = isset($max[1]) ? $max[1] : null;
+
+        $formated_amount = $this->convertAmount($amount, false, $currency);
+
+        if ($formated_amount < $min_amount) {
+            return [
+                'result' => false,
+                'message' => 'Given $amount is lower than expected',
+            ];
+        }
+
+        if ($formated_amount > $max_amount) {
+            return [
+                'result' => false,
+                'message' => 'Given $amount is higher than expected',
+            ];
+        }
+
+        return [
+            'result' => true,
+            'message' => '',
+        ];
+    }
+
+    /**
+     * @param float|int $amount
+     * @param bool $from_cents
+     * @param string $currency
+     *
+     * @throws \PayplugUnifiedCore\Exceptions\InvalidCurrencyException
+     *
+     * @return float|int
+     */
+    private function convertAmountForCurrency($amount, $from_cents, $currency)
+    {
         if ($from_cents) {
-            return \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::fromCents((int) $amount);
+            return \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::fromCents((int) $amount, $currency);
         }
 
         $round_mode = (int) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('PS_PRICE_ROUND_MODE');
@@ -75,8 +198,8 @@ class AmountHelper
         switch ($round_mode) {
             case $roundUp:
             case $roundDown:
-                $amount = $amount * 100;
-                $amount_to_cent = $this->dependencies->getPlugin()->getTools()->tool('ps_round', $amount);
+                $minor_units = \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::toCents(1.0, $currency);
+                $amount_to_cent = $this->dependencies->getPlugin()->getTools()->tool('ps_round', $amount * $minor_units);
 
                 break;
 
@@ -85,83 +208,9 @@ class AmountHelper
             case $roundHalfEven:
             case $roundHalfOdd:
             default:
-                $amount_to_cent = \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::toCents((float) $amount, $mode);
+                $amount_to_cent = \PayplugUnifiedCore\Utilities\Helpers\AmountHelper::toCents((float) $amount, $currency, $mode);
         }
 
         return (int) $amount_to_cent;
-    }
-
-    /**
-     * @description Format the Oney thresholds amount
-     *
-     * @param $amount
-     *
-     * @return array
-     */
-    public function formatOneyAmount($amount)
-    {
-        if (!is_int($amount)) {
-            return [
-                'result' => false,
-                'message' => '$amount must be a int type',
-            ];
-        }
-
-        return [
-            'result' => (float) $this->convertAmount($amount, true),
-            'message' => '$amount is formatted',
-        ];
-    }
-
-    /**
-     * @description Check is given amount is valid with price limit
-     *
-     * @param array $price_limit
-     * @param float $amount
-     *
-     * @return array
-     */
-    public function validateAmount($price_limit = [], $amount = 0)
-    {
-        if (!is_array($price_limit) || empty($price_limit)) {
-            return [
-                'result' => false,
-                'message' => 'Wrong paramaters given, $price_limit must be a non empty array',
-            ];
-        }
-
-        if (!is_float($amount)) {
-            return [
-                'result' => false,
-                'message' => 'Wrong paramaters given, $amount must be a non null float',
-            ];
-        }
-
-        $min = explode(':', $price_limit['min']);
-        $min_amount = isset($min[1]) ? $min[1] : null;
-
-        $max = explode(':', $price_limit['max']);
-        $max_amount = isset($max[1]) ? $max[1] : null;
-
-        $formated_amount = $this->convertAmount($amount);
-
-        if ($formated_amount < $min_amount) {
-            return [
-                'result' => false,
-                'message' => 'Given $amount is lower than expected',
-            ];
-        }
-
-        if ($formated_amount > $max_amount) {
-            return [
-                'result' => false,
-                'message' => 'Given $amount is higher than expected',
-            ];
-        }
-
-        return [
-            'result' => true,
-            'message' => '',
-        ];
     }
 }

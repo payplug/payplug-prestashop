@@ -168,6 +168,22 @@ class ScalapayPaymentMethod extends PaymentMethod
     }
 
     /**
+     * @description Get the ISO code of the currency the account's Scalapay limits are
+     *              expressed in, i.e. the prefix of their `ISO:amount` form.
+     *
+     * @return string empty string when the account limits carry no currency
+     */
+    public function getScalapayLimitsCurrency()
+    {
+        $this->setParameters();
+
+        $account_limits = parent::getPriceLimit();
+        $parts = explode(':', isset($account_limits['min']) ? (string) $account_limits['min'] : '');
+
+        return isset($parts[1]) ? $parts[0] : '';
+    }
+
+    /**
      * @description Get the price limits gating Scalapay at checkout: the merchant's own
      *              limits narrowed against the account's authorized range, so a cart
      *              outside them hides the payment method.
@@ -226,7 +242,7 @@ class ScalapayPaymentMethod extends PaymentMethod
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount');
         foreach ($products as $product) {
-            $unit_price = $amountHelper->convertAmount($product['price_wt']);
+            $unit_price = $amountHelper->convertAmount($product['price_wt'], false, $this->context->currency->iso_code);
             $productName = (string) $product['name'] . (isset($product['attributes'])
                     ? ' - ' . $product['attributes']
                     : '');
@@ -285,7 +301,7 @@ class ScalapayPaymentMethod extends PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount')
-            ->convertAmount((int) $amount, true);
+            ->convertAmount((int) $amount, true, $this->getScalapayLimitsCurrency());
     }
 
     /**
