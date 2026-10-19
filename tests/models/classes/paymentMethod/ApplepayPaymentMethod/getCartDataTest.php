@@ -106,6 +106,7 @@ class getCartDataTest extends BaseApplepayPaymentMethod
 
         $this->class->shouldReceive([
             'getRequest' => [
+                'currency_code' => 'JPY',
                 'total' => [
                     'amount' => 42.42,
                 ],
@@ -359,6 +360,7 @@ class getCartDataTest extends BaseApplepayPaymentMethod
         $this->assertTrue($new_guest->is_guest);
         $this->assertSame('guest@payplug.com', $new_guest->email);
         $this->assertSame(43, $this->cart->id_customer);
+        $this->amountHelper->shouldHaveReceived('convertAmount')->with(42.42, false, 'JPY')->once();
     }
 
     public function testWhenCustomerIsLoggedThePhoneIsNotCompleted()

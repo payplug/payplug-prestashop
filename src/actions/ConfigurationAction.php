@@ -830,16 +830,17 @@ class ConfigurationAction
             // account does not expose comes back as false, hence 0 once cast, which
             // isAmount() rejects: an unusable range fails the save rather than passing it.
             $limits_in_force = $scalapay->getScalapayPriceLimit();
+            $limits_currency = $scalapay->getScalapayLimitsCurrency();
             $amount_helper = $this->dependencies
                 ->getPlugin()
                 ->getModule()
                 ->getInstanceByName($this->dependencies->name)
                 ->getService('payplug.utilities.helper.amount');
             $scalapay_min = isset($datas->scalapay_min_amounts)
-                ? (int) $amount_helper->convertAmount($datas->scalapay_min_amounts)
+                ? (int) $amount_helper->convertAmount($datas->scalapay_min_amounts, false, $limits_currency)
                 : (int) $limits_in_force['min'];
             $scalapay_max = isset($datas->scalapay_max_amounts)
-                ? (int) $amount_helper->convertAmount($datas->scalapay_max_amounts)
+                ? (int) $amount_helper->convertAmount($datas->scalapay_max_amounts, false, $limits_currency)
                 : (int) $limits_in_force['max'];
             $payment_validator = $this->dependencies->getValidators()['payment'];
 
@@ -922,18 +923,18 @@ class ConfigurationAction
                     case 'oney_min_amounts':
                     case 'oney_max_amounts':
                         if ((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) {
-                            $limit_oney = $this->dependencies
+                            $oney = $this->dependencies
                                 ->getPlugin()
                                 ->getPaymentMethodClass()
-                                ->getPaymentMethod('oney')
-                                ->getOneyPriceLimit(false);
+                                ->getPaymentMethod('oney');
+                            $limit_oney = $oney->getOneyPriceLimit(false);
                             $amount = $datas->{$config};
                             $amount_to_cent = $this->dependencies
                                 ->getPlugin()
                                 ->getModule()
                                 ->getInstanceByName($this->dependencies->name)
                                 ->getService('payplug.utilities.helper.amount')
-                                ->convertAmount($amount);
+                                ->convertAmount($amount, false, $oney->getOneyLimitsCurrency());
                             // isAmount() answers with ['result' => bool, 'message' => string];
                             // the array itself is always truthy, so the flag has to be read out.
                             $is_valid_amount = $this->dependencies
@@ -967,7 +968,15 @@ class ConfigurationAction
                                 ->getModule()
                                 ->getInstanceByName($this->dependencies->name)
                                 ->getService('payplug.utilities.helper.amount')
-                                ->convertAmount($value);
+                                ->convertAmount(
+                                    $value,
+                                    false,
+                                    $this->dependencies
+                                        ->getPlugin()
+                                        ->getPaymentMethodClass()
+                                        ->getPaymentMethod('scalapay')
+                                        ->getScalapayLimitsCurrency()
+                                );
                             $formated_amount = $this->dependencies
                                 ->getPlugin()
                                 ->getPaymentMethodClass()

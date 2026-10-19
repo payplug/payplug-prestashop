@@ -472,6 +472,7 @@ class updateActionTest extends BaseOrderAction
                 'result' => true,
                 'resource' => PaymentMock::getStandard([
                     'is_paid' => true,
+                    'currency' => 'JPY',
                     'metadata' => ['Order' => 42],
                 ]),
             ],
@@ -527,9 +528,10 @@ class updateActionTest extends BaseOrderAction
             ->shouldReceive('getService')
             ->with('payplug.utilities.helper.amount')
             ->andReturn($amountHelper);
-        $amountHelper->shouldReceive([
-            'convertAmount' => 200,
-        ]);
+        $amountHelper->shouldReceive('convertAmount')
+            ->with(31320, true, 'JPY')
+            ->once()
+            ->andReturn(200);
 
         $this->assertSame(
             [
@@ -538,6 +540,83 @@ class updateActionTest extends BaseOrderAction
             ],
             $this->action->updateAction($resource_id)
         );
+    }
+
+    public function testWhenResourceAmountCannotBeConvertedNoPaymentIsAddedAndOrderIsNotMarkedPaid()
+    {
+        $resource_id = 'pay_azerty123456';
+
+        $this->payment_method->shouldReceive([
+            'retrieve' => [
+                'result' => true,
+                'resource' => PaymentMock::getStandard([
+                    'is_paid' => true,
+                    'currency' => 'KWD',
+                    'metadata' => ['Order' => 42],
+                ]),
+            ],
+        ]);
+        $order = \Mockery::mock('Order');
+        $order->id = 42;
+        $order->id_cart = 42;
+        $order->current_state = 42;
+        $order->module = 'payplug';
+        $order->shouldReceive([
+            'getOrderPayments' => [],
+        ]);
+
+        $this->order_adapter->shouldReceive([
+            'get' => $order,
+        ]);
+        $this->order_class->shouldReceive([
+            'getOrderStateFromResource' => [
+                'result' => true,
+                'status' => 'paid',
+            ],
+        ]);
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->payplug_order_state_repository->shouldReceive([
+            'getBy' => [
+                'type' => 'pending',
+            ],
+        ]);
+
+        $amountHelper = \Mockery::mock('AmountHelper');
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.utilities.helper.amount')
+            ->andReturn($amountHelper);
+        $amountHelper->shouldReceive('convertAmount')
+            ->with(31320, true, 'KWD')
+            ->once()
+            ->andReturn(0);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'The resource amount cannot be converted',
+            ],
+            $this->action->updateAction($resource_id)
+        );
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('OrderAction::updateAction - The resource amount cannot be converted', 'error')
+            ->once();
+        $order->shouldNotHaveReceived('addOrderPayment');
+        $this->order_class->shouldNotHaveReceived('updateOrderState');
     }
 
     public function testWhenOrderIsUpdated()

@@ -768,13 +768,10 @@ class OneyPaymentMethod extends PaymentMethod
             'max' => false,
         ];
 
-        $id_currency = $this->configuration->getValue('PS_CURRENCY_DEFAULT');
-        $currency = $this->currency_adapter->get((int) $id_currency);
-        if (!$this->validate_adapter->validate('isLoadedObject', $currency)) {
+        $iso_code = $this->getOneyLimitsCurrency();
+        if ('' === $iso_code) {
             return $limits;
         }
-
-        $iso_code = $this->tools->tool('strtoupper', $currency->iso_code);
 
         if ((bool) $custom) {
             $oney_min_amounts = $this->parseCsvAmounts($this->configuration->getValue('oney_custom_min_amounts'));
@@ -792,6 +789,25 @@ class OneyPaymentMethod extends PaymentMethod
         $limits['max'] = isset($oney_max_amounts[$iso_code]) ? (int) $oney_max_amounts[$iso_code] : false;
 
         return $limits;
+    }
+
+    /**
+     * @description Get the ISO code of the currency the Oney limits are expressed in:
+     *              the shop default currency.
+     *
+     * @return string empty string when the shop default currency cannot be loaded
+     */
+    public function getOneyLimitsCurrency()
+    {
+        $this->setParameters();
+
+        $id_currency = $this->configuration->getValue('PS_CURRENCY_DEFAULT');
+        $currency = $this->currency_adapter->get((int) $id_currency);
+        if (!$this->validate_adapter->validate('isLoadedObject', $currency)) {
+            return '';
+        }
+
+        return $this->tools->tool('strtoupper', $currency->iso_code);
     }
 
     /**
@@ -929,27 +945,29 @@ class OneyPaymentMethod extends PaymentMethod
         $this->setParameters();
 
         $limits = $this->getOneyPriceLimit();
+        $limits_currency = $this->getOneyLimitsCurrency();
+        $cart_currency = isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : '';
         $amountHelper = $this->dependencies
             ->getPlugin()
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount');
+        $min = $amountHelper->formatOneyAmount($limits['min'], $limits_currency)['result'];
+        $max = $amountHelper->formatOneyAmount($limits['max'], $limits_currency)['result'];
+        // The limits are in the shop default currency and the cart amount is compared to them
+        // without conversion, which is sound only because Oney is EUR-only.
         $is_valid_amount = $this->validators['payment']->isAmount(
-            $amountHelper->convertAmount($amount),
+            $amountHelper->convertAmount($amount, false, $cart_currency),
             [
-                'min' => $amountHelper->convertAmount($amountHelper->formatOneyAmount($limits['min'])['result']),
-                'max' => $amountHelper->convertAmount($amountHelper->formatOneyAmount($limits['max'])['result']),
+                'min' => $amountHelper->convertAmount($min, false, $limits_currency),
+                'max' => $amountHelper->convertAmount($max, false, $limits_currency),
             ]
         );
 
         if (!$is_valid_amount['result']) {
             return [
                 'result' => false,
-                'message' => sprintf(
-                    $this->oney_translations['amount_error'],
-                    $amountHelper->formatOneyAmount($limits['min'])['result'],
-                    $amountHelper->formatOneyAmount($limits['max'])['result']
-                ),
+                'message' => sprintf($this->oney_translations['amount_error'], $min, $max),
             ];
         }
 
@@ -1028,7 +1046,7 @@ class OneyPaymentMethod extends PaymentMethod
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount');
         foreach ($products as $product) {
-            $unit_price = $amountHelper->convertAmount($product['price_wt']);
+            $unit_price = $amountHelper->convertAmount($product['price_wt'], false, $this->context->currency->iso_code);
             $productName = (string) $product['name'] . (isset($product['attributes'])
                     ? ' - ' . $product['attributes']
                     : '');
@@ -1269,13 +1287,18 @@ class OneyPaymentMethod extends PaymentMethod
     }
 
     /**
-     * Determines whether a phone number is a mobile line for the given
-     * country, returning false if it cannot be parsed or is not valid —
-     * the safe-fallback contract previously provided by the deprecated
-     * PhoneHelper::isMobilePhoneNumber() helper and paymentValidator::
-     * isValidMobilePhoneNumber() validator (using only its boolean
-     * result, since every call site only ever used ['result'], never
-     * ['message']) — both now delegate to the same underlying check.
+     * @description Oney only accepts phone numbers belonging to the address country.
+     *
+     * @return bool
+     */
+    protected function isPhoneRegionStrict()
+    {
+        return true;
+    }
+
+    /**
+     * Determines whether a phone number is a mobile line accepted for the
+     * given country, returning false if it cannot be parsed or is not valid.
      *
      * @param string $iso_code
      * @param string $phone_number
@@ -1288,11 +1311,18 @@ class OneyPaymentMethod extends PaymentMethod
             return false;
         }
 
-        try {
-            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::isMobile((string) $phone_number, (string) $iso_code);
-        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
-            return false;
+        foreach ($this->getPhoneNumberRegions($iso_code) as $region) {
+            try {
+                return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::isMobile(
+                    (string) $phone_number,
+                    $region,
+                    $this->isPhoneRegionStrict()
+                );
+            } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
+            }
         }
+
+        return false;
     }
 
     /**
@@ -1568,13 +1598,14 @@ class OneyPaymentMethod extends PaymentMethod
             }
 
             $amount = explode(':', $config);
+            $currency = $amount[0];
             $amount = (int) $amount[1];
             $amount = $this->dependencies
                 ->getPlugin()
                 ->getModule()
                 ->getInstanceByName($this->dependencies->name)
                 ->getService('payplug.utilities.helper.amount')
-                ->formatOneyAmount($amount)['result'];
+                ->formatOneyAmount($amount, $currency)['result'];
             $thresholds[$amount_key] = $amount;
         }
 
@@ -1646,10 +1677,11 @@ class OneyPaymentMethod extends PaymentMethod
 
             case 'amount':
                 $limits = $this->getOneyPriceLimit(true);
+                $limits_currency = $this->getOneyLimitsCurrency();
                 $err_label = sprintf(
                     $this->oney_translations['invalid_amount'],
-                    $amountHelper->formatOneyAmount($limits['min'])['result'],
-                    $amountHelper->formatOneyAmount($limits['max'])['result']
+                    $amountHelper->formatOneyAmount($limits['min'], $limits_currency)['result'],
+                    $amountHelper->formatOneyAmount($limits['max'], $limits_currency)['result']
                 );
 
                 break;
