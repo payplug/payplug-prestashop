@@ -320,7 +320,15 @@ class OrderAction
                 ->getModule()
                 ->getInstanceByName($this->dependencies->name)
                 ->getService('payplug.utilities.helper.amount')
-                ->convertAmount($resource->amount, true);
+                ->convertAmount($resource->amount, true, isset($resource->currency) ? $resource->currency : '');
+            if (!$amount && isset($resource->amount) && (int) $resource->amount) {
+                $this->logger->addLog('OrderAction::updateAction - The resource amount cannot be converted', 'error');
+
+                return [
+                    'result' => false,
+                    'message' => 'The resource amount cannot be converted',
+                ];
+            }
             if (!$order->addOrderPayment($amount, null, $resource->id)) {
                 $this->logger->addLog('OrderAction::updateAction - Can set order payment for given order', 'error');
 
@@ -537,6 +545,15 @@ class OrderAction
             ];
         }
 
+        if (!$order_tab['amount'] && $this->getResourceAmount($retrieve)) {
+            $this->logger->addLog('OrderAction::createAction - The resource amount cannot be converted', 'error');
+
+            return [
+                'result' => false,
+                'message' => 'The resource amount cannot be converted',
+            ];
+        }
+
         $secure_key = isset($cart->secure_key) && $cart->secure_key
             ? $cart->secure_key
             : (isset($customer->secure_key) && $customer->secure_key ? $customer->secure_key : '');
@@ -622,6 +639,30 @@ class OrderAction
             'id_order' => $order->id,
             'message' => '',
         ];
+    }
+
+    /**
+     * @description Get the amount in cents of a retrieved resource: the sum of its
+     *              schedules for an installment plan, its own amount otherwise
+     *
+     * @param array $retrieve
+     *
+     * @return int
+     */
+    private function getResourceAmount($retrieve)
+    {
+        if (!empty($retrieve['schedule']) && is_array($retrieve['schedule'])) {
+            $amount = 0;
+            foreach ($retrieve['schedule'] as $schedule) {
+                $amount += isset($schedule['amount']) ? (int) $schedule['amount'] : 0;
+            }
+
+            return $amount;
+        }
+
+        $resource = $retrieve['resource'];
+
+        return isset($resource->amount) ? (int) $resource->amount : 0;
     }
 
     /**

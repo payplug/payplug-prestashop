@@ -36,7 +36,7 @@ class validateAmountTest extends TestCase
                 'result' => false,
                 'message' => 'Wrong paramaters given, $price_limit must be a non empty array',
             ],
-            $this->helper->validateAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount, 'EUR')
         );
     }
 
@@ -56,7 +56,7 @@ class validateAmountTest extends TestCase
                 'result' => false,
                 'message' => 'Wrong paramaters given, $amount must be a non null float',
             ],
-            $this->helper->validateAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount, 'EUR')
         );
     }
 
@@ -74,7 +74,7 @@ class validateAmountTest extends TestCase
                 'result' => false,
                 'message' => 'Given $amount is lower than expected',
             ],
-            $this->helper->validateAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount, 'EUR')
         );
     }
 
@@ -92,7 +92,7 @@ class validateAmountTest extends TestCase
                 'result' => false,
                 'message' => 'Given $amount is higher than expected',
             ],
-            $this->helper->validateAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount, 'EUR')
         );
     }
 
@@ -104,13 +104,62 @@ class validateAmountTest extends TestCase
             'max' => 'EUR:2000000',
         ];
         $this->helper->shouldReceive('convertAmount')
+            ->with($amount, false, 'EUR')
             ->andReturn(10000);
         $this->assertSame(
             [
                 'result' => true,
                 'message' => '',
             ],
-            $this->helper->validateAmount($price_limit, $amount)
+            $this->helper->validateAmount($price_limit, $amount, 'EUR')
         );
+    }
+
+    /**
+     * @dataProvider invalidCurrencyProvider
+     *
+     * @param mixed $currency
+     */
+    public function testWhenGivenCurrencyIsInvalid($currency)
+    {
+        $price_limit = [
+            'min' => 'EUR:99',
+            'max' => 'EUR:2000000',
+        ];
+        $this->helper->shouldReceive('convertAmount')->never();
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Wrong paramaters given, $currency must be a non empty string',
+            ],
+            $this->helper->validateAmount($price_limit, 100.00, $currency)
+        );
+    }
+
+    public function testWhenGivenCurrencyCannotBeConverted()
+    {
+        $price_limit = [
+            'min' => 'EUR:99',
+            'max' => 'EUR:2000000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->with(100.00, false, 'KWD')
+            ->andReturn(0);
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Given $amount is lower than expected',
+            ],
+            $this->helper->validateAmount($price_limit, 100.00, 'KWD')
+        );
+    }
+
+    public function invalidCurrencyProvider()
+    {
+        return [
+            'missing' => [''],
+            'null' => [null],
+            'not a string' => [['EUR']],
+        ];
     }
 }

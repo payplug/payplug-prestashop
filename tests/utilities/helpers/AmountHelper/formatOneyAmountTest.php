@@ -16,7 +16,12 @@ class formatOneyAmountTest extends TestCase
 
     public function setUp(): void
     {
+        $logger = \Mockery::mock('Logger');
+        $logger->shouldReceive('addLog');
+        $plugin = \Mockery::mock('Plugin');
+        $plugin->shouldReceive('getLogger')->andReturn($logger);
         $dependencies = \Mockery::mock('Dependencies');
+        $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
         $this->amountHelper = new AmountHelper($dependencies);
     }
 
@@ -56,7 +61,7 @@ class formatOneyAmountTest extends TestCase
                 'result' => false,
                 'message' => $errorMsg,
             ],
-            $this->amountHelper->formatOneyAmount($amount)
+            $this->amountHelper->formatOneyAmount($amount, 'EUR')
         );
     }
 
@@ -76,7 +81,43 @@ class formatOneyAmountTest extends TestCase
                 'result' => (float) $amount,
                 'message' => $message,
             ],
-            $this->amountHelper->formatOneyAmount($amount_given)
+            $this->amountHelper->formatOneyAmount($amount_given, 'EUR')
         );
+    }
+
+    public function testZeroDecimalCurrencyIsFormattedAsIs()
+    {
+        $this->assertSame(
+            [
+                'result' => 20000.0,
+                'message' => '$amount is formatted',
+            ],
+            $this->amountHelper->formatOneyAmount(20000, 'JPY')
+        );
+    }
+
+    /**
+     * @dataProvider invalidCurrencyProvider
+     *
+     * @param mixed $currency
+     */
+    public function testFormatOneyAmountWithInvalidCurrency($currency)
+    {
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => '$currency must be a non empty string',
+            ],
+            $this->amountHelper->formatOneyAmount(20000, $currency)
+        );
+    }
+
+    public function invalidCurrencyProvider()
+    {
+        yield 'missing' => [''];
+
+        yield 'null' => [null];
+
+        yield 'not a string' => [['EUR']];
     }
 }

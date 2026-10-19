@@ -106,4 +106,80 @@ class getResourceDetailTest extends BasePaymentMethod
             $this->class->getResourceDetail($this->resource_id)
         );
     }
+
+    public function testAmountsAreConvertedInTheResourceCurrency()
+    {
+        $this->retrieve['resource']->currency = 'JPY';
+        $this->class->shouldReceive([
+            'retrieve' => $this->retrieve,
+            'getPaymentStatus' => [
+                'id_status' => 2,
+                'code' => 'paid',
+            ],
+        ]);
+
+        $this->class->getResourceDetail($this->resource_id);
+
+        $this->amountHelper->shouldHaveReceived('convertAmount')
+            ->with(\Mockery::any(), true, 'JPY')
+            ->times(3);
+        $this->amountHelper->shouldNotHaveReceived('convertAmount', [\Mockery::any(), true, 'EUR']);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testAmountsAreFormattedInTheResourceCurrencyNotTheContextOne()
+    {
+        $this->context->currency->iso_code = 'EUR';
+        $this->retrieve['resource']->currency = 'JPY';
+        $this->class->shouldReceive([
+            'retrieve' => $this->retrieve,
+            'getPaymentStatus' => [
+                'id_status' => 2,
+                'code' => 'paid',
+            ],
+        ]);
+
+        $this->class->getResourceDetail($this->resource_id);
+
+        $this->price_adapter->shouldHaveReceived('formatPrice')
+            ->with(\Mockery::any(), 'JPY')
+            ->times(3);
+        $this->price_adapter->shouldNotHaveReceived('formatPrice', [\Mockery::any(), 'EUR']);
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @dataProvider missingCurrencyProvider
+     *
+     * @param mixed $currency
+     */
+    public function testAmountsAreFormattedInTheContextCurrencyWhenTheResourceHasNone($currency)
+    {
+        $this->context->currency->iso_code = 'CHF';
+        $this->retrieve['resource']->currency = $currency;
+        $this->class->shouldReceive([
+            'retrieve' => $this->retrieve,
+            'getPaymentStatus' => [
+                'id_status' => 2,
+                'code' => 'paid',
+            ],
+        ]);
+
+        $this->class->getResourceDetail($this->resource_id);
+
+        $this->price_adapter->shouldHaveReceived('formatPrice')
+            ->with(\Mockery::any(), 'CHF')
+            ->times(3);
+        $this->price_adapter->shouldNotHaveReceived('formatPrice', [\Mockery::any(), '']);
+        $this->amountHelper->shouldNotHaveReceived('convertAmount', [\Mockery::any(), true, 'CHF']);
+        $this->addToAssertionCount(1);
+    }
+
+    public function missingCurrencyProvider()
+    {
+        return [
+            'empty string' => [''],
+            'null' => [null],
+        ];
+    }
 }
