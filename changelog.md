@@ -8,6 +8,11 @@
   - [PRE-3641](https://github.com/payplug/payplug-prestashop/pull/133): A Payplug state backed by a configuration key (`PS_OS_*`) now only reuses the state behind it if it is native or owned by the module; a state owned by another module falls back to the name lookup, then to a new Payplug state
   - [PRE-3735](https://github.com/payplug/payplug-prestashop/pull/135): Stop running the back-office REST routes (login, logout, configuration) for unauthenticated requests whose Referer header contains "localhost"
   - [PRE-3735](https://github.com/payplug/payplug-prestashop/pull/135): Fix the return, cancel and notification URLs of MCP payment links, so a paid link updates the order
+  - [PRE-3752](https://github.com/payplug/payplug-prestashop/pull/141): Send a valid phone number belonging to another country than the address (for example a French mobile on a German address) in international format for every payment method except Oney and Bizum, instead of dropping it
+  - [PRE-3752](https://github.com/payplug/payplug-prestashop/pull/141): Accept a metropolitan French number typed in national format (06, 07...) on an address in a French overseas territory (GP, MQ, RE, GF, YT, PM, BL, MF, NC, PF, WF), and a +590 number shared with Guadeloupe (0690..., 0590...) on a Saint-Barthélemy or Saint-Martin address, Oney and Bizum included
+
+- Refactoring :
+  - [PRE-3752](https://github.com/payplug/payplug-prestashop/pull/141): Move to UPC 1.x (the module now requires UPC ^1.2.2): amounts are converted with the currency of the cart or payment they belong to, so a zero-decimal currency (for example JPY) is now converted ×1 instead of ×100; an amount in a missing or unsupported currency is no longer converted: the payment or refund is refused and the order is not marked paid
 
 ## Version 5.2.0
 - Feature :

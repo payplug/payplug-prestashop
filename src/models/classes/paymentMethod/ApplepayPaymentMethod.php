@@ -1167,7 +1167,11 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount')
-            ->convertAmount($request['total']['amount']);
+            ->convertAmount(
+                $request['total']['amount'],
+                false,
+                isset($request['currency_code']) ? $request['currency_code'] : ''
+            );
 
         return [
             'result' => true,

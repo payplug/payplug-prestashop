@@ -84,4 +84,45 @@ class getPaymentOptionTest extends BasePaymentMethod
 
         $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOption()));
     }
+
+    public function testAmountIsValidatedInTheCartCurrency()
+    {
+        $this->class->set('name', 'standard');
+        $this->context->currency->iso_code = 'JPY';
+        $this->configuration->shouldReceive('getValue')
+            ->with('countries')
+            ->andReturn('{}');
+        $this->helpers['amount']->shouldReceive('validateAmount')
+            ->andReturn([
+                'result' => true,
+                'message' => '',
+            ]);
+
+        $this->class->getPaymentOption([]);
+
+        $this->helpers['amount']->shouldHaveReceived('validateAmount')
+            ->with(\Mockery::type('array'), 42.42, 'JPY')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testCartWithoutCurrencyIsValidatedWithoutCurrency()
+    {
+        $this->class->set('name', 'standard');
+        $this->context->currency = null;
+        $this->configuration->shouldReceive('getValue')
+            ->with('countries')
+            ->andReturn('{}');
+        $this->helpers['amount']->shouldReceive('validateAmount')
+            ->andReturn([
+                'result' => false,
+                'message' => '',
+            ]);
+
+        $this->assertSame([], $this->class->getPaymentOption([]));
+
+        $this->helpers['amount']->shouldHaveReceived('validateAmount')
+            ->with(\Mockery::type('array'), 42.42, '')
+            ->once();
+    }
 }

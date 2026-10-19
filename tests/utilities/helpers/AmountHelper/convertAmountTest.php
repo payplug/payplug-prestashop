@@ -23,6 +23,7 @@ class convertAmountTest extends TestCase
     private $constantAdapter;
     private $plugin;
     private $toolsAdapter;
+    private $logger;
 
     public function setUp(): void
     {
@@ -31,6 +32,8 @@ class convertAmountTest extends TestCase
         $this->dependencies = \Mockery::mock('Dependencies');
         $this->plugin = \Mockery::mock('Plugin');
         $this->toolsAdapter = \Mockery::mock('ToolsAdapter');
+        $this->logger = \Mockery::mock('Logger');
+        $this->logger->shouldReceive('addLog');
 
         $this->constantAdapter
             ->shouldReceive('get')
@@ -61,6 +64,7 @@ class convertAmountTest extends TestCase
             'getConstant' => $this->constantAdapter,
             'getConfigurationClass' => $this->configurationClass,
             'getTools' => $this->toolsAdapter,
+            'getLogger' => $this->logger,
         ]);
         $this->dependencies->shouldReceive([
             'getPlugin' => $this->plugin,
@@ -75,7 +79,7 @@ class convertAmountTest extends TestCase
         $amount_expected = 42.42;
         $this->assertSame(
             (float) $amount_expected,
-            $this->amountHelper->convertAmount($amount, true)
+            $this->amountHelper->convertAmount($amount, true, 'EUR')
         );
     }
 
@@ -95,7 +99,7 @@ class convertAmountTest extends TestCase
         $amount_expected = 1443;
         $this->assertSame(
             $amount_expected,
-            $this->amountHelper->convertAmount($amount)
+            $this->amountHelper->convertAmount($amount, false, 'EUR')
         );
     }
 
@@ -115,7 +119,7 @@ class convertAmountTest extends TestCase
         $amount_expected = 1442;
         $this->assertSame(
             $amount_expected,
-            $this->amountHelper->convertAmount($amount)
+            $this->amountHelper->convertAmount($amount, false, 'EUR')
         );
     }
 
@@ -128,7 +132,7 @@ class convertAmountTest extends TestCase
         $amount_expected = 1443;
         $this->assertSame(
             $amount_expected,
-            $this->amountHelper->convertAmount($amount)
+            $this->amountHelper->convertAmount($amount, false, 'EUR')
         );
     }
 
@@ -141,7 +145,7 @@ class convertAmountTest extends TestCase
         $amount_expected = 1443;
         $this->assertSame(
             $amount_expected,
-            $this->amountHelper->convertAmount($amount)
+            $this->amountHelper->convertAmount($amount, false, 'EUR')
         );
     }
 
@@ -154,7 +158,7 @@ class convertAmountTest extends TestCase
         $amount_expected = 1443;
         $this->assertSame(
             $amount_expected,
-            $this->amountHelper->convertAmount($amount)
+            $this->amountHelper->convertAmount($amount, false, 'EUR')
         );
     }
 
@@ -167,7 +171,148 @@ class convertAmountTest extends TestCase
         $amount_expected = 1443;
         $this->assertSame(
             $amount_expected,
-            $this->amountHelper->convertAmount($amount)
+            $this->amountHelper->convertAmount($amount, false, 'EUR')
         );
+    }
+
+    public function testZeroDecimalCurrencyIsConvertedFromCentsAsIs()
+    {
+        $this->assertSame(1000.0, $this->amountHelper->convertAmount(1000, true, 'JPY'));
+    }
+
+    public function testZeroDecimalCurrencyIsConvertedToCentsAsIs()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_HALF_UP);
+
+        $this->assertSame(1000, $this->amountHelper->convertAmount(1000.4, false, 'JPY'));
+    }
+
+    public function testZeroDecimalCurrencyIsRoundedUpOnItsOwnUnit()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_UP);
+        $this->toolsAdapter
+            ->shouldReceive('tool')
+            ->with('ps_round', 1000.2)
+            ->andReturnUsing(function ($arg, $amount) {
+                return ceil($amount);
+            });
+
+        $this->assertSame(1001, $this->amountHelper->convertAmount(1000.2, false, 'JPY'));
+    }
+
+    public function testCurrencyIsCaseInsensitive()
+    {
+        $this->assertSame(42.42, $this->amountHelper->convertAmount(4242, true, 'eur'));
+    }
+
+    /**
+     * @dataProvider invalidCurrencyProvider
+     *
+     * @param mixed $currency
+     */
+    public function testInvalidCurrencyFromCentsReturnsZeroAndLogs($currency)
+    {
+        $this->assertSame(0, $this->amountHelper->convertAmount(4242, true, $currency));
+
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::pattern('/^AmountHelper::convertAmount\(\) - /'), 'error')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @dataProvider invalidCurrencyProvider
+     *
+     * @param mixed $currency
+     */
+    public function testInvalidCurrencyToCentsReturnsZeroAndLogs($currency)
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_HALF_UP);
+
+        $this->assertSame(0, $this->amountHelper->convertAmount(42.42, false, $currency));
+
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::pattern('/^AmountHelper::convertAmount\(\) - /'), 'error')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testInvalidCurrencyWithRoundUpReturnsZeroWithoutRounding()
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn(self::PS_ROUND_UP);
+        $this->toolsAdapter->shouldReceive('tool')->never();
+
+        $this->assertSame(0, $this->amountHelper->convertAmount(42.42, false, ''));
+    }
+
+    /**
+     * @dataProvider missingCurrencyProvider
+     *
+     * @param array $arguments
+     */
+    public function testMissingCurrencyReturnsZeroAndLogsThatTheCurrencyIsRequired($arguments)
+    {
+        $this->assertSame(0, call_user_func_array([$this->amountHelper, 'convertAmount'], $arguments));
+
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('AmountHelper::convertAmount() - $currency is required, the amount is not converted', 'error')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function missingCurrencyProvider()
+    {
+        return [
+            'not given' => [[4242, true]],
+            'empty' => [[4242, true, '']],
+            'null' => [[4242, true, null]],
+        ];
+    }
+
+    public function invalidCurrencyProvider()
+    {
+        return [
+            'missing' => [''],
+            'null' => [null],
+            'not a string' => [['EUR']],
+            'too long' => ['EURO'],
+            'three-decimal currency' => ['KWD'],
+        ];
+    }
+
+    /**
+     * @dataProvider exactHalfProvider
+     *
+     * @param int $round_mode
+     * @param float $amount
+     * @param string $currency
+     * @param int $expected
+     */
+    public function testExactHalfIsRoundedWithTheShopRoundMode($round_mode, $amount, $currency, $expected)
+    {
+        $this->configurationClass->shouldReceive('getValue')
+            ->with('PS_PRICE_ROUND_MODE')
+            ->andReturn($round_mode);
+
+        $this->assertSame($expected, $this->amountHelper->convertAmount($amount, false, $currency));
+    }
+
+    public function exactHalfProvider()
+    {
+        return [
+            'EUR half up' => [self::PS_ROUND_HALF_UP, 0.125, 'EUR', 13],
+            'EUR half down' => [self::PS_ROUND_HALF_DOWN, 0.125, 'EUR', 12],
+            'EUR half even' => [self::PS_ROUND_HALF_EVEN, 0.125, 'EUR', 12],
+            'EUR half odd' => [self::PS_ROUND_HALF_ODD, 0.125, 'EUR', 13],
+            'JPY half even' => [self::PS_ROUND_HALF_EVEN, 1000.5, 'JPY', 1000],
+        ];
     }
 }

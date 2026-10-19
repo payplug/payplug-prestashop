@@ -571,6 +571,79 @@ class createActionTest extends BaseOrderAction
         );
     }
 
+    /**
+     * @dataProvider unconvertedResourceProvider
+     *
+     * @param array $retrieve
+     */
+    public function testWhenResourceAmountCannotBeConvertedOrderIsNotValidated($retrieve)
+    {
+        $resource_id = 'pay_azerty123456';
+        $this->payment_repository->shouldReceive([
+            'getBy' => [
+                'id_payplug_payment' => 42,
+                'resource_id' => 'pay_azerty1234',
+                'is_live' => true,
+                'method' => 'standard',
+                'id_cart' => 42,
+                'cart_hash' => 'cart-hash-azerty1234567',
+                'schedules' => 'NULL',
+                'date_upd' => '1970-01-01 00:00:00',
+            ],
+        ]);
+        $this->cart_adapter->shouldReceive([
+            'get' => CartMock::get(),
+        ]);
+        $this->customer_adapter->shouldReceive([
+            'get' => CustomerMock::get(),
+        ]);
+        $this->validate_adapter->shouldReceive([
+            'validate' => true,
+        ]);
+        $this->order_repository->shouldReceive([
+            'getByIdCart' => [],
+        ]);
+        $this->payment_method->shouldReceive([
+            'getOrderTab' => [
+                'order_state' => 2,
+                'amount' => 0,
+                'module_name' => 'Payplug',
+            ],
+            'retrieve' => $retrieve,
+        ]);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'The resource amount cannot be converted',
+            ],
+            $this->action->createAction($resource_id)
+        );
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('OrderAction::createAction - The resource amount cannot be converted', 'error')
+            ->once();
+        $this->payment_validator->shouldNotHaveReceived('canSaveCard');
+        $this->module->shouldNotHaveReceived('validateOrder');
+    }
+
+    public function unconvertedResourceProvider()
+    {
+        return [
+            'payment' => [[
+                'result' => true,
+                'resource' => PaymentMock::getStandard(['is_paid' => true, 'currency' => 'KWD']),
+            ]],
+            'installment plan' => [[
+                'result' => true,
+                'resource' => PaymentMock::getInstallment(['currency' => 'KWD']),
+                'schedule' => [
+                    ['amount' => 10440, 'date' => '2021-03-05', 'resource' => null],
+                    ['amount' => 10440, 'date' => '2021-04-04', 'resource' => null],
+                ],
+            ]],
+        ];
+    }
+
     public function testWhenOrderCreationThrowAnException()
     {
         $resource_id = 'pay_azerty123456';
