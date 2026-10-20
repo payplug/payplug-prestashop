@@ -1857,11 +1857,10 @@ var $document, $window, __moduleName__Module = {
             if (!$input.length) {
                 return;
             }
-            var pattern = /^[A-Za-zÀ-ÖØ-öø-ÿ' .-]{2,}$/;
             var update = function () {
                 var value = ($input.val() || '').trim();
                 var empty = value.length === 0;
-                var invalid = !empty && !pattern.test(value);
+                var invalid = !empty && value.length < 2;
                 hosted.props.fieldsEmpty.cardHolder = empty;
                 hosted.props.fieldsInvalid.cardHolder = invalid;
                 var $error = $('.' + root + '_error.-cardHolder');

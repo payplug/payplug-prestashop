@@ -1138,6 +1138,7 @@ class PaymentMethod
         if (empty($payplug_amounts)) {
             return [];
         }
+
         return isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
     }
 

@@ -28,6 +28,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PayPlug\src\application\dependencies\BaseClass;
+use PayPlug\src\unified\contract\UnifiedTokenCache;
 
 class CacheRepository extends BaseClass
 {
@@ -179,19 +180,19 @@ class CacheRepository extends BaseClass
     }
 
     /**
-     * @description Flush all the cache.
-     * Remove all Oney Simulation.
+     * @description Flush the cache, keeping the Unified API entries
+     * (in-flight payments state and access token).
      *
      * @return bool
      */
     public function flushCache()
     {
-        $truncate = $this->dependencies
+        $flushed = $this->dependencies
             ->getPlugin()
             ->getCacheRepository()
-            ->deleteAll();
+            ->deleteAllExceptKeyPrefix(UnifiedTokenCache::KEY_PREFIX);
 
-        if (!$truncate) {
+        if (!$flushed) {
             $error_message = 'Error during flush the Oney Simulation DB cache [PayPlugCache.php]';
             $error_level = 'error';
             $this->logger->addLog($error_message, $error_level);

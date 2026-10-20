@@ -88,12 +88,6 @@ class AdminPayplugController extends ModuleAdminController
                 $resource_id = $this->tools->tool('getValue', 'resource_id');
                 $id_customer = $this->tools->tool('getValue', 'id_customer');
                 $id_order = $this->tools->tool('getValue', 'id_order');
-                $amount_formated = is_numeric($amount)
-                    ? $this->dependencies
-                        ->getPlugin()
-                        ->getPaymentAction()
-                        ->getRefundAmountInCents($amount, (string) $resource_id)
-                    : 0;
 
                 if ('uhf' === $this->tools->tool('getValue', 'payment_type')) {
                     $unified_refund_action = $this->dependencies
@@ -112,12 +106,9 @@ class AdminPayplugController extends ModuleAdminController
                 $amount_formated = is_numeric($amount)
                     ? $this->dependencies
                         ->getPlugin()
-                        ->getModule()
-                        ->getInstanceByName($this->dependencies->name)
-                        ->getService('payplug.utilities.helper.amount')
-                        ->convertAmount($amount)
+                        ->getPaymentAction()
+                        ->getRefundAmountInCents($amount, (string) $resource_id)
                     : 0;
-
                 $refund = $this->dependencies
                     ->getPlugin()
                     ->getPaymentAction()

@@ -20,6 +20,7 @@ class createActionTest extends TestCase
 {
     private const STATIC_TOKEN = 'static_token_123';
     private const PAYMENT_ID = 'd4293432-a0ac-4d4f-ae5b-8b12253ecbec';
+    private const CHECK_WITH_BANK = 'We could not confirm your payment. Please check with your bank before trying again.';
 
     public function setUp(): void
     {
@@ -247,7 +248,7 @@ class createActionTest extends TestCase
         [$action, $mocks] = $this->mockActionForAliasPayment();
         $_SERVER['REQUEST_METHOD'] = $request_method;
         $mocks['payment_service']->shouldReceive('createPayment')->never();
-        $mocks['lock']->shouldReceive('acquire')->never();
+        $mocks['lock']->shouldReceive('release')->never();
         $mocks['token_cache']->shouldReceive('get')->never();
         $mocks['alias_repository']->shouldReceive('findUsable')->never();
 
@@ -325,22 +326,35 @@ class createActionTest extends TestCase
         $this->assertSame('https://shop.example/module/payplug/unified?action=challenge&token=concurrent-token', $result['redirect_url']);
     }
 
-    public function testCreateActionAsksToWaitWhenTheConcurrentOperationFoundAfterTheLockCannotBeReconciled()
+    public function testCreateActionAsksToCheckWithTheBankWhenTheConcurrentOperationFoundAfterTheLockCannotBeRead()
     {
         [$action, $mocks] = $this->mockActionForPaymentCreation();
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null, 'op_concurrent');
         $mocks['payment_service']->shouldReceive('getOperation')->once()->with('op_concurrent')
-            ->andThrow(new \Exception('unified API down'));
+            ->andThrow(new ApiException('Unified API operation request failed with HTTP status 503.', 503));
         $mocks['payment_service']->shouldReceive('createPayment')->never();
-        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/getOperation failed/'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/getOperation failed for operation op_concurrent.*cart 42/'));
         $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
 
-        $result = $action->createAction($this->defaultParams());
+        $this->assertSame([
+            'result' => false,
+            'message' => self::CHECK_WITH_BANK,
+        ], $action->createAction($this->defaultParams()));
+    }
+
+    public function testCreateActionAsksToWaitWhenTheConcurrentOperationFoundAfterTheLockDoesNotExist()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null, 'op_concurrent');
+        $mocks['payment_service']->shouldReceive('getOperation')->once()->with('op_concurrent')
+            ->andThrow(new ApiException('Unified API operation request failed with HTTP status 404.', 404));
+        $mocks['payment_service']->shouldReceive('createPayment')->never();
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
 
         $this->assertSame([
             'result' => false,
             'message' => 'Please wait, your previous request is still being processed.',
-        ], $result);
+        ], $action->createAction($this->defaultParams()));
     }
 
     public function testCreateActionReleasesTheLockWhenTheCheckAfterTheLockThrows()
@@ -445,7 +459,7 @@ class createActionTest extends TestCase
         yield 'unprocessable' => [422];
     }
 
-    public function testCreateActionReturnsErrorWhenOperationIdIsMissingFromResponse()
+    public function testCreateActionAsksToCheckWithTheBankWhenOperationIdIsMissingFromResponse()
     {
         [$action, $mocks] = $this->mockActionForPaymentCreation();
 
@@ -463,7 +477,7 @@ class createActionTest extends TestCase
 
         $this->assertSame([
             'result' => false,
-            'message' => 'The transaction was not completed and your card was not charged.',
+            'message' => self::CHECK_WITH_BANK,
         ], $result);
     }
 
@@ -499,14 +513,10 @@ class createActionTest extends TestCase
     }
 
     /**
-     * Fix 3 (PRE-3626 review): everything from lock acquisition through to the final return must
-     * now be wrapped so the lock is released exactly once on every exit path, including an
-     * exception that has nothing to do with createPayment() itself (previously, only the
-     * createPayment()-specific catch released the lock - anything thrown afterwards, e.g. a DB
-     * error inside UnifiedTokenCache::set(), skipped every release() call and left the cart locked
-     * out for the full 30s TTL).
+     * The payment exists once createPayment() returned: a cache failure afterwards is logged, the
+     * lock released once, and the customer told to check with the bank rather than to pay again.
      */
-    public function testCreateActionReleasesLockViaFinallyWhenTokenCacheSetThrowsAfterPaymentCreation()
+    public function testCreateActionAsksToCheckWithTheBankAndReleasesTheLockWhenCachingThePendingOperationThrows()
     {
         [$action, $mocks] = $this->mockActionForPaymentCreation();
 
@@ -521,12 +531,38 @@ class createActionTest extends TestCase
             ->with('uhf_pending_operation:42', 'op_123', 600)
             ->once()
             ->andThrow(new \Exception('cache db down'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/operation op_123 .*cart 42.*cache db down/'));
         $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('cache db down');
+        $this->assertSame([
+            'result' => false,
+            'message' => self::CHECK_WITH_BANK,
+        ], $action->createAction($this->defaultParams()));
+    }
 
-        $action->createAction($this->defaultParams());
+    public function testCreateActionAsksToCheckWithTheBankAndReleasesTheLockWhenCachingTheTokenMappingThrows()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
+            201,
+            '{"id":"op_123","execCode":"0001"}',
+            'https://acs.example/challenge',
+            null,
+            null
+        ));
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null, null, 'op_123');
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_pending_operation:42', 'op_123', 600)->once();
+        $mocks['token_cache']->shouldReceive('set')->with($this->tokenCartKeyMatcher(), '42', 600)->once();
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_cart_token:42', \Mockery::type('string'), 600)->once()
+            ->andThrow(new \Exception('cache db down'));
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/operation op_123 .*cart 42.*cache db down/'));
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $this->assertSame([
+            'result' => false,
+            'message' => self::CHECK_WITH_BANK,
+        ], $action->createAction($this->defaultParams()));
     }
 
     /**
@@ -706,10 +742,11 @@ class createActionTest extends TestCase
      * Fix 6 (PRE-3626 review): UnifiedTokenCache::set() can't propagate a write failure through
      * ITokenCache's void return type, so createAction() does a cheap read-after-write check right
      * after caching the pending operation - if it doesn't round-trip, this must be treated as
-     * fatal for the request (generic error, lock released) rather than redirecting the customer
-     * toward a challenge/return flow that will find nothing cached.
+     * fatal for the request (lock released, the customer told to check with the bank since the
+     * payment exists) rather than redirecting the customer toward a challenge/return flow that
+     * will find nothing cached.
      */
-    public function testCreateActionReturnsGenericErrorAndReleasesLockWhenReadAfterWriteCheckFails()
+    public function testCreateActionAsksToCheckWithTheBankAndReleasesLockWhenReadAfterWriteCheckFails()
     {
         [$action, $mocks] = $this->mockActionForPaymentCreation();
 
@@ -731,7 +768,7 @@ class createActionTest extends TestCase
 
         $this->assertSame([
             'result' => false,
-            'message' => 'The transaction was not completed and your card was not charged.',
+            'message' => self::CHECK_WITH_BANK,
         ], $result);
     }
 
@@ -851,17 +888,17 @@ class createActionTest extends TestCase
     }
 
     /**
-     * Fix 2 (PRE-3626 review): when reconciling an already in-flight pending operation fails
-     * (e.g. it genuinely expired/vanished server-side), createAction() must not hard-fail the
-     * whole checkout over it - it falls through and creates a fresh payment instead.
+     * Only an operation the Unified API reports as unknown (404) lets a new payment be created.
      */
-    public function testCreateActionCreatesNewPaymentWhenReconciliationGetOperationThrows()
+    public function testCreateActionCreatesNewPaymentWhenThePendingOperationDoesNotExist()
     {
         [$action, $mocks] = $this->mockActionForPaymentCreation();
 
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_stale', 'op_stale', 'op_123');
-        $mocks['payment_service']->shouldReceive('getOperation')->with('op_stale')->once()->andThrow(new \Exception('operation not found'));
-        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/getOperation failed/'));
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_stale')->once()
+            ->andThrow(new ApiException('Unified API operation request failed with HTTP status 404.', 404));
+        $mocks['logger']->shouldReceive('error')->never();
+        $mocks['logger']->shouldReceive('info')->once()->with(\Mockery::pattern('/operation op_stale not found.*cart 42/'));
         $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
             201,
             '{"id":"op_123","execCode":"0000_SUCCESS"}',
@@ -877,6 +914,104 @@ class createActionTest extends TestCase
         $result = $action->createAction($this->defaultParams());
 
         $this->assertTrue($result['result']);
+    }
+
+    /**
+     * The pending operation may still be live at the bank: a second payment could charge the
+     * customer twice.
+     *
+     * @dataProvider unreadablePendingOperationProvider
+     */
+    public function testCreateActionCreatesNoPaymentWhenThePendingOperationCannotBeRead(\Exception $exception)
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_pending');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_pending')->once()->andThrow($exception);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/getOperation failed for operation op_pending.*cart 42.*no new payment/'));
+        $mocks['payment_service']->shouldReceive('createPayment')->never();
+        $mocks['lock']->shouldReceive('release')->never();
+
+        $this->assertSame([
+            'result' => false,
+            'message' => self::CHECK_WITH_BANK,
+        ], $action->createAction($this->defaultParams()));
+    }
+
+    public function unreadablePendingOperationProvider()
+    {
+        yield 'timeout or connection failure' => [new ApiException('Unified API HTTP client response is malformed.', 0)];
+
+        yield 'request timeout' => [new ApiException('Unified API operation request failed with HTTP status 408.', 408)];
+
+        yield 'conflict' => [new ApiException('Unified API operation request failed with HTTP status 409.', 409)];
+
+        yield 'server error' => [new ApiException('Unified API operation request failed with HTTP status 500.', 500)];
+
+        yield 'service unavailable' => [new ApiException('Unified API operation request failed with HTTP status 503.', 503)];
+
+        yield 'bad request' => [new ApiException('Unified API operation request failed with HTTP status 400.', 400)];
+
+        yield 'unauthorized' => [new ApiException('Unified API operation request failed with HTTP status 401.', 401)];
+
+        yield 'not an API failure' => [new \RuntimeException('unified API down')];
+    }
+
+    public function testCreateActionCreatesNoPaymentWhenTheChallengeOfAStillPendingOperationCannotBeRebuilt()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_pending');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_cart_token:42')->andReturn(null);
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_pending')->once()
+            ->andReturn(['body' => json_encode(['execCode' => '0001'])]);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Missing token mapping for cart 42/'));
+        $mocks['payment_service']->shouldReceive('createPayment')->never();
+        $mocks['lock']->shouldReceive('release')->never();
+
+        $this->assertSame([
+            'result' => false,
+            'message' => self::CHECK_WITH_BANK,
+        ], $action->createAction($this->defaultParams()));
+    }
+
+    /**
+     * An unreadable operation proves nothing about its outcome: it may have been paid.
+     *
+     * @dataProvider unreadablePendingOperationBodyProvider
+     *
+     * @param string $body
+     */
+    public function testCreateActionCreatesNoPaymentWhenThePendingOperationResponseIsUnreadable($body)
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_pending');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_pending')->once()->andReturn(['body' => $body]);
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/Unreadable getOperation response for operation op_pending.*cart 42.*no new payment/'));
+        $order_action->shouldReceive('createFromOutcome')->never();
+        $mocks['payment_service']->shouldReceive('createPayment')->never();
+        $mocks['lock']->shouldReceive('release')->never();
+
+        $this->assertSame([
+            'result' => false,
+            'message' => self::CHECK_WITH_BANK,
+        ], $action->createAction($this->defaultParams()));
+    }
+
+    public function unreadablePendingOperationBodyProvider()
+    {
+        yield 'missing amount' => [json_encode(['execCode' => '0000', 'orderId' => '42'])];
+
+        yield 'missing amount on a failure code' => [json_encode(['execCode' => '4001', 'orderId' => '42'])];
+
+        yield 'missing execCode' => [json_encode(['amount' => 1234, 'orderId' => '42'])];
+
+        yield 'not JSON' => ['<html>Bad Gateway</html>'];
+
+        yield 'JSON scalar' => ['"0000"'];
     }
 
     /**
@@ -1390,6 +1525,8 @@ class createActionTest extends TestCase
         $mocks['token_cache']->shouldReceive('set')
             ->with('uhf_pending_alias:op_123', json_encode(['alias_id' => $expected_cached_alias_id, 'brand' => 'visa']), 86400)
             ->once();
+        // A retry reconciles this operation instead of creating a second payment.
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_pending_operation:42', 'op_123', 600)->once();
         // Never saved at creation, and no order for a payment still pending (PRE-3557 rule): the
         // later PAID notification creates the order and saves the card.
         $order_action->shouldReceive('createFromOutcome')->never();
@@ -1401,8 +1538,29 @@ class createActionTest extends TestCase
 
         $this->assertSame([
             'result' => false,
-            'message' => 'The transaction was not completed and your card was not charged.',
+            'message' => self::CHECK_WITH_BANK,
         ], $result);
+    }
+
+    public function testCreateActionStillAsksToCheckWithTheBankWhenCachingADirectThreeDsPendingOperationThrows()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(
+            new PaymentOutput(201, '{"id":"op_123","execCode":"0001"}', null, null, null)
+        );
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_pending_operation:42', 'op_123', 600)->once()
+            ->andThrow(new \Exception('cache db down'));
+        $order_action->shouldReceive('createFromOutcome')->never();
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/operation op_123 .*cart 42.*cache db down/'));
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $this->assertSame([
+            'result' => false,
+            'message' => self::CHECK_WITH_BANK,
+        ], $action->createAction($this->defaultParams()));
     }
 
     public function directPendingAliasIdProvider()

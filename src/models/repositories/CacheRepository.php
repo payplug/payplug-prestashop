@@ -51,6 +51,37 @@ class CacheRepository extends EntityRepository
     }
 
     /**
+     * @description Delete every cache entry whose key does not start with the given prefix
+     *
+     * @param string $prefix
+     *
+     * @return bool
+     */
+    public function deleteAllExceptKeyPrefix($prefix = '')
+    {
+        if (!is_string($prefix) || !$prefix) {
+            return false;
+        }
+        if (!is_string($this->entity_name) || !$this->entity_name) {
+            return false;
+        }
+        $entity = $this->getEntityObject($this->entity_name);
+        if (!$entity) {
+            return false;
+        }
+        $definition = $entity->getDefinition();
+        $like_prefix = addcslashes($prefix, '\\%_');
+
+        $result = $this
+            ->delete()
+            ->from($this->getTableName($definition['table']))
+            ->where('`cache_key` NOT LIKE "' . $this->escape($like_prefix) . '%"')
+            ->build();
+
+        return $result ?: false;
+    }
+
+    /**
      * @description Create the table in the database
      *
      * @param string $engine

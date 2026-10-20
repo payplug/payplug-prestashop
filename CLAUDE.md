@@ -289,7 +289,9 @@ insert retries as an update, in case the frictionless notification `save()`d the
   customer static token (`Tools::getToken(false)`) in its body, checked with `hash_equals` (CSRF); the
   token is never put in the URL. On a `createPayment()` failure, an `ApiException` with status 0, 408,
   409 or 5xx is "uncertain" and gets the "Please check with your bank before trying again" message;
-  any other failure gets "your card was not charged".
+  any other failure gets "your card was not charged". Once `createPayment()` has returned, every failure
+  (no operation id, a pending-state cache write that fails or doesn't read back, a synchronous
+  `THREE_DS_PENDING` result) gets the "check with your bank" message, never "not charged".
 - **Amounts**: `AmountHelper::convertAmount()` takes the currency ISO code (default `EUR`) and the UHF
   call sites pass the cart's or order's currency, so JPY and other 0-decimal currencies are converted
   correctly.
@@ -300,7 +302,12 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `UnifiedPaymentAction::reconcilePendingOperation()`: a terminal outcome goes through the same
   `createOrderWithLock()` path `returnAction()`/`notifyAction()` use; a still-`THREE_DS_PENDING`
   outcome redirects back to the *same* challenge (same token, via the `uhf_cart_token` reverse
-  mapping) instead of starting a duplicate one.
+  mapping) instead of starting a duplicate one. A new payment is created only when `getOperation()`
+  answers 404 (or the operation `FAILED`, with `execCode` and `amount` present); any other
+  `getOperation()` failure, a response that is not JSON or lacks `execCode`/`amount`, or a missing
+  `uhf_cart_token` mapping, creates nothing and returns the "check with your bank" message. A
+  synchronous `THREE_DS_PENDING` creation result (no redirect) also caches `uhf_pending_operation`,
+  so a retry reconciles it.
 - **Card alias**: read from the operation's `paymentMethod.storedId`, falling back to
   `paymentMethod.id` (Unified API contract change, PRE-3717/PRE-3721; UPC `^1.2.1`).
 - **JS SDK**: `dev/js/front.js` gained a `hosted_fields` submodule initializing the `dalenys.hostedFields` widget (card/expiry/CVV fields), with per-field validation, brand allow-listing, an anti-double-submit guard with a safety timeout, and tokenization before POSTing to `unified.php?action=create`, with the customer static token (`prestashop.static_token`, set by PrestaShop core on every front page) in the POST body for both the card and saved-alias submits (the URL is server-injected as `hosted_fields_uhf_url`/`payplug_hosted_fields_uhf_url`, built by `PrestashopAdapter17::setHostedFieldsPaymentOption()` — the JS-side variable name kept its original `uhf` naming even though it no longer points at `uhf.php`).

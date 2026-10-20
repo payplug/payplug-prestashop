@@ -272,9 +272,6 @@ class UnifiedPaymentAction
             if (null !== $reconciliation_result) {
                 return $reconciliation_result;
             }
-            // else: getOperation() itself failed (e.g. the operation genuinely expired/vanished
-            // server-side) - don't hard-fail the whole checkout over a reconciliation-check
-            // failure, fall through and create a fresh payment below instead.
         }
 
         $lock = $factory->createLock();
@@ -430,7 +427,7 @@ class UnifiedPaymentAction
             if ('' === $operation_id) {
                 $logger->error('UnifiedPaymentAction::createAction - missing operation identifier in payment creation response');
 
-                return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+                return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
             }
 
             // Only a hfToken payment with an effective save_card creates an alias ($save_card is
@@ -447,39 +444,46 @@ class UnifiedPaymentAction
             $this->bindPaymentReferences($factory, $logger, $decoded_body, $operation_id, (int) $cart->id, $amount_cents);
 
             if ($output->redirectHtml || $output->redirectUrl) {
-                $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
+                try {
+                    $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
 
-                // Read-after-write check: UnifiedTokenCache::set() can't report a write failure through
-                // ITokenCache's void return type, and the return/challenge flow depends on finding
-                // this entry - without it the customer would land on the error page once charged.
-                if ($operation_id !== $token_cache->get('uhf_pending_operation:' . $cart->id)) {
-                    $logger->error('UnifiedPaymentAction::createAction - Failed to persist pending operation cache for cart ' . $cart->id);
+                    // Read-after-write check: UnifiedTokenCache::set() can't report a write failure through
+                    // ITokenCache's void return type, and the return/challenge flow depends on finding
+                    // this entry - without it the customer would land on the error page once charged.
+                    if ($operation_id !== $token_cache->get('uhf_pending_operation:' . $cart->id)) {
+                        $logger->error('UnifiedPaymentAction::createAction - Failed to persist pending operation cache for cart ' . $cart->id);
 
-                    return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
-                }
+                        return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
+                    }
 
-                // Both directions of the token<->cart mapping are cached, same 600s TTL as the
-                // pending-operation entry they're tied to: uhf_token_cart resolves an inbound
-                // return/challenge request to its cart (returnAction()/challengeAction()), while
-                // uhf_cart_token lets reconcilePendingOperation() rebuild the SAME challenge URL
-                // when createAction() is re-entered for a cart that already has a live challenge.
-                $token_cache->set('uhf_token_cart:' . $token, (string) $cart->id, 600);
-                $token_cache->set('uhf_cart_token:' . $cart->id, $token, 600);
+                    // Both directions of the token<->cart mapping are cached, same 600s TTL as the
+                    // pending-operation entry they're tied to: uhf_token_cart resolves an inbound
+                    // return/challenge request to its cart (returnAction()/challengeAction()), while
+                    // uhf_cart_token lets reconcilePendingOperation() rebuild the SAME challenge URL
+                    // when createAction() is re-entered for a cart that already has a live challenge.
+                    $token_cache->set('uhf_token_cart:' . $token, (string) $cart->id, 600);
+                    $token_cache->set('uhf_cart_token:' . $cart->id, $token, 600);
 
-                if (null !== $pending_alias) {
-                    $this->cachePendingAlias($token_cache, $logger, $operation_id, $pending_alias);
-                }
+                    if (null !== $pending_alias) {
+                        $this->cachePendingAlias($token_cache, $logger, $operation_id, $pending_alias);
+                    }
 
-                if ($output->redirectHtml) {
-                    $token_cache->set('uhf_challenge_html:' . $cart->id, (string) $output->redirectHtml, 600);
-                    $redirect_url = $context->link->getModuleLink(
-                        $this->dependencies->name,
-                        'unified',
-                        ['action' => 'challenge', 'token' => $token],
-                        true
-                    );
-                } else {
-                    $redirect_url = $output->redirectUrl;
+                    if ($output->redirectHtml) {
+                        $token_cache->set('uhf_challenge_html:' . $cart->id, (string) $output->redirectHtml, 600);
+                        $redirect_url = $context->link->getModuleLink(
+                            $this->dependencies->name,
+                            'unified',
+                            ['action' => 'challenge', 'token' => $token],
+                            true
+                        );
+                    } else {
+                        $redirect_url = $output->redirectUrl;
+                    }
+                } catch (\Exception $exception) {
+                    $logger->error('UnifiedPaymentAction::createAction - Failed to cache the challenge of operation ' . $operation_id
+                        . ' for cart ' . $cart->id . ': ' . $exception->getMessage());
+
+                    return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
                 }
 
                 return $this->withReturnUrl([
@@ -500,11 +504,19 @@ class UnifiedPaymentAction
                 $this->cachePendingAlias($token_cache, $logger, $operation_id, $pending_alias);
             }
 
-            // PRE-3557 rule: no order for a payment still pending, the notification creates it once paid.
+            // PRE-3557 rule: no order for a payment still pending, the notification creates it once
+            // paid. The cached operation makes a retry reconcile it instead of paying a second time.
             if (PaymentOutcome::THREE_DS_PENDING === $outcome) {
                 $logger->info('UnifiedPaymentAction::createAction - Operation ' . $operation_id . ' still pending 3DS, no order created for cart ' . $cart->id);
 
-                return $this->errorResult($this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'));
+                try {
+                    $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
+                } catch (\Exception $exception) {
+                    $logger->error('UnifiedPaymentAction::createAction - Failed to cache pending operation ' . $operation_id
+                        . ' for cart ' . $cart->id . ': ' . $exception->getMessage());
+                }
+
+                return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
             }
 
             $result = $this->orderAction()->createFromOutcome(
@@ -1153,21 +1165,33 @@ class UnifiedPaymentAction
      * @param mixed $context
      * @param mixed $pending_operation_id
      *
-     * @return array|null the final result to return from createAction(), or null to fall through
-     *                    to a fresh payment creation (reconciliation wasn't possible right now)
+     * @return array|null the final result to return from createAction(), or null when the operation
+     *                    does not exist or failed, so a new payment can be created
      */
     private function reconcilePendingOperation($factory, $logger, $cart, $context, $pending_operation_id)
     {
         try {
             $response = $factory->create()->getOperation($pending_operation_id);
         } catch (\Exception $exception) {
-            $logger->error('UnifiedPaymentAction::reconcilePendingOperation - getOperation failed: ' . $exception->getMessage());
+            if ($exception instanceof ApiException && 404 === (int) $exception->getCode()) {
+                $logger->info('UnifiedPaymentAction::reconcilePendingOperation - Pending operation ' . $pending_operation_id
+                    . ' not found for cart ' . $cart->id . ', a new payment can be created');
 
-            return null;
+                return null;
+            }
+
+            $logger->error('UnifiedPaymentAction::reconcilePendingOperation - getOperation failed for operation ' . $pending_operation_id
+                . ' (cart ' . $cart->id . '), no new payment created: ' . $exception->getMessage());
+
+            return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
         }
 
         $decoded = json_decode($response['body'], true);
-        $exec_code = is_array($decoded) && isset($decoded['execCode']) ? (string) $decoded['execCode'] : self::MISSING_EXEC_CODE;
+        if (!is_array($decoded) || !isset($decoded['execCode'])) {
+            return $this->unreadableOperationResult($logger, $cart, $pending_operation_id, 'no execCode');
+        }
+
+        $exec_code = (string) $decoded['execCode'];
         $outcome = ExecCodeMapper::toPaymentOutcome($exec_code);
 
         if (PaymentOutcome::THREE_DS_PENDING === $outcome) {
@@ -1181,9 +1205,10 @@ class UnifiedPaymentAction
             $token = (string) $token_cache->get('uhf_cart_token:' . $cart->id);
 
             if ('' === $token) {
-                $logger->error('UnifiedPaymentAction::reconcilePendingOperation - Missing token mapping for cart ' . $cart->id . ', cannot rebuild challenge URL');
+                $logger->error('UnifiedPaymentAction::reconcilePendingOperation - Missing token mapping for cart ' . $cart->id
+                    . ', cannot rebuild challenge URL of operation ' . $pending_operation_id . ', no new payment created');
 
-                return null;
+                return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
             }
 
             $redirect_url = $context->link->getModuleLink(
@@ -1199,21 +1224,19 @@ class UnifiedPaymentAction
             ]);
         }
 
-        $amount = is_array($decoded) && isset($decoded['amount']) ? (int) $decoded['amount'] : null;
+        if (!isset($decoded['amount'])) {
+            return $this->unreadableOperationResult($logger, $cart, $pending_operation_id, 'no amount');
+        }
 
-        if (null === $amount) {
-            $outcome = PaymentOutcome::FAILED;
-            $logger->error('UnifiedPaymentAction::reconcilePendingOperation - missing amount field in getOperation response for operation ' . $pending_operation_id);
-            $amount = 0;
-        } else {
-            // Same orderId+amount cross-check as returnAction().
-            $order_id_from_response = is_array($decoded) && isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
+        $amount = (int) $decoded['amount'];
 
-            $requested_amount = $this->getRequestedAmount($factory, $logger, $pending_operation_id);
+        // Same orderId+amount cross-check as returnAction().
+        $order_id_from_response = isset($decoded['orderId']) ? (string) $decoded['orderId'] : null;
 
-            if (!$this->crossChecksOrderIdAndAmount($logger, $cart, (int) $cart->id, $order_id_from_response, $amount, 'UnifiedPaymentAction::reconcilePendingOperation', $pending_operation_id, $requested_amount)) {
-                return $this->crossCheckMismatchResult($this->orderAction());
-            }
+        $requested_amount = $this->getRequestedAmount($factory, $logger, $pending_operation_id);
+
+        if (!$this->crossChecksOrderIdAndAmount($logger, $cart, (int) $cart->id, $order_id_from_response, $amount, 'UnifiedPaymentAction::reconcilePendingOperation', $pending_operation_id, $requested_amount)) {
+            return $this->crossCheckMismatchResult($this->orderAction());
         }
 
         if (PaymentOutcome::PAID === $outcome) {
@@ -1237,6 +1260,24 @@ class UnifiedPaymentAction
         }
 
         return $this->withReturnUrl($result);
+    }
+
+    /**
+     * @description Refuse a new payment over a pending operation whose response can't be read
+     *
+     * @param mixed $logger
+     * @param mixed $cart
+     * @param string $pending_operation_id
+     * @param string $reason
+     *
+     * @return array{result: bool, message: string}
+     */
+    private function unreadableOperationResult($logger, $cart, $pending_operation_id, $reason)
+    {
+        $logger->error('UnifiedPaymentAction::reconcilePendingOperation - Unreadable getOperation response for operation ' . $pending_operation_id
+            . ' (cart ' . $cart->id . ', ' . $reason . '), no new payment created');
+
+        return $this->errorResult($this->dependencies->l('We could not confirm your payment. Please check with your bank before trying again.', 'uhf'));
     }
 
     /**

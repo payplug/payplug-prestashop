@@ -31,7 +31,7 @@ use PayplugUnifiedCore\Contracts\ITokenCache;
 
 class UnifiedTokenCache implements ITokenCache
 {
-    private const KEY_PREFIX = 'upc_token:';
+    public const KEY_PREFIX = 'upc_token:';
 
     private $dependencies;
 
