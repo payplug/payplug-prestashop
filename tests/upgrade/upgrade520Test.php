@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  * @group unit
  * @group upgrade
  */
-class upgrade530Test extends TestCase
+class upgrade520Test extends TestCase
 {
     /**
      * @runInSeparateProcess
@@ -58,11 +58,22 @@ class upgrade530Test extends TestCase
     }
 
     /**
-     * @param array<string, array> $existing_columns SHOW COLUMNS result per column name
-     *
-     * @return string[] the queries executed, SHOW COLUMNS excluded
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
-    private function runUpgrade(array $existing_columns)
+    public function testFailsWhenThePartialRefundStateCannotBeRepaired()
+    {
+        $this->assertFalse($this->runUpgrade([], false, false));
+    }
+
+    /**
+     * @param array<string, array> $existing_columns SHOW COLUMNS result per column name
+     * @param bool $repaired result of the partial refund state repair
+     * @param bool $expected_result expected result of the upgrade
+     *
+     * @return bool|string[] the queries executed (SHOW COLUMNS excluded), or the upgrade result when it is not the expected one
+     */
+    private function runUpgrade(array $existing_columns, $repaired = true, $expected_result = true)
     {
         define('_DB_PREFIX_', 'ps_');
         define('_MYSQL_ENGINE_', 'InnoDB');
@@ -93,18 +104,27 @@ class upgrade530Test extends TestCase
         }');
         \Db::$columns = $existing_columns;
 
-        require_once __DIR__ . '/../../upgrade/upgrade-5.3.0.php';
+        require_once __DIR__ . '/../../upgrade/upgrade-5.2.0.php';
 
         $logger = \Mockery::mock('Logger');
         $logger->shouldReceive('addLog');
         $plugin = \Mockery::mock('Plugin');
         $plugin->shouldReceive('getLogger')->andReturn($logger);
+        $order_state_action = \Mockery::mock('OrderStateAction');
+        $order_state_action->shouldReceive('repairPartialRefundStateAction')->andReturn($repaired);
+        $plugin->shouldReceive('getOrderStateAction')->andReturn($order_state_action);
         $dependencies = \Mockery::mock('Dependencies');
         $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
         $module = new \stdClass();
         $module->payplug_dependencies = $dependencies;
 
-        $this->assertTrue(upgrade_module_5_3_0($module));
+        $result = upgrade_module_5_2_0($module);
+
+        if (!$expected_result) {
+            return $result;
+        }
+
+        $this->assertTrue($result);
 
         return \Db::$queries;
     }
