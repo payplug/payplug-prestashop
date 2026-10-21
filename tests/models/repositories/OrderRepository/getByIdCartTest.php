@@ -69,4 +69,36 @@ class getByIdCartTest extends BaseOrderRepository
             $this->repository->getByIdCart($cart_id)
         );
     }
+
+    public function testReadsThroughTheSqlCacheByDefault()
+    {
+        $this->repository->shouldReceive([
+            'select' => $this->repository,
+            'fields' => $this->repository,
+            'from' => $this->repository,
+            'where' => $this->repository,
+        ]);
+        $this->repository->shouldReceive('build')
+            ->with(false, true)
+            ->once()
+            ->andReturn([]);
+
+        $this->assertSame([], $this->repository->getByIdCart(42));
+    }
+
+    public function testCanBypassTheSqlCache()
+    {
+        $this->repository->shouldReceive([
+            'select' => $this->repository,
+            'fields' => $this->repository,
+            'from' => $this->repository,
+            'where' => $this->repository,
+        ]);
+        $this->repository->shouldReceive('build')
+            ->with(false, false)
+            ->once()
+            ->andReturn([]);
+
+        $this->assertSame([], $this->repository->getByIdCart(42, false));
+    }
 }

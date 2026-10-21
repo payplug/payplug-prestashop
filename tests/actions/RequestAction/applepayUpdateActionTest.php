@@ -45,6 +45,24 @@ class applepayUpdateActionTest extends BaseRequestAction
         );
     }
 
+    public function testWhenApplepayRequestIsRefused()
+    {
+        $request = [
+            'result' => false,
+            'message' => 'The cart products can not be ordered regarding their stock',
+        ];
+        $this->payment_method->shouldReceive([
+            'getRequest' => $request,
+        ]);
+        $this->assertSame(
+            [
+                'result' => false,
+                'request' => $request,
+            ],
+            $this->action->applepayUpdateAction()
+        );
+    }
+
     public function testWhenApplepayRequestReturnedIsValid()
     {
         $this->payment_method->shouldReceive([

@@ -31,6 +31,7 @@ use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationNotSetException;
 use Payplug\Exception\ForbiddenException;
+use Payplug\Exception\HttpException;
 use Payplug\Exception\NotAllowedException;
 use Payplug\Exception\NotFoundException;
 use Payplug\Exception\PayplugServerException;
@@ -258,6 +259,9 @@ class API
                 'code' => (int) $e->getCode(),
                 'message' => $e->getMessage(),
             ];
+            if ($e instanceof HttpException) {
+                $response['details'] = $e->getErrorObject();
+            }
         }
 
         return $response;
@@ -304,6 +308,9 @@ class API
                 'code' => (int) $e->getCode(),
                 'message' => $e->getMessage(),
             ];
+            if ($e instanceof HttpException) {
+                $response['details'] = $e->getErrorObject();
+            }
         }
 
         return $response;

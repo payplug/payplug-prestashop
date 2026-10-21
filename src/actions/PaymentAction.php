@@ -50,6 +50,7 @@ class PaymentAction
     private $dependencies;
     private $logger;
     private $plugin;
+    private $resource_currencies = [];
 
     public function __construct($dependencies)
     {
@@ -592,6 +593,14 @@ class PaymentAction
             ->getPaymentMethodClass()
             ->getPaymentMethod($stored_resource['method']);
 
+        $currency = $this->getResourceCurrency($payment_method, $resource_id);
+        if ('' === $currency) {
+            return [
+                'result' => false,
+                'message' => $translations['error']['default'],
+            ];
+        }
+
         // Get the refundable amount for the got resource ID
         $refundable_amount = $payment_method->getRefundableAmount($stored_resource['resource_id']);
 
@@ -634,7 +643,7 @@ class PaymentAction
         if ($refund_error) {
             return [
                 'result' => true,
-                'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount),
+                'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount, $currency),
                 'template' => $this->renderTemplate($id_order),
                 'message' => $translations['success'], // todo: check if appropriate wording
                 'modal' => $this->renderModalTemplate(),
@@ -652,7 +661,7 @@ class PaymentAction
 
             return [
                 'result' => true,
-                'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount),
+                'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount, $currency),
                 'template' => $this->renderTemplate($id_order),
                 'message' => $translations['success'], // todo: check if appropriate wording
                 'modal' => '',
@@ -671,7 +680,7 @@ class PaymentAction
 
         return [
             'result' => true,
-            'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount),
+            'data' => $this->renderRefundData($refunded_amount, $remaining_refundable_amount, $currency),
             'template' => $this->renderTemplate($id_order),
             'message' => $translations['success'],
             'modal' => '',
@@ -843,14 +852,59 @@ class PaymentAction
     }
 
     /**
+     * @description Convert a refund amount entered in the back office into cents of the
+     *              currency of the payment it refunds.
+     *
+     * @param float|string $amount
+     * @param string $resource_id
+     *
+     * @return int 0 when the payment or its currency cannot be retrieved
+     */
+    public function getRefundAmountInCents($amount, $resource_id)
+    {
+        $this->setParameters();
+
+        if (!is_string($resource_id) || !$resource_id) {
+            $this->logger->addLog('PaymentAction::getRefundAmountInCents - Invalid argument, $resource_id must be a non empty string.', 'error');
+
+            return 0;
+        }
+
+        $stored_resource = $this->plugin
+            ->getPaymentRepository()
+            ->getBy('resource_id', $resource_id);
+        if (empty($stored_resource)) {
+            $this->logger->addLog('PaymentAction::getRefundAmountInCents - No stored payment found for given resource ID.', 'error');
+
+            return 0;
+        }
+
+        $payment_method = $this->plugin
+            ->getPaymentMethodClass()
+            ->getPaymentMethod($stored_resource['method']);
+        $currency = $this->getResourceCurrency($payment_method, $resource_id);
+        if ('' === $currency) {
+            return 0;
+        }
+
+        return (int) $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount')
+            ->convertAmount($amount, false, $currency);
+    }
+
+    /**
      * @description Render the refund data
      *
      * @param int $amount_refunded_payplug
      * @param int $amount_available
+     * @param string|null $currency ISO 4217 code of the refunded payment, the back office currency when null
      *
      * @return string
      */
-    public function renderRefundData($amount_refunded_payplug = 0, $amount_available = 0)
+    public function renderRefundData($amount_refunded_payplug = 0, $amount_available = 0, $currency = null)
     {
         $this->setParameters();
 
@@ -866,6 +920,14 @@ class PaymentAction
             return '';
         }
 
+        if (null === $currency) {
+            $currency = $this->context->currency->iso_code;
+        } elseif (!is_string($currency)) {
+            $this->logger->addLog('PaymentAction::renderRefundData - Invalid argument, $currency must be a string.', 'error');
+
+            return '';
+        }
+
         $price_adapter = $this->dependencies
             ->getPlugin()
             ->getModule()
@@ -876,13 +938,13 @@ class PaymentAction
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount');
-        $amount_refunded_payplug = $amountHelper->convertAmount($amount_refunded_payplug, true);
-        $amount_available = $amountHelper->convertAmount($amount_available, true);
+        $amount_refunded_payplug = $amountHelper->convertAmount($amount_refunded_payplug, true, $currency);
+        $amount_available = $amountHelper->convertAmount($amount_available, true, $currency);
         $this->context->smarty->assign([
             'amount_refunded_payplug' => $amount_refunded_payplug,
-            'amount_refunded_payplug_display' => $price_adapter->formatPrice($amount_refunded_payplug, $this->context->currency->iso_code),
+            'amount_refunded_payplug_display' => $price_adapter->formatPrice($amount_refunded_payplug, $currency),
             'amount_available' => $amount_available,
-            'amount_available_display' => $price_adapter->formatPrice($amount_available, $this->context->currency->iso_code),
+            'amount_available_display' => $price_adapter->formatPrice($amount_available, $currency),
         ]);
 
         return $this->dependencies->configClass->fetchTemplate('views/templates/admin/order/refund_data.tpl');
@@ -906,6 +968,35 @@ class PaymentAction
         }
 
         return $this->dependencies->hookClass->displayAdminOrderMain(['id_order' => $id_order]);
+    }
+
+    /**
+     * @description Get the currency of a payment resource
+     *
+     * @param object $payment_method
+     * @param string $resource_id
+     *
+     * @return string ISO 4217 code, empty when the resource or its currency cannot be retrieved
+     */
+    private function getResourceCurrency($payment_method, $resource_id)
+    {
+        if (isset($this->resource_currencies[$resource_id])) {
+            return $this->resource_currencies[$resource_id];
+        }
+
+        $retrieve = $payment_method->retrieve($resource_id);
+        if (!$retrieve['result']
+            || !isset($retrieve['resource']->currency)
+            || !is_string($retrieve['resource']->currency)
+            || '' === $retrieve['resource']->currency) {
+            $this->logger->addLog('PaymentAction::getResourceCurrency - The resource currency cannot be retrieved.', 'error');
+
+            return '';
+        }
+
+        $this->resource_currencies[$resource_id] = $retrieve['resource']->currency;
+
+        return $this->resource_currencies[$resource_id];
     }
 
     /**

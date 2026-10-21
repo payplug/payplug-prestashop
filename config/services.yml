@@ -20,6 +20,10 @@ services:
     class: PayPlug\src\models\classes\Merchant
     public: true
 
+  payplug.models.classes.order_lock:
+    class: PayPlug\src\models\classes\OrderLock
+    public: true
+
   payplug.utilities.service.api:
     class: PayPlug\src\utilities\services\API
     public: true

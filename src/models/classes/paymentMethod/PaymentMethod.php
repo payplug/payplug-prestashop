@@ -31,6 +31,21 @@ use PayPlug\src\exceptions\BadParameterException;
 
 class PaymentMethod
 {
+    /**
+     * Overseas territories sharing the French numbering, where shoppers often enter a
+     * metropolitan number in national format.
+     */
+    const FRENCH_NUMBERING_TERRITORIES = ['GP', 'MQ', 'RE', 'GF', 'YT', 'PM', 'BL', 'MF', 'NC', 'PF', 'WF'];
+
+    /**
+     * Territories sharing the +590 numbering with Guadeloupe: libphonenumber attributes
+     * a shared number to the first of these regions it is valid in.
+     */
+    const SHARED_NUMBERING_REGIONS = [
+        'BL' => ['GP', 'MF'],
+        'MF' => ['GP', 'BL'],
+    ];
+
     /** @var bool */
     public $cancellable = true;
 
@@ -401,7 +416,7 @@ class PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount')
-            ->convertAmount($resource->amount, true);
+            ->convertAmount($resource->amount, true, isset($resource->currency) ? $resource->currency : '');
 
         $state_addons = $resource->is_live ? '' : '_test';
         $state = (bool) $resource->is_paid ? 'order_state_paid' : 'order_state_pending';
@@ -811,15 +826,19 @@ class PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount');
-        $refunded = $amountHelper->convertAmount($resource->amount_refunded, true);
+        $currency = isset($resource->currency) ? $resource->currency : '';
+        $display_currency = is_string($currency) && '' !== $currency
+            ? $currency
+            : (isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : '');
+        $refunded = $amountHelper->convertAmount($resource->amount_refunded, true, $currency);
         $available = 10 <= $amount_available
-            ? $amountHelper->convertAmount($amount_available, true)
+            ? $amountHelper->convertAmount($amount_available, true, $currency)
             : 0;
         $refund = [
             'refunded' => $refunded,
-            'refunded_display' => $price_adapter->formatPrice($refunded, $this->context->currency->iso_code),
+            'refunded_display' => $price_adapter->formatPrice($refunded, $display_currency),
             'available' => $available,
-            'available_display' => $price_adapter->formatPrice($available, $this->context->currency->iso_code),
+            'available_display' => $price_adapter->formatPrice($available, $display_currency),
             'is_refunded' => (bool) $resource->is_refunded,
         ];
         $can_be_refund = $resource->is_paid
@@ -829,8 +848,8 @@ class PaymentMethod
             $refund['available'] = 0;
         }
 
-        $amount = $amountHelper->convertAmount($resource->amount, true);
-        $amount_display = $price_adapter->formatPrice($amount, $this->context->currency->iso_code);
+        $amount = $amountHelper->convertAmount($resource->amount, true, $currency);
+        $amount_display = $price_adapter->formatPrice($amount, $display_currency);
 
         return [
             'id' => $resource->id,
@@ -1089,10 +1108,27 @@ class PaymentMethod
         $payment = $this->api_service->createPayment($payment_tab);
 
         if (200 != (int) $payment['code']) {
-            return $this->processPaymentError((int) $payment['code'], $payment_tab);
+            return $this->processPaymentError((int) $payment['code'], $payment_tab, $payment);
         }
 
         return $payment;
+    }
+
+    /**
+     * @description Get the price limits authorized for the current payment method.
+     *              Sourced from GET /account (min_amounts/max_amounts per payment method,
+     *              in cents) and mapped in API::treatAccountResponse(). Payment methods the
+     *              account exposes no specific range for fall back on the account default.
+     *
+     * @return array Limits as `ISO:amount` strings, e.g. `['min' => 'EUR:500', 'max' => 'EUR:400000']`
+     */
+    public function getPriceLimit()
+    {
+        $this->setParameters();
+
+        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
+
+        return isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
     }
 
     /**
@@ -1394,12 +1430,11 @@ class PaymentMethod
         }
 
         // Check amount
-        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
-        $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
+        $price_limit = $this->getPriceLimit();
         $cart_amount = $this->context->cart->getOrderTotal(true);
         $is_valid_amount = $this->dependencies
             ->getHelpers()['amount']
-            ->validateAmount($price_limit, (float) $cart_amount);
+            ->validateAmount($price_limit, (float) $cart_amount, $this->context->currency->iso_code);
         if (!$is_valid_amount['result']) {
             $this->logger->addLog('PaymentMethod::getPaymentTab() - Current Context Cart amount is not compatible with payment method.');
 
@@ -1412,7 +1447,7 @@ class PaymentMethod
                 ->getModule()
                 ->getInstanceByName($this->dependencies->name)
                 ->getService('payplug.utilities.helper.amount')
-                ->convertAmount($cart_amount),
+                ->convertAmount($cart_amount, false, $this->context->currency->iso_code),
             'currency' => $this->context->currency->iso_code,
             'notification_url' => $this->context->link->getModuleLink($this->dependencies->name, 'ipn', [], true),
             'force_3ds' => false,
@@ -1516,8 +1551,7 @@ class PaymentMethod
             $billing['company_name'] = empty($billing['company_name'])
                 ? $billing['first_name'] . ' ' . $billing['last_name']
                 : $billing['company_name'];
-            $billing['landline_phone_number'] = $billing['landline_phone_number'] ?: $billing['mobile_phone_number'];
-            $billing['mobile_phone_number'] = $billing['mobile_phone_number'] ?: $billing['landline_phone_number'];
+            $billing = $this->completePhoneNumbers($billing);
 
             // Set shipping informations
             $delivery_type = 'NEW';
@@ -1549,8 +1583,7 @@ class PaymentMethod
             $shipping['company_name'] = empty($shipping['company_name'])
                 ? $shipping['first_name'] . ' ' . $shipping['last_name']
                 : $shipping['company_name'];
-            $shipping['landline_phone_number'] = $shipping['landline_phone_number'] ?: $shipping['mobile_phone_number'];
-            $shipping['mobile_phone_number'] = $shipping['mobile_phone_number'] ?: $shipping['landline_phone_number'];
+            $shipping = $this->completePhoneNumbers($shipping);
 
             $payment_tab['shipping'] = $shipping;
             $payment_tab['billing'] = $billing;
@@ -1560,32 +1593,185 @@ class PaymentMethod
     }
 
     /**
-     * Formats a phone number to E.164 for the Payplug API, returning an
-     * empty string if it cannot be parsed or is not valid for the given
-     * country — the safe-fallback contract previously provided by the
-     * deprecated PhoneNumber::formatPhoneNumber() service.
+     * @description Copy the available phone number into the empty phone field of an
+     *              address; a field without a number is null, never an empty string.
+     *
+     * @return array
+     */
+    protected function completePhoneNumbers(array $address)
+    {
+        $landline = !empty($address['landline_phone_number']) ? $address['landline_phone_number'] : null;
+        $mobile = !empty($address['mobile_phone_number']) ? $address['mobile_phone_number'] : null;
+
+        $address['landline_phone_number'] = $landline ?: $mobile;
+        $address['mobile_phone_number'] = $mobile ?: $landline;
+
+        return $address;
+    }
+
+    /**
+     * @description Whether the phone numbers sent for this payment method must belong
+     *              to the address country.
+     *
+     * @return bool
+     */
+    protected function isPhoneRegionStrict()
+    {
+        return false;
+    }
+
+    /**
+     * @description Get the regions a phone number of an address in the given country
+     *              is read in, in order: the country itself, then the regions sharing its
+     *              numbering, then FR for an overseas territory sharing the French numbering.
+     *
+     * @param string $iso_code
+     *
+     * @return array
+     */
+    protected function getPhoneNumberRegions($iso_code)
+    {
+        $iso_code = strtoupper((string) $iso_code);
+
+        if (!in_array($iso_code, self::FRENCH_NUMBERING_TERRITORIES, true)) {
+            return [$iso_code];
+        }
+
+        $shared_regions = isset(self::SHARED_NUMBERING_REGIONS[$iso_code])
+            ? self::SHARED_NUMBERING_REGIONS[$iso_code]
+            : [];
+
+        return array_merge([$iso_code], $shared_regions, ['FR']);
+    }
+
+    /**
+     * Formats a phone number to E.164 for the Payplug API, returning null
+     * if it cannot be parsed or is not accepted for the given country.
+     *
+     * The Payplug API refuses an empty string phone number but accepts a
+     * null one, which reads as "no phone number available".
      *
      * @param string $phone_number
      * @param string $iso_code
      *
-     * @return string
+     * @return string|null
      */
     protected function formatPhoneNumberSafely($phone_number, $iso_code)
     {
         if (empty($phone_number) || !preg_match('/^[+0-9. ()\/-]{6,}$/', $phone_number) || empty($iso_code)) {
+            return null;
+        }
+
+        $exception = null;
+        foreach ($this->getPhoneNumberRegions($iso_code) as $region) {
+            try {
+                return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164(
+                    (string) $phone_number,
+                    $region,
+                    $this->isPhoneRegionStrict()
+                );
+            } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
+                $exception = $exception ?: $e;
+            }
+        }
+
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog(
+                static::class . '::formatPhoneNumberSafely() - Phone number "'
+                    . $this->maskPhoneNumberForLogging($phone_number)
+                    . '" could not be formatted for country "' . $iso_code . '": ' . $exception->getMessage(),
+                'error'
+            );
+
+        return null;
+    }
+
+    /**
+     * Masks a phone number for logging, keeping only enough of it (the first
+     * 3 and last 2 characters) to correlate a log line with a support case
+     * without writing the customer's full phone number to Kibana/support
+     * exports.
+     *
+     * @param string $phone_number
+     *
+     * @return string
+     */
+    protected function maskPhoneNumberForLogging($phone_number)
+    {
+        $length = \strlen($phone_number);
+        if ($length <= 5) {
+            return str_repeat('*', $length);
+        }
+
+        $visible_prefix = substr($phone_number, 0, 3);
+        $visible_suffix = substr($phone_number, -2);
+
+        return $visible_prefix . str_repeat('*', $length - 5) . $visible_suffix;
+    }
+
+    /**
+     * @description Mask every email-like and phone-number-like sequence of a text for logging.
+     *
+     * @param string $text
+     *
+     * @return string
+     */
+    protected function maskPersonalDataInText($text)
+    {
+        // The local part of an email is fully masked; its domain is kept to correlate refusals.
+        $text = (string) preg_replace(
+            '/(?<![^\s@"\'<>(),;:])[^\s@"\'<>(),;:]++@(?=[^\s@"\'<>(),;:]+\.[^\s@"\'<>(),;:]+)/',
+            '***@',
+            (string) $text
+        );
+
+        // Long numeric ids or timestamps match as well and are masked too, which is accepted.
+        return (string) preg_replace_callback('/\+?\d[\d .()\/-]{6,}\d/', function ($matches) {
+            return $this->maskPhoneNumberForLogging($matches[0]);
+        }, $text);
+    }
+
+    /**
+     * @description Build the refusal reason to log from a failed API call response:
+     *              the API error message and its error type and field details,
+     *              with personal data masked and the details capped in length.
+     *
+     * @param array $api_response
+     *
+     * @return string
+     */
+    protected function getApiRefusalReason($api_response = [])
+    {
+        if (!is_array($api_response)) {
             return '';
         }
 
-        try {
-            return \PayplugUnifiedCore\Utilities\Helpers\PhoneHelper::toE164((string) $phone_number, (string) $iso_code);
-        } catch (\PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException $e) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog(static::class . '::formatPhoneNumberSafely() - Exception thrown: ' . $e->getMessage(), 'error');
+        $details = isset($api_response['details']) && is_array($api_response['details'])
+            ? $api_response['details']
+            : [];
 
-            return '';
+        $message = '';
+        if (isset($details['message']) && is_string($details['message'])) {
+            $message = $details['message'];
+        } elseif (isset($api_response['message']) && is_string($api_response['message'])) {
+            $message = $api_response['message'];
         }
+
+        $reason = '' !== $message ? ': ' . $this->maskPersonalDataInText($message) : '';
+        $error_details = array_intersect_key($details, array_flip(['error_type', 'details']));
+        if (!empty($error_details)) {
+            $encoded_details = $this->maskPersonalDataInText(
+                json_encode($error_details, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            );
+            if (mb_strlen($encoded_details, 'UTF-8') > 500) {
+                $encoded_details = mb_substr($encoded_details, 0, 500, 'UTF-8') . '…';
+            }
+            $reason .= '; details: ' . $encoded_details;
+        }
+
+        return $reason;
     }
 
     /**
@@ -1626,13 +1812,16 @@ class PaymentMethod
             }
         }
 
-        $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
-        $price_limit = isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
+        $price_limit = $this->getPriceLimit();
         $cart_amount = $this->context->cart->getOrderTotal(true);
         if (false === strpos($this->name, 'oney')) {
             if (!$this->dependencies
                 ->getHelpers()['amount']
-                ->validateAmount($price_limit, (float) $cart_amount)['result']) {
+                ->validateAmount(
+                    $price_limit,
+                    (float) $cart_amount,
+                    isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : ''
+                )['result']) {
                 return $payment_options;
             }
         }
@@ -1766,11 +1955,21 @@ class PaymentMethod
      *
      * @param $error_code
      * @param $payment_tab
+     * @param array $api_response response of the failed API call
      *
      * @return array
      */
-    protected function processPaymentError($error_code = 0, $payment_tab = [])
+    protected function processPaymentError($error_code = 0, $payment_tab = [], $api_response = [])
     {
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog(
+                'PaymentMethod::processPaymentError() - Payment resource creation failed (HTTP ' . (int) $error_code . ')'
+                    . $this->getApiRefusalReason($api_response),
+                'error'
+            );
+
         // If the payment resource can't be created due to bad permission, we update the feature activation
         if (403 == $error_code) {
             $cart = $this->dependencies

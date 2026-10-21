@@ -49,11 +49,6 @@ class AdminPayplugController extends ModuleAdminController
         $this->media = $this->dependencies->getPlugin()->getMedia();
         $this->module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
         $this->tools = $this->dependencies->getPlugin()->getTools();
-
-        // If referer is from development server, trigger api rest renderer
-        if (isset($_SERVER['HTTP_REFERER']) && null != strpos($_SERVER['HTTP_REFERER'], 'localhost')) {
-            $this->renderApiRest();
-        }
     }
 
     /**
@@ -90,17 +85,15 @@ class AdminPayplugController extends ModuleAdminController
         if ($this->tools->tool('getValue', '_ajax')) {
             if ($this->tools->tool('getValue', 'refund')) {
                 $amount = str_replace(',', '.', $this->tools->tool('getValue', 'amount'));
-                $amount_formated = is_numeric($amount)
-                    ? $this->dependencies
-                        ->getPlugin()
-                        ->getModule()
-                        ->getInstanceByName($this->dependencies->name)
-                        ->getService('payplug.utilities.helper.amount')
-                        ->convertAmount($amount)
-                    : 0;
                 $resource_id = $this->tools->tool('getValue', 'resource_id');
                 $id_customer = $this->tools->tool('getValue', 'id_customer');
                 $id_order = $this->tools->tool('getValue', 'id_order');
+                $amount_formated = is_numeric($amount)
+                    ? $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentAction()
+                        ->getRefundAmountInCents($amount, (string) $resource_id)
+                    : 0;
                 $refund = $this->dependencies
                     ->getPlugin()
                     ->getPaymentAction()

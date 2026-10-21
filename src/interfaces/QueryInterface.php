@@ -29,9 +29,15 @@ if (!defined('_PS_VERSION_')) {
 
 interface QueryInterface
 {
-    public function query($SQLRequest);
+    public function query($SQLRequest, $use_cache = true);
 
     public function getLastId();
 
     public function escape($string, $htmlOK);
+
+    public function getNamedLock($name, $timeout);
+
+    public function releaseNamedLock($name);
+
+    public function getLastError();
 }

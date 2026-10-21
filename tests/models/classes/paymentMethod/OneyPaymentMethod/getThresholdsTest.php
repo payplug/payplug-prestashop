@@ -65,4 +65,20 @@ class getThresholdsTest extends BaseOneyPaymentMethod
             $this->class->getThresholds($current_configuration)
         );
     }
+
+    public function testThresholdsAreFormattedInTheirOwnCurrency()
+    {
+        $current_configuration = [
+            'oney_min_amounts' => 'JPY:10000',
+            'oney_max_amounts' => 'JPY:300000',
+            'oney_custom_min_amounts' => 'JPY:10000',
+            'oney_custom_max_amounts' => 'JPY:300000',
+        ];
+
+        $this->class->getThresholds($current_configuration);
+
+        $this->amountHelper->shouldHaveReceived('formatOneyAmount')->with(10000, 'JPY')->twice();
+        $this->amountHelper->shouldHaveReceived('formatOneyAmount')->with(300000, 'JPY')->twice();
+        $this->addToAssertionCount(1);
+    }
 }

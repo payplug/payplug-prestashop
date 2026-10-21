@@ -22,7 +22,7 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
             });
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
-            ->andReturn('EUR');
+            ->andReturn('EUR;JPY');
         $this->helpers['amount']->shouldReceive([
             'validateAmount' => [
                 'result' => true,
@@ -81,13 +81,13 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
 
         // Directly test formatPhoneNumberSafely with a loose phone number
         $result = $this->class->formatPhoneNumberSafely('01 23 45 67 89 (bureau)', 'FR');
-        $this->assertSame('', $result);
+        $this->assertNull($result);
 
         // Also verify a properly formatted loose number (no trailing text) is accepted
         $result_valid = $this->class->formatPhoneNumberSafely('01 23 45 67 89', 'FR');
         // This should attempt formatting (not testing the full format here, just
         // that it's not immediately rejected by the regex guard)
-        $this->assertNotEquals('', $result_valid);
+        $this->assertNotNull($result_valid);
     }
 
     /**
@@ -104,18 +104,211 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
     }
 
     /**
-     * @description Documents the cross-border behavior tightening this PR
-     * introduces on the live checkout path (PRE-3591): formatPhoneNumberSafely()
-     * now rejects a phone number that is valid, but not for the given country,
-     * instead of formatting it through as-is. '+32470123456' is a genuine
-     * Belgian mobile number, submitted here with country 'FR' to reproduce the
-     * scenario flagged in the PR description (a Belgian/Swiss mobile number on
-     * a French address).
+     * @dataProvider foreignValidPhoneNumberProvider
+     *
+     * @param string $phone_number
+     * @param string $iso_code
+     * @param string $expected
      */
-    public function testFormatPhoneNumberSafelyRejectsPhoneNumberValidForADifferentCountry()
+    public function testFormatPhoneNumberSafelyAcceptsPhoneNumberValidForADifferentCountry($phone_number, $iso_code, $expected)
     {
-        $result = $this->class->formatPhoneNumberSafely('+32470123456', 'FR');
+        $this->assertSame($expected, $this->class->formatPhoneNumberSafely($phone_number, $iso_code));
+    }
 
-        $this->assertSame('', $result);
+    /**
+     * @dataProvider invalidPhoneNumberProvider
+     *
+     * @param string $phone_number
+     * @param string $iso_code
+     */
+    public function testFormatPhoneNumberSafelyReturnsNullForInvalidNumber($phone_number, $iso_code)
+    {
+        $this->assertNull($this->class->formatPhoneNumberSafely($phone_number, $iso_code));
+    }
+
+    public function testFormatPhoneNumberSafelyLogsInvalidNumberMasked()
+    {
+        $this->class->formatPhoneNumberSafely('+3362345678', 'DE');
+
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::on(function ($message) {
+                return false !== strpos($message, '+33******78')
+                    && false === strpos($message, '+3362345678')
+                    && false !== strpos($message, '"DE"');
+            }), 'error')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testStandardPaymentMethodIsNotPhoneRegionStrict()
+    {
+        $this->assertFalse($this->class->isPhoneRegionStrict());
+    }
+
+    /**
+     * @description French numbers on an address resolved to DE (a French customer
+     * shipping to Germany) are valid numbers, so they are sent in E.164.
+     */
+    public function testCrossBorderPhoneNumbersAreSentInE164()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'getIsoCodeByCountryId' => 'DE',
+        ]);
+        $this->dependencies->configClass = $configClass;
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        $this->assertSame('DE', $payment_tab['billing']['country']);
+        $this->assertSame('+33123456789', $payment_tab['billing']['landline_phone_number']);
+        $this->assertSame('+33623456789', $payment_tab['billing']['mobile_phone_number']);
+        $this->assertSame('+33123456789', $payment_tab['shipping']['landline_phone_number']);
+        $this->assertSame('+33623456789', $payment_tab['shipping']['mobile_phone_number']);
+    }
+
+    /**
+     * @description The Payplug API refuses an empty string phone number but accepts
+     * a null one.
+     */
+    public function testInvalidPhoneNumbersAreNullNeverEmptyString()
+    {
+        $address = $this->address_adapter->get(42);
+        $address->phone = '0612345';
+        $address->phone_mobile = '+3362345678';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        foreach (['billing', 'shipping'] as $type) {
+            foreach (['landline_phone_number', 'mobile_phone_number'] as $field) {
+                $this->assertArrayHasKey($field, $payment_tab[$type]);
+                $this->assertNull($payment_tab[$type][$field]);
+            }
+        }
+    }
+
+    public function testForeignMobileIsCopiedToEmptyLandline()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'getIsoCodeByCountryId' => 'BE',
+        ]);
+        $this->dependencies->configClass = $configClass;
+        $address = $this->address_adapter->get(42);
+        $address->phone = '';
+        $address->phone_mobile = '0033609860479';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        foreach (['billing', 'shipping'] as $type) {
+            $this->assertSame('+33609860479', $payment_tab[$type]['landline_phone_number']);
+            $this->assertSame('+33609860479', $payment_tab[$type]['mobile_phone_number']);
+        }
+    }
+
+    public function foreignValidPhoneNumberProvider()
+    {
+        return [
+            'FR mobile on a DE address' => ['+33612345678', 'DE', '+33612345678'],
+            'FR mobile with 00 prefix on a BE address' => ['0033609860479', 'BE', '+33609860479'],
+            'BE mobile with 00 prefix on a FR address' => ['0032470123456', 'FR', '+32470123456'],
+            'BE mobile on a FR address' => ['+32470123456', 'FR', '+32470123456'],
+            'territory number on a FR address' => ['+596696123456', 'FR', '+596696123456'],
+        ];
+    }
+
+    public function invalidPhoneNumberProvider()
+    {
+        return [
+            'too short for IT' => ['234234234', 'IT'],
+            'truncated FR number on a DE address' => ['+3362345678', 'DE'],
+            'metropolitan national number on a BE address' => ['0612345678', 'BE'],
+            'empty iso' => ['0612345678', ''],
+            'unknown region' => ['+33612345678', 'ZZ'],
+            'empty phone' => ['', 'FR'],
+        ];
+    }
+
+    public function testMobileIsCopiedToEmptyLandline()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'getIsoCodeByCountryId' => 'BE',
+        ]);
+        $this->dependencies->configClass = $configClass;
+        $address = $this->address_adapter->get(42);
+        $address->phone = '';
+        $address->phone_mobile = '0470 12 34 56';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        foreach (['billing', 'shipping'] as $type) {
+            $this->assertSame('+32470123456', $payment_tab[$type]['landline_phone_number']);
+            $this->assertSame('+32470123456', $payment_tab[$type]['mobile_phone_number']);
+        }
+    }
+
+    public function testValidMobileIsCopiedToInvalidLandline()
+    {
+        $address = $this->address_adapter->get(42);
+        $address->phone = '0612345';
+        $address->phone_mobile = '0612345678';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        foreach (['billing', 'shipping'] as $type) {
+            $this->assertSame('+33612345678', $payment_tab[$type]['landline_phone_number']);
+            $this->assertSame('+33612345678', $payment_tab[$type]['mobile_phone_number']);
+        }
+    }
+
+    /**
+     * @description Billing and shipping share the address fixture: the mobile is
+     * only valid for the shipping country.
+     */
+    public function testInvalidBillingPhoneDoesNotAffectShippingPhone()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive('getIsoCodeByCountryId')
+            ->andReturn('BE', 'FR');
+        $this->dependencies->configClass = $configClass;
+        $address = $this->address_adapter->get(42);
+        $address->phone = '';
+        $address->phone_mobile = '0612345678';
+
+        $payment_tab = $this->class->getDefaultPaymentTab();
+
+        $this->assertSame('BE', $payment_tab['billing']['country']);
+        $this->assertNull($payment_tab['billing']['landline_phone_number']);
+        $this->assertNull($payment_tab['billing']['mobile_phone_number']);
+        $this->assertSame('FR', $payment_tab['shipping']['country']);
+        $this->assertSame('+33612345678', $payment_tab['shipping']['landline_phone_number']);
+        $this->assertSame('+33612345678', $payment_tab['shipping']['mobile_phone_number']);
+    }
+
+    /**
+     * @description maskPhoneNumberForLogging() must never write a customer's
+     * full phone number to the logs (Kibana/support exports), per code review
+     * on this PR: keep only enough of it (first 3, last 2 characters) to
+     * correlate a log line with a case.
+     */
+    public function testMaskPhoneNumberForLoggingKeepsOnlyPrefixAndSuffix()
+    {
+        $this->assertSame('+33*******78', $this->class->maskPhoneNumberForLogging('+33612345678'));
+        $this->assertSame('*****', $this->class->maskPhoneNumberForLogging('01234'));
+    }
+
+    public function testAmountIsValidatedAndConvertedInTheCartCurrency()
+    {
+        $this->context->currency->iso_code = 'JPY';
+
+        $this->class->getDefaultPaymentTab();
+
+        $this->helpers['amount']->shouldHaveReceived('validateAmount')
+            ->with(\Mockery::type('array'), 42.42, 'JPY')
+            ->once();
+        $this->amountHelper->shouldHaveReceived('convertAmount')
+            ->with(42.42, false, 'JPY')
+            ->once();
+        $this->addToAssertionCount(1);
     }
 }

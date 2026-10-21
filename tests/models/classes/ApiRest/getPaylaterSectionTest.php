@@ -69,7 +69,7 @@ class getPaylaterSectionTest extends BaseApiRest
                 $this->amountHelper
                     ->shouldReceive('formatOneyAmount')
                     ->once()
-                    ->with($amount[1])
+                    ->with($amount[1], $amount[0])
                     ->andReturn(['result' => [
                         1 => $amount[1],
                     ]]);

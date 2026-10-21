@@ -662,6 +662,18 @@ var $document, $window, __moduleName__Module = {
                     payment_option_id = integrated.props.paymentOptionId,
                     isIntegrated = payment_option_id == $('input[name="payment-option"]:checked').attr('id');
 
+                // Only handle the integrated payment option form or the integrated card form itself, never any
+                // other form of the page (voucher, newsletter...). #pay-with-{id}-form is the wrapper PrestaShop
+                // submits on "Order" click (see order.init), and it only holds the option form: this relies on
+                // themes not nesting unrelated forms inside it, which would bypass this guard.
+                if (typeof event != 'undefined') {
+                    var target = event.target;
+                    if (!target.closest('#pay-with-' + payment_option_id + '-form')
+                        && !target.classList.contains(integrated.props.identifier)) {
+                        return;
+                    }
+                }
+
                 if (!$('#payment-confirmation:visible').length) {
                     return;
                 }
@@ -685,6 +697,7 @@ var $document, $window, __moduleName__Module = {
             workflow: 'checkout',
             session: null,
             request: null,
+            cancelled: false,
             address: {
                 locality: null,
                 country: null,
@@ -766,6 +779,16 @@ var $document, $window, __moduleName__Module = {
 
             const request = applepay.getRequestDatas();
 
+            // No request is sent without workflow or while a session is already in progress
+            if (typeof request === 'undefined') {
+                return;
+            }
+
+            // The payment request has been refused (e.g. a product can't be ordered regarding its stock)
+            if (null === request || false === request.result) {
+                return applepay.error();
+            }
+
             // Define the default carrier
             if (typeof request.carriers != 'undefined' && request.carriers.length) {
                 applepay.props.carrier = request.carriers[0];
@@ -814,6 +837,7 @@ var $document, $window, __moduleName__Module = {
 
             const session = new ApplePaySession(4, apple_pay_request);
             applepay.props.session = session;
+            applepay.props.cancelled = false;
             applepay.getPaymentRequest();
         },
         beginSession: (request) => {
@@ -947,6 +971,9 @@ var $document, $window, __moduleName__Module = {
                 applepay.props.carrier = shippingMethod;
 
                 const request = applepay.getUpdatedRequest();
+                if (!request) {
+                    return applepay.abortSession();
+                }
                 const update = {
                     'newTotal': {
                         "label": request.total.label,
@@ -976,6 +1003,9 @@ var $document, $window, __moduleName__Module = {
                 };
 
                 const request = applepay.getUpdatedRequest();
+                if (!request) {
+                    return applepay.abortSession();
+                }
                 const update = {
                     'newTotal': {
                         "label": request.total.label,
@@ -996,6 +1026,15 @@ var $document, $window, __moduleName__Module = {
                     {session, carrier} = applepay.props,
                     {payment} = event;
 
+                const failPayment = () => {
+                    try {
+                        session.completePayment({"status": ApplePaySession.STATUS_FAILURE});
+                    } finally {
+                        // Abort the payment resource and restore the previous cart, even if the payment sheet is already closed
+                        applepay.sessionHandler.oncancel();
+                    }
+                };
+
                 // Define ApplePayPaymentAuthorizationResult
                 $.ajax({
                     method: "POST",
@@ -1015,12 +1054,11 @@ var $document, $window, __moduleName__Module = {
                         patchPayment: 1,
                         method: 'applepayPatch',
                     },
-                    success: (json) => {
-                        var result = JSON.parse(json);
-
-                        if (!result.result) {
-                            session.completePayment({"status": ApplePaySession.STATUS_FAILURE});
-                            return __moduleName__Module.applepay.error();
+                    dataType: 'json',
+                    success: (result) => {
+                        // Never leave the payment sheet hanging on an unexpected answer
+                        if (!result || !result.result) {
+                            return failPayment();
                         }
 
                         session.completePayment({"status": ApplePaySession.STATUS_SUCCESS});
@@ -1028,13 +1066,20 @@ var $document, $window, __moduleName__Module = {
                     },
                     error: () => {
                         console.log('onpaymentauthorized: An error occured');
-                        __moduleName__Module.applepay.error();
+                        failPayment();
                     }
                 })
             },
             oncancel: (event) => {
                 // Payment canceled by WebKit
                 let {applepay} = __moduleName__Module;
+
+                // The cancel flow can be triggered by the module (abortSession, refused payment) then by WebKit for the same session
+                if (applepay.props.cancelled) {
+                    return;
+                }
+                applepay.props.cancelled = true;
+
                 if (applepay.props.query != null) {
                     applepay.props.query.abort();
                     applepay.props.query = null;
@@ -1053,8 +1098,21 @@ var $document, $window, __moduleName__Module = {
                     success: () => {
                         applepay.error();
                     },
+                    error: () => {
+                        applepay.error();
+                    },
                 });
             },
+        },
+        abortSession: () => {
+            // The updated request has been refused (e.g. a product can't be ordered regarding its stock anymore)
+            const {applepay} = __moduleName__Module;
+            try {
+                applepay.props.session.abort();
+            } catch (err) {
+                console.log('abortSession: ', err);
+            }
+            applepay.sessionHandler.oncancel();
         },
         error: () => {
             let {applepay} = __moduleName__Module;
@@ -1560,6 +1618,8 @@ var $document, $window, __moduleName__Module = {
             attemps: {
                 current: 0,
                 limit: 5,
+                // last tries allowed while the order is still being created elsewhere
+                extra: 5,
                 interval: 2000,
             },
             query: null
@@ -1598,7 +1658,7 @@ var $document, $window, __moduleName__Module = {
                                 validation.actions.redirect(data.redirected_url);
                                 break;
                             case 'wait':
-                                validation.actions.wait();
+                                validation.actions.wait(data.redirected_url);
                                 break;
                             default:
                                 break;
@@ -1611,7 +1671,7 @@ var $document, $window, __moduleName__Module = {
             redirect: function (url) {
                 window.location.href = url;
             },
-            wait: function () {
+            wait: function (fallback_url) {
                 let {validation} = __moduleName__Module,
                     {props} = validation,
                     {attemps} = props;
@@ -1619,6 +1679,11 @@ var $document, $window, __moduleName__Module = {
                 // update attemps
                 attemps.current++;
                 props.attemps = attemps;
+
+                if (fallback_url && attemps.current > attemps.limit + attemps.extra) {
+                    validation.actions.redirect(fallback_url);
+                    return;
+                }
 
                 let last_try = attemps.current >= attemps.limit;
                 setTimeout(() => {

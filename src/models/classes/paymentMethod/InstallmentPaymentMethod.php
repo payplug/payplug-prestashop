@@ -151,7 +151,7 @@ class InstallmentPaymentMethod extends PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount')
-            ->convertAmount($amount, true);
+            ->convertAmount($amount, true, isset($resource->currency) ? $resource->currency : '');
 
         $translation = $this->dependencies
             ->getPlugin()
@@ -431,6 +431,10 @@ class InstallmentPaymentMethod extends PaymentMethod
             ->getModule()
             ->getInstanceByName($this->dependencies->name)
             ->getService('payplug.utilities.helper.amount');
+        $currency = isset($resource->currency) ? $resource->currency : '';
+        $display_currency = is_string($currency) && '' !== $currency
+            ? $currency
+            : (isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : '');
 
         foreach ($retrieve['schedule'] as $schedule) {
             $amount += $schedule['amount'];
@@ -446,14 +450,14 @@ class InstallmentPaymentMethod extends PaymentMethod
                 $refund['is_refunded'] = (bool) $schedule_resource->is_refunded;
                 $payment_list[] = $schedule_detail;
             } else {
-                $amount = $amountHelper->convertAmount($schedule['amount'], true);
+                $schedule_amount = $amountHelper->convertAmount($schedule['amount'], true, $currency);
                 $payment_list[] = [
                     'id' => null,
                     'status' => $translation['detail']['status'][$status['code']],
                     'status_class' => $resource->is_active ? 'pp_success' : 'pp_error',
                     'status_code' => 'incoming',
-                    'amount' => $amount,
-                    'amount_display' => $price_adapter->formatPrice($amount, $this->context->currency->iso_code),
+                    'amount' => $schedule_amount,
+                    'amount_display' => $price_adapter->formatPrice($schedule_amount, $display_currency),
                     'card_brand' => null,
                     'card_mask' => null,
                     'tds' => null,
@@ -466,8 +470,8 @@ class InstallmentPaymentMethod extends PaymentMethod
         }
 
         $refund = $refund + [
-            'refunded_display' => $price_adapter->formatPrice($refund['refunded'], $this->context->currency->iso_code),
-            'available_display' => $price_adapter->formatPrice($refund['available'], $this->context->currency->iso_code),
+            'refunded_display' => $price_adapter->formatPrice($refund['refunded'], $display_currency),
+            'available_display' => $price_adapter->formatPrice($refund['available'], $display_currency),
         ];
 
         return [
@@ -486,7 +490,7 @@ class InstallmentPaymentMethod extends PaymentMethod
                 : $translation['detail']['mode']['test'],
             'refund' => $refund,
             'currency' => $resource->currency,
-            'amount' => $amountHelper->convertAmount($amount, true),
+            'amount' => $amountHelper->convertAmount($amount, true, $currency),
         ];
     }
 
@@ -794,7 +798,7 @@ class InstallmentPaymentMethod extends PaymentMethod
             ->createInstallment($payment_tab);
 
         if (200 != (int) $payment['code']) {
-            return $this->processPaymentError((int) $payment['code'], $payment_tab);
+            return $this->processPaymentError((int) $payment['code'], $payment_tab, $payment);
         }
 
         return $this->retrieveSchedules($payment);

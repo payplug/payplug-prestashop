@@ -66,4 +66,14 @@ class BizumPaymentMethod extends PaymentMethod
 
         return $payment_tab;
     }
+
+    /**
+     * @description Bizum only accepts phone numbers belonging to the address country.
+     *
+     * @return bool
+     */
+    protected function isPhoneRegionStrict()
+    {
+        return true;
+    }
 }

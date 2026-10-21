@@ -126,6 +126,46 @@ class saveResourceTest extends BasePaymentMethod
         );
     }
 
+    public function testApiResponseIsPassedToProcessPaymentError()
+    {
+        $this->class->set('name', 'standard');
+        $payment_tab = [
+            'amount' => 4242,
+            'force_3ds' => false,
+            'hosted_payment' => [],
+            'metadata' => [],
+            'allow_save_card' => false,
+        ];
+        $resource = [
+            'result' => false,
+            'code' => 400,
+            'message' => 'Bad request.',
+            'details' => [
+                'message' => 'The phone number format is invalid.',
+            ],
+        ];
+        $this->api_service->shouldReceive([
+            'createPayment' => $resource,
+        ]);
+
+        $expected_error = [
+            'result' => false,
+            'code' => 400,
+        ];
+        $this->class->shouldReceive([
+            'processPaymentError' => $expected_error,
+        ]);
+
+        $this->assertSame(
+            $expected_error,
+            $this->class->saveResource($payment_tab)
+        );
+        $this->class->shouldHaveReceived('processPaymentError')
+            ->with(400, $payment_tab, $resource)
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
     public function testWhenResourceIsCreatedWithNoError()
     {
         $this->class->set('name', 'standard');

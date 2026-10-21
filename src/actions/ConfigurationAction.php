@@ -811,6 +811,56 @@ class ConfigurationAction
             }
         }
 
+        // Scalapay amounts reach us in euros from the back office. The merchant may only
+        // narrow the range their Payplug account authorizes (from GET /account), never
+        // widen it, and a minimum above the maximum would hide the method for every cart.
+        // This gate must stay as wide as the one guarding persistence in the switch-case
+        // below, which saves each amount on its own: a payload carrying a single amount
+        // would otherwise be persisted unvalidated.
+        if (isset($datas->enable_scalapay)
+            && (bool) $datas->enable_scalapay
+            && (isset($datas->scalapay_min_amounts) || isset($datas->scalapay_max_amounts))) {
+            $scalapay = $this->dependencies
+                ->getPlugin()
+                ->getPaymentMethodClass()
+                ->getPaymentMethod('scalapay');
+            $account_limits = $scalapay->getScalapayPriceLimit(false);
+            // An amount the payload leaves out keeps the value in force, so the bounds
+            // are still compared against each other on a partial payload. A bound the
+            // account does not expose comes back as false, hence 0 once cast, which
+            // isAmount() rejects: an unusable range fails the save rather than passing it.
+            $limits_in_force = $scalapay->getScalapayPriceLimit();
+            $limits_currency = $scalapay->getScalapayLimitsCurrency();
+            $amount_helper = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.utilities.helper.amount');
+            $scalapay_min = isset($datas->scalapay_min_amounts)
+                ? (int) $amount_helper->convertAmount($datas->scalapay_min_amounts, false, $limits_currency)
+                : (int) $limits_in_force['min'];
+            $scalapay_max = isset($datas->scalapay_max_amounts)
+                ? (int) $amount_helper->convertAmount($datas->scalapay_max_amounts, false, $limits_currency)
+                : (int) $limits_in_force['max'];
+            $payment_validator = $this->dependencies->getValidators()['payment'];
+
+            if ($scalapay_min > $scalapay_max
+                || !$payment_validator->isAmount($scalapay_min, $account_limits)['result']
+                || !$payment_validator->isAmount($scalapay_max, $account_limits)['result']) {
+                $logger->addLog('ConfigurationAction::saveAction: Scalapay amounts are outside the range authorized by the account.');
+
+                return [
+                    'success' => false,
+                    'data' => [
+                        'title' => null,
+                        'msg' => $translation['scalapay']['thresholds']['text'],
+                        'close' => $translation['scalapay']['thresholds']['submit'],
+                        'class' => '-error',
+                    ],
+                ];
+            }
+        }
+
         $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
         $configuration_keys = [
             'deferred_state' => 'payplug_deferred_state',
@@ -825,6 +875,8 @@ class ConfigurationAction
             'sandbox_mode' => 'payplug_sandbox',
             'oney_custom_min_amounts' => 'oney_min_amounts',
             'oney_custom_max_amounts' => 'oney_max_amounts',
+            'scalapay_custom_min_amounts' => 'scalapay_min_amounts',
+            'scalapay_custom_max_amounts' => 'scalapay_max_amounts',
             'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
@@ -871,18 +923,20 @@ class ConfigurationAction
                     case 'oney_min_amounts':
                     case 'oney_max_amounts':
                         if ((bool) $datas->enable_oney || 'pspaylater' == $this->dependencies->name) {
-                            $limit_oney = $this->dependencies
+                            $oney = $this->dependencies
                                 ->getPlugin()
                                 ->getPaymentMethodClass()
-                                ->getPaymentMethod('oney')
-                                ->getOneyPriceLimit(false);
+                                ->getPaymentMethod('oney');
+                            $limit_oney = $oney->getOneyPriceLimit(false);
                             $amount = $datas->{$config};
                             $amount_to_cent = $this->dependencies
                                 ->getPlugin()
                                 ->getModule()
                                 ->getInstanceByName($this->dependencies->name)
                                 ->getService('payplug.utilities.helper.amount')
-                                ->convertAmount($amount);
+                                ->convertAmount($amount, false, $oney->getOneyLimitsCurrency());
+                            // isAmount() answers with ['result' => bool, 'message' => string];
+                            // the array itself is always truthy, so the flag has to be read out.
                             $is_valid_amount = $this->dependencies
                                 ->getValidators()['payment']
                                 ->isAmount((int) $amount_to_cent, $limit_oney);
@@ -892,7 +946,44 @@ class ConfigurationAction
                                 ->getPaymentMethod('oney')
                                 ->setCustomOneyLimit((int) $amount_to_cent);
 
-                            if ($is_valid_amount && !$configuration->set($key, (string) $formated_amount)) {
+                            if ($is_valid_amount['result'] && !$configuration->set($key, (string) $formated_amount)) {
+                                return [
+                                    'success' => false,
+                                    'data' => [
+                                        // todo: add translation
+                                        'message' => 'An error has occurred while register ' . $config,
+                                    ],
+                                ];
+                            }
+                        }
+
+                        break;
+
+                    case 'scalapay_min_amounts':
+                    case 'scalapay_max_amounts':
+                        // Already validated above, under a gate matching this one.
+                        if (isset($datas->enable_scalapay) && (bool) $datas->enable_scalapay) {
+                            $amount_to_cent = $this->dependencies
+                                ->getPlugin()
+                                ->getModule()
+                                ->getInstanceByName($this->dependencies->name)
+                                ->getService('payplug.utilities.helper.amount')
+                                ->convertAmount(
+                                    $value,
+                                    false,
+                                    $this->dependencies
+                                        ->getPlugin()
+                                        ->getPaymentMethodClass()
+                                        ->getPaymentMethod('scalapay')
+                                        ->getScalapayLimitsCurrency()
+                                );
+                            $formated_amount = $this->dependencies
+                                ->getPlugin()
+                                ->getPaymentMethodClass()
+                                ->getPaymentMethod('scalapay')
+                                ->setCustomScalapayLimit((int) $amount_to_cent);
+
+                            if (!$configuration->set($key, (string) $formated_amount)) {
                                 return [
                                     'success' => false,
                                     'data' => [

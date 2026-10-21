@@ -56,6 +56,12 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
         $this->logger = $this->plugin->getLogger();
         $this->tools_adapter = $this->plugin->getTools();
 
+        // Every answer of this controller is JSON: never let the browser render it as HTML
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+            header('X-Content-Type-Options: nosniff');
+        }
+
         if (1 == $this->tools_adapter->tool('getValue', '_ajax')) {
             $this->configurationAdapter = $this->plugin->getConfiguration();
 
@@ -313,8 +319,17 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                     'message' => 'Success',
                 ]));
             } elseif ($tools->tool('getIsset', 'addLogger')) {
-                $message = $tools->tool('getValue', 'message');
-                if (!$message || !is_string($message)) {
+                // The logger is only fed by our own front script, which posts: refuse GET (crafted links)
+                $request_method = $this->dependencies
+                    ->getPlugin()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.utilities.service.props')
+                    ->getServerProp('REQUEST_METHOD');
+                $message = 'POST' === $request_method ? $tools->tool('getValue', 'message') : null;
+                // Sanitize before the emptiness check: a message made only of tags becomes empty
+                $message = is_string($message) ? $tools->substr(strip_tags($message), 0, 1000) : null;
+                if (!$message) {
                     exit(json_encode([
                         'result' => true,
                         'message' => 'Failed to add log', // adapter error
@@ -322,9 +337,10 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                 }
                 $this->logger->addLog($message);
 
+                // Do not reflect user input back
                 exit(json_encode([
                     'result' => true,
-                    'message' => $message, // adapter error
+                    'message' => 'Log added',
                 ]));
             } elseif ($tools->tool('getValue', 'method')) {
                 $method = $tools->tool('getValue', 'method');
