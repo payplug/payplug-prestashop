@@ -390,6 +390,25 @@ class OrderAction
             return $order_details;
         }
 
+        $this->resyncPendingUnifiedOrder($order);
+
+        // A paid Unified Hosted Fields operation wins over the Retail lookup below: the cart can
+        // also carry a payplug_payment row from an abandoned Retail attempt (PaymentAction inserts
+        // it when the resource is created, before any payment), which would otherwise hide the
+        // UHF refund form behind the panel of an unpaid Retail resource. It runs for every order of
+        // the module, Retail ones included: a UHF failure (e.g. a missing table) must not break
+        // their panel, so the Retail lookup goes on.
+        try {
+            $unified_detail = $this->renderUnifiedDetail($order);
+        } catch (\Throwable $exception) {
+            $this->logger->addLog('OrderAction::renderDetail - UHF detail of order ' . (int) $order->id
+                . ' could not be rendered (' . get_class($exception) . '): ' . $exception->getMessage(), 'error');
+            $unified_detail = [];
+        }
+        if (!empty($unified_detail)) {
+            return $unified_detail;
+        }
+
         // Retrieve the resource from database
         $stored_resource = $this->dependencies
             ->getPlugin()
@@ -490,6 +509,117 @@ class OrderAction
         } elseif ($resource_detail['refund']['is_refunded']) {
             $order_details['refunded'] = $resource_detail['refund']['refunded'];
             $order_details['refunded_display'] = $resource_detail['refund']['refunded_display'];
+        }
+
+        return $order_details;
+    }
+
+    /**
+     * @description Bring a pending Unified Hosted Fields order up to date with its payment, then
+     *              reload the order page, as the Retail payment methods do from getResourceDetail().
+     *              The order page must render whatever happens: any failure is only logged.
+     *
+     * @param mixed $order
+     */
+    private function resyncPendingUnifiedOrder($order)
+    {
+        try {
+            // Checked here first: the operation action is only built for a pending order.
+            $state_addons = (bool) $this->configuration->getValue('sandbox_mode') ? '_test' : '';
+            if ((int) $order->current_state !== (int) $this->configuration->getValue('order_state_pending' . $state_addons)) {
+                return;
+            }
+
+            $updated = $this->plugin
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.action.unified_payment')
+                ->resyncPendingOrder((int) $order->id);
+            if (!$updated) {
+                return;
+            }
+
+            $link_order = $this->plugin->getContext()->get()->link->getAdminLink(
+                'AdminOrders',
+                true,
+                [],
+                ['vieworder' => 1, 'id_order' => (int) $order->id]
+            );
+            $this->plugin->getTools()->tool('redirectAdmin', $link_order);
+        } catch (\Throwable $exception) {
+            $this->logger->addLog('OrderAction::renderDetail - UHF order ' . (int) $order->id
+                . ' could not be resynced (' . get_class($exception) . '): ' . $exception->getMessage(), 'error');
+        }
+    }
+
+    /**
+     * @description Render the order detail section of an order paid with Unified Hosted Fields.
+     *              Refunded/refundable amounts come from the module's own refund history: the
+     *              Unified API exposes no refundable amount, unlike the Retail API.
+     *
+     * @param mixed $order
+     *
+     * @return array
+     */
+    private function renderUnifiedDetail($order)
+    {
+        $module = $this->plugin->getModule()->getInstanceByName($this->dependencies->name);
+        $payment_operation = $module
+            ->getService('payplug.unified.payment_service_factory')
+            ->createPaymentRepository()
+            ->getPaidByOrderId((string) $order->id);
+        if (null === $payment_operation) {
+            return [];
+        }
+
+        $currency = $this->plugin->getCurrency()->get((int) $order->id_currency);
+        if (!$this->validate_adapter->validate('isLoadedObject', $currency)) {
+            $this->logger->addLog('OrderAction::renderUnifiedDetail - $currency is not a valid object.', 'error');
+
+            return [];
+        }
+
+        $amount_helper = $module->getService('payplug.utilities.helper.amount');
+        $price_adapter = $module->getService('payplug.application.adapter.price');
+        $refunded_cents = (int) $module
+            ->getService('payplug.models.repositories.unified_refund')
+            ->getRefundedAmount((string) $order->id);
+        $available_cents = max(0, (int) $payment_operation->amount - $refunded_cents);
+        $refunded = (float) $amount_helper->convertAmount($refunded_cents, true, $currency->iso_code);
+        $available = (float) $amount_helper->convertAmount($available_cents, true, $currency->iso_code);
+
+        $order_details = [
+            'logo_url' => $this->plugin->getConstant()->get('__PS_BASE_URI__') . 'modules/' . $this->dependencies->name . '/views/img/payplug.svg',
+            'admin_ajax_url' => $this->dependencies->adminClass->getAdminAjaxUrl('AdminModules', (int) $order->id),
+            'order' => $order,
+            'refund' => false,
+            'refunded' => false,
+            'update' => false,
+        ];
+
+        if ($available_cents > 0) {
+            $refunded_presta = $this->plugin->getOrderClass()->getTotalRefunded($order->id);
+            $suggested = \min($refunded_presta, $available) - $refunded;
+            $amount_suggested = \number_format($suggested > 0 ? $suggested : 0, 2, '.', '');
+            $is_live = !(bool) $this->configuration->getValue('sandbox_mode');
+
+            $order_details['refund'] = [
+                'refunded' => $refunded,
+                'available' => $available,
+                'refunded_display' => $price_adapter->formatPrice($refunded, $currency->iso_code),
+                'available_display' => $price_adapter->formatPrice($available, $currency->iso_code),
+                'refunded_presta' => $refunded_presta,
+                'suggested' => $amount_suggested,
+                'mode' => $is_live ? 'live' : 'test',
+                'id' => $payment_operation->operationId,
+                'new_order_state' => (int) $this->configuration->getValue('order_state_refund' . ($is_live ? '' : '_test')),
+                'currency' => $currency,
+                'disabled' => false,
+                'payment_type' => 'uhf',
+            ];
+        } elseif ($refunded_cents > 0) {
+            $order_details['refunded'] = $refunded;
+            $order_details['refunded_display'] = $price_adapter->formatPrice($refunded, $currency->iso_code);
         }
 
         return $order_details;

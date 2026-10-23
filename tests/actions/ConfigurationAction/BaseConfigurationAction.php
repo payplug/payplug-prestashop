@@ -17,6 +17,9 @@ abstract class BaseConfigurationAction extends TestCase
     public $api_service;
     public $configuration;
     public $configuration_class;
+    public $currency_adapter;
+    public $currencies;
+    public $has_eur_currency;
     public $dependencies;
     public $logger;
     public $module;
@@ -42,6 +45,17 @@ abstract class BaseConfigurationAction extends TestCase
         $this->oney = \Mockery::mock('Oney');
         $this->plugin = \Mockery::mock('Plugin');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
+        $this->currencies = [];
+        $this->has_eur_currency = true;
+        $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $this->currency_adapter->shouldReceive('findAll')
+            ->andReturnUsing(function () {
+                return $this->currencies;
+            });
+        $this->currency_adapter->shouldReceive('hasEurCurrency')
+            ->andReturnUsing(function () {
+                return $this->has_eur_currency;
+            });
 
         $this->dependencies = MockHelper::createMockFactory('PayPlug\classes\DependenciesClass');
         $this->dependencies->shouldReceive('l')
@@ -78,6 +92,7 @@ abstract class BaseConfigurationAction extends TestCase
             'getLogger' => $this->logger,
             'getConfiguration' => $this->configuration,
             'getConfigurationClass' => $this->configuration_class,
+            'getCurrency' => $this->currency_adapter,
             'getOney' => $this->oney,
             'getTranslationClass' => $this->translation,
             'getModule' => $this->module_adapter,
@@ -99,5 +114,11 @@ abstract class BaseConfigurationAction extends TestCase
         $this->action = \Mockery::mock(ConfigurationAction::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
+    }
+
+    public function tearDown(): void
+    {
+        \Mockery::close();
+        parent::tearDown();
     }
 }

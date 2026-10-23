@@ -1,5 +1,15 @@
 # Payplug module changelog
 
+## Version 5.2.0
+- Feature :
+  - [PRE-3622](https://github.com/payplug/payplug-prestashop/pull/117): Add Unified hosted fields configuration
+  - [PRE-3622](https://github.com/payplug/payplug-prestashop/pull/118): Set one uhf identifier per currencies
+  - [PRE-3623](https://github.com/payplug/payplug-prestashop/pull/118): Add card tokenization through Unified Hosted Fields for non-EUR carts
+  - [PRE-3624](https://github.com/payplug/payplug-prestashop/pull/123): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
+  - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Let customers save a card and pay with it again through Unified Hosted Fields for non-EUR carts
+  - [PRE-3627](https://github.com/payplug/payplug-prestashop/pull/130): Refund Unified Hosted Fields orders, fully or partially, from the back office
+  - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Keep Unified Hosted Fields payments, saved cards and back-office refunds working with the new Unified API contract (unified-plugin-core ^1.2.1)
+
 ## Version 5.1.1
 - Feature :
   - [PRE-3601](https://github.com/payplug/payplug-prestashop/pull/119): Let the merchant narrow the Scalapay amount range from the back office, and hide Scalapay at checkout for carts outside it
