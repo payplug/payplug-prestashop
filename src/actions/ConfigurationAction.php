@@ -234,6 +234,8 @@ class ConfigurationAction
         // Install SQL
         $txt_log->info('Install SQL');
 
+        $this->forceAutoloadUnifiedRepositories();
+
         if (!$this->dependencies->getPlugin()->getEntityRepository()->initialize()) {
             $txt_log->info('Install failed: Install SQL tables.');
 
@@ -725,6 +727,10 @@ class ConfigurationAction
             }
         }
 
+        if (empty($datas['payment_paylater'])) {
+            unset($datas['payment_paylater']);
+        }
+
         return [
             'success' => true,
             'data' => $datas,
@@ -882,9 +888,41 @@ class ConfigurationAction
             'applepay_display' => 'enable_applepay',
         ];
 
+        $currencies = $this->dependencies
+            ->getPlugin()
+            ->getCurrency()
+            ->findAll();
+        foreach ($currencies as $currency) {
+            if ('EUR' === strtoupper($currency['iso_code'])) {
+                continue;
+            }
+            $name = 'identifier_' . strtolower($currency['iso_code']);
+            $configuration_keys[$name] = 'payplug_' . $name;
+        }
         foreach ($configuration_keys as $key => $config) {
             if (isset($datas->{$config})) {
                 $value = $datas->{$config};
+
+                if (0 === strpos($config, 'payplug_identifier_')) {
+                    $hosted_fields = json_decode($configuration->getValue('hosted_fields') ?: '{}', true);
+                    $name = str_replace('payplug_identifier_', '', $config);
+                    $hosted_fields[$name] = trim((string) $value);
+                    if (!$configuration->set('hosted_fields', (string) json_encode($hosted_fields))) {
+                        $logger->addLog('ConfigurationAction::saveAction: Unable to save ' . $config . '.');
+
+                        return [
+                            'success' => false,
+                            'data' => [
+                                'title' => null,
+                                'msg' => $translation['hosted_fields']['identifier']['text'],
+                                'close' => $translation['error']['submit'],
+                                'class' => '-error',
+                            ],
+                        ];
+                    }
+
+                    continue;
+                }
 
                 switch ($config) {
                     case 'payplug_oney':
@@ -1227,6 +1265,8 @@ class ConfigurationAction
         $txt_log->info('Remove module configuration successful');
 
         $txt_log->info('Drop module table');
+        $this->forceAutoloadUnifiedRepositories();
+
         if (!$this->dependencies
             ->getPlugin()
             ->getEntityRepository()
@@ -1356,5 +1396,25 @@ class ConfigurationAction
         }
 
         return $flag;
+    }
+
+    /**
+     * @description Force-autoload repositories registered only in config/services.yml (not
+     * wired into PluginInit) so EntityRepository's get_declared_classes() reflection walk
+     * (used by both initialize() on install and uninstall() on uninstall) can find them and
+     * create/drop their tables. Called from both installAction() and uninstallAction() so
+     * these tables are neither missed on install nor left as orphans on uninstall. Add one
+     * line here per such repository as new ones are introduced.
+     */
+    private function forceAutoloadUnifiedRepositories()
+    {
+        $module = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name);
+        $module->getService('payplug.models.repositories.unified_operation');
+        $module->getService('payplug.models.repositories.unified_lock');
+        $module->getService('payplug.models.repositories.unified_alias');
+        $module->getService('payplug.models.repositories.unified_refund');
     }
 }

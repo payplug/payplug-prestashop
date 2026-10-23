@@ -40,6 +40,8 @@ abstract class BasePaymentMethod extends TestCase
     protected $country_adapter;
     protected $context_adapter;
     protected $currency_adapter;
+    protected $currencies;
+    protected $has_eur_currency;
     protected $dependencies;
     protected $helpers;
     protected $logger;
@@ -190,7 +192,27 @@ abstract class BasePaymentMethod extends TestCase
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
         $this->country_adapter = \Mockery::mock('Country');
+        $this->currencies = [['iso_code' => 'EUR']];
+        $this->has_eur_currency = true;
         $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $this->currency_adapter->shouldReceive('findAll')
+            ->andReturnUsing(function () {
+                return $this->currencies;
+            });
+        $this->currency_adapter->shouldReceive('hasEurCurrency')
+            ->andReturnUsing(function () {
+                return $this->has_eur_currency;
+            });
+        $this->currency_adapter->shouldReceive('hasOtherCurrency')
+            ->andReturnUsing(function () {
+                foreach ($this->currencies as $currency) {
+                    if ('EUR' != $currency['iso_code']) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
         $this->carrier_adapter = \Mockery::mock('CarrierAdapter');
         $this->cart_adapter = \Mockery::mock('CartAdapter');
         $this->cart_rule_adapter = \Mockery::mock('CartRuleAdapter');
