@@ -1,3 +1,4 @@
+.__moduleName__HostedFields,
 .__moduleName__IntegratedPayment {
   display: none;
   width: 100%;
@@ -145,6 +146,15 @@
 
         input {
           display: none;
+          &:checked {
+            & + span {
+              border-color: #2b343d;
+
+              &:before {
+                opacity: 1;
+              }
+            }
+          }
         }
 
         &:hover {
@@ -179,6 +189,19 @@
       color: #colorMap[deferred_color];
       display: block;
       text-align: center;
+    }
+
+    input {
+      border: none;
+      width: 100%;
+      color: #2b343d;
+      font-family: Poppins, sans-serif;
+      font-size: 14px;
+      text-align: left;
+      outline: none;
+      &::placeholder {
+        color: #2b343d;
+      }
     }
   }
 
@@ -375,6 +398,58 @@
 
     a {
       display: block;
+    }
+  }
+}
+
+.__moduleName__HostedFields {
+  display: flex;
+
+
+  &_container {
+    &.-cardHolder,
+    &.-pan,
+    &.-exp,
+    &.-cvv {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      iframe {
+        height: 50% !important;
+      }
+    }
+  }
+
+  &_schemes {
+    width: 140px;
+    height: 35px;
+  }
+
+  &_container.-savedAliases {
+    flex-direction: column;
+  }
+
+  &_alias {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    cursor: pointer;
+
+    input {
+      margin: 0;
+      width: auto;
+    }
+  }
+
+  &_newCard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+
+    &.-hide {
+      display: none;
     }
   }
 }

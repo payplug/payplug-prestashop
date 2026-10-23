@@ -291,6 +291,11 @@ class Translation
                     'submit' => $this->l('modal.scalapay.thresholds.submit', 'translation'),
                 ],
             ],
+            'hosted_fields' => [
+                'identifier' => [
+                    'text' => $this->l('modal.hosted_fields.identifier.text', 'translation'),
+                ],
+            ],
             'error' => [
                 'text' => $this->l('modal.error.text', 'translation'),
                 'submit' => $this->l('modal.error.submit', 'translation'),
@@ -520,18 +525,26 @@ class Translation
                         'text' => $this->l('paymentmethods.embedded.descriptions.redirect.text', 'translation'),
                         'link' => $this->l('paymentmethods.embedded.descriptions.redirect.link', 'translation'),
                     ],
+                    'hosted_fields' => [
+                        'text' => $this->l('paymentmethods.embedded.descriptions.hosted_fields.text', 'translation'),
+                    ],
                 ],
                 'link' => $this->l('paymentmethods.embedded.link', 'translation'),
                 'options' => [
                     'integrated' => $this->l('paymentmethods.embedded.options.integrated', 'translation'),
                     'popup' => $this->l('paymentmethods.embedded.options.popup', 'translation'),
                     'redirect' => $this->l('paymentmethods.embedded.options.redirect', 'translation'),
+                    'hosted_fields' => $this->l('paymentmethods.embedded.options.hosted_fields', 'translation'),
                 ],
             ],
             'integrated' => [
                 'alert' => [
                     'title' => $this->l('paymentmethods.integrated.alert.text.title', 'translation'),
                     'text' => $this->l('paymentmethods.integrated.alert.text', 'translation'),
+                ],
+                'currencyScopeAlert' => [
+                    'title' => $this->l('paymentmethods.integrated.currencyScope.alert.title', 'translation'),
+                    'text' => $this->l('paymentmethods.integrated.currencyScope.alert.text', 'translation'),
                 ],
             ],
             'one_click' => [
@@ -691,6 +704,17 @@ class Translation
                     ],
                 ],
             ],
+            'hosted_fields' => [
+                'title' => $this->l('paymentmethods.hosted_fields.title', 'translation'),
+                'descriptions' => [
+                    'live' => $this->l('paymentmethods.hosted_fields.descriptions.live', 'translation'),
+                    'sandbox' => $this->l('paymentmethods.hosted_fields.descriptions.sandbox', 'translation'),
+                ],
+                'identifier' => [
+                    'label' => $this->l('paymentmethods.hosted_fields.identifier.label', 'translation'),
+                    'placeholder' => $this->l('paymentmethods.hosted_fields.identifier.placeholder', 'translation'),
+                ],
+            ],
         ];
     }
 
@@ -705,6 +729,8 @@ class Translation
                 'lower' => $this->l('refund.error.lower', 'translation'),
                 'upper' => $this->l('refund.error.upper', 'translation'),
                 'default' => $this->l('refund.error.default', 'translation'),
+                'uncertain' => $this->l('refund.error.uncertain', 'translation'),
+                'no_payment_id' => $this->l('refund.error.no_payment_id', 'translation'),
             ],
             'success' => $this->l('refund.success', 'translation'),
         ];

@@ -251,6 +251,14 @@ class PaymentMethod
      */
     public function getAvailablePaymentMethod()
     {
+        // IF merchant only hasn't EUR currency, we disable all other payment feature
+        if ($this->dependencies->configClass->isValidFeature('feature_hosted_fields')
+            && !$this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()) {
+            return [
+                'standard',
+            ];
+        }
+
         return [
             'one_click',
             'standard',
@@ -1127,6 +1135,9 @@ class PaymentMethod
         $this->setParameters();
 
         $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
+        if (empty($payplug_amounts)) {
+            return [];
+        }
 
         return isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
     }
