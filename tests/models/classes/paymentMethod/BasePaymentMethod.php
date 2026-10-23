@@ -16,11 +16,13 @@ use PayPlug\tests\FormatDataProvider;
 use PayPlug\tests\mock\AddressMock;
 use PayPlug\tests\mock\ContextMock;
 use PayPlug\tests\mock\MockHelper;
+use PayPlug\tests\ReleasesTestProperties;
 use PHPUnit\Framework\TestCase;
 
 abstract class BasePaymentMethod extends TestCase
 {
     use FormatDataProvider;
+    use ReleasesTestProperties;
 
     public $default_payment_tab;
 
@@ -125,7 +127,12 @@ abstract class BasePaymentMethod extends TestCase
         $this->configuration = \Mockery::mock(Configuration::class, [$this->dependencies])->makePartial();
         $this->configuration->shouldReceive('getValue')
             ->with('amounts')
-            ->andReturn('{"default":{"min":"EUR:30","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:30","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"ideal":{"min":"EUR:30","max":"EUR:2000000"},"mybank":{"min":"EUR:30","max":"EUR:2000000"},"satispay":{"min":"EUR:30","max":"EUR:2000000"},"scalapay":{"min":"EUR:500","max":"EUR:400000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}');
+            ->andReturn('{"default":{"min":"EUR:30","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:30","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"ideal":{"min":"EUR:30","max":"EUR:2000000"},"mybank":{"min":"EUR:30","max":"EUR:2000000"},"satispay":{"min":"EUR:30","max":"EUR:2000000"},"scalapay":{"min":"EUR:500","max":"EUR:400000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}')
+            ->byDefault();
+        $this->configuration->shouldReceive('getValue')
+            ->with(\Mockery::anyOf('apm_custom_settings', 'countries'))
+            ->andReturn('{}')
+            ->byDefault();
 
         $this->configuration_adapter = \Mockery::mock('ConfigurationAdapter');
 
@@ -190,6 +197,10 @@ abstract class BasePaymentMethod extends TestCase
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
         $this->country_adapter = \Mockery::mock('Country');
+        $this->country_adapter->shouldReceive([
+            'getByIso' => false,
+            'getCountries' => [],
+        ])->byDefault();
         $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
         $this->carrier_adapter = \Mockery::mock('CarrierAdapter');
         $this->cart_adapter = \Mockery::mock('CartAdapter');
@@ -303,5 +314,11 @@ abstract class BasePaymentMethod extends TestCase
         $this->class = \Mockery::mock(PaymentMethod::class, [$this->dependencies])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->releaseTestProperties();
+        parent::tearDown();
     }
 }

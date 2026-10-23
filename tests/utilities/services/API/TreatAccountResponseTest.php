@@ -204,4 +204,108 @@ class TreatAccountResponseTest extends BaseApi
         self::assertSame(json_encode($countries_metadata), $this->captured_configuration['oney_countries_metadata']);
         self::assertSame('FR', $this->captured_configuration['oney_allowed_countries']);
     }
+
+    public function testWhenResponseContainsPaymentMethodsLimitsAreMappedAndSyncIsStamped()
+    {
+        $this->json_answer['payment_methods'] = [
+            'bancontact' => [
+                'enabled' => true,
+                'allowed_countries' => ['ALL'],
+                'min_amounts' => ['EUR' => 30],
+                'max_amounts' => ['EUR' => 2000000],
+            ],
+            'satispay' => [
+                'enabled' => true,
+                'allowed_countries' => ['IT'],
+                'min_amounts' => ['EUR' => 30],
+                'max_amounts' => ['EUR' => 2000000],
+            ],
+        ];
+
+        $this->service->treatAccountResponse($this->json_answer);
+
+        self::assertSame(
+            '{"bancontact":{"min":"EUR:30","max":"EUR:2000000"},"satispay":{"min":"EUR:30","max":"EUR:2000000"}}',
+            $this->captured_configuration['amounts']
+        );
+        self::assertSame('{"satispay":["IT"]}', $this->captured_configuration['countries']);
+    }
+
+    public function testNewlyInvalidApmSettingsAreLoggedOnceTheLimitsAreStored()
+    {
+        $this->json_answer['payment_methods'] = [
+            'satispay' => [
+                'enabled' => true,
+                'min_amounts' => ['EUR' => 30],
+                'max_amounts' => ['EUR' => 4000],
+            ],
+        ];
+        $previous = ['bizum' => ['min' => 6000, 'max' => 5500, 'currency' => 'EUR']];
+        $stored_amounts = [];
+        $apm_eligibility = \Mockery::mock('ApmEligibility');
+        $apm_eligibility->shouldReceive('getInvalidSettings')
+            ->once()
+            ->andReturnUsing(function () use (&$stored_amounts, $previous) {
+                $stored_amounts[] = isset($this->captured_configuration['amounts']) ? $this->captured_configuration['amounts'] : null;
+
+                return $previous;
+            });
+        $apm_eligibility->shouldReceive('logNewlyInvalidSettings')
+            ->once()
+            ->with($previous)
+            ->andReturnUsing(function () use (&$stored_amounts) {
+                $stored_amounts[] = isset($this->captured_configuration['amounts']) ? $this->captured_configuration['amounts'] : null;
+
+                return ['satispay'];
+            });
+        $this->service->shouldReceive('getApmEligibility')->andReturn($apm_eligibility);
+
+        $this->service->treatAccountResponse($this->json_answer);
+
+        self::assertSame([null, '{"satispay":{"min":"EUR:30","max":"EUR:4000"}}'], $stored_amounts);
+    }
+
+    public function checkFailureProvider()
+    {
+        yield 'previous settings read' => ['getInvalidSettings', new \TypeError('Argument must be of type array')];
+
+        yield 'new settings check' => ['logNewlyInvalidSettings', new \TypeError('Argument must be of type array')];
+
+        yield 'exception' => ['logNewlyInvalidSettings', new \Exception('Argument must be of type array')];
+    }
+
+    /**
+     * @dataProvider checkFailureProvider
+     *
+     * @param string $failing_method
+     * @param \Throwable $error
+     */
+    public function testAccountIsStillTreatedWhenTheApmSettingsCheckFails($failing_method, $error)
+    {
+        $logs = [];
+        $logger = \Mockery::mock('Logger');
+        $logger->shouldReceive('addLog')
+            ->andReturnUsing(function ($message, $level = 'info') use (&$logs) {
+                $logs[] = [$message, $level];
+
+                return true;
+            });
+        $this->plugin->shouldReceive('getLogger')->andReturn($logger);
+        $apm_eligibility = \Mockery::mock('ApmEligibility');
+        $apm_eligibility->shouldReceive([
+            'getInvalidSettings' => [],
+            'logNewlyInvalidSettings' => [],
+        ])->byDefault();
+        $apm_eligibility->shouldReceive($failing_method)->andThrow($error);
+        $this->service->shouldReceive('getApmEligibility')->andReturn($apm_eligibility);
+
+        $permissions = $this->service->treatAccountResponse($this->json_answer);
+
+        self::assertTrue($permissions['can_use_oney']);
+        self::assertArrayHasKey('amounts', $this->captured_configuration);
+        self::assertSame(
+            [['Api::treatAccountResponse - APM settings check failed: Argument must be of type array', 'error']],
+            $logs
+        );
+    }
 }

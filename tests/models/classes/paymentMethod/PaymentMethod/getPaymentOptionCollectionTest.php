@@ -2,6 +2,7 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\PaymentMethod;
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 
 /**
@@ -12,6 +13,8 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
  */
 class getPaymentOptionCollectionTest extends BasePaymentMethod
 {
+    use MockeryPHPUnitIntegration;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -116,5 +119,32 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
         ]);
         $this->dependencies->configClass = $configClass;
         $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOptionCollection()));
+    }
+
+    public function testCheckoutReadsTheCachedLimitsWithoutRequestingTheAccount()
+    {
+        $this->stubOfferedMethods(['satispay' => true, 'bancontact' => true, 'standard' => true]);
+        $this->api_service->shouldNotReceive('getAccount');
+
+        $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOptionCollection()));
+    }
+
+    /**
+     * @param array $availability
+     */
+    private function stubOfferedMethods($availability)
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
+        $this->dependencies->configClass = $configClass;
+        $this->class->shouldReceive([
+            'getPaymentOptionsAvailability' => $availability,
+            'getPaymentMethod' => $this->class,
+            'getPaymentOption' => [
+                'standard' => new \stdClass(),
+            ],
+        ]);
     }
 }

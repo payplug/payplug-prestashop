@@ -42,6 +42,12 @@ class Configuration
             'defaultValue' => '{}',
             'setConf' => 1,
         ],
+        'apm_custom_settings' => [
+            'type' => 'string',
+            'name' => 'APM_CUSTOM_SETTINGS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
         'applepay_carriers' => [
             'type' => 'string',
             'name' => 'APPLEPAY_CARRIERS',
@@ -57,6 +63,8 @@ class Configuration
         'bancontact_country' => [
             'type' => 'integer',
             'name' => 'BANCONTACT_COUNTRY',
+            // Legacy "Belgium only" Bancontact setting: kept only as the source of
+            // ApmEligibility::importLegacyBancontactCountry() and for rollback.
             'defaultValue' => 0,
             'setConf' => 1,
         ],
@@ -381,9 +389,8 @@ class Configuration
         'scalapay_custom_max_amounts' => [
             'type' => 'string',
             'name' => 'SCALAPAY_CUSTOM_MAX_AMOUNTS',
-            // Empty means the merchant never customised the limit: the account's own
-            // authorized range from GET /account applies as-is. It must NOT default to a
-            // concrete amount, or that amount would read as an explicit override.
+            // Legacy Scalapay bounds, with scalapay_custom_min_amounts: kept only as the
+            // source of ApmEligibility::importLegacyScalapaySettings() and for rollback.
             'defaultValue' => '',
             'setConf' => 1,
         ],
@@ -788,6 +795,30 @@ class Configuration
     }
 
     /**
+     * @description get the value of a given configuration for a scope: the value stored for the
+     *              shop, else for the shop group, else the global one
+     *
+     * @param string $key
+     * @param int $id_shop_group 0 with $id_shop 0: global value
+     * @param int $id_shop
+     *
+     * @return mixed
+     */
+    public function getScopedValue($key = '', $id_shop_group = 0, $id_shop = 0)
+    {
+        if (!is_string($key) || !$key) {
+            return false;
+        }
+
+        $configuration_key = !array_key_exists($key, $this->configurations) ? $key : $this->getName($key);
+
+        return $this->dependencies
+            ->getPlugin()
+            ->getConfiguration()
+            ->get($configuration_key, (int) $id_shop_group, (int) $id_shop);
+    }
+
+    /**
      * @description Set the default configuration for module in the database
      *
      * @return bool
@@ -817,10 +848,12 @@ class Configuration
      *
      * @param string $key
      * @param string|null $value
+     * @param int|null $id_shop_group null: current context, 0 with $id_shop 0: global value
+     * @param int|null $id_shop null: current context
      *
      * @return bool
      */
-    public function set($key = '', $value = null)
+    public function set($key = '', $value = null, $id_shop_group = null, $id_shop = null)
     {
         if (!is_string($key) || !$key) {
             return false;
@@ -841,6 +874,6 @@ class Configuration
         return $this->dependencies
             ->getPlugin()
             ->getConfiguration()
-            ->updateValue($this->getName($key), $value);
+            ->updateValue($this->getName($key), $value, $id_shop_group, $id_shop);
     }
 }
