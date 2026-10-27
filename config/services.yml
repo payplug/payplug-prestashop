@@ -12,10 +12,6 @@ services:
     class: PayPlug\src\actions\RequestAction
     public: true
 
-  payplug.action.operation:
-    class: PayPlug\src\actions\OperationAction
-    public: true
-
   payplug.action.unified_order:
     class: PayPlug\src\actions\UnifiedOrderAction
     public: true
