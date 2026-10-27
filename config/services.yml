@@ -12,6 +12,22 @@ services:
     class: PayPlug\src\actions\RequestAction
     public: true
 
+  payplug.action.unified_order:
+    class: PayPlug\src\actions\UnifiedOrderAction
+    public: true
+
+  payplug.action.unified_payment:
+    class: PayPlug\src\actions\UnifiedPaymentAction
+    public: true
+
+  payplug.action.unified_alias:
+    class: PayPlug\src\actions\UnifiedAliasAction
+    public: true
+
+  payplug.action.unified_refund:
+    class: PayPlug\src\actions\UnifiedRefundAction
+    public: true
+
   payplug.models.classes.hook:
     class: PayPlug\src\models\classes\Hook
     public: true
@@ -22,6 +38,26 @@ services:
 
   payplug.models.classes.order_lock:
     class: PayPlug\src\models\classes\OrderLock
+    public: true
+
+  payplug.models.repositories.unified_operation:
+    class: PayPlug\src\models\repositories\UnifiedOperationRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+
+  payplug.models.repositories.unified_lock:
+    class: PayPlug\src\models\repositories\UnifiedLockRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+
+  payplug.models.repositories.unified_alias:
+    class: PayPlug\src\models\repositories\UnifiedAliasRepository
+    arguments: ['@payplug.dependencies_class']
+    public: true
+
+  payplug.models.repositories.unified_refund:
+    class: PayPlug\src\models\repositories\UnifiedRefundRepository
+    arguments: ['@payplug.dependencies_class']
     public: true
 
   payplug.utilities.service.api:
@@ -38,6 +74,10 @@ services:
 
   payplug.utilities.service.props:
     class: PayPlug\src\utilities\services\Props
+    public: true
+
+  payplug.unified.payment_service_factory:
+    class: PayPlug\src\unified\UnifiedApiPaymentServiceFactory
     public: true
 
   payplug.utilities.validator.regex:
