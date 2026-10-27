@@ -8,7 +8,15 @@
   - [PRE-3624](https://github.com/payplug/payplug-prestashop/pull/123): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
   - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Let customers save a card and pay with it again through Unified Hosted Fields for non-EUR carts
   - [PRE-3627](https://github.com/payplug/payplug-prestashop/pull/130): Refund Unified Hosted Fields orders, fully or partially, from the back office
-  - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Keep Unified Hosted Fields payments, saved cards and back-office refunds working with the new Unified API contract (unified-plugin-core ^1.2.1)
+  - [PRE-3626](https://github.com/payplug/payplug-prestashop/pull/127): Confirm Unified Hosted Fields payments asynchronously through the Unified API notification (`notify` front controller)
+  - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Include the cards saved through Unified Hosted Fields in the GDPR data export and erase
+  - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Keep Unified Hosted Fields payments, saved cards and back-office refunds working with the new Unified API contract (unified-plugin-core ^1.2.2)
+
+- Bugfix :
+  - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Require the customer token to delete a saved card (CSRF protection on the saved cards page)
+
+- Refactoring :
+  - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Update `payplug/payplug-php` from 4.1.0 to 4.2.0, installed with unified-plugin-core ^1.2.2
 
 ## Version 5.1.1
 - Feature :
