@@ -12,40 +12,40 @@ class getOptionTest extends BaseScalapayPaymentMethod
 {
     public function testWhenGivenOptionIsntAvailableWithSandboxMode()
     {
-        $this->stubCustomLimits('', '');
-
         $this->assertFalse($this->class->getOption([])['available_test_mode']);
     }
 
-    public function testWhenNoCustomLimitIsConfiguredThresholdsFallBackOnTheAccountRange()
+    public function testThresholdsUseTheFieldsOfTheOtherPproMethods()
     {
-        $this->stubCustomLimits('', '');
-
         $this->assertSame(
             [
                 [
                     'name' => 'thresholds',
                     'image_url' => 'modules/payplug/views/img/oney/payplug-thresholds.jpg',
-                    'title' => 'paymentmethods.scalapay.thresholds.title',
+                    'title' => 'paymentmethods.apm.thresholds.title',
                     'descriptions' => [
-                        'description' => 'paymentmethods.scalapay.thresholds.description',
+                        'description' => 'paymentmethods.apm.thresholds.description',
+                        'decimal' => true,
+                        'strict_range' => true,
                         'min_amount' => [
                             'name' => 'scalapay_min_amounts',
+                            'label' => 'paymentmethods.apm.thresholds.min',
                             'value' => 5.0,
                             'placeholder' => 5.0,
                             'default' => 5.0,
                         ],
-                        'inter' => 'paymentmethods.scalapay.thresholds.inter',
+                        'inter' => 'paymentmethods.apm.thresholds.inter',
                         'max_amount' => [
                             'name' => 'scalapay_max_amounts',
+                            'label' => 'paymentmethods.apm.thresholds.max',
                             'value' => 4000.0,
                             'placeholder' => 4000.0,
                             'default' => 4000.0,
                         ],
                         'error' => [
-                            'text' => 'paymentmethods.scalapay.thresholds.error.text',
-                            'maxtext' => 'paymentmethods.scalapay.thresholds.error.max.text',
-                            'mintext' => 'paymentmethods.scalapay.thresholds.error.min.text',
+                            'text' => 'paymentmethods.apm.thresholds.error.text',
+                            'maxtext' => 'paymentmethods.apm.thresholds.error.max.text',
+                            'mintext' => 'paymentmethods.apm.thresholds.error.min.text',
                         ],
                     ],
                     'switch' => false,
@@ -55,21 +55,24 @@ class getOptionTest extends BaseScalapayPaymentMethod
         );
     }
 
-    public function testWhenCustomLimitsAreConfiguredTheyAreDisplayedWithinTheAccountRange()
+    public function testThresholdsShowTheMerchantRangeOfTheGenericSettings()
     {
-        $this->stubCustomLimits('EUR:1000', 'EUR:200000');
+        $this->stubLegacyCustomLimits('EUR:1000', 'EUR:200000');
+        $this->configuration->shouldReceive('getValue')
+            ->with('apm_custom_settings')
+            ->andReturn('{"scalapay":{"min":{"EUR":3000}}}');
 
         $descriptions = $this->class->getOption([])['advanced_options'][0]['descriptions'];
 
-        $this->assertSame(10.0, $descriptions['min_amount']['value']);
+        $this->assertSame(30.0, $descriptions['min_amount']['value']);
         $this->assertSame(5.0, $descriptions['min_amount']['default']);
-        $this->assertSame(2000.0, $descriptions['max_amount']['value']);
+        $this->assertSame(4000.0, $descriptions['max_amount']['value']);
         $this->assertSame(4000.0, $descriptions['max_amount']['default']);
     }
 
-    public function testThresholdsAreConvertedInTheAccountLimitsCurrency()
+    public function testThresholdsAreConvertedInTheBackOfficeCurrency()
     {
-        $this->stubCustomLimits('', '');
+        $this->stubLegacyCustomLimits('', '');
 
         $this->class->getOption([]);
 
@@ -77,5 +80,40 @@ class getOptionTest extends BaseScalapayPaymentMethod
         $this->amountHelper->shouldHaveReceived('convertAmount')->with(400000, true, 'EUR');
         $this->amountHelper->shouldNotHaveReceived('convertAmount', [\Mockery::any(), true, '']);
         $this->addToAssertionCount(1);
+    }
+
+    public function testABoundTheApiDoesNotSetIsLeftEmpty()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('amounts')
+            ->andReturn('{"scalapay":{"min":"EUR:500"}}');
+        $translation = $this->translation->getPaymentMethodsTranslations();
+        $translation['apm']['thresholds']['error']['default'] = 'between %s and %s';
+        $this->class->set('translation', $translation);
+
+        $descriptions = $this->class->getOption([])['advanced_options'][0]['descriptions'];
+
+        $this->assertSame(5.0, $descriptions['min_amount']['default']);
+        $this->assertSame(
+            ['value' => null, 'placeholder' => null, 'default' => null],
+            array_intersect_key($descriptions['max_amount'], array_flip(['value', 'placeholder', 'default']))
+        );
+        $this->assertSame('between 5 and -', $descriptions['error']['text']);
+    }
+
+    public function testCountriesFieldIsAddedAlongsideTheAmountFields()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('countries')
+            ->andReturn('{"scalapay":["IT"]}');
+        $this->country_adapter->shouldReceive('getCountries')
+            ->andReturn([10 => ['iso_code' => 'IT', 'name' => 'Italie']]);
+
+        $option = $this->class->getOption([]);
+
+        $this->assertCount(1, $option['advanced_options']);
+        $this->assertSame('scalapay_min_amounts', $option['advanced_options'][0]['descriptions']['min_amount']['name']);
+        $this->assertSame('scalapay_countries', $option['countries']['name']);
+        $this->assertSame(['IT'], $option['countries']['value']);
     }
 }

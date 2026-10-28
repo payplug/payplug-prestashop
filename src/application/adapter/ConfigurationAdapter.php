@@ -38,13 +38,20 @@ class ConfigurationAdapter implements ConfigurationInterface
         $this->configuration = new \Configuration();
     }
 
-    public function get($configuration_name)
+    /**
+     * @param string $configuration_name
+     * @param int|null $id_shop_group null: current context
+     * @param int|null $id_shop null: current context
+     *
+     * @return mixed the value of the scope, else of its shop group, else the global one
+     */
+    public function get($configuration_name, $id_shop_group = null, $id_shop = null)
     {
         // Old PHP configs can't accept $this->classVar::staticMethod()
         // But only $var::staticMethod()
         $config = $this->configuration;
 
-        return $config::get($configuration_name);
+        return $config::get($configuration_name, null, $id_shop_group, $id_shop);
     }
 
     /**

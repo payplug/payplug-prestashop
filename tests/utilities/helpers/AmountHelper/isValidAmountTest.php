@@ -139,8 +139,8 @@ class validateAmountTest extends TestCase
     public function testWhenGivenCurrencyCannotBeConverted()
     {
         $price_limit = [
-            'min' => 'EUR:99',
-            'max' => 'EUR:2000000',
+            'min' => 'EUR:99;KWD:99',
+            'max' => 'EUR:2000000;KWD:2000000',
         ];
         $this->helper->shouldReceive('convertAmount')
             ->with(100.00, false, 'KWD')
@@ -161,5 +161,105 @@ class validateAmountTest extends TestCase
             'null' => [null],
             'not a string' => [['EUR']],
         ];
+    }
+
+    public function testWhenCurrencyGivenUsesTheMatchingEntry()
+    {
+        $price_limit = [
+            'min' => 'EUR:500;GBP:400',
+            'max' => 'EUR:9000;GBP:8000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->andReturn(450);
+
+        $this->assertTrue($this->helper->validateAmount($price_limit, 4.50, 'GBP')['result']);
+        $this->assertFalse($this->helper->validateAmount($price_limit, 4.50, 'EUR')['result']);
+    }
+
+    public function testBoundsAreInclusive()
+    {
+        $price_limit = [
+            'min' => 'EUR:500',
+            'max' => 'EUR:9000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->andReturn(500, 9000);
+
+        $this->assertTrue($this->helper->validateAmount($price_limit, 5.00, 'EUR')['result']);
+        $this->assertTrue($this->helper->validateAmount($price_limit, 90.00, 'EUR')['result']);
+    }
+
+    public function testWhenTheLimitsHaveNoEntryForTheCurrencyTheAmountIsNotBounded()
+    {
+        $price_limit = [
+            'min' => 'EUR:500',
+            'max' => 'EUR:9000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->with(100.00, false, 'USD')
+            ->andReturn(10000);
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => '',
+            ],
+            $this->helper->validateAmount($price_limit, 100.00, 'USD')
+        );
+    }
+
+    /**
+     * @dataProvider singleBoundProvider
+     *
+     * @param array $price_limit
+     * @param int $cents
+     * @param array $expected
+     */
+    public function testAMissingBoundDoesNotLimitTheAmount($price_limit, $cents, $expected)
+    {
+        $this->helper->shouldReceive('convertAmount')
+            ->andReturn($cents);
+
+        $this->assertSame($expected, $this->helper->validateAmount($price_limit, 42.00, 'EUR'));
+    }
+
+    public function singleBoundProvider()
+    {
+        $valid = ['result' => true, 'message' => ''];
+
+        return [
+            'only min, amount above' => [['min' => 'EUR:500'], 100000000, $valid],
+            'only min, amount below' => [
+                ['min' => 'EUR:500'],
+                499,
+                ['result' => false, 'message' => 'Given $amount is lower than expected'],
+            ],
+            'only max, amount below' => [['max' => 'EUR:9000'], 1, $valid],
+            'only max, amount above' => [
+                ['max' => 'EUR:9000'],
+                9001,
+                ['result' => false, 'message' => 'Given $amount is higher than expected'],
+            ],
+            'empty max' => [['min' => 'EUR:500', 'max' => ''], 100000000, $valid],
+        ];
+    }
+
+    public function testWhenACurrencyWithoutLimitsCannotBeConvertedTheAmountIsRefused()
+    {
+        $price_limit = [
+            'min' => 'EUR:99',
+            'max' => 'EUR:2000000',
+        ];
+        $this->helper->shouldReceive('convertAmount')
+            ->with(100.00, false, 'KWD')
+            ->andReturn(0);
+
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => 'Given $amount is lower than expected',
+            ],
+            $this->helper->validateAmount($price_limit, 100.00, 'KWD')
+        );
     }
 }
