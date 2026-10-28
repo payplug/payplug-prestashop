@@ -10,9 +10,9 @@ namespace PayPlug\tests\models\classes\paymentMethod\ScalapayPaymentMethod;
  */
 class getPriceLimitTest extends BaseScalapayPaymentMethod
 {
-    public function testWhenNoCustomLimitIsConfigured()
+    public function testTheApiRangeIsReturned()
     {
-        $this->stubCustomLimits('', '');
+        $this->stubLegacyCustomLimits('', '');
 
         $this->assertSame(
             [
@@ -23,14 +23,14 @@ class getPriceLimitTest extends BaseScalapayPaymentMethod
         );
     }
 
-    public function testWhenCustomLimitsNarrowTheAccountRange()
+    public function testLegacyCustomLimitsDoNotNarrowTheApiRange()
     {
-        $this->stubCustomLimits('EUR:1000', 'EUR:200000');
+        $this->stubLegacyCustomLimits('EUR:1000', 'EUR:200000');
 
         $this->assertSame(
             [
-                'min' => 'EUR:1000',
-                'max' => 'EUR:200000',
+                'min' => 'EUR:500',
+                'max' => 'EUR:400000',
             ],
             $this->class->getPriceLimit()
         );

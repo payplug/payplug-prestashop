@@ -80,4 +80,22 @@ class setTest extends BaseConfiguration
         ]);
         $this->assertTrue($this->class->set($key, $value));
     }
+
+    public function testCurrentContextIsWrittenWithoutScope()
+    {
+        $this->configuration->shouldReceive('updateValue')
+            ->once()
+            ->with('PAYPLUG_ENABLE', '1', null, null)
+            ->andReturn(true);
+        $this->assertTrue($this->class->set('enable', '1'));
+    }
+
+    public function testScopeIsPassedToTheAdapter()
+    {
+        $this->configuration->shouldReceive('updateValue')
+            ->once()
+            ->with('PAYPLUG_ENABLE', '1', 1, 2)
+            ->andReturn(true);
+        $this->assertTrue($this->class->set('enable', '1', 1, 2));
+    }
 }

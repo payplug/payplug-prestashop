@@ -229,7 +229,6 @@ class ApiRest
             'oney_custom_min_amounts' => $configuration->getValue('oney_custom_min_amounts'),
             'oney_custom_max_amounts' => $configuration->getValue('oney_custom_max_amounts'),
             'bancontact' => (bool) $payment_methods['bancontact'],
-            'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
             'applepay' => (bool) $payment_methods['applepay'],
             'applepay_display' => $configuration->getValue('applepay_display'),
             'amex' => (bool) $payment_methods['amex'],
@@ -573,7 +572,6 @@ class ApiRest
 
         $default_configuration = [
             'applepay_display' => $configuration->getDefault('applepay_display'),
-            'bancontact_country' => $configuration->getDefault('bancontact_country'),
             'embedded_mode' => $configuration->getDefault('embedded_mode'),
             'inst_mode' => $configuration->getDefault('inst_mode'),
             'inst_min_amount' => $configuration->getDefault('inst_min_amount'),

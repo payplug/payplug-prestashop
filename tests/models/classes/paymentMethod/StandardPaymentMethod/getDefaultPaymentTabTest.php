@@ -2,6 +2,8 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
 /**
  * @group unit
  * @group class
@@ -10,6 +12,10 @@ namespace PayPlug\tests\models\classes\paymentMethod\StandardPaymentMethod;
  */
 class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
 {
+    use MockeryPHPUnitIntegration;
+
+    protected $validate_amount_calls;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -23,11 +29,16 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR;JPY');
-        $this->helpers['amount']->shouldReceive([
-            'validateAmount' => [
-                'result' => true,
-            ],
-        ]);
+        $this->validate_amount_calls = [];
+        $this->helpers['amount']->shouldReceive('validateAmount')
+            ->andReturnUsing(function () {
+                $this->validate_amount_calls[] = func_get_args();
+
+                return [
+                    'result' => true,
+                ];
+            })
+            ->byDefault();
         $this->tools_adapter->shouldReceive('tool')
             ->andReturnUsing(function ($method, $arg) {
                 switch ($method) {
@@ -310,5 +321,75 @@ class getDefaultPaymentTabTest extends BaseStandardPaymentMethod
             ->with(42.42, false, 'JPY')
             ->once();
         $this->addToAssertionCount(1);
+    }
+
+    public function testCardPaymentIsNotCheckedAgainstApmLimits()
+    {
+        $apm_eligibility = \Mockery::mock('ApmEligibility');
+        $apm_eligibility->shouldReceive([
+            'isPpro' => false,
+        ]);
+        $apm_eligibility->shouldNotReceive('isEligible');
+        $this->class->set('apm_eligibility', $apm_eligibility);
+
+        $this->assertNotEmpty($this->class->getDefaultPaymentTab());
+    }
+
+    public function testTheCartAmountIsValidatedInTheCartCurrency()
+    {
+        $this->class->getDefaultPaymentTab();
+
+        $this->assertSame(
+            [[['min' => 'EUR:30', 'max' => 'EUR:2000000'], 42.42, 'EUR']],
+            $this->validate_amount_calls
+        );
+    }
+
+    /**
+     * @dataProvider amountLimitsProvider
+     *
+     * @param string $amounts
+     * @param string $currency
+     * @param int $cents cart amount once converted in the cart currency
+     * @param bool $expected
+     */
+    public function testListingAndPaymentCreationAgreeOnTheAmountLimits($amounts, $currency, $cents, $expected)
+    {
+        $this->context->currency->iso_code = $currency;
+        $this->dependencies->configClass->shouldReceive('getImgLang')->andReturn('fr');
+        $this->configuration->shouldReceive('getValue')
+            ->with('amounts')
+            ->andReturn($amounts);
+        $this->helpers['amount']->shouldReceive('validateAmount')->passthru();
+        $this->helpers['amount']->shouldReceive('convertAmount')
+            ->with(42.42, false, $currency)
+            ->andReturn($cents);
+
+        $this->assertSame($expected, array_key_exists('standard', $this->class->getPaymentOption([])));
+        $this->assertSame($expected, [] !== $this->class->getDefaultPaymentTab());
+    }
+
+    public function amountLimitsProvider()
+    {
+        return [
+            'currency in the limits, amount within' => ['{"default":{"min":"EUR:30","max":"EUR:2000000"}}', 'EUR', 4242, true],
+            'currency in the limits, amount above' => ['{"default":{"min":"EUR:30","max":"EUR:4000"}}', 'EUR', 4242, false],
+            'currency missing from the limits' => ['{"default":{"min":"EUR:30","max":"EUR:4000"}}', 'JPY', 42, true],
+            'currency missing from the limits and not convertible' => ['{"default":{"min":"EUR:30","max":"EUR:2000000"}}', 'JPY', 0, false],
+            'only min, amount above' => ['{"default":{"min":"EUR:30"}}', 'EUR', 4242, true],
+            'only min, amount below' => ['{"default":{"min":"EUR:5000"}}', 'EUR', 4242, false],
+            'only max, amount below' => ['{"default":{"max":"EUR:5000"}}', 'EUR', 4242, true],
+            'only max, amount above' => ['{"default":{"max":"EUR:4000"}}', 'EUR', 4242, false],
+        ];
+    }
+
+    public function testCardAmountIsLeftToTheApiWhenNoLimitIsCached()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('amounts')
+            ->andReturn('{}');
+
+        $this->assertNotEmpty($this->class->getDefaultPaymentTab());
+        $this->assertSame([], $this->validate_amount_calls);
     }
 }

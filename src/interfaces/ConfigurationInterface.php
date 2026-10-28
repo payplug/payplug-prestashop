@@ -29,7 +29,7 @@ if (!defined('_PS_VERSION_')) {
 
 interface ConfigurationInterface
 {
-    public function get($configuration_name);
+    public function get($configuration_name, $id_shop_group = null, $id_shop = null);
 
     public function updateValue($key, $value, $id_shop_group = null, $id_shop = null);
 

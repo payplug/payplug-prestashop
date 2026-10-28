@@ -213,6 +213,11 @@ namespace {
         {
             return '';
         }
+
+        public static function getCountries($idLang, $active = false, $containStates = false, $listStates = true)
+        {
+            return [];
+        }
     }
     class Currency extends ObjectModel
     {

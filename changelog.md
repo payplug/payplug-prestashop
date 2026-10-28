@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 5.3.0
+- Feature :
+  - [PRE-3675](https://github.com/payplug/payplug-prestashop/pull/136): Show Satispay, Bancontact, iDEAL, MyBank, Wero, Bizum and Scalapay at checkout only for eligible cart amounts and billing countries, and let the merchant narrow their amount range and billing countries from the back office
+
 ## Version 5.2.0
 - Feature :
   - [PRE-3622](https://github.com/payplug/payplug-prestashop/pull/117): Add Unified hosted fields configuration
