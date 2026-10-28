@@ -628,6 +628,16 @@ class Translation
                     'delivery_cost' => $this->l('paymentmethods.applepay.modal.delivery_cost', 'translation'),
                     'discount' => $this->l('paymentmethods.applepay.modal.discount', 'translation'),
                 ],
+                'domain_association' => [
+                    'title' => $this->l('paymentmethods.applepay.domain_association.title', 'translation'),
+                    'state_synced' => $this->l('paymentmethods.applepay.domain_association.state_synced', 'translation'),
+                    'state_not_synced' => $this->l('paymentmethods.applepay.domain_association.state_not_synced', 'translation'),
+                    'last_success' => $this->l('paymentmethods.applepay.domain_association.last_success', 'translation'),
+                    'last_error' => $this->l('paymentmethods.applepay.domain_association.last_error', 'translation'),
+                    'never' => $this->l('paymentmethods.applepay.domain_association.never', 'translation'),
+                    'resync' => $this->l('paymentmethods.applepay.domain_association.resync', 'translation'),
+                    'root_file' => $this->l('paymentmethods.applepay.domain_association.root_file', 'translation'),
+                ],
             ],
             'bancontact' => [
                 'title' => $this->l('paymentmethods.bancontact.title', 'translation'),

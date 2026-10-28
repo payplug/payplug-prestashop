@@ -13,18 +13,21 @@ class installActionTest extends BaseConfigurationAction
 {
     public $configuration_helper;
     public $constant;
+    public $domain_association_action;
     public $files_helper;
     public $order_state_action;
     public $entity_repository;
+    public $txt_log;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $txt_log = \Mockery::mock(MyLogPHP::class);
-        $txt_log->shouldReceive([
+        $this->txt_log = \Mockery::mock(MyLogPHP::class);
+        $this->txt_log->shouldReceive([
             'info' => 'log str',
         ]);
+        $this->action->shouldReceive('getInstallLog')->andReturn($this->txt_log);
 
         $this->constant = \Mockery::mock('Constant');
         $this->constant->shouldReceive('get')
@@ -50,6 +53,12 @@ class installActionTest extends BaseConfigurationAction
             ->with('payplug.models.repositories.unified_refund')
             ->andReturn(\Mockery::mock('UnifiedRefundRepository'));
 
+        $this->domain_association_action = \Mockery::mock('ApplePayDomainAssociationAction');
+        $this->module->shouldReceive('getService')
+            ->with('payplug.action.apple_pay_domain_association')
+            ->andReturn($this->domain_association_action)
+            ->byDefault();
+
         $shop = \Mockery::mock('Shop');
         $shop->shouldReceive([
             'isFeatureActive' => true,
@@ -66,9 +75,16 @@ class installActionTest extends BaseConfigurationAction
         ]);
 
         $this->configuration_helper = \Mockery::mock('ConfigurationHelper');
+        $this->files_helper = new class() {
+            public static function clean()
+            {
+                return true;
+            }
+        };
         $this->dependencies->shouldReceive([
             'getHelpers' => [
                 'configuration' => $this->configuration_helper,
+                'files' => $this->files_helper,
             ],
         ]);
     }
@@ -388,5 +404,101 @@ class installActionTest extends BaseConfigurationAction
             ],
             $this->action->installAction()
         );
+    }
+
+    public function testSynchronisesTheApplePayDomainAssociationOnceInstalled()
+    {
+        $this->givenAnInstallThatSucceeds();
+        $this->domain_association_action->shouldReceive('ensureStoredAction')->once()->andReturn(true);
+        $this->txt_log->shouldNotReceive('error');
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => 'Install successful',
+            ],
+            $this->action->installAction()
+        );
+    }
+
+    public function testCompletesTheInstallAndLogsAnErrorWhenTheSynchronisationCannotBeAttempted()
+    {
+        $this->givenAnInstallThatSucceeds();
+        $this->domain_association_action->shouldReceive('ensureStoredAction')->once()->andReturn(false);
+        $this->txt_log->shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/^Apple Pay domain association could not be synchronised: /'));
+
+        $this->assertTrue($this->action->installAction()['result']);
+    }
+
+    public function testCompletesTheInstallAndLogsAnErrorWhenTheActionCannotBeBuilt()
+    {
+        $this->givenAnInstallThatSucceeds();
+        $this->module->shouldReceive('getService')
+            ->with('payplug.action.apple_pay_domain_association')
+            ->andThrow(new \RuntimeException('container broken'));
+        $this->txt_log->shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/could not be synchronised: RuntimeException: container broken$/'));
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => 'Install successful',
+            ],
+            $this->action->installAction()
+        );
+    }
+
+    public function testCompletesTheInstallAndLogsAnErrorWhenTheActionIsNotRegistered()
+    {
+        $this->givenAnInstallThatSucceeds();
+        $this->module->shouldReceive('getService')
+            ->with('payplug.action.apple_pay_domain_association')
+            ->andReturn(null);
+        $this->txt_log->shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/^Apple Pay domain association could not be synchronised: /'));
+
+        $this->assertTrue($this->action->installAction()['result']);
+    }
+
+    public function testDoesNotSynchroniseTheApplePayDomainAssociationWhenTheInstallFails()
+    {
+        $this->givenAnInstallThatSucceeds();
+        $this->action->shouldReceive('installHookAction')->andReturn(false);
+        $this->domain_association_action->shouldNotReceive('ensureStoredAction');
+
+        $this->assertFalse($this->action->installAction()['result']);
+    }
+
+    private function givenAnInstallThatSucceeds()
+    {
+        $this->configuration_helper->shouldReceive([
+            'getRequirements' => [
+                'php' => [
+                    'up2date' => true,
+                ],
+                'curl' => [
+                    'up2date' => true,
+                ],
+                'openssl' => [
+                    'up2date' => true,
+                ],
+            ],
+        ]);
+        $this->configuration_class->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'initialize' => true,
+        ]);
+        $this->action->shouldReceive('installOrderStateAction')->andReturn(true);
+        $this->action->shouldReceive('installTabAction')->andReturn(true);
+        $this->action->shouldReceive('installHookAction')->andReturn(true)->byDefault();
+        $this->order_state_action->shouldReceive([
+            'installTypeAction' => true,
+        ]);
     }
 }

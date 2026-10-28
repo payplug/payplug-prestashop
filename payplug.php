@@ -22,6 +22,7 @@
  */
 // Check if prestashop Context
 use PayPlug\classes\DependenciesClass;
+use PayPlug\src\actions\ApplePayDomainAssociationAction;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -224,6 +225,24 @@ class Payplug extends PaymentModule
     {
         if ($this->payplug_dependencies) {
             return $this->payplug_dependencies->hookClass->actionDeleteGDPRCustomer($params);
+        }
+    }
+
+    /**
+     * @description Serve the Apple Pay domain association file before any controller is instantiated
+     *
+     * @param array $params
+     */
+    public function hookActionDispatcherBefore($params)
+    {
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+        if (!ApplePayDomainAssociationAction::isWellKnownRequest($request_uri) || !$this->payplug_dependencies) {
+            return;
+        }
+
+        $http_method = isset($_SERVER['REQUEST_METHOD']) ? (string) $_SERVER['REQUEST_METHOD'] : '';
+        if ($this->payplug_dependencies->hookClass->actionDispatcherBefore($http_method, $request_uri)) {
+            exit;
         }
     }
 
@@ -652,6 +671,7 @@ class Payplug extends PaymentModule
             'actionAdminLanguagesControllerSaveAfter',
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
+            'actionDispatcherBefore',
             'actionExportGDPRData',
             'actionObjectOrderHistoryAddAfter',
             'actionObjectOrderStateAddAfter',

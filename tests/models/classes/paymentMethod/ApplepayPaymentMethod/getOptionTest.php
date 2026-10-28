@@ -135,4 +135,62 @@ class getOptionTest extends BaseApplepayPaymentMethod
             $this->class->getOption($configuration)['options']
         );
     }
+
+    public function testAddsTheDomainAssociationDiagnostics()
+    {
+        $this->givenAnOptionWithoutCarrier();
+        $diagnostics = [
+            'state' => 'not_synced',
+            'last_attempt_at' => 30,
+            'last_success_at' => 20,
+            'last_error' => 'Unexpected HTTP status 500 from secure.payplug.com.',
+            'root_file_present' => true,
+        ];
+        $this->domain_association_action->shouldReceive('getDiagnosticsAction')->once()->andReturn($diagnostics);
+
+        $option = $this->class->getOption(['applepay_display' => '{"checkout":true,"cart":false,"product":false}']);
+
+        $this->assertSame(
+            array_merge($diagnostics, [
+                'texts' => [
+                    'title' => 'paymentmethods.applepay.domain_association.title',
+                    'state_synced' => 'paymentmethods.applepay.domain_association.state_synced',
+                    'state_not_synced' => 'paymentmethods.applepay.domain_association.state_not_synced',
+                    'last_success' => 'paymentmethods.applepay.domain_association.last_success',
+                    'last_error' => 'paymentmethods.applepay.domain_association.last_error',
+                    'never' => 'paymentmethods.applepay.domain_association.never',
+                    'resync' => 'paymentmethods.applepay.domain_association.resync',
+                    'root_file' => 'paymentmethods.applepay.domain_association.root_file',
+                ],
+            ]),
+            $option['domain_association']
+        );
+    }
+
+    public function testOmitsTheDomainAssociationDiagnosticsAndLogsWhenTheyAreUnavailable()
+    {
+        $this->givenAnOptionWithoutCarrier();
+        $this->domain_association_action->shouldReceive('getDiagnosticsAction')
+            ->andThrow(new \RuntimeException('container failure'));
+
+        $option = $this->class->getOption(['applepay_display' => '{"checkout":true,"cart":false,"product":false}']);
+
+        $this->assertArrayNotHasKey('domain_association', $option);
+        $this->assertSame('applepay_display', $option['options'][0]['name']);
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::pattern('/^ApplepayPaymentMethod::getOption: .*container failure/'), 'error')
+            ->once();
+    }
+
+    private function givenAnOptionWithoutCarrier()
+    {
+        $this->class->shouldReceive([
+            'getAvailableCarriers' => [],
+        ]);
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'isValidFeature' => false,
+        ]);
+        $this->dependencies->configClass = $configClass;
+    }
 }

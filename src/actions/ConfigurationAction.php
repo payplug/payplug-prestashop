@@ -26,6 +26,7 @@ namespace PayPlug\src\actions;
 use PayPlug\classes\MyLogPHP;
 use PayPlug\src\models\classes\ApmEligibility;
 use PayPlug\src\utilities\helpers\LinkHelper;
+use PayPlug\src\utilities\traits\ServiceGetter;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -33,6 +34,8 @@ if (!defined('_PS_VERSION_')) {
 
 class ConfigurationAction
 {
+    use ServiceGetter;
+
     private $dependencies;
 
     public function __construct($dependencies)
@@ -182,7 +185,7 @@ class ConfigurationAction
      */
     public function installAction()
     {
-        $txt_log = new MyLogPHP($this->dependencies->getPlugin()->getConstant()->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/log/install-log.csv');
+        $txt_log = $this->getInstallLog();
         $txt_log->info('Starting to install');
 
         // check requirement
@@ -300,6 +303,8 @@ class ConfigurationAction
         $helpers = $this->dependencies->getHelpers();
         $file_cleaned = $helpers['files']::clean();
         $txt_log->info('Files cleaning: ' . ($file_cleaned ? 'ok' : 'ko'));
+
+        $this->ensureApplePayDomainAssociationStored($txt_log);
 
         return [
             'result' => true,
@@ -1184,7 +1189,7 @@ class ConfigurationAction
      */
     public function uninstallAction()
     {
-        $txt_log = new MyLogPHP($this->dependencies->getPlugin()->getConstant()->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/log/install-log.csv');
+        $txt_log = $this->getInstallLog();
         $txt_log->info('Starting to uninstall.');
 
         $txt_log->info('Deleted saved card');
@@ -1214,6 +1219,8 @@ class ConfigurationAction
             ];
         }
         $txt_log->info('Remove module configuration successful');
+
+        $this->purgeApplePayDomainAssociation($txt_log);
 
         $txt_log->info('Drop module table');
         $this->forceAutoloadUnifiedRepositories();
@@ -1454,6 +1461,72 @@ class ConfigurationAction
         }
 
         return $flag;
+    }
+
+    /**
+     * @return MyLogPHP
+     */
+    protected function getInstallLog()
+    {
+        return new MyLogPHP($this->dependencies->getPlugin()->getConstant()->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/log/install-log.csv');
+    }
+
+    /**
+     * @description Download the Apple Pay domain association file when none is stored, without failing the install
+     *
+     * @param MyLogPHP $txt_log
+     */
+    private function ensureApplePayDomainAssociationStored($txt_log)
+    {
+        $txt_log->info('Synchronise Apple Pay domain association');
+
+        try {
+            $action = $this->getService('payplug.action.apple_pay_domain_association');
+            if (!$action) {
+                $error = 'the action is not registered';
+            } elseif (!$action->ensureStoredAction()) {
+                $error = 'see the module logs';
+            } else {
+                $error = null;
+            }
+        } catch (\Throwable $exception) {
+            $error = get_class($exception) . ': ' . $exception->getMessage();
+        }
+
+        if (null === $error) {
+            $txt_log->info('Synchronise Apple Pay domain association: OK');
+        } else {
+            $txt_log->error('Apple Pay domain association could not be synchronised: ' . $error);
+        }
+    }
+
+    /**
+     * @description Delete the stored Apple Pay domain association file, without failing the uninstall
+     *
+     * @param MyLogPHP $txt_log
+     */
+    private function purgeApplePayDomainAssociation($txt_log)
+    {
+        $txt_log->info('Remove Apple Pay domain association');
+
+        try {
+            $factory = $this->getService('payplug.unified.payment_service_factory');
+            if (!$factory) {
+                $error = 'the payment service factory is not registered';
+            } elseif (!$factory->createDomainAssociationStorage()->purge()) {
+                $error = 'its configuration rows could not be deleted';
+            } else {
+                $error = null;
+            }
+        } catch (\Throwable $exception) {
+            $error = get_class($exception) . ': ' . $exception->getMessage();
+        }
+
+        if (null === $error) {
+            $txt_log->info('Remove Apple Pay domain association successful');
+        } else {
+            $txt_log->error('Apple Pay domain association could not be removed: ' . $error);
+        }
     }
 
     /**
