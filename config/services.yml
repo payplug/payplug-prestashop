@@ -32,6 +32,15 @@ services:
     class: PayPlug\src\actions\UnifiedRefundAction
     public: true
 
+  payplug.action.apple_pay_domain_association:
+    class: PayPlug\src\actions\ApplePayDomainAssociationAction
+    public: true
+
+  payplug.console.refresh_apple_domain_association:
+    class: PayPlug\src\console\RefreshAppleDomainAssociationCommand
+    tags:
+      - { name: console.command, command: 'payplug:apple-pay:refresh-well-known' }
+
   payplug.models.classes.hook:
     class: PayPlug\src\models\classes\Hook
     public: true

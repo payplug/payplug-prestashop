@@ -3,6 +3,7 @@
 ## Version 5.3.0
 - Feature :
   - [PRE-3675](https://github.com/payplug/payplug-prestashop/pull/136): Show Satispay, Bancontact, iDEAL, MyBank, Wero, Bizum and Scalapay at checkout only for eligible cart amounts and billing countries, and let the merchant narrow their amount range and billing countries from the back office
+  - [PRE-3657](https://github.com/payplug/payplug-prestashop/pull/146): Serve the Apple Pay domain verification file on every shop domain from a copy downloaded on install and on the first upgrade, with a back-office diagnostics payload, a Resync endpoint and a `payplug:apple-pay:refresh-well-known` console command
 
 ## Version 5.2.0
 - Feature :
