@@ -45,6 +45,11 @@ class CountryAdapter implements CountryInterface
         return \Country::getByIso($idCurrency);
     }
 
+    public function getCountries($idLang, $activeOnly = false)
+    {
+        return \Country::getCountries((int) $idLang, (bool) $activeOnly);
+    }
+
     public function getCountry($idCountry)
     {
         return new \Country($idCountry);

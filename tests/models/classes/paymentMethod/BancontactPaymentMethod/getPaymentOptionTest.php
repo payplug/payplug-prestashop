@@ -2,6 +2,8 @@
 
 namespace PayPlug\tests\models\classes\paymentMethod\BancontactPaymentMethod;
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
 /**
  * @group unit
  * @group class
@@ -10,23 +12,20 @@ namespace PayPlug\tests\models\classes\paymentMethod\BancontactPaymentMethod;
  */
 class getPaymentOptionTest extends BaseBancontactPaymentMethod
 {
+    use MockeryPHPUnitIntegration;
+
+    protected $config_class;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->configuration->shouldReceive('getValue')
-            ->with('countries')
-            ->andReturn('{}');
-        $this->helpers['amount']->shouldReceive('validateAmount')
-            ->andReturn([
-                'result' => true,
-                'message' => '',
-            ]);
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive([
-            'getIsoCodeByCountryId' => 'FR',
-        ]);
-        $this->dependencies->configClass = $configClass;
+        $this->context->cart->id_address_delivery = 43;
+        $this->context->cart->id_address_invoice = 42;
+        $this->config_class = \Mockery::mock('Config');
+        $this->dependencies->configClass = $this->config_class;
+        $this->configuration->shouldNotReceive('getValue')
+            ->with('bancontact_country');
     }
 
     /**
@@ -39,32 +38,57 @@ class getPaymentOptionTest extends BaseBancontactPaymentMethod
         $this->assertSame([], $this->class->getPaymentOption($payment_options));
     }
 
-    public function testWhenThereIsCountryRestrictionAndAddressDoesNotCorrespond()
+    public function testBancontactIsShownForABelgianBillingAddressWhenOnlyBelgiumIsSelected()
     {
-        $payment_options = [];
         $this->configuration->shouldReceive('getValue')
-            ->with('bancontact_country')
-            ->andReturn(true);
-        $this->validators['payment']->shouldReceive([
-            'isAllowedCountry' => [
-                'result' => false,
-            ],
-        ]);
-        $this->assertSame([], $this->class->getPaymentOption($payment_options));
+            ->with('apm_custom_settings')
+            ->andReturn('{"bancontact":{"countries":["BE"]}}');
+        $this->config_class->shouldReceive('getIsoCodeByCountryId')
+            ->once()
+            ->andReturn('BE');
+
+        $this->assertSame($this->getExpectedOption(), $this->class->getPaymentOption([]));
     }
 
-    public function testWhenThereIsCountryRestrictionAndAddressCorrespond()
+    public function testBancontactIsHiddenForANonBelgianBillingAddressWhenOnlyBelgiumIsSelected()
     {
-        $payment_options = [];
         $this->configuration->shouldReceive('getValue')
-            ->with('bancontact_country')
-            ->andReturn(true);
-        $this->validators['payment']->shouldReceive([
-            'isAllowedCountry' => [
-                'result' => true,
-            ],
-        ]);
-        $expected = [
+            ->with('apm_custom_settings')
+            ->andReturn('{"bancontact":{"countries":["BE"]}}');
+        $this->config_class->shouldReceive('getIsoCodeByCountryId')
+            ->once()
+            ->andReturn('FR');
+
+        $this->assertSame([], $this->class->getPaymentOption([]));
+    }
+
+    public function testBancontactIsShownForAnyBillingCountryWithoutRestriction()
+    {
+        $this->config_class->shouldReceive('getIsoCodeByCountryId')
+            ->once()
+            ->andReturn('FR');
+
+        $this->assertSame($this->getExpectedOption(), $this->class->getPaymentOption([]));
+    }
+
+    public function testBancontactIsHiddenWhenTheBillingCountryIsNotAllowedByTheApi()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('countries')
+            ->andReturn('{"bancontact":["BE","NL"]}');
+        $this->config_class->shouldReceive('getIsoCodeByCountryId')
+            ->once()
+            ->andReturn('FR');
+
+        $this->assertSame([], $this->class->getPaymentOption([]));
+    }
+
+    /**
+     * @return array
+     */
+    private function getExpectedOption()
+    {
+        return [
             'bancontact' => [
                 'name' => 'bancontact',
                 'inputs' => [
@@ -97,48 +121,5 @@ class getPaymentOptionTest extends BaseBancontactPaymentMethod
                 'moduleName' => 'payplug',
             ],
         ];
-        $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
-    }
-
-    public function testWhenThereIsNoCountryRestriction()
-    {
-        $payment_options = [];
-        $this->configuration->shouldReceive('getValue')
-            ->with('bancontact_country')
-            ->andReturn(false);
-        $expected = [
-            'bancontact' => [
-                'name' => 'bancontact',
-                'inputs' => [
-                    'pc' => [
-                        'name' => 'pc',
-                        'type' => 'hidden',
-                        'value' => 'new_card',
-                    ],
-                    'pay' => [
-                        'name' => 'pay',
-                        'type' => 'hidden',
-                        'value' => '1',
-                    ],
-                    'id_cart' => [
-                        'name' => 'id_cart',
-                        'type' => 'hidden',
-                        'value' => 1,
-                    ],
-                    'method' => [
-                        'name' => 'method',
-                        'type' => 'hidden',
-                        'value' => 'bancontact',
-                    ],
-                ],
-                'extra_classes' => 'bancontact',
-                'payment_controller_url' => 'link',
-                'logo' => 'modules/payplug/views/img/svg/checkout/bancontact.svg',
-                'callToActionText' => 'paymentmethods.bancontact.call_to_action',
-                'action' => 'link',
-                'moduleName' => 'payplug',
-            ],
-        ];
-        $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
 }
