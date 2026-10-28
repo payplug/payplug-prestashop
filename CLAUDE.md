@@ -314,6 +314,45 @@ insert retries as an update, in case the frictionless notification `save()`d the
 - **Routes**: `Routes::getHostedFieldsUrl()` reads `HOSTED_FIELDS_URL` from `payplugroutes/.env` and has **no hardcoded default** until the production hosted-fields SDK URL is confirmed (a guessed-but-wrong URL would fail silently): unset, it returns `''`. `PrestashopAdapter17::displayPaymentOption()` then doesn't display the hosted fields option at all (`isHostedFieldsSdkUrlConfigured()`, a non-EUR cart gets no UHF option rather than a broken form) and logs an error through the module logger. The log is there and not in `Routes`: `getSourceUrl()` is built on every front page by `HookClass`'s header hook.
 - The pre-existing Retail API flow (`dispatcher.php`, `PaymentAction`, resource creation) is untouched by this work so far.
 
+### Apple Pay domain association (PRE-3657)
+
+The module answers `/.well-known/apple-developer-merchantid-domain-association` itself, from a copy
+of PayPlug's production file kept in the database; nothing is written under the web root. Fetching
+and validating the file is UPC's `DomainAssociationService` (PRE-3655, UPC 1.3.0).
+
+- **Route**: `payplug.php::hookActionDispatcherBefore()` (hook `actionDispatcherBefore`, fires before
+  any controller is instantiated) matches the path of `REQUEST_URI` with the static
+  `ApplePayDomainAssociationAction::isWellKnownRequest()` (exact path, so no other request builds the
+  container or the action) and only then delegates to `HookClass::actionDispatcherBefore()`, which resolves
+  `ApplePayDomainAssociationAction` (`payplug.action.apple_pay_domain_association`) and calls
+  `serveAction()`: `getRouteResponse()` builds the response (exact path match, `GET`/`HEAD` only, 200
+  `text/plain` + `Cache-Control: public, max-age=3600` with the stored bytes unchanged, else 404 +
+  `Cache-Control: no-store`), then output buffers are discarded (stopping at one that cannot be
+  removed) and status, headers and body sent.
+  The hook only `exit`s when `serveAction()` returns `true`; any exception is logged and falls through
+  to PrestaShop.
+  Install and `upgrade/upgrade-5.3.0.php` register the hook without a shop list, so
+  `Hook::registerHook()` registers it on every shop (`Shop::getCompleteListOfShopsID()`) whatever the
+  shop context; it then runs on each shop where the module is enabled (`module_shop`).
+- **Storage**: `src/unified/contract/UnifiedDomainAssociationStorage` (UPC's `IDomainAssociationStorage`),
+  global `Configuration` keys `PAYPLUG_APPLE_PAY_WELL_KNOWN` (content, **base64**, so `Db::escape()`'s
+  `strip_tags`/`nl2br` and HTMLPurifier can't alter it) and `PAYPLUG_APPLE_PAY_WELL_KNOWN_STATUS`
+  (JSON with `JSON_HEX_*` flags, for the same reason). One copy for every shop of a multishop. Both
+  keys are outside `Configuration::$configurations` and are removed by `uninstallAction()` via `purge()`.
+- **Sync triggers** (no cron, no sync on every upgrade): the end of a successful
+  `ConfigurationAction::installAction()` and `upgrade/upgrade-5.3.0.php` call `ensureStoredAction()`
+  (downloads only when nothing valid is stored; a failure never blocks the install/upgrade, and is
+  logged as an error in `log/install-log.csv` on install, like a failed `purge()` on uninstall, and
+  through the module logger on upgrade, including a service that cannot be built); the BO REST route `apple_pay_resync` (`ApiRest::dispatch()`) and the console
+  command `payplug:apple-pay:refresh-well-known` (`src/console/RefreshAppleDomainAssociationCommand`,
+  `console.command` tag, no constructor dependency so `bin/console list` never builds the module)
+  call `refreshAction()`.
+- **Diagnostics**: `ApplepayPaymentMethod::getOption()` adds `domain_association` (`state`, dates,
+  `last_error` already HTML-escaped server-side, `root_file_present`, `texts`); the Vue panel that
+  renders it lives in `payplug-ui-plugins`.
+- `UnifiedApiPaymentServiceFactory::createDomainAssociationService()` reuses `UnifiedHttpClient` (no
+  bearer, TLS verified, 15 s timeout) and `UnifiedLogger`.
+
 ### Design docs
 
 Feature specs and implementation plans produced via the `superpowers` skill workflow live under [docs/superpowers/specs/](docs/superpowers/specs/) and [docs/superpowers/plans/](docs/superpowers/plans/).

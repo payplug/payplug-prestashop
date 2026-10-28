@@ -13,16 +13,20 @@ class uninstallActionTest extends BaseConfigurationAction
 {
     public $card_action;
     public $constant;
+    public $domain_association_storage;
     public $entity_repository;
+    public $factory;
+    public $txt_log;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $txt_log = \Mockery::mock(MyLogPHP::class);
-        $txt_log->shouldReceive([
+        $this->txt_log = \Mockery::mock(MyLogPHP::class);
+        $this->txt_log->shouldReceive([
             'info' => 'log str',
         ]);
+        $this->action->shouldReceive('getInstallLog')->andReturn($this->txt_log);
 
         $this->card_action = \Mockery::mock('CardAction');
 
@@ -49,6 +53,17 @@ class uninstallActionTest extends BaseConfigurationAction
         $this->module->shouldReceive('getService')
             ->with('payplug.models.repositories.unified_refund')
             ->andReturn(\Mockery::mock('UnifiedRefundRepository'));
+
+        $this->domain_association_storage = \Mockery::mock('UnifiedDomainAssociationStorage');
+        $this->domain_association_storage->shouldReceive('purge')->andReturn(true)->byDefault();
+        $this->factory = \Mockery::mock('UnifiedApiPaymentServiceFactory');
+        $this->factory->shouldReceive('createDomainAssociationStorage')
+            ->andReturn($this->domain_association_storage)
+            ->byDefault();
+        $this->module->shouldReceive('getService')
+            ->with('payplug.unified.payment_service_factory')
+            ->andReturn($this->factory)
+            ->byDefault();
 
         $this->plugin->shouldReceive([
             'getCardAction' => $this->card_action,
@@ -182,5 +197,112 @@ class uninstallActionTest extends BaseConfigurationAction
             ],
             $this->action->uninstallAction()
         );
+    }
+
+    public function testRemovesTheApplePayDomainAssociation()
+    {
+        $this->givenAnUninstallThatSucceeds();
+        $this->domain_association_storage->shouldReceive('purge')->once()->andReturn(true);
+        $this->txt_log->shouldNotReceive('error');
+
+        $this->assertTrue($this->action->uninstallAction()['result']);
+    }
+
+    public function testCompletesTheUninstallAndLogsAnErrorWhenTheApplePayDomainAssociationCannotBeRemoved()
+    {
+        $this->givenAnUninstallThatSucceeds();
+        $this->domain_association_storage->shouldReceive('purge')->once()->andReturn(false);
+        $this->txt_log->shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/^Apple Pay domain association could not be removed: /'));
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => 'Uninstall successful',
+            ],
+            $this->action->uninstallAction()
+        );
+    }
+
+    public function testCompletesTheUninstallAndLogsAnErrorWhenThePurgeThrows()
+    {
+        $this->givenAnUninstallThatSucceeds();
+        $this->domain_association_storage->shouldReceive('purge')
+            ->once()
+            ->andThrow(new \RuntimeException('configuration table locked'));
+        $this->txt_log->shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/could not be removed: RuntimeException: configuration table locked$/'));
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => 'Uninstall successful',
+            ],
+            $this->action->uninstallAction()
+        );
+    }
+
+    public function testCompletesTheUninstallAndLogsAnErrorWhenTheFactoryCannotBeBuilt()
+    {
+        $this->givenAnUninstallThatSucceeds();
+        $this->factory->shouldReceive('createDomainAssociationStorage')
+            ->once()
+            ->andThrow(new \TypeError('dependencies missing'));
+        $this->txt_log->shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/could not be removed: TypeError: dependencies missing$/'));
+
+        $this->assertTrue($this->action->uninstallAction()['result']);
+    }
+
+    public function testCompletesTheUninstallAndLogsAnErrorWhenTheFactoryIsNotRegistered()
+    {
+        $this->givenAnUninstallThatSucceeds();
+        $this->module->shouldReceive('getService')
+            ->with('payplug.unified.payment_service_factory')
+            ->andReturn(null);
+        $this->domain_association_storage->shouldNotReceive('purge');
+        $this->txt_log->shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/^Apple Pay domain association could not be removed: /'));
+
+        $this->assertSame(
+            [
+                'result' => true,
+                'message' => 'Uninstall successful',
+            ],
+            $this->action->uninstallAction()
+        );
+    }
+
+    public function testKeepsTheApplePayDomainAssociationWhenTheConfigurationCannotBeRemoved()
+    {
+        $this->card_action->shouldReceive([
+            'uninstallAction' => true,
+        ]);
+        $this->configuration_class->shouldReceive([
+            'deleteAll' => false,
+        ]);
+        $this->domain_association_storage->shouldNotReceive('purge');
+
+        $this->assertFalse($this->action->uninstallAction()['result']);
+    }
+
+    private function givenAnUninstallThatSucceeds()
+    {
+        $this->card_action->shouldReceive([
+            'uninstallAction' => true,
+        ]);
+        $this->configuration_class->shouldReceive([
+            'deleteAll' => true,
+        ]);
+        $this->entity_repository->shouldReceive([
+            'uninstall' => true,
+        ]);
+        $this->action->shouldReceive([
+            'uninstallTabAction' => true,
+        ]);
     }
 }

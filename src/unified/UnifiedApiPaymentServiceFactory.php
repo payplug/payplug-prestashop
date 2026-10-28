@@ -30,6 +30,7 @@ if (!defined('_PS_VERSION_')) {
 use PayPlug\classes\DependenciesClass;
 use PayPlug\src\models\repositories\UnifiedOperationRepository;
 use PayPlug\src\unified\contract\UnifiedConfigurationRepository;
+use PayPlug\src\unified\contract\UnifiedDomainAssociationStorage;
 use PayPlug\src\unified\contract\UnifiedHttpClient;
 use PayPlug\src\unified\contract\UnifiedLock;
 use PayPlug\src\unified\contract\UnifiedLogger;
@@ -37,6 +38,7 @@ use PayPlug\src\unified\contract\UnifiedOrderStateMutator;
 use PayPlug\src\unified\contract\UnifiedTokenCache;
 use PayplugUnifiedCore\Auth\OAuth2Client;
 use PayplugUnifiedCore\Auth\TokenManager;
+use PayplugUnifiedCore\Services\DomainAssociationService;
 use PayplugUnifiedCore\Services\UnifiedApiPaymentService;
 
 class UnifiedApiPaymentServiceFactory
@@ -101,5 +103,19 @@ class UnifiedApiPaymentServiceFactory
     public function createConfigurationRepository(): UnifiedConfigurationRepository
     {
         return new UnifiedConfigurationRepository($this->dependencies);
+    }
+
+    public function createDomainAssociationStorage(): UnifiedDomainAssociationStorage
+    {
+        return new UnifiedDomainAssociationStorage($this->dependencies);
+    }
+
+    public function createDomainAssociationService(): DomainAssociationService
+    {
+        return new DomainAssociationService(
+            new UnifiedHttpClient(),
+            $this->createDomainAssociationStorage(),
+            $this->createLogger()
+        );
     }
 }
