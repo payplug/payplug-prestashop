@@ -144,4 +144,24 @@ class getPaymentOptionTest extends BaseOneClickPaymentMethod
 
         $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
+
+    public function testWhenEurIsNotAmongTheMerchantCurrencies()
+    {
+        $payment_options = ['standard' => ['name' => 'standard']];
+        $this->configuration->shouldReceive('getValue')
+            ->with('currencies')
+            ->andReturn('GBP');
+        $this->card->shouldReceive([
+            'renderList' => [
+                [
+                    'id_payplug_card' => '1',
+                    'brand' => 'CB',
+                    'last4' => '4242',
+                    'expiry_date' => '12 / 2050',
+                ],
+            ],
+        ]);
+
+        $this->assertSame($payment_options, $this->class->getPaymentOption($payment_options));
+    }
 }

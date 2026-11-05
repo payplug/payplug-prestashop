@@ -161,4 +161,48 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
             $this->class->getPaymentOption($this->payment_options)
         );
     }
+
+    public function testWhenCartCurrencyIsNotSupported()
+    {
+        $payment_options = ['standard' => ['name' => 'standard']];
+        $this->context->currency->iso_code = 'USD';
+        $this->class->shouldReceive('isValidOneyCartQty')
+            ->andThrow(new \RuntimeException('Oney cart checks must not run for an unsupported currency'));
+
+        $this->assertSame($payment_options, $this->class->getPaymentOption($payment_options));
+        $this->logger->shouldNotHaveReceived('addLog', [\Mockery::any(), 'error']);
+    }
+
+    public function testWhenCartQtyIsNotValidTheErrorIsLogged()
+    {
+        $this->class->shouldReceive([
+            'isValidOneyCartQty' => [
+                'result' => false,
+                'message' => 'error given',
+            ],
+        ]);
+
+        $this->class->getPaymentOption([]);
+
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('OneyPaymentMethod::getPaymentOption - error given', 'error')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testWhenCartAddressesDoesNotMatchTheErrorIsLogged()
+    {
+        $this->class->shouldReceive([
+            'isValidOneyCartQty' => ['result' => true, 'message' => ''],
+            'isValidOneyAmount' => ['result' => true, 'message' => ''],
+            'isValidOneyAddresses' => ['result' => false, 'message' => 'invalid addresses'],
+        ]);
+
+        $this->class->getPaymentOption([]);
+
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('OneyPaymentMethod::getPaymentOption - invalid addresses', 'error')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
 }

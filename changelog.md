@@ -15,6 +15,7 @@
 
 - Bugfix :
   - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Require the customer token to delete a saved card (CSRF protection on the saved cards page)
+  - [PRE-3777](https://github.com/payplug/payplug-prestashop/pull/XXX): Hide the payment methods at checkout when the cart currency is not one of the merchant's Payplug currencies, except the standard payment when it is served through Unified Hosted Fields (integrated mode with an identifier set for that currency)
 
 - Refactoring :
   - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Update `payplug/payplug-php` from 4.1.0 to 4.2.0, installed with unified-plugin-core ^1.2.2
