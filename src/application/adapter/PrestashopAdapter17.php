@@ -101,12 +101,8 @@ class PrestashopAdapter17
             && 'EUR' === $this->context->currency->iso_code
         ) {
             $payment_options = $this->setIntegratedPaymentOption($payment_options);
-        } elseif ($this->dependencies->configClass->isValidFeature('feature_standard')
-            && $this->dependencies->configClass->isValidFeature('feature_hosted_fields')
-            && array_key_exists('standard', $payment_options)
-            && 'EUR' !== $this->context->currency->iso_code
-            && $this->isHostedFieldsIdentifierConfigured()
-            && $this->isHostedFieldsSdkUrlConfigured()
+        } elseif (array_key_exists('standard', $payment_options)
+            && $this->canServeHostedFields($this->context->currency->iso_code)
         ) {
             $payment_options = $this->setHostedFieldsPaymentOption($payment_options);
         }
@@ -247,6 +243,24 @@ class PrestashopAdapter17
     }
 
     /**
+     * @description Whether the standard payment can go through the hosted fields for the given
+     *              currency: the standard and hosted fields features are valid, the currency is not
+     *              EUR, a UHF identifier is configured for it and the hosted fields SDK URL is set
+     *
+     * @param string $iso_code
+     *
+     * @return bool
+     */
+    public function canServeHostedFields($iso_code)
+    {
+        return $this->dependencies->configClass->isValidFeature('feature_standard')
+            && $this->dependencies->configClass->isValidFeature('feature_hosted_fields')
+            && 'EUR' !== $iso_code
+            && $this->isHostedFieldsIdentifierConfigured($iso_code)
+            && $this->isHostedFieldsSdkUrlConfigured();
+    }
+
+    /**
      * @description Whether the hosted fields SDK URL is configured, logging an error when it is not:
      *              without it the hosted fields form cannot load
      *
@@ -259,7 +273,7 @@ class PrestashopAdapter17
         }
 
         $this->dependencies->getPlugin()->getLogger()->addLog(
-            'PrestashopAdapter17::displayPaymentOption - HOSTED_FIELDS_URL is not configured in payplugroutes/.env: hosted fields payment option not displayed for currency '
+            'PrestashopAdapter17::canServeHostedFields - HOSTED_FIELDS_URL is not configured in payplugroutes/.env: hosted fields payment option not displayed for currency '
             . $this->context->currency->iso_code,
             'error'
         );

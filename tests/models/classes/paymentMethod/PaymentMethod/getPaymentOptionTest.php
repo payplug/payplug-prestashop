@@ -128,9 +128,7 @@ class getPaymentOptionTest extends BasePaymentMethod
 
         $this->assertSame($payment_options, $this->class->getPaymentOption($payment_options));
         $this->helpers['amount']->shouldNotHaveReceived('validateAmount');
-        $this->logger->shouldHaveReceived('addLog')
-            ->with(\Mockery::pattern('/bancontact.*USD/'), 'info')
-            ->once();
+        $this->logger->shouldNotHaveReceived('addLog');
     }
 
     public function testCartCurrencyAmongTheMerchantCurrenciesShowsThePaymentMethod()
@@ -150,45 +148,59 @@ class getPaymentOptionTest extends BasePaymentMethod
         $this->class->set('name', 'standard');
         $this->context->currency->iso_code = 'USD';
         $this->allowCountryAndAmount();
-        $this->setHostedFieldsConfiguration(true, 'integrated', true);
+        $prestashop_adapter = $this->setHostedFieldsAdapter(true);
+
+        $this->assertArrayHasKey('standard', $this->class->getPaymentOption([]));
+        $prestashop_adapter->shouldHaveReceived('canServeHostedFields')->with('USD')->once();
+    }
+
+    /**
+     * @dataProvider nonIntegratedEmbeddedModeDataProvider
+     *
+     * @param string $embedded_mode
+     */
+    public function testStandardIsShownForAnUnsupportedCurrencyServedByTheHostedFieldsInAShopWithEurWhateverTheEmbeddedMode(
+        $embedded_mode
+    ) {
+        $this->class->set('name', 'standard');
+        $this->context->currency->iso_code = 'USD';
+        $this->has_eur_currency = true;
+        $this->configuration->shouldReceive('getValue')
+            ->with('embedded_mode')
+            ->andReturn($embedded_mode);
+        $this->allowCountryAndAmount();
+        $this->setHostedFieldsAdapter(true);
 
         $this->assertArrayHasKey('standard', $this->class->getPaymentOption([]));
     }
 
-    /**
-     * @dataProvider hostedFieldsNotApplicableDataProvider
-     *
-     * @param string $name
-     * @param bool $feature_enabled
-     * @param string $embedded_mode
-     * @param bool $identifier_configured
-     */
-    public function testPaymentMethodIsHiddenForAnUnsupportedCurrencyNotServedByTheHostedFields(
-        $name,
-        $feature_enabled,
-        $embedded_mode,
-        $identifier_configured
-    ) {
+    public function nonIntegratedEmbeddedModeDataProvider()
+    {
+        yield 'popup' => ['popup'];
+
+        yield 'redirect' => ['redirect'];
+    }
+
+    public function testStandardIsHiddenForAnUnsupportedCurrencyNotServedByTheHostedFields()
+    {
         $payment_options = ['one_click_1' => ['name' => 'one_click']];
-        $this->class->set('name', $name);
+        $this->class->set('name', 'standard');
         $this->context->currency->iso_code = 'USD';
         $this->allowCountryAndAmount();
-        $this->setHostedFieldsConfiguration($feature_enabled, $embedded_mode, $identifier_configured);
+        $this->setHostedFieldsAdapter(false);
 
         $this->assertSame($payment_options, $this->class->getPaymentOption($payment_options));
     }
 
-    public function hostedFieldsNotApplicableDataProvider()
+    public function testThePrestashopAdapterIsNotLoadedForAPaymentMethodOtherThanStandard()
     {
-        yield 'hosted fields feature disabled' => ['standard', false, 'integrated', true];
+        $this->class->set('name', 'bancontact');
+        $this->context->currency->iso_code = 'USD';
+        $this->allowCountryAndAmount();
+        $this->setHostedFieldsAdapter(true);
 
-        yield 'popup embedded mode' => ['standard', true, 'popup', true];
-
-        yield 'redirect embedded mode' => ['standard', true, 'redirect', true];
-
-        yield 'no identifier for the cart currency' => ['standard', true, 'integrated', false];
-
-        yield 'payment method other than standard' => ['bancontact', true, 'integrated', true];
+        $this->assertSame([], $this->class->getPaymentOption([]));
+        $this->dependencies->shouldNotHaveReceived('loadAdapterPresta');
     }
 
     public function testStandardIsHiddenForAnUnsupportedCurrencyWhenThePrestashopAdapterCannotBeLoaded()
@@ -196,7 +208,6 @@ class getPaymentOptionTest extends BasePaymentMethod
         $this->class->set('name', 'standard');
         $this->context->currency->iso_code = 'USD';
         $this->allowCountryAndAmount();
-        $this->setHostedFieldsConfiguration(true, 'integrated', true);
         $this->dependencies->shouldReceive('loadAdapterPresta')->andReturn(false);
 
         $this->assertSame([], $this->class->getPaymentOption([]));
@@ -214,22 +225,15 @@ class getPaymentOptionTest extends BasePaymentMethod
             ]);
     }
 
-    private function setHostedFieldsConfiguration($feature_enabled, $embedded_mode, $identifier_configured)
+    private function setHostedFieldsAdapter($can_serve)
     {
-        $configClass = \Mockery::mock('Config');
-        $configClass->shouldReceive('isValidFeature')
-            ->with('feature_hosted_fields')
-            ->andReturn($feature_enabled);
-        $this->dependencies->configClass = $configClass;
-        $this->configuration->shouldReceive('getValue')
-            ->with('embedded_mode')
-            ->andReturn($embedded_mode);
         $prestashop_adapter = \Mockery::mock('PrestashopAdapter17');
-        $prestashop_adapter->shouldReceive('isHostedFieldsIdentifierConfigured')
+        $prestashop_adapter->shouldReceive('canServeHostedFields')
             ->with('USD')
-            ->andReturn($identifier_configured);
+            ->andReturn($can_serve);
         $this->dependencies->shouldReceive('loadAdapterPresta')
-            ->andReturn($prestashop_adapter)
-            ->byDefault();
+            ->andReturn($prestashop_adapter);
+
+        return $prestashop_adapter;
     }
 }

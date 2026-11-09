@@ -542,6 +542,15 @@ class PaymentMethod
             return [];
         }
 
+        if (!$this->isSupportedCurrency() && !$this->isCartCurrencyServedByHostedFields()) {
+            $this->logger->addLog(
+                'PaymentMethod::getPaymentOptionCollection - cart currency '
+                . (isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : '')
+                . ' is not supported and not served by the hosted fields: no payment option offered',
+                'info'
+            );
+        }
+
         $payment_options = [];
         foreach ($options as $payment_method => $enabled) {
             $allowed_feature = $this->dependencies->configClass->isValidFeature('feature_' . $payment_method);
@@ -1834,17 +1843,24 @@ class PaymentMethod
      */
     protected function isHostedFieldsCurrency()
     {
-        if ('standard' !== $this->name
-            || !isset($this->context->currency->iso_code)
-            || !$this->dependencies->configClass->isValidFeature('feature_hosted_fields')
-            || 'integrated' !== (string) $this->configuration->getValue('embedded_mode')) {
+        return 'standard' === $this->name && $this->isCartCurrencyServedByHostedFields();
+    }
+
+    /**
+     * @description Whether the hosted fields can take the standard payment for the cart currency
+     *
+     * @return bool
+     */
+    protected function isCartCurrencyServedByHostedFields()
+    {
+        if (!isset($this->context->currency->iso_code)) {
             return false;
         }
 
         $prestashop_adapter = $this->dependencies->loadAdapterPresta();
 
         return $prestashop_adapter
-            && $prestashop_adapter->isHostedFieldsIdentifierConfigured((string) $this->context->currency->iso_code);
+            && $prestashop_adapter->canServeHostedFields((string) $this->context->currency->iso_code);
     }
 
     /**
@@ -1854,18 +1870,7 @@ class PaymentMethod
      */
     protected function isOfferedForCartCurrency()
     {
-        if ($this->isSupportedCurrency() || $this->isHostedFieldsCurrency()) {
-            return true;
-        }
-
-        $this->logger->addLog(
-            'PaymentMethod::getPaymentOption - ' . $this->name . ' not offered: cart currency '
-            . (isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : '')
-            . ' is not supported',
-            'info'
-        );
-
-        return false;
+        return $this->isSupportedCurrency() || $this->isHostedFieldsCurrency();
     }
 
     /**

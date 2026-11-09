@@ -1344,11 +1344,8 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $this->setParameters();
-
-        $use_taxes = (bool) $this->configuration->getValue('PS_TAX');
-        $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
-        $cart_amount = $cart_amount ?: $this->context->cart->getOrderTotal(true);
-        if (!$this->isOfferedForCartCurrency() || !$this->isValidOneyCart($cart_amount)) {
+        $cart_amount = $this->isOfferedForCartCurrency() ? $this->getOneyCartAmount() : null;
+        if (null === $cart_amount || !$this->isValidOneyCart($cart_amount)) {
             return $payment_options;
         }
 
@@ -1755,6 +1752,18 @@ class OneyPaymentMethod extends PaymentMethod
         $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
 
         return $this->tools->tool('redirectAdmin', $link_order);
+    }
+
+    /**
+     * @description Cart total checked against the Oney limits, falling back to the total with taxes
+     *
+     * @return float
+     */
+    private function getOneyCartAmount()
+    {
+        $cart_amount = $this->context->cart->getOrderTotal((bool) $this->configuration->getValue('PS_TAX'));
+
+        return $cart_amount ?: $this->context->cart->getOrderTotal(true);
     }
 
     /**

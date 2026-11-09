@@ -102,18 +102,12 @@ class getPaymentOptionTest extends BaseStandardPaymentMethod
         $this->assertSame($payment_options, $this->class->getPaymentOption($payment_options));
     }
 
-    private function setHostedFieldsConfiguration($identifier_configured)
+    private function setHostedFieldsConfiguration($can_serve)
     {
-        $this->dependencies->configClass->shouldReceive('isValidFeature')
-            ->with('feature_hosted_fields')
-            ->andReturn(true);
-        $this->configuration->shouldReceive('getValue')
-            ->with('embedded_mode')
-            ->andReturn('integrated');
         $prestashop_adapter = \Mockery::mock('PrestashopAdapter17');
-        $prestashop_adapter->shouldReceive('isHostedFieldsIdentifierConfigured')
+        $prestashop_adapter->shouldReceive('canServeHostedFields')
             ->with('USD')
-            ->andReturn($identifier_configured);
+            ->andReturn($can_serve);
         $this->dependencies->shouldReceive('loadAdapterPresta')
             ->andReturn($prestashop_adapter);
     }

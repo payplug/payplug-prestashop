@@ -171,6 +171,7 @@ class getPaymentOptionTest extends BaseOneyPaymentMethod
 
         $this->assertSame($payment_options, $this->class->getPaymentOption($payment_options));
         $this->logger->shouldNotHaveReceived('addLog', [\Mockery::any(), 'error']);
+        $this->context->cart->shouldNotHaveReceived('getOrderTotal');
     }
 
     public function testWhenCartQtyIsNotValidTheErrorIsLogged()
