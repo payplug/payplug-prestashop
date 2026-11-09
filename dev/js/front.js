@@ -71,6 +71,7 @@ var $document, $window, __moduleName__Module = {
         this.oney.init();
         this.popup.init();
         this.integrated.init();
+        this.integrated.opc.bindEvents();
         this.hosted_fields.init();
     },
     order: {
@@ -159,18 +160,228 @@ var $document, $window, __moduleName__Module = {
             scheme: null,
             query: null,
             submit: null,
+            opcSubmitting: false,
+            opcPending: false,
+            opcBound: false,
+            opcAttempt: 0,
+            opcTimer: null,
+            paymentStarted: false,
+            remountPending: false,
+        },
+        resolveContext: function () {
+            var integrated = __moduleName__Module.integrated,
+                $method = $('input[name=method][value=integrated]').first(),
+                $wrapper = $method.closest('[id^="pay-with-"][id$="-form"]'),
+                $form = $('.' + integrated.props.identifier).first();
+
+            if (!$wrapper.length || !$form.length) {
+                return null;
+            }
+
+            return {
+                optionId: $wrapper.attr('id').replace(/^pay-with-/, '').replace(/-form$/, ''),
+                $form: $form,
+            };
+        },
+        teardown: function () {
+            var integrated = __moduleName__Module.integrated,
+                interrupted = integrated.props.opcSubmitting;
+
+            integrated.props.integratedPayment = null;
+            integrated.props.form = {};
+            for (var key in integrated.props.fieldsEmpty) {
+                integrated.props.fieldsEmpty[key] = true;
+                integrated.props.fieldsInvalid[key] = true;
+            }
+            integrated.opc.release();
+
+            if (interrupted) {
+                $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                addLogger('OPC_PAYMENT_SECTION_RERENDERED : payment attempt interrupted before the payment creation');
+            }
         },
         init: function () {
             var integrated = __moduleName__Module.integrated,
-                $integratedForm = $('.' + integrated.props.identifier);
-            if ($integratedForm.length) {
-                var $methodInput = document.querySelectorAll('input[name=method][value=integrated]').item(0).parentNode,
-                    payment_option = ($methodInput.childNodes)[3];
-                integrated.props.paymentOptionId = payment_option.id.replace('pay-with-', '');
-                integrated.form.init();
-            } else {
+                context;
+
+            // The SDK instance that created the payment must stay in place until the payment ends,
+            // so the remount is deferred to clear().
+            if (integrated.props.paymentStarted) {
+                integrated.props.remountPending = true;
                 return false;
             }
+
+            context = integrated.resolveContext();
+            if (!context) {
+                integrated.teardown();
+                return false;
+            }
+
+            if (!context.$form.data('payplugMounted')) {
+                integrated.teardown();
+                ipCDNCountdown = 0;
+                integrated.props.paymentOptionId = context.optionId;
+                context.$form.data('payplugMounted', true);
+            }
+
+            integrated.form.init();
+        },
+        opc: {
+            isActive: function () {
+                return $('#opc-pay-button').length > 0
+                    && typeof window.ps_onepagecheckout === 'object'
+                    && window.ps_onepagecheckout !== null
+                    && typeof window.ps_onepagecheckout.submitBeforePayment === 'function';
+            },
+            bindEvents: function () {
+                var integrated = __moduleName__Module.integrated;
+
+                if (integrated.props.opcBound
+                    || !$('#opc-pay-button').length
+                    || typeof prestashop === 'undefined'
+                    || typeof prestashop.on !== 'function') {
+                    return;
+                }
+                integrated.props.opcBound = true;
+
+                prestashop.on('opcPaymentMethodsUpdated', function () {
+                    integrated.init();
+                });
+                prestashop.on('opcPaymentMethodSelected', function (payload) {
+                    if (payload && payload.paymentOptionId === integrated.props.paymentOptionId) {
+                        integrated.form.set();
+                    }
+                });
+                document.addEventListener('click', integrated.opc.onPayClick, true);
+            },
+            release: function () {
+                var integrated = __moduleName__Module.integrated;
+                integrated.props.submited = false;
+                integrated.props.opcSubmitting = false;
+                integrated.props.opcPending = false;
+                integrated.props.opcAttempt++;
+                integrated.opc.stopTimer();
+            },
+            submitTimeout: 30000,
+            startTimer: function () {
+                var integrated = __moduleName__Module.integrated;
+
+                integrated.opc.stopTimer();
+                integrated.props.opcTimer = setTimeout(function () {
+                    integrated.props.opcTimer = null;
+                    if (integrated.props.paymentStarted || !integrated.props.opcSubmitting) {
+                        return;
+                    }
+                    integrated.opc.release();
+                    $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                    addLogger('OPC_SUBMIT_TIMEOUT : card validation or checkout save did not settle');
+                }, integrated.opc.submitTimeout);
+            },
+            stopTimer: function () {
+                var integrated = __moduleName__Module.integrated;
+
+                if (integrated.props.opcTimer !== null) {
+                    clearTimeout(integrated.props.opcTimer);
+                    integrated.props.opcTimer = null;
+                }
+            },
+            // Runs before the One Page Checkout's own pay button handler, which would hand the payment
+            // over to the form action and lock the checkout even when the card is invalid.
+            onPayClick: function (event) {
+                var integrated = __moduleName__Module.integrated,
+                    button = event.target.closest ? event.target.closest('#opc-pay-button') : null,
+                    checked;
+
+                if (!button || button.disabled) {
+                    return;
+                }
+                checked = document.querySelector('input[name="payment-option"]:checked');
+                if (!integrated.opc.isActive() || !checked || checked.id !== integrated.props.paymentOptionId) {
+                    return;
+                }
+                // Unaccepted terms are left to the One Page Checkout's own handler, which this click would skip.
+                if (Array.prototype.some.call(document.querySelectorAll('input[name^="conditions_to_approve"]'), function (input) {
+                    return !input.checked;
+                })) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                if (integrated.props.opcSubmitting) {
+                    return;
+                }
+                if (!integrated.props.integratedPayment) {
+                    $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                    addLogger('OPC_INTEGRATED_NOT_MOUNTED : card fields not mounted at pay time');
+                    return;
+                }
+
+                integrated.props.opcSubmitting = true;
+                integrated.props.opcPending = true;
+                integrated.opc.startTimer();
+                integrated.props.integratedPayment.validateForm();
+            },
+            // submitBeforePayment() resolves the same way whether the checkout was saved or not. A save
+            // ends with a form validation event (valid when the save succeeded); a refused precondition or
+            // a reload emits none, a failed request emits an opcSubmit error, and server field errors with
+            // no matching field are rendered as a new validation alert. Resolves 'saved' or the reason it was not.
+            beforePayment: function () {
+                var alertSelector = '.js-opc-validation-error',
+                    alertsBefore = Array.prototype.slice.call(document.querySelectorAll(alertSelector)),
+                    hasNewAlert = function () {
+                        return Array.prototype.some.call(document.querySelectorAll(alertSelector), function (node) {
+                            return alertsBefore.indexOf(node) === -1;
+                        });
+                    },
+                    failed = false,
+                    isValid = null,
+                    onError = function (payload) {
+                        if (!payload || payload.eventType === 'opcSubmit') {
+                            failed = true;
+                        }
+                    },
+                    onFailed = function () {
+                        failed = true;
+                    },
+                    onValidated = function (payload) {
+                        isValid = !!(payload && payload.isValid);
+                    },
+                    stopListening = function () {
+                        prestashop.removeListener('handleError', onError);
+                        prestashop.removeListener('opcSubmitFailed', onFailed);
+                        prestashop.removeListener('opcFormValidated', onValidated);
+                    };
+
+                prestashop.on('handleError', onError);
+                prestashop.on('opcSubmitFailed', onFailed);
+                prestashop.on('opcFormValidated', onValidated);
+
+                return Promise.resolve()
+                    .then(function () {
+                        return window.ps_onepagecheckout.submitBeforePayment();
+                    })
+                    .then(function () {
+                        if (failed) {
+                            return 'request-failed';
+                        }
+                        if (hasNewAlert()) {
+                            return 'new-alert';
+                        }
+                        if (isValid === null) {
+                            return 'no-validation-event';
+                        }
+                        return isValid ? 'saved' : 'invalid-form';
+                    }, function (e) {
+                        addLogger('OPC_SUBMIT_BEFORE_PAYMENT_FAILED : ' + (e && e.message ? e.message : 'unknown'));
+                        return 'rejected';
+                    })
+                    .then(function (outcome) {
+                        stopListening();
+                        return outcome;
+                    });
+            },
         },
         form: {
             init: function () {
@@ -181,16 +392,46 @@ var $document, $window, __moduleName__Module = {
                     return false;
                 }
 
-                if ($('#' + payment_option_id).attr('checked') == 'checked') {
+                if ($('#' + payment_option_id).prop('checked')) {
                     integrated.form.set();
                 }
 
-                $document.on('click', '#' + payment_option_id, integrated.form.set);
+                $document.off('click.payplugIntegrated');
+                $document.on('click.payplugIntegrated', '#' + payment_option_id, integrated.form.set);
+            },
+            proceed: function () {
+                var integrated = __moduleName__Module.integrated,
+                    attempt = integrated.props.opcAttempt;
+
+                if (!integrated.props.opcPending) {
+                    integrated.form.getPaymentId();
+                    return;
+                }
+
+                integrated.opc.beforePayment().then(function (outcome) {
+                    if (attempt !== integrated.props.opcAttempt) {
+                        return;
+                    }
+                    if (outcome !== 'saved') {
+                        if (outcome !== 'rejected') {
+                            addLogger('OPC_SUBMIT_BEFORE_PAYMENT_NOT_SAVED : ' + outcome);
+                        }
+                        integrated.opc.release();
+                        // Field errors, a failed request and a new alert are shown by the One Page Checkout; a rejected
+                        // submit and a missing validation event are not.
+                        if (outcome === 'no-validation-event' || outcome === 'rejected') {
+                            $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                        }
+                        return;
+                    }
+                    integrated.form.getPaymentId();
+                });
             },
             clear: function (clear) {
                 // confirm creation integrated paiement or show fail popup
                 var integrated = __moduleName__Module.integrated;
-                integrated.props.submited = false;
+                integrated.props.paymentStarted = false;
+                integrated.opc.release();
 
                 if (clear) {
                     let {form} = integrated.props;
@@ -205,7 +446,12 @@ var $document, $window, __moduleName__Module = {
                 }
 
                 // unchecked tos
-                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                integrated.form.untickTerms();
+
+                if (integrated.props.remountPending) {
+                    integrated.props.remountPending = false;
+                    integrated.init();
+                }
             },
             confirm: function (token) {
                 __moduleName__Module.tools.loadSpinner();
@@ -371,6 +617,8 @@ var $document, $window, __moduleName__Module = {
                     return;
                 }
                 integrated.props.submited = true;
+                integrated.props.paymentStarted = true;
+                integrated.opc.stopTimer();
 
                 integratedPayment = integrated.props.integratedPayment;
 
@@ -397,7 +645,13 @@ var $document, $window, __moduleName__Module = {
                         console.log(jqXHR, textStatus, errorThrown);
                     },
                     success: function (result) {
-                        if (result && result.resource_id) {
+                        if (result && result.resource_id && integrated.props.remountPending) {
+                            // The card fields were re-rendered while the payment was being created: the SDK
+                            // instance holding the card data is gone and cannot pay this payment.
+                            addLogger('OPC_PAYMENT_SECTION_RERENDERED : card fields removed before the payment could be submitted');
+                            integrated.form.clear();
+                            $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                        } else if (result && result.resource_id) {
                             integrated.props.paymentId = result.resource_id;
                             integrated.props.cart_id = result.cart_id;
                             integrated.form.submit();
@@ -429,7 +683,7 @@ var $document, $window, __moduleName__Module = {
                 $form.removeClass('-loaded');
 
                 // unchecked tos
-                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                integrated.form.untickTerms();
 
                 try {
                     integrated.form.set();
@@ -442,12 +696,24 @@ var $document, $window, __moduleName__Module = {
                     }
                 }
             },
+            // The classic checkout hides #payment-confirmation until the terms are ticked again. The One Page
+            // Checkout is not told about this untick and its own terms must stay as the customer left them.
+            untickTerms: function () {
+                if (__moduleName__Module.integrated.opc.isActive()) {
+                    return;
+                }
+                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+            },
             set: function () {
                 var integrated = __moduleName__Module.integrated;
 
+                if (integrated.props.paymentStarted) {
+                    return;
+                }
+
                 if (typeof Payplug == 'undefined') {
                     if (ipCDNCountdown < 10) {
-                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                        integrated.form.untickTerms();
                         console.log('Waiting for Integrated payment form to load');
                         ipCDNCountdown++;
                         setTimeout(function () {
@@ -600,20 +866,24 @@ var $document, $window, __moduleName__Module = {
 
                 // Listen to the validateForm Event
                 integratedPayment.onValidateForm(function ({isFormValid}) {
+                    if (integratedPayment !== integrated.props.integratedPayment) {
+                        return;
+                    }
                     if (isFormValid) {
-                        integrated.form.getPaymentId();
+                        integrated.form.proceed();
                     } else {
-                        integrated.props.submited = false;
+                        integrated.opc.release();
                         integrated.form.showError();
                     }
                 });
-                $document.on('submit', 'form', integrated.form.validate);
+                $document.off('submit.payplugIntegrated');
+                $document.on('submit.payplugIntegrated', 'form', integrated.form.validate);
             },
             showError: function () {
                 // valide integrated payment form
                 var integrated = __moduleName__Module.integrated;
 
-                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                integrated.form.untickTerms();
 
                 // Check if field is empty
                 for (var key in integrated.props.fieldsEmpty) {
@@ -621,7 +891,7 @@ var $document, $window, __moduleName__Module = {
                         $('.' + integrated.props.identifier + '_error.-' + key + ' span.invalidField').addClass('-hide');
                         $('.' + integrated.props.identifier + '_error.-' + key + ' span.emptyField').removeClass('-hide');
                         $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
-                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                        integrated.form.untickTerms();
                     }
                 }
 
