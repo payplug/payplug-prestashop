@@ -285,6 +285,15 @@ insert retries as an update, in case the frictionless notification `save()`d the
   `UnifiedOrderAction::confirmationUrl()`'s `secure_key`+`id_order` — exactly what
   `order-confirmation` accepts — could leak via `handleReturn()`'s JSON branch
   (`wantsJsonResponse()`/`&ajax=1`).
+- **Failed-cart marker**: `uhf_failed_cart:<cart>` (value: the failed operation id, TTL 600 s) is
+  written by `createOrderWithLock()` on a `FAILED` outcome, from any path (return, reconciliation,
+  notification, BO resync), before it clears `uhf_pending_operation:<cart>`/`uhf_challenge_html:<cart>`,
+  and only when the cached pending operation is absent or is the one handled: the late notification
+  of an earlier attempt leaves the current attempt's entries alone (logged), and an unreadable pending
+  entry skips the whole cleanup (logged). `createAction()` clears the marker whenever it caches a new
+  pending operation. `returnAction()` consumes it when no pending operation is cached, to show the
+  generic payment error and invalidate the return tokens; without a marker, it logs an error and shows
+  no message.
 - **`createAction()` request checks and failures**: `createAction()` only accepts a POST carrying the
   customer static token (`Tools::getToken(false)`) in its body, checked with `hash_equals` (CSRF); the
   token is never put in the URL. On a `createPayment()` failure, an `ApiException` with status 0, 408,

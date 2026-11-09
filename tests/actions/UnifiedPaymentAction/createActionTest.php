@@ -129,6 +129,7 @@ class createActionTest extends TestCase
         $token_cache->shouldReceive('set')->with('uhf_challenge_html:42', \Mockery::any(), \Mockery::any())->never();
         $token_cache->shouldReceive('set')->with($this->tokenCartKeyMatcher(), '42', 600)->once();
         $token_cache->shouldReceive('set')->with('uhf_cart_token:42', \Mockery::type('string'), 600)->once();
+        $token_cache->shouldReceive('delete')->with('uhf_failed_cart:42')->once();
         $payment_service->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
             201,
             '{"id":"op_123","execCode":"0000_SUCCESS"}',
@@ -862,7 +863,7 @@ class createActionTest extends TestCase
         $order_action = \Mockery::mock('OrderAction');
         $action->orderAction = $order_action;
 
-        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_stale', 'op_stale', 'op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_stale', 'op_stale', null, 'op_123');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_stale')->andReturn(null);
         $mocks['token_cache']->shouldReceive('delete');
         $mocks['payment_service']->shouldReceive('getOperation')->with('op_stale')->once()->andReturn([
@@ -885,6 +886,63 @@ class createActionTest extends TestCase
         $mocks['lock']->shouldReceive('release')->with('uhf_cart:42');
 
         $this->assertTrue($action->createAction($this->defaultParams())['result']);
+    }
+
+    /**
+     * The failure of the reconciled attempt is never reported to the return of the new one.
+     */
+    public function testCreateActionClearsTheFailedCartMarkerOfTheReconciledAttemptWhenCachingTheNewPendingOperation()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_stale', 'op_stale', null, 'op_123');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_alias:op_stale')->andReturn(null);
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_stale')->once()->andReturn([
+            'body' => json_encode(['execCode' => '4008', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        $order_action->shouldReceive('createFromOutcome')
+            ->once()
+            ->with(42, 'op_stale', '4008', PaymentOutcome::FAILED, 1234, null, [])
+            ->andReturn(['result' => false, 'redirect_url' => 'index.php?controller=order&step=3&has_error=1&modulename=payplug', 'persisted' => false]);
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(new PaymentOutput(
+            201,
+            '{"id":"op_123","execCode":"0000_SUCCESS"}',
+            'https://acs.example/challenge',
+            null,
+            null
+        ));
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_failed_cart:42', 'op_stale', 600)->once()->ordered();
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_pending_operation:42', 'op_123', 600)->once()->ordered();
+        $mocks['token_cache']->shouldReceive('delete')->with('uhf_failed_cart:42')->once()->ordered();
+        $mocks['token_cache']->shouldReceive('delete');
+        $mocks['token_cache']->shouldReceive('set')->with($this->tokenCartKeyMatcher(), '42', 600)->once();
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_cart_token:42', \Mockery::type('string'), 600)->once();
+        $mocks['lock']->shouldReceive('release')->with('uhf_cart:42');
+
+        $this->assertTrue($action->createAction($this->defaultParams())['result']);
+    }
+
+    public function testCreateActionClearsTheFailedCartMarkerWhenCachingADirectThreeDsPendingOperation()
+    {
+        [$action, $mocks] = $this->mockActionForPaymentCreation();
+        $order_action = \Mockery::mock('OrderAction');
+        $action->orderAction = $order_action;
+
+        $mocks['payment_service']->shouldReceive('createPayment')->once()->andReturn(
+            new PaymentOutput(201, '{"id":"op_123","execCode":"0001"}', null, null, null)
+        );
+        $mocks['token_cache']->shouldReceive('set')->with('uhf_pending_operation:42', 'op_123', 600)->once()->ordered();
+        $mocks['token_cache']->shouldReceive('delete')->with('uhf_failed_cart:42')->once()->ordered();
+        $order_action->shouldReceive('createFromOutcome')->never();
+        $mocks['logger']->shouldReceive('error')->never();
+        $mocks['lock']->shouldReceive('release')->once()->with('uhf_cart:42');
+
+        $this->assertSame([
+            'result' => false,
+            'message' => self::CHECK_WITH_BANK,
+        ], $action->createAction($this->defaultParams()));
     }
 
     /**
@@ -1878,6 +1936,8 @@ class createActionTest extends TestCase
         // Tests that go on to cache one (via a redirectHtml/redirectUrl response) override this
         // with a second return value for Fix 6's read-after-write check.
         $token_cache->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null)->byDefault();
+        $token_cache->shouldReceive('set')->with(\Mockery::pattern('/^uhf_failed_cart:/'), \Mockery::any(), 600)->byDefault();
+        $token_cache->shouldReceive('delete')->with('uhf_failed_cart:42')->byDefault();
 
         $link->shouldReceive('getModuleLink')->with('payplug', 'unified', $this->tokenActionParams('return'), true)
             ->andReturn('https://shop.example/module/payplug/unified?action=return&id_cart=42');
