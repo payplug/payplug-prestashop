@@ -96,27 +96,21 @@ class getRouteResponseTest extends BaseApplePayDomainAssociationAction
         $this->assertSame('', $response['body']);
     }
 
-    public function testAnswersNotFoundWithoutCacheWhenNothingValidIsStored()
+    public function testFallsThroughWhenNothingValidIsStored()
     {
-        $this->service->shouldReceive('resolve')->andReturn(null);
+        $this->service->shouldReceive('resolve')->once()->andReturn(null);
 
-        $this->assertSame(
-            ['status' => 404, 'headers' => ['Cache-Control: no-store'], 'body' => ''],
-            $this->action->getRouteResponse('GET', self::PATH)
-        );
+        $this->assertNull($this->action->getRouteResponse('GET', self::PATH));
         $this->assertSame([], $this->logs);
     }
 
-    public function testAnswersNotFoundAndLogsWhenTheServiceCannotBeBuilt()
+    public function testFallsThroughAndLogsWhenTheServiceCannotBeBuilt()
     {
         $factory = \Mockery::mock('UnifiedApiPaymentServiceFactory');
         $factory->shouldReceive('createDomainAssociationService')->andThrow(new \RuntimeException('boom'));
         $this->useFactory($factory);
 
-        $response = $this->action->getRouteResponse('GET', self::PATH);
-
-        $this->assertSame(404, $response['status']);
-        $this->assertSame(['Cache-Control: no-store'], $response['headers']);
+        $this->assertNull($this->action->getRouteResponse('GET', self::PATH));
         $this->assertErrorLogged();
         $this->assertStringContainsString('boom', $this->logs[0]['message']);
     }

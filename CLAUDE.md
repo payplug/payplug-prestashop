@@ -318,7 +318,7 @@ insert retries as an update, in case the frictionless notification `save()`d the
 
 The module answers `/.well-known/apple-developer-merchantid-domain-association` itself, from a copy
 of PayPlug's production file kept in the database; nothing is written under the web root. Fetching
-and validating the file is UPC's `DomainAssociationService` (PRE-3655, UPC 1.3.0).
+and validating the file is UPC's `DomainAssociationService` (PRE-3655, UPC `^1.3.1`).
 
 - **Route**: `payplug.php::hookActionDispatcherBefore()` (hook `actionDispatcherBefore`, fires before
   any controller is instantiated) matches the path of `REQUEST_URI` with the static
@@ -326,8 +326,9 @@ and validating the file is UPC's `DomainAssociationService` (PRE-3655, UPC 1.3.0
   container or the action) and only then delegates to `HookClass::actionDispatcherBefore()`, which resolves
   `ApplePayDomainAssociationAction` (`payplug.action.apple_pay_domain_association`) and calls
   `serveAction()`: `getRouteResponse()` builds the response (exact path match, `GET`/`HEAD` only, 200
-  `text/plain` + `Cache-Control: public, max-age=3600` with the stored bytes unchanged, else 404 +
-  `Cache-Control: no-store`), then output buffers are discarded (stopping at one that cannot be
+  `text/plain` + `Cache-Control: public, max-age=3600` with the stored bytes unchanged; with nothing
+  valid stored, or a service that cannot be built, it returns `null` and the request falls through to
+  PrestaShop, so the module never claims the path on a shop without a stored file), then output buffers are discarded (stopping at one that cannot be
   removed) and status, headers and body sent.
   The hook only `exit`s when `serveAction()` returns `true`; any exception is logged and falls through
   to PrestaShop.

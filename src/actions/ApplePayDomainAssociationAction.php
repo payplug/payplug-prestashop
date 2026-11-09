@@ -29,7 +29,7 @@ if (!defined('_PS_VERSION_')) {
 
 use PayPlug\classes\DependenciesClass;
 use PayPlug\src\utilities\traits\ServiceGetter;
-use PayplugUnifiedCore\Output\RefreshResult;
+use PayplugUnifiedCore\Output\DomainAssociationRefreshResult;
 
 class ApplePayDomainAssociationAction
 {
@@ -68,7 +68,7 @@ class ApplePayDomainAssociationAction
      * @param string $http_method
      * @param string $request_uri
      *
-     * @return array{status: int, headers: string[], body: string}|null null when the request is not for this route
+     * @return array{status: int, headers: string[], body: string}|null null when the request is not for this route or nothing valid is stored
      */
     public function getRouteResponse($http_method = '', $request_uri = '')
     {
@@ -88,12 +88,9 @@ class ApplePayDomainAssociationAction
             $content = null;
         }
 
+        // Nothing valid stored: let PrestaShop (or another module) answer this path.
         if (!is_string($content)) {
-            return [
-                'status' => 404,
-                'headers' => ['Cache-Control: no-store'],
-                'body' => '',
-            ];
+            return null;
         }
 
         return [
@@ -167,7 +164,7 @@ class ApplePayDomainAssociationAction
     {
         try {
             $result = $this->getService(self::FACTORY_SERVICE)->createDomainAssociationService()->refresh();
-            if (!$result instanceof RefreshResult) {
+            if (!$result instanceof DomainAssociationRefreshResult) {
                 throw new \UnexpectedValueException('The domain association service returned no refresh result.');
             }
         } catch (\Throwable $exception) {
@@ -175,7 +172,7 @@ class ApplePayDomainAssociationAction
 
             return [
                 'success' => false,
-                'status' => RefreshResult::STATUS_FAILED,
+                'status' => 'failed',
                 'error' => $exception->getMessage(),
             ];
         }

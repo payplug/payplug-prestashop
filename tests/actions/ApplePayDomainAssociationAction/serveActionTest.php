@@ -55,15 +55,13 @@ class serveActionTest extends BaseApplePayDomainAssociationAction
         $this->assertTrue($this->action->serveAction('HEAD', self::PATH));
     }
 
-    public function testSendsAnUncachedNotFoundWhenNothingValidIsStored()
+    public function testSendsNothingAndLetsPrestashopAnswerWhenNothingValidIsStored()
     {
         $this->service->shouldReceive('resolve')->once()->andReturn(null);
-        $this->action->shouldReceive('discardOutputBuffers')->once()->ordered();
-        $this->action->shouldReceive('sendStatus')->once()->with(404)->ordered();
-        $this->action->shouldReceive('sendHeader')->once()->with('Cache-Control: no-store')->ordered();
+        $this->action->shouldNotReceive('discardOutputBuffers', 'sendStatus', 'sendHeader');
         $this->expectOutputString('');
 
-        $this->assertTrue($this->action->serveAction('GET', self::PATH));
+        $this->assertFalse($this->action->serveAction('GET', self::PATH));
     }
 
     public function testSendsNothingAndLogsWhenTheResponseCannotBeBuilt()

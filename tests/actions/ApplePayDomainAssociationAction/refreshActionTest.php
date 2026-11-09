@@ -2,7 +2,7 @@
 
 namespace PayPlug\tests\actions\ApplePayDomainAssociationAction;
 
-use PayplugUnifiedCore\Output\RefreshResult;
+use PayplugUnifiedCore\Output\DomainAssociationRefreshResult;
 
 /**
  * @group unit
@@ -12,7 +12,7 @@ class refreshActionTest extends BaseApplePayDomainAssociationAction
 {
     public function testReportsAnUpdatedFile()
     {
-        $this->service->shouldReceive('refresh')->once()->andReturn(RefreshResult::updated());
+        $this->service->shouldReceive('refresh')->once()->andReturn(DomainAssociationRefreshResult::updated());
 
         $this->assertSame(
             ['success' => true, 'status' => 'updated', 'error' => null],
@@ -22,7 +22,7 @@ class refreshActionTest extends BaseApplePayDomainAssociationAction
 
     public function testReportsAnUnchangedFile()
     {
-        $this->service->shouldReceive('refresh')->once()->andReturn(RefreshResult::unchanged());
+        $this->service->shouldReceive('refresh')->once()->andReturn(DomainAssociationRefreshResult::unchanged());
 
         $this->assertSame(
             ['success' => true, 'status' => 'unchanged', 'error' => null],
@@ -33,7 +33,7 @@ class refreshActionTest extends BaseApplePayDomainAssociationAction
     public function testReportsAFailedRefreshWithItsRawError()
     {
         $this->service->shouldReceive('refresh')->once()->andReturn(
-            RefreshResult::failed('Unexpected HTTP status 500 from secure.payplug.com.')
+            DomainAssociationRefreshResult::failed('Unexpected HTTP status 500 from secure.payplug.com.')
         );
 
         $this->assertSame(
@@ -64,5 +64,26 @@ class refreshActionTest extends BaseApplePayDomainAssociationAction
         $this->assertFalse($result['success']);
         $this->assertSame('failed', $result['status']);
         $this->assertErrorLogged();
+    }
+
+    public function testReportsAFailureAndLogsWhenTheRefreshThrows()
+    {
+        $this->service->shouldReceive('refresh')->once()->andThrow(new \RuntimeException('Storage unavailable.'));
+
+        $this->assertSame(
+            ['success' => false, 'status' => 'failed', 'error' => 'Storage unavailable.'],
+            $this->action->refreshAction()
+        );
+        $this->assertErrorLogged();
+    }
+
+    public function testReportsTheSameFailedStatusAsTheRefreshResult()
+    {
+        $this->service->shouldReceive('refresh')->once()->andThrow(new \RuntimeException('boom'));
+
+        $result = $this->action->refreshAction();
+
+        $this->assertSame(DomainAssociationRefreshResult::STATUS_FAILED, $result['status']);
+        $this->assertSame(DomainAssociationRefreshResult::failed('boom')->status, $result['status']);
     }
 }

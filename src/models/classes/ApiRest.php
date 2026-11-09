@@ -160,7 +160,20 @@ class ApiRest
                 break;
 
             case 'apple_pay_resync':
-                $domain_association_action = $this->module->getService('payplug.action.apple_pay_domain_association');
+                try {
+                    $domain_association_action = $this->module->getService('payplug.action.apple_pay_domain_association');
+                } catch (\Throwable $exception) {
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getLogger()
+                        ->addLog('ApiRest::dispatch: apple_pay_resync - ' . $exception->getMessage(), 'error');
+                    $json = [
+                        'success' => false,
+                        'status' => 'failed',
+                    ];
+
+                    break;
+                }
                 $refresh = $domain_association_action->refreshAction();
                 $json = [
                     'success' => $refresh['success'],

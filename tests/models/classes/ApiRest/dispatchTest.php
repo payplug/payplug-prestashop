@@ -199,6 +199,27 @@ class dispatchTest extends BaseApiRest
         );
     }
 
+    public function testWhenGivenActionIsApplePayResyncAndTheActionCannotBeResolved()
+    {
+        $this->plugin->getModule()
+            ->getInstanceByName('payplug')
+            ->shouldReceive('getService')
+            ->with('payplug.action.apple_pay_domain_association')
+            ->andThrow(new \RuntimeException('boom'));
+
+        $this->assertSame(
+            ['success' => false, 'status' => 'failed'],
+            $this->class->dispatch('apple_pay_resync')
+        );
+        $this->logger->shouldHaveReceived('addLog')
+            ->once()
+            ->with(\Mockery::on(function ($message) {
+                return false !== strpos($message, 'ApiRest::dispatch')
+                    && false !== strpos($message, 'apple_pay_resync')
+                    && false !== strpos($message, 'boom');
+            }), 'error');
+    }
+
     private function mockDomainAssociationAction($domain_association_action)
     {
         $this->plugin->getModule()
