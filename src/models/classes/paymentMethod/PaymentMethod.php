@@ -1352,6 +1352,23 @@ class PaymentMethod
     }
 
     /**
+     * @description Whether the context currency is one of the merchant's currencies
+     *
+     * @return bool
+     */
+    public function isSupportedCurrency()
+    {
+        $this->setParameters();
+
+        return isset($this->context->currency->iso_code)
+            && in_array(
+                $this->context->currency->iso_code,
+                explode(';', (string) $this->configuration->getValue('currencies')),
+                true
+            );
+    }
+
+    /**
      * @description Update the order state if current state is refunded
      *
      * todo: add coverage to this method
@@ -1818,21 +1835,6 @@ class PaymentMethod
         }
 
         return $payment_options;
-    }
-
-    /**
-     * @description Whether the cart currency is one of the merchant's currencies
-     *
-     * @return bool
-     */
-    protected function isSupportedCurrency()
-    {
-        return isset($this->context->currency->iso_code)
-            && in_array(
-                $this->context->currency->iso_code,
-                explode(';', (string) $this->configuration->getValue('currencies')),
-                true
-            );
     }
 
     /**
