@@ -3,6 +3,7 @@
 namespace PayPlug\tests\actions\UnifiedPaymentAction;
 
 use PayPlug\src\actions\UnifiedPaymentAction;
+use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Dto\PaymentDto;
 use PayplugUnifiedCore\Exceptions\ApiException;
@@ -1158,6 +1159,7 @@ class createActionTest extends TestCase
         $factory->shouldReceive('createPaymentRepository')->andReturn($payment_repository);
         $payment_repository->shouldReceive('getRequestedAmountByOperationId')->with('op_pending')->andReturn(null);
         $payment_repository->shouldReceive('getPaymentIdByOperationId')->with('op_pending')->andReturn(null);
+        $payment_repository->shouldReceive('savePaymentDetails')->once()->with('op_pending', \Mockery::type('array'))->andReturn(true);
 
         $token_cache->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_pending');
         $token_cache->shouldReceive('get')->with('uhf_pending_alias:op_pending')->andReturn('{"alias_id":"alias_new_123","brand":"visa"}');
@@ -1931,6 +1933,10 @@ class createActionTest extends TestCase
         $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
         $payment_repository->shouldReceive('getPaymentIdByOperationId')->andReturn(null)->byDefault();
         $payment_repository->shouldReceive('bindPaymentIdIfMissing')->never()->byDefault();
+        $payment_repository->shouldReceive('savePaymentDetails')->andReturn(true)->byDefault();
+        $payment_repository->shouldReceive('getByOperationId')->andReturnUsing(function ($operation_id) {
+            return new OperationData($operation_id, '0001', PaymentOutcome::THREE_DS_PENDING, 0, 'cart:6');
+        })->byDefault();
         $lock->shouldReceive('acquire')->with('uhf_cart:42', 60)->andReturn(true);
         // Fix 2's pending-operation reconciliation check: no pending operation cached by default.
         // Tests that go on to cache one (via a redirectHtml/redirectUrl response) override this

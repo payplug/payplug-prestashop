@@ -20,6 +20,10 @@ services:
     class: PayPlug\src\actions\UnifiedPaymentAction
     public: true
 
+  payplug.action.unified_order_detail:
+    class: PayPlug\src\actions\UnifiedOrderDetailAction
+    public: true
+
   payplug.action.unified_alias:
     class: PayPlug\src\actions\UnifiedAliasAction
     public: true

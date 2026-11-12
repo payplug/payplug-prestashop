@@ -35,6 +35,7 @@ class BaseUnifiedOperationRepository extends BaseRepository
                     'treated' => ['type' => 'boolean'],
                     'payment_id' => ['type' => 'string'],
                     'requested_amount' => ['type' => 'integer'],
+                    'payment_details' => ['type' => 'string'],
                     'date_add' => ['type' => 'string'],
                     'date_upd' => ['type' => 'string'],
                 ],

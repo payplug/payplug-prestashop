@@ -26,6 +26,7 @@ namespace PayPlug\src\actions;
 use PayPlug\classes\DependenciesClass;
 use PayPlug\src\application\adapter\PrestashopAdapter17;
 use PayPlug\src\models\repositories\UnifiedRefundRepository;
+use PayPlug\src\unified\helpers\UnifiedPaymentDetails;
 use PayPlug\src\unified\helpers\UnifiedRefundExecCode;
 use PayPlug\src\utilities\services\Props;
 use PayPlug\src\utilities\traits\ServiceGetter;
@@ -671,7 +672,7 @@ class UnifiedPaymentAction
         }
 
         if (PaymentOutcome::PAID === $outcome) {
-            $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
+            $this->recordPaidOperation($factory, $logger, $operation_id, $decoded, $id_cart);
         }
 
         $pending_alias = $this->resolvePendingAlias($token_cache, $operation_id, $decoded);
@@ -824,7 +825,7 @@ class UnifiedPaymentAction
 
         // $decoded is the re-fetched getOperation() response, never the unverified webhook $body.
         if (PaymentOutcome::PAID === $outcome) {
-            $this->backfillPaymentId($factory, $logger, $operation_data->operationId, $decoded, $id_cart);
+            $this->recordPaidOperation($factory, $logger, $operation_data->operationId, $decoded, $id_cart);
         }
 
         $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $operation_data->operationId, $decoded);
@@ -962,7 +963,7 @@ class UnifiedPaymentAction
         }
 
         if (PaymentOutcome::PAID === $outcome) {
-            $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
+            $this->recordPaidOperation($factory, $logger, $operation_id, $decoded, $id_cart);
         }
 
         $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $operation_id, $decoded);
@@ -1277,7 +1278,7 @@ class UnifiedPaymentAction
         }
 
         if (PaymentOutcome::PAID === $outcome) {
-            $this->backfillPaymentId($factory, $logger, $pending_operation_id, $decoded, (int) $cart->id);
+            $this->recordPaidOperation($factory, $logger, $pending_operation_id, $decoded, (int) $cart->id);
         }
 
         $pending_alias = $this->resolvePendingAlias($factory->createTokenCache(), $pending_operation_id, $decoded);
@@ -1868,37 +1869,13 @@ class UnifiedPaymentAction
      */
     private function extractCardDetails($decoded)
     {
-        $details = ['last4' => null, 'exp_month' => null, 'exp_year' => null];
-        $payment_method = is_array($decoded) && isset($decoded['paymentMethod']) && is_array($decoded['paymentMethod'])
-            ? $decoded['paymentMethod']
-            : [];
+        $details = UnifiedPaymentDetails::fromOperation($decoded);
 
-        $code6x4 = isset($payment_method['card']['code6x4']) && is_string($payment_method['card']['code6x4'])
-            ? $payment_method['card']['code6x4']
-            : '';
-        if (1 === preg_match('/(\d{4})$/', $code6x4, $matches)) {
-            $details['last4'] = $matches[1];
-        }
-
-        $validity_date = isset($payment_method['details']['validityDate']) && is_string($payment_method['details']['validityDate'])
-            ? trim($payment_method['details']['validityDate'])
-            : '';
-        if (1 === preg_match('/^(\d{4})-(\d{2})$/', $validity_date, $matches)) {
-            $year = $matches[1];
-            $month = $matches[2];
-        } elseif (1 === preg_match('/^(\d{2})(\d{2})$/', $validity_date, $matches)) {
-            $month = $matches[1];
-            $year = '20' . $matches[2];
-        } else {
-            return $details;
-        }
-
-        if ((int) $month >= 1 && (int) $month <= 12) {
-            $details['exp_month'] = $month;
-            $details['exp_year'] = $year;
-        }
-
-        return $details;
+        return [
+            'last4' => $details['last4'],
+            'exp_month' => $details['exp_month'],
+            'exp_year' => $details['exp_year'],
+        ];
     }
 
     /**
@@ -2094,6 +2071,75 @@ class UnifiedPaymentAction
     }
 
     /**
+     * @description Record what the module keeps of a paid operation it fetched back: its payment
+     *              id, its card and 3-D Secure details, and the payment id as transaction id of the
+     *              PrestaShop payment of its order when the order already exists
+     *
+     * Same calling conditions as backfillPaymentId(). Never blocks the caller: a failure is only
+     * logged, and the details missing are fetched again when the order is opened in the back office.
+     *
+     * @param mixed $factory
+     * @param mixed $logger
+     * @param string $operation_id
+     * @param mixed $decoded getOperation() response, never a webhook body
+     * @param int $id_cart
+     */
+    private function recordPaidOperation($factory, $logger, $operation_id, $decoded, $id_cart)
+    {
+        $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
+
+        try {
+            $payment_repository = $factory->createPaymentRepository();
+            $payment_repository->savePaymentDetails($operation_id, UnifiedPaymentDetails::fromOperation($decoded));
+            $this->syncOrderOfOperation($payment_repository, $logger, $operation_id, $id_cart);
+        } catch (\Throwable $exception) {
+            $logger->error('UnifiedPaymentAction - details of paid operation ' . $operation_id . ' not recorded: ' . $exception->getMessage());
+        }
+    }
+
+    /**
+     * @description Give the payment of the operation's order its payment id, once the operation
+     *              belongs to an order of the cart paid: until then, the order creation does it
+     *
+     * @param mixed $payment_repository
+     * @param mixed $logger
+     * @param string $operation_id
+     * @param int $id_cart cart the operation paid
+     */
+    private function syncOrderOfOperation($payment_repository, $logger, $operation_id, $id_cart)
+    {
+        $payment_id = $payment_repository->getPaymentIdByOperationId($operation_id);
+        if (null === $payment_id) {
+            return;
+        }
+
+        try {
+            $order_id = $payment_repository->getByOperationId($operation_id)->orderId;
+        } catch (PaymentNotFoundException $exception) {
+            $order_id = '';
+        }
+
+        if (!ctype_digit($order_id)) {
+            return;
+        }
+
+        $order = $this->dependencies->getPlugin()->getOrder()->get((int) $order_id);
+        if (!is_object($order) || empty($order->id)) {
+            return;
+        }
+
+        if ((int) $order->id_cart !== (int) $id_cart) {
+            $logger->error('UnifiedPaymentAction - order ' . (int) $order_id . ' of operation ' . $operation_id
+                . ' belongs to cart ' . (int) $order->id_cart . ', not cart ' . (int) $id_cart
+                . ': payment id ' . $payment_id . ' not given to its payment');
+
+            return;
+        }
+
+        $this->orderAction()->syncOrderPayment((int) $order_id, $payment_id);
+    }
+
+    /**
      * @description Answer the redelivered notification of an already treated operation, recording
      *              its payment id from the operation fetched back when none is recorded yet
      *
@@ -2135,7 +2181,7 @@ class UnifiedPaymentAction
                 return ['http_status' => 200];
             }
 
-            $this->backfillPaymentId($factory, $logger, $operation_id, $decoded, $id_cart);
+            $this->recordPaidOperation($factory, $logger, $operation_id, $decoded, $id_cart);
         } catch (\Throwable $exception) {
             $logger->error('UnifiedPaymentAction::notifyAction - payment id of treated operation ' . $operation_id
                 . ' not recovered: ' . $exception->getMessage());

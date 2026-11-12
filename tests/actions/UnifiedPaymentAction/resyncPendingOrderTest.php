@@ -230,6 +230,27 @@ class resyncPendingOrderTest extends TestCase
         $this->assertTrue($action->resyncPendingOrder(99));
     }
 
+    public function testRecordsTheCardDetailsAndTheTransactionIdOfThePaidOperationOnResync()
+    {
+        [$action, $mocks] = $this->mockAction();
+        $this->mockPaidOperationRow($mocks);
+        $this->mockGetOperation($mocks, ['execCode' => '0000', 'amount' => 1234, 'orderId' => '42', 'paymentMethod' => ['card' => ['type' => 'VISA']]]);
+        $mocks['payment_repository']->shouldReceive('getPaymentIdByOperationId')->with('op_123')->andReturn(self::PAYMENT_ID);
+        $mocks['payment_repository']->shouldReceive('savePaymentDetails')->once()->with('op_123', \Mockery::on(function (array $details) {
+            return 'VISA' === $details['brand'];
+        }))->andReturn(true);
+        $mocks['payment_repository']->shouldReceive('getByOperationId')->with('op_123')
+            ->andReturn(new OperationData('op_123', '0000', PaymentOutcome::PAID, 1234, '99'));
+        $mocks['order_action']->shouldReceive('syncOrderPayment')->once()->with(99, self::PAYMENT_ID)->andReturn(false);
+        $mocks['order_action']->shouldReceive('createFromOutcome')
+            ->once()
+            ->andReturn(['result' => true, 'redirect_url' => 'confirmation', 'persisted' => true, 'outcome_applied' => true]);
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_123');
+        $this->mockOrderStates($mocks, self::PENDING_STATE, self::PAID_STATE);
+
+        $this->assertTrue($action->resyncPendingOrder(99));
+    }
+
     public function testKeepsThePaymentIdAlreadyRecordedOnResync()
     {
         [$action, $mocks] = $this->mockAction();
@@ -385,6 +406,10 @@ class resyncPendingOrderTest extends TestCase
         $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
         $payment_repository->shouldReceive('getPaymentIdByOperationId')->andReturn(null)->byDefault();
         $payment_repository->shouldReceive('bindPaymentIdIfMissing')->never()->byDefault();
+        $payment_repository->shouldReceive('savePaymentDetails')->andReturn(true)->byDefault();
+        $payment_repository->shouldReceive('getByOperationId')->andReturnUsing(function ($operation_id) {
+            return new OperationData($operation_id, '0001', PaymentOutcome::THREE_DS_PENDING, 0, 'cart:6');
+        })->byDefault();
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         $token_cache->shouldReceive('delete')->byDefault();

@@ -152,6 +152,41 @@ Naming rule: `Unified` names anything that talks to the Unified API or implement
   `createOrderWithLock()` (existing-order branch of `createFromOutcome()`, then `markTreated()`),
   and leaves a `THREE_DS_PENDING` order as is. The page reloads only when the order actually left
   the pending state; any failure is logged and the order page still renders.
+- **BO payment details, label and transaction id (PRE-3747)**: a paid UHF order shows the same
+  "Payplug payment details" block as a Retail order (`details.tpl`, unchanged). `renderUnifiedDetail()`
+  adds a `payment` key built by `UnifiedOrderDetailAction::buildPayment()`
+  (`payplug.action.unified_order_detail`), in the shape of `PaymentMethod::getResourceDetail()`: `id` =
+  the recorded `payment_id` (key absent when none, never the operation id), status
+  `paid`/`partially_refunded`/`refunded` derived from the operation amount vs
+  `UnifiedRefundRepository::getRefundedAmount()`, amounts converted with the order's currency, mode
+  from `sandbox_mode`, "Paid at" = the operation row's `date_add` (else the order's), card brand/mask/
+  expiry and 3-D Secure (`authentication.globalStatus` `OK` -> yes, any other value -> no, absent ->
+  line hidden). No card country, exchange rate nor EUR counter-value: no `getOperation()` field
+  carries them. Card/3DS data come from the `payment_details` JSON column of
+  `payplug_unified_operation` (`savePaymentDetails()`/`getPaymentDetails()`, never written by
+  `save()`; mapping in `src/unified/helpers/UnifiedPaymentDetails`, also used for aliases), recorded
+  by `UnifiedPaymentAction::recordPaidOperation()` next to `backfillPaymentId()` on every path that
+  re-reads a `PAID` operation (never from a webhook body, never for `FAILED`/`THREE_DS_PENDING`/
+  refunds). An order without snapshot (frictionless payment, order whose operation was never re-read,
+  column missing on an install that ran an rc of `upgrade-5.2.0.php`) gets one `getOperation()` at render,
+  persisted only for a `PAID` response; a failure is logged and the block shows the locally known fields.
+  A failed or non-`PAID` fetch, or a fetched snapshot that cannot be saved (still shown for that view),
+  sets the token-cache marker `uhf_details_fetch_failed:<operation_id>` (300 s): no fetch while it is
+  present, so a BO view never waits on the API more than once per 5 minutes per order; a cache error is
+  logged and never breaks the render. `buildPayment()` has no side effect. The block is built in its
+  own `try/catch`: the refund form never depends on it. `UnifiedOrderAction::createFromOutcome()` validates the order with
+  `getOrderTranslations()['module_name']['default']` (the EUR card label) and with the recorded
+  `payment_id` as `transaction_id` (none when unknown). The order being validated in the pending
+  state, PrestaShop creates its `order_payment` row only when the paid state is applied, with no
+  transaction id: `UnifiedOrderAction::syncOrderPayment()` then fills, on the rows with an empty
+  `transaction_id` whose `payment_method` is the module's `displayName` (set by core
+  `OrderHistory`) or the order label (set by `addOrderPayment()`) only, the payment id and the label
+  (a payment the merchant added from the BO is never touched), and replaces an order label still equal to
+  the module name. It runs after a `PAID` outcome is applied (`persistAndApplyOutcome()`), from
+  `recordPaidOperation()` once the operation belongs to an order whose `id_cart` is the cart paid (a
+  mismatch is logged as an error, nothing synced), and from `OrderAction::renderUnifiedDetail()` at each
+  BO render with a known `payment_id` (own `try/catch`), which heals orders created before this change
+  when they are opened.
 - **Asynchronous confirmation (PRE-3626)**: `UnifiedPaymentAction::notifyAction()`, reached via
   `controllers/front/notify.php` (`module/payplug/notify`) — a fixed URL, no per-order parameter,
   matching PayPlug's Unified API notifier ("Receiver"), which is configured once per merchant

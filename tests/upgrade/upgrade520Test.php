@@ -50,11 +50,42 @@ class upgrade520Test extends TestCase
         $queries = $this->runUpgrade([
             'payment_id' => [['Field' => 'payment_id']],
             'requested_amount' => [['Field' => 'requested_amount']],
+            'payment_details' => [['Field' => 'payment_details']],
         ]);
 
         foreach ($queries as $query) {
             $this->assertStringNotContainsString('ALTER TABLE', $query);
         }
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testCreatesTheOperationTableWithThePaymentDetailsColumn()
+    {
+        $queries = $this->runUpgrade([]);
+
+        $this->assertStringContainsString('`payment_details` TEXT NULL', $queries[0]);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testAddsThePaymentDetailsColumnToAnExistingTable()
+    {
+        $queries = $this->runUpgrade([
+            'payment_id' => [['Field' => 'payment_id']],
+            'requested_amount' => [['Field' => 'requested_amount']],
+            'payment_details' => [],
+        ]);
+
+        $this->assertContains(
+            'ALTER TABLE `ps_payplug_unified_operation` ADD COLUMN `payment_details` TEXT NULL AFTER `requested_amount`',
+            $queries
+        );
+        $this->assertCount(1, preg_grep('/^ALTER TABLE/', $queries));
     }
 
     /**

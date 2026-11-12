@@ -9,6 +9,8 @@ require_once __DIR__ . '/../../stubs/Cart.php';
 
 abstract class BaseUnifiedOrderAction extends TestCase
 {
+    protected const PAYMENT_LABEL = 'Carte Bancaire by Payplug';
+
     public function tearDown(): void
     {
         \Mockery::close();
@@ -79,6 +81,7 @@ abstract class BaseUnifiedOrderAction extends TestCase
         $configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn(false)->byDefault();
         $plugin->shouldReceive('getOrderClass')->andReturn($order_class)->byDefault();
         $order_class->shouldReceive('getOrderStates')->with(true)->andReturn(['error' => 5, 'paid' => 2, 'pending' => 1])->byDefault();
+        $this->mockTranslations($plugin);
 
         $order_adapter->shouldReceive('getIdByCartId')->with(42)->andReturn(99);
         $order_adapter->shouldReceive('get')->with(99)->andReturn($existing_order);
@@ -86,6 +89,7 @@ abstract class BaseUnifiedOrderAction extends TestCase
         $context_adapter->shouldReceive('get')->andReturn($context);
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->id = 17;
+        $module->displayName = 'Payplug';
 
         return [$dependencies, [
             'plugin' => $plugin,
@@ -145,6 +149,7 @@ abstract class BaseUnifiedOrderAction extends TestCase
         $plugin->shouldReceive('getConfigurationClass')->andReturn($configuration_class);
         $plugin->shouldReceive('getOrderClass')->andReturn($order_class);
         $plugin->shouldReceive('getModule')->andReturn($module_adapter);
+        $this->mockTranslations($plugin);
 
         $order_adapter->shouldReceive('get')->with(0)->andReturn(null);
         $order_adapter->shouldReceive('get')->with(99)->andReturn($this->mockOrder(12.34))->byDefault();
@@ -153,6 +158,7 @@ abstract class BaseUnifiedOrderAction extends TestCase
         $configuration_class->shouldReceive('getValue')->with('sandbox_mode')->andReturn(0);
         $order_class->shouldReceive('getOrderStates')->with(true)->andReturn(['pending' => 5, 'paid' => 2, 'error' => 8]);
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
+        $module->displayName = 'Payplug';
         $amount_helper->shouldReceive('convertAmount')->with(1234, true, 'USD')->andReturn(12.34);
         $amount_helper->shouldReceive('convertAmount')->with(12.34, false, 'USD')->andReturn(1234)->byDefault();
 
@@ -164,6 +170,7 @@ abstract class BaseUnifiedOrderAction extends TestCase
             ->with('payplug.unified.payment_service_factory')
             ->andReturn($factory);
         $factory->shouldReceive('createLogger')->andReturn($logger);
+        $factory->shouldReceive('createPaymentRepository')->andReturn($this->mockPaymentRepository())->byDefault();
 
         return [$dependencies, [
             'plugin' => $plugin,
@@ -229,7 +236,7 @@ abstract class BaseUnifiedOrderAction extends TestCase
     protected function mockPersistence(array $mocks, $payment_repository = null)
     {
         if (null === $payment_repository) {
-            $payment_repository = \Mockery::mock('PaymentRepository');
+            $payment_repository = $this->mockPaymentRepository();
             $payment_repository->shouldReceive('save')->once();
         }
         $state_mutator = \Mockery::mock('OrderStateMutator');
@@ -260,5 +267,106 @@ abstract class BaseUnifiedOrderAction extends TestCase
             ->andReturn($alias_repository);
 
         return $alias_repository;
+    }
+
+    /**
+     * Payment repository with no payment id recorded, unless a test says otherwise.
+     *
+     * @return object
+     */
+    protected function mockPaymentRepository()
+    {
+        $payment_repository = \Mockery::mock('PaymentRepository');
+        $payment_repository->shouldReceive('getPaymentIdByOperationId')->andReturn(null)->byDefault();
+
+        return $payment_repository;
+    }
+
+    /**
+     * @param mixed $plugin
+     */
+    protected function mockTranslations($plugin)
+    {
+        $translation_class = \Mockery::mock('TranslationClass');
+        $plugin->shouldReceive('getTranslationClass')->andReturn($translation_class)->byDefault();
+        $translation_class->shouldReceive('getOrderTranslations')
+            ->andReturn(['module_name' => ['default' => self::PAYMENT_LABEL]])
+            ->byDefault();
+    }
+
+    /**
+     * @param string $transaction_id
+     * @param string $payment_method 'Payplug' is the module's displayName, set by PrestaShop on the
+     *                               payment it creates when the order is paid
+     *
+     * @return object an OrderPayment double recording its update() calls
+     */
+    protected function mockOrderPayment($transaction_id, $payment_method = 'Payplug')
+    {
+        return new class($transaction_id, $payment_method) {
+            public $transaction_id;
+            public $payment_method;
+            public $updates = 0;
+
+            public function __construct($transaction_id, $payment_method)
+            {
+                $this->transaction_id = $transaction_id;
+                $this->payment_method = $payment_method;
+            }
+
+            public function update()
+            {
+                ++$this->updates;
+
+                return true;
+            }
+        };
+    }
+
+    /**
+     * Order 99, as loaded by syncOrderPayment(), with the given payment rows.
+     *
+     * @param array<string, object> $mocks
+     * @param object[] $order_payments
+     * @param string $payment payment label of the order
+     *
+     * @return object the order double
+     */
+    protected function mockOrderPayments(array $mocks, array $order_payments, $payment = self::PAYMENT_LABEL)
+    {
+        $order = new class($order_payments, $payment) {
+            public $id = 99;
+            public $id_currency = 2;
+            public $module = 'payplug';
+            public $payment;
+            public $updates = 0;
+            private $order_payments;
+
+            public function __construct($order_payments, $payment)
+            {
+                $this->order_payments = $order_payments;
+                $this->payment = $payment;
+            }
+
+            public function getOrderPayments()
+            {
+                return $this->order_payments;
+            }
+
+            public function getOrdersTotalPaid()
+            {
+                return 12.34;
+            }
+
+            public function update()
+            {
+                ++$this->updates;
+
+                return true;
+            }
+        };
+        $mocks['order_adapter']->shouldReceive('get')->with(99)->andReturn($order);
+
+        return $order;
     }
 }
