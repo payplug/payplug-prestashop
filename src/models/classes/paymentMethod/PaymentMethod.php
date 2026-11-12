@@ -251,6 +251,14 @@ class PaymentMethod
      */
     public function getAvailablePaymentMethod()
     {
+        // IF merchant only hasn't EUR currency, we disable all other payment feature
+        if ($this->dependencies->configClass->isValidFeature('feature_hosted_fields')
+            && !$this->dependencies->getPlugin()->getCurrency()->hasEurCurrency()) {
+            return [
+                'standard',
+            ];
+        }
+
         return [
             'one_click',
             'standard',
@@ -532,6 +540,15 @@ class PaymentMethod
         $options = $this->getPaymentOptionsAvailability();
         if (empty($options)) {
             return [];
+        }
+
+        if (!$this->isSupportedCurrency() && !$this->isCartCurrencyServedByHostedFields()) {
+            $this->logger->addLog(
+                'PaymentMethod::getPaymentOptionCollection - cart currency '
+                . (isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : '')
+                . ' is not supported and not served by the hosted fields: no payment option offered',
+                'info'
+            );
         }
 
         $payment_options = [];
@@ -1127,6 +1144,9 @@ class PaymentMethod
         $this->setParameters();
 
         $payplug_amounts = json_decode($this->configuration->getValue('amounts'), true);
+        if (empty($payplug_amounts)) {
+            return [];
+        }
 
         return isset($payplug_amounts[$this->name]) ? $payplug_amounts[$this->name] : $payplug_amounts['default'];
     }
@@ -1332,6 +1352,23 @@ class PaymentMethod
     }
 
     /**
+     * @description Whether the context currency is one of the merchant's currencies
+     *
+     * @return bool
+     */
+    public function isSupportedCurrency()
+    {
+        $this->setParameters();
+
+        return isset($this->context->currency->iso_code)
+            && in_array(
+                $this->context->currency->iso_code,
+                explode(';', (string) $this->configuration->getValue('currencies')),
+                true
+            );
+    }
+
+    /**
      * @description Update the order state if current state is refunded
      *
      * todo: add coverage to this method
@@ -1422,8 +1459,7 @@ class PaymentMethod
             return [];
         }
 
-        $supported_currencies = explode(';', $this->configuration->getValue('currencies'));
-        if (!in_array($this->context->currency->iso_code, $supported_currencies, true)) {
+        if (!$this->isSupportedCurrency()) {
             $this->logger->addLog('PaymentMethod::getPaymentTab() - Context Currency object is not supported.');
 
             return [];
@@ -1794,77 +1830,49 @@ class PaymentMethod
             return [];
         }
 
-        $payplug_countries = json_decode($this->configuration->getValue('countries'), true);
-
-        if (isset($payplug_countries[$this->name])) {
-            $address = $this->dependencies
-                ->getPlugin()
-                ->getAddress()
-                ->get((int) $this->context->cart->id_address_invoice);
-            $iso = $this->dependencies
-                ->configClass
-                ->getIsoCodeByCountryId((int) $address->id_country);
-
-            if (!$this->dependencies
-                ->getValidators()['payment']
-                ->isAllowedCountry(implode(',', $payplug_countries[$this->name]), $iso)['result']) {
-                return $payment_options;
-            }
+        if ($this->isOfferedForCartCurrency() && $this->isAllowedForCartCountryAndAmount()) {
+            $payment_options[$this->name] = $this->getDefaultPaymentOption();
         }
-
-        $price_limit = $this->getPriceLimit();
-        $cart_amount = $this->context->cart->getOrderTotal(true);
-        if (false === strpos($this->name, 'oney')) {
-            if (!$this->dependencies
-                ->getHelpers()['amount']
-                ->validateAmount(
-                    $price_limit,
-                    (float) $cart_amount,
-                    isset($this->context->currency->iso_code) ? $this->context->currency->iso_code : ''
-                )['result']) {
-                return $payment_options;
-            }
-        }
-
-        $payment_options[$this->name] = [
-            'name' => $this->name,
-            'inputs' => [
-                'pc' => [
-                    'name' => 'pc',
-                    'type' => 'hidden',
-                    'value' => 'new_card',
-                ],
-                'pay' => [
-                    'name' => 'pay',
-                    'type' => 'hidden',
-                    'value' => '1',
-                ],
-                'id_cart' => [
-                    'name' => 'id_cart',
-                    'type' => 'hidden',
-                    'value' => (int) $this->context->cart->id,
-                ],
-                'method' => [
-                    'name' => 'method',
-                    'type' => 'hidden',
-                    'value' => $this->name,
-                ],
-            ],
-            'extra_classes' => $this->name,
-            'payment_controller_url' => $this->context->link->getModuleLink(
-                $this->dependencies->name,
-                'payment',
-                ['type' => $this->name]
-            ),
-            'logo' => $this->img_path . 'svg/checkout/' . $this->name . '.svg',
-            'callToActionText' => isset($this->translation[$this->name]['call_to_action'])
-                ? $this->translation[$this->name]['call_to_action']
-                : '',
-            'action' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
-            'moduleName' => $this->dependencies->name,
-        ];
 
         return $payment_options;
+    }
+
+    /**
+     * @description Whether the standard payment is offered through the Unified hosted fields
+     *              for a cart currency the merchant's currencies do not include
+     *
+     * @return bool
+     */
+    protected function isHostedFieldsCurrency()
+    {
+        return 'standard' === $this->name && $this->isCartCurrencyServedByHostedFields();
+    }
+
+    /**
+     * @description Whether the hosted fields can take the standard payment for the cart currency
+     *
+     * @return bool
+     */
+    protected function isCartCurrencyServedByHostedFields()
+    {
+        if (!isset($this->context->currency->iso_code)) {
+            return false;
+        }
+
+        $prestashop_adapter = $this->dependencies->loadAdapterPresta();
+
+        return $prestashop_adapter
+            && $prestashop_adapter->canServeHostedFields((string) $this->context->currency->iso_code);
+    }
+
+    /**
+     * @description Whether the payment method can be offered for the cart currency
+     *
+     * @return bool
+     */
+    protected function isOfferedForCartCurrency()
+    {
+        return $this->isSupportedCurrency() || $this->isHostedFieldsCurrency();
     }
 
     /**
@@ -2032,5 +2040,89 @@ class PaymentMethod
             'result' => false,
             'code' => $error_code,
         ];
+    }
+
+    /**
+     * @description Get the payment option of the current payment method
+     *
+     * @return array
+     */
+    private function getDefaultPaymentOption()
+    {
+        return [
+            'name' => $this->name,
+            'inputs' => [
+                'pc' => [
+                    'name' => 'pc',
+                    'type' => 'hidden',
+                    'value' => 'new_card',
+                ],
+                'pay' => [
+                    'name' => 'pay',
+                    'type' => 'hidden',
+                    'value' => '1',
+                ],
+                'id_cart' => [
+                    'name' => 'id_cart',
+                    'type' => 'hidden',
+                    'value' => (int) $this->context->cart->id,
+                ],
+                'method' => [
+                    'name' => 'method',
+                    'type' => 'hidden',
+                    'value' => $this->name,
+                ],
+            ],
+            'extra_classes' => $this->name,
+            'payment_controller_url' => $this->context->link->getModuleLink(
+                $this->dependencies->name,
+                'payment',
+                ['type' => $this->name]
+            ),
+            'logo' => $this->img_path . 'svg/checkout/' . $this->name . '.svg',
+            'callToActionText' => isset($this->translation[$this->name]['call_to_action'])
+                ? $this->translation[$this->name]['call_to_action']
+                : '',
+            'action' => $this->context->link->getModuleLink($this->dependencies->name, 'dispatcher', [], true),
+            'moduleName' => $this->dependencies->name,
+        ];
+    }
+
+    /**
+     * @description Whether the payment method is allowed for the cart invoice country and amount
+     *
+     * @return bool
+     */
+    private function isAllowedForCartCountryAndAmount()
+    {
+        $payplug_countries = json_decode($this->configuration->getValue('countries'), true);
+
+        if (isset($payplug_countries[$this->name])) {
+            $address = $this->dependencies
+                ->getPlugin()
+                ->getAddress()
+                ->get((int) $this->context->cart->id_address_invoice);
+            $iso = $this->dependencies
+                ->configClass
+                ->getIsoCodeByCountryId((int) $address->id_country);
+
+            if (!$this->dependencies
+                ->getValidators()['payment']
+                ->isAllowedCountry(implode(',', $payplug_countries[$this->name]), $iso)['result']) {
+                return false;
+            }
+        }
+
+        if (false !== strpos($this->name, 'oney')) {
+            return true;
+        }
+
+        return (bool) $this->dependencies
+            ->getHelpers()['amount']
+            ->validateAmount(
+                $this->getPriceLimit(),
+                (float) $this->context->cart->getOrderTotal(true),
+                $this->context->currency->iso_code
+            )['result'];
     }
 }

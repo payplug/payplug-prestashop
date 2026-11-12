@@ -1344,39 +1344,8 @@ class OneyPaymentMethod extends PaymentMethod
         }
 
         $this->setParameters();
-
-        $is_valid_cart = $this->isValidOneyCartQty($this->context->cart);
-        if (!$is_valid_cart['result']) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('OneyPaymentMethod::getPaymentOption - ' . $is_valid_cart['message'], 'error');
-
-            return $payment_options;
-        }
-        $use_taxes = (bool) $this->configuration->getValue('PS_TAX');
-        $cart_amount = $this->context->cart->getOrderTotal($use_taxes);
-        $cart_amount = $cart_amount ?: $this->context->cart->getOrderTotal(true);
-        $is_valid_amount = $this->isValidOneyAmount($cart_amount);
-        if (!$is_valid_amount['result']) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('OneyPaymentMethod::getPaymentOption - ' . $is_valid_amount['message'], 'error');
-
-            return $payment_options;
-        }
-
-        $is_valid_addresses = $this->isValidOneyAddresses(
-            (int) $this->context->cart->id_address_delivery,
-            (int) $this->context->cart->id_address_invoice
-        );
-        if (!$is_valid_addresses['result']) {
-            $this->dependencies
-                ->getPlugin()
-                ->getLogger()
-                ->addLog('OneyPaymentMethod::getPaymentOption - ' . $is_valid_addresses['message'], 'error');
-
+        $cart_amount = $this->isOfferedForCartCurrency() ? $this->getOneyCartAmount() : null;
+        if (null === $cart_amount || !$this->isValidOneyCart($cart_amount)) {
             return $payment_options;
         }
 
@@ -1783,6 +1752,48 @@ class OneyPaymentMethod extends PaymentMethod
         $link_order = $this->context->link->getAdminLink('AdminOrders', true, [], $parameters);
 
         return $this->tools->tool('redirectAdmin', $link_order);
+    }
+
+    /**
+     * @description Cart total checked against the Oney limits, falling back to the total with taxes
+     *
+     * @return float
+     */
+    private function getOneyCartAmount()
+    {
+        $cart_amount = $this->context->cart->getOrderTotal((bool) $this->configuration->getValue('PS_TAX'));
+
+        return $cart_amount ?: $this->context->cart->getOrderTotal(true);
+    }
+
+    /**
+     * @description Check the cart quantities, amount and addresses against the Oney requirements,
+     *              logging the first failing check
+     *
+     * @param float $cart_amount
+     *
+     * @return bool
+     */
+    private function isValidOneyCart($cart_amount)
+    {
+        $validation = $this->isValidOneyCartQty($this->context->cart);
+        if ($validation['result']) {
+            $validation = $this->isValidOneyAmount($cart_amount);
+        }
+        if ($validation['result']) {
+            $validation = $this->isValidOneyAddresses(
+                (int) $this->context->cart->id_address_delivery,
+                (int) $this->context->cart->id_address_invoice
+            );
+        }
+        if (!$validation['result']) {
+            $this->dependencies
+                ->getPlugin()
+                ->getLogger()
+                ->addLog('OneyPaymentMethod::getPaymentOption - ' . $validation['message'], 'error');
+        }
+
+        return (bool) $validation['result'];
     }
 
     /**

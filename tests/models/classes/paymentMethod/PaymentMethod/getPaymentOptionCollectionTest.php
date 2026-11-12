@@ -117,4 +117,90 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
         $this->dependencies->configClass = $configClass;
         $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOptionCollection()));
     }
+
+    public function testAnUnsupportedCartCurrencyNotServedByTheHostedFieldsIsLoggedOncePerRender()
+    {
+        $this->context->currency->iso_code = 'USD';
+        $this->mockTwoEnabledPaymentMethods();
+        $this->mockHostedFieldsAdapter(false);
+
+        $this->class->getPaymentOptionCollection();
+
+        $this->class->shouldHaveReceived('getPaymentOption')->twice();
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(
+                'PaymentMethod::getPaymentOptionCollection - cart currency USD is not supported and not served by the hosted fields: no payment option offered',
+                'info'
+            )
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testAnUnsupportedCartCurrencyIsLoggedWhenThePrestashopAdapterCannotBeLoaded()
+    {
+        $this->context->currency->iso_code = 'USD';
+        $this->mockTwoEnabledPaymentMethods();
+        $this->dependencies->shouldReceive('loadAdapterPresta')->andReturn(false);
+
+        $this->class->getPaymentOptionCollection();
+
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::pattern('/cart currency USD is not supported and not served by the hosted fields/'), 'info')
+            ->once();
+        $this->addToAssertionCount(1);
+    }
+
+    public function testAnUnsupportedCartCurrencyServedByTheHostedFieldsIsNotLogged()
+    {
+        $this->context->currency->iso_code = 'USD';
+        $this->mockTwoEnabledPaymentMethods();
+        $prestashop_adapter = $this->mockHostedFieldsAdapter(true);
+
+        $this->class->getPaymentOptionCollection();
+
+        $prestashop_adapter->shouldHaveReceived('canServeHostedFields')->with('USD')->once();
+        $this->logger->shouldNotHaveReceived('addLog');
+        $this->addToAssertionCount(1);
+    }
+
+    public function testASupportedCartCurrencyIsNotLogged()
+    {
+        $this->context->currency->iso_code = 'EUR';
+        $this->mockTwoEnabledPaymentMethods();
+
+        $this->class->getPaymentOptionCollection();
+
+        $this->logger->shouldNotHaveReceived('addLog');
+        $this->dependencies->shouldNotHaveReceived('loadAdapterPresta');
+        $this->addToAssertionCount(1);
+    }
+
+    private function mockHostedFieldsAdapter($can_serve)
+    {
+        $prestashop_adapter = \Mockery::mock('PrestashopAdapter17');
+        $prestashop_adapter->shouldReceive('canServeHostedFields')->andReturn($can_serve);
+        $this->dependencies->shouldReceive('loadAdapterPresta')->andReturn($prestashop_adapter);
+
+        return $prestashop_adapter;
+    }
+
+    private function mockTwoEnabledPaymentMethods()
+    {
+        $configClass = \Mockery::mock('Config');
+        $configClass->shouldReceive([
+            'isValidFeature' => true,
+        ]);
+        $this->dependencies->configClass = $configClass;
+        $this->class->shouldReceive([
+            'getPaymentOptionsAvailability' => [
+                'standard' => true,
+                'bancontact' => true,
+            ],
+            'getPaymentMethod' => $this->class,
+        ]);
+        $this->class->shouldReceive('getPaymentOption')
+            ->andReturnUsing(function ($payment_options) {
+                return $payment_options;
+            });
+    }
 }

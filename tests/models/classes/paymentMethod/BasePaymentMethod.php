@@ -40,6 +40,8 @@ abstract class BasePaymentMethod extends TestCase
     protected $country_adapter;
     protected $context_adapter;
     protected $currency_adapter;
+    protected $currencies;
+    protected $has_eur_currency;
     protected $dependencies;
     protected $helpers;
     protected $logger;
@@ -126,6 +128,10 @@ abstract class BasePaymentMethod extends TestCase
         $this->configuration->shouldReceive('getValue')
             ->with('amounts')
             ->andReturn('{"default":{"min":"EUR:30","max":"EUR:2000000"},"oney_x3_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_with_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x3_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"oney_x4_without_fees":{"min":"EUR:10000","max":"EUR:300000"},"bancontact":{"min":"EUR:30","max":"EUR:2000000"},"giropay":{"min":"EUR:100","max":"EUR:1000000"},"ideal":{"min":"EUR:30","max":"EUR:2000000"},"mybank":{"min":"EUR:30","max":"EUR:2000000"},"satispay":{"min":"EUR:30","max":"EUR:2000000"},"scalapay":{"min":"EUR:500","max":"EUR:400000"},"sofort":{"min":"EUR:100","max":"EUR:500000"}}');
+        $this->configuration->shouldReceive('getValue')
+            ->with('currencies')
+            ->andReturn('EUR')
+            ->byDefault();
 
         $this->configuration_adapter = \Mockery::mock('ConfigurationAdapter');
 
@@ -190,7 +196,27 @@ abstract class BasePaymentMethod extends TestCase
         $this->payment_repository = \Mockery::mock('PaymentRepository');
         $this->validate_adapter = \Mockery::mock('ValidateAdapter');
         $this->country_adapter = \Mockery::mock('Country');
+        $this->currencies = [['iso_code' => 'EUR']];
+        $this->has_eur_currency = true;
         $this->currency_adapter = \Mockery::mock('CurrencyAdapter');
+        $this->currency_adapter->shouldReceive('findAll')
+            ->andReturnUsing(function () {
+                return $this->currencies;
+            });
+        $this->currency_adapter->shouldReceive('hasEurCurrency')
+            ->andReturnUsing(function () {
+                return $this->has_eur_currency;
+            });
+        $this->currency_adapter->shouldReceive('hasOtherCurrency')
+            ->andReturnUsing(function () {
+                foreach ($this->currencies as $currency) {
+                    if ('EUR' != $currency['iso_code']) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
         $this->carrier_adapter = \Mockery::mock('CarrierAdapter');
         $this->cart_adapter = \Mockery::mock('CartAdapter');
         $this->cart_rule_adapter = \Mockery::mock('CartRuleAdapter');

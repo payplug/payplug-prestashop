@@ -1,5 +1,26 @@
 # Payplug module changelog
 
+## Version 5.2.0
+- Feature :
+  - [PRE-3622](https://github.com/payplug/payplug-prestashop/pull/117): Add Unified hosted fields configuration
+  - [PRE-3622](https://github.com/payplug/payplug-prestashop/pull/118): Set one uhf identifier per currencies
+  - [PRE-3623](https://github.com/payplug/payplug-prestashop/pull/118): Add card tokenization through Unified Hosted Fields for non-EUR carts
+  - [PRE-3624](https://github.com/payplug/payplug-prestashop/pull/123): Add Unified Hosted Fields payment creation, 3DS/SCA challenge and return handling for non-EUR carts
+  - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Let customers save a card and pay with it again through Unified Hosted Fields for non-EUR carts
+  - [PRE-3627](https://github.com/payplug/payplug-prestashop/pull/130): Refund Unified Hosted Fields orders, fully or partially, from the back office
+  - [PRE-3626](https://github.com/payplug/payplug-prestashop/pull/127): Confirm Unified Hosted Fields payments asynchronously through the Unified API notification (`notify` front controller)
+  - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Include the cards saved through Unified Hosted Fields in the GDPR data export and erase
+  - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Keep Unified Hosted Fields payments, saved cards and back-office refunds working with the new Unified API contract (unified-plugin-core ^1.2.2)
+  - [PRE-3778](https://github.com/payplug/payplug-prestashop/pull/150): Show the payment error message to a customer back from a failed Unified Hosted Fields 3DS authentication whose failure notification arrived first
+  - [PRE-3747](https://github.com/payplug/payplug-prestashop/pull/151): Show the same payment details block, payment method label and transaction id for Unified Hosted Fields orders as for EUR orders in the back office
+
+- Bugfix :
+  - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Require the customer token to delete a saved card (CSRF protection on the saved cards page)
+  - [PRE-3777](https://github.com/payplug/payplug-prestashop/pull/147): Hide the payment methods at checkout when the cart currency is not one of the merchant's Payplug currencies, except the standard payment when it is served through Unified Hosted Fields (an identifier set for that currency), and hide the Apple Pay express button on the product and cart pages for such a currency
+
+- Refactoring :
+  - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Update `payplug/payplug-php` from 4.1.0 to 4.2.0, installed with unified-plugin-core ^1.2.2
+
 ## Version 5.1.1
 - Feature :
   - [PRE-3601](https://github.com/payplug/payplug-prestashop/pull/119): Let the merchant narrow the Scalapay amount range from the back office, and hide Scalapay at checkout for carts outside it

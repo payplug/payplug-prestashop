@@ -71,6 +71,7 @@ var $document, $window, __moduleName__Module = {
         this.oney.init();
         this.popup.init();
         this.integrated.init();
+        this.hosted_fields.init();
     },
     order: {
         init: function () {
@@ -606,7 +607,6 @@ var $document, $window, __moduleName__Module = {
                         integrated.form.showError();
                     }
                 });
-
                 $document.on('submit', 'form', integrated.form.validate);
             },
             showError: function () {
@@ -1127,6 +1127,7 @@ var $document, $window, __moduleName__Module = {
             identifier: '__moduleName__Card',
             query: null,
             id_card: 0,
+            type: 'card',
         },
         init: function () {
             var card = __moduleName__Module.card,
@@ -1141,6 +1142,8 @@ var $document, $window, __moduleName__Module = {
             event.stopPropagation();
             var $elem = $(this);
             __moduleName__Module.card.props.id_card = $elem.data('id_card');
+            // Retail API card (payplug_card) or UHF alias (payplug_unified_alias): ids can collide.
+            __moduleName__Module.card.props.type = 'alias' === $elem.data('type') ? 'alias' : 'card';
             __moduleName__Module.popup.set(card_confirm_deleted_msg);
         },
         //display second popup to announce the card's deletion success
@@ -1148,25 +1151,27 @@ var $document, $window, __moduleName__Module = {
 
             event.preventDefault();
             event.stopPropagation();
-            var id_card = __moduleName__Module.card.props.id_card,
-                url = window['__moduleName___delete_card_url'] + '&pc=' + id_card,
-                card = __moduleName__Module.card,
-                identifier = card.props.identifier;
+            var card = __moduleName__Module.card,
+                id_card = card.props.id_card,
+                type = card.props.type,
+                param = 'alias' === type ? 'pa' : 'pc',
+                url = window['__moduleName___delete_card_url'] + '&' + param + '=' + id_card,
+                identifier = card.props.identifier,
+                data = {delete: 1};
+
+            data[param] = id_card;
 
             $.ajax({
                 type: 'POST',
                 url: url,
                 dataType: 'json',
-                data: {
-                    delete: 1,
-                    pc: id_card
-                },
+                data: data,
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log(jqXHR, textStatus, errorThrown);
                 },
                 success: function (result) {
                     if (result) {
-                        $('.' + identifier + '[data-id_card=' + id_card + ']').remove();
+                        $('.' + identifier + '[data-type="' + type + '"][data-id_card="' + id_card + '"]').remove();
                         __moduleName__Module.popup.setDeleteCardPopup(card_deleted_msg);
                     }
                 }
@@ -1691,6 +1696,338 @@ var $document, $window, __moduleName__Module = {
                 }, attemps.interval);
             }
         }
+    },
+    hosted_fields: {
+        props: {
+            identifier: '__moduleName__HostedFields',
+            root: '__moduleName__HostedFields',
+            paymentOptionId: null,
+            instance: null,
+            fieldsInvalid: {cardHolder: true, pan: true, exp: true, cvv: true},
+            fieldsEmpty: {cardHolder: true, pan: true, exp: true, cvv: true},
+            attempts: 0,
+            maxAttempts: 30,
+            // Stops a double click from firing a second createToken()/AJAX round-trip.
+            submited: false,
+            // Watchdog: createToken() is SDK code that may never call back, which would leave submited stuck.
+            submitTimeoutId: null,
+            // Lets a late callback or watchdog from a superseded attempt detect it is stale.
+            submitAttemptId: 0,
+        },
+        init: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (!$('.' + hosted.props.identifier).length) {
+                return;
+            }
+
+            // Found via the method input, not by sibling position, which varies with the option inputs.
+            var $methodInput = $('input[name=method][value=hosted_fields]').first(),
+                $form = $methodInput.length ? $methodInput.parent() : $(),
+                formId = $form.length ? ($form.attr('id') || '') : '';
+            hosted.props.paymentOptionId = formId ? formId.replace('payment-payment-option-', 'payment-option-').replace('-form', '') : null;
+
+            // The SDK iframes can fail to render in a hidden container: mount once the option is selected.
+            if (typeof $document != 'undefined' && hosted.props.paymentOptionId) {
+                if ($('#' + hosted.props.paymentOptionId).attr('checked') == 'checked') {
+                    hosted.mountIfNewCard();
+                } else {
+                    $document.on('click', '#' + hosted.props.paymentOptionId, hosted.mountIfNewCard);
+                }
+            }
+
+            hosted.bindCardholder();
+            hosted.bindSavedAliases();
+            hosted.attachFormValidateListener();
+        },
+        // A preselected saved alias keeps the new-card wrapper hidden: never mount the iframes
+        // inside it, wait for "pay with a new card" instead.
+        mountIfNewCard: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (hosted.syncNewCardFields()) {
+                hosted.setup();
+            }
+        },
+        // The server hides the new-card wrapper whenever saved aliases exist, but the browser may
+        // restore "pay with a new card" as checked (reload, back/forward): follow the radio state.
+        syncNewCardFields: function () {
+            var isNewCard = !__moduleName__Module.hosted_fields.isAliasSelected();
+            $('#hf-new-card-fields')[isNewCard ? 'removeClass' : 'addClass']('-hide');
+            return isNewCard;
+        },
+        isAliasSelected: function () {
+            var $selected = $('.hf-alias-radio:checked');
+            return $selected.length > 0 && $selected.val() !== '';
+        },
+        bindSavedAliases: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (typeof $document == 'undefined' || !$('.hf-alias-radio').length) {
+                return;
+            }
+            // init() runs twice (document ready + hosted_fields.tpl): namespaced so off() drops
+            // the previous binding, same as bindCardholder().
+            $document.off('change.hostedFieldsAlias')
+                .on('change.hostedFieldsAlias', '.hf-alias-radio', hosted.onPaymentChoiceChange);
+            hosted.syncNewCardFields();
+        },
+        onPaymentChoiceChange: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                isNewCard = hosted.syncNewCardFields();
+            $('.' + hosted.props.root + '_error.-payment').removeClass('-show').text('');
+            if (isNewCard) {
+                // The radios live in the selected, hence visible, payment option.
+                hosted.setup();
+            }
+        },
+        setup: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (hosted.props.instance) {
+                return;
+            }
+            if (typeof window.dalenys === 'undefined' || typeof window.dalenys.hostedFields === 'undefined') {
+                if (hosted.props.attempts++ >= hosted.props.maxAttempts) {
+                    console.error('[HostedFields] SDK not available after ' + hosted.props.maxAttempts + ' attempts');
+                    // Otherwise form.validate() would keep failing with no visible feedback.
+                    $('.' + hosted.props.root + '_error.-payment')
+                        .text(window['payplug_hosted_fields_error_generic'])
+                        .addClass('-show');
+                    return;
+                }
+                setTimeout(hosted.setup, 300);
+                return;
+            }
+            hosted.props.instance = window.dalenys.hostedFields({
+                companyId: window['hosted_company_id'], // PAYPLUG_OAUTH_COMPANY_ID
+                identifier: window['payplug_hosted_fields_identifier'],
+                fields: {
+                    brand: {
+                        id: "hosted-brand-container",
+                        version: 2,
+                        useInlineSelection: true, // to use the new version of the brand selector component
+                    },
+                    card: {
+                        id: 'hosted-card-container',
+                        placeholder: placeholderPan,
+                        onInput: function (event) {
+                            hosted.handleFieldEvent('pan', event);
+                        },
+                    },
+                    expiry: {
+                        id: 'hosted-expiry-container',
+                        placeholder: placeholderExp,
+                        onInput: function (event) {
+                            hosted.handleFieldEvent('exp', event);
+                        },
+                    },
+                    cryptogram: {
+                        id: 'hosted-cvv-container',
+                        placeholder: placeholderCvv,
+                        onInput: function (event) {
+                            hosted.handleFieldEvent('cvv', event);
+                        },
+                    },
+                },
+            });
+            if (hosted.props.instance && hosted.props.instance.load) {
+                hosted.props.instance.load();
+            }
+        },
+        handleFieldEvent: function (field, event) {
+            var hosted = __moduleName__Module.hosted_fields;
+            var root = hosted.props.root;
+            var $error = $('.' + root + '_error.-' + field);
+            if (event.type === 'invalid') {
+                var isEmpty = event.errorName === 'FIELD_EMPTY';
+                $error.find('span.invalidField')[isEmpty ? 'addClass' : 'removeClass']('-hide');
+                $error.find('span.emptyField')[isEmpty ? 'removeClass' : 'addClass']('-hide');
+                $('.' + root + '_container.-' + field).addClass('-invalid');
+                hosted.props.fieldsInvalid[field] = true;
+                hosted.props.fieldsEmpty[field] = isEmpty;
+            } else if (event.type === 'valid') {
+                $error.find('span.invalidField').addClass('-hide');
+                $error.find('span.emptyField').addClass('-hide');
+                $('.' + root + '_container.-' + field).removeClass('-invalid');
+                hosted.props.fieldsInvalid[field] = false;
+                hosted.props.fieldsEmpty[field] = false;
+            }
+        },
+        bindCardholder: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            var root = hosted.props.root;
+            var $input = $('#hf-cardholder');
+            if (!$input.length) {
+                return;
+            }
+            var update = function () {
+                var value = ($input.val() || '').trim();
+                var empty = value.length === 0;
+                var invalid = !empty && value.length < 2;
+                hosted.props.fieldsEmpty.cardHolder = empty;
+                hosted.props.fieldsInvalid.cardHolder = invalid;
+                var $error = $('.' + root + '_error.-cardHolder');
+                $error.find('span.emptyField')[empty ? 'removeClass' : 'addClass']('-hide');
+                $error.find('span.invalidField')[(!empty && invalid) ? 'removeClass' : 'addClass']('-hide');
+            };
+            // init() runs twice and `update` is a new closure each time: namespaced so off() drops the old one.
+            $input.off('input.hostedFieldsCardholder blur.hostedFieldsCardholder')
+                .on('input.hostedFieldsCardholder blur.hostedFieldsCardholder', update);
+            update();
+        },
+        attachFormValidateListener: function () {
+            var hosted = __moduleName__Module.hosted_fields;
+            if (typeof $document == 'undefined') {
+                return;
+            }
+            // init() runs twice: namespaced and unbound first, or the payment would be submitted twice.
+            $document.off('submit.hostedFields').on('submit.hostedFields', 'form', hosted.form.validate);
+        },
+        form: {
+            validate: function (event) {
+                var hosted = __moduleName__Module.hosted_fields,
+                    payment_option_id = hosted.props.paymentOptionId,
+                    isHostedFields = payment_option_id == $('input[name="payment-option"]:checked').attr('id');
+
+                // The submit listener is global: ignore the other payment options.
+                if (typeof event != 'undefined' && !isHostedFields) {
+                    return;
+                }
+
+                // Reset on every failure path and by the watchdog; success redirects away.
+                if (hosted.props.submited) {
+                    return false;
+                }
+
+                if (typeof event != 'undefined' && isHostedFields) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                if (hosted.isAliasSelected()) {
+                    hosted.props.submited = true;
+                    hosted.form.submitAlias($('.hf-alias-radio:checked').val());
+                    return false;
+                }
+
+                var invalid = Object.keys(hosted.props.fieldsInvalid).some(function (key) {
+                    return hosted.props.fieldsInvalid[key] || hosted.props.fieldsEmpty[key];
+                });
+                if (invalid || !hosted.props.instance || !hosted.props.instance.createToken) {
+                    return false;
+                }
+                hosted.props.submited = true;
+                hosted.props.submitAttemptId += 1;
+                var attemptId = hosted.props.submitAttemptId;
+                // 20s covers a slow tokenization while still recovering a stuck form.
+                hosted.props.submitTimeoutId = setTimeout(function () {
+                    hosted.form.onSubmitTimeout(attemptId);
+                }, 20000);
+                hosted.props.instance.createToken(function (result) {
+                    hosted.form.onTokenCreated(attemptId, result);
+                });
+                return false;
+            },
+            onSubmitTimeout: function (attemptId) {
+                var hosted = __moduleName__Module.hosted_fields;
+                // Superseded: submited belongs to the newer attempt now.
+                if (attemptId !== hosted.props.submitAttemptId) {
+                    return;
+                }
+                if (!hosted.props.submited) {
+                    return;
+                }
+                hosted.props.submited = false;
+                $('.' + hosted.props.root + '_error.-payment')
+                    .text(window['payplug_hosted_fields_error_generic'])
+                    .addClass('-show');
+            },
+            onTokenCreated: function (attemptId, result) {
+                var hosted = __moduleName__Module.hosted_fields;
+                // Stale callback: return before clearTimeout(), which would clear the newer attempt's watchdog.
+                if (attemptId !== hosted.props.submitAttemptId) {
+                    return;
+                }
+                clearTimeout(hosted.props.submitTimeoutId);
+                var root = hosted.props.root;
+                var $paymentError = $('.' + root + '_error.-payment');
+
+                if (!result || result.execCode !== '0000') {
+                    hosted.props.submited = false;
+                    $paymentError.text(window['payplug_hosted_fields_error_generic']).addClass('-show');
+                    return;
+                }
+
+                var brand = (result.selectedBrand || '').toLowerCase();
+                if ((window['payplug_hosted_fields_accepted_brands'] || []).indexOf(brand) === -1) {
+                    hosted.props.submited = false;
+                    $paymentError.text(window['payplug_hosted_fields_error_unsupported_brand']).addClass('-show');
+                    return;
+                }
+
+                $paymentError.removeClass('-show').text('');
+                $('#hf-token').val(result.hfToken);
+                $('#hf-selected-brand').val(brand);
+                hosted.form.submit(result.hfToken, brand);
+            },
+            submit: function (hfToken, selectedBrand) {
+                var hosted = __moduleName__Module.hosted_fields;
+                $.ajax({
+                    type: 'POST',
+                    url: window['payplug_hosted_fields_uhf_url'],
+                    dataType: 'json',
+                    data: {
+                        hfToken: hfToken,
+                        selectedBrand: selectedBrand,
+                        save_card: $('#hf-save-card').is(':checked') ? 1 : 0,
+                        // window['ajax_cart_id'] only exists on the validation page.
+                        id_cart: $('input[name="id_cart"]').val(),
+                        cardholderName: $('#hf-cardholder').val(),
+                        // CSRF check: the server only creates a payment for a POST carrying this token.
+                        static_token: (window['prestashop'] || {}).static_token,
+                    },
+                    error: hosted.form.onSubmitError,
+                    success: hosted.form.onSubmitResponse,
+                });
+            },
+            // Saved alias: no tokenization, ownership checked server-side. idPayplugAlias is the
+            // module's row id, so the Unified API alias never reaches the page.
+            submitAlias: function (idPayplugAlias) {
+                var hosted = __moduleName__Module.hosted_fields;
+                $.ajax({
+                    type: 'POST',
+                    url: window['payplug_hosted_fields_uhf_url'],
+                    dataType: 'json',
+                    data: {
+                        id_payplug_alias: idPayplugAlias,
+                        id_cart: $('input[name="id_cart"]').val(),
+                        static_token: (window['prestashop'] || {}).static_token,
+                    },
+                    error: hosted.form.onSubmitError,
+                    success: hosted.form.onSubmitResponse,
+                });
+            },
+            onSubmitError: function () {
+                var hosted = __moduleName__Module.hosted_fields;
+                hosted.props.submited = false;
+                $('.' + hosted.props.root + '_error.-payment')
+                    .text(window['payplug_hosted_fields_error_generic'])
+                    .addClass('-show');
+            },
+            onSubmitResponse: function (resp) {
+                var hosted = __moduleName__Module.hosted_fields;
+                if (resp && resp.result) {
+                    if (resp.return_url) {
+                        window.location.href = resp.return_url;
+                        return;
+                    }
+                    hosted.props.submited = false;
+                    return;
+                }
+                hosted.props.submited = false;
+                var message = (resp && resp.message) ? resp.message : window['payplug_hosted_fields_error_generic'];
+                $('.' + hosted.props.root + '_error.-payment')
+                    .text(message)
+                    .addClass('-show');
+            },
+        },
     },
 };
 

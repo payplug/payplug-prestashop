@@ -43,9 +43,9 @@ class AmountHelper
      *
      * @param $amount
      * @param bool $from_cents
-     * @param string $currency ISO 4217 code of the amount's currency
+     * @param string $currency ISO 4217 code of the amount's currency, which sets its number of minor units
      *
-     * @return float|int 0 when $currency is not a supported ISO 4217 code
+     * @return float|int 0 when $currency is missing or not a supported ISO 4217 code
      */
     public function convertAmount($amount = 0, $from_cents = false, $currency = '')
     {
