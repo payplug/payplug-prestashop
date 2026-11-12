@@ -564,10 +564,10 @@ class OrderAction
     private function renderUnifiedDetail($order)
     {
         $module = $this->plugin->getModule()->getInstanceByName($this->dependencies->name);
-        $payment_operation = $module
+        $operation_repository = $module
             ->getService('payplug.unified.payment_service_factory')
-            ->createPaymentRepository()
-            ->getPaidByOrderId((string) $order->id);
+            ->createPaymentRepository();
+        $payment_operation = $operation_repository->getPaidByOrderId((string) $order->id);
         if (null === $payment_operation) {
             return [];
         }
@@ -622,7 +622,62 @@ class OrderAction
             $order_details['refunded_display'] = $price_adapter->formatPrice($refunded, $currency->iso_code);
         }
 
+        $this->syncUnifiedOrderPayment($module, $operation_repository, $order, $payment_operation);
+        $payment = $this->buildUnifiedPayment($module, $order, $payment_operation, $currency, $refunded_cents);
+        if (!empty($payment)) {
+            $order_details['payment'] = $payment;
+        }
+
         return $order_details;
+    }
+
+    /**
+     * @description Give the PrestaShop payment of an order paid with Unified Hosted Fields the
+     *              recorded payment id when it has none. A failure is only logged.
+     *
+     * @param mixed $module
+     * @param mixed $operation_repository
+     * @param mixed $order
+     * @param mixed $payment_operation
+     */
+    private function syncUnifiedOrderPayment($module, $operation_repository, $order, $payment_operation)
+    {
+        try {
+            $payment_id = $operation_repository->getPaymentIdByOperationId($payment_operation->operationId);
+            if (null !== $payment_id) {
+                $module->getService('payplug.action.unified_order')->syncOrderPayment((int) $order->id, $payment_id);
+            }
+        } catch (\Throwable $exception) {
+            $this->logger->addLog('OrderAction::renderDetail - payment of UHF order ' . (int) $order->id
+                . ' not brought up to date (' . get_class($exception) . '): ' . $exception->getMessage(), 'error');
+        }
+    }
+
+    /**
+     * @description Build the payment details block of an order paid with Unified Hosted Fields.
+     *              A failure is logged and only hides the block: the refund form stays.
+     *
+     * @param mixed $module
+     * @param mixed $order
+     * @param mixed $payment_operation
+     * @param mixed $currency
+     * @param int $refunded_cents
+     *
+     * @return array
+     */
+    private function buildUnifiedPayment($module, $order, $payment_operation, $currency, $refunded_cents)
+    {
+        try {
+            $payment = $module
+                ->getService('payplug.action.unified_order_detail')
+                ->buildPayment($order, $payment_operation, $currency, $refunded_cents);
+        } catch (\Throwable $exception) {
+            $this->logger->addLog('OrderAction::renderDetail - payment details of UHF order ' . (int) $order->id
+                . ' could not be built (' . get_class($exception) . '): ' . $exception->getMessage(), 'error');
+            $payment = [];
+        }
+
+        return is_array($payment) ? $payment : [];
     }
 
     /**

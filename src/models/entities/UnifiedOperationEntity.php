@@ -53,6 +53,7 @@ class UnifiedOperationEntity
             'treated' => ['type' => 'boolean'],
             'payment_id' => ['type' => 'string'],
             'requested_amount' => ['type' => 'integer'],
+            'payment_details' => ['type' => 'string'],
             'date_add' => ['type' => 'string'],
             'date_upd' => ['type' => 'string'],
         ],
@@ -72,6 +73,9 @@ class UnifiedOperationEntity
 
     /** @var string */
     private $outcome;
+
+    /** @var string|null */
+    private $payment_details;
 
     /** @var string|null */
     private $payment_id;
@@ -152,6 +156,14 @@ class UnifiedOperationEntity
     public function getOutcome()
     {
         return $this->outcome;
+    }
+
+    /**
+     * @return string|null JSON card and 3-D Secure details of the payment
+     */
+    public function getPaymentDetails()
+    {
+        return $this->payment_details;
     }
 
     /**
@@ -302,6 +314,24 @@ class UnifiedOperationEntity
         }
 
         $this->outcome = $outcome;
+
+        return $this;
+    }
+
+    /**
+     * @param $payment_details
+     *
+     * @throws BadParameterException
+     *
+     * @return $this
+     */
+    public function setPaymentDetails($payment_details)
+    {
+        if (!is_string($payment_details)) {
+            throw new BadParameterException('Invalid argument, $payment_details must be a string');
+        }
+
+        $this->payment_details = $payment_details;
 
         return $this;
     }

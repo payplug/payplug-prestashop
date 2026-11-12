@@ -3,6 +3,7 @@
 namespace PayPlug\tests\actions\UnifiedPaymentAction;
 
 use PayPlug\src\actions\UnifiedPaymentAction;
+use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PHPUnit\Framework\TestCase;
 
@@ -665,6 +666,35 @@ class returnActionTest extends TestCase
         $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
     }
 
+    public function testRecordsTheCardDetailsOfThePaidOperationOnTheReturn()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode([
+                'execCode' => '0000',
+                'amount' => 1234,
+                'orderId' => '42',
+                'authentication' => ['globalStatus' => 'NOK'],
+                'paymentMethod' => ['card' => ['code6x4' => '511111XXXXXX4444', 'type' => 'MASTERCARD'], 'details' => ['validityDate' => '0731']],
+            ]),
+        ]);
+        $mocks['payment_repository']->shouldReceive('savePaymentDetails')->once()->with('op_123', [
+            'brand' => 'MASTERCARD',
+            'last4' => '4444',
+            'exp_month' => '07',
+            'exp_year' => '2031',
+            'tds' => 'no',
+        ])->andReturn(true);
+        $mocks['order_action']->shouldReceive('createFromOutcome')
+            ->once()
+            ->andReturn(['result' => true, 'redirect_url' => 'https://shop.example/order-confirmation?id_order=99']);
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
     public function testKeepsThePaymentIdAlreadyRecordedOnTheReturn()
     {
         [$action, $mocks] = $this->mockActionForReturn();
@@ -777,6 +807,10 @@ class returnActionTest extends TestCase
         $payment_repository->shouldReceive('getRequestedAmountByOperationId')->andReturn(null)->byDefault();
         $payment_repository->shouldReceive('getPaymentIdByOperationId')->andReturn(null)->byDefault();
         $payment_repository->shouldReceive('bindPaymentIdIfMissing')->never()->byDefault();
+        $payment_repository->shouldReceive('savePaymentDetails')->andReturn(true)->byDefault();
+        $payment_repository->shouldReceive('getByOperationId')->andReturnUsing(function ($operation_id) {
+            return new OperationData($operation_id, '0001', PaymentOutcome::THREE_DS_PENDING, 0, 'cart:6');
+        })->byDefault();
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         // Fix 7: cache cleanup after a terminal reconciliation - not asserted by every test, only
