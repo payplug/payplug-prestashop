@@ -141,4 +141,11 @@ class getPaymentOptionTest extends BaseBancontactPaymentMethod
         ];
         $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
+
+    public function testWhenCartCurrencyIsNotSupported()
+    {
+        $this->context->currency->iso_code = 'USD';
+
+        $this->assertSame([], $this->class->getPaymentOption([]));
+    }
 }

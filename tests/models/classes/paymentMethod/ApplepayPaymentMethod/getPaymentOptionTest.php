@@ -78,4 +78,14 @@ class getPaymentOptionTest extends BaseApplepayPaymentMethod
 
         $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
+
+    public function testWhenCartCurrencyIsNotSupported()
+    {
+        $this->context->currency->iso_code = 'USD';
+        $this->configuration->shouldReceive('getValue')
+            ->with('applepay_display')
+            ->andReturn('{"checkout":true,"cart":false,"product":false}');
+
+        $this->assertSame([], $this->class->getPaymentOption([]));
+    }
 }
