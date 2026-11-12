@@ -5,8 +5,6 @@ namespace PayPlug\tests\utilities\services\Routes;
 use PayPlug\src\utilities\services\Routes;
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../../stubs/PrestaShopLogger.php';
-
 /**
  * @group unit
  * @group service
@@ -14,6 +12,8 @@ require_once __DIR__ . '/../../../stubs/PrestaShopLogger.php';
  */
 class getSourceUrlTest extends TestCase
 {
+    const DEFAULT_HOSTED_FIELDS_URL = 'https://payment.payplug.com/ui/hosted-fields-lib/hosted-fields/v2.2.0/hosted-fields.min.js';
+
     public $service;
     public $dependencies;
 
@@ -33,14 +33,12 @@ class getSourceUrlTest extends TestCase
         // tests non-deterministic).
         $this->setDotenvLoaded(true);
         unset($_ENV['HOSTED_FIELDS_URL']);
-        \PrestaShopLogger::$logs = [];
     }
 
     public function tearDown(): void
     {
         $this->setDotenvLoaded(false);
         unset($_ENV['HOSTED_FIELDS_URL']);
-        \PrestaShopLogger::$logs = [];
         \Mockery::close();
     }
 
@@ -65,7 +63,7 @@ class getSourceUrlTest extends TestCase
         );
     }
 
-    public function testHostedFieldsKeyIsEmptyWhenNotConfigured()
+    public function testHostedFieldsKeyIsTheDefaultSdkUrlWhenNotConfigured()
     {
         $this->service->shouldReceive('getApiUrl')->andReturn('https://api.test');
         $this->service->shouldReceive('getCDNUrl')->andReturn('https://cdn.test');
@@ -73,7 +71,7 @@ class getSourceUrlTest extends TestCase
 
         $routes = $this->service->getSourceUrl();
 
-        $this->assertSame('', $routes['hosted_fields']);
+        $this->assertSame(self::DEFAULT_HOSTED_FIELDS_URL, $routes['hosted_fields']);
     }
 
     public function testGetHostedFieldsUrlReturnsEnvValueWhenConfigured()
@@ -83,21 +81,16 @@ class getSourceUrlTest extends TestCase
         $this->assertSame('https://hosted-fields.example/sdk.js', $this->service->getHostedFieldsUrl());
     }
 
-    /**
-     * getSourceUrl() is built on every front page (HookClass header hook): the missing URL is
-     * logged where the hosted fields option would be displayed, not here.
-     */
-    public function testGetHostedFieldsUrlReturnsAnEmptyStringWithoutLoggingWhenNotConfigured()
+    public function testGetHostedFieldsUrlReturnsTheDefaultSdkUrlWhenNotConfigured()
     {
-        $this->assertSame('', $this->service->getHostedFieldsUrl());
-        $this->assertSame([], \PrestaShopLogger::$logs);
+        $this->assertSame(self::DEFAULT_HOSTED_FIELDS_URL, $this->service->getHostedFieldsUrl());
     }
 
-    public function testGetHostedFieldsUrlReturnsAnEmptyStringWhenConfiguredEmpty()
+    public function testGetHostedFieldsUrlReturnsTheDefaultSdkUrlWhenConfiguredEmpty()
     {
         $_ENV['HOSTED_FIELDS_URL'] = '';
 
-        $this->assertSame('', $this->service->getHostedFieldsUrl());
+        $this->assertSame(self::DEFAULT_HOSTED_FIELDS_URL, $this->service->getHostedFieldsUrl());
     }
 
     private function setDotenvLoaded($value)

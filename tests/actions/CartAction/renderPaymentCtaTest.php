@@ -51,6 +51,7 @@ class renderPaymentCtaTest extends BaseCartAction
             'getCarriersList' => [
                 42,
             ],
+            'isSupportedCurrency' => true,
         ]);
 
         $this->configurePluginMocks('applepay_template');
@@ -64,11 +65,67 @@ class renderPaymentCtaTest extends BaseCartAction
     public function testWhenApplePayCartIsAllowed()
     {
         $this->configureMocks(0, '{"applepay":true}', '{"checkout":false,"cart":true,"product":false}', 'cart');
-        $this->payment_method->shouldReceive(['getCarriersList' => [42]]);
+        $this->payment_method->shouldReceive([
+            'getCarriersList' => [42],
+            'isSupportedCurrency' => true,
+        ]);
 
         $this->configurePluginMocks('applepay_template');
 
         $this->assertSame('applepay_template', $this->action->renderPaymentCTA());
+    }
+
+    /**
+     * @description Test when the cart currency is not supported by the merchant
+     *
+     * @dataProvider controllerProvider
+     *
+     * @param string $controller
+     */
+    public function testWhenCurrencyIsNotSupported($controller)
+    {
+        $this->configureMocks(0, '{"applepay":true}', '{"checkout":true,"cart":true,"product":true}', $controller);
+        $this->payment_method->shouldReceive(['isSupportedCurrency' => false]);
+
+        $this->assertFalse($this->action->renderPaymentCTA());
+        $this->action->shouldNotHaveReceived('renderApplepayCheckout');
+    }
+
+    /**
+     * @description Test when the Apple Pay payment method is not available for the shop
+     *
+     * @dataProvider controllerProvider
+     *
+     * @param string $controller
+     */
+    public function testWhenApplePayPaymentMethodIsNotAvailable($controller)
+    {
+        $this->configureMocks(0, '{"applepay":true}', '{"checkout":true,"cart":true,"product":true}', $controller);
+        $this->payment_method_class->shouldReceive('getPaymentMethod')
+            ->with('applepay')
+            ->andReturn([]);
+
+        $this->assertFalse($this->action->renderPaymentCTA());
+        $this->action->shouldNotHaveReceived('renderApplepayCheckout');
+    }
+
+    /**
+     * @description Test that the currency is not checked when the display configuration already hides the button
+     */
+    public function testCurrencyIsNotCheckedWhenTheButtonIsDisabledForThePage()
+    {
+        $this->configureMocks(0, '{"applepay":true}', '{"checkout":true,"cart":false,"product":true}', 'cart');
+
+        $this->assertFalse($this->action->renderPaymentCTA());
+        $this->payment_method_class->shouldNotHaveReceived('getPaymentMethod');
+    }
+
+    public function controllerProvider()
+    {
+        return [
+            'cart' => ['cart'],
+            'product' => ['product'],
+        ];
     }
 
     /**
@@ -114,7 +171,8 @@ class renderPaymentCtaTest extends BaseCartAction
         $this->instance->shouldReceive(['getController' => $controller]);
         $this->dispatcher->shouldReceive(['getInstance' => $this->instance]);
         $this->payment_method_class->shouldReceive('getPaymentMethod')
-            ->andReturn($this->payment_method);
+            ->andReturn($this->payment_method)
+            ->byDefault();
     }
 
     /**

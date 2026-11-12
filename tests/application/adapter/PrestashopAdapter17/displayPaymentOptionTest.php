@@ -91,45 +91,28 @@ class displayPaymentOptionTest extends BasePrestashopAdapter17
 
     /**
      * Scenario 3: USD cart, feature_hosted_fields and feature_standard valid,
-     * Configuration::hosted_fields has an identifier for 'usd' -> the new
-     * setHostedFieldsPaymentOption() path is taken.
+     * Configuration::hosted_fields has an identifier for 'usd' -> the
+     * setHostedFieldsPaymentOption() path is taken whatever the embedded mode,
+     * in a shop that also has EUR.
+     *
+     * @dataProvider embeddedModeDataProvider
+     *
+     * @param string $embedded_mode
      */
-    public function testHostedFieldsPathIsTakenWhenIdentifierIsConfiguredForCurrency()
+    public function testHostedFieldsPathIsTakenWhenIdentifierIsConfiguredForCurrency($embedded_mode)
     {
-        $this->context->currency->iso_code = 'USD';
-        $this->config_class->shouldReceive('isValidFeature')
-            ->with('feature_standard')->andReturn(true);
-        $this->config_class->shouldReceive('isValidFeature')
-            ->with('feature_integrated')->andReturn(true);
-        $this->config_class->shouldReceive('isValidFeature')
-            ->with('feature_hosted_fields')->andReturn(true);
-        $this->configuration->shouldReceive('getValue')
-            ->with('embedded_mode')->andReturn('redirect');
-        $this->configuration->shouldReceive('getValue')
-            ->with('hosted_fields')->andReturn('{"usd":"ident_42"}');
-        $this->routes->shouldReceive('getSourceUrl')
-            ->andReturn(['hosted_fields' => 'https://hosted-fields.test/sdk.js']);
-        $this->logger->shouldReceive('addLog')->never();
+        $this->setHostedFieldsCart($embedded_mode);
 
-        $this->adapter->shouldReceive('setIntegratedPaymentOption')->never();
-        $this->adapter->shouldReceive('setHostedFieldsPaymentOption')
-            ->once()
-            ->with($this->payment_options)
-            ->andReturnUsing(function ($payment_options) {
-                $payment_options['standard']['tpl'] = 'hosted_fields.tpl';
-                $payment_options['standard']['action'] = 'javascript:payplugModule.hosted_fields.form.validate();';
-                $payment_options['standard']['inputs']['method']['value'] = 'hosted_fields';
+        $this->assertHostedFieldsPathIsTaken();
+    }
 
-                return $payment_options;
-            });
+    public function embeddedModeDataProvider()
+    {
+        yield 'integrated' => ['integrated'];
 
-        $result = $this->adapter->displayPaymentOption($this->payment_options);
+        yield 'popup' => ['popup'];
 
-        $this->assertSame(
-            'javascript:payplugModule.hosted_fields.form.validate();',
-            $result[0]->getAction()
-        );
-        $this->assertSame('hosted_fields', $result[0]->getInputs()['method']['value']);
+        yield 'redirect' => ['redirect'];
     }
 
     /**
@@ -146,7 +129,7 @@ class displayPaymentOptionTest extends BasePrestashopAdapter17
         $this->config_class->shouldReceive('isValidFeature')
             ->with('feature_hosted_fields')->andReturn(true);
         $this->configuration->shouldReceive('getValue')
-            ->with('embedded_mode')->andReturn('redirect');
+            ->with('embedded_mode')->andReturn('integrated');
         $this->configuration->shouldReceive('getValue')
             ->with('hosted_fields')->andReturn('{"usd":"ident_42"}');
         $this->routes->shouldReceive('getSourceUrl')->andReturn(['hosted_fields' => '']);
@@ -178,7 +161,7 @@ class displayPaymentOptionTest extends BasePrestashopAdapter17
         $this->config_class->shouldReceive('isValidFeature')
             ->with('feature_hosted_fields')->andReturn(true);
         $this->configuration->shouldReceive('getValue')
-            ->with('embedded_mode')->andReturn('redirect');
+            ->with('embedded_mode')->andReturn('integrated');
         $this->configuration->shouldReceive('getValue')
             ->with('hosted_fields')->andReturn('{}');
 
@@ -234,5 +217,46 @@ class displayPaymentOptionTest extends BasePrestashopAdapter17
         $result = $this->adapter->displayPaymentOption($this->payment_options);
 
         $this->assertSame('logo.png', $result[0]->getLogo());
+    }
+
+    private function setHostedFieldsCart($embedded_mode)
+    {
+        $this->context->currency->iso_code = 'USD';
+        $this->config_class->shouldReceive('isValidFeature')
+            ->with('feature_standard')->andReturn(true);
+        $this->config_class->shouldReceive('isValidFeature')
+            ->with('feature_integrated')->andReturn(true);
+        $this->config_class->shouldReceive('isValidFeature')
+            ->with('feature_hosted_fields')->andReturn(true);
+        $this->configuration->shouldReceive('getValue')
+            ->with('embedded_mode')->andReturn($embedded_mode);
+        $this->configuration->shouldReceive('getValue')
+            ->with('hosted_fields')->andReturn('{"usd":"ident_42"}');
+        $this->routes->shouldReceive('getSourceUrl')
+            ->andReturn(['hosted_fields' => 'https://hosted-fields.test/sdk.js']);
+        $this->logger->shouldReceive('addLog')->never();
+    }
+
+    private function assertHostedFieldsPathIsTaken()
+    {
+        $this->adapter->shouldReceive('setIntegratedPaymentOption')->never();
+        $this->adapter->shouldReceive('setHostedFieldsPaymentOption')
+            ->once()
+            ->with($this->payment_options)
+            ->andReturnUsing(function ($payment_options) {
+                $payment_options['standard']['tpl'] = 'hosted_fields.tpl';
+                $payment_options['standard']['action'] = 'javascript:payplugModule.hosted_fields.form.validate();';
+                $payment_options['standard']['inputs']['method']['value'] = 'hosted_fields';
+
+                return $payment_options;
+            });
+
+        $result = $this->adapter->displayPaymentOption($this->payment_options);
+
+        $this->assertSame(
+            'javascript:payplugModule.hosted_fields.form.validate();',
+            $result[0]->getAction()
+        );
+        $this->assertSame('hosted_fields', $result[0]->getInputs()['method']['value']);
     }
 }

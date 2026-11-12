@@ -105,4 +105,17 @@ class getPaymentOptionTest extends BaseInstallmentPaymentMethod
 
         $this->assertSame($expected, $this->class->getPaymentOption($payment_options));
     }
+
+    public function testWhenCartCurrencyIsNotSupported()
+    {
+        $this->context->currency->iso_code = 'USD';
+        $this->configuration_adapter->shouldReceive('get')
+            ->with('PS_TAX')
+            ->andReturn('1');
+        $this->configuration->shouldReceive('getValue')
+            ->with('inst_min_amount')
+            ->andReturn('30');
+
+        $this->assertSame([], $this->class->getPaymentOption([]));
+    }
 }
