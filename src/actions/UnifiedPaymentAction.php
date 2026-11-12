@@ -446,6 +446,7 @@ class UnifiedPaymentAction
             if ($output->redirectHtml || $output->redirectUrl) {
                 try {
                     $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
+                    $token_cache->delete('uhf_failed_cart:' . $cart->id);
 
                     // Read-after-write check: UnifiedTokenCache::set() can't report a write failure through
                     // ITokenCache's void return type, and the return/challenge flow depends on finding
@@ -511,6 +512,7 @@ class UnifiedPaymentAction
 
                 try {
                     $token_cache->set('uhf_pending_operation:' . $cart->id, $operation_id, 600);
+                    $token_cache->delete('uhf_failed_cart:' . $cart->id);
                 } catch (\Exception $exception) {
                     $logger->error('UnifiedPaymentAction::createAction - Failed to cache pending operation ' . $operation_id
                         . ' for cart ' . $cart->id . ': ' . $exception->getMessage());
@@ -616,12 +618,7 @@ class UnifiedPaymentAction
         $operation_id = $token_cache->get('uhf_pending_operation:' . $id_cart);
 
         if (!$operation_id) {
-            $logger->error('UnifiedPaymentAction::returnAction - No pending UPC operation for cart ' . $id_cart);
-
-            return $this->withReturnUrl([
-                'result' => false,
-                'redirect_url' => $order_action->errorUrl(),
-            ]);
+            return $this->returnWithoutPendingOperation($logger, $token_cache, $order_action, $token, $id_cart);
         }
 
         try {
@@ -1145,6 +1142,46 @@ class UnifiedPaymentAction
     }
 
     /**
+     * @description Resolve a 3DS return for a cart that has no pending operation, from the
+     * failed-cart marker left by a failed outcome already handled for that cart
+     *
+     * @param mixed $logger
+     * @param mixed $token_cache
+     * @param mixed $order_action
+     * @param string $token
+     * @param int $id_cart
+     *
+     * @return array{result: bool, redirect_url: string, return_url: string}
+     */
+    private function returnWithoutPendingOperation($logger, $token_cache, $order_action, $token, $id_cart)
+    {
+        try {
+            $failed_operation_id = (string) $token_cache->get('uhf_failed_cart:' . $id_cart);
+        } catch (\Throwable $exception) {
+            $logger->error('UnifiedPaymentAction::returnAction - Failed cart marker unreadable for cart ' . $id_cart . ': ' . $exception->getMessage());
+            $failed_operation_id = '';
+        }
+
+        if ('' !== $failed_operation_id) {
+            $logger->info('UnifiedPaymentAction::returnAction - Failed outcome already handled for cart ' . $id_cart
+                . ' (operation ' . $failed_operation_id . '), pending operation cleared');
+            $token_cache->delete('uhf_failed_cart:' . $id_cart);
+            $token_cache->delete('uhf_token_cart:' . $token);
+            $token_cache->delete('uhf_cart_token:' . $id_cart);
+            $this->dependencies->getHelpers()['cookies']->setPaymentErrorsCookie([
+                $this->dependencies->l('The transaction was not completed and your card was not charged.', 'uhf'),
+            ]);
+        } else {
+            $logger->error('UnifiedPaymentAction::returnAction - No pending UPC operation for cart ' . $id_cart);
+        }
+
+        return $this->withReturnUrl([
+            'result' => false,
+            'redirect_url' => $order_action->errorUrl(),
+        ]);
+    }
+
+    /**
      * @description Get the UnifiedOrderAction service, lazily loaded
      */
     private function orderAction()
@@ -1341,9 +1378,7 @@ class UnifiedPaymentAction
         }
 
         if ($result['result'] || PaymentOutcome::FAILED === $outcome) {
-            $token_cache = $factory->createTokenCache();
-            $token_cache->delete('uhf_pending_operation:' . $id_cart);
-            $token_cache->delete('uhf_challenge_html:' . $id_cart);
+            $this->clearCartPaymentState($factory, $logger, $id_cart, $operation_id, $outcome);
         }
 
         // Not on a failed PAID attempt (retry possible): the entry then expires with its own TTL.
@@ -1353,6 +1388,45 @@ class UnifiedPaymentAction
         }
 
         return $result;
+    }
+
+    /**
+     * @description Clear the cart's pending operation and challenge, and record the failed-cart
+     * marker on a FAILED outcome, unless another operation is pending for the cart or the pending
+     * entry can't be read
+     *
+     * @param mixed $factory
+     * @param mixed $logger
+     * @param int $id_cart
+     * @param string $operation_id
+     * @param string $outcome
+     */
+    private function clearCartPaymentState($factory, $logger, $id_cart, $operation_id, $outcome)
+    {
+        $token_cache = $factory->createTokenCache();
+
+        try {
+            $pending_operation_id = (string) $token_cache->get('uhf_pending_operation:' . $id_cart);
+        } catch (\Throwable $exception) {
+            $logger->error('UnifiedPaymentAction::createOrderWithLock - Pending operation unreadable for cart ' . $id_cart
+                . ', pending operation kept: ' . $exception->getMessage());
+
+            return;
+        }
+
+        if ('' !== $pending_operation_id && (string) $operation_id !== $pending_operation_id) {
+            $logger->info('UnifiedPaymentAction::createOrderWithLock - Operation ' . $operation_id . ' handled while operation '
+                . $pending_operation_id . ' is pending for cart ' . $id_cart . ', pending operation kept');
+
+            return;
+        }
+
+        if (PaymentOutcome::FAILED === $outcome) {
+            // Set before the pending entry is cleared, so a 3DS return always finds one of them.
+            $token_cache->set('uhf_failed_cart:' . $id_cart, (string) $operation_id, 600);
+        }
+        $token_cache->delete('uhf_pending_operation:' . $id_cart);
+        $token_cache->delete('uhf_challenge_html:' . $id_cart);
     }
 
     /**

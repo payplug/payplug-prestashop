@@ -388,7 +388,9 @@ class resyncPendingOrderTest extends TestCase
         $lock->shouldReceive('acquire')->andReturn(true)->byDefault();
         $lock->shouldReceive('release')->byDefault();
         $token_cache->shouldReceive('delete')->byDefault();
+        $token_cache->shouldReceive('set')->with(\Mockery::pattern('/^uhf_failed_cart:/'), \Mockery::any(), 600)->byDefault();
         $token_cache->shouldReceive('get')->with(\Mockery::pattern('/^uhf_pending_alias:/'))->andReturn(null)->byDefault();
+        $token_cache->shouldReceive('get')->with(\Mockery::pattern('/^uhf_pending_operation:/'))->andReturn(null)->byDefault();
 
         $action->orderAction = $order_action;
         $order_action->shouldReceive('errorUrl')->andReturn('index.php?controller=order&step=3&has_error=1&modulename=payplug');

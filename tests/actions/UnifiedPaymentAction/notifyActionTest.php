@@ -22,6 +22,11 @@ class notifyActionTest extends TestCase
     private const VALID_BODY = '{"id":"359fe258-8264-4a90-9a40-d16e1736058d","execCode":"0000","orderId":"6","amount":2900}';
     private const OPERATION_ID = '359fe258-8264-4a90-9a40-d16e1736058d';
     private const PAYMENT_ID = 'd4293432-a0ac-4d4f-ae5b-8b12253ecbec';
+    private const FAILED_WITHOUT_ORDER = [
+        'result' => false,
+        'redirect_url' => 'index.php?controller=order&step=3&has_error=1&modulename=payplug',
+        'persisted' => false,
+    ];
 
     public function tearDown(): void
     {
@@ -87,6 +92,157 @@ class notifyActionTest extends TestCase
         $result = $action->notifyAction();
 
         $this->assertSame(200, $result['http_status']);
+    }
+
+    /**
+     * The failure of a cart whose abandoned PayPlug order carries the operation is still visible
+     * to the 3DS return of that cart.
+     */
+    public function testRecordsTheFailedCartMarkerBeforeClearingThePendingOperationWhenTheFailureLandsOnAnAbandonedOrder()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_failed","execCode":"4008","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, 'op_failed', '4008', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, 'op_failed', '4008', PaymentOutcome::FAILED, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+            'outcome_applied' => true,
+        ]);
+        $mocks['token_cache']->shouldReceive('set')->once()->with('uhf_failed_cart:6', 'op_failed', 600)->ordered();
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_operation:6')->ordered();
+        $mocks['payment_repository']->shouldReceive('save')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_failed');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testRecordsNoFailedCartMarkerOnAPaidOutcome()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, '359fe258-8264-4a90-9a40-d16e1736058d', '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['token_cache']->shouldReceive('set')->never();
+        $mocks['payment_repository']->shouldReceive('markTreated')->once();
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testRecordsTheFailedCartMarkerBeforeClearingThePendingOperationWhenItIsTheNotifiedOne()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_failed","execCode":"4008","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, 'op_failed', '4008', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, 'op_failed', '4008', PaymentOutcome::FAILED, 2900, self::FAILED_WITHOUT_ORDER);
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:6')->andReturn('op_failed');
+        $mocks['token_cache']->shouldReceive('set')->once()->with('uhf_failed_cart:6', 'op_failed', 600)->ordered();
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_operation:6')->ordered();
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_challenge_html:6');
+        $mocks['payment_repository']->shouldReceive('save')->once();
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_failed');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testRecordsTheFailedCartMarkerWhenNoPendingOperationIsCached()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_failed","execCode":"4008","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, 'op_failed', '4008', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, 'op_failed', '4008', PaymentOutcome::FAILED, 2900, self::FAILED_WITHOUT_ORDER);
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:6')->andReturn(null);
+        $mocks['token_cache']->shouldReceive('set')->once()->with('uhf_failed_cart:6', 'op_failed', 600);
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_operation:6');
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_challenge_html:6');
+        $mocks['payment_repository']->shouldReceive('save')->once();
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_failed');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    /**
+     * The late failure of an earlier attempt must not report the attempt in progress as failed,
+     * nor drop the pending operation its 3DS return needs.
+     */
+    public function testKeepsTheCartPaymentStateOfTheAttemptInProgressWhenAnEarlierAttemptFailureIsNotifiedLate()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_failed","execCode":"4008","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, 'op_failed', '4008', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, 'op_failed', '4008', PaymentOutcome::FAILED, 2900, self::FAILED_WITHOUT_ORDER);
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:6')->andReturn('op_current');
+        $mocks['token_cache']->shouldReceive('set')->never();
+        $mocks['token_cache']->shouldReceive('delete')->never()->with('uhf_pending_operation:6');
+        $mocks['token_cache']->shouldReceive('delete')->never()->with('uhf_challenge_html:6');
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_alias:op_failed');
+        $mocks['logger']->shouldReceive('info')->once()
+            ->with('UnifiedPaymentAction::createOrderWithLock - Operation op_failed handled while operation op_current is pending for cart 6, pending operation kept');
+        $mocks['payment_repository']->shouldReceive('save')->once();
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_failed');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    public function testKeepsThePendingOperationOfTheAttemptInProgressWhenAnotherOperationIsPaid()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')->andReturn(self::VALID_BODY);
+        $this->mockGetOperationResponse($mocks, self::OPERATION_ID, '0000', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, self::OPERATION_ID, '0000', PaymentOutcome::PAID, 2900, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+            'persisted' => true,
+        ]);
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:6')->andReturn('op_current');
+        $mocks['token_cache']->shouldReceive('set')->never();
+        $mocks['token_cache']->shouldReceive('delete')->never()->with('uhf_pending_operation:6');
+        $mocks['token_cache']->shouldReceive('delete')->never()->with('uhf_challenge_html:6');
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_alias:' . self::OPERATION_ID);
+        $mocks['logger']->shouldReceive('info')->once()
+            ->with('UnifiedPaymentAction::createOrderWithLock - Operation ' . self::OPERATION_ID . ' handled while operation op_current is pending for cart 6, pending operation kept');
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with(self::OPERATION_ID);
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
+    }
+
+    /**
+     * An unreadable pending entry may be the attempt in progress: it is neither cleared nor
+     * reported as failed, and the outcome is still treated.
+     */
+    public function testKeepsTheCartPaymentStateWhenThePendingOperationCannotBeRead()
+    {
+        [$action, $mocks] = $this->mockActionForNotify();
+        $mocks['tools_adapter']->shouldReceive('tool')->with('file_get_contents', 'php://input')
+            ->andReturn('{"id":"op_failed","execCode":"4008","orderId":"6","amount":2900}');
+        $this->mockGetOperationResponse($mocks, 'op_failed', '4008', '6', 2900);
+        $this->mockCartForAmountCrossCheck($action->dependencies, 2900);
+        $this->mockCreateFromOutcome($mocks, 'op_failed', '4008', PaymentOutcome::FAILED, 2900, self::FAILED_WITHOUT_ORDER);
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:6')->andThrow(new \RuntimeException('cache table unavailable'));
+        $mocks['token_cache']->shouldReceive('set')->never();
+        $mocks['token_cache']->shouldReceive('delete')->never()->with('uhf_pending_operation:6');
+        $mocks['token_cache']->shouldReceive('delete')->never()->with('uhf_challenge_html:6');
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_alias:op_failed');
+        $mocks['logger']->shouldReceive('error')->once()
+            ->with('UnifiedPaymentAction::createOrderWithLock - Pending operation unreadable for cart 6, pending operation kept: cache table unavailable');
+        $mocks['payment_repository']->shouldReceive('save')->once();
+        $mocks['payment_repository']->shouldReceive('markTreated')->once()->with('op_failed');
+
+        $this->assertSame(200, $action->notifyAction()['http_status']);
     }
 
     public function testReturnsServerErrorAndDoesNotMarkTreatedWhenOrderCreationFailsForNonFailedOutcome()
@@ -1388,7 +1544,9 @@ class notifyActionTest extends TestCase
         $token_cache = \Mockery::mock('TokenCache');
         $factory->shouldReceive('createTokenCache')->andReturn($token_cache)->byDefault();
         $token_cache->shouldReceive('delete')->byDefault();
+        $token_cache->shouldReceive('set')->with(\Mockery::pattern('/^uhf_failed_cart:/'), \Mockery::any(), 600)->byDefault();
         $token_cache->shouldReceive('get')->with(\Mockery::pattern('/^uhf_pending_alias:/'))->andReturn(null)->byDefault();
+        $token_cache->shouldReceive('get')->with(\Mockery::pattern('/^uhf_pending_operation:/'))->andReturn(null)->byDefault();
 
         // UnifiedOrderAction now has its own dedicated test coverage (UnifiedOrderActionTest) -
         // this suite mocks it as an opaque collaborator instead of re-exercising its internal
