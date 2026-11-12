@@ -47,18 +47,128 @@ class returnActionTest extends TestCase
         $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
     }
 
+    /**
+     * Only the cart-scoped marker is read: a failed operation recorded for an order whose id
+     * happens to equal the cart id has no bearing on the return of this cart.
+     */
     public function testReturnsErrorUrlWhenNoPendingOperationIsCached()
     {
         [$action, $mocks] = $this->mockActionForReturn();
+        $mocks['payment_repository']->shouldNotReceive('getAllBy', 'getByOrderId', 'getPaidByOrderId');
 
         $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
         $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null);
-        $mocks['logger']->shouldReceive('error')->once();
+        $mocks['token_cache']->shouldReceive('get')->once()->with('uhf_failed_cart:42')->andReturn(null);
+        $mocks['payment_service']->shouldReceive('getOperation')->never();
+        $mocks['token_cache']->shouldReceive('delete')->never();
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')->never();
+        $mocks['logger']->shouldReceive('error')->once()->with('UnifiedPaymentAction::returnAction - No pending UPC operation for cart 42');
 
         $result = $action->returnAction(['token' => 'good-token']);
 
         $this->assertFalse($result['result']);
         $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+    }
+
+    /**
+     * The FAILED notification was handled before the 3DS return: it replaced the pending entry
+     * with the failed-cart marker.
+     */
+    public function testShowsThePaymentErrorAndConsumesTheTokenWhenTheFailureWasAlreadyHandled()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null);
+        $mocks['token_cache']->shouldReceive('get')->once()->with('uhf_failed_cart:42')->andReturn('op_failed');
+        $mocks['payment_service']->shouldReceive('getOperation')->never();
+        $mocks['order_action']->shouldReceive('createFromOutcome')->never();
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_failed_cart:42');
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_token_cart:good-token');
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_cart_token:42');
+        $mocks['logger']->shouldReceive('error')->never();
+        $mocks['logger']->shouldReceive('info')->once()
+            ->with('UnifiedPaymentAction::returnAction - Failed outcome already handled for cart 42 (operation op_failed), pending operation cleared');
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')
+            ->once()
+            ->with(['The transaction was not completed and your card was not charged.']);
+
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertFalse($result['result']);
+        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+    }
+
+    /**
+     * @dataProvider failedCartMarkerReadErrorProvider
+     */
+    public function testShowsNoPaymentErrorAndKeepsTheTokenWhenTheFailedCartMarkerCannotBeRead(\Throwable $error)
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn(null);
+        $mocks['token_cache']->shouldReceive('get')->once()->with('uhf_failed_cart:42')->andThrow($error);
+        $mocks['payment_service']->shouldReceive('getOperation')->never();
+        $mocks['token_cache']->shouldReceive('delete')->never();
+        $mocks['cookies']->shouldReceive('setPaymentErrorsCookie')->never();
+        $mocks['logger']->shouldReceive('error')->once()->with(\Mockery::pattern('/cart 42.*cache unavailable/'));
+        $mocks['logger']->shouldReceive('error')->once()->with('UnifiedPaymentAction::returnAction - No pending UPC operation for cart 42');
+
+        $result = $action->returnAction(['token' => 'good-token']);
+
+        $this->assertFalse($result['result']);
+        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+    }
+
+    public function failedCartMarkerReadErrorProvider()
+    {
+        return [
+            'exception' => [new \Exception('cache unavailable')],
+            'type error' => [new \TypeError('cache unavailable')],
+        ];
+    }
+
+    /**
+     * A return landing between the cleanup of the pending entry and anything else always finds
+     * one of the two entries.
+     */
+    public function testRecordsTheFailedCartMarkerBeforeClearingThePendingOperationOnAFailedReturn()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '4008', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '4008', PaymentOutcome::FAILED, 1234, [
+            'result' => false,
+            'redirect_url' => 'index.php?controller=order&step=3&has_error=1&modulename=payplug',
+        ]);
+        $mocks['token_cache']->shouldReceive('set')->once()->with('uhf_failed_cart:42', 'op_123', 600)->ordered();
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_operation:42')->ordered();
+
+        $this->assertFalse($action->returnAction(['token' => 'good-token'])['result']);
+    }
+
+    public function testRecordsNoFailedCartMarkerOnAPaidReturn()
+    {
+        [$action, $mocks] = $this->mockActionForReturn();
+
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_token_cart:good-token')->andReturn('42');
+        $mocks['token_cache']->shouldReceive('get')->with('uhf_pending_operation:42')->andReturn('op_123');
+        $mocks['payment_service']->shouldReceive('getOperation')->with('op_123')->andReturn([
+            'body' => json_encode(['execCode' => '0000', 'amount' => 1234, 'orderId' => '42']),
+        ]);
+        $this->mockCreateFromOutcome($mocks, 'op_123', '0000', PaymentOutcome::PAID, 1234, [
+            'result' => true,
+            'redirect_url' => 'https://shop.example/order-confirmation?id_order=99',
+        ]);
+        $mocks['token_cache']->shouldReceive('set')->never();
+        $mocks['token_cache']->shouldReceive('delete')->once()->with('uhf_pending_operation:42');
+
+        $this->assertTrue($action->returnAction(['token' => 'good-token'])['result']);
     }
 
     public function testReturnsErrorUrlWhenGetOperationThrows()
@@ -672,6 +782,7 @@ class returnActionTest extends TestCase
         // Fix 7: cache cleanup after a terminal reconciliation - not asserted by every test, only
         // the ones specifically covering it.
         $token_cache->shouldReceive('delete')->byDefault();
+        $token_cache->shouldReceive('set')->with(\Mockery::pattern('/^uhf_failed_cart:/'), \Mockery::any(), 600)->byDefault();
         $token_cache->shouldReceive('get')->with(\Mockery::pattern('/^uhf_pending_alias:/'))->andReturn(null)->byDefault();
 
         // UnifiedOrderAction now has its own dedicated test coverage (UnifiedOrderActionTest) -
