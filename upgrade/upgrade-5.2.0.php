@@ -44,6 +44,7 @@ function upgrade_module_5_2_0($object)
             `treated` TINYINT(1) NOT NULL DEFAULT 0,
             `payment_id` VARCHAR(255) NULL,
             `requested_amount` INT(11) UNSIGNED NULL,
+            `payment_details` TEXT NULL,
             `date_add` DATETIME NULL,
             `date_upd` DATETIME NULL,
             CONSTRAINT payplug_unified_operation_unique UNIQUE (operation_id),
@@ -60,6 +61,7 @@ function upgrade_module_5_2_0($object)
     $operation_columns = [
         'payment_id' => 'VARCHAR(255) NULL AFTER `treated`',
         'requested_amount' => 'INT(11) UNSIGNED NULL AFTER `payment_id`',
+        'payment_details' => 'TEXT NULL AFTER `requested_amount`',
     ];
     foreach ($operation_columns as $column => $definition) {
         if (!$flag_operation) {

@@ -81,4 +81,23 @@ class initializeTest extends BaseUnifiedOperationRepository
 
         $this->assertTrue($this->repository->initialize($this->engine));
     }
+
+    public function testCreatesThePaymentDetailsColumn()
+    {
+        $this->repository->shouldReceive([
+            'getEntityObject' => $this->entity,
+            'create' => $this->repository,
+            'table' => $this->repository,
+            'condition' => $this->repository,
+            'engine' => $this->repository,
+            'build' => true,
+        ]);
+        $this->repository->shouldReceive('fields')
+            ->once()
+            ->with('`payment_details` TEXT NULL')
+            ->andReturn($this->repository);
+        $this->repository->shouldReceive('fields')->andReturn($this->repository);
+
+        $this->assertTrue($this->repository->initialize($this->engine));
+    }
 }

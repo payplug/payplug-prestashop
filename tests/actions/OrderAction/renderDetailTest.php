@@ -16,6 +16,9 @@ class renderDetailTest extends BaseOrderAction
 {
     protected $constant;
     protected $operation_action;
+    protected $order_detail_action;
+    protected $unified_operation_repository;
+    protected $unified_order_action;
 
     public function setUp(): void
     {
@@ -29,6 +32,11 @@ class renderDetailTest extends BaseOrderAction
         $this->operation_action = \Mockery::mock('UnifiedPaymentAction');
         $this->operation_action->shouldReceive('resyncPendingOrder')->andReturn(false)->byDefault();
         $this->module->shouldReceive('getService')->with('payplug.action.unified_payment')->andReturn($this->operation_action);
+        $this->order_detail_action = \Mockery::mock('UnifiedOrderDetailAction');
+        $this->order_detail_action->shouldReceive('buildPayment')->andReturn(['status_code' => 'paid'])->byDefault();
+        $this->module->shouldReceive('getService')->with('payplug.action.unified_order_detail')->andReturn($this->order_detail_action);
+        $this->unified_order_action = \Mockery::mock('UnifiedOrderAction');
+        $this->module->shouldReceive('getService')->with('payplug.action.unified_order')->andReturn($this->unified_order_action);
     }
 
     public function tearDown(): void
@@ -372,7 +380,157 @@ class renderDetailTest extends BaseOrderAction
 
         $this->assertSame('uhf', $result['refund']['payment_type']);
         $this->assertSame('op_pay', $result['refund']['id']);
+        $this->assertSame(['status_code' => 'paid'], $result['payment']);
+    }
+
+    public function testUhfOrderShowsItsPaymentDetailsNextToTheRefundForm()
+    {
+        $order = $this->mockUhfOrder();
+        $operation = new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42');
+        $this->mockUnifiedServices($operation, 1000);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $payment = ['id' => 'pay_1', 'status_code' => 'partially_refunded'];
+        $this->order_detail_action->shouldReceive('buildPayment')
+            ->once()
+            ->with($order, $operation, \Mockery::on(function ($currency) {
+                return 'USD' === $currency->iso_code;
+            }), 1000)
+            ->andReturn($payment);
+
+        $result = $this->action->renderDetail(42);
+
+        $this->assertSame($payment, $result['payment']);
+        $this->assertSame('uhf', $result['refund']['payment_type']);
+        $this->assertFalse($result['update']);
+    }
+
+    public function testFullyRefundedUhfOrderStillShowsItsPaymentDetails()
+    {
+        $this->mockUhfOrder();
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 2900);
+        $this->order_detail_action->shouldReceive('buildPayment')->once()->andReturn(['status_code' => 'refunded']);
+
+        $result = $this->action->renderDetail(42);
+
+        $this->assertSame('refunded', $result['payment']['status_code']);
+        $this->assertSame('USD 29.00', $result['refunded_display']);
+    }
+
+    /**
+     * The refund form must stay available whatever happens to the details block.
+     */
+    public function testUhfRefundFormStaysWhenThePaymentDetailsCannotBeBuilt()
+    {
+        $this->mockUhfOrder();
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 1000);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->order_detail_action->shouldReceive('buildPayment')->andThrow(new \Exception('translations unavailable'));
+
+        $result = $this->action->renderDetail(42);
+
         $this->assertArrayNotHasKey('payment', $result);
+        $this->assertSame('uhf', $result['refund']['payment_type']);
+        $this->assertSame(19.0, $result['refund']['available']);
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::pattern('/payment details of UHF order 42 could not be built.*translations unavailable/'), 'error')
+            ->once();
+    }
+
+    /**
+     * Orders created before their label and transaction id were set are brought up to date when
+     * opened.
+     */
+    public function testUhfOrderGivesItsPaymentThePaymentIdWhenOpened()
+    {
+        $this->mockUhfOrder();
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 0);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->unified_operation_repository->shouldReceive('getPaymentIdByOperationId')->with('op_pay')->andReturn('pay_1');
+        $this->unified_order_action->shouldReceive('syncOrderPayment')->once()->with(42, 'pay_1')->andReturn(true);
+
+        $result = $this->action->renderDetail(42);
+
+        $this->assertSame('paid', $result['payment']['status_code']);
+        $this->assertSame('uhf', $result['refund']['payment_type']);
+    }
+
+    public function testUhfOrderPaymentIsLeftAloneWhenNoPaymentIdIsRecorded()
+    {
+        $this->mockUhfOrder();
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 0);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->unified_order_action->shouldReceive('syncOrderPayment')->never();
+
+        $this->assertSame('uhf', $this->action->renderDetail(42)['refund']['payment_type']);
+    }
+
+    public function testUhfOrderStillRendersWhenItsPaymentCannotBeBroughtUpToDate()
+    {
+        $this->mockUhfOrder();
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 1000);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->unified_operation_repository->shouldReceive('getPaymentIdByOperationId')->with('op_pay')->andReturn('pay_1');
+        $this->unified_order_action->shouldReceive('syncOrderPayment')->once()->andThrow(new \Exception('service unavailable'));
+
+        $result = $this->action->renderDetail(42);
+
+        $this->assertSame('paid', $result['payment']['status_code']);
+        $this->assertSame(19.0, $result['refund']['available']);
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::pattern('/payment of UHF order 42 not brought up to date.*service unavailable/'), 'error')
+            ->once();
+    }
+
+    public function testUhfOrderStillRendersWhenItsPaymentIdCannotBeRead()
+    {
+        $this->mockUhfOrder();
+        $this->mockUnifiedServices(new OperationData('op_pay', '0000', PaymentOutcome::PAID, 2900, '42'), 0);
+        $this->order_class->shouldReceive('getTotalRefunded')->with(42)->andReturn(0);
+        $this->unified_operation_repository->shouldReceive('getPaymentIdByOperationId')->andThrow(new \Exception('Unknown column'));
+        $this->unified_order_action->shouldReceive('syncOrderPayment')->never();
+
+        $result = $this->action->renderDetail(42);
+
+        $this->assertSame('paid', $result['payment']['status_code']);
+        $this->logger->shouldHaveReceived('addLog')
+            ->with(\Mockery::pattern('/payment of UHF order 42 not brought up to date.*Unknown column/'), 'error')
+            ->once();
+    }
+
+    /**
+     * EUR orders are paid through the Retail API: their block is built by the payment method,
+     * never by the UHF detail builder.
+     */
+    public function testRetailOrderNeverBuildsUhfPaymentDetails()
+    {
+        $adminClass = \Mockery::mock('AdminClass');
+        $adminClass->shouldReceive(['getAdminAjaxUrl' => '/']);
+        $this->dependencies->adminClass = $adminClass;
+        $orderClass = \Mockery::mock('OrderClass');
+        $orderClass->shouldReceive(['getUndefinedOrderHistory' => []]);
+        $this->dependencies->orderClass = $orderClass;
+        $order = OrderMock::get();
+        $order->module = 'payplug';
+        $retail_payment = ['id' => 'pay_azerty12345', 'mode' => 'live', 'status_code' => 'paid'];
+        $this->payment_method->shouldReceive(['getResourceDetail' => $retail_payment]);
+        $this->configuration_class->shouldReceive('getValue')->with('order_state_pending')->andReturn('42');
+        $this->constant->shouldReceive('get')->with('__PS_BASE_URI__')->andReturn('/');
+        $this->order_adapter->shouldReceive(['get' => $order]);
+        $this->payment_repository->shouldReceive(['getBy' => ['resource_id' => 'pay_azerty12345', 'method' => 'standard']]);
+        $this->validate_adapter->shouldReceive(['validate' => true]);
+        $this->mockUnifiedServices(null, 0);
+        $this->order_detail_action->shouldReceive('buildPayment')->never();
+        $this->unified_order_action->shouldReceive('syncOrderPayment')->never();
+
+        $this->assertSame([
+            'logo_url' => '/modules/payplug/views/img/payplug.svg',
+            'admin_ajax_url' => '/',
+            'order' => $order,
+            'refund' => false,
+            'refunded' => false,
+            'update' => true,
+            'payment' => $retail_payment,
+        ], $this->action->renderDetail(42));
     }
 
     /**
@@ -413,6 +571,7 @@ class renderDetailTest extends BaseOrderAction
     {
         $factory = \Mockery::mock('Factory');
         $operation_repository = \Mockery::mock('UnifiedOperationRepository');
+        $this->unified_operation_repository = $operation_repository;
         $refund_repository = \Mockery::mock('UnifiedRefundRepository');
         $amount_helper = new AmountHelper(\Mockery::mock('Dependencies'));
         $price_adapter = \Mockery::mock('PriceAdapter');
@@ -425,6 +584,7 @@ class renderDetailTest extends BaseOrderAction
         $this->module->shouldReceive('getService')->with('payplug.application.adapter.price')->andReturn($price_adapter);
         $factory->shouldReceive('createPaymentRepository')->andReturn($operation_repository);
         $operation_repository->shouldReceive('getPaidByOrderId')->with('42')->andReturn($paid_operation);
+        $operation_repository->shouldReceive('getPaymentIdByOperationId')->andReturn(null)->byDefault();
         $refund_repository->shouldReceive('getRefundedAmount')->with('42')->andReturn($refunded_cents);
         $price_adapter->shouldReceive('formatPrice')->andReturnUsing(function ($price, $iso_code) {
             return $iso_code . ' ' . number_format($price, 2);

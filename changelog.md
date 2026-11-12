@@ -12,6 +12,7 @@
   - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Include the cards saved through Unified Hosted Fields in the GDPR data export and erase
   - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Keep Unified Hosted Fields payments, saved cards and back-office refunds working with the new Unified API contract (unified-plugin-core ^1.2.2)
   - [PRE-3778](https://github.com/payplug/payplug-prestashop/pull/150): Show the payment error message to a customer back from a failed Unified Hosted Fields 3DS authentication whose failure notification arrived first
+  - [PRE-3747](https://github.com/payplug/payplug-prestashop/pull/151): Show the same payment details block, payment method label and transaction id for Unified Hosted Fields orders as for EUR orders in the back office
 
 - Bugfix :
   - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Require the customer token to delete a saved card (CSRF protection on the saved cards page)

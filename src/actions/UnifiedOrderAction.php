@@ -147,6 +147,7 @@ class UnifiedOrderAction
 
         $order_adapter = $plugin->getOrder();
         $module = $plugin->getModule()->getInstanceByName($this->dependencies->name);
+        $payment_id = $this->recordedPaymentId($operation_id);
 
         try {
             $currency = $plugin->getCurrency()->getCurrency((int) $cart->id_currency);
@@ -162,9 +163,9 @@ class UnifiedOrderAction
                 (int) $cart->id,
                 $initial_state,
                 $amount_float,
-                $this->dependencies->name,
+                $this->paymentLabel(),
                 null,
-                ['transaction_id' => $operation_id],
+                '' !== $payment_id ? ['transaction_id' => $payment_id] : [],
                 (int) $cart->id_currency,
                 false,
                 $secure_key
@@ -298,6 +299,159 @@ class UnifiedOrderAction
     }
 
     /**
+     * @description Give the order's payments without transaction id the payment id and the
+     *              payment label, and the order the payment label when its label is the module
+     *              name. Never overwrites a transaction id.
+     *
+     * PrestaShop creates the payment row of an order validated in the pending state only when the
+     * paid state is applied, without transaction id. Never throws: a failure is logged.
+     *
+     * @param int $order_id
+     * @param string|null $payment_id the payment's own id, never the operation id
+     *
+     * @return bool true when the order or one of its payments was updated
+     */
+    public function syncOrderPayment($order_id, $payment_id)
+    {
+        $updated = false;
+        if ('' === (string) $payment_id) {
+            return $updated;
+        }
+
+        try {
+            $order = $this->dependencies->getPlugin()->getOrder()->get((int) $order_id);
+            if (is_object($order) && isset($order->module) && $order->module === $this->dependencies->name) {
+                $label = $this->paymentLabel();
+                $updated = $this->fillOrderPayments($order, (string) $payment_id, $label);
+                $updated = $this->relabelOrder($order, $label) || $updated;
+            }
+        } catch (\Throwable $exception) {
+            $this->logger()->error(
+                'UnifiedOrderAction::syncOrderPayment - payment of order ' . (int) $order_id
+                . ' not updated with payment id ' . $payment_id . ': ' . $exception->getMessage()
+            );
+        }
+
+        return $updated;
+    }
+
+    /**
+     * @description Fill the Payplug payments of the order that have no transaction id. Any other
+     *              payment, e.g. one the merchant added from the back office, is left untouched.
+     *
+     * @param mixed $order
+     * @param string $payment_id
+     * @param string $label
+     *
+     * @return bool true when a payment was updated
+     */
+    private function fillOrderPayments($order, $payment_id, $label)
+    {
+        $payplug_methods = $this->payplugPaymentMethods($label);
+        $updated = false;
+        foreach ((array) $order->getOrderPayments() as $order_payment) {
+            if ('' !== (string) $order_payment->transaction_id
+                || !in_array((string) $order_payment->payment_method, $payplug_methods, true)) {
+                continue;
+            }
+
+            $order_payment->transaction_id = $payment_id;
+            $order_payment->payment_method = $label;
+            $updated = (bool) $order_payment->update() || $updated;
+        }
+
+        return $updated;
+    }
+
+    /**
+     * @description Get the payment methods a payment of a Payplug order is recorded with: the
+     *              module's displayName, set by OrderHistory::changeIdOrderState() on the payment
+     *              it creates when the order is paid, and the order label, set by
+     *              Order::addOrderPayment() when validateOrder() records the payment (the payment
+     *              label, or the module name for an order validated with it)
+     *
+     * @param string $label
+     *
+     * @return string[]
+     */
+    private function payplugPaymentMethods($label)
+    {
+        $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
+        $display_name = is_object($module) && isset($module->displayName) ? (string) $module->displayName : '';
+
+        return array_values(array_filter([$display_name, $label, $this->dependencies->name], function ($method) {
+            return '' !== $method;
+        }));
+    }
+
+    /**
+     * @param mixed $order
+     * @param string $label
+     *
+     * @return bool true when the order label was replaced
+     */
+    private function relabelOrder($order, $label)
+    {
+        if ($order->payment !== $this->dependencies->name || $label === $this->dependencies->name) {
+            return false;
+        }
+
+        $order->payment = $label;
+
+        return (bool) $order->update();
+    }
+
+    /**
+     * @description Get the label of the order's payment method, the one of an EUR card payment
+     *
+     * @return string the module name when the label cannot be translated
+     */
+    private function paymentLabel()
+    {
+        try {
+            $translations = $this->dependencies->getPlugin()->getTranslationClass()->getOrderTranslations();
+            $label = isset($translations['module_name']['default']) ? (string) $translations['module_name']['default'] : '';
+        } catch (\Throwable $exception) {
+            $label = '';
+        }
+
+        return '' !== $label ? $label : $this->dependencies->name;
+    }
+
+    /**
+     * @param string $operation_id
+     *
+     * @return string the payment id recorded for the operation, '' when none is (or it cannot be read)
+     */
+    private function recordedPaymentId($operation_id)
+    {
+        try {
+            $payment_id = $this->paymentRepository()->getPaymentIdByOperationId((string) $operation_id);
+        } catch (\Throwable $exception) {
+            $this->logger()->error(
+                'UnifiedOrderAction - payment id of operation ' . $operation_id . ' could not be read: ' . $exception->getMessage()
+            );
+            $payment_id = null;
+        }
+
+        return null !== $payment_id ? (string) $payment_id : '';
+    }
+
+    /**
+     * @description Fill the transaction id of the payment created when the paid state was applied
+     *
+     * @param int $order_id
+     * @param string $operation_id
+     */
+    private function syncPaidOrderPayment($order_id, $operation_id)
+    {
+        $payment_id = $this->recordedPaymentId($operation_id);
+        if ('' !== $payment_id) {
+            $this->syncOrderPayment($order_id, $payment_id);
+        }
+    }
+
+    /**
      * @description Find the existing order for a cart and describe its ownership and state
      *
      * @param int $id_cart
@@ -404,6 +558,10 @@ class UnifiedOrderAction
             $outcome_applied = false;
         }
 
+        if (PaymentOutcome::PAID === $state_outcome && $outcome_applied) {
+            $this->syncPaidOrderPayment($order_id, $operation_id);
+        }
+
         if (PaymentOutcome::FAILED === $outcome) {
             return [
                 'result' => false,
@@ -493,9 +651,25 @@ class UnifiedOrderAction
      */
     private function logger()
     {
+        return $this->factory()->createLogger();
+    }
+
+    /**
+     * @description Get the UPC operation repository from the unified API payment service factory
+     */
+    private function paymentRepository()
+    {
+        return $this->factory()->createPaymentRepository();
+    }
+
+    /**
+     * @description Get the unified API payment service factory
+     */
+    private function factory()
+    {
         $module = $this->dependencies->getPlugin()->getModule()->getInstanceByName($this->dependencies->name);
 
-        return $module->getService('payplug.unified.payment_service_factory')->createLogger();
+        return $module->getService('payplug.unified.payment_service_factory');
     }
 
     /**

@@ -80,6 +80,7 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
             ->fields('`treated` TINYINT(1) NOT NULL DEFAULT 0')
             ->fields('`payment_id` VARCHAR(255) NULL')
             ->fields('`requested_amount` INT(11) UNSIGNED NULL')
+            ->fields('`payment_details` TEXT NULL')
             ->fields('`date_add` DATETIME NULL')
             ->fields('`date_upd` DATETIME NULL')
             ->condition('CONSTRAINT payplug_unified_operation_unique UNIQUE (operation_id), KEY payplug_unified_operation_order_id (order_id)')
@@ -234,6 +235,53 @@ class UnifiedOperationRepository extends EntityRepository implements IPaymentRep
 
         return $row && isset($row['requested_amount']) && is_numeric($row['requested_amount'])
             ? (int) $row['requested_amount']
+            : null;
+    }
+
+    /**
+     * Card and 3-D Secure details of the payment (UnifiedPaymentDetails::fromOperation()), shown on
+     * the back-office order page. save() never writes them.
+     */
+    public function savePaymentDetails(string $operationId, array $details): bool
+    {
+        try {
+            $existing = $this->getBy('operation_id', $operationId);
+
+            return $existing && (bool) $this->updateEntity(
+                (int) $existing['id_payplug_unified_operation'],
+                ['payment_details' => (string) json_encode($details)]
+            );
+        } catch (\Throwable $exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @return array<string, string|null>|null null when none were recorded or they cannot be read
+     */
+    public function getPaymentDetails(string $operationId): ?array
+    {
+        try {
+            $row = $this->getBy('operation_id', $operationId);
+            $details = $row && isset($row['payment_details']) && is_string($row['payment_details'])
+                ? json_decode($row['payment_details'], true)
+                : null;
+        } catch (\Throwable $exception) {
+            $details = null;
+        }
+
+        return is_array($details) ? $details : null;
+    }
+
+    /**
+     * @return string|null 'Y-m-d H:i:s', null for an unknown operation or an undated row
+     */
+    public function getDateAddByOperationId(string $operationId): ?string
+    {
+        $row = $this->getBy('operation_id', $operationId);
+
+        return $row && isset($row['date_add']) && is_string($row['date_add']) && '' !== $row['date_add']
+            ? $row['date_add']
             : null;
     }
 
