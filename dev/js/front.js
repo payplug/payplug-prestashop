@@ -76,24 +76,46 @@ var $document, $window, __moduleName__Module = {
     },
     order: {
         init: function () {
-            // Styling
+            this.style();
+            this.observeOpc();
+            this.checkErrors();
+
+            $document.on('click', '.__moduleName__Msg_button', __moduleName__Module.popup.close);
+            $document.on('click', '.__moduleName__Msg_declineButton', __moduleName__Module.popup.close);
+        },
+        style: function () {
             var $options = $('input[data-module-name="__moduleName__"]');
             $options.parents('.payment-option').addClass('__moduleName__PaymentOption')
             $options.each(function () {
                 var $form = $('#pay-with-' + this.id + '-form').find('form');
                 if ($form.find('input[name=method]').val() == "oney") {
-                    if ($form.find('input[name=__moduleName__Oney_type]').val().includes("without_fees")) {
+                    const type = $form.find('input[name=__moduleName__Oney_type]').val() || '';
+                    if (type.includes("without_fees")) {
                         $('#' + this.id + '-container').addClass('without_fees');
-                    } else if ($form.find('input[name=__moduleName__Oney_type]').val().includes("with_fees")) {
+                    } else if (type.includes("with_fees")) {
                         $('#' + this.id + '-container').addClass('with_fees');
                     }
                 }
             })
+        },
+        observeOpc: function () {
+            const target = document.getElementById('opc-payment-methods');
+            if (!target || typeof MutationObserver === 'undefined') {
+                return;
+            }
 
-            this.checkErrors();
-
-            $document.on('click', '.__moduleName__Msg_button', __moduleName__Module.popup.close);
-            $document.on('click', '.__moduleName__Msg_declineButton', __moduleName__Module.popup.close);
+            // The One Page Checkout replaces the payment list, or nodes nested inside it, by AJAX: style each new render once.
+            let pending = false;
+            new MutationObserver(function () {
+                if (pending) {
+                    return;
+                }
+                pending = true;
+                window.requestAnimationFrame(function () {
+                    pending = false;
+                    __moduleName__Module.order.style();
+                });
+            }).observe(target, {childList: true, subtree: true});
         },
         checkErrors: function () {
             if (typeof check_errors == 'undefined' || !check_errors) {
