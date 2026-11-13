@@ -6,6 +6,9 @@
   - [PRE-3657](https://github.com/payplug/payplug-prestashop/pull/146): Serve the Apple Pay domain verification file on every shop domain from a copy downloaded on install and on the first upgrade, with a back-office diagnostics payload, a Resync endpoint and a `payplug:apple-pay:refresh-well-known` console command
   - [PRE-3812](https://github.com/payplug/payplug-prestashop/pull/148): Show the integrated card payment fields with the One Page Checkout (ps_onepagecheckout)
 
+- Bugfix :
+  - [PRE-3813](https://github.com/payplug/payplug-prestashop/pull/152): Keep the Payplug payment option logos (Oney 3x/4x included) at the same size with the native One Page Checkout as in the classic checkout
+
 ## Version 5.2.1
 - Bugfix :
   - [PRE-3868](https://github.com/payplug/payplug-prestashop/pull/162): Replace `serialize()` with `json_encode()` in the currency list cache key, refused by the PrestaShop Addons validator, and add a `composer cs-forbidden` check that rejects `serialize()`, `unserialize()` and `eval()` in the module code
