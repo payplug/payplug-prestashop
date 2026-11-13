@@ -242,6 +242,23 @@ class ApplepayPaymentMethod extends PaymentMethod
             ],
         ];
 
+        try {
+            $option['domain_association'] = array_merge(
+                $this->dependencies
+                    ->getPlugin()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.action.apple_pay_domain_association')
+                    ->getDiagnosticsAction(),
+                ['texts' => $this->translation[$this->name]['domain_association']]
+            );
+        } catch (\Throwable $exception) {
+            $this->logger->addLog(
+                'ApplepayPaymentMethod::getOption: Apple Pay domain association diagnostics unavailable: ' . $exception->getMessage(),
+                'error'
+            );
+        }
+
         return $option;
     }
 

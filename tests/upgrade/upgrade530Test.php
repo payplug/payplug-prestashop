@@ -18,9 +18,12 @@ class upgrade530Test extends TestCase
     use MockeryPHPUnitIntegration;
     use ReleasesTestProperties;
 
+    protected $action;
     protected $api_service;
     protected $configuration;
     protected $dependencies;
+    protected $failing_writes;
+    protected $logs;
     protected $module;
     protected $global_writes;
     protected $saved;
@@ -35,7 +38,9 @@ class upgrade530Test extends TestCase
             'scalapay_custom_min_amounts' => '',
             'scalapay_custom_max_amounts' => '',
         ];
+        $this->failing_writes = [];
         $this->global_writes = [];
+        $this->logs = [];
         $this->saved = [];
         $this->saved_scoped = [];
         $this->scoped = [];
@@ -56,6 +61,9 @@ class upgrade530Test extends TestCase
         $this->configuration->shouldReceive('getScopedValue')->andReturnUsing($read);
         $this->configuration->shouldReceive('set')
             ->andReturnUsing(function ($key, $value, $id_shop_group = null, $id_shop = null) {
+                if (in_array($key, $this->failing_writes, true)) {
+                    return false;
+                }
                 if ($id_shop) {
                     $this->saved_scoped[$id_shop_group . '/' . $id_shop][$key] = $value;
                     $this->scoped[$key][$id_shop_group . '/' . $id_shop] = $value;
@@ -97,13 +105,24 @@ class upgrade530Test extends TestCase
             });
 
         $logger = \Mockery::mock('Logger');
-        $logger->shouldReceive('addLog');
+        $logger->shouldReceive('addLog')->andReturnUsing(function ($message, $level = 'info') {
+            $this->logs[] = ['level' => $level, 'message' => $message];
+
+            return true;
+        });
 
         $this->api_service = \Mockery::mock('ApiService');
-        $this->module = \Mockery::mock('Module');
+        $this->api_service->shouldReceive('getAccount')->andReturn(['is_live' => false])->byDefault();
+        $this->action = \Mockery::mock('ApplePayDomainAssociationAction');
+        $this->action->shouldReceive('ensureStoredAction')->andReturn(true)->byDefault();
+        $this->module = \Mockery::mock('Payplug');
         $this->module->shouldReceive('getService')
             ->with('payplug.utilities.service.api')
             ->andReturn($this->api_service);
+        $this->module->shouldReceive('getService')
+            ->with('payplug.action.apple_pay_domain_association')
+            ->andReturn($this->action);
+        $this->module->shouldReceive('registerHook')->with('actionDispatcherBefore')->andReturn(true)->byDefault();
         $module_adapter = \Mockery::mock('ModuleAdapter');
         $module_adapter->shouldReceive('getInstanceByName')
             ->with('payplug')
@@ -135,6 +154,7 @@ class upgrade530Test extends TestCase
                 'amount' => new AmountHelper($this->dependencies),
             ],
         ]);
+        $this->module->payplug_dependencies = $this->dependencies;
     }
 
     protected function tearDown(): void
@@ -326,14 +346,111 @@ class upgrade530Test extends TestCase
         );
     }
 
+    public function testTheUpgradeFailsWhenTheMerchantSettingsKeyCannotBeInitialised()
+    {
+        $this->failing_writes = ['apm_custom_settings'];
+        $this->module->shouldReceive('registerHook')->once()->with('actionDispatcherBefore')->andReturn(true);
+        $this->action->shouldReceive('ensureStoredAction')->once()->andReturn(true);
+
+        $this->assertFalse(upgrade_module_5_3_0($this->getModuleObject()));
+    }
+
+    public function testRegistersTheDispatcherHookAndStoresTheFile()
+    {
+        $this->module->shouldReceive('registerHook')->once()->with('actionDispatcherBefore')->andReturn(true);
+        $this->action->shouldReceive('ensureStoredAction')->once()->andReturn(true);
+
+        $this->assertTrue(upgrade_module_5_3_0($this->module));
+    }
+
+    public function testRegistersTheDispatcherHookOnEveryShop()
+    {
+        $received = [];
+        $this->module->shouldReceive('registerHook')->once()->andReturnUsing(function () use (&$received) {
+            $received = func_get_args();
+
+            return true;
+        });
+
+        $this->assertTrue(upgrade_module_5_3_0($this->module));
+        // Hook::registerHook() registers on Shop::getCompleteListOfShopsID() when no shop list is given.
+        $this->assertSame(['actionDispatcherBefore'], $received);
+    }
+
+    public function testSucceedsWhenTheFileCannotBeDownloaded()
+    {
+        $this->module->shouldReceive('registerHook')->with('actionDispatcherBefore')->andReturn(true);
+        $this->action->shouldReceive('ensureStoredAction')->once()->andReturn(false);
+
+        $this->assertTrue(upgrade_module_5_3_0($this->module));
+    }
+
+    public function testFailsWhenTheHookCannotBeRegistered()
+    {
+        $this->module->shouldReceive('registerHook')->with('actionDispatcherBefore')->andReturn(false);
+        $this->action->shouldReceive('ensureStoredAction')->once()->andReturn(true);
+
+        $this->assertFalse(upgrade_module_5_3_0($this->module));
+    }
+
+    public function testSucceedsWhenTheActionServiceIsMissing()
+    {
+        $module = \Mockery::mock('Payplug');
+        $module->payplug_dependencies = $this->module->payplug_dependencies;
+        $module->shouldReceive('registerHook')->with('actionDispatcherBefore')->andReturn(true);
+        $module->shouldReceive('getService')->with('payplug.action.apple_pay_domain_association')->andReturn(null);
+
+        $this->assertTrue(upgrade_module_5_3_0($module));
+    }
+
+    public function testSucceedsAndLogsWhenTheActionServiceCannotBeBuilt()
+    {
+        $module = \Mockery::mock('Payplug');
+        $module->payplug_dependencies = $this->module->payplug_dependencies;
+        $module->shouldReceive('registerHook')->with('actionDispatcherBefore')->andReturn(true);
+        $module->shouldReceive('getService')
+            ->with('payplug.action.apple_pay_domain_association')
+            ->andThrow(new \RuntimeException('container broken'));
+
+        $this->assertTrue(upgrade_module_5_3_0($module));
+        $this->assertErrorLogged('container broken');
+    }
+
+    public function testSucceedsAndLogsWhenTheSynchronisationThrows()
+    {
+        $this->module->shouldReceive('registerHook')->with('actionDispatcherBefore')->andReturn(true);
+        $this->action->shouldReceive('ensureStoredAction')->once()->andThrow(new \Error('sync broken'));
+
+        $this->assertTrue(upgrade_module_5_3_0($this->module));
+        $this->assertErrorLogged('sync broken');
+    }
+
+    public function testKeepsTheHookRegistrationResultWhenTheSynchronisationThrows()
+    {
+        $this->module->shouldReceive('registerHook')->with('actionDispatcherBefore')->andReturn(false);
+        $this->action->shouldReceive('ensureStoredAction')->once()->andThrow(new \RuntimeException('sync broken'));
+
+        $this->assertFalse(upgrade_module_5_3_0($this->module));
+        $this->assertErrorLogged('sync broken');
+    }
+
     /**
-     * @return \stdClass
+     * @param string $message
+     */
+    private function assertErrorLogged($message)
+    {
+        $errors = array_values(array_filter($this->logs, function ($log) {
+            return 'error' === $log['level'];
+        }));
+        $this->assertCount(1, $errors);
+        $this->assertStringContainsString($message, $errors[0]['message']);
+    }
+
+    /**
+     * @return \Mockery\MockInterface
      */
     private function getModuleObject()
     {
-        $object = new \stdClass();
-        $object->payplug_dependencies = $this->dependencies;
-
-        return $object;
+        return $this->module;
     }
 }
