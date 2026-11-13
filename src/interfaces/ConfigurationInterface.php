@@ -31,6 +31,8 @@ interface ConfigurationInterface
 {
     public function get($configuration_name, $id_shop_group = null, $id_shop = null);
 
+    public function getGlobalValue($configuration_name);
+
     public function updateValue($key, $value, $id_shop_group = null, $id_shop = null);
 
     public function deleteByName($key);

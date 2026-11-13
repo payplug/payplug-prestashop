@@ -64,6 +64,22 @@ function upgrade_module_5_3_0($object)
         $logger->addLog('Upgrade 5.3.0: payment method limits refresh failed with code ' . (int) $e->getCode(), 'warning');
     }
 
+    $flag = (bool) $object->registerHook('actionDispatcherBefore') && $flag;
+
+    // Downloads the Apple Pay domain association file only when none is stored. A failed download
+    // does not block the upgrade: the merchant can resync from the back office or the console.
+    try {
+        $domain_association_action = $object->getService('payplug.action.apple_pay_domain_association');
+        if ($domain_association_action) {
+            $domain_association_action->ensureStoredAction();
+        }
+    } catch (\Throwable $exception) {
+        $logger->addLog(
+            'Apple Pay domain association synchronisation failed: ' . get_class($exception) . ': ' . $exception->getMessage(),
+            'error'
+        );
+    }
+
     $logger->addLog('End upgrade script 5.3.0, result: ' . ($flag ? 'ok' : 'ko'));
 
     return $flag;

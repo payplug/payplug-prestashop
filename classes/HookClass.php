@@ -125,6 +125,39 @@ class HookClass
     }
 
     /**
+     * @description Serve the Apple Pay domain association file
+     *
+     * @param string $http_method
+     * @param string $request_uri
+     *
+     * @return bool true when a response was sent and the request must end there
+     */
+    public function actionDispatcherBefore($http_method, $request_uri)
+    {
+        try {
+            $action = $this->module
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.action.apple_pay_domain_association');
+            if (!$action) {
+                throw new \UnexpectedValueException('The Apple Pay domain association action is not registered.');
+            }
+        } catch (\Throwable $exception) {
+            try {
+                $this->dependencies->getPlugin()->getLogger()->addLog(
+                    'HookClass::actionDispatcherBefore - ' . get_class($exception) . ': ' . $exception->getMessage(),
+                    'error'
+                );
+            } catch (\Throwable $log_exception) {
+                // The request falls through to PrestaShop, which a logging failure must not prevent.
+            }
+
+            return false;
+        }
+
+        return $action->serveAction($http_method, $request_uri);
+    }
+
+    /**
      * @param $customer
      *
      * @return string
