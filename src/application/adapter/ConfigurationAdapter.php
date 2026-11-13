@@ -54,6 +54,13 @@ class ConfigurationAdapter implements ConfigurationInterface
         return $config::get($configuration_name, null, $id_shop_group, $id_shop);
     }
 
+    public function getGlobalValue($configuration_name)
+    {
+        $config = $this->configuration;
+
+        return $config::getGlobalValue($configuration_name);
+    }
+
     /**
      * @param string $key
      * @param mixed $value

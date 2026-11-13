@@ -12,6 +12,7 @@ abstract class BaseHookClass extends TestCase
     protected $config_class;
     protected $dependencies;
     protected $hook;
+    protected $module;
     protected $plugin;
     protected $translation;
 
@@ -25,14 +26,14 @@ abstract class BaseHookClass extends TestCase
             return $key;
         });
 
-        $module = \Mockery::mock('Module');
-        $module->shouldReceive('getService')->with('payplug.action.unified_alias')->andReturn($this->alias_action);
+        $this->module = \Mockery::mock('Module');
+        $this->module->shouldReceive('getService')->with('payplug.action.unified_alias')->andReturn($this->alias_action);
         $module_adapter = \Mockery::mock('ModuleAdapter');
-        $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
+        $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($this->module);
         $context_adapter = \Mockery::mock('ContextAdapter');
         $context_adapter->shouldReceive('get')->andReturn(new \stdClass());
 
-        // The constructor reads every collaborator off the plugin; only the ones the GDPR
+        // The constructor reads every collaborator off the plugin; only the ones the tested
         // hooks use are set explicitly, the others resolve to null (unused here).
         $this->plugin = \Mockery::mock('Plugin')->shouldIgnoreMissing();
         $this->plugin->shouldReceive([
