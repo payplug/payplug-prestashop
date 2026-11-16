@@ -254,7 +254,7 @@ class PayplugAjaxModuleFrontController extends ModuleFrontController
                             ->l('The transaction was not completed and your card was not charged.', 'ajax'),
                     ]);
                     $payment['force_reload'] = true;
-                    $payment['return_url'] = $context->link->getPageLink('order', true, $context->language->id, [
+                    $payment['return_url'] = $this->contextAdapter->getPageLink('order', [
                         'step' => '3',
                         'has_error' => '1',
                         'modulename' => $this->dependencies->name,

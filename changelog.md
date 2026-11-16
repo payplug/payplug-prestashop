@@ -15,6 +15,7 @@
   - [PRE-3747](https://github.com/payplug/payplug-prestashop/pull/151): Show the same payment details block, payment method label and transaction id for Unified Hosted Fields orders as for EUR orders in the back office
 
 - Bugfix :
+  - [PRE-3778](https://github.com/payplug/payplug-prestashop/pull/153): Build the front-office redirect URLs (checkout error, payment return, order confirmation) with PrestaShop's page links so they follow URL rewriting and the customer's language
   - [PRE-3625](https://github.com/payplug/payplug-prestashop/pull/129): Require the customer token to delete a saved card (CSRF protection on the saved cards page)
   - [PRE-3777](https://github.com/payplug/payplug-prestashop/pull/147): Hide the payment methods at checkout when the cart currency is not one of the merchant's Payplug currencies, except the standard payment when it is served through Unified Hosted Fields (an identifier set for that currency), and hide the Apple Pay express button on the product and cart pages for such a currency
 

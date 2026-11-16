@@ -44,4 +44,11 @@ class ContextAdapter implements ContextInterface
 
         return $context::getContext();
     }
+
+    public function getPageLink($page = '', $args = [])
+    {
+        $context = $this->get();
+
+        return $context->link->getPageLink($page, true, (int) $context->language->id, $args);
+    }
 }

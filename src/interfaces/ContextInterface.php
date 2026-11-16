@@ -30,4 +30,6 @@ if (!defined('_PS_VERSION_')) {
 interface ContextInterface
 {
     public function get();
+
+    public function getPageLink($page, $args = []);
 }
