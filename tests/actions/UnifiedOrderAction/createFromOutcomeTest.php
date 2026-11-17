@@ -62,7 +62,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
 
         $this->assertFalse($result['result']);
         $this->assertTrue($result['persisted']);
-        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertSame(self::ERROR_URL, $result['redirect_url']);
     }
 
     public function testCreateFromOutcomeRefusesToReconcileAnOrderNotCreatedByThisModule()
@@ -89,6 +89,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
 
         $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
         $plugin->shouldReceive('getModule')->andReturn($module_adapter);
+        $plugin->shouldReceive('getContext')->andReturn($this->mockContextAdapter());
 
         $order_adapter->shouldReceive('getIdByCartId')->with(42)->andReturn(99);
         $order_adapter->shouldReceive('get')->with(99)->andReturn($existing_order);
@@ -105,7 +106,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
 
         $this->assertFalse($result['result']);
-        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertSame(self::ERROR_URL, $result['redirect_url']);
     }
 
     public function testCreateFromOutcomeStillRedirectsToConfirmationWhenReconciliationPersistenceThrowsForPaidOutcome()
@@ -156,7 +157,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0002_TECHNICAL_ERROR', PaymentOutcome::FAILED, 1234);
 
         $this->assertFalse($result['result']);
-        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertSame(self::ERROR_URL, $result['redirect_url']);
         $this->assertFalse($result['outcome_applied']);
     }
 
@@ -198,6 +199,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
         $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
 
         $plugin->shouldReceive('getOrder')->andReturn($order_adapter);
+        $plugin->shouldReceive('getContext')->andReturn($this->mockContextAdapter());
 
         $order_adapter->shouldReceive('getIdByCartId')->with(42)->andReturn(0);
         $order_adapter->shouldReceive('get')->with(0)->andReturn(null);
@@ -206,7 +208,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000_ERROR', PaymentOutcome::FAILED, 1234);
 
         $this->assertFalse($result['result']);
-        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertSame(self::ERROR_URL, $result['redirect_url']);
     }
 
     public function testReturnsErrorUrlWhenValidateOrderThrows()
@@ -220,7 +222,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
 
         $this->assertFalse($result['result']);
-        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertSame(self::ERROR_URL, $result['redirect_url']);
     }
 
     public function testReturnsErrorUrlWhenValidateOrderRaisesAnError()
@@ -234,7 +236,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
 
         $this->assertFalse($result['result']);
-        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertSame(self::ERROR_URL, $result['redirect_url']);
     }
 
     public function testReturnsErrorUrlWhenNewOrderIdCannotBeResolved()
@@ -247,7 +249,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
         $result = $this->mockOrderAction($dependencies)->createFromOutcome(42, 'op_123', '0000', PaymentOutcome::PAID, 1234);
 
         $this->assertFalse($result['result']);
-        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertSame(self::ERROR_URL, $result['redirect_url']);
     }
 
     /**
@@ -261,15 +263,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
     {
         [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
 
-        $context_adapter = \Mockery::mock('ContextAdapter');
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
-            }
-        }];
-        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
-        $context_adapter->shouldReceive('get')->andReturn($context);
+        $this->mockConfirmationLink($mocks);
 
         $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
         $mocks['module']->shouldReceive('validateOrder')->once();
@@ -293,15 +287,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
     {
         [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
 
-        $context_adapter = \Mockery::mock('ContextAdapter');
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
-            }
-        }];
-        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
-        $context_adapter->shouldReceive('get')->andReturn($context);
+        $this->mockConfirmationLink($mocks);
 
         $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
         $mocks['module']->shouldReceive('validateOrder')->once();
@@ -325,15 +311,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
     {
         [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
 
-        $context_adapter = \Mockery::mock('ContextAdapter');
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
-            }
-        }];
-        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
-        $context_adapter->shouldReceive('get')->andReturn($context);
+        $this->mockConfirmationLink($mocks);
 
         $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
         $mocks['module']->shouldReceive('validateOrder')->once();
@@ -614,15 +592,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
     {
         [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
 
-        $context_adapter = \Mockery::mock('ContextAdapter');
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
-            }
-        }];
-        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
-        $context_adapter->shouldReceive('get')->andReturn($context);
+        $this->mockConfirmationLink($mocks);
 
         $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
         $mocks['module']->shouldReceive('validateOrder')->once();
@@ -771,7 +741,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
 
         $this->assertFalse($result['result']);
         $this->assertFalse($result['persisted']);
-        $this->assertSame('index.php?controller=order&step=3&has_error=1&modulename=payplug', $result['redirect_url']);
+        $this->assertSame(self::ERROR_URL, $result['redirect_url']);
     }
 
     /**
@@ -781,15 +751,7 @@ class createFromOutcomeTest extends BaseUnifiedOrderAction
     {
         [$dependencies, $mocks] = $this->mockDependenciesForOrderCreation();
 
-        $context_adapter = \Mockery::mock('ContextAdapter');
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
-            }
-        }];
-        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
-        $context_adapter->shouldReceive('get')->andReturn($context);
+        $this->mockConfirmationLink($mocks);
 
         $mocks['order_adapter']->shouldReceive('getIdByCartId')->with(42)->andReturn(0, 99);
         $mocks['module']->shouldReceive('validateOrder')->once();

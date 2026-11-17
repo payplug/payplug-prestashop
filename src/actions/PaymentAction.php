@@ -458,12 +458,13 @@ class PaymentAction
             switch ($method) {
                 case 'one_click':
                     return [
-                        'return_url' => 'index.php?controller=order&step=3&embedded=1'
-                            . '&pc=' . $this->plugin
-                                ->getTools()
-                                ->tool('getValue', 'pc')
-                            . '&def=' . (int) $payment_methods['deferred']
-                            . '&modulename=' . $this->dependencies->name,
+                        'return_url' => $this->plugin->getContext()->getPageLink('order', [
+                            'step' => '3',
+                            'embedded' => '1',
+                            'pc' => $this->plugin->getTools()->tool('getValue', 'pc'),
+                            'def' => (int) $payment_methods['deferred'],
+                            'modulename' => $this->dependencies->name,
+                        ]),
                     ];
 
                 case 'amex':
@@ -472,12 +473,22 @@ class PaymentAction
                     if ('redirect' != (string) $this->plugin
                         ->getConfigurationClass()
                         ->getValue('embedded_mode')) {
+                        $url_args = [
+                            'step' => '3',
+                            'embedded' => '1',
+                            'modulename' => $this->dependencies->name,
+                        ];
+                        if ('installment' == $method) {
+                            $url_args['inst'] = '1';
+                        }
+                        if ('amex' == $method) {
+                            $url_args['amex'] = '1';
+                        } elseif ($payment_methods['deferred']) {
+                            $url_args['def'] = '1';
+                        }
+
                         return [
-                            'return_url' => 'index.php?controller=order&step=3&embedded=1'
-                                . ('installment' == $method ? '&inst=1' : '')
-                                . ('amex' == $method ? '&amex=1' : '')
-                                . ('amex' != $method && $payment_methods['deferred'] ? '&def=1' : '')
-                                . '&modulename=' . $this->dependencies->name,
+                            'return_url' => $this->plugin->getContext()->getPageLink('order', $url_args),
                         ];
                     }
 

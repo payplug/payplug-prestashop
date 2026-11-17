@@ -10,6 +10,8 @@ require_once __DIR__ . '/../../stubs/Cart.php';
 abstract class BaseUnifiedOrderAction extends TestCase
 {
     protected const PAYMENT_LABEL = 'Carte Bancaire by Payplug';
+    protected const SHOP_URL = 'https://shop.example/';
+    protected const ERROR_URL = self::SHOP_URL . 'order?step=3&has_error=1&modulename=payplug';
 
     public function tearDown(): void
     {
@@ -49,7 +51,7 @@ abstract class BaseUnifiedOrderAction extends TestCase
 
         $plugin = \Mockery::mock('Plugin');
         $order_adapter = \Mockery::mock('OrderAdapter');
-        $context_adapter = \Mockery::mock('ContextAdapter');
+        $context_adapter = $this->mockContextAdapter();
         $module_adapter = \Mockery::mock('ModuleAdapter');
         $module = \Mockery::mock('Module');
         $validator = \Mockery::mock('OrderValidator');
@@ -58,12 +60,6 @@ abstract class BaseUnifiedOrderAction extends TestCase
 
         $existing_order = $this->mockOrder(12.34);
         $existing_order->secure_key = 'order_secure_key';
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?key=' . $params['key'] . '&id_order=' . $params['id_order'];
-            }
-        }];
 
         $dependencies->shouldReceive('getPlugin')->andReturn($plugin);
         $dependencies->shouldReceive('getValidators')->andReturn(['order' => $validator]);
@@ -86,7 +82,6 @@ abstract class BaseUnifiedOrderAction extends TestCase
         $order_adapter->shouldReceive('getIdByCartId')->with(42)->andReturn(99);
         $order_adapter->shouldReceive('get')->with(99)->andReturn($existing_order);
         $validator->shouldReceive('isCreated')->with($existing_order, 42)->andReturn(['result' => true]);
-        $context_adapter->shouldReceive('get')->andReturn($context);
         $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
         $module->id = 17;
         $module->displayName = 'Payplug';
@@ -149,6 +144,7 @@ abstract class BaseUnifiedOrderAction extends TestCase
         $plugin->shouldReceive('getConfigurationClass')->andReturn($configuration_class);
         $plugin->shouldReceive('getOrderClass')->andReturn($order_class);
         $plugin->shouldReceive('getModule')->andReturn($module_adapter);
+        $plugin->shouldReceive('getContext')->andReturn($this->mockContextAdapter())->byDefault();
         $this->mockTranslations($plugin);
 
         $order_adapter->shouldReceive('get')->with(0)->andReturn(null);
@@ -216,15 +212,25 @@ abstract class BaseUnifiedOrderAction extends TestCase
      */
     protected function mockConfirmationLink(array $mocks)
     {
+        $mocks['plugin']->shouldReceive('getContext')->andReturn($this->mockContextAdapter());
+    }
+
+    /**
+     * ContextAdapter whose getPageLink() renders the page and its arguments as a plain URL, so
+     * that a test can assert on the arguments UnifiedOrderAction passes to it.
+     *
+     * @return object
+     */
+    protected function mockContextAdapter()
+    {
         $context_adapter = \Mockery::mock('ContextAdapter');
-        $context = (object) ['link' => new class() {
-            public function getPageLink($page, $ssl, $lang, $params)
-            {
-                return 'https://shop.example/order-confirmation?id_order=' . $params['id_order'];
-            }
-        }];
-        $mocks['plugin']->shouldReceive('getContext')->andReturn($context_adapter);
-        $context_adapter->shouldReceive('get')->andReturn($context);
+        $context_adapter->shouldReceive('getPageLink')
+            ->andReturnUsing(function ($page, $args = []) {
+                return self::SHOP_URL . $page . '?' . http_build_query($args);
+            })
+            ->byDefault();
+
+        return $context_adapter;
     }
 
     /**

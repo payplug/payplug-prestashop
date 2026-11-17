@@ -210,7 +210,11 @@ class UnifiedOrderAction
      */
     public function errorUrl()
     {
-        return 'index.php?controller=order&step=3&has_error=1&modulename=' . $this->dependencies->name;
+        return $this->dependencies->getPlugin()->getContext()->getPageLink('order', [
+            'step' => '3',
+            'has_error' => '1',
+            'modulename' => $this->dependencies->name,
+        ]);
     }
 
     /**
@@ -682,29 +686,16 @@ class UnifiedOrderAction
     private function confirmationUrl($id_cart, $order_id = 0, $secure_key = '')
     {
         $plugin = $this->dependencies->getPlugin();
-        $context_adapter = $plugin->getContext();
-        $context = is_object($context_adapter) && method_exists($context_adapter, 'get')
-            ? $context_adapter->get()
-            : $context_adapter;
+        $module = $plugin->getModule()->getInstanceByName($this->dependencies->name);
+        $module_id = isset($module->id) ? (int) $module->id : 0;
+        $url_args = [
+            'id_cart' => (int) $id_cart,
+            'id_module' => $module_id,
+            'id_order' => (int) $order_id,
+            'key' => $secure_key,
+        ];
 
-        if (is_object($context)
-            && isset($context->link)
-            && is_object($context->link)
-            && method_exists($context->link, 'getPageLink')) {
-            $module = $plugin->getModule()->getInstanceByName($this->dependencies->name);
-            $module_id = isset($module->id) ? (int) $module->id : 0;
-
-            return $context->link->getPageLink('order-confirmation', true, null, [
-                'id_cart' => (int) $id_cart,
-                'id_module' => $module_id,
-                'id_order' => (int) $order_id,
-                'key' => $secure_key,
-            ]);
-        }
-
-        return 'index.php?controller=order-confirmation&id_cart=' . (int) $id_cart
-            . '&id_order=' . (int) $order_id
-            . '&key=' . rawurlencode((string) $secure_key);
+        return $plugin->getContext()->getPageLink('order-confirmation', $url_args);
     }
 
     /**

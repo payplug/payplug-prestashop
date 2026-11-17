@@ -40,7 +40,8 @@ abstract class BasePaymentAction extends TestCase
         ]);
         $this->configuration->shouldReceive('getValue')
             ->with('payment_methods')
-            ->andReturn('{"standard":true, "deferred": true, "amex": true}');
+            ->andReturn('{"standard":true, "deferred": true, "amex": true}')
+            ->byDefault();
         $this->configuration->shouldReceive('getValue')
             ->with('sandbox_mode')
             ->andReturn(true);

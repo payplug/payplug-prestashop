@@ -392,7 +392,11 @@ class HookClass
                         ->getTranslationClass()
                         ->l('hook.header.transactionNotCompleted', 'hookclass'),
                 ]);
-                $error_url = 'index.php?controller=order&step=3&has_error=1&modulename=' . $this->dependencies->name;
+                $error_url = $this->dependencies->getPlugin()->getContext()->getPageLink('order', [
+                    'step' => '3',
+                    'has_error' => '1',
+                    'modulename' => $this->dependencies->name,
+                ]);
                 $this->tools->tool('redirect', $error_url);
             }
         }

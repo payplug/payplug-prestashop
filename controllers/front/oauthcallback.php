@@ -52,17 +52,18 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
             exit('Forbidden');
         }
 
+        $dependencies = new PayPlug\classes\DependenciesClass();
+
         // Handle OAuth error responses (e.g. user cancelled authorization)
         $oauthError = Tools::getValue('error');
         if ($oauthError) {
             LinkHelper::clearOAuthState();
             $returnUrl = LinkHelper::getAdminReturnUrl();
-            Tools::redirect($returnUrl ?: $this->context->link->getPageLink('index'));
+            Tools::redirect($returnUrl ?: $dependencies->getPlugin()->getContext()->getPageLink('index'));
 
             return;
         }
 
-        $dependencies = new PayPlug\classes\DependenciesClass();
         $configAction = $dependencies->getPlugin()->getConfigurationAction();
 
         // Registration flow: PayPlug redirects with client_id + company_id
@@ -103,6 +104,6 @@ class PayplugOauthcallbackModuleFrontController extends ModuleFrontController
         }
 
         // Fallback: redirect to shop homepage
-        Tools::redirect($this->context->link->getPageLink('index'));
+        Tools::redirect($dependencies->getPlugin()->getContext()->getPageLink('index'));
     }
 }
