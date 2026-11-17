@@ -13,11 +13,14 @@ use PayPlug\tests\mock\CurrencyMock;
  */
 class getRequestTest extends BaseApplepayPaymentMethod
 {
+    private $cart;
+
     public function setUp(): void
     {
         parent::setUp();
+        $this->cart = CartMock::get();
         $this->cart_adapter->shouldReceive([
-            'get' => CartMock::get(),
+            'get' => $this->cart,
         ]);
     }
 
@@ -100,6 +103,12 @@ class getRequestTest extends BaseApplepayPaymentMethod
         $this->currency_adapter->shouldReceive([
             'get' => CurrencyMock::get(),
         ]);
+        $this->mockCheckoutCustomer(true);
+        $this->cart_adapter->shouldReceive([
+            'isVirtualCart' => false,
+        ]);
+        $this->cart_adapter->shouldNotReceive('getDeliveryOptionList');
+        $this->cart_adapter->shouldNotReceive('setDeliveryOption');
         $this->tools_adapter->shouldReceive('tool')
             ->with('getValue', 'carrier')
             ->andReturn(false);
@@ -137,6 +146,353 @@ class getRequestTest extends BaseApplepayPaymentMethod
             'apple_pay_domain' => 'my-mock.com',
         ];
         $this->assertSame($expected, $this->class->getRequest());
+    }
+
+    /**
+     * @dataProvider incompleteCheckoutCartProvider
+     *
+     * @param bool $is_customer_loaded
+     * @param array $cart_values
+     * @param string $missing_data
+     */
+    public function testWhenCheckoutCartIsIncomplete($is_customer_loaded, $cart_values, $missing_data)
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->mockCheckoutCustomer($is_customer_loaded);
+        foreach ($cart_values as $key => $value) {
+            $this->cart->{$key} = $value;
+        }
+        $this->cart_adapter->shouldReceive([
+            'isVirtualCart' => false,
+            'checkQuantities' => true,
+        ]);
+        $this->cart_adapter->shouldNotReceive('getOrderTotal');
+
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The checkout cart has no ' . $missing_data,
+        ], $this->class->getRequest('checkout'));
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('ApplepayPaymentMethod::getRequest() - The checkout cart has no ' . $missing_data . ' (cart id: 1)', 'error')
+            ->once();
+    }
+
+    public function incompleteCheckoutCartProvider()
+    {
+        yield 'customer not loaded' => [false, [], 'customer'];
+
+        yield 'cart without customer' => [true, ['id_customer' => 0], 'customer'];
+
+        yield 'cart without delivery address' => [true, ['id_address_delivery' => 0], 'delivery address'];
+
+        yield 'cart without invoice address' => [true, ['id_address_invoice' => 0], 'invoice address'];
+
+        yield 'cart without carrier' => [true, ['id_carrier' => 0], 'carrier'];
+    }
+
+    public function testWhenPostedDeliveryOptionIsAvailableItIsSavedOnTheCheckoutCart()
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->mockCheckoutCustomer(true, '2,');
+        $this->cart->id_carrier = 0;
+        $this->cart->delivery_option = '';
+        $this->cart_adapter->shouldReceive('getDeliveryOptionList')
+            ->once()
+            ->with(1)
+            ->andReturn([
+                2 => [
+                    '1,' => [],
+                    '2,' => [],
+                ],
+            ]);
+        $this->cart_adapter->shouldReceive('setDeliveryOption')
+            ->once()
+            ->with($this->cart, [2 => '2,'])
+            ->andReturnUsing(function ($cart) {
+                $cart->id_carrier = 2;
+
+                return true;
+            });
+        $this->cart_adapter->shouldReceive('getOrderTotal')
+            ->once()
+            ->with(1, true, 2)
+            ->andReturn(42);
+        $this->cart_adapter->shouldReceive([
+            'checkQuantities' => true,
+        ]);
+
+        $this->assertSame([
+            'country_code' => 'FR',
+            'currency_code' => 'EUR',
+            'total' => [
+                'label' => 'my mock',
+                'amount' => 42,
+            ],
+            'apple_pay_domain' => 'my-mock.com',
+        ], $this->class->getRequest('checkout'));
+    }
+
+    public function testWhenPostedDeliveryOptionIsAlreadyTheCartOneItIsNotSavedAgain()
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->mockCheckoutCustomer(true, '1,');
+        $this->cart->delivery_option = '{"2":"1,"}';
+        $this->cart_adapter->shouldReceive('getDeliveryOptionList')
+            ->andReturn([
+                2 => [
+                    '1,' => [],
+                ],
+            ]);
+        $this->cart_adapter->shouldNotReceive('setDeliveryOption');
+        $this->cart_adapter->shouldReceive([
+            'getOrderTotal' => 42,
+            'checkQuantities' => true,
+        ]);
+
+        $this->assertSame(42, $this->class->getRequest('checkout')['total']['amount']);
+    }
+
+    public function testWhenPostedDeliveryOptionIsNotAvailableTheCartIsNotChanged()
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->mockCheckoutCustomer(true, '3,');
+        $this->cart->id_carrier = 0;
+        $this->cart_adapter->shouldReceive('getDeliveryOptionList')
+            ->once()
+            ->with(1)
+            ->andReturn([
+                2 => [
+                    '1,' => [],
+                    '2,' => [],
+                ],
+                5 => [
+                    '3,' => [],
+                ],
+            ]);
+        $this->cart_adapter->shouldNotReceive('setDeliveryOption');
+        $this->cart_adapter->shouldNotReceive('getOrderTotal');
+        $this->cart_adapter->shouldReceive([
+            'isVirtualCart' => false,
+            'checkQuantities' => true,
+        ]);
+
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The checkout cart has no carrier',
+        ], $this->class->getRequest('checkout'));
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('ApplepayPaymentMethod::getRequest() - The posted delivery option is not available for the checkout cart (cart id: 1)', 'error')
+            ->once();
+    }
+
+    /**
+     * @dataProvider malformedDeliveryOptionProvider
+     *
+     * @param mixed $delivery_option
+     */
+    public function testWhenPostedDeliveryOptionIsMalformedTheCartIsNotChanged($delivery_option)
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->mockCheckoutCustomer(true, $delivery_option);
+        $this->cart->id_carrier = 0;
+        $this->cart_adapter->shouldNotReceive('getDeliveryOptionList');
+        $this->cart_adapter->shouldNotReceive('setDeliveryOption');
+        $this->cart_adapter->shouldNotReceive('getOrderTotal');
+        $this->cart_adapter->shouldReceive([
+            'isVirtualCart' => false,
+            'checkQuantities' => true,
+        ]);
+
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The checkout cart has no carrier',
+        ], $this->class->getRequest('checkout'));
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('ApplepayPaymentMethod::getRequest() - The posted delivery option is not available for the checkout cart (cart id: 1)', 'error')
+            ->once();
+    }
+
+    public function malformedDeliveryOptionProvider()
+    {
+        yield 'without the trailing comma' => ['2'];
+
+        yield 'not a carrier id' => ['abc,'];
+
+        yield 'carrier ids without separator' => ['2,3'];
+
+        yield 'injected markup' => ['2,<script>'];
+
+        yield 'array' => [['2' => '2,']];
+    }
+
+    public function testWhenCheckoutCartHasNoDeliveryAddressThePostedDeliveryOptionIsIgnored()
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->mockCheckoutCustomer(true, '2,');
+        $this->cart->id_address_delivery = 0;
+        $this->cart->id_carrier = 0;
+        $this->cart_adapter->shouldNotReceive('getDeliveryOptionList');
+        $this->cart_adapter->shouldNotReceive('setDeliveryOption');
+        $this->cart_adapter->shouldReceive([
+            'checkQuantities' => true,
+        ]);
+
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The checkout cart has no delivery address',
+        ], $this->class->getRequest('checkout'));
+    }
+
+    public function testWhenPostedDeliveryOptionCanNotBeSaved()
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->mockCheckoutCustomer(true, '2,');
+        $this->cart->id_carrier = 0;
+        $this->cart->delivery_option = '';
+        $this->cart_adapter->shouldReceive('getDeliveryOptionList')
+            ->andReturn([
+                2 => [
+                    '2,' => [],
+                ],
+            ]);
+        $this->cart_adapter->shouldReceive('setDeliveryOption')
+            ->once()
+            ->andReturn(false);
+        $this->cart_adapter->shouldNotReceive('getOrderTotal');
+        $this->cart_adapter->shouldReceive([
+            'checkQuantities' => true,
+        ]);
+
+        $this->assertSame([
+            'result' => false,
+            'message' => 'The checkout cart delivery option can not be saved',
+        ], $this->class->getRequest('checkout'));
+        $this->logger->shouldHaveReceived('addLog')
+            ->with('ApplepayPaymentMethod::getRequest() - The checkout cart delivery option can not be saved (cart id: 1)', 'error')
+            ->once();
+    }
+
+    public function testWhenVirtualCheckoutCartHasNoCarrier()
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->mockCheckoutCustomer(true);
+        $this->cart->id_carrier = 0;
+        $this->cart_adapter->shouldReceive('isVirtualCart')
+            ->once()
+            ->with($this->cart)
+            ->andReturn(true);
+        $this->cart_adapter->shouldReceive([
+            'getOrderTotal' => 42,
+            'checkQuantities' => true,
+        ]);
+
+        $this->assertSame([
+            'country_code' => 'FR',
+            'currency_code' => 'EUR',
+            'total' => [
+                'label' => 'my mock',
+                'amount' => 42,
+            ],
+            'apple_pay_domain' => 'my-mock.com',
+        ], $this->class->getRequest('checkout'));
+    }
+
+    public function testWhenCheckoutCartCheckIsDisabled()
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->cart->id_carrier = 0;
+        $this->validate_adapter->shouldNotReceive('validate');
+        $this->tools_adapter->shouldNotReceive('tool');
+        $this->cart_adapter->shouldNotReceive('isVirtualCart');
+        $this->cart_adapter->shouldNotReceive('setDeliveryOption');
+        $this->cart_adapter->shouldReceive([
+            'getOrderTotal' => 42,
+            'checkQuantities' => true,
+        ]);
+
+        $this->assertSame([
+            'country_code' => 'FR',
+            'currency_code' => 'EUR',
+            'total' => [
+                'label' => 'my mock',
+                'amount' => 42,
+            ],
+            'apple_pay_domain' => 'my-mock.com',
+        ], $this->class->getRequest('checkout', false));
+    }
+
+    /**
+     * @dataProvider nonCheckoutWorkflowProvider
+     *
+     * @param string $workflow
+     */
+    public function testWhenNonCheckoutCartHasNoCustomerAddressOrCarrier($workflow)
+    {
+        $this->currency_adapter->shouldReceive([
+            'get' => CurrencyMock::get(),
+        ]);
+        $this->cart->id_customer = 0;
+        $this->cart->id_address_delivery = 0;
+        $this->cart->id_address_invoice = 0;
+        $this->cart->id_carrier = 0;
+        $this->validate_adapter->shouldNotReceive('validate');
+        $this->cart_adapter->shouldNotReceive('isVirtualCart');
+        $this->cart_adapter->shouldNotReceive('setDeliveryOption');
+        $this->tools_adapter->shouldNotReceive('tool')
+            ->with('getValue', 'delivery_option');
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'empty_cart')
+            ->andReturn(false);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'address')
+            ->andReturn(false);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'carrier')
+            ->andReturn(false);
+        $this->cart_adapter->shouldReceive([
+            'getOrderTotal' => 42,
+            'checkQuantities' => true,
+        ]);
+        $this->class->shouldReceive([
+            'getDeliveryOptions' => [],
+            'getLinesItems' => [],
+        ]);
+
+        $this->assertSame([
+            'country_code' => 'FR',
+            'currency_code' => 'EUR',
+            'total' => [
+                'label' => 'my mock',
+                'amount' => 42,
+            ],
+            'apple_pay_domain' => 'my-mock.com',
+            'line_items' => [],
+        ], $this->class->getRequest($workflow));
+    }
+
+    public function nonCheckoutWorkflowProvider()
+    {
+        yield 'shopping cart' => ['shopping-cart'];
+
+        yield 'product page without a new cart' => ['product'];
     }
 
     /**
@@ -272,6 +628,22 @@ class getRequestTest extends BaseApplepayPaymentMethod
 
         // The previous cart is kept in the cookie to be restored on cancel
         $this->assertSame(1, $this->context->cookie->previous_cart_id);
+    }
+
+    /**
+     * @description Mock the context customer and the delivery option posted with a checkout request
+     *
+     * @param bool $is_loaded
+     * @param mixed $delivery_option
+     */
+    private function mockCheckoutCustomer($is_loaded, $delivery_option = false)
+    {
+        $this->validate_adapter->shouldReceive('validate')
+            ->with('isLoadedObject', $this->context->customer)
+            ->andReturn($is_loaded);
+        $this->tools_adapter->shouldReceive('tool')
+            ->with('getValue', 'delivery_option')
+            ->andReturn($delivery_option);
     }
 
     /**

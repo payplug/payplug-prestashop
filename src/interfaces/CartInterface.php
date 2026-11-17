@@ -52,4 +52,6 @@ interface CartInterface
     public function updateQty($id_cart, $quantity, $id_product, $id_product_attribute, $id_customization, $operator, $id_address_delivery);
 
     public function checkQuantities($cart);
+
+    public function setDeliveryOption($cart, $delivery_option);
 }

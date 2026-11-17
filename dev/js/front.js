@@ -72,6 +72,7 @@ var $document, $window, __moduleName__Module = {
         this.popup.init();
         this.integrated.init();
         this.integrated.opc.bindEvents();
+        this.applepay.opc.bindEvents();
         this.hosted_fields.init();
         this.hosted_fields.opc.bindEvents();
     },
@@ -277,6 +278,11 @@ var $document, $window, __moduleName__Module = {
                 });
                 document.addEventListener('click', integrated.opc.onPayClick, true);
             },
+            hasUncheckedTerms: function () {
+                return Array.prototype.some.call(document.querySelectorAll('input[name^="conditions_to_approve"]'), function (input) {
+                    return !input.checked;
+                });
+            },
             release: function () {
                 var integrated = __moduleName__Module.integrated;
                 integrated.props.submited = false;
@@ -323,9 +329,7 @@ var $document, $window, __moduleName__Module = {
                     return;
                 }
                 // Unaccepted terms are left to the One Page Checkout's own handler, which this click would skip.
-                if (Array.prototype.some.call(document.querySelectorAll('input[name^="conditions_to_approve"]'), function (input) {
-                    return !input.checked;
-                })) {
+                if (integrated.opc.hasUncheckedTerms()) {
                     return;
                 }
 
@@ -991,6 +995,8 @@ var $document, $window, __moduleName__Module = {
             session: null,
             request: null,
             cancelled: false,
+            opcBound: false,
+            opcFormValid: null,
             address: {
                 locality: null,
                 country: null,
@@ -1014,20 +1020,67 @@ var $document, $window, __moduleName__Module = {
             applepay.display();
             applepay.handler();
         },
+        selectedMethod: () => {
+            const payment_method_id = $('input[name="payment-option"]:checked').attr('id');
+            return $('#pay-with-' + payment_method_id + '-form input[name="method"]').val();
+        },
         handler: () => {
             const {applepay} = __moduleName__Module,
                 {workflow} = applepay.props;
-            $('apple-pay-button, #payment-confirmation button').click(function (event) {
-                $(this).fadeOut(10).fadeIn(10);
-                let payment_method_id = $('input[name="payment-option"]:checked').attr('id'),
-                    payment_method = $('#pay-with-' + payment_method_id + '-form input[name="method"]').val();
+            $('apple-pay-button, #payment-confirmation button')
+                .off('click.__moduleName__ApplePay')
+                .on('click.__moduleName__ApplePay', function (event) {
+                    $(this).fadeOut(10).fadeIn(10);
 
-                if ('applepay' == payment_method || 'checkout' != workflow) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    applepay.createSession();
+                    if ('applepay' == applepay.selectedMethod() || 'checkout' != workflow) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        applepay.createSession();
+                    }
+                });
+        },
+        opc: {
+            bindEvents: () => {
+                const {applepay} = __moduleName__Module;
+                if (applepay.props.opcBound) {
+                    return;
                 }
-            });
+                applepay.props.opcBound = true;
+                if (typeof prestashop !== 'undefined' && typeof prestashop.on === 'function') {
+                    prestashop.on('opcFormValidated', (payload) => {
+                        applepay.props.opcFormValid = !!(payload && payload.isValid);
+                    });
+                }
+                document.addEventListener('click', applepay.opc.onPayClick, true);
+            },
+            // Runs before the One Page Checkout's own pay button handler, which saves the checkout and then
+            // submits the option form instead of starting the Apple Pay session within the click.
+            onPayClick: (event) => {
+                const {applepay, integrated} = __moduleName__Module,
+                    button = event.target.closest ? event.target.closest('#opc-pay-button') : null;
+
+                if (!button
+                    || button.disabled
+                    || !integrated.opc.isActive()
+                    || 'applepay' !== applepay.selectedMethod()) {
+                    return;
+                }
+
+                if (typeof window.ApplePaySession !== 'function') {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    return applepay.error();
+                }
+
+                // A checkout the One Page Checkout does not report as valid is left to its own handler, which shows the errors.
+                if (true !== applepay.props.opcFormValid || integrated.opc.hasUncheckedTerms()) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                applepay.createSession();
+            },
         },
         display: () => {
             let {applepay} = __moduleName__Module,
@@ -1048,15 +1101,9 @@ var $document, $window, __moduleName__Module = {
                     break;
                 case 'checkout':
                 default:
-                    const paymentOptionId = $wrapper
-                            .parents('.additional-information')
-                            .eq(0)
-                            .attr('id')
-                            .replace('payment-option-', '')
-                            .replace('-additional-information', ''),
-                        $paymentOption = $('#payment-option-' + paymentOptionId + '-container').eq(0);
-                    if (!applepay_allowed) {
-                        $paymentOption.addClass('-hidden');
+                    const additionalInformationId = $wrapper.closest('.js-additional-information, .additional-information').attr('id');
+                    if (!applepay_allowed && additionalInformationId) {
+                        $('#' + additionalInformationId.replace(/-additional-information$/, '-container')).addClass('-hidden');
                     }
                     break;
             }
@@ -1064,10 +1111,10 @@ var $document, $window, __moduleName__Module = {
         createSession: async () => {
             // Get PaymentRequest data
             const {applepay} = __moduleName__Module,
-                {worflow} = applepay.props;
+                {workflow} = applepay.props;
 
-            if (!ApplePaySession) {
-                return;
+            if (typeof window.ApplePaySession !== 'function') {
+                return applepay.error();
             }
 
             const request = applepay.getRequestDatas();
@@ -1113,7 +1160,7 @@ var $document, $window, __moduleName__Module = {
                 })),
             }
 
-            if ('checkout' != worflow) {
+            if ('checkout' != workflow) {
                 apple_pay_request.shippingMethods = request.carriers;
                 apple_pay_request.lineItems = request.line_items;
                 apple_pay_request.requiredBillingContactFields = [
@@ -1190,6 +1237,14 @@ var $document, $window, __moduleName__Module = {
             }
             let data = {
                 workflow: workflow,
+            }
+
+            // The checkout may not have saved the carrier shown on the page yet
+            if (workflow === 'checkout') {
+                const $delivery_option = $('input[name^="delivery_option"]:checked');
+                if ($delivery_option.length) {
+                    data.delivery_option = $delivery_option.first().val();
+                }
             }
 
             // Check if it's on the product page and add product-related data
