@@ -73,6 +73,7 @@ var $document, $window, __moduleName__Module = {
         this.integrated.init();
         this.integrated.opc.bindEvents();
         this.hosted_fields.init();
+        this.hosted_fields.opc.bindEvents();
     },
     order: {
         init: function () {
@@ -2005,31 +2006,122 @@ var $document, $window, __moduleName__Module = {
             submitTimeoutId: null,
             // Lets a late callback or watchdog from a superseded attempt detect it is stale.
             submitAttemptId: 0,
+            // The create request is in flight: a re-render must not drop the fields it came from.
+            requestPending: false,
+            remountPending: false,
+            opcBound: false,
         },
-        init: function () {
+        // The pay-with-{option id}-form wrapper is rendered the same way by the classic theme, Hummingbird
+        // and the One Page Checkout, unlike the id of the option form inside it.
+        resolveContext: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                $method = $('input[name=method][value=hosted_fields]').first(),
+                $wrapper = $method.closest('[id^="pay-with-"][id$="-form"]'),
+                $form = $('.' + hosted.props.identifier).first();
+
+            if (!$wrapper.length || !$form.length) {
+                return null;
+            }
+
+            return {
+                optionId: $wrapper.attr('id').replace(/^pay-with-/, '').replace(/-form$/, ''),
+                $form: $form,
+            };
+        },
+        // A form without the marker comes from a new render of the payment section: the SDK instance
+        // and the pending submit belong to the replaced DOM.
+        resetMount: function ($form) {
             var hosted = __moduleName__Module.hosted_fields;
-            if (!$('.' + hosted.props.identifier).length) {
+            if ($form.data('payplugHfMounted')) {
                 return;
             }
 
-            // Found via the method input, not by sibling position, which varies with the option inputs.
-            var $methodInput = $('input[name=method][value=hosted_fields]').first(),
-                $form = $methodInput.length ? $methodInput.parent() : $(),
-                formId = $form.length ? ($form.attr('id') || '') : '';
-            hosted.props.paymentOptionId = formId ? formId.replace('payment-payment-option-', 'payment-option-').replace('-form', '') : null;
+            hosted.props.instance = null;
+            hosted.props.attempts = 0;
+            for (var key in hosted.props.fieldsInvalid) {
+                hosted.props.fieldsInvalid[key] = true;
+                hosted.props.fieldsEmpty[key] = true;
+            }
+            $form.data('payplugHfMounted', true);
+            hosted.interruptAttempt();
+        },
+        // Drops the attempt of the replaced or removed fields: a late tokenization callback or watchdog
+        // is ignored. A tokenization under way is reported to the shopper and logged.
+        interruptAttempt: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                interrupted = hosted.props.submited;
+
+            clearTimeout(hosted.props.submitTimeoutId);
+            hosted.props.submitTimeoutId = null;
+            hosted.props.submitAttemptId += 1;
+            hosted.props.submited = false;
+
+            if (interrupted) {
+                $('.' + hosted.props.root + '_error.-payment')
+                    .text(window['payplug_hosted_fields_error_generic'])
+                    .addClass('-show');
+                addLogger('OPC_PAYMENT_SECTION_RERENDERED : hosted fields payment attempt interrupted before the payment creation');
+            }
+        },
+        init: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                context;
+
+            // The create request decides what happens next (3DS redirect or error on the page):
+            // the remount waits for its answer.
+            if (hosted.props.requestPending) {
+                hosted.props.remountPending = true;
+                return;
+            }
+
+            context = hosted.resolveContext();
+            hosted.props.paymentOptionId = context ? context.optionId : null;
+            if (typeof $document !== 'undefined') {
+                $document.off('click.hostedFieldsMount');
+                if (!context) {
+                    $document.off('submit.hostedFields');
+                }
+            }
+            if (!context) {
+                hosted.interruptAttempt();
+                return;
+            }
+            hosted.resetMount(context.$form);
 
             // The SDK iframes can fail to render in a hidden container: mount once the option is selected.
-            if (typeof $document != 'undefined' && hosted.props.paymentOptionId) {
-                if ($('#' + hosted.props.paymentOptionId).attr('checked') == 'checked') {
+            if (typeof $document !== 'undefined') {
+                $document.on('click.hostedFieldsMount', '#' + hosted.props.paymentOptionId, hosted.mountIfNewCard);
+                if ($('#' + hosted.props.paymentOptionId).prop('checked')) {
                     hosted.mountIfNewCard();
-                } else {
-                    $document.on('click', '#' + hosted.props.paymentOptionId, hosted.mountIfNewCard);
                 }
             }
 
             hosted.bindCardholder();
             hosted.bindSavedAliases();
             hosted.attachFormValidateListener();
+        },
+        opc: {
+            bindEvents: function () {
+                var hosted = __moduleName__Module.hosted_fields;
+
+                if (hosted.props.opcBound
+                    || !$('#opc-pay-button').length
+                    || typeof prestashop === 'undefined'
+                    || typeof prestashop.on !== 'function') {
+                    return;
+                }
+                hosted.props.opcBound = true;
+
+                // Deferred until the One Page Checkout has shown the selected option of the new list.
+                prestashop.on('opcPaymentMethodsUpdated', function () {
+                    setTimeout(hosted.init, 0);
+                });
+                prestashop.on('opcPaymentMethodSelected', function (payload) {
+                    if (payload && payload.paymentOptionId === hosted.props.paymentOptionId) {
+                        hosted.mountIfNewCard();
+                    }
+                });
+            },
         },
         // A preselected saved alias keeps the new-card wrapper hidden: never mount the iframes
         // inside it, wait for "pay with a new card" instead.
@@ -2176,7 +2268,8 @@ var $document, $window, __moduleName__Module = {
             validate: function (event) {
                 var hosted = __moduleName__Module.hosted_fields,
                     payment_option_id = hosted.props.paymentOptionId,
-                    isHostedFields = payment_option_id == $('input[name="payment-option"]:checked').attr('id');
+                    isHostedFields = !!payment_option_id
+                        && payment_option_id == $('input[name="payment-option"]:checked').attr('id');
 
                 // The submit listener is global: ignore the other payment options.
                 if (typeof event != 'undefined' && !isHostedFields) {
@@ -2261,6 +2354,7 @@ var $document, $window, __moduleName__Module = {
             },
             submit: function (hfToken, selectedBrand) {
                 var hosted = __moduleName__Module.hosted_fields;
+                hosted.props.requestPending = true;
                 $.ajax({
                     type: 'POST',
                     url: window['payplug_hosted_fields_uhf_url'],
@@ -2283,6 +2377,7 @@ var $document, $window, __moduleName__Module = {
             // module's row id, so the Unified API alias never reaches the page.
             submitAlias: function (idPayplugAlias) {
                 var hosted = __moduleName__Module.hosted_fields;
+                hosted.props.requestPending = true;
                 $.ajax({
                     type: 'POST',
                     url: window['payplug_hosted_fields_uhf_url'],
@@ -2296,9 +2391,19 @@ var $document, $window, __moduleName__Module = {
                     success: hosted.form.onSubmitResponse,
                 });
             },
+            // Runs the remount a re-render asked for while the create request was in flight.
+            onRequestDone: function () {
+                var hosted = __moduleName__Module.hosted_fields;
+                hosted.props.requestPending = false;
+                if (hosted.props.remountPending) {
+                    hosted.props.remountPending = false;
+                    hosted.init();
+                }
+            },
             onSubmitError: function () {
                 var hosted = __moduleName__Module.hosted_fields;
                 hosted.props.submited = false;
+                hosted.form.onRequestDone();
                 $('.' + hosted.props.root + '_error.-payment')
                     .text(window['payplug_hosted_fields_error_generic'])
                     .addClass('-show');
@@ -2311,9 +2416,11 @@ var $document, $window, __moduleName__Module = {
                         return;
                     }
                     hosted.props.submited = false;
+                    hosted.form.onRequestDone();
                     return;
                 }
                 hosted.props.submited = false;
+                hosted.form.onRequestDone();
                 var message = (resp && resp.message) ? resp.message : window['payplug_hosted_fields_error_generic'];
                 $('.' + hosted.props.root + '_error.-payment')
                     .text(message)
