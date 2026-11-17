@@ -8,6 +8,7 @@
 
 - Bugfix :
   - [PRE-3813](https://github.com/payplug/payplug-prestashop/pull/152): Keep the Payplug payment option logos (Oney 3x/4x included) at the same size with the native One Page Checkout as in the classic checkout
+  - [PRE-3814](https://github.com/payplug/payplug-prestashop/pull/154): Show the Unified Hosted Fields card, expiry date and CVV fields of non-EUR carts with the Hummingbird theme and the One Page Checkout, and show them again after the payment methods are refreshed
 
 ## Version 5.2.0
 - Feature :
