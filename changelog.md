@@ -13,6 +13,7 @@
   - [PRE-3721](https://github.com/payplug/payplug-prestashop/pull/137): Keep Unified Hosted Fields payments, saved cards and back-office refunds working with the new Unified API contract (unified-plugin-core ^1.2.2)
   - [PRE-3778](https://github.com/payplug/payplug-prestashop/pull/150): Show the payment error message to a customer back from a failed Unified Hosted Fields 3DS authentication whose failure notification arrived first
   - [PRE-3747](https://github.com/payplug/payplug-prestashop/pull/151): Show the same payment details block, payment method label and transaction id for Unified Hosted Fields orders as for EUR orders in the back office
+  - [PRE-3821](https://github.com/payplug/payplug-prestashop/pull/157): Rename the Scalapay payment option at checkout to "Pay with Scalapay" ("Payez avec Scalapay" in French), without any mention of 3x/4x installments (CCD2)
 
 - Bugfix :
   - [PRE-3778](https://github.com/payplug/payplug-prestashop/pull/153): Build the front-office redirect URLs (checkout error, payment return, order confirmation) with PrestaShop's page links so they follow URL rewriting and the customer's language
