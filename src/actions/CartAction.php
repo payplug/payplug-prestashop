@@ -64,6 +64,7 @@ class CartAction
             || !isset($payment_methods['applepay']) || !$payment_methods['applepay']
             || (!(bool) $applepay_display['cart'] && 'cart' === $controller)
             || (!(bool) $applepay_display['product'] && 'product' === $controller)
+            || !$this->isApplePayCurrencySupported()
         ) {
             return false;
         }
@@ -178,6 +179,21 @@ class CartAction
 
         return $this->dependencies->configClass
             ->fetchTemplate('checkout/payment/applepay.tpl');
+    }
+
+    /**
+     * @description Whether Apple Pay is available for the shop and the context currency is one of the merchant's currencies
+     *
+     * @return bool
+     */
+    private function isApplePayCurrencySupported()
+    {
+        $applepay = $this->dependencies
+            ->getPlugin()
+            ->getPaymentMethodClass()
+            ->getPaymentMethod('applepay');
+
+        return is_object($applepay) && $applepay->isSupportedCurrency();
     }
 
     /**

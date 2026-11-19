@@ -14,6 +14,34 @@ Installation
 
 You should use Prestashop module importation in Prestashop admin pages
 
+Unified Hosted Fields (non-EUR card payments)
+---------
+
+Card payments on non-EUR carts go through the Unified API (Unified Hosted Fields). Besides the module
+configuration (one Account ID per non-EUR currency, `feature_hosted_fields`), it needs:
+
+* **`HOSTED_FIELDS_URL`** in `payplugroutes/.env`: the Hosted Fields SDK URL. There is no default: without
+  it the Unified Hosted Fields option is not displayed at checkout and an error is logged.
+* **The Receiver (notification URL)**, registered on the PayPlug side once per merchant account and per
+  shop, not per payment. It must point at the module's `notify` front controller. PrestaShop builds
+  that URL from the shop's settings, so register the form that matches the shop:
+
+  | Shop settings | Receiver URL |
+  |---|---|
+  | Friendly URLs on, one active language | `https://<shop-domain>/module/payplug/notify` |
+  | Friendly URLs on, several active languages | `https://<shop-domain>/<lang-iso>/module/payplug/notify` (e.g. `/fr/`) |
+  | Friendly URLs off | `https://<shop-domain>/index.php?fc=module&module=payplug&controller=notify` |
+
+  The URL takes no parameter: unlike the Retail `ipn` URL, it is the same for every payment. If the
+  shop's domain, friendly URL setting or languages change, the Receiver must be updated, otherwise
+  notifications are lost without any error on the shop side. In a multistore setup, each shop domain
+  needs its own Receiver.
+
+Known limit: an order is only created once the payment is confirmed (PRE-3557). If the customer closes
+the tab after paying and the notification never reaches the shop (wrong Receiver URL, shop unreachable),
+the payment is captured but no order is created. Nothing reconciles it automatically: check the
+PayPlug portal for paid payments without an order.
+
 Plugin UI Library
 ---------
 

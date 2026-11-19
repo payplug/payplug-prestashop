@@ -105,10 +105,15 @@ class HookClass
      */
     public function actionDeleteGDPRCustomer($customer)
     {
-        $deleted = $this->dependencies
+        $cards_deleted = $this->dependencies
             ->getPlugin()
             ->getCardAction()
             ->deleteByCustomerAction((int) $customer['id']);
+        $aliases_deleted = $this->module
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.action.unified_alias')
+            ->deleteByCustomerAction((int) $customer['id']);
+        $deleted = $cards_deleted && $aliases_deleted;
         if (!$deleted) {
             return \json_encode($this->dependencies
                 ->getPlugin()
@@ -126,11 +131,22 @@ class HookClass
      */
     public function actionExportGDPRData($customer)
     {
-        if (!$cards = $this->dependencies->configClass->gdprCardExport((int) $customer['id'])) {
+        $cards = $this->dependencies->configClass->gdprCardExport((int) $customer['id']);
+        $aliases = $this->module
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.action.unified_alias')
+            ->gdprExportAction((int) $customer['id']);
+        $cards = array_merge($cards ?: [], $aliases ?: []);
+        if (!$cards) {
             return \json_encode($this->dependencies
                 ->getPlugin()
                 ->getTranslationClass()
                 ->l('hook.actionExportGDPRData.unableToExport', 'hookclass'));
+        }
+
+        // One numbering across saved cards (payplug_card) and saved aliases (payplug_unified_alias).
+        foreach ($cards as $index => $card) {
+            $cards[$index]['#'] = $index + 1;
         }
 
         return \json_encode($cards);
@@ -376,7 +392,11 @@ class HookClass
                         ->getTranslationClass()
                         ->l('hook.header.transactionNotCompleted', 'hookclass'),
                 ]);
-                $error_url = 'index.php?controller=order&step=3&has_error=1&modulename=' . $this->dependencies->name;
+                $error_url = $this->dependencies->getPlugin()->getContext()->getPageLink('order', [
+                    'step' => '3',
+                    'has_error' => '1',
+                    'modulename' => $this->dependencies->name,
+                ]);
                 $this->tools->tool('redirect', $error_url);
             }
         }

@@ -51,7 +51,11 @@ class PayplugDispatcherModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         if ($method = $this->toolsAdapter->tool('getValue', 'method')) {
-            $error_url = 'index.php?controller=order&step=3&has_error=1&modulename=' . $this->dependenciesClass->name;
+            $error_url = $this->dependenciesClass->getPlugin()->getContext()->getPageLink('order', [
+                'step' => '3',
+                'has_error' => '1',
+                'modulename' => $this->dependenciesClass->name,
+            ]);
 
             // Check if order exists
             $cart = $this->cartAdapter->get((int) (int) $this->toolsAdapter->tool('getValue', 'id_cart'));

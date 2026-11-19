@@ -19,7 +19,7 @@ class deleteByCustomerActionTest extends BaseCardAction
         $this->assertFalse($this->action->deleteByCustomerAction($customer_id));
     }
 
-    public function testWhenNoCardsFound()
+    public function testWhenNoCardsFoundItIsASuccess()
     {
         $customer_id = 42;
 
@@ -34,8 +34,9 @@ class deleteByCustomerActionTest extends BaseCardAction
         $this->card_repository->shouldReceive([
             'getAllByCustomer' => [],
         ]);
+        $this->action->shouldNotReceive('deleteAction');
 
-        $this->assertFalse($this->action->deleteByCustomerAction($customer_id));
+        $this->assertTrue($this->action->deleteByCustomerAction($customer_id));
     }
 
     public function testWhenRetrievedCardCantBeDeleted()

@@ -346,10 +346,9 @@ class ValidationAction
      */
     public function getOrderLinks($id_order = 0)
     {
-        $context = $this->dependencies
+        $context_adapter = $this->dependencies
             ->getPlugin()
-            ->getContext()
-            ->get();
+            ->getContext();
         $confirmation_url_fields = [];
         if (is_int($id_order) && $id_order) {
             $order = $this->dependencies
@@ -365,13 +364,13 @@ class ValidationAction
         }
 
         return [
-            'confirm' => $context->link->getPageLink('order-confirmation', true, $context->language->id, $confirmation_url_fields),
-            'error' => $context->link->getPageLink('order', true, $context->language->id, [
+            'confirm' => $context_adapter->getPageLink('order-confirmation', $confirmation_url_fields),
+            'error' => $context_adapter->getPageLink('order', [
                 'step' => 3,
                 'has_error' => 1,
                 'modulename' => $this->dependencies->name,
             ]),
-            'cancel' => $context->link->getPageLink('order', true, $context->language->id, [
+            'cancel' => $context_adapter->getPageLink('order', [
                 'step' => 3,
             ]),
         ];

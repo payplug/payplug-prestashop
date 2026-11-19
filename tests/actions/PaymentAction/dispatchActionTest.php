@@ -42,27 +42,65 @@ class dispatchActionTest extends BasePaymentAction
         $this->cartAdapter->shouldReceive([
             'get' => CartMock::get(),
         ]);
+        $this->context->shouldReceive('getPageLink')
+            ->once()
+            ->with('order', [
+                'step' => '3',
+                'embedded' => '1',
+                'pc' => 42,
+                'def' => 1,
+                'modulename' => 'payplug',
+            ])
+            ->andReturn('https://shop.example/order?step=3&embedded=1&pc=42&def=1&modulename=payplug');
+
         $this->assertSame(
             [
-                'return_url' => 'index.php?controller=order&step=3&embedded=1&pc=42&def=1&modulename=payplug',
+                'return_url' => 'https://shop.example/order?step=3&embedded=1&pc=42&def=1&modulename=payplug',
             ],
             $this->action->dispatchAction($method)
         );
     }
 
-    public function testWhenModuleIsConfigureWithPopupDisplay()
+    /**
+     * @dataProvider embeddedReturnUrlProvider
+     *
+     * @param string $method
+     * @param string $payment_methods
+     * @param array $expected_args
+     */
+    public function testWhenModuleIsConfigureWithPopupDisplay($method, $payment_methods, $expected_args)
     {
-        $method = 'standard';
+        $this->configuration->shouldReceive('getValue')
+            ->with('payment_methods')
+            ->andReturn($payment_methods);
         $this->configuration->shouldReceive('getValue')
             ->with('embedded_mode')
             ->andReturn('popup');
+        $this->context->shouldReceive('getPageLink')
+            ->once()
+            ->with('order', $expected_args)
+            ->andReturn('https://shop.example/order');
 
         $this->assertSame(
             [
-                'return_url' => 'index.php?controller=order&step=3&embedded=1&def=1&modulename=' . $this->dependencies->name,
+                'return_url' => 'https://shop.example/order',
             ],
             $this->action->dispatchAction($method)
         );
+    }
+
+    public function embeddedReturnUrlProvider()
+    {
+        $deferred = '{"standard":true, "deferred": true, "amex": true}';
+        $not_deferred = '{"standard":true, "deferred": false, "amex": true}';
+        $base = ['step' => '3', 'embedded' => '1', 'modulename' => 'payplug'];
+
+        return [
+            'standard, deferred' => ['standard', $deferred, $base + ['def' => '1']],
+            'standard, not deferred' => ['standard', $not_deferred, $base],
+            'installment, deferred' => ['installment', $deferred, $base + ['inst' => '1', 'def' => '1']],
+            'amex never deferred' => ['amex', $deferred, $base + ['amex' => '1']],
+        ];
     }
 
     public function testWhenNoPaymentTabIsReturnForCurrentPaymentMethod()
