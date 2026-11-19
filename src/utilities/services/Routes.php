@@ -82,7 +82,7 @@ class Routes
      */
     public function getUnifiedApiUrl()
     {
-        return $this->getEnv('UNIFIED_API_BASE_URL') ?: 'https://api.payplug.com';
+        return $this->getEnv('UNIFIED_API_BASE_URL') ?: 'https://payment.payplug.com';
     }
 
     /**
