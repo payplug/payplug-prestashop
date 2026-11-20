@@ -152,6 +152,13 @@ class PrestashopAdapter17
                 }
             }
 
+            if ('scalapay' == $payment_method) {
+                $scalapay_widget = $this->renderScalapayCheckoutWidget();
+                if ('' !== $scalapay_widget) {
+                    $payment_option['additionalInformation'] = $scalapay_widget;
+                }
+            }
+
             if (isset($payment_option['additionalInformation'])) {
                 $paymentOption->setAdditionalInformation($payment_option['additionalInformation']); // Échéanciers Oney
             }
@@ -555,6 +562,34 @@ class PrestashopAdapter17
         $this->context->smarty->assign([
             'payplug_switch' => $switch,
         ]);
+    }
+
+    /**
+     * @description Render the Scalapay widget shown under the Scalapay payment option
+     *
+     * @return string empty when the widget is not shown or could not be rendered
+     */
+    protected function renderScalapayCheckoutWidget()
+    {
+        try {
+            $action = $this->dependencies
+                ->getPlugin()
+                ->getModule()
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.action.scalapay_widget');
+            if (!$action) {
+                throw new \UnexpectedValueException('The Scalapay widget action is not registered.');
+            }
+
+            return (string) $action->renderCheckout();
+        } catch (\Throwable $exception) {
+            $this->dependencies->getPlugin()->getLogger()->addLog(
+                'PrestashopAdapter17::renderScalapayCheckoutWidget - ' . get_class($exception) . ': ' . $exception->getMessage(),
+                'error'
+            );
+
+            return '';
+        }
     }
 
     /**

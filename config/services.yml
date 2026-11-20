@@ -36,6 +36,10 @@ services:
     class: PayPlug\src\actions\ApplePayDomainAssociationAction
     public: true
 
+  payplug.action.scalapay_widget:
+    class: PayPlug\src\actions\ScalapayWidgetAction
+    public: true
+
   payplug.console.refresh_apple_domain_association:
     class: PayPlug\src\console\RefreshAppleDomainAssociationCommand
     tags:

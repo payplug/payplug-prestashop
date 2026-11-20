@@ -37,6 +37,10 @@ class upgrade530Test extends TestCase
         $this->stored = [
             'scalapay_custom_min_amounts' => '',
             'scalapay_custom_max_amounts' => '',
+            'scalapay_product_widget' => '1',
+            'scalapay_cart_widget' => '1',
+            'scalapay_checkout_widget' => '1',
+            'scalapay_amount_selectors' => '{}',
         ];
         $this->failing_writes = [];
         $this->global_writes = [];
@@ -432,6 +436,82 @@ class upgrade530Test extends TestCase
 
         $this->assertFalse(upgrade_module_5_3_0($this->module));
         $this->assertErrorLogged('sync broken');
+    }
+
+    public function testTheMissingScalapayWidgetSettingsAreCreatedWithTheirDefaults()
+    {
+        $this->forgetScalapayWidgetSettings();
+        $this->stored['apm_custom_settings'] = '{}';
+
+        $this->assertTrue(upgrade_module_5_3_0($this->getModuleObject()));
+
+        $this->assertSame(
+            [
+                'scalapay_product_widget' => '1',
+                'scalapay_cart_widget' => '1',
+                'scalapay_checkout_widget' => '1',
+                'scalapay_amount_selectors' => '{}',
+            ],
+            $this->saved
+        );
+        $this->assertSame(array_keys($this->saved), $this->global_writes);
+    }
+
+    public function testTheExistingScalapayWidgetSettingsAreKept()
+    {
+        $this->forgetScalapayWidgetSettings();
+        $this->stored['apm_custom_settings'] = '{}';
+        $this->stored['scalapay_product_widget'] = '0';
+        $this->stored['scalapay_amount_selectors'] = '{"product":["#price"]}';
+
+        $this->assertTrue(upgrade_module_5_3_0($this->getModuleObject()));
+
+        $this->assertSame(['scalapay_cart_widget' => '1', 'scalapay_checkout_widget' => '1'], $this->saved);
+        $this->assertSame('0', $this->stored['scalapay_product_widget']);
+        $this->assertSame('{"product":["#price"]}', $this->stored['scalapay_amount_selectors']);
+    }
+
+    public function testTheScalapayWidgetSettingsExistBeforeTheAccountRequest()
+    {
+        $this->forgetScalapayWidgetSettings();
+        $saved_on_request = null;
+        $this->api_service->shouldReceive('getAccount')
+            ->once()
+            ->andReturnUsing(function () use (&$saved_on_request) {
+                $saved_on_request = $this->saved;
+
+                return ['is_live' => true];
+            });
+
+        $this->assertTrue(upgrade_module_5_3_0($this->getModuleObject()));
+        $this->assertArrayHasKey('scalapay_cart_widget', $saved_on_request);
+    }
+
+    public function testASecondRunWritesNothingMore()
+    {
+        $this->forgetScalapayWidgetSettings();
+        upgrade_module_5_3_0($this->getModuleObject());
+        $this->saved = [];
+        $this->global_writes = [];
+
+        $this->assertTrue(upgrade_module_5_3_0($this->getModuleObject()));
+        $this->assertSame([], $this->saved);
+    }
+
+    public function testTheUpgradeFailsWhenAScalapayWidgetSettingCannotBeCreated()
+    {
+        $this->forgetScalapayWidgetSettings();
+        $this->failing_writes = ['scalapay_cart_widget'];
+
+        $this->assertFalse(upgrade_module_5_3_0($this->getModuleObject()));
+        $this->assertSame('1', $this->saved['scalapay_checkout_widget']);
+    }
+
+    private function forgetScalapayWidgetSettings()
+    {
+        foreach (['scalapay_product_widget', 'scalapay_cart_widget', 'scalapay_checkout_widget', 'scalapay_amount_selectors'] as $key) {
+            unset($this->stored[$key]);
+        }
     }
 
     /**
