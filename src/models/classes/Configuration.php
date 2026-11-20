@@ -386,6 +386,24 @@ class Configuration
             'defaultValue' => '{"amex":false,"applepay":false,"bancontact":false,"deferred":false,"installment":false,"ideal":false,"mybank":false,"one_click":false,"oney":false,"satispay":false,"standard":true,"wero":false,"bizum":false,"scalapay":false}',
             'setConf' => 1,
         ],
+        'scalapay_amount_selectors' => [
+            'type' => 'string',
+            'name' => 'SCALAPAY_AMOUNT_SELECTORS',
+            'defaultValue' => '{}',
+            'setConf' => 1,
+        ],
+        'scalapay_cart_widget' => [
+            'type' => 'integer',
+            'name' => 'SCALAPAY_CART_WIDGET',
+            'defaultValue' => 1,
+            'setConf' => 1,
+        ],
+        'scalapay_checkout_widget' => [
+            'type' => 'integer',
+            'name' => 'SCALAPAY_CHECKOUT_WIDGET',
+            'defaultValue' => 1,
+            'setConf' => 1,
+        ],
         'scalapay_custom_max_amounts' => [
             'type' => 'string',
             'name' => 'SCALAPAY_CUSTOM_MAX_AMOUNTS',
@@ -398,6 +416,18 @@ class Configuration
             'type' => 'string',
             'name' => 'SCALAPAY_CUSTOM_MIN_AMOUNTS',
             'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'scalapay_merchant_token' => [
+            'type' => 'string',
+            'name' => 'SCALAPAY_MERCHANT_TOKEN',
+            'defaultValue' => '',
+            'setConf' => 1,
+        ],
+        'scalapay_product_widget' => [
+            'type' => 'integer',
+            'name' => 'SCALAPAY_PRODUCT_WIDGET',
+            'defaultValue' => 1,
             'setConf' => 1,
         ],
         'sandbox_mode' => [

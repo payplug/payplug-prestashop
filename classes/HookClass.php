@@ -23,6 +23,7 @@
 
 namespace PayPlug\classes;
 
+use PayPlug\src\actions\ScalapayWidgetAction;
 use Symfony\Component\Dotenv\Dotenv;
 
 if (!defined('_PS_VERSION_')) {
@@ -43,7 +44,9 @@ class HookClass
     private $media;
     private $module;
     private $orderAdapter;
+    private $oney_product_cta;
     private $orderStateAdapter;
+    private $scalapay_widget_action;
     private $sql;
     private $tools;
     private $validate;
@@ -295,6 +298,96 @@ class HookClass
                 ]);
             }
         }
+    }
+
+    /**
+     * @description Render the Oney call to action and the Scalapay widget after a product price
+     *
+     * @param array $params displayProductPriceBlock hook parameters
+     *
+     * @return string
+     */
+    public function displayProductPriceBlock($params)
+    {
+        if (null === $this->oney_product_cta) {
+            $this->oney_product_cta = (bool) $this->configuration->getValue('oney_product_cta');
+        }
+
+        $oney_cta = $this->oney_product_cta
+            ? $this->dependencies->getPlugin()->getOneyAction()->renderCTA($params)
+            : '';
+
+        return $oney_cta . $this->renderScalapayWidget('product', $params);
+    }
+
+    /**
+     * @description Render the Apple Pay and Oney calls to action and the Scalapay widget on the cart page
+     *
+     * @return string
+     */
+    public function displayExpressCheckout()
+    {
+        $oney_cta = (bool) $this->configuration->getValue('oney_cart_cta')
+            ? $this->dependencies->getPlugin()->getOneyAction()->renderCTA()
+            : '';
+        $payment_cta = $this->dependencies->getPlugin()->getCartAction()->renderPaymentCTA();
+
+        return $payment_cta . $oney_cta . $this->renderScalapayWidget('cart');
+    }
+
+    /**
+     * @description Render the page header, followed by the Scalapay widget script on the pages showing a widget
+     *
+     * @param array $params displayHeader hook parameters
+     *
+     * @return string
+     */
+    public function renderHeader($params)
+    {
+        $header = $this->displayHeader($params);
+        $script = false === $header ? '' : $this->renderScalapayWidget('script');
+
+        return $header . $script;
+    }
+
+    /**
+     * @description Render the Scalapay widget, or its script, of a front-office page
+     *
+     * @param string $page product, cart or script
+     * @param array $params hook parameters
+     *
+     * @return string empty when nothing is shown or the rendering failed
+     */
+    public function renderScalapayWidget($page, $params = [])
+    {
+        $output = '';
+        if ($this->mayShowScalapayWidget($page, $params)) {
+            try {
+                $action = $this->getScalapayWidgetAction();
+
+                switch ($page) {
+                    case 'product':
+                        $output = (string) $action->renderProduct($params);
+
+                        break;
+
+                    case 'cart':
+                        $output = (string) $action->renderCart();
+
+                        break;
+
+                    default:
+                        $output = (string) $action->renderScriptTag();
+                }
+            } catch (\Throwable $exception) {
+                $this->dependencies->getPlugin()->getLogger()->addLog(
+                    'HookClass::renderScalapayWidget - ' . get_class($exception) . ': ' . $exception->getMessage(),
+                    'error'
+                );
+            }
+        }
+
+        return $output;
     }
 
     /**
@@ -588,5 +681,50 @@ class HookClass
         }
 
         return true;
+    }
+
+    /**
+     * @description Check, without building the widget action, that Scalapay is enabled and the page can show its widget
+     *
+     * @param string $page product, cart or script
+     * @param array $params hook parameters
+     *
+     * @return bool
+     */
+    private function mayShowScalapayWidget($page, $params)
+    {
+        $controllers = [
+            'product' => ['product'],
+            'cart' => ['cart'],
+            'script' => array_values(ScalapayWidgetAction::PAGE_CONTROLLERS),
+        ];
+        if (!isset($controllers[$page])
+            || ('product' === $page && (!isset($params['type']) || 'after_price' !== $params['type']))) {
+            return false;
+        }
+
+        $payment_methods = json_decode((string) $this->configuration->getValue('payment_methods'), true);
+
+        return is_array($payment_methods)
+            && !empty($payment_methods['scalapay'])
+            && in_array((string) $this->dispatcher->getInstance()->getController(), $controllers[$page], true);
+    }
+
+    /**
+     * @return object
+     */
+    private function getScalapayWidgetAction()
+    {
+        if (null === $this->scalapay_widget_action) {
+            $action = $this->module
+                ->getInstanceByName($this->dependencies->name)
+                ->getService('payplug.action.scalapay_widget');
+            if (!$action) {
+                throw new \UnexpectedValueException('The Scalapay widget action is not registered.');
+            }
+            $this->scalapay_widget_action = $action;
+        }
+
+        return $this->scalapay_widget_action;
     }
 }
