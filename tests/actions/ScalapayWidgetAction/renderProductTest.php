@@ -34,6 +34,7 @@ class renderProductTest extends BaseScalapayWidgetAction
                 'scalapay_merchant_token' => 'tok_test_123',
                 'scalapay_type' => 'product',
                 'scalapay_amount_selectors' => '[".current-price-value"]',
+                'scalapay_amount' => '30.00',
                 'scalapay_locale' => 'fr',
             ],
             $this->assigned
@@ -86,9 +87,10 @@ class renderProductTest extends BaseScalapayWidgetAction
         $this->assertSame('', $this->action->renderProduct($this->params));
     }
 
-    public function testTheAmountIsThePriceTimesTheWantedQuantity()
+    public function testTheEligibilityAmountIsThePriceTimesTheWantedQuantity()
     {
         $this->amount_helper->shouldReceive('convertAmount')->once()->with(60.0, false, 'EUR')->andReturn(6000);
+        $this->amount_helper->shouldReceive('convertAmount')->with(30.0, false, 'EUR')->andReturn(3000);
 
         $this->assertNotSame('', $this->action->renderProduct($this->params));
     }
@@ -98,6 +100,7 @@ class renderProductTest extends BaseScalapayWidgetAction
         unset($this->request['quantity_wanted']);
         $this->params['product']['quantity_wanted'] = 3;
         $this->amount_helper->shouldReceive('convertAmount')->once()->with(90.0, false, 'EUR')->andReturn(9000);
+        $this->amount_helper->shouldReceive('convertAmount')->with(30.0, false, 'EUR')->andReturn(3000);
 
         $this->assertNotSame('', $this->action->renderProduct($this->params));
     }
@@ -105,9 +108,39 @@ class renderProductTest extends BaseScalapayWidgetAction
     public function testOneUnitIsUsedWhenNoQuantityIsKnown()
     {
         unset($this->request['quantity_wanted']);
-        $this->amount_helper->shouldReceive('convertAmount')->once()->with(30.0, false, 'EUR')->andReturn(3000);
+        $this->amount_helper->shouldReceive('convertAmount')->twice()->with(30.0, false, 'EUR')->andReturn(3000);
 
         $this->assertNotSame('', $this->action->renderProduct($this->params));
+    }
+
+    public function testTheWidgetAmountIsTheDisplayedUnitPriceWhateverTheQuantity()
+    {
+        $this->request['quantity_wanted'] = '3';
+        $this->params['product']['price_amount'] = 24.9;
+
+        $this->action->renderProduct($this->params);
+
+        $this->assertSame('24.90', $this->assigned['scalapay_amount']);
+    }
+
+    public function testTheWidgetAmountFollowsTheCombinationPrice()
+    {
+        $this->params['product']['id_product_attribute'] = 7;
+        $this->params['product']['price_amount'] = '119.99';
+
+        $this->action->renderProduct($this->params);
+
+        $this->assertSame('119.99', $this->assigned['scalapay_amount']);
+    }
+
+    public function testTheWidgetAmountIsConvertedWithTheCartCurrency()
+    {
+        $this->amount_helper->shouldReceive('convertAmount')->with(60.0, false, 'EUR')->andReturn(6000);
+        $this->amount_helper->shouldReceive('convertAmount')->once()->with(30.0, false, 'EUR')->andReturn(3000);
+
+        $this->action->renderProduct($this->params);
+
+        $this->assertSame('30.00', $this->assigned['scalapay_amount']);
     }
 
     public function testTheProductCanBeAnArrayAccessObject()
@@ -170,11 +203,20 @@ class renderProductTest extends BaseScalapayWidgetAction
     public function testTheTokenAndSelectorsAreAssignedRawForTheTemplateToEscape()
     {
         $this->stored['scalapay_merchant_token'] = 'tok"<x>';
-        $this->stored['scalapay_amount_selectors'] = '{"product":["#price > span"]}';
+        $this->context->shop->theme_name = 'hummingbird';
 
         $this->action->renderProduct($this->params);
 
         $this->assertSame('tok"<x>', $this->assigned['scalapay_merchant_token']);
-        $this->assertSame('["#price > span"]', $this->assigned['scalapay_amount_selectors']);
+        $this->assertSame('[".product__price"]', $this->assigned['scalapay_amount_selectors']);
+    }
+
+    public function testACustomThemeGetsNoSelectorButStillTheAmount()
+    {
+        $this->context->shop->theme_name = 'my_theme';
+
+        $this->assertSame('<scalapay/widget.tpl>', $this->action->renderProduct($this->params));
+        $this->assertSame('[]', $this->assigned['scalapay_amount_selectors']);
+        $this->assertSame('30.00', $this->assigned['scalapay_amount']);
     }
 }

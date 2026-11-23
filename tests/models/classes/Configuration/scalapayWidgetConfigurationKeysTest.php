@@ -40,12 +40,9 @@ class scalapayWidgetConfigurationKeysTest extends BaseConfiguration
         $this->assertSame(1, $this->class->get('scalapay_merchant_token')['setConf']);
     }
 
-    public function testAmountSelectorsDefaultToAnEmptyJsonObject()
+    public function testNoPriceSelectorKeyIsDeclared()
     {
-        $this->assertSame('{}', $this->class->getDefault('scalapay_amount_selectors'));
-        $this->assertSame('string', $this->class->getType('scalapay_amount_selectors'));
-        $this->assertSame('PAYPLUG_SCALAPAY_AMOUNT_SELECTORS', $this->class->getName('scalapay_amount_selectors'));
-        $this->assertSame(1, $this->class->get('scalapay_amount_selectors')['setConf']);
+        $this->assertSame([], preg_grep('/selector/i', array_keys($this->class->configurations)));
     }
 
     public function testTheWidgetKeysAreSeededOnInstall()
@@ -64,6 +61,6 @@ class scalapayWidgetConfigurationKeysTest extends BaseConfiguration
         $this->assertSame('1', $seeded['PAYPLUG_SCALAPAY_CART_WIDGET']);
         $this->assertSame('1', $seeded['PAYPLUG_SCALAPAY_CHECKOUT_WIDGET']);
         $this->assertSame('', $seeded['PAYPLUG_SCALAPAY_MERCHANT_TOKEN']);
-        $this->assertSame('{}', $seeded['PAYPLUG_SCALAPAY_AMOUNT_SELECTORS']);
+        $this->assertArrayNotHasKey('PAYPLUG_SCALAPAY_AMOUNT_SELECTORS', $seeded);
     }
 }

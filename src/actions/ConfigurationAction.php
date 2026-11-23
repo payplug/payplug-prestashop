@@ -1260,27 +1260,23 @@ class ConfigurationAction
     }
 
     /**
-     * @description Save the Scalapay widget switches and price selectors submitted with Scalapay enabled;
-     *              none is saved when a selector is invalid.
+     * @description Save the Scalapay widget switches submitted with Scalapay enabled
      *
      * @param \stdClass $datas
      * @param array $translation modal translations
      *
-     * @return array|null the refusal to answer, null when the settings are saved or not submitted
+     * @return array|null the refusal to answer, null when the switches are saved or not submitted
      */
     protected function saveScalapayWidgetSettings($datas, $translation)
     {
         $refusal = null;
         if (isset($datas->enable_scalapay) && (bool) $datas->enable_scalapay) {
-            $settings = $this->getScalapayWidgetSettings($datas);
-            $message = null === $settings
-                ? $translation['scalapay']['amount_selectors']['text']
-                : $this->storeConfigurations($settings, $translation['error']['text']);
+            $message = $this->storeConfigurations($this->getScalapayWidgetSettings($datas), $translation['error']['text']);
             if (null !== $message) {
                 $this->dependencies
                     ->getPlugin()
                     ->getLogger()
-                    ->addLog('ConfigurationAction::saveAction: Scalapay widget settings refused or not saved.');
+                    ->addLog('ConfigurationAction::saveAction: Scalapay widget settings not saved.');
                 $refusal = [
                     'success' => false,
                     'data' => [
@@ -1299,7 +1295,7 @@ class ConfigurationAction
     /**
      * @param \stdClass $datas
      *
-     * @return array|null the configuration values to store by key, null when a price selector is invalid
+     * @return array the configuration values to store by key
      */
     protected function getScalapayWidgetSettings($datas)
     {
@@ -1311,12 +1307,7 @@ class ConfigurationAction
             }
         }
 
-        $amount_selectors = $this->getScalapayAmountSelectors($datas);
-        if (null !== $amount_selectors) {
-            $settings['scalapay_amount_selectors'] = $amount_selectors;
-        }
-
-        return false === $amount_selectors ? null : $settings;
+        return $settings;
     }
 
     /**
@@ -1335,53 +1326,6 @@ class ConfigurationAction
         }
 
         return null;
-    }
-
-    /**
-     * @description Merge the Scalapay price selectors submitted for each page into the stored ones;
-     *              an emptied field, or one holding the theme default, goes back to the theme default,
-     *              a field not submitted keeps its value.
-     *
-     * @param \stdClass $datas
-     *
-     * @return false|string|null the JSON to store, false when a selector is invalid, null when none is submitted
-     */
-    protected function getScalapayAmountSelectors($datas)
-    {
-        $stored = json_decode(
-            (string) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('scalapay_amount_selectors'),
-            true
-        );
-
-        $posted = false;
-        $selectors = [];
-        $widget_action = null;
-        foreach (['product', 'cart', 'checkout'] as $page) {
-            $field = 'scalapay_amount_selectors_' . $page;
-            if (!property_exists($datas, $field)) {
-                if (isset($stored[$page]) && is_array($stored[$page]) && !empty($stored[$page])) {
-                    $selectors[$page] = $stored[$page];
-                }
-
-                continue;
-            }
-
-            $posted = true;
-            $parsed = ScalapayWidgetAction::parseAmountSelectors($datas->{$field});
-            if (null === $parsed) {
-                return false;
-            }
-            $widget_action = $widget_action ?: $this->getService('payplug.action.scalapay_widget');
-            if (!empty($parsed) && (!$widget_action || $parsed !== $widget_action->getThemeAmountSelectors($page))) {
-                $selectors[$page] = $parsed;
-            }
-        }
-
-        if (!$posted) {
-            return null;
-        }
-
-        return empty($selectors) ? '{}' : (string) json_encode($selectors, JSON_UNESCAPED_SLASHES);
     }
 
     /**

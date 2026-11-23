@@ -26,18 +26,9 @@ class scalapayWidgetTranslationsTest extends BaseTranslation
         foreach (['checkout', 'product', 'cart'] as $page) {
             $this->assertSame('paymentmethods.scalapay.widget.' . $page . '.title', $translations[$page]['title']);
             $this->assertSame('paymentmethods.scalapay.widget.' . $page . '.description', $translations[$page]['description']);
-            $this->assertSame('paymentmethods.scalapay.widget.selectors.' . $page, $translations['selectors'][$page]);
         }
-        $this->assertSame('paymentmethods.scalapay.widget.selectors.title', $translations['selectors']['title']);
-        $this->assertSame('paymentmethods.scalapay.widget.selectors.description', $translations['selectors']['description']);
-    }
-
-    public function testTheSaveErrorMessageIsDeclared()
-    {
-        $this->assertSame(
-            'modal.scalapay.amount_selectors.text',
-            $this->class->getModalTranslations()['scalapay']['amount_selectors']['text']
-        );
+        $this->assertSame(['checkout', 'product', 'cart'], array_keys($translations));
+        $this->assertArrayNotHasKey('scalapay', $this->class->getModalTranslations());
     }
 
     public function localeProvider()
@@ -86,7 +77,6 @@ class scalapayWidgetTranslationsTest extends BaseTranslation
                 $keys[] = $key;
             }
         );
-        $keys[] = $this->class->getModalTranslations()['scalapay']['amount_selectors']['text'];
 
         return $keys;
     }

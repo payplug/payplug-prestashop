@@ -122,7 +122,7 @@ class getOptionTest extends BaseScalapayPaymentMethod
         $names = array_column($this->class->getOption([])['advanced_options'], 'name');
 
         $this->assertSame(
-            ['thresholds', 'scalapay_checkout_widget', 'scalapay_product_widget', 'scalapay_cart_widget', 'scalapay_amount_selectors'],
+            ['thresholds', 'scalapay_checkout_widget', 'scalapay_product_widget', 'scalapay_cart_widget'],
             $names
         );
     }
@@ -134,7 +134,7 @@ class getOptionTest extends BaseScalapayPaymentMethod
         $names = array_column($this->class->getOption([])['advanced_options'], 'name');
 
         $this->assertSame(
-            ['scalapay_checkout_widget', 'scalapay_product_widget', 'scalapay_cart_widget', 'scalapay_amount_selectors'],
+            ['scalapay_checkout_widget', 'scalapay_product_widget', 'scalapay_cart_widget'],
             $names
         );
     }
@@ -172,66 +172,11 @@ class getOptionTest extends BaseScalapayPaymentMethod
         $this->assertFalse($options['scalapay_cart_widget']['checked']);
     }
 
-    public function testTheSelectorsOptionHasOneTextFieldPerPage()
+    public function testNoPriceSelectorFieldIsOffered()
     {
-        $this->widget_action->shouldReceive('getStoredAmountSelectors')->with('product')->andReturn(['#price', '.price']);
+        $option = $this->class->getOption([]);
 
-        $option = $this->getAdvancedOptionsByName([])['scalapay_amount_selectors'];
-
-        $this->assertSame('paymentmethods.scalapay.widget.selectors.title', $option['title']);
-        $this->assertFalse($option['switch']);
-        $this->assertSame(
-            [
-                ['description' => 'paymentmethods.scalapay.widget.selectors.description'],
-                ['type' => 'text', 'datas' => ['text' => 'paymentmethods.scalapay.widget.selectors.product', 'class' => '']],
-                ['type' => 'input', 'datas' => [
-                    'name' => 'scalapay_amount_selectors_product',
-                    'type' => 'text',
-                    'value' => '#price, .price',
-                    'placeholder' => '.current-price-value',
-                    'class' => '',
-                ]],
-                ['type' => 'text', 'datas' => ['text' => 'paymentmethods.scalapay.widget.selectors.cart', 'class' => '']],
-                ['type' => 'input', 'datas' => [
-                    'name' => 'scalapay_amount_selectors_cart',
-                    'type' => 'text',
-                    'value' => '',
-                    'placeholder' => '.cart-summary-totals .cart-total .value',
-                    'class' => '',
-                ]],
-                ['type' => 'text', 'datas' => ['text' => 'paymentmethods.scalapay.widget.selectors.checkout', 'class' => '']],
-                ['type' => 'input', 'datas' => [
-                    'name' => 'scalapay_amount_selectors_checkout',
-                    'type' => 'text',
-                    'value' => '',
-                    'placeholder' => '.cart-summary-totals .cart-total .value',
-                    'class' => '',
-                ]],
-            ],
-            $option['descriptions']
-        );
-    }
-
-    public function testTheSelectorFieldsAreEmptyWhenNothingIsStored()
-    {
-        $this->widget_action->shouldNotReceive('getAmountSelectors');
-
-        $descriptions = $this->getAdvancedOptionsByName([])['scalapay_amount_selectors']['descriptions'];
-
-        foreach ([2 => '.current-price-value', 4 => '.cart-summary-totals .cart-total .value', 6 => '.cart-summary-totals .cart-total .value'] as $index => $default) {
-            $this->assertSame('', $descriptions[$index]['datas']['value']);
-            $this->assertSame($default, $descriptions[$index]['datas']['placeholder']);
-        }
-    }
-
-    public function testTheSelectorsOptionIsLeftOutWhenTheWidgetActionIsMissing()
-    {
-        $this->module->shouldReceive('getService')->with('payplug.action.scalapay_widget')->andReturn(null);
-
-        $options = $this->getAdvancedOptionsByName([]);
-
-        $this->assertArrayHasKey('scalapay_cart_widget', $options);
-        $this->assertArrayNotHasKey('scalapay_amount_selectors', $options);
+        $this->assertStringNotContainsString('selector', json_encode($option));
     }
 
     public function testTheMerchantTokenIsNeverSentToTheBackOffice()

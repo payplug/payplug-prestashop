@@ -71,11 +71,6 @@ class ScalapayPaymentMethod extends PaymentMethod
             ];
         }
 
-        $amount_selectors = $this->getAmountSelectorsOption($translation['selectors']);
-        if (!empty($amount_selectors)) {
-            $option['advanced_options'][] = $amount_selectors;
-        }
-
         return $option;
     }
 
@@ -149,57 +144,6 @@ class ScalapayPaymentMethod extends PaymentMethod
         }
 
         return ['cart' => $cart_context];
-    }
-
-    /**
-     * @description Get the option editing the CSS selectors of the price read by the widget
-     *
-     * @param array $translation
-     *
-     * @return array empty when the widget action is not available
-     */
-    protected function getAmountSelectorsOption($translation = [])
-    {
-        $widget_action = $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.action.scalapay_widget');
-        if (!$widget_action) {
-            $this->logger->addLog('ScalapayPaymentMethod::getAmountSelectorsOption: The Scalapay widget action is not registered.');
-
-            return [];
-        }
-
-        $descriptions = [
-            ['description' => $translation['description']],
-        ];
-        foreach (['product', 'cart', 'checkout'] as $page) {
-            $descriptions[] = [
-                'type' => 'text',
-                'datas' => [
-                    'text' => $translation[$page],
-                    'class' => '',
-                ],
-            ];
-            $descriptions[] = [
-                'type' => 'input',
-                'datas' => [
-                    'name' => 'scalapay_amount_selectors_' . $page,
-                    'type' => 'text',
-                    'value' => implode(', ', $widget_action->getStoredAmountSelectors($page)),
-                    'placeholder' => implode(', ', $widget_action->getThemeAmountSelectors($page)),
-                    'class' => '',
-                ],
-            ];
-        }
-
-        return [
-            'name' => 'scalapay_amount_selectors',
-            'title' => $translation['title'],
-            'descriptions' => $descriptions,
-            'switch' => false,
-        ];
     }
 
     /**

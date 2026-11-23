@@ -9,14 +9,6 @@ namespace PayPlug\tests\actions\ScalapayWidgetAction;
  */
 class getAmountSelectorsTest extends BaseScalapayWidgetAction
 {
-    public function testStoredSelectorsAreTrimmed()
-    {
-        $this->stored['scalapay_amount_selectors'] = '{"product":[".a"," .b "]}';
-
-        $this->assertSame(['.a', '.b'], $this->action->getAmountSelectors('product'));
-        $this->assertSame([], $this->logs);
-    }
-
     public function themeDefaultProvider()
     {
         yield 'classic product' => ['classic', 'product', ['.current-price-value']];
@@ -27,9 +19,9 @@ class getAmountSelectorsTest extends BaseScalapayWidgetAction
 
         yield 'hummingbird product' => ['hummingbird', 'product', ['.product__price']];
 
-        yield 'hummingbird cart' => ['hummingbird', 'cart', ['.cart-summary__total .cart-summary__line:first-child .cart-summary__value']];
+        yield 'hummingbird cart' => ['hummingbird', 'cart', []];
 
-        yield 'hummingbird checkout' => ['hummingbird', 'checkout', ['.cart-summary__total .cart-summary__line:first-child .cart-summary__value']];
+        yield 'hummingbird checkout' => ['hummingbird', 'checkout', []];
 
         yield 'unknown theme' => ['my_theme', 'product', []];
     }
@@ -41,13 +33,9 @@ class getAmountSelectorsTest extends BaseScalapayWidgetAction
      * @param string $page
      * @param array $expected
      */
-    public function testThemeDefaultIsUsedWhenNothingIsStoredForThePage($theme, $page, $expected)
+    public function testTheSelectorsAreTheThemeDefaults($theme, $page, $expected)
     {
         $this->context->shop->theme_name = $theme;
-        $this->stored['scalapay_amount_selectors'] = '{"cart":[".mine"]}';
-        if ('cart' === $page) {
-            $this->stored['scalapay_amount_selectors'] = '{"product":[".mine"]}';
-        }
 
         $this->assertSame($expected, $this->action->getAmountSelectors($page));
     }
@@ -62,89 +50,53 @@ class getAmountSelectorsTest extends BaseScalapayWidgetAction
         $this->assertSame(['.product__price'], $this->action->getAmountSelectors('product'));
     }
 
-    public function missingStoredValueProvider()
+    public function pageProvider()
     {
-        yield 'missing row' => [false];
+        yield ['cart'];
 
-        yield 'empty object' => ['{}'];
-
-        yield 'malformed json' => ['{"product":'];
-
-        yield 'empty list' => ['{"product":[]}'];
-
-        yield 'not a list' => ['{"product":".a"}'];
+        yield ['checkout'];
     }
 
     /**
-     * @dataProvider missingStoredValueProvider
+     * @dataProvider pageProvider
      *
-     * @param mixed $stored
+     * @param string $page
      */
-    public function testThemeDefaultIsUsedWhenTheStoredValueHasNoSelectorForThePage($stored)
+    public function testAHummingbirdChildThemeHasNoCartTotalSelector($page)
     {
-        $this->stored['scalapay_amount_selectors'] = $stored;
+        $theme = \Mockery::mock('Theme');
+        $theme->shouldReceive('get')->with('parent')->andReturn('hummingbird');
+        $this->context->shop->theme_name = 'my_child_theme';
+        $this->context->shop->theme = $theme;
 
-        $this->assertSame(['.current-price-value'], $this->action->getAmountSelectors('product'));
-    }
-
-    public function invalidSelectorProvider()
-    {
-        yield 'opening angle bracket' => ['.a<b'];
-
-        yield 'double quote' => ['.a"b'];
-
-        yield 'single quote' => ['.a\'b'];
-
-        yield 'backtick' => ['.a`b'];
-
-        yield 'backslash' => ['.a\\b'];
-
-        yield 'control character' => [".a\x07b"];
-
-        yield 'too long' => [str_repeat('a', 201)];
-
-        yield 'not a string' => [42];
+        $this->assertSame([], $this->action->getAmountSelectors($page));
     }
 
     /**
-     * @dataProvider invalidSelectorProvider
+     * @dataProvider pageProvider
      *
-     * @param mixed $selector
+     * @param string $page
      */
-    public function testAnInvalidStoredSelectorFallsBackToTheThemeDefaultAndIsLogged($selector)
+    public function testTheClassicCartTotalSelectorTargetsTheLineWithTaxes($page)
     {
-        $this->stored['scalapay_amount_selectors'] = json_encode(['product' => ['.ok', $selector]]);
+        $this->assertSame(['.cart-summary-totals .cart-total .value'], $this->action->getAmountSelectors($page));
+    }
+
+    public function testAThemeWithAnUnknownParentHasNoSelector()
+    {
+        $theme = \Mockery::mock('Theme');
+        $theme->shouldReceive('get')->with('parent')->andReturn('other_theme');
+        $this->context->shop->theme_name = 'my_child_theme';
+        $this->context->shop->theme = $theme;
+
+        $this->assertSame([], $this->action->getAmountSelectors('product'));
+    }
+
+    public function testALeftoverStoredSelectorValueIsIgnored()
+    {
+        $this->stored['scalapay_amount_selectors'] = '{"product":["#custom"]}';
 
         $this->assertSame(['.current-price-value'], $this->action->getAmountSelectors('product'));
-        $this->assertCount(1, $this->logs);
-        $this->assertSame('warning', $this->logs[0]['level']);
-    }
-
-    public function testMoreThanTenStoredSelectorsFallBackToTheThemeDefault()
-    {
-        $selectors = [];
-        for ($i = 0; $i < 11; ++$i) {
-            $selectors[] = '.s' . $i;
-        }
-        $this->stored['scalapay_amount_selectors'] = json_encode(['product' => $selectors]);
-
-        $this->assertSame(['.current-price-value'], $this->action->getAmountSelectors('product'));
-    }
-
-    public function testChildCombinatorsAreAccepted()
-    {
-        $this->stored['scalapay_amount_selectors'] = '{"product":[".product-prices > .current-price"]}';
-
-        $this->assertSame(['.product-prices > .current-price'], $this->action->getAmountSelectors('product'));
-        $this->assertSame([], $this->logs);
-    }
-
-    public function testTwoHundredCharactersAreAccepted()
-    {
-        $selector = str_repeat('a', 200);
-        $this->stored['scalapay_amount_selectors'] = json_encode(['product' => [$selector]]);
-
-        $this->assertSame([$selector], $this->action->getAmountSelectors('product'));
     }
 
     public function testAnUnknownPageHasNoSelector()

@@ -15,6 +15,35 @@ class renderCheckoutTest extends BaseScalapayWidgetAction
 
         $this->assertSame('<scalapay/widget.tpl>', $this->action->renderCheckout());
         $this->assertSame('checkout', $this->assigned['scalapay_type']);
+        $this->assertSame('150.00', $this->assigned['scalapay_amount']);
+    }
+
+    public function testTheAmountIsTheCartTotalWithTaxes()
+    {
+        $this->context->cart->shouldReceive('getOrderTotal')->once()->with(true)->andReturn(89.9);
+
+        $this->action->renderCheckout();
+
+        $this->assertSame('89.90', $this->assigned['scalapay_amount']);
+    }
+
+    public function testHummingbirdShowingPricesWithoutTaxesGetsTheTotalWithTaxes()
+    {
+        $this->context->shop->theme_name = 'hummingbird';
+        $this->context->cart->shouldReceive('getOrderTotal')->with(false)->andReturn(100.0);
+        $this->context->cart->shouldReceive('getOrderTotal')->with(true)->andReturn(120.0);
+
+        $this->assertSame('<scalapay/widget.tpl>', $this->action->renderCheckout());
+        $this->assertSame('[]', $this->assigned['scalapay_amount_selectors']);
+        $this->assertSame('120.00', $this->assigned['scalapay_amount']);
+    }
+
+    public function testTheAmountIsLeftOutWithoutACart()
+    {
+        $this->context->cart = null;
+
+        $this->assertSame('<scalapay/widget.tpl>', $this->action->renderCheckout());
+        $this->assertSame('', $this->assigned['scalapay_amount']);
     }
 
     public function testTheCheckoutWidgetDoesNotDependOnTheController()
@@ -26,9 +55,11 @@ class renderCheckoutTest extends BaseScalapayWidgetAction
 
     public function testTheCheckoutWidgetIsNotGatedByTheAmount()
     {
-        $this->amount_helper->shouldNotReceive('convertAmount');
+        $this->context->cart->shouldReceive('getOrderTotal')->with(true)->andReturn(4500.0);
+        $this->apm_eligibility->shouldNotReceive('getEffectiveLimits');
 
         $this->assertNotSame('', $this->action->renderCheckout());
+        $this->assertSame('4500.00', $this->assigned['scalapay_amount']);
     }
 
     public function testNothingIsRenderedWhenTheCheckoutSwitchIsOff()

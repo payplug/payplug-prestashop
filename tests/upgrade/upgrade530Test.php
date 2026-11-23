@@ -40,7 +40,6 @@ class upgrade530Test extends TestCase
             'scalapay_product_widget' => '1',
             'scalapay_cart_widget' => '1',
             'scalapay_checkout_widget' => '1',
-            'scalapay_amount_selectors' => '{}',
         ];
         $this->failing_writes = [];
         $this->global_writes = [];
@@ -450,7 +449,6 @@ class upgrade530Test extends TestCase
                 'scalapay_product_widget' => '1',
                 'scalapay_cart_widget' => '1',
                 'scalapay_checkout_widget' => '1',
-                'scalapay_amount_selectors' => '{}',
             ],
             $this->saved
         );
@@ -462,13 +460,11 @@ class upgrade530Test extends TestCase
         $this->forgetScalapayWidgetSettings();
         $this->stored['apm_custom_settings'] = '{}';
         $this->stored['scalapay_product_widget'] = '0';
-        $this->stored['scalapay_amount_selectors'] = '{"product":["#price"]}';
 
         $this->assertTrue(upgrade_module_5_3_0($this->getModuleObject()));
 
         $this->assertSame(['scalapay_cart_widget' => '1', 'scalapay_checkout_widget' => '1'], $this->saved);
         $this->assertSame('0', $this->stored['scalapay_product_widget']);
-        $this->assertSame('{"product":["#price"]}', $this->stored['scalapay_amount_selectors']);
     }
 
     public function testTheScalapayWidgetSettingsExistBeforeTheAccountRequest()
@@ -509,7 +505,7 @@ class upgrade530Test extends TestCase
 
     private function forgetScalapayWidgetSettings()
     {
-        foreach (['scalapay_product_widget', 'scalapay_cart_widget', 'scalapay_checkout_widget', 'scalapay_amount_selectors'] as $key) {
+        foreach (['scalapay_product_widget', 'scalapay_cart_widget', 'scalapay_checkout_widget'] as $key) {
             unset($this->stored[$key]);
         }
     }

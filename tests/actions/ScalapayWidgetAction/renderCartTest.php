@@ -21,13 +21,36 @@ class renderCartTest extends BaseScalapayWidgetAction
         $this->assertSame('<scalapay/widget.tpl>', $this->action->renderCart());
         $this->assertSame('cart', $this->assigned['scalapay_type']);
         $this->assertSame('[".cart-summary-totals .cart-total .value"]', $this->assigned['scalapay_amount_selectors']);
+        $this->assertSame('150.00', $this->assigned['scalapay_amount']);
     }
 
     public function testTheAmountIsTheCartTotalWithTaxes()
     {
-        $this->amount_helper->shouldReceive('convertAmount')->once()->with(150.0, false, 'EUR')->andReturn(15000);
+        $this->context->cart->shouldReceive('getOrderTotal')->once()->with(true)->andReturn(1234.5);
+        $this->amount_helper->shouldReceive('convertAmount')->with(1234.5, false, 'EUR')->andReturn(123450);
 
         $this->assertNotSame('', $this->action->renderCart());
+        $this->assertSame('1234.50', $this->assigned['scalapay_amount']);
+    }
+
+    public function testHummingbirdShowingPricesWithoutTaxesGetsTheTotalWithTaxes()
+    {
+        $this->context->shop->theme_name = 'hummingbird';
+        $this->context->cart->shouldReceive('getOrderTotal')->with(false)->andReturn(100.0);
+        $this->context->cart->shouldReceive('getOrderTotal')->with(true)->andReturn(120.0);
+
+        $this->assertSame('<scalapay/widget.tpl>', $this->action->renderCart());
+        $this->assertSame('[]', $this->assigned['scalapay_amount_selectors']);
+        $this->assertSame('120.00', $this->assigned['scalapay_amount']);
+    }
+
+    public function testACustomThemeGetsNoSelectorButStillTheAmount()
+    {
+        $this->context->shop->theme_name = 'my_theme';
+
+        $this->assertSame('<scalapay/widget.tpl>', $this->action->renderCart());
+        $this->assertSame('[]', $this->assigned['scalapay_amount_selectors']);
+        $this->assertSame('150.00', $this->assigned['scalapay_amount']);
     }
 
     public function testNothingIsRenderedOutsideTheCartPage()

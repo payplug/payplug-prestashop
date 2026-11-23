@@ -36,10 +36,6 @@ class ScalapayWidgetAction
 
     const WIDGET_SCRIPT_URL = 'https://cdn.scalapay.com/widget/v5/js/scalapay-widget.js';
 
-    const MAX_SELECTORS = 10;
-
-    const MAX_SELECTOR_LENGTH = 200;
-
     const CURRENCY = 'EUR';
 
     const DEFAULT_LOCALE = 'en';
@@ -60,8 +56,8 @@ class ScalapayWidgetAction
         ],
         'hummingbird' => [
             'product' => ['.product__price'],
-            'cart' => ['.cart-summary__total .cart-summary__line:first-child .cart-summary__value'],
-            'checkout' => ['.cart-summary__total .cart-summary__line:first-child .cart-summary__value'],
+            'cart' => [],
+            'checkout' => [],
         ],
     ];
 
@@ -74,22 +70,6 @@ class ScalapayWidgetAction
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
-    }
-
-    /**
-     * @description Split the comma-separated CSS selectors typed in the back office
-     *
-     * @param mixed $value
-     *
-     * @return string[]|null null when a selector is invalid or there are too many
-     */
-    public static function parseAmountSelectors($value)
-    {
-        if (!is_string($value)) {
-            return null;
-        }
-
-        return self::filterAmountSelectors(explode(',', $value));
     }
 
     /**
@@ -128,7 +108,7 @@ class ScalapayWidgetAction
             $price = isset($product['price_amount']) ? (float) $product['price_amount'] : 0.0;
             if ($this->isWidgetAvailable('product', $price * $this->getQuantityWanted($product))) {
                 self::$product_widget_rendered = true;
-                $widget = $this->renderWidget('product');
+                $widget = $this->renderWidget('product', $price);
             }
         }
 
@@ -144,10 +124,11 @@ class ScalapayWidgetAction
     {
         $widget = '';
         $cart = $this->dependencies->getPlugin()->getContext()->get()->cart;
-        if ('cart' === $this->getController()
-            && is_object($cart)
-            && $this->isWidgetAvailable('cart', (float) $cart->getOrderTotal(true))) {
-            $widget = $this->renderWidget('cart');
+        if ('cart' === $this->getController() && is_object($cart)) {
+            $total = (float) $cart->getOrderTotal(true);
+            if ($this->isWidgetAvailable('cart', $total)) {
+                $widget = $this->renderWidget('cart', $total);
+            }
         }
 
         return $widget;
@@ -160,7 +141,13 @@ class ScalapayWidgetAction
      */
     public function renderCheckout()
     {
-        return $this->isWidgetAvailable('checkout') ? $this->renderWidget('checkout') : '';
+        $widget = '';
+        if ($this->isWidgetAvailable('checkout')) {
+            $cart = $this->dependencies->getPlugin()->getContext()->get()->cart;
+            $widget = $this->renderWidget('checkout', is_object($cart) ? (float) $cart->getOrderTotal(true) : null);
+        }
+
+        return $widget;
     }
 
     /**
@@ -184,58 +171,13 @@ class ScalapayWidgetAction
     }
 
     /**
-     * @description Get the CSS selectors of the price the widget reads on a page
-     *
-     * @param string $page product, cart or checkout
-     *
-     * @return string[] the stored selectors, else the default ones of the shop theme
-     */
-    public function getAmountSelectors($page = '')
-    {
-        $selectors = $this->getStoredAmountSelectors($page);
-
-        return empty($selectors) ? $this->getThemeAmountSelectors($page) : $selectors;
-    }
-
-    /**
-     * @description Get the CSS selectors of the price stored by the merchant for a page
-     *
-     * @param string $page product, cart or checkout
-     *
-     * @return string[] empty when none is stored or the stored ones are invalid
-     */
-    public function getStoredAmountSelectors($page = '')
-    {
-        $stored = json_decode(
-            (string) $this->dependencies->getPlugin()->getConfigurationClass()->getValue('scalapay_amount_selectors'),
-            true
-        );
-
-        $selectors = [];
-        if (is_string($page)
-            && isset(self::PAGE_CONTROLLERS[$page], $stored[$page])
-            && is_array($stored[$page])
-            && !empty($stored[$page])) {
-            $selectors = (array) self::filterAmountSelectors($stored[$page]);
-            if (empty($selectors)) {
-                $this->dependencies
-                    ->getPlugin()
-                    ->getLogger()
-                    ->addLog('ScalapayWidgetAction::getStoredAmountSelectors - Invalid stored ' . $page . ' selectors, the theme ones are used.', 'warning');
-            }
-        }
-
-        return $selectors;
-    }
-
-    /**
-     * @description Get the default CSS selectors of the price on a page for the shop theme
+     * @description Get the CSS selectors of the price the widget reads on a page, for the shop theme
      *
      * @param string $page product, cart or checkout
      *
      * @return string[] empty for a theme without defaults
      */
-    public function getThemeAmountSelectors($page = '')
+    public function getAmountSelectors($page = '')
     {
         $theme = $this->getThemeName();
 
@@ -327,7 +269,7 @@ class ScalapayWidgetAction
      */
     private function isAmountWithinLimits($apm_eligibility, $amount, $currency)
     {
-        $cents = (int) $this->getService('payplug.utilities.helper.amount')->convertAmount($amount, false, $currency);
+        $cents = $this->toCents($amount, $currency);
         $limits = $apm_eligibility->getEffectiveLimits('scalapay', $currency);
 
         return $limits['valid']
@@ -354,49 +296,45 @@ class ScalapayWidgetAction
     }
 
     /**
-     * @param array $selectors
-     *
-     * @return string[]|null null when a selector is invalid or there are too many
-     */
-    private static function filterAmountSelectors($selectors)
-    {
-        $filtered = [];
-        foreach ($selectors as $selector) {
-            if (!is_string($selector)) {
-                return null;
-            }
-
-            $selector = trim($selector);
-            if ('' === $selector) {
-                continue;
-            }
-
-            if (strlen($selector) > self::MAX_SELECTOR_LENGTH
-                || preg_match('/[<"\'`\\\\\x00-\x1F\x7F]/', $selector)) {
-                return null;
-            }
-
-            $filtered[] = $selector;
-        }
-
-        return count($filtered) > self::MAX_SELECTORS ? null : $filtered;
-    }
-
-    /**
      * @param string $page
+     * @param float|null $amount price shown on the page, read by the widget when its selectors find none
      *
      * @return string
      */
-    private function renderWidget($page)
+    private function renderWidget($page, $amount = null)
     {
         $this->dependencies->getPlugin()->getAssign()->assign([
             'scalapay_merchant_token' => $this->getMerchantToken(),
             'scalapay_type' => $page,
             'scalapay_amount_selectors' => json_encode($this->getAmountSelectors($page), JSON_UNESCAPED_SLASHES),
+            'scalapay_amount' => null === $amount ? '' : $this->formatAmount($amount),
             'scalapay_locale' => $this->getLocale(),
         ]);
 
         return (string) $this->dependencies->configClass->fetchTemplate('scalapay/widget.tpl');
+    }
+
+    /**
+     * @param float $amount
+     *
+     * @return string the amount in euros with a dot and two decimals, empty when it is not positive
+     */
+    private function formatAmount($amount)
+    {
+        $cents = $this->toCents($amount, $this->getCartCurrency());
+
+        return $cents > 0 ? sprintf('%d.%02d', intdiv($cents, 100), $cents % 100) : '';
+    }
+
+    /**
+     * @param float|int $amount
+     * @param string $currency
+     *
+     * @return int
+     */
+    private function toCents($amount, $currency)
+    {
+        return (int) $this->getService('payplug.utilities.helper.amount')->convertAmount($amount, false, $currency);
     }
 
     /**

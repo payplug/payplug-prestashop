@@ -298,11 +298,6 @@ class Translation
                     'text' => $this->l('modal.hosted_fields.identifier.text', 'translation'),
                 ],
             ],
-            'scalapay' => [
-                'amount_selectors' => [
-                    'text' => $this->l('modal.scalapay.amount_selectors.text', 'translation'),
-                ],
-            ],
             'error' => [
                 'text' => $this->l('modal.error.text', 'translation'),
                 'submit' => $this->l('modal.error.submit', 'translation'),
@@ -718,13 +713,6 @@ class Translation
                     'cart' => [
                         'title' => $this->l('paymentmethods.scalapay.widget.cart.title', 'translation'),
                         'description' => $this->l('paymentmethods.scalapay.widget.cart.description', 'translation'),
-                    ],
-                    'selectors' => [
-                        'title' => $this->l('paymentmethods.scalapay.widget.selectors.title', 'translation'),
-                        'description' => $this->l('paymentmethods.scalapay.widget.selectors.description', 'translation'),
-                        'product' => $this->l('paymentmethods.scalapay.widget.selectors.product', 'translation'),
-                        'cart' => $this->l('paymentmethods.scalapay.widget.selectors.cart', 'translation'),
-                        'checkout' => $this->l('paymentmethods.scalapay.widget.selectors.checkout', 'translation'),
                     ],
                 ],
             ],

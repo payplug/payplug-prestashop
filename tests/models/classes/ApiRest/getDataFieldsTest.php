@@ -21,7 +21,6 @@ class getDataFieldsTest extends BaseApiRest
             'scalapay_checkout_widget' => '1',
             'scalapay_product_widget' => '0',
             'scalapay_cart_widget' => '1',
-            'scalapay_amount_selectors' => '{"product":["#price"]}',
             'scalapay_merchant_token' => 'tok_secret_42',
         ];
         $this->configuration_class->shouldReceive('getValue')->andReturnUsing(function ($key) {
