@@ -1057,52 +1057,7 @@ class ConfigurationAction
 
         $scalapay_refusal = $this->saveScalapayWidgetSettings($datas, $translation);
 
-        $payment_methods = [];
-        $payment_method_keys = [
-            'amex' => 'enable_american_express',
-            'applepay' => 'enable_applepay',
-            'bancontact' => 'enable_bancontact',
-            'deferred' => 'enable_payplug_deferred',
-            'installment' => 'enable_payplug_inst',
-            'ideal' => 'enable_ideal',
-            'mybank' => 'enable_mybank',
-            'one_click' => 'enable_one_click',
-            'oney' => 'enable_oney',
-            'satispay' => 'enable_satispay',
-            'standard' => 'enable_standard',
-            'wero' => 'enable_wero',
-            'bizum' => 'enable_bizum',
-            'scalapay' => 'enable_scalapay',
-        ];
-        foreach ($payment_method_keys as $key => $config) {
-            $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;
-        }
-        if (!$configuration->set('payment_methods', json_encode($payment_methods))) {
-            return [
-                'success' => false,
-                'data' => [
-                    // todo: add translation
-                    'message' => 'An error has occurred while register ' . $config,
-                ],
-            ];
-        }
-
-        $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.utilities.service.api')
-            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
-
-        return null !== $scalapay_refusal ? $scalapay_refusal : [
-            'success' => true,
-            'data' => [
-                'title' => null,
-                'msg' => $translation['confirmation']['text'],
-                'close' => $translation['confirmation']['submit'],
-            ],
-            'send_telementry' => true,
-        ];
+        return null !== $scalapay_refusal ? $scalapay_refusal : $this->savePaymentMethods($datas, $translation);
     }
 
     /**
@@ -1256,6 +1211,66 @@ class ConfigurationAction
         return [
             'result' => true,
             'message' => 'Uninstall successful',
+        ];
+    }
+
+    /**
+     * @description Save the enabled payment methods, then initialize the API for the saved mode
+     *
+     * @param \stdClass $datas
+     * @param array $translation modal translations
+     *
+     * @return array
+     */
+    protected function savePaymentMethods($datas, $translation)
+    {
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+
+        $payment_methods = [];
+        $payment_method_keys = [
+            'amex' => 'enable_american_express',
+            'applepay' => 'enable_applepay',
+            'bancontact' => 'enable_bancontact',
+            'deferred' => 'enable_payplug_deferred',
+            'installment' => 'enable_payplug_inst',
+            'ideal' => 'enable_ideal',
+            'mybank' => 'enable_mybank',
+            'one_click' => 'enable_one_click',
+            'oney' => 'enable_oney',
+            'satispay' => 'enable_satispay',
+            'standard' => 'enable_standard',
+            'wero' => 'enable_wero',
+            'bizum' => 'enable_bizum',
+            'scalapay' => 'enable_scalapay',
+        ];
+        foreach ($payment_method_keys as $key => $config) {
+            $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;
+        }
+        if (!$configuration->set('payment_methods', json_encode($payment_methods))) {
+            return [
+                'success' => false,
+                'data' => [
+                    // todo: add translation
+                    'message' => 'An error has occurred while register ' . $config,
+                ],
+            ];
+        }
+
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
+
+        return [
+            'success' => true,
+            'data' => [
+                'title' => null,
+                'msg' => $translation['confirmation']['text'],
+                'close' => $translation['confirmation']['submit'],
+            ],
+            'send_telementry' => true,
         ];
     }
 

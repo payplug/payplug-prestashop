@@ -109,6 +109,19 @@ class dispatchSendTelemetryTest extends BaseApiRest
             ->once();
     }
 
+    public function testAnAccountRefreshReturningNoAccountDoesNotChangeTheAnswer()
+    {
+        $this->api_service->shouldReceive('getAccount')->withNoArgs()->andReturnUsing(function () {
+            $this->calls[] = 'account';
+
+            return false;
+        });
+
+        $this->assertSame(['success' => true], $this->class->dispatch('send_telemetry'));
+        $this->assertSame(['telemetry', 'account'], $this->calls);
+        $this->logger->shouldNotHaveReceived('addLog', [\Mockery::pattern('/refreshScalapayMerchantToken/'), \Mockery::any()]);
+    }
+
     public function testTheAccountIsStillRefreshedWhenTheTelemetryFails()
     {
         $this->telemetry_action->shouldReceive('sendAction')->with('save')->andReturnUsing(function () {

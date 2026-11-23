@@ -175,6 +175,32 @@ class isWidgetAvailableTest extends BaseScalapayWidgetAction
         $this->assertTrue($this->action->isWidgetAvailable($page, 150.0));
     }
 
+    public function testThePaymentMethodsAreLoadedOncePerRequest()
+    {
+        $this->payment_method_class->shouldReceive('getPaymentMethod')
+            ->once()
+            ->with('scalapay')
+            ->andReturn($this->scalapay_payment_method);
+        $other_action = \Mockery::mock(\PayPlug\src\actions\ScalapayWidgetAction::class)->makePartial();
+        $other_action->dependencies = $this->dependencies;
+
+        $this->assertTrue($this->action->isWidgetAvailable('product'));
+        $this->assertTrue($this->action->isWidgetAvailable('product', 150.0));
+        $this->assertTrue($other_action->isWidgetAvailable('checkout'));
+    }
+
+    public function testARefusedMerchantCurrencyIsAlsoKeptForTheRequest()
+    {
+        $this->stored['currencies'] = 'USD';
+        $this->payment_method_class->shouldReceive('getPaymentMethod')
+            ->once()
+            ->with('scalapay')
+            ->andReturn($this->scalapay_payment_method);
+
+        $this->assertFalse($this->action->isWidgetAvailable('product'));
+        $this->assertFalse($this->action->isWidgetAvailable('cart'));
+    }
+
     public function testNoWidgetWhenTheScalapayPaymentMethodCannotBeLoaded()
     {
         $this->payment_method_class->shouldReceive('getPaymentMethod')->with('scalapay')->andReturn([]);

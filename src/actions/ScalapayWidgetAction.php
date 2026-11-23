@@ -67,6 +67,8 @@ class ScalapayWidgetAction
 
     private static $script_rendered = false;
 
+    private static $merchant_currency_supported;
+
     public function __construct()
     {
         $this->dependencies = new DependenciesClass();
@@ -265,13 +267,17 @@ class ScalapayWidgetAction
     /**
      * @param \PayPlug\src\models\classes\paymentMethod\PaymentMethod $payment_method_class
      *
-     * @return bool whether the cart currency is one of the merchant currencies, as required to offer the Scalapay option
+     * @return bool whether the cart currency is one of the merchant currencies, as required to offer the Scalapay option,
+     *              computed once per request since it builds every payment method
      */
     private function isMerchantCurrency($payment_method_class)
     {
-        $scalapay = $payment_method_class->getPaymentMethod('scalapay');
+        if (null === self::$merchant_currency_supported) {
+            $scalapay = $payment_method_class->getPaymentMethod('scalapay');
+            self::$merchant_currency_supported = is_object($scalapay) && $scalapay->isSupportedCurrency();
+        }
 
-        return is_object($scalapay) && $scalapay->isSupportedCurrency();
+        return self::$merchant_currency_supported;
     }
 
     /**

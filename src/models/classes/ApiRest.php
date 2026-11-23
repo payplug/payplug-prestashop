@@ -813,8 +813,6 @@ class ApiRest
     /**
      * @description Refresh the account to store the Scalapay merchant token, which the account only
      *              exposes once PayPlug knows Scalapay is enabled in the module
-     *
-     * @return bool whether the account was refreshed
      */
     protected function refreshScalapayMerchantToken()
     {
@@ -829,14 +827,11 @@ class ApiRest
             try {
                 $this->module->getService('payplug.utilities.service.api')->getAccount();
             } catch (\Throwable $exception) {
-                $refresh = false;
                 $this->dependencies
                     ->getPlugin()
                     ->getLogger()
                     ->addLog('ApiRest::refreshScalapayMerchantToken - ' . get_class($exception) . ': ' . $exception->getMessage(), 'error');
             }
         }
-
-        return $refresh;
     }
 }

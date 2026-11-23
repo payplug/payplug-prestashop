@@ -166,10 +166,10 @@ abstract class BaseScalapayWidgetAction extends TestCase
     private function resetRenderedFlags()
     {
         $reflection = new \ReflectionClass(ScalapayWidgetAction::class);
-        foreach (['product_widget_rendered', 'script_rendered'] as $name) {
+        foreach (['product_widget_rendered' => false, 'script_rendered' => false, 'merchant_currency_supported' => null] as $name => $value) {
             $property = $reflection->getProperty($name);
             $property->setAccessible(true);
-            $property->setValue(null, false);
+            $property->setValue(null, $value);
         }
     }
 }

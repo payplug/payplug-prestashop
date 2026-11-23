@@ -110,6 +110,20 @@ class saveActionScalapayWidgetTest extends BaseConfigurationAction
         );
     }
 
+    public function testNothingIsSavedAfterASwitchThatCannotBeStored()
+    {
+        $this->configuration_class->shouldReceive('set')
+            ->with('scalapay_cart_widget', \Mockery::any())
+            ->andReturn(false);
+        $datas = $this->getDatas(true);
+        $datas->enable_scalapay_cart_widget = true;
+
+        $this->assertFalse($this->action->saveAction($datas)['success']);
+
+        $this->assertArrayNotHasKey('payment_methods', $this->stored);
+        $this->api_service->shouldNotHaveReceived('initialize');
+    }
+
     public function testTheOneyKeysAreUnaffected()
     {
         $datas = $this->getDatas(true);

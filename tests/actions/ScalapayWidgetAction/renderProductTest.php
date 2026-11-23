@@ -114,6 +114,24 @@ class renderProductTest extends BaseScalapayWidgetAction
         $this->assertNotSame('', $this->action->renderProduct($this->params));
     }
 
+    public function testNoWidgetWhenThePriceTimesTheWantedQuantityExceedsTheScalapayMaximum()
+    {
+        $this->params['product']['price_amount'] = 1500.0;
+        $this->request['quantity_wanted'] = '3';
+
+        $this->assertSame('', $this->action->renderProduct($this->params));
+        $this->assertSame([], $this->assigned);
+    }
+
+    public function testTheSameUnitPriceForOneUnitShowsTheWidgetWithTheUnitPrice()
+    {
+        $this->params['product']['price_amount'] = 1500.0;
+        $this->request['quantity_wanted'] = '1';
+
+        $this->assertSame('<scalapay/widget.tpl>', $this->action->renderProduct($this->params));
+        $this->assertSame('1500.00', $this->assigned['scalapay_amount']);
+    }
+
     public function testTheWidgetAmountIsTheDisplayedUnitPriceWhateverTheQuantity()
     {
         $this->request['quantity_wanted'] = '3';
