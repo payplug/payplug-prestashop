@@ -19,4 +19,4 @@
 *  @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of Payplug SAS
 *}
-<scalapay-widget merchant-token="{$scalapay_merchant_token|escape:'htmlall':'UTF-8'}" type="{$scalapay_type|escape:'htmlall':'UTF-8'}" amount-selectors="{$scalapay_amount_selectors|escape:'htmlall':'UTF-8'}"{if $scalapay_amount} amount="{$scalapay_amount|escape:'htmlall':'UTF-8'}"{/if} locale="{$scalapay_locale|escape:'htmlall':'UTF-8'}"></scalapay-widget>
+<scalapay-widget merchant-token="{$scalapay_merchant_token|escape:'htmlall':'UTF-8'}" type="{$scalapay_type|escape:'htmlall':'UTF-8'}" amount-selectors="{$scalapay_amount_selectors|escape:'htmlall':'UTF-8'}"{if $scalapay_amount} amount="{$scalapay_amount|escape:'htmlall':'UTF-8'}"{/if}{if $scalapay_environment} environment="{$scalapay_environment|escape:'htmlall':'UTF-8'}"{/if} locale="{$scalapay_locale|escape:'htmlall':'UTF-8'}"></scalapay-widget>

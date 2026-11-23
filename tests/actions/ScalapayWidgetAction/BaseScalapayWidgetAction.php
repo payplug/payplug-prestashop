@@ -17,8 +17,11 @@ abstract class BaseScalapayWidgetAction extends TestCase
     protected $controller;
     protected $dependencies;
     protected $logs;
+    protected $payment_method_class;
     protected $request;
+    protected $scalapay_payment_method;
     protected $stored;
+    protected $widget_environment;
 
     public function setUp(): void
     {
@@ -29,6 +32,7 @@ abstract class BaseScalapayWidgetAction extends TestCase
         $this->logs = [];
         $this->controller = 'product';
         $this->request = [];
+        $this->widget_environment = '';
         $this->stored = [
             'payment_methods' => '{"scalapay":true}',
             'sandbox_mode' => '0',
@@ -36,6 +40,7 @@ abstract class BaseScalapayWidgetAction extends TestCase
             'scalapay_product_widget' => '1',
             'scalapay_cart_widget' => '1',
             'scalapay_checkout_widget' => '1',
+            'currencies' => 'EUR;USD',
         ];
 
         $this->configuration = \Mockery::mock('Configuration');
@@ -95,8 +100,18 @@ abstract class BaseScalapayWidgetAction extends TestCase
             'countries' => null,
             'valid' => true,
         ])->byDefault();
-        $payment_method_class = \Mockery::mock('PaymentMethodClass');
-        $payment_method_class->shouldReceive('getApmEligibility')->andReturn($this->apm_eligibility);
+        $this->scalapay_payment_method = \Mockery::mock('ScalapayPaymentMethod');
+        $this->scalapay_payment_method->shouldReceive('isSupportedCurrency')->andReturnUsing(function () {
+            return in_array($this->context->currency->iso_code, explode(';', (string) $this->stored['currencies']), true);
+        })->byDefault();
+        $this->payment_method_class = \Mockery::mock('PaymentMethodClass');
+        $this->payment_method_class->shouldReceive('getApmEligibility')->andReturn($this->apm_eligibility);
+        $this->payment_method_class->shouldReceive('getPaymentMethod')
+            ->with('scalapay')
+            ->andReturnUsing(function () {
+                return $this->scalapay_payment_method;
+            })
+            ->byDefault();
 
         $this->amount_helper = \Mockery::mock('AmountHelper');
         $this->amount_helper->shouldReceive('convertAmount')->andReturnUsing(function ($amount, $from_cents, $currency) {
@@ -114,6 +129,11 @@ abstract class BaseScalapayWidgetAction extends TestCase
             return true;
         });
 
+        $routes = \Mockery::mock('Routes');
+        $routes->shouldReceive('getScalapayWidgetEnvironment')->andReturnUsing(function () {
+            return $this->widget_environment;
+        });
+
         $plugin = \Mockery::mock('Plugin');
         $plugin->shouldReceive([
             'getAssign' => $assign,
@@ -122,7 +142,8 @@ abstract class BaseScalapayWidgetAction extends TestCase
             'getDispatcher' => $dispatcher,
             'getLogger' => $logger,
             'getModule' => $module_adapter,
-            'getPaymentMethodClass' => $payment_method_class,
+            'getPaymentMethodClass' => $this->payment_method_class,
+            'getRoutes' => $routes,
             'getTools' => $tools,
         ]);
 

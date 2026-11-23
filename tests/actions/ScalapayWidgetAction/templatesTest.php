@@ -27,6 +27,7 @@ class templatesTest extends TestCase
             . ' type="{$scalapay_type|escape:\'htmlall\':\'UTF-8\'}"'
             . ' amount-selectors="{$scalapay_amount_selectors|escape:\'htmlall\':\'UTF-8\'}"'
             . '{if $scalapay_amount} amount="{$scalapay_amount|escape:\'htmlall\':\'UTF-8\'}"{/if}'
+            . '{if $scalapay_environment} environment="{$scalapay_environment|escape:\'htmlall\':\'UTF-8\'}"{/if}'
             . ' locale="{$scalapay_locale|escape:\'htmlall\':\'UTF-8\'}"'
             . '></scalapay-widget>',
             $this->getMarkup('widget.tpl')

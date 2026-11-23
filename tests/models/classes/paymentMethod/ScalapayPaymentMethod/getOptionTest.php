@@ -139,7 +139,7 @@ class getOptionTest extends BaseScalapayPaymentMethod
         );
     }
 
-    public function testEachWidgetSwitchHasATitleADescriptionAndNoIllustration()
+    public function testEachWidgetSwitchHasATitleADescriptionNoIllustrationAndIsOffByDefault()
     {
         $options = $this->getAdvancedOptionsByName([]);
 
@@ -152,7 +152,7 @@ class getOptionTest extends BaseScalapayPaymentMethod
                         ['description' => 'paymentmethods.scalapay.widget.' . $page . '.description'],
                     ],
                     'switch' => true,
-                    'checked' => true,
+                    'checked' => false,
                 ],
                 $options['scalapay_' . $page . '_widget']
             );

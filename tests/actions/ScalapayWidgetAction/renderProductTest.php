@@ -35,6 +35,7 @@ class renderProductTest extends BaseScalapayWidgetAction
                 'scalapay_type' => 'product',
                 'scalapay_amount_selectors' => '[".current-price-value"]',
                 'scalapay_amount' => '30.00',
+                'scalapay_environment' => '',
                 'scalapay_locale' => 'fr',
             ],
             $this->assigned
@@ -218,5 +219,28 @@ class renderProductTest extends BaseScalapayWidgetAction
         $this->assertSame('<scalapay/widget.tpl>', $this->action->renderProduct($this->params));
         $this->assertSame('[]', $this->assigned['scalapay_amount_selectors']);
         $this->assertSame('30.00', $this->assigned['scalapay_amount']);
+    }
+
+    public function testNothingIsRenderedWhenEuroIsNotAMerchantCurrency()
+    {
+        $this->stored['currencies'] = 'USD';
+
+        $this->assertSame('', $this->action->renderProduct($this->params));
+        $this->assertSame([], $this->assigned);
+    }
+
+    public function testNoEnvironmentIsAssignedByDefault()
+    {
+        $this->action->renderProduct($this->params);
+
+        $this->assertSame('', $this->assigned['scalapay_environment']);
+    }
+
+    public function testTheIntegrationEnvironmentIsAssignedWhenConfigured()
+    {
+        $this->widget_environment = 'integration';
+
+        $this->assertSame('<scalapay/widget.tpl>', $this->action->renderProduct($this->params));
+        $this->assertSame('integration', $this->assigned['scalapay_environment']);
     }
 }

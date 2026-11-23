@@ -108,6 +108,10 @@ class isWidgetAvailableTest extends BaseScalapayWidgetAction
         yield 'checkout off' => ['checkout', 'scalapay_checkout_widget', '0'];
 
         yield 'product row missing' => ['product', 'scalapay_product_widget', false];
+
+        yield 'cart row missing' => ['cart', 'scalapay_cart_widget', false];
+
+        yield 'checkout row missing' => ['checkout', 'scalapay_checkout_widget', false];
     }
 
     /**
@@ -142,6 +146,54 @@ class isWidgetAvailableTest extends BaseScalapayWidgetAction
     {
         $this->context->currency->iso_code = 'USD';
         $this->apm_eligibility->shouldNotReceive('getApiLimits');
+
+        $this->assertFalse($this->action->isWidgetAvailable('product'));
+    }
+
+    /**
+     * @dataProvider pageProvider
+     *
+     * @param string $page
+     */
+    public function testNoWidgetWhenEuroIsNotAMerchantCurrency($page)
+    {
+        $this->stored['currencies'] = 'USD;GBP';
+
+        $this->assertFalse($this->action->isWidgetAvailable($page));
+        $this->assertFalse($this->action->isWidgetAvailable($page, 150.0));
+    }
+
+    /**
+     * @dataProvider pageProvider
+     *
+     * @param string $page
+     */
+    public function testTheWidgetIsAvailableWhenEuroIsTheOnlyMerchantCurrency($page)
+    {
+        $this->stored['currencies'] = 'EUR';
+
+        $this->assertTrue($this->action->isWidgetAvailable($page, 150.0));
+    }
+
+    public function testNoWidgetWhenTheScalapayPaymentMethodCannotBeLoaded()
+    {
+        $this->payment_method_class->shouldReceive('getPaymentMethod')->with('scalapay')->andReturn([]);
+
+        $this->assertFalse($this->action->isWidgetAvailable('product'));
+    }
+
+    public function testThePaymentMethodsAreNotLoadedForANonEuroCart()
+    {
+        $this->context->currency->iso_code = 'USD';
+        $this->payment_method_class->shouldNotReceive('getPaymentMethod');
+
+        $this->assertFalse($this->action->isWidgetAvailable('product'));
+    }
+
+    public function testThePaymentMethodsAreNotLoadedWhenScalapayIsOff()
+    {
+        $this->stored['payment_methods'] = '{"scalapay":false}';
+        $this->payment_method_class->shouldNotReceive('getPaymentMethod');
 
         $this->assertFalse($this->action->isWidgetAvailable('product'));
     }

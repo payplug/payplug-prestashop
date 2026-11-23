@@ -87,9 +87,11 @@ class ScalapayWidgetAction
         }
 
         $currency = $this->getCartCurrency();
-        $apm_eligibility = $this->dependencies->getPlugin()->getPaymentMethodClass()->getApmEligibility();
+        $payment_method_class = $this->dependencies->getPlugin()->getPaymentMethodClass();
+        $apm_eligibility = $payment_method_class->getApmEligibility();
 
         return $this->isCurrencySupported($apm_eligibility, $currency)
+            && $this->isMerchantCurrency($payment_method_class)
             && (null === $amount || $this->isAmountWithinLimits($apm_eligibility, $amount, $currency));
     }
 
@@ -261,6 +263,18 @@ class ScalapayWidgetAction
     }
 
     /**
+     * @param \PayPlug\src\models\classes\paymentMethod\PaymentMethod $payment_method_class
+     *
+     * @return bool whether the cart currency is one of the merchant currencies, as required to offer the Scalapay option
+     */
+    private function isMerchantCurrency($payment_method_class)
+    {
+        $scalapay = $payment_method_class->getPaymentMethod('scalapay');
+
+        return is_object($scalapay) && $scalapay->isSupportedCurrency();
+    }
+
+    /**
      * @param \PayPlug\src\models\classes\ApmEligibility $apm_eligibility
      * @param float|int $amount
      * @param string $currency
@@ -308,6 +322,7 @@ class ScalapayWidgetAction
             'scalapay_type' => $page,
             'scalapay_amount_selectors' => json_encode($this->getAmountSelectors($page), JSON_UNESCAPED_SLASHES),
             'scalapay_amount' => null === $amount ? '' : $this->formatAmount($amount),
+            'scalapay_environment' => $this->dependencies->getPlugin()->getRoutes()->getScalapayWidgetEnvironment(),
             'scalapay_locale' => $this->getLocale(),
         ]);
 

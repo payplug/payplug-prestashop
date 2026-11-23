@@ -389,13 +389,13 @@ class Configuration
         'scalapay_cart_widget' => [
             'type' => 'integer',
             'name' => 'SCALAPAY_CART_WIDGET',
-            'defaultValue' => 1,
+            'defaultValue' => 0,
             'setConf' => 1,
         ],
         'scalapay_checkout_widget' => [
             'type' => 'integer',
             'name' => 'SCALAPAY_CHECKOUT_WIDGET',
-            'defaultValue' => 1,
+            'defaultValue' => 0,
             'setConf' => 1,
         ],
         'scalapay_custom_max_amounts' => [
@@ -421,7 +421,7 @@ class Configuration
         'scalapay_product_widget' => [
             'type' => 'integer',
             'name' => 'SCALAPAY_PRODUCT_WIDGET',
-            'defaultValue' => 1,
+            'defaultValue' => 0,
             'setConf' => 1,
         ],
         'sandbox_mode' => [

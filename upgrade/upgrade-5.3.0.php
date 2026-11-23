@@ -38,9 +38,9 @@ function upgrade_module_5_3_0($object)
     }
 
     $scalapay_widget_settings = [
-        'scalapay_product_widget' => '1',
-        'scalapay_cart_widget' => '1',
-        'scalapay_checkout_widget' => '1',
+        'scalapay_product_widget' => '0',
+        'scalapay_cart_widget' => '0',
+        'scalapay_checkout_widget' => '0',
     ];
     foreach ($scalapay_widget_settings as $key => $value) {
         if (false === $configuration->getValue($key)) {

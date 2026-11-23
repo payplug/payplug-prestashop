@@ -437,7 +437,7 @@ class upgrade530Test extends TestCase
         $this->assertErrorLogged('sync broken');
     }
 
-    public function testTheMissingScalapayWidgetSettingsAreCreatedWithTheirDefaults()
+    public function testTheMissingScalapayWidgetSettingsAreCreatedSwitchedOff()
     {
         $this->forgetScalapayWidgetSettings();
         $this->stored['apm_custom_settings'] = '{}';
@@ -446,9 +446,9 @@ class upgrade530Test extends TestCase
 
         $this->assertSame(
             [
-                'scalapay_product_widget' => '1',
-                'scalapay_cart_widget' => '1',
-                'scalapay_checkout_widget' => '1',
+                'scalapay_product_widget' => '0',
+                'scalapay_cart_widget' => '0',
+                'scalapay_checkout_widget' => '0',
             ],
             $this->saved
         );
@@ -459,12 +459,12 @@ class upgrade530Test extends TestCase
     {
         $this->forgetScalapayWidgetSettings();
         $this->stored['apm_custom_settings'] = '{}';
-        $this->stored['scalapay_product_widget'] = '0';
+        $this->stored['scalapay_product_widget'] = '1';
 
         $this->assertTrue(upgrade_module_5_3_0($this->getModuleObject()));
 
-        $this->assertSame(['scalapay_cart_widget' => '1', 'scalapay_checkout_widget' => '1'], $this->saved);
-        $this->assertSame('0', $this->stored['scalapay_product_widget']);
+        $this->assertSame(['scalapay_cart_widget' => '0', 'scalapay_checkout_widget' => '0'], $this->saved);
+        $this->assertSame('1', $this->stored['scalapay_product_widget']);
     }
 
     public function testTheScalapayWidgetSettingsExistBeforeTheAccountRequest()
@@ -500,7 +500,7 @@ class upgrade530Test extends TestCase
         $this->failing_writes = ['scalapay_cart_widget'];
 
         $this->assertFalse(upgrade_module_5_3_0($this->getModuleObject()));
-        $this->assertSame('1', $this->saved['scalapay_checkout_widget']);
+        $this->assertSame('0', $this->saved['scalapay_checkout_widget']);
     }
 
     private function forgetScalapayWidgetSettings()

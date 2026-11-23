@@ -107,4 +107,12 @@ class renderScriptTagTest extends BaseScalapayWidgetAction
 
         $this->assertNotSame('', $this->action->renderScriptTag());
     }
+
+    public function testNoScriptWhenEuroIsNotAMerchantCurrency()
+    {
+        $this->controller = 'cart';
+        $this->stored['currencies'] = 'USD';
+
+        $this->assertSame('', $this->action->renderScriptTag());
+    }
 }

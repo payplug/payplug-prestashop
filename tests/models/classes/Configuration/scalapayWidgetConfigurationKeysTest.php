@@ -24,9 +24,9 @@ class scalapayWidgetConfigurationKeysTest extends BaseConfiguration
      * @param string $key
      * @param string $name
      */
-    public function testWidgetSwitchesAreOnByDefault($key, $name)
+    public function testWidgetSwitchesAreOffByDefault($key, $name)
     {
-        $this->assertSame(1, $this->class->getDefault($key));
+        $this->assertSame(0, $this->class->getDefault($key));
         $this->assertSame('integer', $this->class->getType($key));
         $this->assertSame($name, $this->class->getName($key));
         $this->assertSame(1, $this->class->get($key)['setConf']);
@@ -57,9 +57,9 @@ class scalapayWidgetConfigurationKeysTest extends BaseConfiguration
 
         $this->assertTrue($this->class->initialize());
 
-        $this->assertSame('1', $seeded['PAYPLUG_SCALAPAY_PRODUCT_WIDGET']);
-        $this->assertSame('1', $seeded['PAYPLUG_SCALAPAY_CART_WIDGET']);
-        $this->assertSame('1', $seeded['PAYPLUG_SCALAPAY_CHECKOUT_WIDGET']);
+        $this->assertSame('0', $seeded['PAYPLUG_SCALAPAY_PRODUCT_WIDGET']);
+        $this->assertSame('0', $seeded['PAYPLUG_SCALAPAY_CART_WIDGET']);
+        $this->assertSame('0', $seeded['PAYPLUG_SCALAPAY_CHECKOUT_WIDGET']);
         $this->assertSame('', $seeded['PAYPLUG_SCALAPAY_MERCHANT_TOKEN']);
         $this->assertArrayNotHasKey('PAYPLUG_SCALAPAY_AMOUNT_SELECTORS', $seeded);
     }

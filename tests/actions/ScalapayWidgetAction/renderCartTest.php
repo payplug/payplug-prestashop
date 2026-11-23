@@ -80,4 +80,27 @@ class renderCartTest extends BaseScalapayWidgetAction
 
         $this->assertSame('', $this->action->renderCart());
     }
+
+    public function testNothingIsRenderedWhenEuroIsNotAMerchantCurrency()
+    {
+        $this->stored['currencies'] = 'USD';
+
+        $this->assertSame('', $this->action->renderCart());
+        $this->assertSame([], $this->assigned);
+    }
+
+    public function testNoEnvironmentIsAssignedByDefault()
+    {
+        $this->action->renderCart();
+
+        $this->assertSame('', $this->assigned['scalapay_environment']);
+    }
+
+    public function testTheIntegrationEnvironmentIsAssignedWhenConfigured()
+    {
+        $this->widget_environment = 'integration';
+
+        $this->assertSame('<scalapay/widget.tpl>', $this->action->renderCart());
+        $this->assertSame('integration', $this->assigned['scalapay_environment']);
+    }
 }
