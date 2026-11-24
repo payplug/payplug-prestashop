@@ -37,7 +37,8 @@ class ScalapayWidgetAction
     const WIDGET_SCRIPT_URL = 'https://cdn.scalapay.com/widget/v5/js/scalapay-widget.js';
 
     /**
-     * Set to 'integration' by the QA zip build (dev/ci/set_environment.sh), empty in the repository.
+     * Empty in the repository; template-ci's presta-zip-generation.yml writes its scalapay-env input into it
+     * ('integration' for QA zips).
      */
     const WIDGET_ENVIRONMENT = '';
 
