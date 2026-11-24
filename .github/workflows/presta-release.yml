@@ -20,6 +20,7 @@ jobs:
       php-version: '7.4'
       node-version: '20'
       env: qa
+      scalapay-env: integration
       ref: refs/heads/master
     secrets:
       api-payplug: ${{ secrets.PAYPLUG_API_QA }}

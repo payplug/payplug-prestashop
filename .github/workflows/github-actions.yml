@@ -44,6 +44,7 @@ jobs:
     with:
       php-version: '7.4'
       node-version: '20'
+      scalapay-env: integration
       ref: ${{ github.head_ref }}
     secrets:
       api-payplug: ${{ secrets.PAYPLUG_API_QA }}
