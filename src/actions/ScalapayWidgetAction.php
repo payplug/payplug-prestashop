@@ -36,6 +36,11 @@ class ScalapayWidgetAction
 
     const WIDGET_SCRIPT_URL = 'https://cdn.scalapay.com/widget/v5/js/scalapay-widget.js';
 
+    /**
+     * Set to 'integration' by the QA zip build (dev/ci/set_environment.sh), empty in the repository.
+     */
+    const WIDGET_ENVIRONMENT = '';
+
     const CURRENCY = 'EUR';
 
     const DEFAULT_LOCALE = 'en';
@@ -328,7 +333,7 @@ class ScalapayWidgetAction
             'scalapay_type' => $page,
             'scalapay_amount_selectors' => json_encode($this->getAmountSelectors($page), JSON_UNESCAPED_SLASHES),
             'scalapay_amount' => null === $amount ? '' : $this->formatAmount($amount),
-            'scalapay_environment' => $this->dependencies->getPlugin()->getRoutes()->getScalapayWidgetEnvironment(),
+            'scalapay_environment' => $this->getWidgetEnvironment(),
             'scalapay_locale' => $this->getLocale(),
         ]);
 
@@ -367,6 +372,16 @@ class ScalapayWidgetAction
             ->getPlugin()
             ->getConfigurationClass()
             ->getValue('scalapay_merchant_token'));
+    }
+
+    /**
+     * @return string the environment set at build time, else the local SCALAPAY_WIDGET_ENVIRONMENT setting
+     */
+    private function getWidgetEnvironment()
+    {
+        return '' !== static::WIDGET_ENVIRONMENT
+            ? static::WIDGET_ENVIRONMENT
+            : $this->dependencies->getPlugin()->getRoutes()->getScalapayWidgetEnvironment();
     }
 
     /**
