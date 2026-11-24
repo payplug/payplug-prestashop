@@ -64,6 +64,14 @@ function waitForOneyWidget(callback, onUnavailable) {
     });
 }
 
+// One Page Checkout (ps_onepagecheckout) emits its events on the prestashop object, once per page.
+function canBindOpcEvents(bound) {
+    return !bound
+        && $('#opc-pay-button').length > 0
+        && typeof prestashop !== 'undefined'
+        && typeof prestashop.on === 'function';
+}
+
 var $document, $window, __moduleName__Module = {
     init: function () {
         this.card.init();
@@ -260,10 +268,7 @@ var $document, $window, __moduleName__Module = {
             bindEvents: function () {
                 var integrated = __moduleName__Module.integrated;
 
-                if (integrated.props.opcBound
-                    || !$('#opc-pay-button').length
-                    || typeof prestashop === 'undefined'
-                    || typeof prestashop.on !== 'function') {
+                if (!canBindOpcEvents(integrated.props.opcBound)) {
                     return;
                 }
                 integrated.props.opcBound = true;
@@ -1539,6 +1544,7 @@ var $document, $window, __moduleName__Module = {
             this.cta.init();
             this.required.init();
             this.checkout.init();
+            this.checkout.opc.bindEvents();
 
             oney.load();
 
@@ -1664,13 +1670,91 @@ var $document, $window, __moduleName__Module = {
         // single business_transaction_code — a legal requirement.
         checkout: {
             props: {
-                identifier: '__moduleName__OneyCheckout'
+                identifier: '__moduleName__OneyCheckout',
+                clickBound: false,
+                opcBound: false,
+                seq: 0,
             },
             init: function () {
-                var checkout = this;
+                this.bindGlobalClick();
+                this.mount();
+            },
+            // Mount each placeholder once per set of values: a placeholder re-rendered
+            // with another amount (One Page Checkout carrier/address change) is mounted
+            // again, an unchanged one is skipped.
+            mount: function () {
+                const checkout = __moduleName__Module.oney.checkout;
                 $('.' + checkout.props.identifier).each(function () {
-                    checkout.load($(this));
+                    const $placeholder = $(this),
+                        key = checkout.key($placeholder),
+                        previous_key = $placeholder.data('oneyKey');
+
+                    if (previous_key === key) {
+                        return;
+                    }
+                    if (previous_key) {
+                        // Reused node: clear the previous schedule, possibly hidden by a failed load.
+                        $placeholder.removeData('oneyKey oneyMount').empty().show();
+                    }
+                    // A mount id, not the key alone: the same values can come back on this node
+                    // while an earlier load for them is still pending.
+                    const mount = ++checkout.props.seq;
+
+                    $placeholder.data('oneyKey', key).data('oneyMount', mount);
+                    checkout.setMountId($placeholder, mount);
+                    checkout.load($placeholder);
                 });
+            },
+            // Oney fills the placeholder found by id when its own request completes: an id
+            // unique to each mount keeps the response of an earlier mount out of a newer render.
+            setMountId: function ($placeholder, mount) {
+                const base_id = __moduleName__Module.oney.checkout.baseId($placeholder);
+
+                if (base_id) {
+                    $placeholder.attr('id', base_id + '-mount-' + mount);
+                }
+            },
+            baseId: function ($placeholder) {
+                return ($placeholder.attr('id') || '').replace(/-mount-\d+$/, '');
+            },
+            key: function ($placeholder) {
+                return [
+                    __moduleName__Module.oney.checkout.baseId($placeholder),
+                    $placeholder.attr('data-business-transaction-code'),
+                    $placeholder.attr('data-payment-amount'),
+                    $placeholder.attr('data-country'),
+                    $placeholder.attr('data-merchant-guid'),
+                ].join('|');
+            },
+            isCurrent: function ($placeholder, key, mount) {
+                return document.body.contains($placeholder[0])
+                    && $placeholder.data('oneyKey') === key
+                    && $placeholder.data('oneyMount') === mount;
+            },
+            hideIfCurrent: function ($placeholder, key, mount) {
+                if (__moduleName__Module.oney.checkout.isCurrent($placeholder, key, mount)) {
+                    $placeholder.hide();
+                }
+            },
+            opc: {
+                bindEvents: function () {
+                    const checkout = __moduleName__Module.oney.checkout;
+
+                    if (!canBindOpcEvents(checkout.props.opcBound)) {
+                        return;
+                    }
+                    checkout.props.opcBound = true;
+
+                    prestashop.on('opcPaymentMethodsUpdated', function () {
+                        checkout.mount();
+                    });
+                },
+            },
+            bindGlobalClick: function () {
+                if (this.props.clickBound) {
+                    return;
+                }
+                this.props.clickBound = true;
 
                 // The Oney widget can detach its own popin from the DOM (as part of its
                 // close handler) before the click event finishes bubbling. When that
@@ -1693,15 +1777,21 @@ var $document, $window, __moduleName__Module = {
                 });
             },
             load: function ($placeholder) {
-                var id = $placeholder.attr('id'),
-                    business_transaction_code = $placeholder.data('business-transaction-code'),
-                    payment_amount = parseFloat($placeholder.data('payment-amount')),
+                const id = $placeholder.attr('id'),
+                    business_transaction_code = $placeholder.attr('data-business-transaction-code'),
+                    payment_amount = parseFloat($placeholder.attr('data-payment-amount')),
                     // The buyer's delivery country (and its matching merchant_guid) can
                     // differ from the shop's company_iso for multi-country merchants: use
                     // the same country server-side resolved the business_transaction_code
                     // for, not the shop-wide globals used by the PDP/cart pop-in.
-                    country = $placeholder.data('country'),
-                    merchant_guid = $placeholder.data('merchant-guid');
+                    country = $placeholder.attr('data-country'),
+                    merchant_guid = $placeholder.attr('data-merchant-guid'),
+                    key = $placeholder.data('oneyKey'),
+                    mount = $placeholder.data('oneyMount'),
+                    checkout = __moduleName__Module.oney.checkout,
+                    hide = function () {
+                        checkout.hideIfCurrent($placeholder, key, mount);
+                    };
 
                 if (!id || !business_transaction_code || !payment_amount || !country || !merchant_guid) {
                     return;
@@ -1709,6 +1799,10 @@ var $document, $window, __moduleName__Module = {
 
                 payplug_utilities.loadScript(window['__moduleName___oney_loader_url'], function () {
                     waitForOneyWidget(function () {
+                        // A placeholder replaced or remounted meanwhile has its own load.
+                        if (!checkout.isCurrent($placeholder, key, mount)) {
+                            return;
+                        }
                         oneyMerchantApp.loadCheckoutSection({
                             options: {
                                 country: country,
@@ -1718,20 +1812,18 @@ var $document, $window, __moduleName__Module = {
                                 filter_by: 'business_transaction_code',
                                 business_transaction_code: business_transaction_code,
                                 checkout_placeholder: '#' + id,
-                                errorCallback: function () {
-                                    $placeholder.hide();
-                                }
+                                errorCallback: hide
                             }
                         });
                     }, function () {
                         // oneyMerchantApp never showed up after the loader ran: hide the
                         // placeholder, the rest of the checkout stays usable.
-                        $placeholder.hide();
+                        hide();
                     });
                 }, function () {
                     // Oney unavailable (loader blocked/unreachable): hide the placeholder,
                     // the rest of the checkout (other payment methods) stays usable.
-                    $placeholder.hide();
+                    hide();
                 });
             },
         },
@@ -2159,10 +2251,7 @@ var $document, $window, __moduleName__Module = {
             bindEvents: function () {
                 var hosted = __moduleName__Module.hosted_fields;
 
-                if (hosted.props.opcBound
-                    || !$('#opc-pay-button').length
-                    || typeof prestashop === 'undefined'
-                    || typeof prestashop.on !== 'function') {
+                if (!canBindOpcEvents(hosted.props.opcBound)) {
                     return;
                 }
                 hosted.props.opcBound = true;
